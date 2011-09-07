@@ -14,8 +14,8 @@ import org.virbo.dataset.WritableDataSet;
  * @author jbf
  */
 public class TruncatedFloat extends BufferDataSet implements WritableDataSet {
-    public TruncatedFloat( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
-        super( rank, reclen, recoffs, len0, len1, len2, TRUNCATEDFLOAT, back );
+    public TruncatedFloat( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, ByteBuffer back ) {
+        super( rank, reclen, recoffs, len0, len1, len2, len3, TRUNCATEDFLOAT, back );
     }
 
     public double value() {

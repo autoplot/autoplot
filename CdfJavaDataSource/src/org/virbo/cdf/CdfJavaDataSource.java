@@ -372,6 +372,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
         }
 
+        
+if ( result.rank()==4 ) {
+    System.err.println("nn");
+}
+
+
+
+
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
             for (int idep = 0; idep < 3; idep++) {

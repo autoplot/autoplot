@@ -262,6 +262,7 @@ public class CdfUtil {
                     result= BufferDataSet.makeDataSet( qube.length, reclen, 0, qube[0],
                                 qube.length < 2 ? 1 : qube[1],
                                 qube.length < 3 ? 1 : qube[2],
+                                qube.length < 4 ? 1 : qube[3],
                                 aggBuffer, type );
                 } else {
                     throw new IllegalArgumentException("internal error unimplemented: "+variable.getType() );

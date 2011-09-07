@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 
 public class Short extends BufferDataSet {
 
-    public Short(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
-        super(rank, reclen, recoffs, len0, len1, len2, SHORT, back );
+    public Short(int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, ByteBuffer back ) {
+        super(rank, reclen, recoffs, len0, len1, len2, len3, SHORT, back );
     }
 
     public double value() {

@@ -378,9 +378,9 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
         if ( len1==-1 ) {
-            return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, bbuf );
+            return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, 1, bbuf );
         } else {
-            return new org.virbo.binarydatasource.Double( 2, len1*SIZE_DOUBLE, 0, points, len1, 1, bbuf );
+            return new org.virbo.binarydatasource.Double( 2, len1*SIZE_DOUBLE, 0, points, len1, 1, 1, bbuf );
         }
     }
 

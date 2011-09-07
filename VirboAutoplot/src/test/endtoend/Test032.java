@@ -193,7 +193,7 @@ public class Test032 {
 
         System.err.println( System.getProperty("java.version") + " " + System.getProperty("os.arch") );
         System.err.println( "C-based library version: " + CDF.getLibraryVersion() );
-        
+test3();
         test1();
         test1_b();
         test2();

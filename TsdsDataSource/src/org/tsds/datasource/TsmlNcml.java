@@ -386,10 +386,10 @@ public class TsmlNcml {
 
         if (len1 == -1) {
             int points = bbuf.limit() / BufferDataSet.byteCount(type);
-            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(1, BufferDataSet.byteCount(type), 0, points, 1, 1, bbuf, type);
+            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(1, BufferDataSet.byteCount(type), 0, points, 1, 1, 1, bbuf, type);
         } else {
             int points = bbuf.limit() / len1 / BufferDataSet.byteCount(type);
-            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(RANK_LIMIT, len1 * BufferDataSet.byteCount(type), 0, points, len1, 1, bbuf, type);
+            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(RANK_LIMIT, len1 * BufferDataSet.byteCount(type), 0, points, len1, 1, 1, bbuf, type);
         }
     }
 }

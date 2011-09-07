@@ -248,9 +248,9 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( rank2[0]<0 ) {
                 rank2[0]= fieldCount + rank2[0];
             }
-            ds= BufferDataSet.makeDataSet( 2, recSizeBytes, recOffset, frecCount, rank2[1]-rank2[0], 1, buf, columnType );
+            ds= BufferDataSet.makeDataSet( 2, recSizeBytes, recOffset, frecCount, rank2[1]-rank2[0], 1, 1, buf, columnType );
         } else {
-            ds= BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, buf, columnType );
+            ds= BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, 1, buf, columnType );
         }
 
         if (dep0 > -1 || dep0Offset > -1 ) {
@@ -265,7 +265,7 @@ public class BinaryDataSource extends AbstractDataSource {
                     dep0Offset= ((int[])recFormatParse[0])[dep0];
                 }
             }
-            QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, buf, dep0Type );
+            QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, 1, buf, dep0Type );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
             boolean reportOffset= !( getParameter( "reportOffset", "no" ).equals("no") );

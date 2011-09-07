@@ -47,7 +47,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         BufferDataSet ddata = BufferDataSet.makeDataSet(1,
                 recSize, dep0Len * typeSize,
-                data.length(), 1, 1,
+                data.length(), 1, 1, 1,
                 result, type);
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
@@ -60,7 +60,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if (dep0 != null) {
             BufferDataSet ddep0 = BufferDataSet.makeDataSet(1,
                     recSize, 0 * typeSize,
-                    data.length(), 1, 1,
+                    data.length(), 1, 1, 1,
                     result, type);
             it = new QubeDataSetIterator(dep0);
 
@@ -94,7 +94,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         BufferDataSet ddata = BufferDataSet.makeDataSet( 2,
                 recSize, dep0Len * typeSize,
-                data.length(), data.length(0), 1,
+                data.length(), data.length(0), 1, 1,
                 result, type);
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);

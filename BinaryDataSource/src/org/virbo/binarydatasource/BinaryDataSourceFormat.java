@@ -52,7 +52,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         result.order( "big".equals( params.get("byteOrder") ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
         
         BufferDataSet ddata= BufferDataSet.makeDataSet( 2, recSize, dep0Len * typeSize, 
-                data.length(), data.length(0), 1, 
+                data.length(), data.length(0), 1, 1,
                 result, type );
         /*Double ddata= new Double( 2, 
                 recSize, dep0Len * typeSize, 
@@ -69,7 +69,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         if ( dep0!=null ) {
             BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
                 recSize, 0 * typeSize, 
-                data.length(), data.length(0), 1,
+                data.length(), data.length(0), 1, 1,
                 result, type );
           /*  Double ddep0= new Double( 1,
                 recSize, 0 * typeSize, 
@@ -104,7 +104,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         
         BufferDataSet ddata= BufferDataSet.makeDataSet( 1, 
                 recSize, dep0Len*typeSize, 
-                data.length(), 1, 1,
+                data.length(), 1, 1, 1,
                 result, type );
         
         QubeDataSetIterator it= new QubeDataSetIterator(data);
@@ -117,7 +117,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         if ( dep0!=null ) {
             BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
                 recSize, 0*typeSize, 
-                data.length(), 1, 1, 
+                data.length(), 1, 1, 1, 
                 result, type );
             it= new QubeDataSetIterator(dep0);
         

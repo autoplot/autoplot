@@ -20,6 +20,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     int len0;
     int len1;
     int len2;
+    int len3;
     
     
     /**
@@ -98,35 +99,53 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
      * @return
      */
-    public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, Object type ) {
+    public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, ByteBuffer buf, Object type ) {
         BufferDataSet result;
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
         if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type); 
         if ( reclen * len0 > buf.limit() ) throw new IllegalArgumentException( String.format( "buffer length (%d bytes) is too small to contain data (%d %d-byte records)", buf.limit(), len0, reclen ) );
         if ( type.equals(DOUBLE) ) {
-            result=new Double( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new Double( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(FLOAT) ) {
-            result=new  Float( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Float( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(LONG) ) {
-            result=new  Long( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Long( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(INT) ) {
-            result=new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Int( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(UINT) ) {
-            result=new  UInt( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  UInt( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(SHORT) ) {
-            result=new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Short( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(USHORT) ) {
-            result=new  UShort( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  UShort( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(TRUNCATEDFLOAT) ) {
-            result=new  TruncatedFloat( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  TruncatedFloat( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(BYTE) ) {
-            result=new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Byte( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if (type.equals(UBYTE) ) {
-            result=new UByte( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new UByte( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else {
             throw new IllegalArgumentException("bad data type: "+type);
         }
         return result;
+    }
+
+    /**
+     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:
+     *   rank 1 dataset may not have len1>1.
+     *   reclen cannot be shorter than the byte length of the field type.
+     * @param rank
+     * @param reclen  length in bytes of each record
+     * @param recoffs  byte offet of each record
+     * @param len0   number of elements in the first index
+     * @param len1   number of elements in the second index
+     * @param len2   number of elements in the third index
+     * @param back   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
+     * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
+     * @return
+     */
+    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
+        this( rank, reclen, recoffs, len0, len1, len2, 11, type, back );
     }
 
     /**
@@ -139,11 +158,12 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param len0   number of elements in the first index
      * @param len1   number of elements in the second index
      * @param len2   number of elements in the third index
+     * @param len3   number of elements in the fourth index
      * @param back   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
      * @return
      */
-    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
+    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, Object type, ByteBuffer back  ) {
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
         if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type);
 
@@ -154,6 +174,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         this.len0 = len0;
         this.len1 = len1;
         this.len2 = len2;
+        this.len3 = len3;
         this.type= type;
         this.fieldLen= byteCount(type);
         if ( rank>1 ) {
@@ -190,7 +211,11 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         return len2;
     }
 
-    protected void rangeCheck(int i0, int i1, int i2) {
+    @Override
+    public int length(int i0, int i1, int i2) {
+        return len3;
+    }
+    protected void rangeCheck(int i0, int i1, int i2, int i3) {
         if (i0 < 0 || i0 >= len0) {
             throw new IndexOutOfBoundsException("i0=" + i0 + " " + this.toString());
         }
@@ -199,6 +224,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         }
         if (i2 < 0 || i2 >= len2) {
             throw new IndexOutOfBoundsException("i2=" + i2 + " " + this.toString());
+        }
+        if (i3 < 0 || i3 >= len3) {
+            throw new IndexOutOfBoundsException("i3=" + i3 + " " + this.toString());
         }
 
     }
@@ -220,7 +248,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     protected int offset(int i0 ) {
         if ( this.rank!=1 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
-            rangeCheck(i0, 0, 0);
+            rangeCheck(i0, 0, 0, 0 );
         }
         return recoffset + reclen * i0;
     }
@@ -234,7 +262,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     protected int offset(int i0, int i1 ) {
         if ( this.rank!=2 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
-            rangeCheck(i0, i1, 0);
+            rangeCheck(i0, i1, 0, 0 );
         }        
         return  recoffset + reclen * i0 + i1 * fieldLen;
     }
@@ -249,11 +277,25 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     protected int offset(int i0, int i1, int i2) {
         if ( this.rank!=3 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
-            rangeCheck(i0, i1, i2);
+            rangeCheck(i0, i1, i2, 0);
         }
         return recoffset + reclen * i0 + i1 * fieldLen * len2  + i2 * fieldLen ;
     }
 
+    /**
+     * return the offset, in bytes, of the element.
+     * @param i0
+     * @param i1
+     * @param i2
+     * @return the offset, in bytes, of the element.
+     */
+    protected int offset(int i0, int i1, int i2, int i3 ) {
+        if ( this.rank!=4 ) throw new IllegalArgumentException("rank error");
+        if (RANGE_CHECK) {
+            rangeCheck(i0, i1, i2, i3);
+        }
+        return recoffset + reclen * i0 + i1 * fieldLen * len2  + i2 * fieldLen ;
+    }
 
     @Override
     public abstract double value();
@@ -277,7 +319,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      */
     @Override
     public QDataSet trim( int ist, int ien ) {
-        return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, back, type );
+        return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, len3, back, type );
     }
 
     /*public BufferDataSet slice( int i0 ) {
