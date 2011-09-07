@@ -1,6 +1,6 @@
 angle= linspace( -PI,PI,40 )
 rad= linspace( 1, 5, 20 )
-dist= randn( 40, 20 )
+dist= ripples( 40, 20 )
 
 #plotx( angle, rad, dist )
 result= link(  angle, rad, dist )
