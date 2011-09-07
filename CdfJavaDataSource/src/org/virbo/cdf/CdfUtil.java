@@ -11,12 +11,14 @@ package org.virbo.cdf;
 import gov.nasa.gsfc.voyager.cdf.Attribute;
 import gov.nasa.gsfc.voyager.cdf.CDF;
 import gov.nasa.gsfc.voyager.cdf.Variable;
+import gov.nasa.gsfc.voyager.cdf.VariableDataLocator;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +31,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSourceUtil;
@@ -150,16 +150,32 @@ public class CdfUtil {
 
         //CDFData cdfData= CDFData.get( variable, recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals, false );
         Object odata=null;
-        ByteBuffer buf=null;
+        ByteBuffer[] buf=null;
+        boolean useBuf= true;  // switch to turn NIO use on/off
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
-                if ( false && ( variable.getType()==44 || variable.getType()==21 ) ) {
+                if ( useBuf && variable.rowMajority() && ( variable.getType()==44 || variable.getType()==21 ) ) {
                     //buf= Extractor.get1DSeriesNio( cdf, variable, null);
                     //odata= cdf.get1D( variable.getName() );
+                    VariableDataLocator loc= variable.getLocator();
+                    int[][] intloc= loc.getLocations();
+                    ByteBuffer buff= variable.getBuffer();
+
+                    buf= new ByteBuffer[intloc.length];
+                    // use to test: vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/cris_h2/2011/ac_h2_cris_20110802_v05.cdf?flux_B (158701 bytes)
+                    for ( int part=0; part<intloc.length; part++ ) {
+                        int nrec= intloc[part][1]-intloc[part][0] + 1;
+                        int reclen= variable.getDataItemSize();
+                        buff.limit( intloc[part][2] + nrec*reclen );
+                        buff.position(intloc[part][2]);
+                        Buffer chunk= buff.slice();
+                        buf[part]= (ByteBuffer)chunk;
+                    }
+                    //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
                     System.err.println("reading variable "+variable.getName());
                     odata= cdf.get1D( variable.getName() ); // this is my hack
@@ -220,7 +236,7 @@ public class CdfUtil {
         if ( variable.rowMajority()==false ) buf= null;   // we won't support this yet.
 
         if ( variable.rowMajority()  ) {
-            if ( buf!=null ) {
+            if ( useBuf && buf!=null ) {
                 if ( variable.getType()==CDFConstants.CDF_FLOAT || variable.getType()==CDFConstants.CDF_REAL4 ) {
                     int reclen= 1;
                     for ( int i=1; i<qube.length; i++ ) reclen*= qube[i];
@@ -237,10 +253,16 @@ public class CdfUtil {
                     }
                     reclen= reclen * BufferDataSet.byteCount(type);
 
+                    ByteBuffer aggBuffer= ByteBuffer.allocate(reclen*qube[0]);
+                    for ( int i=0; i<buf.length; i++ ) {
+                        aggBuffer.put(buf[i]);
+                    }
+                    aggBuffer.flip();
+
                     result= BufferDataSet.makeDataSet( qube.length, reclen, 0, qube[0],
                                 qube.length < 2 ? 1 : qube[1],
                                 qube.length < 3 ? 1 : qube[2],
-                                buf, type );
+                                aggBuffer, type );
                 } else {
                     throw new IllegalArgumentException("internal error unimplemented: "+variable.getType() );
                 }

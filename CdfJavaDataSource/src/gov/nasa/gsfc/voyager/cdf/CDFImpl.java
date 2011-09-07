@@ -482,8 +482,12 @@ public abstract class CDFImpl implements java.io.Serializable {
             // PadValue immediately follows DimVarys
             if (padValueSpecified()) {
                 int padValueSize = getDataItemSize()/dataItemSize;
-                padValue = getNumberAttribute(type, padValueSize, _buf,
+                if ( DataTypes.method[type]==null ) {
+                    padValue=null;
+                } else {
+                    padValue = getNumberAttribute(type, padValueSize, _buf,
                     byteOrder);
+                }
             }
             // ignore numberOfElements for numeric data types
             if (DataTypes.isStringType(type)) dataItemSize *= numberOfElements;
@@ -511,6 +515,15 @@ public abstract class CDFImpl implements java.io.Serializable {
             VariableDataBuffer[] vdbuf = new VariableDataBuffer[dbufs.size()];
             dbufs.toArray(vdbuf);
             return vdbuf;
+        }
+        /**
+         * return a ByteBuffer that directly accesses the data.
+         * DO NOT mutate this, this is probably backed by the file on disk.
+         * @return read-only byte buffer
+         */
+        public ByteBuffer getBuffer() {
+            ByteBuffer result= buf.duplicate();
+            return result.asReadOnlyBuffer();
         }
 
         /**

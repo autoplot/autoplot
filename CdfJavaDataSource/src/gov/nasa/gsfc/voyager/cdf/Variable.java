@@ -1,4 +1,5 @@
 package gov.nasa.gsfc.voyager.cdf;
+import java.nio.ByteBuffer;
 import java.util.*;
 /**
  * Interface that defines methods for getting  properties of
@@ -84,6 +85,13 @@ public interface Variable {
      * and offset of the start of region.
      */
     public VariableDataLocator getLocator();
+
+    /**
+     * return the buffer containing the variable, to be used with locator.
+     * @return
+     */
+    public ByteBuffer getBuffer();
+
     /**
      * Gets an array of VariableDataBuffer objects that provide location of
      * data for this variable if this variable is not compressed. This method
