@@ -209,6 +209,7 @@ public class CdfUtil {
             dimSizes= new int[0];
         }
 
+        
         int[] qube;
         if ( recCount==-1 ) {
             qube= new int[ dimSizes.length ];
