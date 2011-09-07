@@ -797,6 +797,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, doyCB, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_USE_TIME_RANGE_EDITOR, timeRangeSelectorMenuItem, "selected" );
                 bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                 bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
                 bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, timeRangeEditor, "useDoy" );
@@ -1399,8 +1400,8 @@ APSplash.checkTime("init 52");
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
-        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
-        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        dataSetSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
+        timeRangeSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
         jMenu4 = new javax.swing.JMenu();
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -1704,26 +1705,26 @@ APSplash.checkTime("init 52");
 
         jMenu5.setText("Address Bar");
 
-        jRadioButtonMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
-        addressBarButtonGroup.add(jRadioButtonMenuItem1);
-        jRadioButtonMenuItem1.setSelected(true);
-        jRadioButtonMenuItem1.setText("Data Set Selector");
-        jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        dataSetSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
+        addressBarButtonGroup.add(dataSetSelectorMenuItem);
+        dataSetSelectorMenuItem.setSelected(true);
+        dataSetSelectorMenuItem.setText("Data Set Selector");
+        dataSetSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonMenuItem1ActionPerformed(evt);
+                dataSetSelectorMenuItemActionPerformed(evt);
             }
         });
-        jMenu5.add(jRadioButtonMenuItem1);
+        jMenu5.add(dataSetSelectorMenuItem);
 
-        jRadioButtonMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
-        addressBarButtonGroup.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setText("Time Range Selector");
-        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        timeRangeSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
+        addressBarButtonGroup.add(timeRangeSelectorMenuItem);
+        timeRangeSelectorMenuItem.setText("Time Range Selector");
+        timeRangeSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonMenuItem2ActionPerformed(evt);
+                timeRangeSelectorMenuItemActionPerformed(evt);
             }
         });
-        jMenu5.add(jRadioButtonMenuItem2);
+        jMenu5.add(timeRangeSelectorMenuItem);
 
         optionsMenu.add(jMenu5);
 
@@ -1914,28 +1915,28 @@ APSplash.checkTime("init 52");
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE))
+                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(4, 4, 4)
-                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)))
+                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE)))
                 .addContainerGap())
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 570, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 578, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -2266,19 +2267,19 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
-private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-    if ( jRadioButtonMenuItem1.isSelected() ) {
+private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorMenuItemActionPerformed
+    if ( dataSetSelectorMenuItem.isSelected() ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
         dom.getOptions().setUseTimeRangeEditor(false);
     }
-}//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
+}//GEN-LAST:event_dataSetSelectorMenuItemActionPerformed
 
-private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-    if ( jRadioButtonMenuItem2.isSelected() ) {
+private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeSelectorMenuItemActionPerformed
+    if ( timeRangeSelectorMenuItem.isSelected() ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
         dom.getOptions().setUseTimeRangeEditor(true);
     }
-}//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
+}//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -2620,6 +2621,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem createPngWalkMenuItem;
     private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
+    private javax.swing.JRadioButtonMenuItem dataSetSelectorMenuItem;
     private javax.swing.JMenuItem decodeURLItem;
     private javax.swing.JCheckBoxMenuItem doyCB;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
@@ -2644,8 +2646,6 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -2671,6 +2671,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JPanel tabbedPanelContainer;
     private javax.swing.JCheckBoxMenuItem textAntiAlias;
     private javax.swing.JPanel timeRangePanel;
+    private javax.swing.JRadioButtonMenuItem timeRangeSelectorMenuItem;
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
