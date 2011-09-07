@@ -1168,7 +1168,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             boolean isRichHeader = AsciiParser.isRichHeader(p.header);
             if (isRichHeader) {
                 try {
-                    AsciiHeadersParser.parseMetadata(p.header, new String[p.fieldCount()]);
+                    String[] columns=  new String[p.fieldCount()];
+                    for ( int i=0; i<columns.length; i++ )  columns[i]="";
+                    AsciiHeadersParser.parseMetadata(p.header,columns);
                 } catch (ParseException ex) {
                     Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
                     richHeaderWarn = ex;
