@@ -40,6 +40,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.util.TickleTimer;
 
 /**
  * PlotElement for controlling how data is handled.
@@ -103,13 +104,27 @@ public class DataPanel extends javax.swing.JPanel {
         ActionMap am= componentTextField.getActionMap();
         am.put( "INCREMENT_UP", new AbstractAction("incr_up") {
             public void actionPerformed(ActionEvent e) {
-                doIncrUp(1);
+                incrUpCount++;
+                if ( System.currentTimeMillis()-lastIncrUp > 300 ) {
+                    doIncrUp(incrUpCount);
+                    incrUpCount=0;
+                    lastIncrUp=  System.currentTimeMillis();
+                } else {
+                    tt.tickle("incr");
+                }
             }
         } );
         
         am.put( "INCREMENT_DOWN", new AbstractAction("incr_down") {
             public void actionPerformed(ActionEvent e) {
-                doIncrUp(-1);
+                incrUpCount--;
+                if ( System.currentTimeMillis()-lastIncrUp > 300 ) {
+                    doIncrUp(incrUpCount);
+                    incrUpCount=0;
+                    lastIncrUp=  System.currentTimeMillis();
+                } else {
+                    tt.tickle("incr");
+                }
             }
         } );
 
@@ -134,6 +149,19 @@ public class DataPanel extends javax.swing.JPanel {
             applicationController.getPlotElement().setComponent( componentTextField.getText() );
             componentTextField.setCaretPosition(cp);
     }
+
+    private long lastIncrUp=0;
+    private int incrUpCount=0; // number to send to incrUp
+
+    TickleTimer tt= new TickleTimer( 100, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( incrUpCount!=0 ) {
+                doIncrUp(incrUpCount);
+                incrUpCount= 0;
+                lastIncrUp=  System.currentTimeMillis();
+            }
+        }
+    } );
 
 
     public void doBindings() {
@@ -437,7 +465,7 @@ public class DataPanel extends javax.swing.JPanel {
         jLabel3.setText("Operations:");
         jLabel3.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
 
-        componentTextField.setText("jTextField1");
+        componentTextField.setText(" ");
         componentTextField.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         componentTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
