@@ -209,16 +209,6 @@ public class CdfUtil {
             dimSizes= new int[0];
         }
 
-        //kludge: in library, where majority has no effect on dimSizes.  See
-        if ( ! variable.rowMajority()  ) {
-            int n= dimSizes.length;
-            for ( int i=0; i<n/2; i++ ) {
-                int t= dimSizes[i];
-                dimSizes[i]= dimSizes[n-i-1];
-                dimSizes[n-i-1]= t;
-            }
-        }
-
         int[] qube;
         if ( recCount==-1 ) {
             qube= new int[ dimSizes.length ];
