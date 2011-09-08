@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Data from HDF5 file.  I found this when looking for HDF5s to plot.</small></p>
+        <p><small>Pngwalk tool now supports nested folders like $Y$m$d/$H.  Also a new command-line version is introduced...</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -24,6 +24,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <ul>
             <li>bugfix: digitizing script works again</li>
             <li>bugfix: use Ops.safeName to create a filename for a temporary download.</li>
+            <li>bugfix: rich headers RENDER_TYPE=spectrogram</li>
+            <li>PitchAngleDistribution works again, handles fill, and minds both the x and y axes.</li>
+            <li>Many others...</li>
         </ul>
         <p>Older bugfixes:</p>
         <ul>
@@ -42,6 +45,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Features:</p>
         <ul>
+            <li>create/use pngwalks with nested folders ($Y/$m$d)</li>
+            <li>BinaryDataSource supports rank 4 data</li>
+            <li>More rigorous testing of cdf support.</li>
             <li>scripting waitUntilIdle command</li>
             <li>scripting getParam improvements and downloadResourceAsTempFile brought over from 2011 branch.</li>
             <li>improve filesystem completions for action triggers like "pngwalk:/home/jbf/COMP"</li>
