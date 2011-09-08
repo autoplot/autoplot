@@ -172,8 +172,11 @@ public class Test032 {
         //test1_dump( ds1 );
 
         System.err.println( "java =" + ds1 );
-        test1_dump( ds1.slice(2) );
         System.err.println( "   c =" + ds2 );
+
+        System.err.println( "=== java " + ds1 + " ===");
+        test1_dump( ds1.slice(2) );
+        System.err.println( "===    c " + ds2 + " ===");
         test1_dump( ds2.slice(2) );
 
         System.err.println( "== row major slice(2) ==" );
