@@ -51,6 +51,11 @@ public class CreatePngWalk {
         OutputStream out=null;
         BufferedImage image=null;
         try {
+            File outf= new File( filename );
+            File parentf= outf.getParentFile();
+            if ( parentf!=null && !parentf.exists() ) {
+                parentf.mkdirs();
+            }
             out= new java.io.FileOutputStream(filename);
             image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
             DasPNGEncoder encoder = new DasPNGEncoder();
@@ -159,7 +164,12 @@ public class CreatePngWalk {
             BufferedImage image = myWriteToPng(String.format("%s%s_%s.png", params.outputFolder, params.product, i), appmodel, dom2, w0, h0);
             if (params.createThumbs) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                ImageIO.write(thumb400, "png", new java.io.File(String.format("%sthumbs400/%s_%s.png", params.outputFolder, params.product, i)));
+                File outf= new java.io.File(String.format("%sthumbs400/%s_%s.png", params.outputFolder, params.product, i) );
+                File parentf= outf.getParentFile();
+                if ( parentf!=null && !parentf.exists() ) {
+                    parentf.mkdirs();
+                }
+                ImageIO.write(thumb400, "png", outf );
             }
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
             //etaSec= (n-count) / imagesPerSec

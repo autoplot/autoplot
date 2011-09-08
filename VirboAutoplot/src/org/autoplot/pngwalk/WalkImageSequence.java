@@ -15,6 +15,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
@@ -101,8 +102,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
             }
         }
 
+        int splitIndex= WalkUtil.splitIndex( template );
+
         URI fsRoot;
-        fsRoot = DataSetURI.getResourceURI( URISplit.parse(template).path );
+        fsRoot = DataSetURI.getResourceURI( template.substring(0,splitIndex) );
+
         try {
             FileSystem fs= FileSystem.create( fsRoot );
             if ( fs.getFileObject("/thumbs400/").exists() ) {
