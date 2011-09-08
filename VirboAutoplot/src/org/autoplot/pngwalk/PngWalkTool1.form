@@ -35,15 +35,15 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="dataSetSelector1" alignment="0" pref="870" max="32767" attributes="0"/>
+                  <Component id="dataSetSelector1" alignment="0" pref="894" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="statusLabel" pref="882" max="32767" attributes="1"/>
+              <Component id="statusLabel" pref="906" max="32767" attributes="1"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="pngsPanel" alignment="1" pref="894" max="32767" attributes="0"/>
+          <Component id="pngsPanel" alignment="1" pref="918" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

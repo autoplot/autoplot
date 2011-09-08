@@ -14,30 +14,30 @@ package org.autoplot.pngwalk;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultFocusManager;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -59,6 +59,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 import org.das2.datum.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -72,6 +73,8 @@ import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.FileSystemUtil;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -149,11 +152,35 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
     }
 
+    private static String readPngwalkFile( String template ) {
+        URISplit split= URISplit.parse(template);
+        try {
+            Properties p= new Properties();
+            File local= FileSystemUtil.doDownload( split.file, new NullProgressMonitor() );
+            p.load( new FileInputStream( local ) );
+            String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") + ".png";
+            template= t;
+        } catch (FileSystemOfflineException ex) {
+            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            throw new IllegalArgumentException("File does not exist: "+template);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+        return template;
+
+    }
     public static PngWalkTool1 start( String template, final Window parent ) {
 
         final PngWalkTool1 tool = new PngWalkTool1();
 
         if ( template!=null ) {
+            if ( template.endsWith(".pngwalk") ) {
+                template= readPngwalkFile(template);
+            }
             tool.setTemplate(template);
         } 
 
@@ -375,6 +402,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         dataSetSelector1.setEnableDataSource(false);
         dataSetSelector1.setAcceptPattern("(?i).*(\\.gif|\\.png|\\.jpg)");
         dataSetSelector1.setSuggestFiles(false); // only aggs.
+        dataSetSelector1.registerActionTrigger( ".*\\.pngwalk", new AbstractAction("pngwalk") {
+            public void actionPerformed( ActionEvent ev ) {
+                String template= dataSetSelector1.getValue();
+                if ( template.endsWith(".pngwalk") ) {
+                   template= readPngwalkFile(template);
+                }
+                setTemplate(template);
+            }
+        });
 
         views= new PngWalkView[7];
 
@@ -976,7 +1012,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     }//GEN-LAST:event_jumpToFirstButtonActionPerformed
 
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
-        setTemplate( dataSetSelector1.getValue() );
+        String t= dataSetSelector1.getValue();
+        if ( t.endsWith(".pngwalk") ) {
+            t= readPngwalkFile(t);
+        }
+        setTemplate( t );
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
 
     private void showMissingCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_showMissingCheckBoxItemStateChanged
