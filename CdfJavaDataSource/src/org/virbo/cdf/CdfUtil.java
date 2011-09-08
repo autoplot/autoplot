@@ -151,7 +151,7 @@ public class CdfUtil {
         //CDFData cdfData= CDFData.get( variable, recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals, false );
         Object odata=null;
         ByteBuffer[] buf=null;
-        boolean useBuf= true;  // switch to turn NIO use on/off
+        boolean useBuf= false;  // switch to turn NIO use on/off
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
@@ -209,6 +209,15 @@ public class CdfUtil {
             dimSizes= new int[0];
         }
 
+        //kludge: in library, where majority has no effect on dimSizes.  See
+        if ( ! variable.rowMajority()  ) {
+            int n= dimSizes.length;
+            for ( int i=0; i<n/2; i++ ) {
+                int t= dimSizes[i];
+                dimSizes[i]= dimSizes[n-i-1];
+                dimSizes[n-i-1]= t;
+            }
+        }
         
         int[] qube;
         if ( recCount==-1 ) {
@@ -263,16 +272,18 @@ public class CdfUtil {
             }
         } else {
             if ( recCount==-1 ) {
-                if ( qube.length==2 ) {
-                    int tr= qube[1];
-                    qube[1]= qube[0];
-                    qube[0]= tr;                    
-                } else if ( qube.length==3 ) {
-                    int tr= qube[2];
-                    qube[2]= qube[0];
-                    qube[0]= tr;
-                } else if ( qube.length>4 ) {
-                    throw new IllegalArgumentException("rank limit");
+                if ( true ) { //TODO: looks to me like there are two transposes here, see above
+                    if ( qube.length==2 ) {
+                        int tr= qube[1];
+                        qube[1]= qube[0];
+                        qube[0]= tr;
+                    } else if ( qube.length==3 ) {
+                        int tr= qube[2];
+                        qube[2]= qube[0];
+                        qube[0]= tr;
+                    } else if ( qube.length>4 ) {
+                        throw new IllegalArgumentException("rank limit");
+                    }
                 }
                 int [] qqube= new int[qube.length+1];
                 qqube[0]= 1;
@@ -280,18 +291,20 @@ public class CdfUtil {
                 //result= TrArrayDataSet.wrap( odata, qqube, false );
                 result= (MutablePropertyDataSet) TrDDataSet.wrap( (double[]) odata, qqube).slice(0);
             } else {
-                if ( qube.length==3 ) {
-                    int tr= qube[2];
-                    qube[2]= qube[1];
-                    qube[1]= tr;
-                } else if ( qube.length==4 ) {
-                    int tr= qube[3];
-                    qube[3]= qube[1];
-                    qube[1]= tr;
-                } else if ( qube.length>4 ) {
-                    throw new IllegalArgumentException("rank limit");
+                if ( true ) {
+                    if ( qube.length==3 ) {
+                        int tr= qube[2];
+                        qube[2]= qube[1];
+                        qube[1]= tr;
+                    } else if ( qube.length==4 ) {
+                        int tr= qube[3];
+                        qube[3]= qube[1];
+                        qube[1]= tr;
+                    } else if ( qube.length>4 ) {
+                        throw new IllegalArgumentException("rank limit");
+                    }
                 }
-                result= ArrayDataSet.wrap( odata, qube, false );
+                result= TrArrayDataSet.wrap( odata, qube, false );
             }
         }
 
