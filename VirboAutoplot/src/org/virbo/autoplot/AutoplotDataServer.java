@@ -90,7 +90,7 @@ public class AutoplotDataServer {
 
         long t0= System.currentTimeMillis();
 
-        System.err.println("org.virbo.autoplot.AutoplotDataServer " + APSplash.getVersion() + " 20110217_1441");
+        System.err.println("org.virbo.autoplot.AutoplotDataServer " + APSplash.getVersion() + " 20110902");
 
         ArgumentList alm = new ArgumentList("AutoplotServer");
         alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
@@ -107,7 +107,7 @@ public class AutoplotDataServer {
 
         String timeRange = alm.getValue("timeRange");
 
-        String step = "1 days";
+        String step = "3600 s";
 
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
@@ -195,7 +195,7 @@ public class AutoplotDataServer {
             DatumRange outer= DatumRangeUtil.parseTimeRange(timeRange);
 
             Datum first= TimeUtil.prevMidnight( outer.min() );
-            Datum next= first.add( Units.days.parse(step) );
+            Datum next= first.add( Units.seconds.parse(step) );
 
             List<DatumRange> drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
 
@@ -208,6 +208,7 @@ public class AutoplotDataServer {
 
                 //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
                 //TODO: find a way to test for this and give a good error message.
+                System.err.println( String.format( "getDataSet('%s','%s')", suri, dr ) );
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 if ( ds1!=null ) {
                     QDataSet range= DataSetOps.dependBounds( ds1 );
