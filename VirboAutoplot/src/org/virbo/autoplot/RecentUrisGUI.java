@@ -176,6 +176,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     while (scan.hasNextLine()) {
                         String line = scan.nextLine();
                         String[] ss= line.split("\\s+",2);
+                        if ( ss.length<2 ) {
+                            continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
+                        }
                         try {
                             if ( filt!=null && !ss[1].contains(filt) ) {
                                 continue;
