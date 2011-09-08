@@ -482,6 +482,20 @@ public class PlotElementController extends DomNodeController {
                     PlotController pc= plot.getController();
                     pc.doPlotElementDefaultsUnitsChange(plotElement);
                 }
+                QDataSet context= (QDataSet) fillDs.property(QDataSet.CONTEXT_0);
+                if ( context!=null ) {
+                    DatumRange cdr;
+                    if ( context.rank()==1 ) {
+                        cdr= DataSetUtil.asDatumRange( context, true );
+                    } else {
+                        cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
+                    }
+                    Plot plot= this.dom.getController().getPlotFor(plotElement);
+                    plot.setContext( cdr ); //TODO: this is really backwards, this is intended to be a controller, not a display.
+                } else {
+                    // TODO: ???
+                }
+
             }
             _setDataSet(fillDs);
         } catch ( RuntimeException ex ) {
