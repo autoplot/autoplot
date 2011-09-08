@@ -301,6 +301,13 @@ public class AutoplotUI extends javax.swing.JFrame {
                 //do nothing
             }
         });
+        dataSetSelector.registerActionTrigger( "(.*)\\.pngwalk", new AbstractAction( "pngwalk") {
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                String pngwalk= dataSetSelector.getValue();
+                PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                applicationModel.addRecent(dataSetSelector.getValue());
+            }
+        });
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( "script") {
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
