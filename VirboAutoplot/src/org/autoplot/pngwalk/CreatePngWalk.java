@@ -22,13 +22,12 @@ import org.das2.components.DasProgressPanel;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
+import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.state.StatePersistence;
 
 /**
@@ -238,5 +237,30 @@ public class CreatePngWalk {
 
         }
 
+    }
+
+    public static void main( String[] args ) throws InterruptedException, ParseException, IOException {
+        final ArgumentList alm = new ArgumentList("CreatePngWalk");
+        alm.addOptionalSwitchArgument( "timeFormat", "f", "timeFormat", "$Y$m$d", "timeformat for png files, e.g. $Y is year, $j is day of year");
+        alm.addSwitchArgument( "timeRange", "r", "timeRange", "time range to cover, e.g. 2011 through 2012" );
+        alm.addOptionalSwitchArgument( "createThumbs", "t", "createThumbs", "y", "create thumbnails, y (default) or n" );
+        alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
+        alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
+        alm.addSwitchArgument( "vap", "v", "vap", "vap file or URI to plot");
+        alm.process(args);
+
+        Params params= new Params();
+        params.createThumbs= alm.getValue("createThumbs").equals("y");
+        params.outputFolder= alm.getValue("outputFolder");
+        params.product= alm.getValue("product");
+        params.timeFormat= alm.getValue("timeFormat");
+        params.timeRangeStr= alm.getValue("timeRange");
+        
+        String vap= alm.getValue("vap");
+        ScriptContext.plot(vap);
+
+        doIt( ScriptContext.getDocumentModel(), params );
+
+        System.exit(0); // something starts up thread that prevents java from exiting.
     }
 }
