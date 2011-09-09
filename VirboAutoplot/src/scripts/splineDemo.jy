@@ -3,7 +3,7 @@
 
 from org.apache.commons.math.analysis.interpolation import SplineInterpolator
 
-x= coerce( [ 2., 3., 4. ] )
+x= dataset( [ 2., 3., 4. ] )
 y= (x-3)**2
 
 si= SplineInterpolator()
