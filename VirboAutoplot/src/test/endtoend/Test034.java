@@ -14,6 +14,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 /**
  * Test tool to simulate more sophistocated GUI operations
+ * See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
  * @author jbf
  */
 public class Test034 {
@@ -50,6 +51,17 @@ public class Test034 {
         writeToPng( "test034_003.png" );
     }
 
+    private static void test004() throws Exception {
+        reset();
+        Application dom= getDocumentModel();
+        plot( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+        writeToPng( "test034_004a.png" );
+        DatumRange tr= dom.getTimeRange();
+        tr= DatumRangeUtil.rescale( tr, -0.7, 0.3 );
+        dom.setTimeRange(tr);
+        writeToPng( "test034_004b.png" );
+    }
+
     public static void main( String[] args ) throws Exception {
 
         long t0;
@@ -68,6 +80,11 @@ public class Test034 {
         test003();
         System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
         
+        t0= System.currentTimeMillis();
+        // this shows hidden TSB, where bottom two panels listen to the dom.timeRange to filter what they see.
+        test004();
+        System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+
         System.exit(0);
     }
 }
