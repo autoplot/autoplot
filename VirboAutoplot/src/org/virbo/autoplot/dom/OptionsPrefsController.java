@@ -58,6 +58,42 @@ public class OptionsPrefsController {
         options.addPropertyChangeListener( listener );
     }
 
+    public void loadPreferencesWithEvents( ) {
+        options.setAutolabelling ( prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling) );
+        options.setAutolayout ( prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout) );
+        options.setAutoranging ( prefs.getBoolean(Options.PROP_AUTORANGING, options.autoranging) );
+        if ( !options.autoranging ) {
+            System.err.println("Autorange default was false, enabling it now.");
+            options.setAutoranging( true );
+        }
+        if ( !options.autolayout ) {
+            System.err.println("Autolayout default was false, enabling it now.");
+            options.setAutolayout( true );
+        }
+        if ( !options.autolabelling ) {
+            System.err.println("Autolabelling default was false, enabling it now.");
+            options.setAutolabelling( true );
+        }
+        options.setBackground ( Color.decode(prefs.get(Options.PROP_BACKGROUND, DomUtil.encodeColor(options.background))) );
+        options.setCanvasFont ( prefs.get(Options.PROP_CANVASFONT, options.canvasFont) );
+        options.setColor ( Color.decode(prefs.get(Options.PROP_COLOR, DomUtil.encodeColor(options.color))) );
+        options.setDrawAntiAlias ( prefs.getBoolean(Options.PROP_DRAWANTIALIAS, options.drawAntiAlias) );
+        options.setDrawGrid ( prefs.getBoolean(Options.PROP_DRAWGRID, options.drawGrid) );
+        options.setDrawMinorGrid ( prefs.getBoolean(Options.PROP_DRAWMINORGRID, options.drawMinorGrid) );
+        options.setFillColor ( Color.decode(prefs.get(Options.PROP_FILLCOLOR, DomUtil.encodeColor(options.fillColor))) );
+        options.setForeground ( Color.decode(prefs.get(Options.PROP_FOREGROUND, DomUtil.encodeColor(options.foreground))) );
+        options.setLogConsoleVisible ( prefs.getBoolean(Options.PROP_LOGCONSOLEVISIBLE, options.logConsoleVisible) );
+        options.setOverRendering ( prefs.getBoolean(Options.PROP_OVERRENDERING, options.overRendering) );
+        options.setScriptVisible ( prefs.getBoolean(Options.PROP_SCRIPTVISIBLE, options.scriptVisible) );
+        options.setDataVisible ( prefs.getBoolean(Options.PROP_DATAVISIBLE, options.dataVisible) );
+        options.setLayoutVisible ( prefs.getBoolean(Options.PROP_LAYOUTVISIBLE, options.layoutVisible ));
+        options.setServerEnabled ( prefs.getBoolean(Options.PROP_SERVERENABLED, options.serverEnabled) );
+        options.setSpecialEffects ( prefs.getBoolean(Options.PROP_SPECIALEFFECTS, options.specialEffects) );
+        options.setTextAntiAlias ( prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias) );
+        options.setDayOfYear( prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear) );
+        options.setNearestNeighbor( prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor) );
+    }
+
     public void loadPreferences() {
         options.autolabelling = prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling);
         options.autolayout = prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout);
