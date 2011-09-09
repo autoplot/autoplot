@@ -1193,7 +1193,7 @@ public class PlotElementController extends DomNodeController {
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
 
-            // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
+            // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682  
 
             //DatumRange xdr= peleCopy.getPlotDefaults().getXaxis().getRange();
             //boolean log= peleCopy.getPlotDefaults().getXaxis().isLog();
