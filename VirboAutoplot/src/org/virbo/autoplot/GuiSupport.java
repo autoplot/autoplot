@@ -562,7 +562,7 @@ public class GuiSupport {
         return new AbstractAction("New Window") {
             public void actionPerformed( ActionEvent e ) {
                 ApplicationModel model = new ApplicationModel();
-                model.setExceptionHandler( parent.applicationModel.getExceptionHandler() );
+                model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
                 model.addDasPeersToApp();
                 AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
@@ -575,7 +575,7 @@ public class GuiSupport {
         return new AbstractAction("Clone to New Window") {
             public void actionPerformed( ActionEvent e ) {
                 ApplicationModel model = new ApplicationModel();
-                model.setExceptionHandler( model.getExceptionHandler() );
+                model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
                 model.addDasPeersToApp();
                 AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
