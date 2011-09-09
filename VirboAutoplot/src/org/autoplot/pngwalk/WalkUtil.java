@@ -49,7 +49,7 @@ public class WalkUtil {
      * @return
      */
     protected static int splitIndex(String surl) {
-        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y",".*") );
+        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","*") );
         if ( i!=-1 ) {
             i = surl.lastIndexOf('/', i);
         } else {
