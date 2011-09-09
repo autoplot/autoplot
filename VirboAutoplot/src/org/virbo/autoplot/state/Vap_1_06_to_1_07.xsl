@@ -7,13 +7,10 @@
      support old vap files, we check for this.  Unfortunately this bug cannot be
      fixed without loading the data and must be fixed within Autoplot. -->
 
-    <xsl:template match="/vap/Application/DataSourceFilter">  <!-- drop properties -->
-         <xsl:element name="property">
-              <xsl:attribute name='name'>sliceDimension</xsl:attribute>
-              <xsl:attribute name='name'>sliceIndex</xsl:attribute>
-              <xsl:attribute name='name'>transpose</xsl:attribute>
-         </xsl:element>
-    </xsl:template>
+    <!-- we drop support for old slice nodes. We could implement slices with the new filters node, but the old properties haven't been used in ages.-->
+    <xsl:template match="DataSourceFilter/property[@name='transpose']"/>  <!-- drop properties -->
+    <xsl:template match="DataSourceFilter/property[@name='sliceIndex']"/>  <!-- drop properties -->
+    <xsl:template match="DataSourceFilter/property[@name='sliceDimension']"/>  <!-- drop properties -->
 
     <xsl:template match="*">
         <xsl:copy>
