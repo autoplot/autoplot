@@ -66,7 +66,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return ads;
     }
 
-    private static int splitIndex(String surl) {
+    private static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
         int i0 = surl.indexOf("%Y");  //TODO: /tmp/data_$(m,Y=2011).dat
         if ( i0==-1 ) i0 = surl.indexOf("$Y");
         int i1;
