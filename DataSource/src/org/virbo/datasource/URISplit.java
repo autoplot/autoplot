@@ -600,6 +600,8 @@ public class URISplit {
             } else {
                 name = ss[i].substring(0, j);
                 value = ss[i].substring(j + 1);
+                value = value.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
+                value = value.replaceAll("%26", "&");
                 result.put(name, value);
             }
         }
@@ -622,7 +624,9 @@ public class URISplit {
             } else {
                 String value = (String) parms.get(key);
                 if (value != null) {
-                    result.append("&" + key + "=" + uriEncode(value)); //result.append("&" + key + "=" + uriEncode(value).replaceAll("%20", "+" ));
+                    value= uriEncode(value);
+                    value= value.replaceAll("&", "%26");
+                    result.append("&" + key + "=" + value );
                 } else {
                     result.append("&" + key);
                 }
