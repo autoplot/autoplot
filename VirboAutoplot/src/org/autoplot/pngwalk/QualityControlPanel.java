@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -24,11 +23,9 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -127,7 +124,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 Properties sequenceProperties;
                 sequenceProperties = new Properties();
                 String template= walkImageSequence.getTemplate();
-                String path= URISplit.parse(template).path;
+                int i= WalkUtil.splitIndex(template);
+                String path= template.substring(0,i);
                 URI fsRoot = DataSetURI.getResourceURI(path);
                 FileSystem tfs = FileSystem.create(fsRoot);
                 FileObject propsFile = tfs.getFileObject("sequence.properties");
