@@ -7,6 +7,14 @@
      support old vap files, we check for this.  Unfortunately this bug cannot be
      fixed without loading the data and must be fixed within Autoplot. -->
 
+    <xsl:template match="/vap/Application/DataSourceFilter">  <!-- drop properties -->
+         <xsl:element name="property">
+              <xsl:attribute name='name'>sliceDimension</xsl:attribute>
+              <xsl:attribute name='name'>sliceIndex</xsl:attribute>
+              <xsl:attribute name='name'>transpose</xsl:attribute>
+         </xsl:element>
+    </xsl:template>
+
     <xsl:template match="*">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
