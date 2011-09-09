@@ -643,8 +643,13 @@ public class DataSetSelector extends javax.swing.JPanel {
                     int xpos = xpos2 - model.getValue();
                     xpos = Math.min(model.getExtent(), xpos);
 
-                    completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
+                    if ( dataSetSelector.isShowing() ) {
+                        completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
+                    } else {
+                        JOptionPane.showMessageDialog( dataSetSelector, "<html>Completions for "+getValue()+"<br>are not available when the data set selector is not showing.</html>");
+                    }
                     completionsRunnable = null;
+                    
                 } catch (NullPointerException ex) {
                     ex.printStackTrace(); // TODO: look into this
 
