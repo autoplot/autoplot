@@ -74,6 +74,7 @@ import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
@@ -567,6 +568,9 @@ public class GuiSupport {
                 AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 view.setVisible(true);
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                opc.loadPreferencesWithEvents();
+
             }
         };
     }
@@ -581,6 +585,9 @@ public class GuiSupport {
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 view.setVisible(true);
                 model.dom.syncTo( parent.applicationModel.dom );
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                opc.loadPreferencesWithEvents();
+
             }
         };
     }
