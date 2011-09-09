@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import java.io.File;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
 import org.virbo.autoplot.dom.Application;
@@ -52,6 +53,8 @@ public class Test034 {
     public static void main( String[] args ) throws Exception {
 
         long t0;
+
+        System .err.println("pwd: "+(new File(".")).getCanonicalPath());
 
         t0= System.currentTimeMillis();
         test001();

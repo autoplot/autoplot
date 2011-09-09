@@ -8,7 +8,7 @@ ant -quiet do-tag | grep -v  "Trying to override old definition of task " #TODO:
 cd ../VirboAutoplot
 ant -quiet do-tag | grep -v  "Trying to override old definition of task "
 
-export AP_VERSION=v2010b_17
+export AP_VERSION=20110908
 
 ant jar -Ddefault_release_tag=$AP_VERSION
 ant jnlp-release -Ddefault_release_tag=$AP_VERSION

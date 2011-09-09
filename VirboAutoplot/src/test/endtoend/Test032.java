@@ -170,13 +170,19 @@ public class Test032 {
         ds2= Util.getDataSet(  "vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/testCdfColMajor.cdf?rank4float" );
 
         //test1_dump( ds1 );
-
+        
         System.err.println( "java =" + ds1 );
+        System.err.println( "   c =" + ds2 );
+
+        System.err.println( "=== java " + ds1 + " ===");
         System.err.println( "   c =" + ds2 );
 
         System.err.println( "=== java " + ds1 + " ===");
         test1_dump( ds1.slice(2) );
         System.err.println( "===    c " + ds2 + " ===");
+        test1_dump( ds1.slice(2) );
+        
+        System.err.println( "   c =" + ds2 );
         test1_dump( ds2.slice(2) );
 
         System.err.println( "== row major slice(2) ==" );
@@ -196,7 +202,7 @@ public class Test032 {
 
         System.err.println( System.getProperty("java.version") + " " + System.getProperty("os.arch") );
         System.err.println( "C-based library version: " + CDF.getLibraryVersion() );
-test3();
+
         test1();
         test1_b();
         test2();

@@ -1193,16 +1193,20 @@ public class PlotElementController extends DomNodeController {
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
 
-            if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
-                // this means we've already autoranged.
-                peleCopy.getPlotDefaults().getXaxis().setAutoRange(false);
-            }
+            // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
+
+            //DatumRange xdr= peleCopy.getPlotDefaults().getXaxis().getRange();
+            //boolean log= peleCopy.getPlotDefaults().getXaxis().isLog();
+            //if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
+            //    // this means we've already autoranged.
+            //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); // Why do we do this again?  Boy I wish I'd made some tests...
+            //}
 
             doAutoranging( peleCopy,props,fillDs );
 
-            if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
-                peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
-            }
+            //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
+            //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
+            //}
 
             TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
             if ( tsb!=null ) {
