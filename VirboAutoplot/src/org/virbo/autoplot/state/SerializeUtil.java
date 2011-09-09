@@ -307,6 +307,9 @@ public class SerializeUtil {
                             String stype= e.getAttribute("type");
                             if ( !stype.equals("DomNode") ) {
                                 Object child= getLeafNode( e );
+                                if ( pd==null ) {
+                                    // we need to drop sliceIndex, etc in xslt
+                                }
                                 pd.getWriteMethod().invoke( node, child );
                             } else {
                                 Node childElement= e.getFirstChild();
