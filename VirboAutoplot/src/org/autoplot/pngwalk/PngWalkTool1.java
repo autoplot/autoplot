@@ -51,6 +51,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.das2.components.TearoffTabbedPane;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.ArgumentList;
@@ -58,6 +59,9 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
+import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -316,13 +320,25 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         JMenu navMenu= new JMenu("Navigate");
         navMenu.add( new AbstractAction( "Go To Date..." ) {
             public void actionPerformed(ActionEvent e) {
-                String str= JOptionPane.showInputDialog(tool,"Select date to display");
+                DatumRange dr= tool.seq.getTimeSpan();
+                String str;
+                if ( dr!=null ) {
+                    str= JOptionPane.showInputDialog(tool,"Select date to display", TimeDatumFormatter.DAYS.format( TimeUtil.prevMidnight( dr.min() ) ) );
+                } else {
+                    JOptionPane.showMessageDialog( tool, "File times are not available" );
+                    return;
+                }
                 if ( str!=null ) {
                     try {
                         DatumRange ds = DatumRangeUtil.parseTimeRange(str);
                         tool.seq.gotoSubrange(ds);
                     } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog( tool, "parse error: "+ex );
+                        try {
+                            double d= Units.us2000.parse(str).doubleValue(Units.us2000);
+                            tool.seq.gotoSubrange( DatumRange.newDatumRange( d, d, Units.us2000 ));
+                        } catch (ParseException ex2) {
+                            JOptionPane.showMessageDialog( tool, "parse error: "+ex2 );
+                        }
                         return;
                     } catch (RuntimeException ex ) {
                         tool.setStatus( "warning: "+ex.toString() );
