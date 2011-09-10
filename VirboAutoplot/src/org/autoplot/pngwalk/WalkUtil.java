@@ -49,7 +49,7 @@ public class WalkUtil {
      * @return
      */
     protected static int splitIndex(String surl) {
-        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","*") );
+        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","$(","%{","*") );
         if ( i!=-1 ) {
             i = surl.lastIndexOf('/', i);
         } else {
@@ -90,7 +90,7 @@ public class WalkUtil {
 
         i = splitIndex(sansArgs);
         FileSystem fs = FileSystem.create( DataSetURI.getResourceURI(sansArgs.substring(0, i+1)) );
-        String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
+        String spec= sansArgs.substring(i+1);
 
         spec= spec.replaceAll("\\*", ".*"); //GRR.  What if I put .* in there knowing it was a regex.
         spec= spec.replaceAll("\\?", ".");
