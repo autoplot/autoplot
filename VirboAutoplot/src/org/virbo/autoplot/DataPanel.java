@@ -133,6 +133,11 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
 
+    protected void expertMode( boolean expert ) {
+        componentTextField.setVisible(expert);
+        operationsLabel.setVisible(expert);
+    }
+
     private void doIncrUp( int amount ) {
             String s= componentTextField.getText();
             int cp= componentTextField.getCaretPosition();
@@ -422,7 +427,7 @@ public class DataPanel extends javax.swing.JPanel {
         sliceIndexSpinner = new javax.swing.JSpinner();
         sliceIndexLabel = new javax.swing.JLabel();
         transposeCheckBox = new javax.swing.JCheckBox();
-        jLabel3 = new javax.swing.JLabel();
+        operationsLabel = new javax.swing.JLabel();
         componentTextField = new javax.swing.JTextField();
         doSliceCheckBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
@@ -462,8 +467,8 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel3.setText("Operations:");
-        jLabel3.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
+        operationsLabel.setText("Operations:");
+        operationsLabel.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
 
         componentTextField.setText(" ");
         componentTextField.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
@@ -504,7 +509,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
-                        .add(jLabel3)
+                        .add(operationsLabel)
                         .add(18, 18, 18)
                         .add(componentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
@@ -523,7 +528,7 @@ public class DataPanel extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
+                    .add(operationsLabel)
                     .add(componentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -682,9 +687,9 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox doSliceCheckBox;
     private javax.swing.JComboBox fillValueComboBox;
     private javax.swing.JLabel fillValueLabel;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel operationsLabel;
     private javax.swing.JLabel sliceIndexLabel;
     private javax.swing.JSpinner sliceIndexSpinner;
     private javax.swing.JComboBox sliceTypeComboBox;
