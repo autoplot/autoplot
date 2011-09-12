@@ -8,8 +8,6 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.virbo.autoplot.util.TickleTimer;
