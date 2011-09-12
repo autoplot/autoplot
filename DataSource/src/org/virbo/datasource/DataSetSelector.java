@@ -6,7 +6,9 @@
 package org.virbo.datasource;
 
 import java.awt.AWTKeyStroke;
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Font;
@@ -51,6 +53,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -1526,6 +1529,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         JMenuItem pasteItem = result.add(new DefaultEditorKit.PasteAction());
         pasteItem.setText("Paste");
 
+        result.add( new JSeparator() );
+
         JMenu fontMenu= new JMenu( "Font Size" );
 
         fontMenu.add( new AbstractAction( "Big" ) {
@@ -1563,12 +1568,30 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
         result.add(fontMenu);
 
+        if ( this.alternatePeerCard!=null ) {
+            result.add( new JSeparator() );
+            result.add( new AbstractAction( alternatePeer ) {
+                public void actionPerformed(ActionEvent ev) {
+                    Container trp= DataSetSelector.this.getParent();
+                    ((CardLayout)DataSetSelector.this.getParent().getLayout()).show( trp, alternatePeerCard );
+                }
+            } );
+        }
+
 
         return result;
 
     }
     public static void main( String[] args ) {
         DataSetSelectorDemo.main(args);
+    }
+
+    private String alternatePeer;
+    private String alternatePeerCard;
+
+    public void setAlternatePeer( String title, String card ) {
+        this.alternatePeer= title;
+        this.alternatePeerCard= card;
     }
 
 }

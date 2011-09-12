@@ -11,15 +11,24 @@
 
 package org.virbo.datasource;
 
-import java.awt.Color;
+import java.awt.CardLayout;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -34,6 +43,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     /** Creates new form TimeRangePanel */
     public TimeRangeEditor() {
         initComponents();
+        addMousePopupListener();
     }
 
     DatumRange range= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
@@ -294,5 +304,63 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         };
     }
+
+    private String alternatePeer;
+    private String alternatePeerCard;
+
+    public void setAlternatePeer(String label, String card ) {
+        this.alternatePeer= label;
+        this.alternatePeerCard= card;
+    }
+
+    
+    private void addMousePopupListener() {
+        timeRangeTextField.addMouseListener( new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+        });
+    }
+    private void showPopup( MouseEvent e ) {
+        getPopupMenu().show( this, e.getX(), e.getY() );
+    }
+
+    private JPopupMenu getPopupMenu() {
+        JPopupMenu result= new JPopupMenu();
+        JMenuItem cutItem = result.add(new DefaultEditorKit.CutAction());
+        cutItem.setText("Cut");
+        JMenuItem copyItem = result.add(new DefaultEditorKit.CopyAction());
+        copyItem.setText("Copy");
+        JMenuItem pasteItem = result.add(new DefaultEditorKit.PasteAction());
+        pasteItem.setText("Paste");
+
+        if ( this.alternatePeerCard!=null ) {
+            result.add( new JSeparator() );
+            result.add( new AbstractAction( alternatePeer ) {
+                public void actionPerformed(ActionEvent ev) {
+                    Container trp= TimeRangeEditor.this.getParent();
+                    ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                }
+            } );
+        }
+
+
+        return result;
+
+    }
+
 
 }
