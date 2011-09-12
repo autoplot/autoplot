@@ -112,7 +112,14 @@ public class CsvDataSource extends AbstractDataSource {
         }
         DataSetBuilder tbuilder= new DataSetBuilder( 1, 100 );
 
+        mon.setTaskSize(-1);
+        mon.started();
+
+        int line=0;
+
         while ( reader.readRecord() ) {
+            line++;
+            mon.setProgressMessage("read line "+line);
             if ( hline>0 ) {
                 if ( icolumn==-1 ) {
                     icolumn= reader.getColumnCount()-1;
@@ -184,8 +191,10 @@ public class CsvDataSource extends AbstractDataSource {
                 builder.putValue(-1,cb);
                 builder.nextRecord();
             }
-
+            line++;
         }
+
+        mon.finished();
 
         DDataSet ds= builder.getDataSet();
         if ( idep0column>=0 ) {
