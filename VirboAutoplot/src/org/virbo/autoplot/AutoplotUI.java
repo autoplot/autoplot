@@ -1347,7 +1347,7 @@ APSplash.checkTime("init 52");
             }
         } );
         item.setToolTipText("Export recent URIs to a bookmarks file.  (There is no method for importing recent URIs.)");
-
+//TODO: export recent is never added to the menu.
         bookmarksMenu.add(new JSeparator());
 
         bookmarksManager.updateBookmarks( bookmarksMenu, this.dataSetSelector );
@@ -2004,12 +2004,17 @@ APSplash.checkTime("init 52");
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         String uri= (String) dataSetSelector.getValue();
         ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setFocusURI(uri);
-        if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
-            plotAnotherUrl();
-        } else if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
-            overplotAnotherUrl();
+        if ( this.isExpertMode() ) {
+            if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
+                plotAnotherUrl();
+            } else if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
+                overplotAnotherUrl();
+            } else {
+                plotUrl(uri);
+            }
         } else {
-            plotUrl();
+            dom.getController().reset();
+            plotUrl( uri );
         }
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
@@ -2884,6 +2889,10 @@ APSplash.checkTime("init -80");
             dataPanel.expertMode(expert);
         }
 
+    }
+
+    public boolean isExpertMode() {
+        return expertMenuItems.get(0).isVisible()==true;
     }
 
     public boolean isBasicMode() {
