@@ -45,6 +45,7 @@ import org.virbo.datasource.ui.TableRowHeader;
 public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     Map<Integer, String> columns;
+    List<String> headers= new ArrayList();
     boolean focusDepend0 = false;
     Map<String, String> params;
     URISplit split;
@@ -349,8 +350,23 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
+
+            headers.add("");
+            headers.addAll( Arrays.asList(reader.getHeaders()) );
+
+            for ( int i=0; i<headers.size(); i++ ) {
+                try {
+                    Integer.parseInt(headers.get(i));
+                    headers.set( i, "field"+i );
+                } catch (NumberFormatException ex ) {
+                    if ( headers.get(i).trim().length()==0 ) {
+                        headers.set( i, "field"+i );
+                    }
+                }
+            }
+
             
-            DefaultTableModel tmodel= new DefaultTableModel( reader.getHeaders(),20 );
+            DefaultTableModel tmodel= new DefaultTableModel( headers.toArray(new String[headers.size()]), 20 );
 
             int line=0;
             while ( reader.readRecord() && line<20 ) {
@@ -362,22 +378,23 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
             columns= new HashMap<Integer, String>();
             for ( int i=0; i<ncol; i++ ) {
-                columns.put( i, reader.getHeader(i) );
+                columns.put( i, headers.get(i) );
             }
             
             this.jTable1.setModel( tmodel );
 
-            List<String> headers= new ArrayList();
-            headers.add("");
-            headers.addAll( Arrays.asList(reader.getHeaders()) );
-
-            columnsComboBox.setModel( new DefaultComboBoxModel( headers.toArray() ) );
+            String[] hh= new String[headers.size()+1];
+            hh[0]="";
+            for ( int i=0; i<headers.size(); i++ ) {
+                hh[i+1]= headers.get(i);
+            }
+            columnsComboBox.setModel( new DefaultComboBoxModel( hh ) );
             String column= params.get(PROP_COLUMN);
             if ( column!=null ) this.columnsComboBox.setSelectedItem(params.get(PROP_COLUMN));
             String bundle= params.get(PROP_BUNDLE);
             if ( bundle!=null ) this.columnsComboBox.setSelectedItem(params.get(PROP_BUNDLE));
 
-            dep0Columns.setModel( new DefaultComboBoxModel( headers.toArray() ) );
+            dep0Columns.setModel( new DefaultComboBoxModel( hh ) );
             String depend0column= params.get(PROP_DEP0);
             if ( depend0column!=null ) this.dep0Columns.setSelectedItem(params.get(PROP_DEP0));
 
@@ -396,7 +413,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
     String v= (String) dep0Columns.getSelectedItem();
     if ( v.equals("") ) {
-        params.put(PROP_DEP0, null );
+        params.remove(PROP_DEP0 );
     } else {
         params.put(PROP_DEP0, v );
     }
@@ -408,15 +425,15 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
 private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_columnsComboBoxItemStateChanged
     String v= (String) columnsComboBox.getSelectedItem();
     if ( v.equals("") ) {
-        params.put(PROP_COLUMN, null );
-        params.put(PROP_BUNDLE, null );
+        params.remove(PROP_COLUMN );
+        params.remove(PROP_BUNDLE );
     } else {
         if ( v.contains("-") || v.contains(":") ) {
             params.put(PROP_BUNDLE, v );
-            params.put(PROP_COLUMN, null );
+            params.remove(PROP_COLUMN);
         } else {
             params.put(PROP_COLUMN, v );
-            params.put(PROP_BUNDLE, null );
+            params.remove(PROP_BUNDLE );
         }
     }
 }//GEN-LAST:event_columnsComboBoxItemStateChanged
