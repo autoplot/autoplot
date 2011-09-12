@@ -58,13 +58,13 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editDomMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
+            <MenuItem class="javax.swing.JMenuItem" name="inspectVapFileMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Inspect Vap File..."/>
                 <Property name="toolTipText" type="java.lang.String" value="View a vap file from a local disk in the property editor"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem6ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="inspectVapFileMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator1">
@@ -223,7 +223,7 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <Menu class="javax.swing.JMenu" name="jMenu1">
+            <Menu class="javax.swing.JMenu" name="enableFeatureMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Enable Feature"/>
               </Properties>
@@ -269,7 +269,7 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <Menu class="javax.swing.JMenu" name="jMenu2">
+            <Menu class="javax.swing.JMenu" name="textSizeMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Text Size"/>
               </Properties>
@@ -300,7 +300,7 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <Menu class="javax.swing.JMenu" name="jMenu5">
+            <Menu class="javax.swing.JMenu" name="addressBarMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Address Bar"/>
               </Properties>
@@ -336,7 +336,7 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <Menu class="javax.swing.JMenu" name="jMenu4">
+            <Menu class="javax.swing.JMenu" name="autoMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Auto"/>
               </Properties>

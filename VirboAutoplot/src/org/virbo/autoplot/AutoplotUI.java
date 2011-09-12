@@ -59,6 +59,7 @@ import java.util.logging.Logger;
 import javax.help.CSH;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -122,6 +123,7 @@ import org.w3c.dom.Element;
  * @author  jbf
  */
 public class AutoplotUI extends javax.swing.JFrame {
+    private static final String TAB_SCRIPT = "script";
     
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
     final String TAB_TOOLTIP_AXES = "<html>Adjust selected plot axes.<br>%s<html>";
@@ -175,6 +177,8 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
     private TimeRangeEditor timeRangeEditor;
+    private List<JMenuItem> expertMenuItems= new ArrayList(); // list of items to hide
+    private JMenu expertMenu;
         
     
     /** Creates new form AutoPlotMatisse */
@@ -239,6 +243,28 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
         
         initComponents();
+        expertMenuItems.add( editDomMenuItem );
+        expertMenuItems.add( inspectVapFileMenuItem );
+        expertMenuItems.add( renderingOptionsMenu );
+        expertMenuItems.add( enableFeatureMenu );
+        expertMenuItems.add( autoMenu );
+        expertMenuItems.add( aggregateMenuItem );
+        expertMenuItems.add( decodeURLItem );
+
+        jMenuBar1.add( Box.createHorizontalGlue() );
+        expertMenu= new JMenu("Expert");
+        expertMenu.add( new JMenuItem( new AbstractAction( "Basic Mode") {
+           public void actionPerformed( ActionEvent e ) {
+               expertMode(false);
+           }
+        }));
+        expertMenu.add( new JMenuItem( new AbstractAction( "Expert Mode") {
+           public void actionPerformed( ActionEvent e ) {
+               expertMode(true);
+           }
+        }));
+        expertMenu.setToolTipText("<html>Toggle between expert and basic mode.<br>Basic mode allows for browsing products composed by data providers<br>Expert allows composing new products and scripting");
+        jMenuBar1.add( expertMenu );
 
         KeyChain.getDefault().setParentGUI(this);
         
@@ -308,7 +334,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 applicationModel.addRecent(dataSetSelector.getValue());
             }
         });
-        dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( "script") {
+        dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
                 if ( !( script.endsWith(".jy") || script.endsWith(".JY") ) ) {
@@ -358,7 +384,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 //do nothing
             }
         });
-        URISplit.setOtherSchemes( Arrays.asList( "script", "pngwalk", "bookmarks" ) );
+        URISplit.setOtherSchemes( Arrays.asList( "script","pngwalk", "bookmarks") );
 
         APSplash.checkTime("init 40");
 
@@ -646,7 +672,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             scriptPanel= new JythonScriptPanel(applicationModel, this.dataSetSelector);
-            tabs.addTab( "script", null, scriptPanel,
+            tabs.addTab( TAB_SCRIPT, null, scriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             scriptPanelMenuItem.setSelected(true);
         }
@@ -888,11 +914,15 @@ public class AutoplotUI extends javax.swing.JFrame {
     }
 
     private void fillFileMenu() {
+        List<JMenuItem> expertItems= new ArrayList();
 
-        fileMenu.add(support.createNewApplicationAction() );
-        fileMenu.add(support.createCloneApplicationAction() );
+        expertItems.add( new JMenuItem(support.createNewApplicationAction()) );
+        expertItems.add( new JMenuItem(support.createCloneApplicationAction()) );
+        fileMenu.add( expertItems.get(0) );
+        fileMenu.add( expertItems.get(1) );
 
         javax.swing.JMenuItem mi= new JMenuItem( support.createNewDOMAction() );
+        expertItems.add(mi);
         mi.setToolTipText("Reset application to initial state");
         fileMenu.add(mi);
 
@@ -902,10 +932,12 @@ APSplash.checkTime("init 51");
 APSplash.checkTime("init 52");
         mi= new JMenuItem(getAddPanelAction() );
         mi.setToolTipText("Add a new plot or overplot to the application");
+        expertItems.add(mi);
         fileMenu.add(mi);
 
         mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
         mi.setToolTipText("Open local file");
+        expertItems.add(mi);
         fileMenu.add(mi);
 
         mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
@@ -970,6 +1002,7 @@ APSplash.checkTime("init 52");
 
         item = new JMenuItem( support.getDumpDataAction2( dom ) );
         item.setToolTipText("Export the data that has the focus");
+        expertItems.add(item);
         fileMenu.add( item );
 
         //fileMenu.add( new )
@@ -991,6 +1024,8 @@ APSplash.checkTime("init 52");
                 AppManager.getInstance().quit();
             }
         });
+
+        expertMenuItems.addAll( expertItems );
     }
 
     public void resetAction( String name, Action a ) {
@@ -1376,7 +1411,7 @@ APSplash.checkTime("init 52");
         undoMultipleMenu = new javax.swing.JMenu();
         jSeparator2 = new javax.swing.JSeparator();
         editDomMenuItem = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        inspectVapFileMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
@@ -1397,19 +1432,19 @@ APSplash.checkTime("init 52");
         plotStyleMenu = new javax.swing.JMenu();
         fontsAndColorsMenuItem = new javax.swing.JMenuItem();
         canvasSizeMenuItem = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
+        enableFeatureMenu = new javax.swing.JMenu();
         scriptPanelMenuItem = new javax.swing.JCheckBoxMenuItem();
         logConsoleMenuItem = new javax.swing.JCheckBoxMenuItem();
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         layoutPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        textSizeMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
+        addressBarMenu = new javax.swing.JMenu();
         dataSetSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
         timeRangeSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
-        jMenu4 = new javax.swing.JMenu();
+        autoMenu = new javax.swing.JMenu();
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -1504,14 +1539,14 @@ APSplash.checkTime("init 52");
         });
         editMenu.add(editDomMenuItem);
 
-        jMenuItem6.setText("Inspect Vap File...");
-        jMenuItem6.setToolTipText("View a vap file from a local disk in the property editor");
-        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+        inspectVapFileMenuItem.setText("Inspect Vap File...");
+        inspectVapFileMenuItem.setToolTipText("View a vap file from a local disk in the property editor");
+        inspectVapFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem6ActionPerformed(evt);
+                inspectVapFileMenuItemActionPerformed(evt);
             }
         });
-        editMenu.add(jMenuItem6);
+        editMenu.add(inspectVapFileMenuItem);
         editMenu.add(jSeparator1);
 
         pasteDataSetURLMenuItem.setText("Paste URL");
@@ -1646,7 +1681,7 @@ APSplash.checkTime("init 52");
 
         optionsMenu.add(plotStyleMenu);
 
-        jMenu1.setText("Enable Feature");
+        enableFeatureMenu.setText("Enable Feature");
 
         scriptPanelMenuItem.setText("Script Panel");
         scriptPanelMenuItem.setToolTipText("Script Panel adds a tab that displays scripts used for the jython data source.  It also provides a way to create new jython sources.");
@@ -1655,7 +1690,7 @@ APSplash.checkTime("init 52");
                 scriptPanelMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(scriptPanelMenuItem);
+        enableFeatureMenu.add(scriptPanelMenuItem);
 
         logConsoleMenuItem.setText("Log Console");
         logConsoleMenuItem.setToolTipText("Add a tab that receives and displays messages posted to the java logging system.  ");
@@ -1664,7 +1699,7 @@ APSplash.checkTime("init 52");
                 logConsoleMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(logConsoleMenuItem);
+        enableFeatureMenu.add(logConsoleMenuItem);
 
         serverCheckBoxMenuItem.setText("Server");
         serverCheckBoxMenuItem.setToolTipText("<html> Start up back end server that allows commands to be send to Autoplot via a port. </html>");
@@ -1673,19 +1708,19 @@ APSplash.checkTime("init 52");
                 serverCheckBoxMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(serverCheckBoxMenuItem);
+        enableFeatureMenu.add(serverCheckBoxMenuItem);
 
         dataPanelCheckBoxMenuItem.setText("Data Panel");
         dataPanelCheckBoxMenuItem.setToolTipText("The data panel allows for explicitly setting valid range and fill values for the dataset, and additional controls for data reduction before plotting. ");
-        jMenu1.add(dataPanelCheckBoxMenuItem);
+        enableFeatureMenu.add(dataPanelCheckBoxMenuItem);
 
         layoutPanelCheckBoxMenuItem.setText("Layout Panel");
         layoutPanelCheckBoxMenuItem.setToolTipText("Enables the layout panel, which shows all the plots and plot elements in thier relative positions.\n");
-        jMenu1.add(layoutPanelCheckBoxMenuItem);
+        enableFeatureMenu.add(layoutPanelCheckBoxMenuItem);
 
-        optionsMenu.add(jMenu1);
+        optionsMenu.add(enableFeatureMenu);
 
-        jMenu2.setText("Text Size");
+        textSizeMenu.setText("Text Size");
 
         jMenuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         jMenuItem1.setText("Bigger");
@@ -1695,7 +1730,7 @@ APSplash.checkTime("init 52");
                 jMenuItem1ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem1);
+        textSizeMenu.add(jMenuItem1);
 
         jMenuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
         );
@@ -1706,11 +1741,11 @@ APSplash.checkTime("init 52");
                 jMenuItem2ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem2);
+        textSizeMenu.add(jMenuItem2);
 
-        optionsMenu.add(jMenu2);
+        optionsMenu.add(textSizeMenu);
 
-        jMenu5.setText("Address Bar");
+        addressBarMenu.setText("Address Bar");
 
         dataSetSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
         addressBarButtonGroup.add(dataSetSelectorMenuItem);
@@ -1721,7 +1756,7 @@ APSplash.checkTime("init 52");
                 dataSetSelectorMenuItemActionPerformed(evt);
             }
         });
-        jMenu5.add(dataSetSelectorMenuItem);
+        addressBarMenu.add(dataSetSelectorMenuItem);
 
         timeRangeSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
         addressBarButtonGroup.add(timeRangeSelectorMenuItem);
@@ -1731,21 +1766,21 @@ APSplash.checkTime("init 52");
                 timeRangeSelectorMenuItemActionPerformed(evt);
             }
         });
-        jMenu5.add(timeRangeSelectorMenuItem);
+        addressBarMenu.add(timeRangeSelectorMenuItem);
 
-        optionsMenu.add(jMenu5);
+        optionsMenu.add(addressBarMenu);
 
-        jMenu4.setText("Auto");
+        autoMenu.setText("Auto");
 
         autoRangingCheckBoxMenuItem.setSelected(true);
         autoRangingCheckBoxMenuItem.setText("AutoRanging");
         autoRangingCheckBoxMenuItem.setToolTipText("Allow automatic axis range setting.  Range is based on metadata hints and data range.");
-        jMenu4.add(autoRangingCheckBoxMenuItem);
+        autoMenu.add(autoRangingCheckBoxMenuItem);
 
         autoLabellingCheckBoxMenuItem.setSelected(true);
         autoLabellingCheckBoxMenuItem.setText("AutoLabelling");
         autoLabellingCheckBoxMenuItem.setToolTipText("Allow automatic setting of axis labels based on metadata. ");
-        jMenu4.add(autoLabellingCheckBoxMenuItem);
+        autoMenu.add(autoLabellingCheckBoxMenuItem);
 
         autoLayoutCheckBoxMenuItem.setSelected(true);
         autoLayoutCheckBoxMenuItem.setText("AutoLayout");
@@ -1755,9 +1790,9 @@ APSplash.checkTime("init 52");
                 autoLayoutCheckBoxMenuItemActionPerformed(evt);
             }
         });
-        jMenu4.add(autoLayoutCheckBoxMenuItem);
+        autoMenu.add(autoLayoutCheckBoxMenuItem);
 
-        optionsMenu.add(jMenu4);
+        optionsMenu.add(autoMenu);
 
         jMenuBar1.add(optionsMenu);
 
@@ -2085,7 +2120,7 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && scriptPanel == null) {
         scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
-        tabs.insertTab("script", null, scriptPanel, 
+        tabs.insertTab(TAB_SCRIPT, null, scriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
     } else {
         JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
@@ -2161,9 +2196,9 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     statusTextField.setText("");
 }//GEN-LAST:event_statusLabelMouseClicked
 
-private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+private void inspectVapFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectVapFileMenuItemActionPerformed
     this.support.doInspectVap();
-}//GEN-LAST:event_jMenuItem6ActionPerformed
+}//GEN-LAST:event_inspectVapFileMenuItemActionPerformed
 
 private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLayoutCheckBoxMenuItemActionPerformed
     if ( autoLayoutCheckBoxMenuItem.isSelected() ) {
@@ -2615,9 +2650,11 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
     private javax.swing.ButtonGroup addressBarButtonGroup;
+    private javax.swing.JMenu addressBarMenu;
     private javax.swing.JMenuItem aggregateMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
+    private javax.swing.JMenu autoMenu;
     private javax.swing.JCheckBoxMenuItem autoRangingCheckBoxMenuItem;
     private javax.swing.JMenuItem autoplotHelpMenuItem;
     private javax.swing.JMenuItem autoplotHomepageButton;
@@ -2635,23 +2672,20 @@ APSplash.checkTime("init -80");
     private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
     private javax.swing.JMenuItem editDomMenuItem;
     private javax.swing.JMenu editMenu;
+    private javax.swing.JMenu enableFeatureMenu;
     private javax.swing.JMenuItem exceptionReport;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenuItem gettingStartedMenuItem;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem inspectVapFileMenuItem;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -2677,6 +2711,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JTextField statusTextField;
     private javax.swing.JPanel tabbedPanelContainer;
     private javax.swing.JCheckBoxMenuItem textAntiAlias;
+    private javax.swing.JMenu textSizeMenu;
     private javax.swing.JPanel timeRangePanel;
     private javax.swing.JRadioButtonMenuItem timeRangeSelectorMenuItem;
     private javax.swing.JMenu toolsMenu;
@@ -2829,5 +2864,26 @@ APSplash.checkTime("init -80");
 
     public DataSetSelector getDataSetSelector() {
         return this.dataSetSelector;
+    }
+
+    public void basicMode( ) {
+        expertMode(false);
+    }
+
+    public void expertMode( boolean expert ) {
+        this.autoMenu.setVisible(expert);
+        for ( JMenuItem mi: expertMenuItems ) {
+            mi.setVisible(expert);
+        }
+        expertMenu.setText( expert ? "Expert" : "Basic" );
+        dataSetSelector.getEditor().setEditable(expert);
+        if ( dataPanel!=null ) {
+            dataPanel.expertMode(expert);
+        }
+
+    }
+
+    public boolean isBasicMode() {
+        return expertMenuItems.get(0).isVisible()==false;
     }
 }
