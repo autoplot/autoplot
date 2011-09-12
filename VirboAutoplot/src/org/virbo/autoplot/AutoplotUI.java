@@ -273,6 +273,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         timeRangeEditor = new TimeRangeEditor();
         timeRangePanel.add( timeRangeEditor, "card1" );
         timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
+        timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
+        dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
+
         dom.getController().addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, timeRangeEditor.getUriFocusListener() );
         
         this.statusTextField.setBackground( new Color(0.f,0.f,0.f,0.f) );
