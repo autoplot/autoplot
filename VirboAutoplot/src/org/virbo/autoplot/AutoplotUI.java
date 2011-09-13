@@ -102,6 +102,7 @@ import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.OptionsPrefsController;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
@@ -164,6 +165,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     private JythonScriptPanel scriptPanel;
     private DataPanel dataPanel;
     private LayoutPanel layoutPanel;
+    private JScrollPane layoutPanel1;
     private LogConsole logConsole;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
@@ -640,6 +642,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         } else {
             flayoutPane= null;
         }
+        layoutPanel1= flayoutPane;
 
         final JScrollPane fdataPane;
         if (model.getDocumentModel().getOptions().isDataVisible()) {
@@ -2885,10 +2888,34 @@ APSplash.checkTime("init -80");
         }
         expertMenu.setText( expert ? "Expert" : "Basic" );
         dataSetSelector.getEditor().setEditable(expert);
+        dataSetSelector.getEditor().setEnabled(expert);
         if ( dataPanel!=null ) {
             dataPanel.expertMode(expert);
         }
-
+        for ( Plot p: dom.getPlots() ) {
+            p.getController().expertMode(expert);
+        }
+        if ( scriptPanel!=null ) {
+            if ( expert ) {
+                tabs.add( TAB_SCRIPT, scriptPanel );
+            } else {
+                tabs.remove( scriptPanel );
+            }
+        }
+        if ( logConsole!=null ) {
+            if ( expert ) {
+                tabs.add( "console", logConsole );
+            } else {
+                tabs.remove( logConsole );
+            }
+        }
+        if ( layoutPanel1!=null ) {
+            if ( expert ) {
+                tabs.add( "layout", layoutPanel1 );
+            } else {
+                tabs.remove( layoutPanel1 );
+            }
+        }
     }
 
     public boolean isExpertMode() {
