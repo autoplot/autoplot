@@ -154,7 +154,7 @@ public class ScriptContext extends PyJavaInstance {
             if ( view!=null ) {
                 view.dataSetSelector.setValue(surl);
             }
-            model.resetDataSetSourceURL(surl, new NullProgressMonitor());
+            model.resetDataSetSourceURL(surl, false, new NullProgressMonitor() );
         } else {
             DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
             dsf.setUri(null);
