@@ -1079,4 +1079,24 @@ public class PlotController extends DomNodeController {
         plot.setTitle(title);
         plot.setAutoLabel(true);
     }
+
+    private JMenuItem[] expertMenuItems;
+
+    /**
+     * provide spot to locate the menu items that are hidden in basic mode.
+     * @param items
+     */
+    public void setExpertMenuItems( JMenuItem[] items ) {
+        this.expertMenuItems= items;
+    }
+
+    public JMenuItem[] getExpertMenuItems() {
+        return this.expertMenuItems;
+    }
+
+    public void expertMode( boolean expert ) {
+        for ( JMenuItem mi: expertMenuItems ) {
+            mi.setVisible(expert);
+        }
+    }
 }
