@@ -301,6 +301,9 @@ public class ApplicationModel {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
+        resetDataSetSourceURL( surl, true, mon );
+    }
 
 
     /**
@@ -317,7 +320,7 @@ public class ApplicationModel {
      * @param surl the new data source URL.
      * @param mon progress monitor which is just used to convey messages.
      */
-    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
+    protected void resetDataSetSourceURL(String surl, boolean addToHistory, ProgressMonitor mon) {
 
         if (surl == null) {
             return;
