@@ -35,7 +35,9 @@ import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -998,18 +1000,21 @@ public class GuiSupport {
         final DasAxis dasAxis = axis.getController().getDasAxis();
         final DasMouseInputAdapter mouseAdapter = dasAxis.getDasMouseInputAdapter();
 
+        List<JMenuItem> expertMenuItems= new ArrayList();
+
         mouseAdapter.removeMenuItem("Properties");
 
         JMenuItem item;
 
-        mouseAdapter.addMenuItem(new JMenuItem(new AbstractAction("Axis Properties") {
-
+        item= new JMenuItem(new AbstractAction("Axis Properties") {
             public void actionPerformed(ActionEvent e) {
                 PropertyEditor pp = new PropertyEditor(axis);
                 pp.showDialog(dasAxis.getCanvas());
             }
-        }));
-
+        });
+        mouseAdapter.addMenuItem(item);
+        expertMenuItems.add(item);
+        
         mouseAdapter.addMenuItem(new JSeparator());
 
         if (axis == plot.getXaxis()) {
@@ -1024,11 +1029,10 @@ public class GuiSupport {
             });
             item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
             addPlotMenu.add(item);
-
+            expertMenuItems.add( addPlotMenu );
         }
 
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
-
             public void actionPerformed(ActionEvent e) {
                 BindingModel[] bms= controller.getBindingsFor(axis);
                 controller.unbind(axis);  // TODO: check for application timerange
@@ -1037,7 +1041,7 @@ public class GuiSupport {
         });
         item.setToolTipText("remove any plot and panel property bindings");
         mouseAdapter.addMenuItem(item);
-
+        expertMenuItems.add(item);
 
         JMenu bindingMenu = new JMenu("Add Binding");
 
@@ -1053,9 +1057,7 @@ public class GuiSupport {
             bindingMenu.add(item);
         }
 
-
         item = new JMenuItem(new AbstractAction("Bind to Plot Above") {
-
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
@@ -1102,6 +1104,7 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
+        expertMenuItems.add(bindingMenu);
 
         JMenu connectorMenu = new JMenu("Add Connector");
 
@@ -1119,6 +1122,7 @@ public class GuiSupport {
             }
         });
         connectorMenu.add(item);
+        expertMenuItems.add(connectorMenu);
 
         if ( axis.getController().getDasAxis().isHorizontal() ) {
             item= new JMenuItem( new AbstractAction("Add Additional Ticks from...") {
@@ -1144,11 +1148,25 @@ public class GuiSupport {
                 }
             });
             mouseAdapter.addMenuItem(item);
+            expertMenuItems.add(item);
+
+            List<JMenuItem> expertMenuItemsList= new ArrayList( Arrays.asList( plotController.getExpertMenuItems() ) );
+            expertMenuItemsList.addAll(expertMenuItems);
+
+            plotController.setExpertMenuItems( expertMenuItemsList.toArray(new JMenuItem[expertMenuItemsList.size()] )  );
         }
 
     }
 
+    /**
+     * Add items to the plot context menu, such as properties and add plot.
+     * @param controller
+     * @param plot
+     * @param plotController
+     * @param domPlot
+     */
     static void addPlotContextMenuItems( final ApplicationController controller, final DasPlot plot, final PlotController plotController, final Plot domPlot) {
+
         plot.getDasMouseInputAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
 
         plot.getDasMouseInputAdapter().removeMenuItem("Dump Data");
@@ -1156,32 +1174,40 @@ public class GuiSupport {
 
         JMenuItem item;
 
-        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Plot Properties") {
+        List<JMenuItem> expertMenuItems= new ArrayList();
 
+        JMenuItem mi;
+
+        mi= new JMenuItem(new AbstractAction("Plot Properties") {
             public void actionPerformed(ActionEvent e) {
                 PropertyEditor pp = new PropertyEditor(domPlot);
                 pp.showDialog(plot.getCanvas());
             }
-        }));
+        });
+        plot.getDasMouseInputAdapter().addMenuItem(mi);
+        expertMenuItems.add( mi );
 
-        plot.getDasMouseInputAdapter().addMenuItem( new JMenuItem(new AbstractAction("Plot Element Properties") {
+        mi= new JMenuItem(new AbstractAction("Plot Element Properties") {
             public void actionPerformed(ActionEvent e) {
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
                 pp.showDialog(plot.getCanvas());
             }
-        } ) );
+        } );
+        plot.getDasMouseInputAdapter().addMenuItem( mi );
+        expertMenuItems.add( mi );
 
-       JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Plot Element Style Properties") {
+
+        JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Plot Element Style Properties") {
             public void actionPerformed(ActionEvent e) {
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p.getStyle());
                 pp.showDialog(plot.getCanvas());
             }
         });
-        plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);
-        
+        plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);        
         plot.getDasMouseInputAdapter().addMenuItem(panelPropsMenuItem);
+        expertMenuItems.add(panelPropsMenuItem);
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
@@ -1228,45 +1254,37 @@ public class GuiSupport {
                 //run.run();
             }
         });
-
         item.setToolTipText("make a new plot, and copy the plot elements into it.  The plot is not bound,\n" +
                 "and a connector is drawn between the two.  The panel uris are bound as well.");
         addPlotMenu.add(item);
-        
+        expertMenuItems.add(addPlotMenu);
+
         JMenu editPlotMenu = new JMenu("Edit Plot");
         plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
-
         controller.fillEditPlotMenu(editPlotMenu, domPlot);
+        expertMenuItems.add(editPlotMenu);
 
         JMenu panelMenu = new JMenu("Edit Plot Element");
-
         plot.getDasMouseInputAdapter().addMenuItem(panelMenu);
+        expertMenuItems.add(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Above") {
-
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
                     dstPlot = controller.addPlot(LayoutConstants.ABOVE);
-                    //dstPlot.getXaxis().syncTo(plot.getXaxis(),Collections.singletonList(DomNode.PROP_ID));
-                    //dstPlot.getYaxis().syncTo(plot.getYaxis(),Collections.singletonList(DomNode.PROP_ID));
-                    //dstPlot.getZaxis().syncTo(plot.getZaxis(),Collections.singletonList(DomNode.PROP_ID));
                     pelement.setPlotId(dstPlot.getId());
-                    //dstPlot.getXaxis().syncTo(plot.getXaxis(),Collections.singletonList(DomNode.PROP_ID));
-                    //dstPlot.getYaxis().syncTo(plot.getYaxis(),Collections.singletonList(DomNode.PROP_ID));
-                    //dstPlot.getZaxis().syncTo(plot.getZaxis(),Collections.singletonList(DomNode.PROP_ID));
-                    //controller.bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
                 } else {
                     pelement.setPlotId(dstPlot.getId());
                 }
             }
         });
         panelMenu.add(item);
+        expertMenuItems.add(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Below") {
-
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
@@ -1281,9 +1299,9 @@ public class GuiSupport {
             }
         });
         panelMenu.add(item);
+        expertMenuItems.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
-
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 if (controller.getApplication().getPlotElements().length < 2) {
@@ -1297,9 +1315,9 @@ public class GuiSupport {
             }
         });
         panelMenu.add(item);
+        expertMenuItems.add(item);
 
         item=  new JMenuItem(new AbstractAction("Move Plot Element Below Others") {
-
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot p= pelement.getController().getApplication().getController().getPlotFor(pelement);
@@ -1307,26 +1325,33 @@ public class GuiSupport {
             }
         });
         panelMenu.add(item);
+        expertMenuItems.add(item);
 
         JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
             public void actionPerformed(ActionEvent e) {
                 GuiSupport.editPlotElement( controller.getApplicationModel(), plot );
             }
         });
+        expertMenuItems.add(editDataMenu);
 
         plot.getDasMouseInputAdapter().addMenuItem(editDataMenu);
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
         plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
-
             public void actionPerformed(ActionEvent e) {
                 plotController.resetZoom(true, true, true);
             }
         }));
 
+        plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
-        plot.getDasMouseInputAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
+        JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
+        plot.getDasMouseInputAdapter().addMenuItem(ezMenu);
+        expertMenuItems.add(ezMenu);
+
+        plotController.setExpertMenuItems( expertMenuItems.toArray(new JMenuItem[expertMenuItems.size()] ) );
+
     }
 
     protected void doInspectVap() {
