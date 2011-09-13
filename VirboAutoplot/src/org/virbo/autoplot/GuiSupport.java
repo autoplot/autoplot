@@ -1150,11 +1150,12 @@ public class GuiSupport {
             mouseAdapter.addMenuItem(item);
             expertMenuItems.add(item);
 
-            List<JMenuItem> expertMenuItemsList= new ArrayList( Arrays.asList( plotController.getExpertMenuItems() ) );
-            expertMenuItemsList.addAll(expertMenuItems);
-
-            plotController.setExpertMenuItems( expertMenuItemsList.toArray(new JMenuItem[expertMenuItemsList.size()] )  );
         }
+
+        List<JMenuItem> expertMenuItemsList= new ArrayList( Arrays.asList( plotController.getExpertMenuItems() ) );
+        expertMenuItemsList.addAll(expertMenuItems);
+
+        plotController.setExpertMenuItems( expertMenuItemsList.toArray(new JMenuItem[expertMenuItemsList.size()] )  );
 
     }
 
