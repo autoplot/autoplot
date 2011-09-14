@@ -5,11 +5,10 @@
 
 package test.endtoend;
 
-import java.io.IOException;
-import org.virbo.autoplot.*;
+import org.virbo.autoplot.ScriptContext;
 
 /**
- * Reiner's stuff
+ * Reiner's stuff, other vap files.
  * @author jbf
  */
 public class Test003 {
@@ -40,6 +39,11 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3_v1.03a.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_003.png" );
+
+            ScriptContext.reset();
+
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap" );
+            ScriptContext.writeToPng( "test003_004.png" );
 
             if ( headless ) System.exit(0);
             
