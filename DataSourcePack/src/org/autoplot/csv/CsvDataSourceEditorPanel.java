@@ -351,7 +351,8 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
 
-            headers.add("");
+            headers= new ArrayList<String>();
+            
             headers.addAll( Arrays.asList(reader.getHeaders()) );
 
             for ( int i=0; i<headers.size(); i++ ) {
@@ -366,7 +367,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             }
 
             
-            DefaultTableModel tmodel= new DefaultTableModel( headers.toArray(new String[headers.size()]), 20 );
+            DefaultTableModel tmodel= new DefaultTableModel( headers.toArray( new String[headers.size()] ), 20 );
 
             int line=0;
             while ( reader.readRecord() && line<20 ) {
