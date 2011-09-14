@@ -121,11 +121,9 @@ public class DataSourceController extends DomNodeController {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                     DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 } else {
-                    System.err.println("wait current thread="+Thread.currentThread());
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
                         @Override
                         public void run() {
-                            System.err.println("run current thread="+Thread.currentThread());
                             DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                             if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
                             DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
