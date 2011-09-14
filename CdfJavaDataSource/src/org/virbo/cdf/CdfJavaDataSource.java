@@ -120,7 +120,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 try {
                     result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
                 } catch ( IllegalArgumentException ex ) {
-                    throw new IllegalArgumentException("virtual function "+function+" not supported");
+                    throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
                 
             } else { // typical route
