@@ -258,7 +258,7 @@ public class Application extends DomNode {
     @Override
     public void syncTo(DomNode n,List<String> exclude) {
         super.syncTo(n,exclude);
-        if ( this.controller!=null ) {
+        if ( this.controller!=null ) { //TODO: what if there's no controller, shouldn't we sync that?
             this.controller.syncTo( (Application)n, exclude );
         }
     }
