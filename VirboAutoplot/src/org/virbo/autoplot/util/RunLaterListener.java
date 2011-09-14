@@ -40,6 +40,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
 
         this.node= node;
         this.propertyName= propertyName;
+        this.immediatelyAfter= immediatelyAfter;
 
         if ( propertyName!=null ) {
             this.node.addPropertyChangeListener( propertyName, this );
