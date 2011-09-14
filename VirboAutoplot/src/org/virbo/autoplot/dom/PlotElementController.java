@@ -30,6 +30,7 @@ import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
+import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
@@ -1410,7 +1411,7 @@ public class PlotElementController extends DomNodeController {
         }
 
 
-        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ||  spec== RenderType.pitchAngleDistribution ) {
+        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
 
             QDataSet xds = (QDataSet) SemanticOps.xtagsDataSet(fillDs);
             if (xds == null) {
@@ -1502,19 +1503,21 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
 
-            if ( spec==RenderType.pitchAngleDistribution ) {
-                ydesc.range= new DatumRange( ydesc.range.max().multiply(-1), ydesc.range.max() );
-                peleCopy.getPlotDefaults().getXaxis().setLog(false);
-                peleCopy.getPlotDefaults().getXaxis().setRange(ydesc.range);
-                peleCopy.getPlotDefaults().getYaxis().setLog(false);
-                peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+            if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
+                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            }
+            peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
+            peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+            
+        } else if ( spec==RenderType.pitchAngleDistribution ) {
+            QDataSet qube= PitchAngleDistributionRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
             } else {
-                if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                    peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
-                    peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
-                }
-                peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
-                peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
             }
 
         } else if ( spec==RenderType.digital || spec==RenderType.eventsBar || spec==RenderType.image ) {
@@ -1966,9 +1969,11 @@ public class PlotElementController extends DomNodeController {
         Renderer oldRenderer= getRenderer();
         maybeCreateDasPeer();
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
-            //QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
             //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
-            //getRenderer().setDataSet(oldDs);
+            if ( oldDs!=null ) {
+                getRenderer().setDataSet(oldDs);
+            }
         }
     }
 
