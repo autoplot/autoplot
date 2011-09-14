@@ -121,9 +121,11 @@ public class DataSourceController extends DomNodeController {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                     DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 } else {
-                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, false ) {
+                    System.err.println("wait current thread="+Thread.currentThread());
+                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
                         @Override
                         public void run() {
+                            System.err.println("run current thread="+Thread.currentThread());
                             DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                             if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
                             DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
@@ -278,7 +280,7 @@ public class DataSourceController extends DomNodeController {
             setTsb(null);
             setTsbSuri(null);
             if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) {
-                dsf.setUri("vap+internal:");
+                dsf.setUri("vap+internal:"); //TODO: when is this supposed to happen?  Test033 is hitting here.
             }
 
         } else {
@@ -1449,17 +1451,27 @@ public class DataSourceController extends DomNodeController {
      * Preconditions: 
      *   dsf.getUri is set.
      *   Any or no datasource is set.
+     *   dom.getController().isValueAdjusting() is false
      * Postconditions: 
      *   A dataSource object is created 
      *   dsf._getDataSource returns the data source.
      *   A thread has been started that will load the dataset.
      * Side Effects:
      *   update is called to start the download, unless 
-     *   if this is headless, then the dataset has been loaded sychronously.
+     *   if this is headless, then the dataset has been loaded synchronously.
      */
     private void resolveDataSource( boolean valueWasAdjusting, ProgressMonitor mon ) {
         Caching cache1 = getCaching();
 
+        if ( dom.getController().isValueAdjusting() ) {
+            System.err.println( "return of bug first demoed by test033: where the adjusting property is breifly cleared. " + dom.getController().changesSupport.isValueAdjusting() );
+            System.err.println( "See https://sourceforge.net/tracker/?func=detail&aid=3409414&group_id=199733&atid=970682");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         String surl = dsf.getUri();
         if (surl == null) {
             getApplication().getController().deleteParentsOfDataSourceFilter(dsf);
