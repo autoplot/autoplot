@@ -491,7 +491,10 @@ public class PlotElementController extends DomNodeController {
                         cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
                     }
                     Plot plot= this.dom.getController().getPlotFor(plotElement);
-                    plot.setContext( cdr ); //TODO: this is really backwards, this is intended to be a controller, not a display.
+                    DatumRange oldContext= plot.getContext();
+                    if ( ( oldContext.equals( Axis.DEFAULT_RANGE ) || UnitsUtil.isTimeLocation( oldContext.getUnits() ) ) && UnitsUtil.isTimeLocation( cdr.getUnits() ) ) {
+                        plot.setContext( cdr ); //TODO: this is really backwards, this is intended to be a controller, not a display.
+                    }
                 } else {
                     // TODO: ???
                 }
