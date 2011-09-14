@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import org.das2.datum.DatumRangeUtil;
 import org.virbo.autoplot.ScriptContext;
 
 /**
@@ -44,6 +45,9 @@ public class Test003 {
 
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap" );
             ScriptContext.writeToPng( "test003_004.png" );
+
+            ScriptContext.getDocumentModel().getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("2000-01-09 10:00 to 12:00") );
+            ScriptContext.writeToPng( "test003_004a.png" );
 
             ScriptContext.reset();
 
