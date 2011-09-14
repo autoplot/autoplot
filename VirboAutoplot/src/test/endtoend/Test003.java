@@ -45,6 +45,12 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap" );
             ScriptContext.writeToPng( "test003_004.png" );
 
+            ScriptContext.reset();
+
+            // ancient vap file version <1.00 still loads in.
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/garageTemps.vap" );
+            ScriptContext.writeToPng( "test003_005.png" );
+
             if ( headless ) System.exit(0);
             
         } catch ( Exception ex ) {
