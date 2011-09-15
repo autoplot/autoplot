@@ -466,7 +466,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                         dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
                     }
 
-                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) {
+                    dialog.expertMode(isExpertMode());
+
+                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
                         if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
                             if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
                                 ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
@@ -1592,6 +1594,20 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public void setAlternatePeer( String title, String card ) {
         this.alternatePeer= title;
         this.alternatePeerCard= card;
+    }
+
+    private boolean expertMode= false;
+    private boolean isExpertMode() {
+        return expertMode;
+    }
+
+    public void setExpertMode( boolean expert ) {
+        this.expertMode= expert;
+        if ( expert ) {
+            this.plotItButton.setToolTipText("<html>Plot this data location, or URI.<br> Ctrl modifier: plot the dataset by adding a new plot<br> Shift modifier: plot the dataset as an overplot<br> ");
+        } else {
+            this.plotItButton.setToolTipText("<html>Plot this data location, or URI.<br> ");
+        }
     }
 
 }
