@@ -257,12 +257,12 @@ public class AutoplotUI extends javax.swing.JFrame {
         expertMenu= new JMenu("Expert");
         expertMenu.add( new JMenuItem( new AbstractAction( "Basic Mode") {
            public void actionPerformed( ActionEvent e ) {
-               expertMode(false);
+               setExpertMode(false);
            }
         }));
         expertMenu.add( new JMenuItem( new AbstractAction( "Expert Mode") {
            public void actionPerformed( ActionEvent e ) {
-               expertMode(true);
+               setExpertMode(true);
            }
         }));
         expertMenu.setToolTipText("<html>Toggle between expert and basic mode.<br>Basic mode allows for browsing products composed by data providers<br>Expert allows composing new products and scripting");
@@ -949,6 +949,7 @@ APSplash.checkTime("init 52");
         mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
               public void actionPerformed( ActionEvent e ) {
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
+                  dia.setExpertMode( isExpertMode() );
                   dia.setVisible(true);
                   if (dia.isCancelled()) {
                     return;
@@ -2878,10 +2879,14 @@ APSplash.checkTime("init -80");
     }
 
     public void basicMode( ) {
-        expertMode(false);
+        setExpertMode(false);
     }
 
-    public void expertMode( boolean expert ) {
+    /**
+     * set the application expert mode flag to restrict the app for browsing.
+     * @param expert
+     */
+    public void setExpertMode( boolean expert ) {
         this.autoMenu.setVisible(expert);
         for ( JMenuItem mi: expertMenuItems ) {
             mi.setVisible(expert);
@@ -2890,10 +2895,10 @@ APSplash.checkTime("init -80");
         dataSetSelector.getEditor().setEditable(expert);
         dataSetSelector.getEditor().setEnabled(expert);
         if ( dataPanel!=null ) {
-            dataPanel.expertMode(expert);
+            dataPanel.setExpertMode(expert);
         }
         for ( Plot p: dom.getPlots() ) {
-            p.getController().expertMode(expert);
+            p.getController().setExpertMode(expert);
         }
         if ( scriptPanel!=null ) {
             if ( expert ) {
@@ -2916,6 +2921,7 @@ APSplash.checkTime("init -80");
                 tabs.remove( layoutPanel1 );
             }
         }
+        dataSetSelector.setExpertMode(expert);
     }
 
     public boolean isExpertMode() {
