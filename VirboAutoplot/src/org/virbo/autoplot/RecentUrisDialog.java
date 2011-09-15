@@ -248,6 +248,12 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_editUriButtonActionPerformed
 
+    public void setExpertMode( boolean expert ) {
+        editUriButton.setVisible(expert);
+        overplotButton.setVisible(expert);
+        plotBelowButton.setVisible(expert);
+    }
+
     /**
     * @param args the command line arguments
     */

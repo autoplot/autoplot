@@ -24,7 +24,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace pref="322" max="32767" attributes="0"/>
+              <EmptySpace pref="407" max="32767" attributes="0"/>
               <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="overplotButton" min="-2" max="-2" attributes="0"/>
@@ -43,7 +43,7 @@
               <Component id="filterTextField" min="-2" pref="191" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="updateButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="427" max="32767" attributes="0"/>
+              <EmptySpace pref="466" max="32767" attributes="0"/>
           </Group>
           <Component id="recentUrisGUI1" alignment="1" pref="781" max="32767" attributes="0"/>
       </Group>
