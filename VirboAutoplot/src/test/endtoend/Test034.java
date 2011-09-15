@@ -53,7 +53,6 @@ public class Test034 {
 
     private static void test004() throws Exception {
         reset();
-        getDocumentModel().getOptions().setAutolayout(false);
         Application dom= getDocumentModel();
         plot( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
         writeToPng( "test034_004a.png" );
@@ -66,6 +65,8 @@ public class Test034 {
     public static void main( String[] args ) throws Exception {
 
         long t0;
+
+        getDocumentModel().getOptions().setAutolayout(false);
 
         System .err.println("pwd: "+(new File(".")).getCanonicalPath());
 
