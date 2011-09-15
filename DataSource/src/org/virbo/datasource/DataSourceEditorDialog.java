@@ -56,6 +56,11 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         this.modifiers = modifiers;
     }
 
+    public void setExpertMode( boolean expert ) {
+        overplotButton.setVisible(expert);
+        plotBelowButton.setVisible(expert);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
