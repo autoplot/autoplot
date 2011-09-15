@@ -466,7 +466,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
                     }
 
-                    dialog.expertMode(isExpertMode());
+                    dialog.setExpertMode(isExpertMode());
 
                     if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
                         if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
