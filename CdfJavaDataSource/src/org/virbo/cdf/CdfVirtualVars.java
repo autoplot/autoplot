@@ -129,6 +129,8 @@ public class CdfVirtualVars {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
             return Ops.fftPower( args.get(0), 512, new NullProgressMonitor() );
+        } else if ( function.equals("alternate_view") ) {
+            return args.get(0);
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
@@ -158,7 +160,7 @@ public class CdfVirtualVars {
     }
 
     public static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPower512" );
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPower512", "alternate_view" );
         return functions.contains(function);
     }
 }
