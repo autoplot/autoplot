@@ -124,6 +124,7 @@ public class IstpMetadataModel extends MetadataModel {
             DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
             if ( vrange.min().doubleValue(units)>min ) min= vrange.min().doubleValue(units);
             if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
+            if ( vrange.min().doubleValue(units)>max ) max= vrange.max().doubleValue(units); //vap+cdaweb:ds=IM_HK_FSW&id=BF_DramMbeCnt&timerange=2005-12-18
         }
         return DatumRange.newDatumRange(min, max, units);
     }
@@ -162,6 +163,7 @@ public class IstpMetadataModel extends MetadataModel {
             DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
             if ( vrange.min().doubleValue(units)>min ) min= vrange.min().doubleValue(units);
             if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
+            if ( vrange.min().doubleValue(units)>max ) max= vrange.max().doubleValue(units); //vap+cdaweb:ds=IM_HK_FSW&id=BF_DramMbeCnt&timerange=2005-12-18
         }
         range = new DatumRange(min, max, units);
         return range;
