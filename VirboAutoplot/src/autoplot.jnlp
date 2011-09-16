@@ -39,7 +39,7 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20110910.jar" />
         
         <!-- cdf -->
         <jar href="http://autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
