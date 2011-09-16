@@ -120,7 +120,13 @@ public class DomNodeController {
         } else {
             List<DomNodeController> kids= getChildControllers();
             for ( DomNodeController k: kids ) {
-                if ( k.isPendingChanges() ) return true;
+                if ( k.isPendingChanges() ) {
+                    //useful for debugging, see https://sourceforge.net/tracker/index.php?func=detail&aid=3410461&group_id=199733&atid=970682
+                    //for ( Object o:  k.changesSupport.changesPending.keySet() ) {
+                    //    System.err.println( "pending change "+o );
+                    //}
+                    return true;
+                }
             }
         }
         return false;
