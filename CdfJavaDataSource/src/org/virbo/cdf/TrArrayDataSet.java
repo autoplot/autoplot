@@ -44,4 +44,46 @@ public abstract class TrArrayDataSet extends AbstractDataSet {
         throw new IllegalArgumentException("component type not supported: "+c );
 
     }
+
+    public Class getComponentType() {
+        return getBack().getClass().getComponentType();
+    }
+
+    /**
+     * provide access to the backing array.
+     * @return
+     */
+    protected abstract Object getBack();
+
+    public int jvmMemory() {
+        int sizePer;
+        Class component= this.getComponentType();
+        if ( component==double.class ) {
+            sizePer= 8;
+        } else if ( component==float.class ) {
+            sizePer= 4;
+        } else if ( component==long.class ) {
+            sizePer= 8;
+        } else if ( component==int.class ) {
+            sizePer= 4;
+        } else if ( component==short.class ) {
+            sizePer= 2;
+        } else if ( component==byte.class ) {
+            sizePer= 1;
+        } else {
+            throw new IllegalArgumentException("not supported "+component );
+        }
+        return Array.getLength( this.getBack() ) * sizePer;
+    }
+    /**
+     * the slice operator would be better implemented here, but there is no
+     * transposed version of the class.
+     * @param i
+     * @return
+     */
+    //@Override
+    //public QDataSet slice(int i) {
+    //    //System.err.println("\n\nUsing Slice0DataSet to implement slice\n\n");
+    //    return new Slice0DataSet(this, i);
+    //}
 }

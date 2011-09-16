@@ -119,6 +119,10 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         DataSetUtil.addQube(this);
     }
 
+    protected Object getBack() {
+        return this.back;
+    }
+
     public int rank() {
         return rank;
     }
@@ -561,19 +565,6 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         joinProperties(ds);
     }
 
-    /**
-     * the slice operator is better implemented here.  Presently, we
-     * use System.arraycopy to copy out the data, but this should be
-     * reimplemented along with an offset parameter so the original data
-     * can be used to back the data.
-     * @param i
-     * @return
-     */
-    @Override
-    public QDataSet slice(int i) {
-        System.err.println("\n\nUsing Slice0DataSet to implement slice\n\n");
-        return new Slice0DataSet(this, i);
-    }
 
     /**
      * trim operator copies the data into a new dataset.
