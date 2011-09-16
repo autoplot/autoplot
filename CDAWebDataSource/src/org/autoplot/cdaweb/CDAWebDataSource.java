@@ -157,6 +157,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     Map<String,String> fileParams= getParams();
                     fileParams.remove( PARAM_TIMERANGE );
                     fileParams.remove( PARAM_DS );
+                    System.err.println( "loading "+fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
                     DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
                     ds1= dataSource.getDataSet( t1 );
                 }
@@ -186,7 +187,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 result= accum;
             }
             
-            // we know the ranges for timeseriesbrowse, klduge around autorange 10% bug.
+            // we know the ranges for timeseriesbrowse, kludge around autorange 10% bug.
             if ( result!=null ) {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
                 if ( dep0!=null && range!=null ) {
