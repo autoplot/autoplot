@@ -324,6 +324,9 @@ public class CdfUtil {
                 for ( int j=0; j<Array.getLength(o0); j++ ) {
                     sdata[j]= (String) Array.get(o0, j);
                 }
+            } else if ( o0.getClass()==String.class ) {
+                sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
+                sdata[0]= String.valueOf( o0 );
             } else {
                 throw new IllegalArgumentException("not handled single array where expected double array");
             }
