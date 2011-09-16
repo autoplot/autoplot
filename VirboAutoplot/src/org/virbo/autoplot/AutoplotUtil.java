@@ -719,7 +719,7 @@ public class AutoplotUtil {
                 }
                 result.range = new DatumRange( div.rangeContaining(min).min(), div.rangeContaining(max).max() );
             } else if ( UnitsUtil.isTimeLocation(u) ) {
-                if ( result.range.min().doubleValue( Units.us2000 ) > -6.3113480E15 ) {  //Julian has yr1800 limit.
+                if ( result.range.min().doubleValue( Units.us2000 ) > -6.3113480E15 ) {  //TODO: Julian has yr1800 limit.
                     DomainDivider div= DomainDividerUtil.getDomainDivider( result.range.min(), result.range.max() );
                     while ( div.boundaryCount( result.range.min(), result.range.max() ) > 40 ) {
                         div= div.coarserDivider(false);
