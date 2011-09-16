@@ -1596,7 +1596,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.alternatePeerCard= card;
     }
 
-    private boolean expertMode= false;
+    private boolean expertMode= true;
     private boolean isExpertMode() {
         return expertMode;
     }
