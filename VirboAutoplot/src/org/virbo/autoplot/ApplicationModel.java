@@ -21,13 +21,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.Kernel;
-import org.autoplot.pngwalk.ScalePerspectiveImageOp;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -153,12 +149,24 @@ public class ApplicationModel {
     public void showMessage( String message, String title, int messageType ) {
         if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {
             Component p= SwingUtilities.getRoot(canvas);
-            JOptionPane.showMessageDialog( p, message, title, messageType );
-        } else {
-            if ( messageType==JOptionPane.WARNING_MESSAGE || messageType!=JOptionPane.INFORMATION_MESSAGE || messageType!=JOptionPane.PLAIN_MESSAGE ) {
-                throw new RuntimeException( title + ": " + message );
+            if ( p==null ) {
+                if ( messageType==JOptionPane.WARNING_MESSAGE ) {
+                    System.err.println( "WARNING: "+ title + ": " + message  );
+                } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
+                    System.err.println( "INFO: "+ title + ": " + message  );
+                } else {
+                    System.err.println( title + ": " + message  );
+                }
             } else {
-                System.err.println( title + ": " + message );  //TODO: when would we ever use this?  We are not getting exception in Hudson tests because of this (TSDS timeout).
+                JOptionPane.showMessageDialog( p, message, title, messageType );
+            }
+        } else {
+            if ( messageType==JOptionPane.WARNING_MESSAGE ) {
+                System.err.println( "WARNING: "+ title + ": " + message  );
+            } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
+                System.err.println( "INFO: "+ title + ": " + message  );
+            } else {
+                System.err.println( title + ": " + message  );
             }
         }
     }
@@ -959,7 +967,7 @@ public class ApplicationModel {
             doBindings( state );
 
             for (Entry<String, String> e : deltas.entrySet()) {
-                logger.finest("applying to vap " + e.getKey() + "=" + e.getValue());
+                logger.log(Level.FINEST, "applying to vap {0}={1}", new Object[]{e.getKey(), e.getValue()});
                 String node = e.getKey();
                 String sval = e.getValue();
 
@@ -1222,10 +1230,10 @@ public class ApplicationModel {
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
 
     /**
-     * wait for autoplot to settle, waiting for pending changes in the application controller and canvas.
+     * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
-        logger.fine("enter waitUntilIdle, pendingChanges=" + dom.getController().isPendingChanges());
+        logger.log(Level.FINE, "enter waitUntilIdle, pendingChanges={0}", dom.getController().isPendingChanges());
         while ( dom.getController().isPendingChanges() ) {
             dom.getController().waitUntilIdle();
             logger.fine("waiting for canvas");
