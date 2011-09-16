@@ -11,10 +11,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -159,6 +157,7 @@ public class IstpMetadataModel extends MetadataModel {
             min = max / 10000;
         }
         if ( units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
+        if ( max<min ) max= Double.MAX_VALUE; //vap+cdaweb:ds=I2_AV_AME&id=ampl&timerange=1978-01-23+7:28:21+to+7:28:22
         if ( UnitsUtil.isTimeLocation(units) ) {
             DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
             if ( vrange.min().doubleValue(units)>min ) min= vrange.min().doubleValue(units);
