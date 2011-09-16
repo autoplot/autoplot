@@ -504,6 +504,22 @@ public class CdfUtil {
             function= (Attribute) cdf.getAttribute("FUNCTION"); //TODO: need to support CDF Virtual vars
         } catch (Exception e) {
         }
+
+        int skipCount=0;
+        for (int i=0; i<v.length; i++ ) {
+            Variable var = cdf.getVariable(v[i]);
+            if ( dataOnly ) {
+               Object varType= getAttribute( cdf, var.getName(), "VAR_TYPE" );
+               if ( varType==null || !varType.equals("data") ) {
+                   skipCount++;
+               }
+            }
+        }
+        if ( skipCount==v.length ) {
+            System.err.println( "turning off dataOnly because it rejects everything");
+            dataOnly= false;
+        }
+
         for (int i = 0; i < v.length; i++) {
             Variable var = cdf.getVariable(v[i]);
             if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
@@ -575,6 +591,7 @@ public class CdfUtil {
                                 String funct= (String)getAttribute( cdf, var.getName(), "FUNCTION" );
                                 if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
                                 if ( !CdfVirtualVars.isSupported(funct) ) {
+                                    System.err.println("virtual function not supported: "+funct );
                                     continue;
                                 }
                             }
