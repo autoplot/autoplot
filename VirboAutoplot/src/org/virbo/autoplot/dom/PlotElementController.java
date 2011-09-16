@@ -557,23 +557,26 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
         public synchronized void propertyChange(PropertyChangeEvent evt) {
-            changesSupport.performingChange( this, PENDING_SET_DATASET );
             if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
-                System.err.println("kludge pec446 cannot be removed");
+                //TODO: find a way to fix this properly or don't call it a kludge! System.err.println("kludge pec446 cannot be removed");
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
-            QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
-            if ( resetComponent ) {
-                //if ( !plotElement.component.equals("") )  {
-                //    plotElement.setComponent("");
-                //} else {
-                    plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
-                //}
-                setResetComponent(false);
+            changesSupport.performingChange( this, PENDING_SET_DATASET );
+            try {
+                QDataSet fillDs = dsf.controller.getFillDataSet();
+                logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
+                if ( resetComponent ) {
+                    //if ( !plotElement.component.equals("") )  {
+                    //    plotElement.setComponent("");
+                    //} else {
+                        plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
+                    //}
+                    setResetComponent(false);
+                }
+                updateDataSet();
+            } finally {
+                changesSupport.changePerformed( this, PENDING_SET_DATASET );
             }
-            updateDataSet();
-            changesSupport.changePerformed( this, PENDING_SET_DATASET );
         }
 
         @Override
@@ -1157,114 +1160,116 @@ public class PlotElementController extends DomNodeController {
         setStatus("busy: do autorange");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
-        Plot plot = dom.controller.getPlotFor(plotElement);
+        try {
+            Plot plot = dom.controller.getPlotFor(plotElement);
 
-        PlotElement peleCopy = (PlotElement) plotElement.copy();
-        peleCopy.setId("");
-        peleCopy.setParent("");
-        peleCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
+            PlotElement peleCopy = (PlotElement) plotElement.copy();
+            peleCopy.setId("");
+            peleCopy.setParent("");
+            peleCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
-        DataSourceController dsc= getDataSourceFilter().getController();
+            DataSourceController dsc= getDataSourceFilter().getController();
 
-        QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
-        Map props= dsc.getFillProperties();
-        String comp= plotElement.getComponent();
-        if ( comp.length()>0 ) {
-            fillDs = processDataSet( comp, fillDs );
-            props= processProperties( comp, props ); //TODO: support components
-        }
-
-        if ( props==null ) {
-            System.err.println("null properties in doResetRanges");
-        }
-        
-        if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autoLabel property.
-
-            doMetadata(peleCopy, props, fillDs );
-
-            String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
-            if (dsf.controller.getReduceDataSetString() != null) { //TODO remove dsf slicing
-                String title = peleCopy.getPlotDefaults().getTitle();
-                title += "!c" + reduceRankString;
-                peleCopy.getPlotDefaults().setTitle(title);
+            QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
+            Map props= dsc.getFillProperties();
+            String comp= plotElement.getComponent();
+            if ( comp.length()>0 ) {
+                fillDs = processDataSet( comp, fillDs );
+                props= processProperties( comp, props ); //TODO: support components
             }
-            if ( !plotElement.getComponent().equals("") ) {
-                String title = peleCopy.getPlotDefaults().getTitle();
-                title += "!c%{CONTEXT}";
-                peleCopy.getPlotDefaults().setTitle(title);
+
+            if ( props==null ) {
+                System.err.println("null properties in doResetRanges");
             }
-        }
 
-        if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
+            if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autoLabel property.
 
-            // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682  
+                doMetadata(peleCopy, props, fillDs );
 
-            //DatumRange xdr= peleCopy.getPlotDefaults().getXaxis().getRange();
-            //boolean log= peleCopy.getPlotDefaults().getXaxis().isLog();
-            //if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
-            //    // this means we've already autoranged.
-            //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); // Why do we do this again?  Boy I wish I'd made some tests...
-            //}
+                String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
+                if (dsf.controller.getReduceDataSetString() != null) { //TODO remove dsf slicing
+                    String title = peleCopy.getPlotDefaults().getTitle();
+                    title += "!c" + reduceRankString;
+                    peleCopy.getPlotDefaults().setTitle(title);
+                }
+                if ( !plotElement.getComponent().equals("") ) {
+                    String title = peleCopy.getPlotDefaults().getTitle();
+                    title += "!c%{CONTEXT}";
+                    peleCopy.getPlotDefaults().setTitle(title);
+                }
+            }
 
-            doAutoranging( peleCopy,props,fillDs );
+            if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
 
-            //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
-            //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
-            //}
+                // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
 
-            TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
-            if ( tsb!=null ) {
-                if ( fillDs!=null ) {
-                    QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
-                    Units xunits;
-                    if ( xds.rank()<=1 ) {
-                        xunits= (Units)xds.property(QDataSet.UNITS);
+                //DatumRange xdr= peleCopy.getPlotDefaults().getXaxis().getRange();
+                //boolean log= peleCopy.getPlotDefaults().getXaxis().isLog();
+                //if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
+                //    // this means we've already autoranged.
+                //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); // Why do we do this again?  Boy I wish I'd made some tests...
+                //}
+
+                doAutoranging( peleCopy,props,fillDs );
+
+                //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
+                //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
+                //}
+
+                TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
+                if ( tsb!=null ) {
+                    if ( fillDs!=null ) {
+                        QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
+                        Units xunits;
+                        if ( xds.rank()<=1 ) {
+                            xunits= (Units)xds.property(QDataSet.UNITS);
+                        } else {
+                            //JOIN dataset
+                            xunits= (Units)xds.property(QDataSet.UNITS,0);
+                        }
+                        if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
+                            peleCopy.getPlotDefaults().getXaxis().setRange( tsb.getTimeRange() );
+                        }
+                    }
+                }
+
+                Renderer newRenderer = getRenderer();
+                if (newRenderer instanceof SeriesRenderer && fillDs != null) {
+                    QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                    if (d != null) {
+                        ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
                     } else {
-                        //JOIN dataset
-                        xunits= (Units)xds.property(QDataSet.UNITS,0);
-                    }
-                    if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
-                        peleCopy.getPlotDefaults().getXaxis().setRange( tsb.getTimeRange() );
+                        ((SeriesRenderer) newRenderer).setCadenceCheck(true);
                     }
                 }
+
+            } else {
+                setStatus( "autoranging is disabled" );
             }
 
-            Renderer newRenderer = getRenderer();
-            if (newRenderer instanceof SeriesRenderer && fillDs != null) {
-                QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-                if (d != null) {
-                    ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
-                } else {
-                    ((SeriesRenderer) newRenderer).setCadenceCheck(true);
-                }
+            if ( plotElement.getComponent().equals("") && plotElement.isAutoLabel() ) plotElement.setLegendLabelAutomatically( peleCopy.getLegendLabel() );
+
+            peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
+            peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
+            peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
+
+            if ( logger.isLoggable(Level.FINEST) ) {
+                logger.finest( String.format( "done, autorange  x:%s, y:%s ",
+                        peleCopy.getPlotDefaults().getXaxis().getRange().toString(),
+                        peleCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
             }
-            
-        } else {
-            setStatus( "autoranging is disabled" );
+
+            plotElement.setPlotDefaults( peleCopy.getPlotDefaults() );  // bug 2992903 runs through here
+            plotElement.style.syncTo( peleCopy.style );
+            plotElement.renderType= peleCopy.renderType;  // don't fire an event
+            // and hope that the plot is listening.
+
+            if ( dom.getOptions().isAutoranging() ) {
+                setStatus("done, autorange");
+            }
+        } finally {
+            changesSupport.changePerformed(this, PENDING_RESET_RANGE);
         }
-
-        if ( plotElement.getComponent().equals("") && plotElement.isAutoLabel() ) plotElement.setLegendLabelAutomatically( peleCopy.getLegendLabel() );
-
-        peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
-        peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
-        peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
-
-        if ( logger.isLoggable(Level.FINEST) ) {
-            logger.finest( String.format( "done, autorange  x:%s, y:%s ",
-                    peleCopy.getPlotDefaults().getXaxis().getRange().toString(),
-                    peleCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
-        }
-
-        plotElement.setPlotDefaults( peleCopy.getPlotDefaults() );  // bug 2992903 runs through here
-        plotElement.style.syncTo( peleCopy.style );
-        plotElement.renderType= peleCopy.renderType;  // don't fire an event
-        // and hope that the plot is listening.
-
-        if ( dom.getOptions().isAutoranging() ) {
-            setStatus("done, autorange");
-        }
-
-        changesSupport.changePerformed(this, PENDING_RESET_RANGE);
     }
 
 
