@@ -622,6 +622,7 @@ public class DataSourceController extends DomNodeController {
             return this.uri + "?range="+getTimeRange() + ( res==null ? "" : "&resolution="+res );
         }
 
+        @Override
         public String toString() {
             Datum res= getTimeResolution();
             return "inttsb: "+getTimeRange()+" " +( res==null ? "" : "&resolution="+res );
@@ -1332,10 +1333,10 @@ public class DataSourceController extends DomNodeController {
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
             // look again to see if it has timeSeriesBrowse now--JythonDataSource
             if ( getTsb()==null && getDataSource().getCapability( TimeSeriesBrowse.class ) !=null ) {
-                TimeSeriesBrowse tsb= getDataSource().getCapability( TimeSeriesBrowse.class );
+                TimeSeriesBrowse tsb1= getDataSource().getCapability( TimeSeriesBrowse.class );
                 PlotElement pe= getPlotElement();
                 if ( pe!=null && this.doesPlotElementSupportTsb( pe ) ) {  //TODO: less flakey
-                    setTsb(tsb);
+                    setTsb(tsb1);
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,pe);
                     timeSeriesBrowseController.setup(false);
                 }
