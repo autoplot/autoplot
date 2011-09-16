@@ -1094,7 +1094,7 @@ public class PlotController extends DomNodeController {
         return this.expertMenuItems;
     }
 
-    public void expertMode( boolean expert ) {
+    public void setExpertMode( boolean expert ) {
         for ( JMenuItem mi: expertMenuItems ) {
             mi.setVisible(expert);
         }
