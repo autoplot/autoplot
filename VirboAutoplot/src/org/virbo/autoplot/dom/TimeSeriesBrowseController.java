@@ -252,11 +252,11 @@ public class TimeSeriesBrowseController {
                     }
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(newResolution);
-                    System.err.println( "updateTsb: " + trange + " (@" + newResolution+")" );
+                    logger.log( Level.FINE, "updateTsb: {0} (@{1})", new Object[]{trange, newResolution});
                 } else {
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(null);
-                    System.err.println( "updateTsb: " + trange + " (@ intrinsic)" );
+                    logger.log( Level.FINE, "updateTsb: {0} (@ intrinsic)", trange);
                 }
 
                 String surl;
