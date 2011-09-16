@@ -870,15 +870,18 @@ public class DataSourceController extends DomNodeController {
         changesSupport.performingChange(this, PENDING_FILL_DATASET);
         Runnable run= new Runnable() {
             public void run() {
-                if ( delay>0 ) {
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    if ( delay>0 ) {
+                        try {
+                            Thread.sleep(delay);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
+                    updateFill();
+                } finally {
+                    changesSupport.changePerformed(this, PENDING_FILL_DATASET);
                 }
-                updateFill();
-                changesSupport.changePerformed(this, PENDING_FILL_DATASET);
             }
         };
         if ( delay==0 ) {
@@ -922,7 +925,6 @@ public class DataSourceController extends DomNodeController {
      */
     @SuppressWarnings("unchecked")
     private void updateFill() {
-        changesSupport.performingChange(this, PENDING_FILL_DATASET);
 
         logger.fine("enter updateFill");
 
@@ -930,78 +932,83 @@ public class DataSourceController extends DomNodeController {
             return;
         }
 
-        Map props = getProperties();
-
-        MutablePropertyDataSet fillDs;
-
-        String filters= dsf.getFilters();
-
-        boolean doSlice= filters.length()>0;
-
-        if ( doSlice ) { // plot element now does slicing, but we can do it here as well.
-
-            QDataSet ds;
-            if ( DataSetOps.isProcessAsync(filters) ) {
-                System.err.println("asynchronous processes not supported here");
-                setReduceDataSetString(null);
-                ds= getDataSet();
-            } else {
-                ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
-                setReduceDataSetString(filters);
-            }
-
-            //TODO: must we process the props as well?
-            fillDs = DataSetOps.makePropertiesMutable(ds);
-
-        } else {
-            fillDs = DataSetOps.makePropertiesMutable(getDataSet());
-            setReduceDataSetString(null);
-        }
-
-        // add the cadence property to each dimension of the dataset, so that
-        // the plot element doesn't have to worry about it.
-        for ( int i=0; i<fillDs.rank(); i++ ) {
-            QDataSet dep= (QDataSet) fillDs.property("DEPEND_"+i);
-            if ( dep!=null ) {
-                dep= DataSetOps.makePropertiesMutable(dep);
-                if ( i==0 ) {
-                    guessCadence( (MutablePropertyDataSet) dep,fillDs);
-                } else {
-                    if ( dep.rank()==1 ) {
-                        guessCadence( (MutablePropertyDataSet) dep,null);
-                    } else if ( dep.rank()==2 && dep.length(0)>2 ) {
-                        //guessCadence( (MutablePropertyDataSet) dep.slice(0),null);
-                    }
-                }
-                fillDs.putProperty( "DEPEND_"+i, dep );
-            }
-        }
-
-        //props.put( QDataSet.RENDER_TYPE, null );
-        //DataSetUtil.putProperties( props, fillDs ); //NEW: just copy the properties into the dataset.
-
-        /*  begin fill dataset  */
-
-
-        double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
-
+        changesSupport.performingChange(this, PENDING_FILL_DATASET);
         try {
-            double[] vminMaxFill = PlotElementUtil.parseFillValidRangeInternal(dsf.getValidRange(), dsf.getFill());
-            vmin = vminMaxFill[0];
-            vmax = vminMaxFill[1];
-            fill = vminMaxFill[2];
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-        }
-        // check the dataset for fill data, inserting canonical fill values.
-        AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        setFillProperties(props);
-        if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
-            this.fillDataSet = null;
+            Map props = getProperties();
+
+            MutablePropertyDataSet fillDs;
+
+            String filters= dsf.getFilters();
+
+            boolean doSlice= filters.length()>0;
+
+            if ( doSlice ) { // plot element now does slicing, but we can do it here as well.
+
+                QDataSet ds;
+                if ( DataSetOps.isProcessAsync(filters) ) {
+                    System.err.println("asynchronous processes not supported here");
+                    setReduceDataSetString(null);
+                    ds= getDataSet();
+                } else {
+                    ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
+                    setReduceDataSetString(filters);
+                }
+
+                //TODO: must we process the props as well?
+                fillDs = DataSetOps.makePropertiesMutable(ds);
+
+            } else {
+                fillDs = DataSetOps.makePropertiesMutable(getDataSet());
+                setReduceDataSetString(null);
+            }
+
+            // add the cadence property to each dimension of the dataset, so that
+            // the plot element doesn't have to worry about it.
+            for ( int i=0; i<fillDs.rank(); i++ ) {
+                QDataSet dep= (QDataSet) fillDs.property("DEPEND_"+i);
+                if ( dep!=null ) {
+                    dep= DataSetOps.makePropertiesMutable(dep);
+                    if ( i==0 ) {
+                        guessCadence( (MutablePropertyDataSet) dep,fillDs);
+                    } else {
+                        if ( dep.rank()==1 ) {
+                            guessCadence( (MutablePropertyDataSet) dep,null);
+                        } else if ( dep.rank()==2 && dep.length(0)>2 ) {
+                            //guessCadence( (MutablePropertyDataSet) dep.slice(0),null);
+                        }
+                    }
+                    fillDs.putProperty( "DEPEND_"+i, dep );
+                }
+            }
+
+            //props.put( QDataSet.RENDER_TYPE, null );
+            //DataSetUtil.putProperties( props, fillDs ); //NEW: just copy the properties into the dataset.
+
+            /*  begin fill dataset  */
+
+
+            double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
+
+            try {
+                double[] vminMaxFill = PlotElementUtil.parseFillValidRangeInternal(dsf.getValidRange(), dsf.getFill());
+                vmin = vminMaxFill[0];
+                vmax = vminMaxFill[1];
+                fill = vminMaxFill[2];
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+            }
+            // check the dataset for fill data, inserting canonical fill values.
+            AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
+
+            setFillProperties(props);
+            if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
+                this.fillDataSet = null;
+            }
+            setFillDataSet(fillDs);
+        } finally {
+            changesSupport.changePerformed(this, PENDING_FILL_DATASET);
         }
-        setFillDataSet(fillDs);
-        changesSupport.changePerformed(this, PENDING_FILL_DATASET);
     }
 
     /**
@@ -1407,6 +1414,7 @@ public class DataSourceController extends DomNodeController {
         } catch (Exception e) {
             setException(e);
             setDataSet(null);
+            e.printStackTrace();
             setStatus("error: " + e.getMessage());
             handleException(e);
             if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), e );
@@ -1597,6 +1605,7 @@ public class DataSourceController extends DomNodeController {
         } else if ( e.getMessage()!=null && e.getMessage().contains("nsupported protocol") ) { //unsupport protocol
             model.showMessage( e.getMessage(), "Unsupported Protocol", JOptionPane.ERROR_MESSAGE );
         } else {
+            System.err.println(model.getExceptionHandler());
             model.getExceptionHandler().handle(e);
         }
     }
