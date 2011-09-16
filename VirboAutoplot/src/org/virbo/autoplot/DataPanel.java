@@ -275,7 +275,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
         if ( immediately ) {
             sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
-            if ( !componentTextField.getText().equals( element.getComponent() ) ) {
+            if ( element!=null && !componentTextField.getText().equals( element.getComponent() ) ) {
                 componentTextField.setText( element.getComponent() );
                 componentChanged();
             }
@@ -283,7 +283,7 @@ public class DataPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
-                    if ( !componentTextField.getText().equals( element.getComponent() ) ) {
+                    if ( element!=null && !componentTextField.getText().equals( element.getComponent() ) ) {
                         componentTextField.setText( element.getComponent() );
                         componentChanged();
                     }
