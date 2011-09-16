@@ -2598,7 +2598,7 @@ APSplash.checkTime("init -80");
                             }   
                         }
                     };
-                    new Thread(run).start();
+                    new Thread(run,"batchRunScriptThread").start();
                 } else {
                     if ( app!=null ) app.setStatus("ready");
                 }
