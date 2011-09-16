@@ -10,7 +10,9 @@ import java.util.List;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
@@ -122,6 +124,26 @@ public class CdfVirtualVars {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
             return Ops.fftPower( args.get(0), 512, new NullProgressMonitor() );
+        } else if (function.equals("fftPowerDelta512")) {
+            QDataSet deltaT= args.get(1);       // time between successive measurements.
+            MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
+            while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
+            waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
+            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
+            return pow;
+        } else if (function.equals("fftPowerDeltaTranslation512")) {
+            QDataSet deltaT= args.get(1);       // time between successive measurements.
+            QDataSet translation= args.get(2);  // shift this amount after fft (because it was with respect to another signal
+            MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
+            waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT.slice(0),Ops.findgen(waves.length(0)) ) );
+            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
+            MutablePropertyDataSet poww= DataSetOps.makePropertiesMutable(pow);
+            QDataSet trs1= Ops.add( (QDataSet) pow.property(QDataSet.DEPEND_1),translation.slice(0));
+            poww.putProperty( QDataSet.DEPEND_1, trs1 );
+   throw new IllegalArgumentException("untested");
+            //return poww;
+        } else if ( function.equals("alternate_view") ) {
+            return args.get(0);
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
@@ -151,7 +173,7 @@ public class CdfVirtualVars {
     }
 
     protected static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10" );
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512", "fftPowerDeltaTranslation512", "alternate_view");
         return functions.contains(function);
     }
 }
