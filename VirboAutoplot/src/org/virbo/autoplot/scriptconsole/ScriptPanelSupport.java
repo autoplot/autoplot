@@ -378,7 +378,7 @@ public class ScriptPanelSupport {
 
                     }
                 };
-                new Thread(run).start();
+                new Thread(run,"sessionRunScriptThread").start();
             }
 
         } catch (IOException iOException) {
