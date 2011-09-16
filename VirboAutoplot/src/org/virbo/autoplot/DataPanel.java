@@ -133,7 +133,7 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
 
-    protected void expertMode( boolean expert ) {
+    protected void setExpertMode( boolean expert ) {
         componentTextField.setVisible(expert);
         operationsLabel.setVisible(expert);
     }
