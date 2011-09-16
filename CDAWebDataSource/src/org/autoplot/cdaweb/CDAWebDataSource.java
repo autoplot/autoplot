@@ -168,14 +168,14 @@ public class CDAWebDataSource extends AbstractDataSource {
                         result= (MutablePropertyDataSet)ds1;
                     } else {
                         accum = ArrayDataSet.maybeCopy(ds1);
-                        accum.grow(result.length()*files.length*11/10);  //110%
+                        accum.grow(accum.length()*files.length*11/10);  //110%
                     }
                 } else {
                     ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
                     if ( accum.canAppend(ads1) ) {
                         accum.append( ads1 );
                     } else {
-                        accum.grow( result.length() + ads1.length() * ( files.length-i) );
+                        accum.grow( accum.length() + ads1.length() * ( files.length-i) );
                         accum.append( ads1 );
                     }
                     range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
