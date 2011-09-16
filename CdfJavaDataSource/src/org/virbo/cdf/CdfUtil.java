@@ -177,7 +177,7 @@ public class CdfUtil {
                     }
                     //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
-                    System.err.println("reading variable "+variable.getName());
+                    //System.err.println("reading variable "+variable.getName());
                     odata= cdf.get1D( variable.getName() ); // this is my hack
                 }
             } else {
@@ -365,6 +365,20 @@ public class CdfUtil {
     }
     
 
+    /**
+     * returns the amount of JVM memory occupied by the dataset. (Approx.)
+     * @param ds
+     * @return
+     */
+    public static int jvmMemory( QDataSet ds ) {
+        if ( ds instanceof ArrayDataSet ) {
+            return ((ArrayDataSet)ds).jvmMemory();
+        } else if ( ds instanceof TrArrayDataSet ) {
+            return ((TrArrayDataSet)ds).jvmMemory();
+        } else {
+            throw new IllegalArgumentException("not supported type of QDataSet: "+ds);
+        }
+    }
 
     public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws Exception {
         return getPlottable(cdf, dataOnly, rankLimit, false);
