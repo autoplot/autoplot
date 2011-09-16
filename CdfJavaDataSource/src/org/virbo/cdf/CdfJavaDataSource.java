@@ -253,7 +253,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
         Pattern p = Pattern.compile("DEPEND_[0-9]");
 
-        String[] vv= cdf.variableAttributeNames(var.getName());
+        String[] vv;
+        try {
+            vv= cdf.variableAttributeNames(var.getName());
+        } catch ( NullPointerException ex ) {
+            ex.printStackTrace();
+            throw ex;
+        }
 
         for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
             for (int i = 0; i < vv.length; i++) {
@@ -303,7 +309,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
      */
     private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon ) throws Exception, ParseException {
         Variable variable = cdf.getVariable(svariable);
-
+        if ( variable==null ) {
+            throw new IllegalArgumentException( "No such variable: "+svariable );
+        }
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
 
         long numRec = variable.getNumberOfValues();
@@ -481,6 +489,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 } else {
                     if (labl != null) {
                         try {
+                            if ( cdf.getVariable(labl)==null ) {
+                                throw new IllegalArgumentException("no such variable: "+labl+" referred to by variable: "+ svariable );
+                            }
                             MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
                             result.putProperty("DEPEND_" + idep, depDs);
                         } catch (Exception e) {
