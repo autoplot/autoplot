@@ -23,6 +23,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.cdf.CdfUtil;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -91,7 +92,8 @@ public class CDAWebDataSource extends AbstractDataSource {
 
         mon.started();
 
-        ArrayDataSet result = null;
+        MutablePropertyDataSet result= null;
+        ArrayDataSet accum = null;
 
         try {
             mon.setProgressMessage("refreshing database");
@@ -158,28 +160,32 @@ public class CDAWebDataSource extends AbstractDataSource {
                     DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
                     ds1= dataSource.getDataSet( t1 );
                 }
-
+ 
                 if (result == null) {
                     range= fsm.getRangeFor(files[i]);
                     if ( files.length==1 ) {
-                        result= ArrayDataSet.maybeCopy(ds1);
+                        result= (MutablePropertyDataSet)ds1;
                     } else {
-                        result = ArrayDataSet.maybeCopy(ds1);
-                        result.grow(result.length()*files.length*11/10);  //110%
+                        accum = ArrayDataSet.maybeCopy(ds1);
+                        accum.grow(result.length()*files.length*11/10);  //110%
                     }
                 } else {
-                    ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
-                    if ( result.canAppend(ads1) ) {
-                        result.append( ads1 );
+                    ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
+                    if ( accum.canAppend(ads1) ) {
+                        accum.append( ads1 );
                     } else {
-                        result.grow( result.length() + ads1.length() * ( files.length-i) );
-                        result.append( ads1 );
+                        accum.grow( result.length() + ads1.length() * ( files.length-i) );
+                        accum.append( ads1 );
                     }
                     range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
                 }
 
             }
 
+            if ( result==null ) {
+                result= accum;
+            }
+            
             // we know the ranges for timeseriesbrowse, klduge around autorange 10% bug.
             if ( result!=null ) {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
@@ -197,7 +203,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         } finally {
             mon.finished();
         }
-        
+
         return result;
 
     }
