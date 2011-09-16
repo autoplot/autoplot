@@ -411,7 +411,7 @@ public class DataSourceController extends DomNodeController {
             if (dom.controller.isHeadless()) {
                 throw new IllegalArgumentException(message.toString());
             } else {
-                JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
+                this.model.showMessage( message.toString(), "Data Set is Invalid", JOptionPane.WARNING_MESSAGE );
             }
 
             if (ds instanceof MutablePropertyDataSet) {
