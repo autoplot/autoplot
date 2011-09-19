@@ -25,14 +25,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,11 +38,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -544,9 +540,17 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             public void run() {
                 String ss= jComboBox1.getSelectedItem().toString();
                 try {
-
                     DasServer server= DasServer.create( new URL( ss ) );
-                    TreeModel model= server.getDataSetList();
+                    TreeModel model;
+                    if ( expert ) {
+                        model= server.getDataSetList();
+                    } else {
+                        if ( ss.contains("JBF") ) {
+                            model= server.getDataSetListWithDiscovery();
+                        } else {
+                            model= server.getDataSetList();
+                        }
+                    }
                     jTree1.setModel(model);
                     if ( dataSetId!=null ) selectDataSetId();
                 } catch (DasException ex) {
@@ -639,4 +643,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return result;
     }
 
+    private boolean expert;
+    
+    /**
+     * call this before prepare.
+     * @param expert
+     */
+    public void setExpertMode( boolean expert ) {
+        this.expert= expert;
+    }
 }
