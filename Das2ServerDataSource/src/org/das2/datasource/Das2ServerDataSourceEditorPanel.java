@@ -144,9 +144,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel5.setToolTipText("<html>\nInterval (in seconds) to use for TCA (ephemeris) data.<br>\nLeave blank for most datasets.<br>\n</html>\n");
 
         tcaTextField.setText(" ");
+        tcaTextField.setToolTipText("<html> Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html> ");
 
         jLabel6.setText("TCA Item:");
         jLabel6.setToolTipText("The optional item number for TCAs.");
+
+        tcaItem.setToolTipText("The optional item number for TCAs.");
 
         viewDsdfButton.setText("View DSDF");
         viewDsdfButton.addActionListener(new java.awt.event.ActionListener() {

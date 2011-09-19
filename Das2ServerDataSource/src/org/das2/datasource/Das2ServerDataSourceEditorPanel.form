@@ -203,6 +203,7 @@
     <Component class="javax.swing.JTextField" name="tcaTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value=" "/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for TCA (ephemeris) data.&lt;br&gt; Leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel6">
@@ -212,6 +213,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="tcaItem">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="The optional item number for TCAs."/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="viewDsdfButton">
       <Properties>
