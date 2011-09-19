@@ -35,11 +35,14 @@
                       <Component id="plotButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="primaryDataSetSelector" alignment="0" pref="678" max="32767" attributes="0"/>
-                  <Component id="primaryCheckBox" alignment="0" pref="678" max="32767" attributes="0"/>
                   <Component id="secondaryCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="secondaryDataSetSelector" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="tertiaryCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="tertiaryDataSetSelector" alignment="0" pref="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="jLabel1" pref="503" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="175" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -49,8 +52,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="primaryCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="primaryDataSetSelector" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="secondaryCheckBox" min="-2" max="-2" attributes="0"/>
@@ -60,7 +63,7 @@
               <Component id="tertiaryCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="tertiaryDataSetSelector" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="65" max="32767" attributes="0"/>
+              <EmptySpace pref="70" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="plotButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="plotBelowButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -133,15 +136,10 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="primaryCheckBox">
+    <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Plot the Data Set URI:"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Enter the data set URI, such as the name of an ascii text file and parameters for parsing.  &#xa;Possible completions are displayed when CTRL-Space is pressed, and the folder icon &#xa;may invoke an editor depending on the data source type.&#xa;&#xa;Uncheck this to add an empty panel.&#xa;&lt;/html&gt;"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="primaryCheckBoxActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>
