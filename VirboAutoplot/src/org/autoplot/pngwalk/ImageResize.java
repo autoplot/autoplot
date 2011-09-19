@@ -18,9 +18,9 @@ public class ImageResize {
 
     /**
      * convenient typical use.
-     * @param img
-     * @param thumbSize
-     * @return
+     * @param img image to resize.
+     * @param thumbSize corner-to-corner size, preserving aspect ratio.
+     * @return buffered image that is thumbSize across.
      */
     public static BufferedImage getScaledInstance( BufferedImage img, int thumbSize ) {
         int w0= img.getWidth();
