@@ -124,7 +124,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             for ( int i=0; i<files.length; i++ ) {
                 if ( mon.isCancelled() ) break;
                 mon.setTaskProgress(i*10);
-                mon.setProgressMessage( "reading "+files[i] );
+                mon.setProgressMessage( "load "+files[i] );
 
                 ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
 
@@ -162,7 +162,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     ds1= dataSource.getDataSet( t1 );
                 }
  
-                if (result == null) {
+                if ( result==null && accum==null ) {
                     range= fsm.getRangeFor(files[i]);
                     if ( files.length==1 ) {
                         result= (MutablePropertyDataSet)ds1;
