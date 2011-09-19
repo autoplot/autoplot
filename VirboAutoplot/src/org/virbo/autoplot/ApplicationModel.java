@@ -356,7 +356,7 @@ public class ApplicationModel {
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
-                    addRecent( surl );
+                    if ( addToHistory ) addRecent( surl );
                 } catch (HtmlResponseIOException ex ) {
                     // we know the URL here, so rethrow it.
                     URL url= ex.getURL();
