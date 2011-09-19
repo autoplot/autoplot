@@ -17,6 +17,24 @@ import java.awt.image.BufferedImage;
 public class ImageResize {
 
     /**
+     * convenient typical use.
+     * @param img
+     * @param thumbSize
+     * @return
+     */
+    public static BufferedImage getScaledInstance( BufferedImage img, int thumbSize ) {
+        int w0= img.getWidth();
+        int h0= img.getHeight();
+        int thumbH = 0, thumbW = 0;
+        if ( true ) {
+            double aspect = 1. * w0 / h0;
+            thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
+            thumbW = (int) (thumbH * aspect);
+        }
+        return getScaledInstance( img, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
+    }
+
+    /**
      * Convenience method that returns a scaled instance of the
      * provided {@code BufferedImage}.
      *
