@@ -495,4 +495,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         return false;
     }
 
+    private boolean expert= true;
+
+    public void setExpertMode( boolean expert ) {
+        this.expert= expert;
+    }
 }
