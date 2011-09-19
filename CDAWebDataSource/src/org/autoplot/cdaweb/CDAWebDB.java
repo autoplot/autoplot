@@ -261,12 +261,12 @@ public class CDAWebDB {
     public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
         String master= "ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
-        //DasProgressPanel p= DasProgressPanel.createFramed("downloading master cdf");
-        p.setLabel("downloading master cdf");
+        //DasProgressPanel p= DasProgressPanel.createFramed("loading master cdf");
+        p.setProgressMessage("loading master cdf");
         
         try {
             try {
-                DataSetURI.getFile(new URI(master), p);
+                DataSetURI.getFile(new URI(master), new NullProgressMonitor() );
             } catch (URISyntaxException ex) {
                 Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -309,6 +309,7 @@ public class CDAWebDB {
             }
 
         }
+        p.setProgressMessage(" ");
         return master;
     }
 
