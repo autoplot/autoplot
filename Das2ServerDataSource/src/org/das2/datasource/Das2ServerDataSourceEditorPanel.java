@@ -375,11 +375,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     for (int i = 2; i < oo.length; i++) {
                         ds = ds + "/" + oo[i];
                     }
-                    System.err.println(ds);
                     String surl = oo[0] + "?server=dsdf&dataset=" + ds;
                     URL url = new URL(surl);
-
-                    System.err.println(url);
                     
                     in = url.openStream();
 
