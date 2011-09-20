@@ -182,11 +182,8 @@ class Das2ServerDataSource extends AbstractDataSource {
             
         }
 
+        logger.fine( String.valueOf(url2) );
 
-        System.err.println( "==URL==");
-        System.err.println( url2 );
-        System.err.println( "==URL==");
-        
         boolean qds= "1".equals( dsdfParams.get("qstream") );
 
         logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
@@ -326,7 +323,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                     if ( resolution!=null ) {
                             sparams+= "&resolution=" + resolution.doubleValue(Units.seconds);
                     } else {
-                        System.err.println("no resolution specified");
+                        logger.fine("no resolution specified");
                     }
                     if ( dsParams!=null )  sparams+= "&" + dsParams;
                     return "vap+das2Server:" + resourceURI + "?" + sparams;
