@@ -7,6 +7,7 @@ package org.autoplot.cdaweb;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
@@ -217,7 +219,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             String master= db.getMasterFile( ds.toLowerCase(), mon );
 
-            DataSource cdf= getDelegateFactory().getDataSource( new URI(master+"?"+param) );
+            DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+param) );
 
             try {
                 cdf.getDataSet( new NullProgressMonitor() );  // this should be quick, because there is no data.
