@@ -54,6 +54,10 @@ if [ "" = "$WGET" ]; then
     WGET=wget
 fi
 
+if [ "" = "$RSYNC" ]; then
+    RSYNC=rsync
+fi
+
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
@@ -85,8 +89,8 @@ for i in \
   FitsDataSource OpenDapDataSource \
   CdfDataSource CdfJavaDataSource CDAWebDataSource \
   VirboAutoplot; do
-    echo rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
-    rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
+    echo ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
+    ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
 done
 echo "done copy sources"
 
@@ -154,8 +158,8 @@ for i in \
   CdfJavaDataSource \
   VirboAutoplot; do
     if [ -d ../${i}/javahelp/ ]; then
-        echo rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
-        rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+        echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+        ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
     fi
 done
 
