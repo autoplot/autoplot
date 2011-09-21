@@ -933,6 +933,10 @@ public class PlotController extends DomNodeController {
         }
     }
 
+    /**
+     * adjust the plot axes so it remains isotropic.
+     * @param axis if non-null, the axis that changed, and the other should be adjusted.
+     */
     private void checkIsotropic(DasAxis axis) {
         Datum scalex = dasPlot.getXAxis().getDatumRange().width().divide(dasPlot.getXAxis().getDLength());
         Datum scaley = dasPlot.getYAxis().getDatumRange().width().divide(dasPlot.getYAxis().getDLength());
