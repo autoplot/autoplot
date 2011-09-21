@@ -97,8 +97,12 @@ public class Test501 {
 
         flatten( tm, "", tm.getRoot(), ids );
 
-        List<Integer> skip= Arrays.asList( 3, 4, 5, 6, 7, 18 );
-        for ( int i=20; i<96; i++ ) skip.add(i);
+        List<Integer> skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
+        for ( int i=8; i<ids.size(); i++ ) {
+            String id= ids.get(i);
+            if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(i);
+        }
+
 
         Map<Integer,String> failures= new LinkedHashMap();
 
@@ -112,13 +116,19 @@ public class Test501 {
 
         int iid=0;
         for ( String id: ids ) {
+            System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
+
+            if ( id.contains("/testing/") ) {
+                System.err.println( "ids containing /testing/ are automatically skipped: " + id );
+                continue;
+            }
+            
             if ( skip.contains(iid ) ) {
                 iid++;
+                System.err.println( "test marked for skipping in Test501.java: " + id );
                 continue;
             }
-            if ( id.contains("/testing/") ) {
-                continue;
-            }
+
 
             StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
             String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this.
@@ -127,7 +137,6 @@ public class Test501 {
             DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
             String uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
-            System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
             System.err.println("id: "+id );
             System.err.println("uri: "+uri);
 
