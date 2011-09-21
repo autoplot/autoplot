@@ -97,22 +97,20 @@ public class Test501 {
 
         flatten( tm, "", tm.getRoot(), ids );
 
-        List<Integer> skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
-        for ( int i=8; i<ids.size(); i++ ) {
-            String id= ids.get(i);
-            if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(i);
-        }
-
-
         Map<Integer,String> failures= new LinkedHashMap();
 
+        List<Integer> skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
         int count=0;
         for ( String id: ids ) {
             if ( id.contains("/testing/") ) {
+                System.err.println("skipping /testing/: "+id);
                 continue;
             }
+            if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(count);
             count++;
         }
+
+        System.err.println( "Skipping the tests: " + skip );
 
         int iid=0;
         for ( String id: ids ) {
