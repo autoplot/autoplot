@@ -221,11 +221,6 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+param) );
 
-            try {
-                cdf.getDataSet( new NullProgressMonitor() );  // this should be quick, because there is no data.
-            } catch ( Exception ex ) {
-                //do nothing, because the exception should be caused by no records.  TODO: it should throw NoDataInIntervalException, I think.
-            }
             metadata= cdf.getMetadata(mon); // note this is a strange branch, because usually we have read data first.
         }
         return metadata;
