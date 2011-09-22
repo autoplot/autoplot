@@ -309,9 +309,6 @@ public class ApplicationModel {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
-        resetDataSetSourceURL( surl, true, mon );
-    }
 
 
     /**
@@ -328,7 +325,7 @@ public class ApplicationModel {
      * @param surl the new data source URL.
      * @param mon progress monitor which is just used to convey messages.
      */
-    protected void resetDataSetSourceURL(String surl, boolean addToHistory, ProgressMonitor mon) {
+    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
 
         if (surl == null) {
             return;
@@ -356,7 +353,7 @@ public class ApplicationModel {
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
-                    if ( addToHistory ) addRecent( surl );
+                    addRecent( surl );
                 } catch (HtmlResponseIOException ex ) {
                     // we know the URL here, so rethrow it.
                     URL url= ex.getURL();
