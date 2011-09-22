@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot;
 
+import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
@@ -429,6 +430,24 @@ public class ScriptContext extends PyJavaInstance {
         }
     }
 
+    public static void writeToPng( BufferedImage image, String filename ) throws IOException {
+
+        final FileOutputStream out1 = new FileOutputStream(filename);
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        try {
+            encoder.write((BufferedImage) image, out1);
+        } catch (IOException ioe) {
+        } finally {
+            try {
+                out1.close();
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
+        }
+    }
+
     /**
      * This is intended to be used with a debugger.  The developer should put
      * a breakpoint at the out.write statement, and then call peekAt from
@@ -528,6 +547,19 @@ public class ScriptContext extends PyJavaInstance {
         return image;
     }
 
+    /**
+     * convenient method for getting an image from the current canvas.
+     * @return
+     */
+    public static BufferedImage writeToBufferedImage( ) throws InterruptedException {
+        model.waitUntilIdle(false);
+        
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+
+        BufferedImage image= (BufferedImage)  model.getDocumentModel().getCanvases(0).getController().getDasCanvas().getImage(width, height);
+        return image;
+    }
     /**
      * return an array of URLs that match the spec for the time range provided.
      * For example,
