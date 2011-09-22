@@ -63,8 +63,43 @@ public class CdfJavaDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    protected static final LinkedHashMap<String,CDF> openFiles= new LinkedHashMap();
+    protected static final Map<CDF,String> openFilesRev= new HashMap();
+    protected static final Map<String,Long> openFilesFresh= new HashMap();
+
+    protected static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
+    protected static final HashMap<String,Long> dsCacheFresh= new HashMap();
+
+    private static synchronized void cdfCacheUnload( String fileName, boolean unloadDs ) {
+        CDF cdf= openFiles.remove(fileName);
+        openFilesRev.remove(cdf);
+        openFilesFresh.remove(fileName);
+        if ( unloadDs ) {
+            List<String> unload= new ArrayList();
+            for ( String ds: dsCache.keySet() ) {
+                if ( ds.startsWith(fileName) ) {
+                    unload.add(ds);
+                }
+            }
+            for ( String ds: unload ) {
+                dsCache.remove(ds);
+                dsCacheFresh.remove(ds);
+            }
+        }
+    }
+
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+        String lsurl= uri.toString();
+        MutablePropertyDataSet cached= dsCache.get(lsurl);
+        if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
+            synchronized (this) {
+                dsCache.remove(lsurl);
+                dsCache.put( lsurl, cached );
+                dsCacheFresh.put( lsurl, System.currentTimeMillis() );
+            }
+        }
+
         File cdfFile;
         cdfFile = getFile(mon);
 
@@ -76,7 +111,36 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         CDF cdf;
         try {
-            cdf = CDFFactory.getCDF(fileName);
+            cdf= openFiles.get(fileName);
+            if ( cdf==null ) {
+                synchronized (this) {
+                    cdf = CDFFactory.getCDF(fileName);
+                    openFiles.put(fileName, cdf);
+                    openFilesRev.put(cdf, fileName);
+                    openFilesFresh.put(fileName,System.currentTimeMillis());
+                    if ( openFiles.size()>10 ) {
+                        String oldest= openFiles.entrySet().iterator().next().getKey();
+                        cdfCacheUnload(oldest,true);
+                    }
+                }
+            } else {
+                synchronized (this) { // freshen reference.
+                    long date= openFilesFresh.get(fileName);
+                    if ( new File(fileName).lastModified() > date ) {
+                        cdf = CDFFactory.getCDF(fileName);
+                        openFiles.put(fileName, cdf);
+                        openFilesRev.put(cdf, fileName);
+                        openFilesFresh.put(fileName,System.currentTimeMillis());
+
+                    } else {
+                        cdfCacheUnload(fileName,false);
+                        openFiles.put(fileName, cdf);
+                        openFilesRev.put(cdf, fileName);
+                        openFilesFresh.put(fileName,System.currentTimeMillis());
+                        logger.fine("using cached open CDF "+fileName);
+                    }
+                }
+            }
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
@@ -102,9 +166,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
             if (!"no".equals(interpMeta)) {
                 long numRec= variable.getNumberOfValues();
                 long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
-                attributes = readAttributes(cdf, variable, 0);
-                if ( recs[2]==-1 ) {
-                    attributes= MetadataUtil.sliceProperties(attributes, 0);
+                if ( attributes==null ) {
+                    attributes = readAttributes(cdf, variable, 0);
+                    if ( recs[2]==-1 ) {
+                        attributes= MetadataUtil.sliceProperties(attributes, 0);
+                    }
                 }
             }
 
@@ -249,7 +315,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
     }
 
     /* read all the variable attributes into a Map */
-    private HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
+    private synchronized HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
         Pattern p = Pattern.compile("DEPEND_[0-9]");
 
@@ -399,6 +465,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         if ( reformDep && cdf.getVariable( depName ).recordVariance() ) {
                             reformDep= false;
                         }
+
                         MutablePropertyDataSet depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
