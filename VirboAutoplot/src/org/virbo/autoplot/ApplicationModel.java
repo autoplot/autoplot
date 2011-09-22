@@ -578,6 +578,11 @@ public class ApplicationModel {
             return;
         }
 
+        if ( surl.contains("nohistory=true") ) {
+            System.err.println("Not logging URI because it contains nohistory=true");
+            return;
+        }
+
         if ( recent==null ) recent= new ArrayList<Bookmark>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
