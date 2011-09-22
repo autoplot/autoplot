@@ -584,6 +584,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     };
 
     public void setTemplate( String template ) {
+
+        if ( template.contains("$") && !template.contains("%") ) {
+            template= template.replaceAll("\\$","%");
+        }
+        
         dataSetSelector1.setValue(template);
 
         WalkImageSequence oldseq= this.seq;
