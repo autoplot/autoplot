@@ -100,6 +100,7 @@ public abstract class Bookmark {
         String s = null;
         String title = null;
         ImageIcon icon = null;
+        String description= null;
 
         NodeList nl;
         nl = ((Element) element).getElementsByTagName("title");
@@ -117,6 +118,12 @@ public abstract class Bookmark {
             icon = new ImageIcon(decodeImage(s));
         }
 
+        nl = ((Element) element).getElementsByTagName("description");
+        if (nl.getLength() > 0) {
+            s = ((Text) (nl.item(0).getFirstChild())).getData();
+            description = URLDecoder.decode(s, "UTF-8");
+        }
+        
         if (element.getNodeName().equals("bookmark")) {
 
             nl = ((Element) element).getElementsByTagName("url");
@@ -125,6 +132,7 @@ public abstract class Bookmark {
             Bookmark book = new Bookmark.Item(url);
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
+            if ( description!=null ) book.setDescription(description);
             return book;
 
         } else if (element.getNodeName().equals("bookmark-folder")) {
@@ -218,6 +226,7 @@ public abstract class Bookmark {
             Bookmark.Folder book = new Bookmark.Folder(title);
             if ( icon!=null ) book.setIcon(icon);
             if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
+            if ( description!=null ) book.setDescription(description);
 
             book.getBookmarks().addAll(contents);
             for ( int i=0; i<contents.size(); i++ ) {
@@ -261,7 +270,7 @@ public abstract class Bookmark {
      * @return
      */
     public static String formatBooks(List<Bookmark> bookmarks) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append("<bookmark-list>\n");
         for (Bookmark o : bookmarks) {
@@ -292,14 +301,18 @@ public abstract class Bookmark {
     public static String formatBookmark(Bookmark bookmark) {
 
         try {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             if (bookmark instanceof Bookmark.Item) {
+                if ( bookmark.title.contains("PO_H0_TIM") ) {
+                    System.err.println("here307");
+                }
                 Bookmark.Item b = (Bookmark.Item) bookmark;
                 buf.append("  <bookmark>\n");
-                buf.append("     <title>" + URLEncoder.encode(b.getTitle(), "UTF-8") + "</title>\n");
-                if (b.icon != null) buf.append("     <icon>" + encodeImage((BufferedImage) b.icon.getImage()) + "</icon>\n");
-                buf.append("     <url>" + URLEncoder.encode(b.getUrl(), "UTF-8") + "</url>\n");
+                buf.append("     <title>").append(URLEncoder.encode(b.getTitle(), "UTF-8")).append("</title>\n");
+                if (b.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) b.icon.getImage())).append("</icon>\n");
+                if (b.description != null) buf.append("     <description>").append( URLEncoder.encode(b.getDescription(), "UTF-8")).append("</description>\n");
+                buf.append("     <url>").append(URLEncoder.encode(b.getUrl(), "UTF-8")).append("</url>\n");
                 buf.append("  </bookmark>\n");
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
@@ -307,12 +320,13 @@ public abstract class Bookmark {
                 if ( f.getRemoteUrl()!=null ) {
                     if ( title.endsWith(" " + MSG_REMOTE) ) title= title.substring(0,title.length()-(1+MSG_REMOTE.length()));
                     if ( title.endsWith(" " + MSG_NO_REMOTE ) ) title= title.substring(0,title.length()-(1+MSG_NO_REMOTE.length()));
-                    buf.append("  <bookmark-folder remoteUrl=\"" +URLEncoder.encode(f.getRemoteUrl(), "UTF-8")  +"\">\n");
+                    buf.append("  <bookmark-folder remoteUrl=\"").append(URLEncoder.encode(f.getRemoteUrl(), "UTF-8")).append("\">\n");
                 } else {
                     buf.append("  <bookmark-folder>\n");
                 }
-                buf.append("    <title>" + URLEncoder.encode(title, "UTF-8") + "</title>\n");
-                if (f.icon != null) buf.append("     <icon>" + encodeImage((BufferedImage) f.icon.getImage()) + "</icon>\n");
+                buf.append("    <title>").append(URLEncoder.encode(title, "UTF-8")).append("</title>\n");
+                if (f.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) f.icon.getImage())).append("</icon>\n");
+                if (f.description != null) buf.append("     <description>").append( URLEncoder.encode(f.getDescription(), "UTF-8")).append("</description>\n");
                 buf.append(formatBooks(f.getBookmarks()));
                 buf.append("  </bookmark-folder>\n");
             }
@@ -370,23 +384,30 @@ public abstract class Bookmark {
         propertyChangeSupport.removePropertyChangeListener(l);
     }
 
-    /**
-     * Getter for property title.
-     * @return Value of property title.
-     */
     public String getTitle() {
         return this.title;
     }
 
-    /**
-     * Setter for property title.
-     * @param title New value of property title.
-     */
     public void setTitle(String title) {
         String oldTitle = this.title;
         this.title = title;
         propertyChangeSupport.firePropertyChange("title", oldTitle, title);
     }
+
+
+    protected String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        String oldValue= this.description;
+        this.description = description;
+        propertyChangeSupport.firePropertyChange( "description", oldValue, description );
+    }
+
+
     protected ImageIcon icon = null;
     public static final String PROP_ICON = "icon";
 
@@ -455,10 +476,12 @@ public abstract class Bookmark {
             return bookmarks;
         }
 
+        @Override
         public int hashCode() {
             return bookmarks.hashCode() + ( remoteUrl!=null ? remoteUrl.hashCode() : 0 );
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Folder) {
                 Bookmark.Folder that= (Bookmark.Folder) obj;
@@ -472,6 +495,7 @@ public abstract class Bookmark {
 
         public Bookmark copy() {
             Bookmark.Folder result = new Bookmark.Folder(getTitle());
+            result.description= this.description;
             result.remoteUrl= remoteUrl;
             result.bookmarks = new ArrayList<Bookmark>(this.bookmarks);
             return result;
@@ -508,10 +532,12 @@ public abstract class Bookmark {
             propertyChangeSupport.firePropertyChange("url", oldUrl, url);
         }
 
+        @Override
         public int hashCode() {
             return url.hashCode();
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Item) {
                 Bookmark.Item that= (Bookmark.Item)obj;
@@ -525,6 +551,7 @@ public abstract class Bookmark {
         public Bookmark copy() {
             Bookmark.Item result = new Bookmark.Item(getUrl());
             result.setTitle(getTitle());
+            result.description= this.description;
             return result;
         }
     }
