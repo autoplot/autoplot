@@ -664,6 +664,10 @@ public class DataSetURI {
      * introduced when we needed access to a URL with arguments.  This allows us
      * to download the file in a script and then read the file.  It will put the
      * file in the directory, and the parameters are encoded in the name.
+     * Note this cannot be used to download HTML content, because checkNonHtml is
+     * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
+     * it's needed.
+     * 
      * @param url the address to download.
      * @param mon a progress monitor.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
