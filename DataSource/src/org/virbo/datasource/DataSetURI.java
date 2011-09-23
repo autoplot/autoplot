@@ -704,7 +704,7 @@ public class DataSetURI {
         File result= new File(filename);
         result.deleteOnExit();
 
-        checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...
+        checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...  
 
         newf.renameTo( result );
         return result;
