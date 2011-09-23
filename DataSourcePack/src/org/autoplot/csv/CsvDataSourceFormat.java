@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
@@ -68,10 +69,17 @@ public class CsvDataSourceFormat implements DataSourceFormat {
                 }
                 if ( dss[ids].rank()==1 ) {
                     labels[col++]= u;
-                    
                 } else {
-                    for ( int j=0;j<dss[ids].length(0); j++ ) {
-                        labels[col++]= u+" " +j;
+                    QDataSet dep1= (QDataSet) dss[ids].property(QDataSet.DEPEND_1);
+                    if (dep1!=null && dep1.rank()==1) {
+                        Units dep1units= SemanticOps.getUnits(dep1);
+                        for ( int j=0;j<dss[ids].length(0); j++ ) {
+                            labels[col++]= dep1units.format( Datum.create( dep1.value(j), dep1units ) );
+                        }
+                    } else {
+                        for ( int j=0;j<dss[ids].length(0); j++ ) {
+                            labels[col++]= u+" " +j;
+                        }
                     }
                 }
             }
