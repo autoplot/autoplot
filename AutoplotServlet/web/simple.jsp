@@ -21,27 +21,29 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 
     <h1>Autoplot Simple Servlet</h1>
     
-    This demonstrates how Autoplot can be used within a web application
-    container to provide static images.
-    
-    <form action="SimpleServlet">
-        Enter Autoplot URL:
-        <input type="text" name="url" value="http://localhost:14397/AutoplotServlet/data/0B000800408DD710.$Y$m$d.d2s?timerange=20090314" size="80" />
-        <input type="submit" value="Plot" />
-    </form>
+    <p>This demonstrates how Autoplot can be used within a web application
+    container to provide static images.</p>
 
-<br><br>
+    <h2>Enter Autoplot URI:</h2>
+
     <form action="SimpleServlet">
         <input name="url" value="http://www.sarahandjeremy.net/~jbf/1wire/data/2007/0B000800408DD710.%Y%m%d.d2s?timerange=20071210" size="80" type="text">
         <input value="Plot" type="submit">
     </form>
-<br><br>
+<br>
     <form action="SimpleServlet">
        <input name="url" value="vap+tsds:http://timeseries.org/get.cgi?StartDate=20030301&EndDate=20030401&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="80" type="text">
         <input value="Plot" type="submit">
     </form>
-<br><br>
-    <h1>This shows all the new controls:</h1>
+
+
+<h2>Or refer to .vap files:</h2>
+<form action="SimpleServlet">
+        <input name="vap" value="http://autoplot.org/data/autoplot-applet.vap" size="80" type="text">
+        <input value="Plot" type="submit">
+    </form>
+
+    <h1>This shows all sorts of controls:</h1>
     <form action="SimpleServlet">
         <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
         Apply a process to the dataset after loading: <select name="process">
