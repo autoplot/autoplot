@@ -31,8 +31,10 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.Slice0DataSet;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -102,6 +104,17 @@ public class CdfUtil {
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
 
+        {
+            String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            if ( cdfFile!=null ) {
+                String uri= cdfFile + "?" + variable.getName();
+                if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
+                    uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
+                }
+                MutablePropertyDataSet result= CdfJavaDataSource.dsCache.get( uri );
+                if ( result!=null ) return result;
+            }
+        }
         if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
         
         long varType = variable.getType();
@@ -155,6 +168,26 @@ public class CdfUtil {
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
+
+
+        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
+        long sizeBytes;
+        int itype=  variable.getType();
+        if ( itype==CDFConstants.CDF_EPOCH16 ) {
+            sizeBytes= 16;            
+        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
+            sizeBytes= 8;
+        } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
+            sizeBytes=8; //sizeBytes= 4;
+        } else if( itype == CDFConstants.CDF_INT2 || itype == CDFConstants.CDF_UINT2  ) {
+            sizeBytes=8; //sizeBytes= 2;
+        } else if( itype == CDFConstants.CDF_INT1 || itype == CDFConstants.CDF_UINT1 || itype==CDFConstants.CDF_BYTE || itype==CDFConstants.CDF_UCHAR || itype==CDFConstants.CDF_CHAR ) {
+            sizeBytes=8; //sizeBytes= 1;
+        } else {
+            throw new IllegalArgumentException("didn't code for type");
+        }
+        size= size*sizeBytes;
+System.out.println("size of "+variable.getName()+": "+size/1024/1024 + "  type: "+ itype );
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
@@ -364,6 +397,18 @@ public class CdfUtil {
 
         }
 
+System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
+        if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
+            String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            if ( cdfFile!=null ) {
+                String uri= cdfFile + "?" + variable.getName();
+                if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
+                    uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
+                }
+                CdfJavaDataSource.dsCache.put( uri, result );
+                CdfJavaDataSource.dsCacheFresh.put( uri, System.currentTimeMillis() );
+            }
+        }
         return result;
     }
     
@@ -378,6 +423,8 @@ public class CdfUtil {
             return ((ArrayDataSet)ds).jvmMemory();
         } else if ( ds instanceof TrArrayDataSet ) {
             return ((TrArrayDataSet)ds).jvmMemory();
+        } else if ( ds instanceof Slice0DataSet ) {
+            return 0; // TODO: not worth chasing after
         } else {
             throw new IllegalArgumentException("not supported type of QDataSet: "+ds);
         }
