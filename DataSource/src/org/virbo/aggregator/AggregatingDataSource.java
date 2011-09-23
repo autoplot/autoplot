@@ -31,6 +31,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.JoinDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
@@ -298,7 +299,7 @@ public class AggregatingDataSource extends AbstractDataSource {
             return altResult;
             
         } else {
-            ArrayDataSet dep0 = result == null ? null : (ArrayDataSet) result.property(DDataSet.DEPEND_0);
+            MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
             Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
                 dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
