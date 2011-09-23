@@ -34,6 +34,7 @@ import org.das2.util.AboutUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
@@ -205,7 +206,8 @@ public class SimpleServlet extends HttpServlet {
             logit("set canvas parameters", t0, uniq, debug);
 
             if (vap != null) {
-                appmodel.doOpen(new File(vap));
+                appmodel.resetDataSetSourceURL( vap, new NullProgressMonitor() );
+                //appmodel.doOpen(new File(vap));
                 logit("opened vap", t0, uniq, debug);
                 width = appmodel.dom.getCanvases(0).getWidth();
                 height = appmodel.dom.getCanvases(0).getHeight();
