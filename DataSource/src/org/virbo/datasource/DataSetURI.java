@@ -691,7 +691,7 @@ public class DataSetURI {
 
         String filename = new File( localCache, split.file.substring(split.path.length()) ).toString();
 
-        if ( split.params.length()>0 ) {
+        if ( split.params!=null && split.params.length()>0 ) {
             String safe= split.params;
             safe= safe.replaceAll("\\+","_"); // 2011 safeName uses "plus" for this
             safe= safe.replaceAll("-","."); // 2011 safeName uses "_" for this, but it should be different than "+"
