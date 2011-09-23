@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.das2.datum.Units;
+import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -80,16 +81,23 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         writer.writeRecord(labels);
 
         writer.setForceQualifier(false);
-        
+        writer.setUseTextQualifier(true);
+
+        DatumFormatter[] formats= new DatumFormatter[dss.length];
+        for ( int ids=0; ids<dss.length; ids++ ) {
+            Units u= SemanticOps.getUnits(dss[ids]);
+            formats[ids]= u.getDatumFormatterFactory().defaultFormatter();
+        }
+
         for ( int i=0; i<data.length(); i++ ) {
             col= 0;
             for ( int ids=0; ids<dss.length; ids++ ) {
                 Units u= SemanticOps.getUnits(dss[ids]);
                 if ( dss[ids].rank()==1 ) {
-                    values[col++]= u.format( u.createDatum( dss[ids].value(i) ) );
+                    values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i) ), u );
                 } else {
                     for ( int j=0;j<dss[ids].length(0); j++ ) {
-                        values[col++]= u.format( u.createDatum( dss[ids].value(i) ) );
+                        values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i,j) ), u );
                     }
                 }
             }
