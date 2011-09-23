@@ -697,13 +697,16 @@ public class DataSetURI {
 
         System.err.println( "reading URL "+url );
         InputStream in = new DasProgressMonitorInputStream( url.openStream(), mon );
-        OutputStream out= new FileOutputStream( new File(filename + "__") );
+        File newf= new File(filename + "__");
+        OutputStream out= new FileOutputStream( newf );
         DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
 
         File result= new File(filename);
         result.deleteOnExit();
 
-        new File(filename + "__").renameTo( result );
+        checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...
+
+        newf.renameTo( result );
         return result;
     }
 
