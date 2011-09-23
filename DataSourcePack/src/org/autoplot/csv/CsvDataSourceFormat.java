@@ -15,7 +15,6 @@ import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
 
