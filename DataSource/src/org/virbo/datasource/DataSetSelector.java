@@ -423,7 +423,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 Method m= edit.getClass().getDeclaredMethod( "setExpertMode", boolean.class );
                 m.invoke( edit, this.isExpertMode() );
             } catch ( NoSuchMethodException ex ) {
-                ex.printStackTrace(); //okay
+                //ex.printStackTrace(); //okay
             }
         } catch (URISyntaxException ex) {
             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
