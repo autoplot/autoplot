@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -105,6 +106,12 @@ public class ScriptPanelSupport {
                 }
                 if ( saveAs()==JOptionPane.CANCEL_OPTION ) {
                     return false;
+                }
+            }
+            if ( split.params!=null ) {
+                Map<String,String> params= URISplit.parseParams(split.params);
+                if ( params.containsKey("script") ) {
+                    sfile= params.get("script");
                 }
             }
             file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
