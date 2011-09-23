@@ -12,16 +12,14 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.channels.Channels;
@@ -147,12 +145,12 @@ public abstract class Bookmark {
                 try {
                     System.err.println("opening "+remoteUrl+"...");
                     URL rurl= new URL(remoteUrl);
-                    URLConnection connect= rurl.openConnection();
-                    connect.setConnectTimeout(1000);
-                    connect.setReadTimeout(1000);
+                    //URLConnection connect= rurl.openConnection();
+                    //connect.setConnectTimeout(1000);
+                    //connect.setReadTimeout(1000);
 
                     // copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
-                    in = DataSetURI.getInputStream( rurl.toURI(), new NullProgressMonitor() );
+                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
                     ByteArrayOutputStream boas=new ByteArrayOutputStream();
                     WritableByteChannel dest = Channels.newChannel(boas);
                     ReadableByteChannel src = Channels.newChannel(in);
@@ -181,8 +179,6 @@ public abstract class Bookmark {
                     Element flist = (Element) nl.item(0);
                     contents = parseBookmarks(flist);
 
-                } catch (URISyntaxException ex ) {
-                    ex.printStackTrace();
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SAXException ex) {
