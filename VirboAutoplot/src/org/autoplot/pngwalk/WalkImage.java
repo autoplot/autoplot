@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.das2.datum.DatumRange;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -109,6 +110,16 @@ public class WalkImage  {
 
     public String getCaption() {
         return caption;
+    }
+
+    DatumRange dr;
+
+    public DatumRange getDatumRange() {
+        return dr;
+    }
+
+    public void setDatumRange( DatumRange dr ) {
+        this.dr= dr;
     }
 
     public BufferedImage getImage() {
