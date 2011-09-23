@@ -60,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.dataset.DataSetUtil;
+import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -85,6 +86,7 @@ import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
@@ -272,7 +274,7 @@ public class GuiSupport {
 
     }
 
-    private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, boolean formatPlotElement  ) throws IOException {
+    private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, String dscontrol  ) throws IOException {
 
         ProgressMonitor mon=null;
         try {
@@ -290,7 +292,19 @@ public class GuiSupport {
             }
 
             mon= DasProgressPanel.createFramed( parent, "formatting data" );
-            if ( formatPlotElement ) {
+            if ( dscontrol.equals("plotElementTrim") ) {
+                DasPlot p= pe.getController().getDasPlot();
+                DatumRange xbounds= p.getXAxis().getDatumRange();
+                QDataSet dsout=  pe.getController().getDataSet();
+                if ( dsf.getController().getTsb()!=null ) {
+                    dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                    dsout= SemanticOps.trim( dsout, xbounds, null );
+                    format.formatData( uriOut, dsout, mon );
+                } else {
+                    dsout= SemanticOps.trim( dsout, xbounds, null );
+                    format.formatData( uriOut, dsout, mon );
+                }
+            } else if ( dscontrol.equals("plotElement") ) {
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
                     dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
@@ -407,7 +421,16 @@ public class GuiSupport {
                         Runnable run= new Runnable() {
                             public void run() {
                                 try {
-                                    doDumpData( fds,dsf,pe,format,uriOut,edp.isFormatPlotElement() );
+                                    String formatControl;
+                                    if ( edp.isFormatPlotElement() ) {
+                                        formatControl= "plotElement";
+                                    } else if ( edp.isFormatPlotElementAndTrim() ) {
+                                        formatControl= "plotElementTrim";
+                                    } else {
+                                        formatControl= "dataSourceFilter";
+                                    }
+
+                                    doDumpData( fds,dsf,pe,format,uriOut,formatControl );
                                 } catch ( IOException ex ) {
                                     parent.applicationModel.getExceptionHandler().handle(ex);
                                 }
