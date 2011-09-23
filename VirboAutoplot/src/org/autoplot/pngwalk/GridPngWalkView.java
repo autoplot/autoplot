@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JComponent;
@@ -26,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 
 /**
  *
@@ -246,6 +249,8 @@ public class GridPngWalkView extends PngWalkView {
             int colMax = Math.min((bounds.x + bounds.width) / thumbSize + 1, nCols);
             FontMetrics fm = g2.getFontMetrics();
 
+            List<DatumRange> drs= seq.getActiveSubrange();
+
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
                     int i = (row * nCols) + col;
@@ -279,6 +284,30 @@ public class GridPngWalkView extends PngWalkView {
 
                     if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                         paintQualityControlIcon( i, g2, imgX, imgY, true );
+                    }
+
+                    try {
+                    int ds=6;
+                    if ( drs!=null && i<seq.size()-1 && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                        g2.setColor(Color.GRAY);
+                        int cx = col*thumbSize + (thumbSize ) - ds;
+                        int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
+                        Shape oldClip = g2.getClip();
+                        g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
+                        g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                        g2.setClip(oldClip);
+                    }
+                    if ( drs!=null && i>0 && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                        g2.setColor(Color.GRAY);
+                        int cx = col*thumbSize;
+                        int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
+                        Shape oldClip = g2.getClip();
+                        g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
+                        g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                        g2.setClip(oldClip);
+                    }
+                    } catch ( NullPointerException ex ) {
+                        ex.printStackTrace();;
                     }
 
                     if (showCaptions && wimage.getCaption()!=null) {
