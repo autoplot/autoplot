@@ -42,6 +42,11 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         <input name="vap" value="http://autoplot.org/data/autoplot-applet.vap" size="80" type="text">
         <input value="Plot" type="submit">
     </form>
+    <br>
+<form action="SimpleServlet">
+    <input name="vap" value="http://autoplot.org/data/autoplot-applet.vap?timerange=2003-05-08" size="80" type="text">
+        <input value="Plot" type="submit">
+    </form>
 
     <h1>This shows all sorts of controls:</h1>
     <form action="SimpleServlet">
