@@ -180,7 +180,8 @@ public class CdfVirtualVars {
     }
 
     public static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPower512", "alternate_view" );
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
+                "fftPowerDeltaTranslation512", "alternate_view" );
         return functions.contains(function);
     }
 }
