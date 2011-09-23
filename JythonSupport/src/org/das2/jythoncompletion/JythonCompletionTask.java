@@ -101,7 +101,11 @@ public class JythonCompletionTask implements CompletionTask {
         PyMethodPeeker mpeek = new PyMethodPeeker(m);
         //PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
         return new PyReflectedFunctionPeeker(mpeek.getReflectedFunction()).getMethod(i);
+    }
 
+    private int getMethodCount( PyMethod m ) {
+        PyMethodPeeker mpeek = new PyMethodPeeker(m);
+        return new PyReflectedFunctionPeeker(mpeek.getReflectedFunction()).getArgsCount();
     }
 
     private void queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
@@ -139,9 +143,6 @@ public class JythonCompletionTask implements CompletionTask {
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
-            if ( ss.equals("Action") ) {
-                System.err.println("here action");
-            }
             if (ss.startsWith(cc.completable)) {
                 PyObject po;
                 try {
@@ -201,11 +202,15 @@ public class JythonCompletionTask implements CompletionTask {
                         Method jm;
                         try {
                             jm = getJavaMethod(m, 0);
+                            if ( getMethodCount(m)>1 ) {
+                                jm = getJavaMethod(m, getMethodCount(m)-1); //TODO: show completions for each argument type.
+                            }
                         } catch ( RuntimeException ex ) {
                             continue;
                         }
                         signature = methodSignature(jm);
                         args = methodArgs(jm);
+                        label= ss + args;
                     } else {
                         PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
                         Class dc = peek.getInstanceClass();
