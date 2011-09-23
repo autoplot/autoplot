@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Pngwalk tool now supports nested folders like $Y$m$d/$H.  Also a new command-line version is introduced...</small></p>
+        <p><small>"Basic" mode simplifies the GUI and doesn't allow new vaps to be composed.  Also, I've spent much of the month studying performance and finding the limits of the CDAWeb support.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,31 +22,35 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Bugfixes:</p>
         <ul>
+            <li>minor bugfixes.</li>
+            <li>bugfixes with AutoplotServlet</li>
+            <li>bugfix: remote bookmarks files references could not contain query part.</li>
+            <li>bugfix 3410461: any changesSupport.performingChange needs try/finally</li>
+            <li>bugfix 3405480: bugs with slicing in autoplot2011, connector since context.</li>
+            <li>bugfix 3405801:	operations key listener when holding key</li>
+            <li>bugfix 3409414: test033 on 2011 branch shows bug with runLater</li>
+            <li>bugfix 3409852:	improvements to the pitch angle distribution renderer</li>
+            <li>bugfix 3405109:	feedback when error in rich ascii</li>
+        </ul>
+        <ul>
             <li>bugfix: digitizing script works again</li>
             <li>bugfix: use Ops.safeName to create a filename for a temporary download.</li>
             <li>bugfix: rich headers RENDER_TYPE=spectrogram</li>
             <li>PitchAngleDistribution works again, handles fill, and minds both the x and y axes.</li>
             <li>Many others...</li>
         </ul>
-        <p>Older bugfixes:</p>
-        <ul>
-            <li>bugfix: help system focus</li>
-            <li>bugfix: completions after getParam(x,default,label)</li>
-            <li>bugfix: runtime error when time location units are y axis</li>
-            <li>bugfix:<a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3377088&group_id=199733&atid=970682">3377088</a>: need to reset ID's in reset method.</li>
-            <li>bugfix: switch from NNspectrogram to spectrogram would result in runtime error</li>
-            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3373948&group_id=199733&atid=970682">3373948</a>: undo after add three below fails</li>
-            <li>improve transparency by adding progress bar to getMasterFile in CDAWeb</li>
-            <li>bug 3349316: never allow autoranging=false to persist between sessions.</li>
-            <li>rte_1482456189_20110627_214119: check for null param.  There must be some datasets with no plottable parameters (in CDAWeb)</li>
-            <li>rte_1959777447_20110623_144934: don't give runtime error when the uri cannot be resolved.  This doesn't help the user.  Now we give them a more informative screen</li>
-            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302003&group_id=199733&atid=970682">3302003</a>: problems with noaa08_meped1mins_sem_....cdf CDF_UCHAR</li>
-        </ul>
-
+        
         <p>Features:</p>
         <ul>
+            <li>3404248: Improvements for CDF Autoplot2011b: Epoch variables are cached to avoid repeat reads.</li>
+            <li>3409891: decorations for zooming</li>
+            <li>3409852: improvements to pitch angle distribution renderer</li>
+            <li>3405256: true csv reader</li>
             <li>virtual variables and fixes associated with CDF testing</li>
-            <li>expert/basic mode</li>
+            <li>3402856: expert/basic mode</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>create/use pngwalks with nested folders ($Y/$m$d)</li>
             <li>BinaryDataSource supports rank 4 data</li>
             <li>More rigorous testing of cdf support.</li>
@@ -56,18 +60,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>applot.pro includes code to plot papco dataset model</li>
             <li>add xunits keyword, so you can say xunits='seconds since 2000-001T00:00'</li>
             <li>remove extraneous feedback in applot</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>      
-            <li>add getParam to completions in jython editor</li>
-            <li>minor enhancements to applot in IDL, including position and renderType bugfix.</li>
-            <li>rfe <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2981338&group_id=199733&atid=970685">2981338</a>: submit runtime can submit vap and undo info, which can be disabled.  log info no longer submitted.</li>
-            <li>check returned content for html code when data or vap was expected, for example with typos and mediawiki or in a hotel room</li>
-            <li>logic limiting scan buttons changed to limit scanning to range within dataset initial range, instead of by unit type.</li>
-            <li>add negate, cos, sin, toRadians, toDegrees, and smooth to sprocess.  negate handles units.</li>
-            <li>add fts extension to Fits reader.</li>
-            <li>rfe <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3377224&group_id=199733&atid=970685">3377224</a> autorange, autolayout, and autolabelling should not persist
-            <li>introduce forward compatibility.  Where autoplot2011 files can be read in because it has conversion from v1.07 vap file to v1.06</li>
         </ul>
 
 <p>Known issues:</p>
