@@ -41,7 +41,7 @@
                   <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="filenameTF" pref="300" max="32767" attributes="0"/>
+                      <Component id="filenameTF" pref="510" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="chooseFileB" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -52,7 +52,12 @@
               <Component id="additionalOptionsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="warningMessageLabel" alignment="0" pref="404" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="processedWithinXRangeB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="warningMessageLabel" pref="339" max="32767" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -64,7 +69,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="processedDataB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="warningMessageLabel" min="-2" pref="23" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="warningMessageLabel" min="-2" pref="23" max="-2" attributes="0"/>
+                  <Component id="processedWithinXRangeB" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -78,7 +86,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="additionalOptionsButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="55" max="32767" attributes="0"/>
+              <EmptySpace pref="122" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -95,7 +103,7 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Processed Data or Component"/>
-        <Property name="toolTipText" type="java.lang.String" value="Data as displayed, including slice and other operations"/>
+        <Property name="toolTipText" type="java.lang.String" value="Data as displayed, including slice and other operations.  This is the loaded data, and may extend past plot boundaries.&#xa;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JRadioButton" name="originalDataB">
@@ -156,6 +164,15 @@
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="warningMessageLabel">
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="processedWithinXRangeB">
+      <Properties>
+        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+          <ComponentRef name="buttonGroup1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Processed Data within X Axis Range"/>
+        <Property name="toolTipText" type="java.lang.String" value="Processed data, but also trim to the data to the X axis bounds.&#xa;"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

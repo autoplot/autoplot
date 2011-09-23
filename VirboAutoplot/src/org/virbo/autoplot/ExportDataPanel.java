@@ -10,7 +10,6 @@
  */
 package org.virbo.autoplot;
 
-import java.awt.BorderLayout;
 import java.io.File;
 import java.util.List;
 import javax.swing.JFileChooser;
@@ -65,6 +64,14 @@ public class ExportDataPanel extends javax.swing.JPanel {
         return processedDataB.isSelected();
     }
 
+    /**
+     * format the visible data, trimming to xaxis bounds.
+     * @return
+     */
+    public boolean isFormatPlotElementAndTrim() {
+        return processedWithinXRangeB.isSelected();
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -85,12 +92,13 @@ public class ExportDataPanel extends javax.swing.JPanel {
         chooseFileB = new javax.swing.JButton();
         additionalOptionsButton = new javax.swing.JButton();
         warningMessageLabel = new javax.swing.JLabel();
+        processedWithinXRangeB = new javax.swing.JRadioButton();
 
         jLabel2.setText("Select Output Format:");
 
         buttonGroup1.add(processedDataB);
         processedDataB.setText("Processed Data or Component");
-        processedDataB.setToolTipText("Data as displayed, including slice and other operations");
+        processedDataB.setToolTipText("Data as displayed, including slice and other operations.  This is the loaded data, and may extend past plot boundaries.\n");
 
         buttonGroup1.add(originalDataB);
         originalDataB.setSelected(true);
@@ -129,6 +137,10 @@ public class ExportDataPanel extends javax.swing.JPanel {
             }
         });
 
+        buttonGroup1.add(processedWithinXRangeB);
+        processedWithinXRangeB.setText("Processed Data within X Axis Range");
+        processedWithinXRangeB.setToolTipText("Processed data, but also trim to the data to the X axis bounds.\n");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -150,14 +162,18 @@ public class ExportDataPanel extends javax.swing.JPanel {
                     .add(jLabel3)
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(filenameTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                        .add(filenameTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(chooseFileB)))
                 .add(22, 22, 22))
             .add(layout.createSequentialGroup()
                 .add(additionalOptionsButton)
                 .addContainerGap())
-            .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(processedWithinXRangeB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -168,7 +184,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(processedDataB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(processedWithinXRangeB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -181,7 +199,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                     .add(chooseFileB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(additionalOptionsButton)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -261,12 +279,15 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
         String ss=  (String) evt.getItem();
 
-        if ( ss.equals(".txt") || ss.equals(".dat") || ss.equals(".csv") ) { //TODO: hard coded for ASCII
+        if ( ss.equals(".txt") || ss.equals(".dat") ) { //TODO: hard coded for ASCII
             editorPanel= new AsciiTableDataSourceFormatEditorPanel();
             String t=  getFilenameTF().getText();
             if ( t.contains("/" ) ) {
                 editorPanel.setURI( getFilenameTF().getText() );
             }
+        } else if ( ss.equals(".csv" ) ) {
+            editorPanel= null;
+
         } else {
             Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
             if ( oeditorPanel!=null ) {
@@ -307,6 +328,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JRadioButton originalDataB;
     private javax.swing.JRadioButton processedDataB;
+    private javax.swing.JRadioButton processedWithinXRangeB;
     private javax.swing.JLabel warningMessageLabel;
     // End of variables declaration//GEN-END:variables
 
