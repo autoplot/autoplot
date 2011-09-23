@@ -130,13 +130,14 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
             String captionString;
             if (datumRanges.get(i) != null) {
-                captionString = datumRanges.get(i).toString();
+                captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
             } else {
                 captionString = uris.get(i).getPath();
                 captionString = captionString.substring(captionString.lastIndexOf('/')+1);
             }
 
             existingImages.get(i).setCaption(captionString);
+            existingImages.get(i).setDatumRange(datumRanges.get(i));
         }
 
         for (DatumRange dr : datumRanges) {
