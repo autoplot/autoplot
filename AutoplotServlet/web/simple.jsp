@@ -50,7 +50,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 
     <h1>This shows all sorts of controls:</h1>
     <form action="SimpleServlet">
-        <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
+        <input name="url" value="vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
         Apply a process to the dataset after loading: <select name="process">
             <option selected></option>
             <option>histogram</option>
@@ -67,8 +67,8 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         height: <input name="height" value="400" > <br>
         <br>
         <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
-        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
-        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
+        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://autoplot.org/help#Layout">help</a>)<br>
+        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://autoplot.org/help#Layout">help</a>)<br>
         <br>
         timerange: <input name="timeRange" value="2003-mar"><br>
         <br>
@@ -77,7 +77,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             <option>spectrogram</option>
             <option>series</option>
             <option>scatter</option>
-            <option>histogram</option>
+            <option>stairSteps</option>
             <option>fill_to_zero</option>
         </select><br>
         color: <input name="color" value="#0000ff"><br>
