@@ -33,6 +33,7 @@ cd temp-classes
 jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
 jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
 jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
+jar xvf ../../APLibs/lib/javacsv.jar
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
 echo "Remove codes that are not used by the applet and cause problems, such as AutoplotUI.java and *EditorPanel.java"
@@ -58,6 +59,7 @@ if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes 
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/propertyeditor/PropertyEditor.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+
 echo "done compile sources."
 
 if [ $hasErrors -eq 1 ]; then
@@ -116,9 +118,7 @@ mkdir -p ../dist/
 $JAVA5_HOME/bin/jar cf ../dist/AutoplotAppletAll.jar *
 cd ..
 
-$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apAppletAll.proguard
-$JAVA6_HOME/bin/pack200 dist/AutoplotAppletAll.pro.jar.pack.gz dist/AutoplotAppletAll.pro.jar
-$JAVA6_HOME/bin/pack200 dist/AutoplotAppletAll.jar.pack.gz dist/AutoplotAppletAll.jar
+$JAVA5_HOME/bin/pack200 dist/AutoplotAppletAll.jar.pack.gz dist/AutoplotAppletAll.jar
 
 echo "copy example html."
 cp src/AutoplotApplet.html dist/
