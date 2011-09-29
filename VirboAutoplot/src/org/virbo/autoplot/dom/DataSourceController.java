@@ -1192,8 +1192,18 @@ public class DataSourceController extends DomNodeController {
     public static final String PROP_DATASOURCE = "dataSource";
 
     protected DataSource dataSource = null;
-    
-    public synchronized DataSource getDataSource() {
+
+    /**
+     * return the controller's current datasource.  This was synchronized, but
+     * this would mean that external clients could not query what the current source
+     * was.  Since this is only reading the variable, this seems harmless.
+     * Note, findbugs prompted the code change, not an observed bug.
+     * TODO: there is probably a better way to do this, synchronizing properly on
+     * several objects.
+     *
+     * @return
+     */
+    public DataSource getDataSource() {
         return dataSource;
     }
 
