@@ -277,7 +277,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 try {
                                     String delegateUri= aggf.getDelegateDataSourceFactoryUri(surl);
                                     DataSourceFactory ddsf= aggf.getDelegateDataSourceFactory(surl);
-                                    if ( !ddsf.reject( delegateUri, completionsMonitor) ) {
+                                    if ( !ddsf.reject( delegateUri, mon) ) {
                                         surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
                                         if ( !f.reject(surl1, mon) ) {
                                             setMessage("accepted aggregation after setting timerange");
