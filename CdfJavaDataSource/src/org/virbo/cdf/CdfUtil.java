@@ -106,7 +106,7 @@ public class CdfUtil {
 
         {
             String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
-            if ( cdfFile!=null ) {
+            if ( false && cdfFile!=null ) {
                 String uri= cdfFile + "?" + variable.getName();
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
