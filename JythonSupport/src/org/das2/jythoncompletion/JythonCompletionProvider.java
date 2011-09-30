@@ -25,6 +25,9 @@ public class JythonCompletionProvider implements CompletionProvider {
     
     private JythonCompletionProvider() {
         settings= new CompletionSettings();
+        settings.loadPreferences();
+
+
     }
     
     private static JythonCompletionProvider instance;

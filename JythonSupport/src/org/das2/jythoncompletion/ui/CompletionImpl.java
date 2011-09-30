@@ -482,7 +482,7 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
                     || e.getKeyCode() == KeyEvent.VK_HOME || e.getKeyCode() == KeyEvent.VK_END) {
                 hideCompletion(false);                
             }
-            if (e.getKeyCode() == KeyEvent.VK_TAB) {
+            if ( tabIsCompletion && e.getKeyCode() == KeyEvent.VK_TAB) {
                 e.consume();
                 if (guardedPos) {
                     Toolkit.getDefaultToolkit().beep();
@@ -1344,6 +1344,16 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
     
     void testSetActiveComponent(JTextComponent component) {
         activeComponent = new WeakReference<JTextComponent>(component);
+    }
+
+    boolean tabIsCompletion= true;
+    public void setTabIsCompletion(boolean b) {
+        this.tabIsCompletion= b;
+        if ( !b ) {
+            inputMap.remove( KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ) );
+        } else {
+            inputMap.put( KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ), COMPLETION_SHOW );
+        }
     }
     
     // ..........................................................................
