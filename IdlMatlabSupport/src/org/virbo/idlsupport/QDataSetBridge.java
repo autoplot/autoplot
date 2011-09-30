@@ -45,7 +45,7 @@ public abstract class QDataSetBridge {
         datasets = new LinkedHashMap<String, QDataSet>();
         names = new LinkedHashMap<QDataSet, String>();
         sliceDep= new LinkedHashMap<String,String>();
-        System.err.println("QDataSetBridge v1.6.04");
+        System.err.println("QDataSetBridge v1.7.01");
     }
 
     /**
@@ -139,7 +139,8 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * initiates the read after.  See getProgressMonitor for use.  
+     * initiates the read on a separate thread, so this does not block and should
+     * be used with caution.  See getProgressMonitor for use.  
      *
      */
     public void doGetDataSet(final ProgressMonitor mon)  {
@@ -204,7 +205,7 @@ public abstract class QDataSetBridge {
      * returns an object that can be used to monitor the progress of a download.
      * NOTE: I don't think this would work right now, since getDataSet is
      * implemented as a synchronous process--meaning it returns after the download
-     * is done.
+     * is done.  This should be used with doGetDataSet(monitor)
      * 
      * mon= qds->getProgressMonitor();
      * qds->getDataSet( mon )
@@ -370,9 +371,9 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
-            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+            throw new IllegalArgumentException("did not find dataset name="+name );
         }
-        copyValues( ds, result );
+        copyValues( ds1, result );
     }
 
     /**
@@ -391,7 +392,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
-            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+            throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
     }
@@ -407,7 +408,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
-            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+            throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
     }
