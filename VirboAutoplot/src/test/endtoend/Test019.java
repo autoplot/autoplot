@@ -7,6 +7,7 @@ package test.endtoend;
 
 import java.io.File;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
@@ -14,6 +15,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileSystem;
 
 /**
@@ -108,11 +110,25 @@ public class Test019 {
 //            System.err.println(ff[0]);
 //        }
     }
-    
+
+    public static void testLayout( ) throws ParseException {
+        double [] res0, res1, res2;
+        res0= DasDevicePosition.parseFormatStr("100% -5em +4px");
+        res1= DasDevicePosition.parseFormatStr("100%-5em+4pt");
+        res2= DasDevicePosition.parseFormatStr("+4pt-5em+100%");
+        for ( int i=0; i<3; i++ ) {
+            if ( res0[i]!=res1[i] ) throw new IllegalArgumentException("layout parsing res0!=res1");
+            if ( res0[i]!=res2[i] ) throw new IllegalArgumentException("layout parsing res0!=res2");
+        }
+        res0= DasDevicePosition.parseFormatStr("100%");
+        res0= DasDevicePosition.parseFormatStr("0%");
+        res0= DasDevicePosition.parseFormatStr(""); // should be same as "0%"
+    }
     public static void main( String[] args ) {
         try {
             testTimeRangeFormatParse();
             testRestrictedFileSystemAccess();
+            testLayout();
         } catch (Exception ex) {
             Logger.getLogger( Test019.class.getName()).log( Level.SEVERE, "error in test019", ex );
             ex.printStackTrace();
