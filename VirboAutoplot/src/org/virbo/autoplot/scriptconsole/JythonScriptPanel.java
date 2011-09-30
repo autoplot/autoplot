@@ -27,6 +27,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
+import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -161,6 +162,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
 
+        CompletionSettings se= JythonCompletionProvider.getInstance().settings();
+        
+        impl.setTabIsCompletion(se.isTabIsCompletion());
     }
 
     /**
