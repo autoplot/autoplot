@@ -1,0 +1,16 @@
+# demo pitch angle dist
+ds= getDataSet('vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/polar/timas_h0/1996/po_h0_tim_19961121_v03.cdf?Flux_H')
+
+ds.putProperty( QDataSet.DEPEND_1, linspace( 1., 5., 28 ) )
+
+deg= ds.property(QDataSet.DEPEND_2)
+deg= deg * PI / 180.
+deg.putProperty( QDataSet.UNITS, Units.radians )
+ds.putProperty( QDataSet.DEPEND_2, deg )
+
+result= ds
+#ds.putProperty( QDataSet.RENDER_TYPE, 'pitchAngleDistribution' )
+
+# you have to mess with this a bit to get a redraw.
+
+
