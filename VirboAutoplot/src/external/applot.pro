@@ -1,6 +1,9 @@
 ;; for rank 2, ytags must be specified
 ; ascii, boolean, use ascii transfer types
 pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
+
+   on_error, 2
+   
    streamHeader= [ '[00]xxxxxx<stream>', '</stream>' ]
    contentLength= -10 ; don't include the packet tag and content length
    for i=0,n_elements( streamHeader )-1 do begin
@@ -203,14 +206,7 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
    sep= !version.os_family eq 'Windows' ? ';' : ':'
 
    port= 12345
-
-   ; AUTOPLOT_HOME is the location of the Autoplot jar files
-   aphome= getenv( 'AUTOPLOT_HOME' )
    
-   jars= file_search( aphome+'lib/*.jar' )
-   jars= [ aphome + 'VirboAutoplot.jar', jars ]
-   classpath= strjoin( jars, sep )
-
    if keyword_set(respawn) then begin
       javahome= getenv( 'JAVA_HOME' )
       if javahome eq '' then javahome= 'c:/"program files"/java/jre1.6.0_03/'
@@ -301,7 +297,7 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
    endif
    
    ; serialize the data to a das2stream in a temporary file
-   if ( size( x, /type ) eq 2   or  size( x, /type ) eq 3  ) then begin
+   if ( size(x,/n_elements) eq 1 and size( x, /type ) eq 2   or  size( x, /type ) eq 3  ) then begin
       pos= x
       xx= y
       if ( n_elements(z) gt 0 ) then yy= z
