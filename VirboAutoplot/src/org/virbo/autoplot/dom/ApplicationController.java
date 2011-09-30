@@ -1966,7 +1966,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
-    public synchronized Canvas getCanvas() {
+    public Canvas getCanvas() {
         return canvas;
     }
 
