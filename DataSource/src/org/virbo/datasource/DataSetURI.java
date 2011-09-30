@@ -941,7 +941,7 @@ public class DataSetURI {
 
         // check for single completion that is just a folder name with /.
         if (completions.size() == 1) {
-            if ((completions.get(0)).equals(surlDir + prefix + "/")) {
+            if ((completions.get(0).completion).equals(surlDir + prefix + "/")) {
                 // maybe we should do something special.
             }
         }
