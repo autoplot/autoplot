@@ -492,7 +492,7 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         try {
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement());
+            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
             model.setList(book);
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -579,7 +579,7 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
             List<Bookmark> newList = new ArrayList(model.list.size());
             for (int i = 0; i < model.list.size(); i++) {
                 newList.add(i, model.list.get(i).copy());
@@ -759,9 +759,9 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
             } else {
                 read = new BufferedReader(new FileReader(f));
                 StringBuilder buff= new StringBuilder();
-                String s= "";
+                String s= null;
                 do {
-                    buff.append(s).append("\n");
+                    if ( s!=null ) buff.append(s).append("\n");
                     s= read.readLine();
                 } while ( s!=null );
 
@@ -795,7 +795,9 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
             out = new PrintWriter(new FileOutputStream(f));
             out.print(s);
             out.close();
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             out.close();
@@ -891,8 +893,13 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
 
         if ( prefNode==null ) {
             Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-            prefs.put("bookmarks", Bookmark.formatBooks(newValue));
-
+            try {
+                prefs.put("bookmarks", Bookmark.formatBooks(newValue));
+            } catch (IOException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
