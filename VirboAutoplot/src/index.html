@@ -24,6 +24,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <ul>
             <li>bugfixes with AutoplotServlet</li>
             <li>bugfix: remote bookmarks files references could not contain query part.</li>
+            <li>bugfix: script editor works properly with script= in URIs, before resource file would load.</li>
             <li>bugfix 3410461: any changesSupport.performingChange needs try/finally</li>
             <li>bugfix 3405480: bugs with slicing in autoplot2011, connector since context.</li>
             <li>bugfix 3405801:	operations key listener when holding key</li>
@@ -43,10 +44,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>bug 2985864: Jython editor has option to disable tab completion, so ctrl-space is used completion and tab is tab</li>
+            <li>3416707: bookmarks file has addresses unnessarily URLencoded.  bookmarks.xml is new file.</li>
             <li>3404248: Improvements for CDF Autoplot2011b: Epoch variables are cached to avoid repeat reads.</li>
             <li>3409891: decorations for zooming</li>
             <li>3409852: improvements to pitch angle distribution renderer</li>
             <li>3405256: true csv reader</li>
+            <li>indicate sequence gaps in Pngwalk grid view.</li>
             <li>virtual variables and fixes associated with CDF testing</li>
             <li>3402856: expert/basic mode</li>
         </ul>
