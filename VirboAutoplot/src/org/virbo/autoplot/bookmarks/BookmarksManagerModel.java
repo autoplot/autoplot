@@ -52,7 +52,7 @@ public class BookmarksManagerModel {
         int r = chooser.showOpenDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
-                List<Bookmark> importBook = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())).getDocumentElement(), null );
+                List<Bookmark> importBook = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())).getDocumentElement() );
                 List<Bookmark> newList= new ArrayList(this.list.size());
                 for ( int i=0; i<this.list.size(); i++ ) {
                     newList.add(i,this.list.get(i).copy());
@@ -97,8 +97,6 @@ public class BookmarksManagerModel {
                 out = new FileOutputStream(f);
                 out.write(format.getBytes());
                 
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -425,7 +423,7 @@ public class BookmarksManagerModel {
         }
         try {
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
             importList(importBook);
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -463,7 +461,7 @@ public class BookmarksManagerModel {
             for ( int i=0; i<this.list.size(); i++ ) {
                 newList.add(i,this.list.get(i).copy());
             }
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
             List<Bookmark> copy= new ArrayList();
             for ( int i=0;i<importBook.size(); i++ ) {
                 Bookmark m=  importBook.get(i);
