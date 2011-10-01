@@ -40,6 +40,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -1332,16 +1333,20 @@ APSplash.checkTime("init 52");
         
         maybeCreateBookmarksManager();
 
-        if ( !bookmarksManager.hasPrefNode("autoplot") ) {
-            if ( bookmarksManager.getModel().getList()==null ) {
-                setStatus("importing legacy bookmarks");
+        if ( !bookmarksManager.hasPrefNode("bookmarks") ) {
+            if ( bookmarksManager.hasPrefNode("autoplot") ) {
                 bookmarksManager.setPrefNode("autoplot");
-                List<Bookmark> bookmarks = applicationModel.getLegacyBookmarks();
-                bookmarksManager.getModel().setList(bookmarks);
+                if ( bookmarksManager.getModel().getList()==null ) {
+                    setStatus("importing legacy bookmarks");
+                    bookmarksManager.setPrefNode("autoplot");
+                    List<Bookmark> bookmarks = applicationModel.getLegacyBookmarks();
+                    bookmarksManager.getModel().setList(bookmarks);
+                }
+                bookmarksManager.resetPrefNode("bookmarks");
             }
         }
 
-        bookmarksManager.setPrefNode("autoplot");
+        bookmarksManager.setPrefNode("bookmarks");
         
         bookmarksMenu.removeAll();
 
