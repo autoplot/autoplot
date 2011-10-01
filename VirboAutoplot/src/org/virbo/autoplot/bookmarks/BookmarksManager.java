@@ -492,7 +492,7 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         try {
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
+            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement() );
             model.setList(book);
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -579,7 +579,7 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement(), null );
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
             List<Bookmark> newList = new ArrayList(model.list.size());
             for (int i = 0; i < model.list.size(); i++) {
                 newList.add(i, model.list.get(i).copy());
@@ -736,6 +736,11 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
     String prefNode= null;
 
     /**
+     * keep track of the bookmarks file.
+     */
+    File bookmarksFile= null;
+
+    /**
      * setting this makes the manager the authority on bookmarks.
      * @param nodeName
      */
@@ -769,9 +774,10 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
                 model.setList(book);
             }
 
+            bookmarksFile= f;
             model.addPropertyChangeListener( new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
-                    formatToFile(f);
+                    formatToFile(bookmarksFile);
                 }
             } );
             
@@ -788,7 +794,35 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
         }
     }
 
+    /**
+     * rename the pref node, to aid with version changes
+     * @param nodeName
+     */
+    public void resetPrefNode( String nodeName ) {
+        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+        if ( !f2.exists() ) {
+            boolean ok= f2.mkdirs();
+            if ( !ok ) {
+                throw new RuntimeException("unable to create folder "+ f2 );
+            }
+        }
+
+        final File f = new File( f2, nodeName + ".xml");
+        if ( f.exists() )  {
+            throw new IllegalArgumentException("bookmarks pref node already exists: "+f);
+        } else {
+            formatToFile( f );
+        }
+        bookmarksFile= f; // setPrefNode added a listener.
+        prefNode= nodeName;
+        
+    }
+
     private void formatToFile( File f ) {
+        System.err.println("formatting "+f);
+        if ( f.toString().endsWith("autoplot.xml") ) {
+            System.err.println("here123224");
+        }
         PrintWriter out = null;
         try {
             String s = Bookmark.formatBooks(model.getList());
@@ -796,8 +830,6 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
             out.print(s);
             out.close();
         } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             out.close();
@@ -893,13 +925,7 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
 
         if ( prefNode==null ) {
             Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-            try {
-                prefs.put("bookmarks", Bookmark.formatBooks(newValue));
-            } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            prefs.put("bookmarks", Bookmark.formatBooks(newValue));
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {

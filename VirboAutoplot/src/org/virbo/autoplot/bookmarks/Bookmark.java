@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -48,6 +49,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -86,13 +90,15 @@ public abstract class Bookmark {
             InputSource source = new InputSource(in);
             Document document = builder.parse(source);
 
-            return parseBookmark(document.getDocumentElement());
+            String vers= document.getDocumentElement().getAttribute("version");
+
+            return parseBookmark( document.getDocumentElement(),vers );
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static Bookmark parseBookmark(Node element) throws UnsupportedEncodingException, IOException {
+    public static Bookmark parseBookmark(Node element, String vers) throws UnsupportedEncodingException, IOException {
 
         String url = null;
         String s = null;
@@ -105,7 +111,7 @@ public abstract class Bookmark {
         if (nl.getLength()>0 ) {
             if ( !nl.item(0).hasChildNodes() ) throw new IllegalArgumentException("bookmark has empty title");
             s = ((Text) (nl.item(0).getFirstChild())).getData();
-            title = URLDecoder.decode(s, "UTF-8");
+            title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
         } else {
             throw new IllegalArgumentException("bookmark has no title");
         }
@@ -119,14 +125,23 @@ public abstract class Bookmark {
         nl = ((Element) element).getElementsByTagName("description");
         if (nl.getLength() > 0) {
             s = ((Text) (nl.item(0).getFirstChild())).getData();
-            description = URLDecoder.decode(s, "UTF-8");
+            description = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
         }
         
         if (element.getNodeName().equals("bookmark")) {
 
-            nl = ((Element) element).getElementsByTagName("url");
-            s = ((Text) (nl.item(0).getFirstChild())).getData();
-            url = URLDecoder.decode(s, "UTF-8");
+            if ( vers.equals("") ) {
+                nl = ((Element) element).getElementsByTagName("url");
+                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                url = URLDecoder.decode(s, "UTF-8") ;
+            } else {
+                nl = ((Element) element).getElementsByTagName("uri");
+                if ( nl.getLength()==0 ) {
+                    nl = ((Element) element).getElementsByTagName("url");
+                }
+                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                url = s;
+            }
             Bookmark book = new Bookmark.Item(url);
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
@@ -140,7 +155,7 @@ public abstract class Bookmark {
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
             if ( remoteUrlNode!=null ) { // 2984078
-                remoteUrl= URLDecoder.decode( remoteUrlNode.getNodeValue(), "US-ASCII" );
+                remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
                 InputStream in=null;
                 try {
                     System.err.println("opening "+remoteUrl+"...");
@@ -177,7 +192,7 @@ public abstract class Bookmark {
                     nl= (NodeList)o;
                     //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
                     Element flist = (Element) nl.item(0);
-                    contents = parseBookmarks(flist);
+                    contents = parseBookmarks(flist, vers );
 
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
@@ -215,8 +230,11 @@ public abstract class Bookmark {
             
             if ( contents==null || contents.size()==0 ) {
                 nl = ((Element) element).getElementsByTagName("bookmark-list");
+                if ( nl.getLength()==0 ) {
+                    throw new IllegalArgumentException("bookmark-folder should contain only bookmark-list");
+                }
                 Element flist = (Element) nl.item(0);
-                contents = parseBookmarks(flist);
+                contents = parseBookmarks(flist, vers );
             }
 
             Bookmark.Folder book = new Bookmark.Folder(title);
@@ -237,7 +255,21 @@ public abstract class Bookmark {
 
     }
 
-    public static List<Bookmark> parseBookmarks(Element root) {
+    public static List<Bookmark> parseBookmarks(Element root ) {
+        String vers= root.getAttribute("version");
+        return parseBookmarks( root, vers );
+    }
+
+    /**
+     * parse the bookmarks in the element root into a list of folders and bookmarks.
+     * @param root
+     * @param vers null or the version string.  If null, then check for a version attribute.
+     * @return
+     */
+    public static List<Bookmark> parseBookmarks(Element root, String vers) {
+        if ( vers==null ) {
+            vers= root.getAttribute("version");
+        }
         ArrayList<Bookmark> result = new ArrayList<Bookmark>();
         NodeList list = root.getChildNodes();
         Bookmark lastBook=null;
@@ -245,10 +277,17 @@ public abstract class Bookmark {
             Node n = list.item(i);
             if ( ! ( n instanceof Element ) ) continue;
             try {
-                Bookmark book = parseBookmark(n);
+                Bookmark book = parseBookmark(n,vers);
                 result.add(book);
                 lastBook= book;
             } catch (Exception ex) {
+                try {
+                    parseBookmark(n, vers);
+                } catch (UnsupportedEncodingException ex1) {
+                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex1);
+                }
                 System.err.println("## bookmark number=" + i);
                 ex.printStackTrace();
                 System.err.println("last bookmark parsed:"+lastBook);
@@ -265,7 +304,7 @@ public abstract class Bookmark {
      * @param bookmarks List of Bookmark.List or Bookmark
      * @return
      */
-    public static String formatBooks(List<Bookmark> bookmarks) {
+    public static String formatBooksOld(List<Bookmark> bookmarks) {
         StringBuilder buf = new StringBuilder();
 
         buf.append("<bookmark-list>\n");
@@ -275,6 +314,54 @@ public abstract class Bookmark {
         buf.append("</bookmark-list>\n");
         return buf.toString();
 
+    }
+    
+    /**
+     * format the bookmarks into xml for persistent storage.
+     * @param bookmarks List of Bookmark.List or Bookmark
+     * @return
+     */
+    public static String formatBooks(List<Bookmark> bookmarks) {
+
+        try {
+            Document doc= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+            Element e= doc.createElement("bookmark-list");
+            e.setAttribute( "version", "1.1" );
+
+            for (Bookmark o : bookmarks) {
+                formatBookmark(doc,e,o);
+            }
+            doc.appendChild(e);
+
+            ByteArrayOutputStream baos= new ByteArrayOutputStream();
+
+            DOMImplementationLS ls = (DOMImplementationLS)
+                            doc.getImplementation().getFeature("LS", "3.0");
+            LSOutput output = ls.createLSOutput();
+            output.setEncoding("UTF-8");
+            output.setByteStream(baos);
+            LSSerializer serializer = ls.createLSSerializer();
+
+            try {
+                if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                    serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                }
+            } catch (Error error) {
+                // Ed's nice trick for finding the implementation
+                //String name = serializer.getClass().getSimpleName();
+                //java.net.URL u = serializer.getClass().getResource(name+".class");
+                //System.err.println(u);
+                error.printStackTrace();
+            }
+            serializer.write(doc, output);
+
+            return baos.toString("UTF-8");
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        } catch ( ParserConfigurationException ex ) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private static String encodeImage(BufferedImage image) throws IOException {
@@ -289,6 +376,70 @@ public abstract class Bookmark {
         return ImageIO.read(new ByteArrayInputStream(bd));
     }
 
+    public static void formatBookmark( Document doc, Element parent, Bookmark bookmark ) throws IOException {
+        if (bookmark instanceof Bookmark.Item) {
+            Bookmark.Item b = (Bookmark.Item) bookmark;
+
+            Element book= doc.createElement("bookmark");
+            Element title= doc.createElement("title");
+            title.appendChild( doc.createTextNode( b.getTitle() ));
+            book.appendChild(title);
+            Element url= doc.createElement("url");
+            url.appendChild( doc.createTextNode( b.getUrl() ) );
+            book.appendChild(url);
+            if ( b.icon!=null ) {
+                Element icon= doc.createElement("icon");
+                icon.appendChild( doc.createTextNode( encodeImage((BufferedImage) b.icon.getImage()) ) );
+                book.appendChild(icon);
+            }
+            if ( b.description!=null ) {
+                Element desc= doc.createElement("description");
+                desc.appendChild( doc.createTextNode( b.getDescription() ) );
+                book.appendChild(desc);
+            }
+            parent.appendChild(book);
+
+        } else if (bookmark instanceof Bookmark.Folder) {
+            Bookmark.Folder f = (Bookmark.Folder) bookmark;
+
+            String title= f.getTitle();
+            if ( f.getRemoteUrl()!=null ) {
+                if ( title.endsWith(" " + MSG_REMOTE) ) title= title.substring(0,title.length()-(1+MSG_REMOTE.length()));
+                if ( title.endsWith(" " + MSG_NO_REMOTE ) ) title= title.substring(0,title.length()-(1+MSG_NO_REMOTE.length()));
+            }
+            Element folder= doc.createElement("bookmark-folder");
+            if ( f.getRemoteUrl()!=null ) {
+                folder.setAttribute( "remoteUrl", f.getRemoteUrl() );
+            }
+
+            Element titleEle= doc.createElement("title");
+            titleEle.appendChild( doc.createTextNode( f.getTitle() ) );
+            folder.appendChild(titleEle);
+
+            if ( f.icon!=null ) {
+                Element icon= doc.createElement("icon");
+                icon.appendChild( doc.createTextNode( encodeImage( (BufferedImage)f.getIcon().getImage() ) ) );
+                folder.appendChild(icon);
+            }
+            if (f.description != null) {
+                Element desc= doc.createElement("description");
+                desc.appendChild( doc.createTextNode( f.getDescription() ) );
+                folder.appendChild(desc);
+            }
+
+            Element list= doc.createElement("bookmark-list");
+            for ( Bookmark book: f.getBookmarks() ) {
+                formatBookmark( doc, list, book );
+            }
+            folder.appendChild(list);
+
+            parent.appendChild(folder);
+
+        }
+        return;
+
+    }
+
     /**
      * format the bookmarks into xml for persistent storage.
      * @param bookmarks List of Bookmark.List or Bookmark
@@ -300,9 +451,6 @@ public abstract class Bookmark {
             StringBuilder buf = new StringBuilder();
 
             if (bookmark instanceof Bookmark.Item) {
-                if ( bookmark.title.contains("PO_H0_TIM") ) {
-                    System.err.println("here307");
-                }
                 Bookmark.Item b = (Bookmark.Item) bookmark;
                 buf.append("  <bookmark>\n");
                 buf.append("     <title>").append(URLEncoder.encode(b.getTitle(), "UTF-8")).append("</title>\n");
@@ -323,7 +471,7 @@ public abstract class Bookmark {
                 buf.append("    <title>").append(URLEncoder.encode(title, "UTF-8")).append("</title>\n");
                 if (f.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) f.icon.getImage())).append("</icon>\n");
                 if (f.description != null) buf.append("     <description>").append( URLEncoder.encode(f.getDescription(), "UTF-8")).append("</description>\n");
-                buf.append(formatBooks(f.getBookmarks()));
+                buf.append(formatBooksOld(f.getBookmarks()));
                 buf.append("  </bookmark-folder>\n");
             }
             return buf.toString();
