@@ -97,7 +97,7 @@ public class Util {
         List<String> result= new ArrayList();
         for ( Bookmark b: recent ) {
             if ( b instanceof Bookmark.Item ) {
-                result.add( ((Bookmark.Item)b).getUrl() );
+                result.add( ((Bookmark.Item)b).getUri() );
             }
         }
         sel.setRecent(result);

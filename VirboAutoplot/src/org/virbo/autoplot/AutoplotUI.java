@@ -461,7 +461,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     List<String> urls = new ArrayList<String>();
                     List<Bookmark> recent = applicationModel.getRecent();
                     for (Bookmark b : recent) {
-                        urls.add(((Bookmark.Item) b).getUrl());
+                        urls.add(((Bookmark.Item) b).getUri());
                     }
                     dataSetSelector.setRecent(urls);
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
@@ -510,17 +510,17 @@ public class AutoplotUI extends javax.swing.JFrame {
         addStyle().run();
         addFeatures(fmodel);
 
-        List<String> urls = new ArrayList<String>();
+        List<String> uris = new ArrayList<String>();
         List<Bookmark> recent = applicationModel.getRecent();
         APSplash.checkTime("init 80");
 
         for (Bookmark b : recent) {
-            urls.add(((Bookmark.Item) b).getUrl());
+            uris.add(((Bookmark.Item) b).getUri());
         }
-        dataSetSelector.setRecent(urls);
-        if (urls.size() > 1) {
+        dataSetSelector.setRecent(uris);
+        if (uris.size() > 1) {
             if ( dataSetSelector.getEditor().getText().equals("") ) {
-                dataSetSelector.getEditor().setText(urls.get(urls.size() - 1)); // avoid firing event
+                dataSetSelector.getEditor().setText(uris.get(uris.size() - 1)); // avoid firing event
             }
         }
 
@@ -2816,14 +2816,14 @@ APSplash.checkTime("init -80");
             public void run() {
                 for ( Bookmark t: tools ) {
                     final Bookmark tt= t;
-                    final String surl = ((Bookmark.Item) tt).getUrl();
+                    final String suri = ((Bookmark.Item) tt).getUri();
                     Action a= new AbstractAction(t.getTitle()) {
                         public void actionPerformed(ActionEvent e) {
                             try {
                                 if ( !( ( e.getModifiers() & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
-                                    JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+                                    JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
                                 } else {
-                                    plotUri("script:"+ ((Bookmark.Item) tt).getUrl() );
+                                    plotUri("script:"+ ((Bookmark.Item) tt).getUri() );
                                 }
                             } catch (MalformedURLException ex) {
                                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -2831,7 +2831,7 @@ APSplash.checkTime("init -80");
                         }
                     };
                     JMenuItem ji= new JMenuItem(a);
-                    ji.setToolTipText( "<html>"+ surl + "<br>press ctrl to inspect" );
+                    ji.setToolTipText( "<html>"+ suri + "<br>press ctrl to inspect" );
                     toolsMenu.add( ji );
                 }
             }

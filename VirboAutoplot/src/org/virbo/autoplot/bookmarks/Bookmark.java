@@ -420,8 +420,8 @@ public abstract class Bookmark {
             Element title= doc.createElement("title");
             title.appendChild( doc.createTextNode( b.getTitle() ));
             book.appendChild(title);
-            Element url= doc.createElement("url");
-            url.appendChild( doc.createTextNode( b.getUrl() ) );
+            Element url= doc.createElement("uri");
+            url.appendChild( doc.createTextNode( b.getUri() ) );
             book.appendChild(url);
             if ( b.icon!=null ) {
                 Element icon= doc.createElement("icon");
@@ -492,7 +492,7 @@ public abstract class Bookmark {
                 buf.append("     <title>").append(URLEncoder.encode(b.getTitle(), "UTF-8")).append("</title>\n");
                 if (b.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) b.icon.getImage())).append("</icon>\n");
                 if (b.description != null) buf.append("     <description>").append( URLEncoder.encode(b.getDescription(), "UTF-8")).append("</description>\n");
-                buf.append("     <url>").append(URLEncoder.encode(b.getUrl(), "UTF-8")).append("</url>\n");
+                buf.append("     <url>").append(URLEncoder.encode(b.getUri(), "UTF-8")).append("</url>\n");
                 buf.append("  </bookmark>\n");
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
@@ -685,43 +685,43 @@ public abstract class Bookmark {
     public static class Item extends Bookmark {
 
         /** Creates a new instance of Bookmark */
-        public Item(String surl) {
-            super(surl);
-            this.url = surl;
+        public Item(String suri) {
+            super(suri);
+            this.uri = suri;
         }
         /**
-         * Holds value of property url.
+         * Holds value of property uri.
          */
-        private String url;
+        private String uri;
 
         /**
-         * Getter for property url.
-         * @return Value of property url.
+         * Getter for property uri.
+         * @return Value of property uri.
          */
-        public String getUrl() {
-            return this.url;
+        public String getUri() {
+            return this.uri;
         }
 
         /**
-         * Setter for property url.
-         * @param url New value of property url.
+         * Setter for property uri.
+         * @param uri New value of property uri.
          */
-        public void setUrl(String url) {
-            String oldUrl = this.url;
-            this.url = url;
-            propertyChangeSupport.firePropertyChange("url", oldUrl, url);
+        public void setUri(String uri) {
+            String oldUrl = this.uri;
+            this.uri = uri;
+            propertyChangeSupport.firePropertyChange("uri", oldUrl, uri);
         }
 
         @Override
         public int hashCode() {
-            return url.hashCode();
+            return uri.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Item) {
                 Bookmark.Item that= (Bookmark.Item)obj;
-                return that.url.equals(this.url)
+                return that.uri.equals(this.uri)
                         && (that.getParent()==null || this.getParent()==null || that.getParent().getTitle().equals(this.getParent().getTitle()) );
             } else {
                 return false;
@@ -729,7 +729,7 @@ public abstract class Bookmark {
         }
 
         public Bookmark copy() {
-            Bookmark.Item result = new Bookmark.Item(getUrl());
+            Bookmark.Item result = new Bookmark.Item(getUri());
             result.setTitle(getTitle());
             result.description= this.description;
             return result;

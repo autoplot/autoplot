@@ -81,7 +81,7 @@ public class DemoPngWalk {
             } else {
                 try {
                     List<Bookmark> books = Bookmark.parseBookmarks(srecent);
-                    tool.setTemplate( ((Bookmark.Item)books.get(0)).getUrl() );
+                    tool.setTemplate( ((Bookmark.Item)books.get(0)).getUri() );
                 } catch (SAXException ex) {
                     Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {

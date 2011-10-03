@@ -153,7 +153,7 @@ public class BookmarksManagerTransferrable {
 
             public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                 if (flavor == DataFlavor.stringFlavor) {
-                    return bookmark.getUrl();
+                    return bookmark.getUri();
                 } else if (flavor == BOOKMARK_FLAVOR) {
                     return bookmark;
                 } else {

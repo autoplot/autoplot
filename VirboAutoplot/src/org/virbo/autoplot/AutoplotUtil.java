@@ -163,7 +163,7 @@ public class AutoplotUtil {
 
         for (Bookmark b : recent) {
             if (b instanceof Bookmark.Item) {
-                urls.add(((Bookmark.Item) b).getUrl());
+                urls.add(((Bookmark.Item) b).getUri());
             }
         }
         return urls;

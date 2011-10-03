@@ -49,7 +49,7 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
                 List<String> urls = new ArrayList<String>();
                 List<Bookmark> recent = Bookmark.parseBookmarks(srecent);
                 for (Bookmark b : recent) {
-                    urls.add(((Bookmark.Item) b).getUrl());
+                    urls.add(((Bookmark.Item) b).getUri());
                 }
                 dataSetSelector1.setRecent(urls);
                 if (urls.size() > 1) {

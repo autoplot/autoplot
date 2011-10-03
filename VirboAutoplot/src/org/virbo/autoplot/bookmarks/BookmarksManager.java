@@ -115,7 +115,7 @@ public class BookmarksManager extends javax.swing.JDialog {
 
             public void run() {
                 Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-                ImageIcon icon = AutoplotUtil.createIcon(null, ((Bookmark.Item) b).getUrl());
+                ImageIcon icon = AutoplotUtil.createIcon(null, ((Bookmark.Item) b).getUri());
                 b.setIcon(icon);
                 //iconButton.setIcon(icon);
                 model.fireBookmarkChange(b);
@@ -423,7 +423,7 @@ private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     if ( b!=null && b instanceof Bookmark.Item) {
-        ((Bookmark.Item) b).setUrl(URLTextField.getText());
+        ((Bookmark.Item) b).setUri(URLTextField.getText());
         jTree1.repaint();
         model.fireBookmarkChange(b);
     }
@@ -442,7 +442,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
     if ( dirtyBookmark!=null ) {
         dirtyBookmark.setTitle(titleTextField.getText());
         if ( dirtyBookmark instanceof Bookmark.Item ) {
-            ((Bookmark.Item)dirtyBookmark).setUrl(URLTextField.getText());
+            ((Bookmark.Item)dirtyBookmark).setUri(URLTextField.getText());
         }
         dirtyBookmark.setDescription( descriptionTextField.getText() );
         model.fireBookmarkChange(dirtyBookmark);
@@ -461,7 +461,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         descriptionTextField.setText( b.getDescription() );
         URLTextField.setEnabled(b instanceof Bookmark.Item);
         if (b instanceof Bookmark.Item) {
-            URLTextField.setText(((Bookmark.Item) b).getUrl());
+            URLTextField.setText(((Bookmark.Item) b).getUri());
         } else {
             if ( b instanceof Bookmark.Folder && ((Bookmark.Folder)b).getRemoteUrl()!=null ) {
                 String url= ((Bookmark.Folder)b).getRemoteUrl();
@@ -873,15 +873,15 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
             if (book instanceof Bookmark.Item) {
                 JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
                     public void actionPerformed(ActionEvent e) {
-                        sel.setValue(((Bookmark.Item) book).getUrl());
+                        sel.setValue(((Bookmark.Item) book).getUri());
                         sel.maybePlot(e.getModifiers());
                     }
                 });
 
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    mi.setToolTipText( "<html>" + ((Bookmark.Item) book).getUrl() + "<br><em>"+ book.getDescription() + "</em></html>" );
+                    mi.setToolTipText( "<html>" + ((Bookmark.Item) book).getUri() + "<br><em>"+ book.getDescription() + "</em></html>" );
                 } else {
-                    mi.setToolTipText(((Bookmark.Item) book).getUrl());
+                    mi.setToolTipText(((Bookmark.Item) book).getUri());
                 }
                 if (book.getIcon() != null) {
                     mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
