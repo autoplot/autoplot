@@ -667,6 +667,10 @@ public class DataSetURI {
      * Note this cannot be used to download HTML content, because checkNonHtml is
      * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
      * it's needed.
+     *
+     * This is not deleted if the file is already local.  Do not delete this file
+     * yourself, it should be deleted when the process exits.
+     * TODO: what about Tomcat and other long java processes?
      * 
      * @param url the address to download.
      * @param mon a progress monitor.
@@ -675,6 +679,17 @@ public class DataSetURI {
      */
     public static File downloadResourceAsTempFile( URL url, ProgressMonitor mon ) throws IOException {
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
+
+        if ( split.file.startsWith("file:/") ) {
+            if ( split.params!=null && split.params.length()>0 ) {
+                throw new IllegalArgumentException("local file URLs cannot have arguments");
+            }
+            try {
+                return new File(new URL(split.file).toURI());
+            } catch (URISyntaxException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+        }
 
         File local= FileSystem.settings().getLocalCacheDir();
         FileSystem fs = FileSystem.create( toUri(split.path) );
