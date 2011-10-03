@@ -12,13 +12,14 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -80,6 +81,32 @@ public abstract class Bookmark {
         }
     }
 
+
+    /**
+     * read in the bookmarks file, which should be an xml file with the top node <bookmark-list>.
+     * @param url local or remote file.
+     * @return
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static List<Bookmark> parseBookmarks( URL url ) throws SAXException, IOException {
+        try {
+
+            File file= DataSetURI.downloadResourceAsTempFile( url, new NullProgressMonitor() );
+
+            Reader in = new BufferedReader( new FileReader(file) );
+
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource source = new InputSource(in);
+            Document document = builder.parse(source);
+
+            return parseBookmarks(document.getDocumentElement());
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public static Bookmark parseBookmark(String data) throws SAXException, IOException {
         try {
 
@@ -92,13 +119,22 @@ public abstract class Bookmark {
 
             String vers= document.getDocumentElement().getAttribute("version");
 
-            return parseBookmark( document.getDocumentElement(),vers );
+            return parseBookmark( document.getDocumentElement(),vers,1 );
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static Bookmark parseBookmark(Node element, String vers) throws UnsupportedEncodingException, IOException {
+    /**
+     * parse the bookmarks in this node.
+     * @param element
+     * @param vers null, empty string <2011, or version number
+     * @param remoteLevel if >0, then allow remote to be retrieved
+     * @return
+     * @throws UnsupportedEncodingException
+     * @throws IOException
+     */
+    public static Bookmark parseBookmark( Node element, String vers, int remoteLevel ) throws UnsupportedEncodingException, IOException {
 
         String url = null;
         String s = null;
@@ -154,7 +190,7 @@ public abstract class Bookmark {
 
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
-            if ( remoteUrlNode!=null ) { // 2984078
+            if ( remoteUrlNode!=null && remoteLevel>0 ) { // 2984078
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
                 InputStream in=null;
                 try {
@@ -192,7 +228,7 @@ public abstract class Bookmark {
                     nl= (NodeList)o;
                     //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
                     Element flist = (Element) nl.item(0);
-                    contents = parseBookmarks(flist, vers );
+                    contents = parseBookmarks( flist, null, remoteLevel-1 );
 
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
@@ -234,7 +270,7 @@ public abstract class Bookmark {
                     throw new IllegalArgumentException("bookmark-folder should contain only bookmark-list");
                 }
                 Element flist = (Element) nl.item(0);
-                contents = parseBookmarks(flist, vers );
+                contents = parseBookmarks( flist, vers, remoteLevel );
             }
 
             Bookmark.Folder book = new Bookmark.Folder(title);
@@ -257,7 +293,7 @@ public abstract class Bookmark {
 
     public static List<Bookmark> parseBookmarks(Element root ) {
         String vers= root.getAttribute("version");
-        return parseBookmarks( root, vers );
+        return parseBookmarks( root, vers, 1 );
     }
 
     /**
@@ -266,7 +302,7 @@ public abstract class Bookmark {
      * @param vers null or the version string.  If null, then check for a version attribute.
      * @return
      */
-    public static List<Bookmark> parseBookmarks(Element root, String vers) {
+    public static List<Bookmark> parseBookmarks( Element root, String vers, int remoteLevel ) {
         if ( vers==null ) {
             vers= root.getAttribute("version");
         }
@@ -277,12 +313,12 @@ public abstract class Bookmark {
             Node n = list.item(i);
             if ( ! ( n instanceof Element ) ) continue;
             try {
-                Bookmark book = parseBookmark(n,vers);
+                Bookmark book = parseBookmark(n,vers,remoteLevel );
                 result.add(book);
                 lastBook= book;
             } catch (Exception ex) {
                 try {
-                    parseBookmark(n, vers);
+                    parseBookmark( n, vers, remoteLevel );
                 } catch (UnsupportedEncodingException ex1) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex1);
                 } catch (IOException ex1) {
