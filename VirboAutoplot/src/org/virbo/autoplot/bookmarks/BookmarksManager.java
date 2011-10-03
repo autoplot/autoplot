@@ -641,6 +641,13 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         txt= txt.replaceAll("\n", "<br>");
         descriptionTextField.setText(txt);
     }
+
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    if ( b!=null ) {
+        b.setDescription(descriptionTextField.getText());
+        jTree1.repaint();
+        model.fireBookmarkChange(b);
+    }
 }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
