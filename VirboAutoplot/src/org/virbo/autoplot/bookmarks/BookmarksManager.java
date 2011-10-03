@@ -795,7 +795,7 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
     }
 
     /**
-     * rename the pref node, to aid with version changes
+     * rename the pref node, to aid with version changes.  E.g. convert autoplot.xml to bookmarks.xml
      * @param nodeName
      */
     public void resetPrefNode( String nodeName ) {
@@ -820,9 +820,6 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
 
     private void formatToFile( File f ) {
         System.err.println("formatting "+f);
-        if ( f.toString().endsWith("autoplot.xml") ) {
-            System.err.println("here123224");
-        }
         PrintWriter out = null;
         try {
             String s = Bookmark.formatBooks(model.getList());
