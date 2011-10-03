@@ -44,6 +44,10 @@ public class Test035 {
         format( book, "test035_001_autoplot_spot6_2010.xml" );
         System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
+        book= Bookmark.parseBookmarks( new URL( "http://autoplot.org/data/demos.xml" ) );
+        format( book, "test035_002_demos.xml" );
+        System.err.printf( "test 002: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+
         //book= Bookmark.parseBookmarks( new URL( home + "bookmarks/rw_20111003.xml" ) );
         //format( book, "test035_002_rw_20111003.xml" );
 
