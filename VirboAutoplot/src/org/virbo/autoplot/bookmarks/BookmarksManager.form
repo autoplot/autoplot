@@ -118,7 +118,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="641" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="0" pref="681" max="32767" attributes="0"/>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="importButton" min="-2" max="-2" attributes="0"/>
@@ -126,23 +126,25 @@
                       <Component id="importFromWebButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="ExportButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="334" max="32767" attributes="0"/>
+                      <EmptySpace pref="374" max="32767" attributes="0"/>
                       <Component id="dismissButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="URLTextField" pref="600" max="32767" attributes="0"/>
+                      <Component id="URLTextField" pref="644" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="titleTextField" pref="599" max="32767" attributes="0"/>
+                      <Component id="titleTextField" pref="639" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="descriptionTextField" pref="553" max="32767" attributes="0"/>
+                      <Component id="descriptionTextField" pref="563" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -155,7 +157,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="252" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="250" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -165,6 +167,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="descriptionTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -232,10 +235,14 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="URL:"/>
+        <Property name="text" type="java.lang.String" value="URI:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="URLTextField">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL)"/>
+      </Properties>
       <Events>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="URLTextFieldFocusLost"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="URLTextFieldKeyTyped"/>
@@ -244,6 +251,7 @@
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Title:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Title for the URI"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="titleTextField">
@@ -265,9 +273,20 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="descriptionTextField">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Up to a short paragraph describing the data"/>
+      </Properties>
       <Events>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="descriptionTextFieldFocusLost"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="descriptionTextFieldKeyTyped"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

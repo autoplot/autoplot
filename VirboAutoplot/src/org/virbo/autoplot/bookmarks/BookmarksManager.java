@@ -42,7 +42,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -157,6 +159,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         descriptionTextField = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -207,8 +210,10 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        jLabel3.setText("URL:");
+        jLabel3.setText("URI:");
+        jLabel3.setToolTipText("Location of the data (often the URL)");
 
+        URLTextField.setToolTipText("Location of the data (often the URL)");
         URLTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 URLTextFieldFocusLost(evt);
@@ -221,6 +226,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
 
         jLabel2.setText("Title:");
+        jLabel2.setToolTipText("Title for the URI");
 
         titleTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -247,6 +253,7 @@ public class BookmarksManager extends javax.swing.JDialog {
 
         jLabel4.setText("Description:");
 
+        descriptionTextField.setToolTipText("Up to a short paragraph describing the data");
         descriptionTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 descriptionTextFieldFocusLost(evt);
@@ -255,6 +262,13 @@ public class BookmarksManager extends javax.swing.JDialog {
         descriptionTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 descriptionTextFieldKeyTyped(evt);
+            }
+        });
+
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -347,7 +361,7 @@ public class BookmarksManager extends javax.swing.JDialog {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
                     .add(layout.createSequentialGroup()
                         .add(importButton)
@@ -355,20 +369,22 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .add(importFromWebButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 334, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 374, Short.MAX_VALUE)
                         .add(dismissButton))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
+                        .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE))
+                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)))
+                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -377,7 +393,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
@@ -385,7 +401,8 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(7, 7, 7)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
-                    .add(descriptionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(descriptionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
@@ -608,6 +625,24 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
     dirtyBookmark= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
 }//GEN-LAST:event_descriptionTextFieldKeyTyped
 
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    String txt= descriptionTextField.getText();
+    if ( txt.contains("<br>") ) {
+        txt=  txt.replaceAll("<br>", "\n");
+    }
+    JTextArea edit= new JTextArea(txt);
+    edit.setRows(5);
+    edit.setColumns(80);
+    JScrollPane jScrollPane2= new JScrollPane(edit);
+
+    int ok= JOptionPane.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), JOptionPane.OK_CANCEL_OPTION );
+    if ( ok==JOptionPane.OK_OPTION ) {
+        txt= edit.getText();
+        txt= txt.replaceAll("\n", "<br>");
+        descriptionTextField.setText(txt);
+    }
+}//GEN-LAST:event_jButton1ActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -640,6 +675,7 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
     private javax.swing.JButton importFromWebButton;
     private javax.swing.JMenuItem importMenuItem;
     private javax.swing.JMenuItem importUrlMenuItem;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
