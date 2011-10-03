@@ -25,9 +25,26 @@ import org.virbo.dsops.Ops;
  */
 public class TestSupport {
 
-    public static final String TEST_DATA= "file:/home/jbf/ct/hudson/data.backup/";
-    
-    public static final String TEST_VAP= "file:/home/jbf/ct/hudson/vap/";
+    /**
+     * input vaps for testing.
+     */
+    public static final String TEST_HOME= "/home/jbf/ct/hudson/";
+
+
+    /**
+     * input data for testing
+     */
+    public static final String TEST_DATA= "file:" + TEST_HOME + "data.backup/";
+
+    /**
+     * input data for testing, small area that can be backed up.
+     */
+    public static final String TEST_DATA_SMALL= "file:" + TEST_HOME + "data/";
+
+    /**
+     * input vaps for testing.
+     */
+    public static final String TEST_VAP= "file:" + TEST_HOME + "vap/";
 
     public static MutablePropertyDataSet sampleDataRank2( int len0, int len1 ) {
         MutablePropertyDataSet rank2Rand= (MutablePropertyDataSet) Ops.add( Ops.randomn(-12345, len0,len1),
