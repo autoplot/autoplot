@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
+import org.das2.datum.InconvertibleUnitsException;
+import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
@@ -36,6 +39,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.dsops.Ops;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -94,6 +98,59 @@ public class CdfUtil {
             type = (String) attrs.get("SCALETYP");
         }
         return type;
+    }
+
+    /**
+     * add the valid range only if it looks like it is correct.  It must contain some of the data.
+     */
+    public static void maybeAddValidRange( Map<String,Object> props, MutablePropertyDataSet ds ) {
+
+        Units pu= (Units) props.get(QDataSet.UNITS);
+        Units u= (Units) ds.property( QDataSet.UNITS );
+
+        UnitsConverter uc;
+        if ( pu==null || u==null ) {
+            uc= UnitsConverter.IDENTITY;
+        } else if ( u==Units.cdfEpoch ) {
+            uc= UnitsConverter.IDENTITY;
+        } else if ( pu==Units.microseconds && u==Units.us2000 ) { // epoch16
+            uc= UnitsConverter.IDENTITY;
+        } else {
+            if ( pu==u ) {
+                uc= UnitsConverter.IDENTITY;
+            } else if ( UnitsUtil.isOrdinalMeasurement(u) || UnitsUtil.isOrdinalMeasurement(pu) ) {
+                return;
+            } else {
+                try {
+                    uc= UnitsConverter.getConverter( pu, u );
+                } catch ( InconvertibleUnitsException ex ) { // PlasmaWave group Polar H7 files
+                    uc= UnitsConverter.IDENTITY;
+                }
+            }
+        }
+
+        double dmin=Double.NEGATIVE_INFINITY;
+        double dmax=Double.POSITIVE_INFINITY;
+        if ( ds.rank()==1 ) {
+            QDataSet range= Ops.extent(ds);
+            dmin= uc.convert(range.value(0));
+            dmax= uc.convert(range.value(1));
+        }
+
+        Number nmin= (Number)props.get(QDataSet.VALID_MIN);
+        double vmin= nmin==null ?  Double.POSITIVE_INFINITY : nmin.doubleValue();
+        Number nmax= (Number)props.get(QDataSet.VALID_MAX);
+        double vmax= nmax==null ?  Double.POSITIVE_INFINITY : nmax.doubleValue();
+
+        boolean intersects= false;
+        if ( dmax>vmin && dmin<vmax ) {
+            intersects= true;
+        }
+
+        if ( intersects || dmax==dmin || dmax<-1e30 || dmin>1e30 )  { //bugfix 3235447: all data invalid
+            if ( nmax!=null ) ds.putProperty(QDataSet.VALID_MAX, uc.convert(nmax) );
+            if ( nmin!=null ) ds.putProperty(QDataSet.VALID_MIN, uc.convert(nmin) );
+        }
     }
 
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
