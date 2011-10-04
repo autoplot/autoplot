@@ -146,16 +146,17 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
         String constraint = null;
 
-        Variable variable = cdf.getVariable(svariable);
         String interpMeta = (String) map.get(PARAM_INTERPMETA);
-        if (!"no".equals(interpMeta)) {        
-            long numRec= variable.getNumberOfValues();
+        if (!"no".equals(interpMeta)) {
+            Variable variable;
             int i = svariable.indexOf("[");
             if (i != -1) {
                 constraint = svariable.substring(i);
                 svariable = svariable.substring(0, i);
             }
-
+            variable= cdf.getVariable(svariable);
+            long numRec= variable.getNumberOfValues();
+            
             long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
             if ( attributes==null ) {
                 attributes = readAttributes(cdf, variable, 0);
@@ -164,6 +165,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
             }
         }
+
         QDataSet result= getDataSet(mon,attributes);
         String os1= (String)map.get(PARAM_SLICE1);
         if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
