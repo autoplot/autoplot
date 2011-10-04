@@ -218,6 +218,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         messageComponent= null;
 
+        String desc= CDAWebDB.getInstance().getServiceProviderIds().get(ds);
+        descriptionLabel.setText( "<html><small>"+desc+"</small></html>");
+        
         try {
             if ( ds == null ? currentDs != null : !ds.equals(currentDs) ) {
                 doRefreshDataSet(ds,args);
@@ -289,6 +292,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         jLabel3 = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
         availableTextField = new javax.swing.JLabel();
+        descriptionLabel = new javax.swing.JLabel();
 
         jLabel1.setText("Dataset:");
 
@@ -347,6 +351,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap())
         );
 
+        descriptionLabel.setText("Description of dataset goes here");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -359,8 +365,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(pickDsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-            .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
             .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -371,7 +381,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     .add(dsidComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(pickDsButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .add(descriptionLabel)
+                .add(4, 4, 4)
+                .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -404,6 +416,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel availableTextField;
+    private javax.swing.JLabel descriptionLabel;
     private javax.swing.JComboBox dsidComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;

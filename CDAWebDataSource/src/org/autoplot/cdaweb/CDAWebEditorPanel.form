@@ -25,8 +25,13 @@
               <Component id="pickDsButton" min="-2" pref="78" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="parameterPanel" alignment="0" pref="434" max="32767" attributes="0"/>
           <Component id="timeRangePanel" alignment="0" max="32767" attributes="0"/>
+          <Component id="parameterPanel" alignment="0" pref="434" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="descriptionLabel" pref="410" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -38,9 +43,11 @@
                   <Component id="dsidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="pickDsButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="parameterPanel" pref="216" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="descriptionLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="parameterPanel" pref="195" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangePanel" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -133,5 +140,10 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="descriptionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Description of dataset goes here"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
