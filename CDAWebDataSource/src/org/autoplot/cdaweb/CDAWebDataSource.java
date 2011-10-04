@@ -24,6 +24,8 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.cdf.CdfJavaDataSource;
+import org.virbo.cdf.CdfJavaDataSourceFactory;
 import org.virbo.cdf.CdfUtil;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
@@ -109,7 +111,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
 
-            DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
+            DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
 
             mon.setTaskSize(files.length*10);
             mon.started();
@@ -130,7 +132,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                 ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
 
-                QDataSet ds1;
+                MutablePropertyDataSet ds1=null;
                 if ( virtual!=null && !virtual.equals("") ) {
                     int nc=0;
                     List<QDataSet> comps= new ArrayList();
@@ -141,14 +143,14 @@ public class CDAWebDataSource extends AbstractDataSource {
                     if ( function!=null ) {
                         String comp= (String)metadata.get( "COMPONENT_"  + nc );
                         while ( comp!=null ) {
-                            DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
-                            ds1= dataSource.getDataSet( t1 );
+                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
+                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                             comps.add( ds1 );
                             nc++;
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
                         }
                         try {
-                            ds1= CdfVirtualVars.execute( function, comps );
+                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( function, comps );
                         } catch (IllegalArgumentException ex ){
                             throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
                         }
@@ -160,10 +162,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                     fileParams.remove( PARAM_TIMERANGE );
                     fileParams.remove( PARAM_DS );
                     System.err.println( "loading "+fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
-                    DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
-                    ds1= dataSource.getDataSet( t1 );
+                    CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
+                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                 }
- 
+
                 if ( result==null && accum==null ) {
                     range= fsm.getRangeFor(files[i]);
                     if ( files.length==1 ) {
