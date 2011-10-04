@@ -88,27 +88,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
     }
 
-    @Override
-    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        String lsurl= uri.toString();
-        MutablePropertyDataSet cached= dsCache.get(lsurl);
-        if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
-            synchronized (this) {
-                dsCache.remove(lsurl);
-                dsCache.put( lsurl, cached );
-                dsCacheFresh.put( lsurl, System.currentTimeMillis() );
-            }
-        }
-
-        File cdfFile;
-        cdfFile = getFile(mon);
-
-        String fileName = cdfFile.toString();
-        //if (System.getProperty("os.name").startsWith("Windows")) {
-        //    fileName = CdfUtil.win95Name(cdfFile);
-        //}
-        Map map = getParams();
-
+    public CDF getCdfFile( String fileName ) {
         CDF cdf;
         try {
             cdf= openFiles.get(fileName);
@@ -144,6 +124,85 @@ public class CdfJavaDataSource extends AbstractDataSource {
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
+        return cdf;
+
+    }
+
+    @Override
+    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+
+        File cdfFile;
+        cdfFile = getFile(mon);
+        
+        String fileName = cdfFile.toString();
+        
+        Map map = getParams();
+        
+        CDF cdf= getCdfFile(fileName);
+        
+        String svariable = (String) map.get(PARAM_ID);
+        if (svariable == null) {
+            svariable = (String) map.get("arg_0");
+        }
+        String constraint = null;
+
+        Variable variable = cdf.getVariable(svariable);
+        String interpMeta = (String) map.get(PARAM_INTERPMETA);
+        if (!"no".equals(interpMeta)) {        
+            long numRec= variable.getNumberOfValues();
+            int i = svariable.indexOf("[");
+            if (i != -1) {
+                constraint = svariable.substring(i);
+                svariable = svariable.substring(0, i);
+            }
+
+            long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
+            if ( attributes==null ) {
+                attributes = readAttributes(cdf, variable, 0);
+                if ( recs[2]==-1 ) {
+                    attributes= MetadataUtil.sliceProperties(attributes, 0);
+                }
+            }
+        }
+        QDataSet result= getDataSet(mon,attributes);
+        String os1= (String)map.get(PARAM_SLICE1);
+        if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
+            int is= Integer.parseInt(os1);
+            result= DataSetOps.slice1(result,is);
+            this.attributes= null; // they aren't relevant now.
+        }
+        return result;
+        
+    }
+
+    /**
+     * get the dataset with the attributes.  attributes may be specified separately to support CDAWebDataSource, which uses a "master" cdf to override the specs within each file.
+     * @param mon
+     * @param attr1
+     * @return
+     * @throws Exception
+     */
+    public QDataSet getDataSet( ProgressMonitor mon, Map<String,Object> attr1 ) throws Exception {
+
+        String lsurl= uri.toString();
+        MutablePropertyDataSet cached= dsCache.get(lsurl);
+        if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
+            synchronized (this) {
+                dsCache.remove(lsurl);
+                dsCache.put( lsurl, cached );
+                dsCacheFresh.put( lsurl, System.currentTimeMillis() );
+            }
+        }
+
+        File cdfFile;
+        cdfFile = getFile(mon);
+
+        String fileName = cdfFile.toString();
+        
+        Map map = getParams();
+
+        CDF cdf= getCdfFile(fileName);
+
         String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
@@ -161,28 +220,17 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
 
         try {
-            Variable variable = cdf.getVariable(svariable);
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
-            if (!"no".equals(interpMeta)) {
-                long numRec= variable.getNumberOfValues();
-                long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
-                if ( attributes==null ) {
-                    attributes = readAttributes(cdf, variable, 0);
-                    if ( recs[2]==-1 ) {
-                        attributes= MetadataUtil.sliceProperties(attributes, 0);
-                    }
-                }
-            }
 
             MutablePropertyDataSet result;
-            if ( attributes!=null && attributes.containsKey("VIRTUAL") && attributes.containsKey("FUNCTION") ) {
+            if ( attr1!=null && attr1.containsKey("VIRTUAL") && attr1.containsKey("FUNCTION") ) {
                 List<QDataSet> attr= new ArrayList();
-                String function= (String)attributes.get("FUNCTION");
-                if ( attributes.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_0"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_1"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_2"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, mon ) );
+                String function= (String)attr1.get("FUNCTION");
+                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, mon ) );
+                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, mon ) );
+                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, mon ) );
+                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, mon ) );
+                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, mon ) );
                 try {
                     result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
                 } catch ( IllegalArgumentException ex ) {
@@ -190,7 +238,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
                 
             } else { // typical route
-                result= wrapDataSet(cdf, svariable, constraint, false, true, mon );
+                result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, mon );
+
             }
 
             boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
@@ -199,17 +248,17 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_1, null );
                 result.putProperty( QDataSet.DEPEND_2, null );
                 result.putProperty( QDataSet.DEPEND_3, null );
-                attributes.remove( "DEPEND_0" );
-                attributes.remove( "DEPEND_1" );
-                attributes.remove( "DEPEND_2" );
-                attributes.remove( "DEPEND_3" );
+                attr1.remove( "DEPEND_0" );
+                attr1.remove( "DEPEND_1" );
+                attr1.remove( "DEPEND_2" );
+                attr1.remove( "DEPEND_3" );
             }
 
             if (!"no".equals(interpMeta)) {
                 MetadataModel model = new IstpMetadataModel();
 
-                Map<String, Object> istpProps = model.properties(attributes);
-                maybeAddValidRange(istpProps, result);
+                Map<String, Object> istpProps = model.properties(attr1);
+                CdfUtil.maybeAddValidRange(istpProps, result);
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
                 result.putProperty(QDataSet.LABEL, istpProps.get("FIELDNAM") );
                 result.putProperty(QDataSet.TITLE, istpProps.get("CATDESC" ) );
@@ -228,7 +277,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
                     Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
                     if ( depds!=null && depProps!=null ) {
-                        maybeAddValidRange( depProps, depds );
+                        CdfUtil.maybeAddValidRange( depProps, depds );
                         depds.putProperty(QDataSet.FILL_VALUE, depProps.get(QDataSet.FILL_VALUE));
                         depds.putProperty(QDataSet.LABEL, depProps.get("FIELDNAM") );
                         depds.putProperty(QDataSet.TITLE, depProps.get("CATDESC" ) );
@@ -244,74 +293,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_3, null );
             }
 
-            result.putProperty( QDataSet.METADATA, attributes );
+            result.putProperty( QDataSet.METADATA, attr1 );
             result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
-
-            String os1= (String)map.get(PARAM_SLICE1);
-            if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
-                int is= Integer.parseInt(os1);
-                result= DataSetOps.slice1(result,is);
-                this.attributes= null; // they aren't relevant now.
-            }
 
             return result;
         } catch ( Exception e ) {
             throw e;
         }
 
-    }
-
-    /**
-     * add the valid range only if it looks like it is correct.  It must contain some of the data.
-     */
-    private void maybeAddValidRange( Map<String,Object> props, MutablePropertyDataSet ds ) {
-
-        Units pu= (Units) props.get(QDataSet.UNITS);
-        Units u= (Units) ds.property( QDataSet.UNITS );
-
-        UnitsConverter uc;
-        if ( pu==null || u==null ) {
-            uc= UnitsConverter.IDENTITY;
-        } else if ( u==Units.cdfEpoch ) {
-            uc= UnitsConverter.IDENTITY;
-        } else if ( pu==Units.microseconds && u==Units.us2000 ) { // epoch16
-            uc= UnitsConverter.IDENTITY;
-        } else {
-            if ( pu==u ) {
-                uc= UnitsConverter.IDENTITY;
-            } else if ( UnitsUtil.isOrdinalMeasurement(u) || UnitsUtil.isOrdinalMeasurement(pu) ) {
-                return;
-            } else {
-                try {
-                    uc= UnitsConverter.getConverter( pu, u );
-                } catch ( InconvertibleUnitsException ex ) { // PlasmaWave group Polar H7 files
-                    uc= UnitsConverter.IDENTITY;
-                }
-            }
-        }
-
-        double dmin=Double.NEGATIVE_INFINITY;
-        double dmax=Double.POSITIVE_INFINITY;
-        if ( ds.rank()==1 ) {
-            QDataSet range= Ops.extent(ds);
-            dmin= uc.convert(range.value(0));
-            dmax= uc.convert(range.value(1));
-        }
-
-        Number nmin= (Number)props.get(QDataSet.VALID_MIN);
-        double vmin= nmin==null ?  Double.POSITIVE_INFINITY : nmin.doubleValue();
-        Number nmax= (Number)props.get(QDataSet.VALID_MAX);
-        double vmax= nmax==null ?  Double.POSITIVE_INFINITY : nmax.doubleValue();
-
-        boolean intersects= false;
-        if ( dmax>vmin && dmin<vmax ) {
-            intersects= true;
-        }
-
-        if ( intersects || dmax==dmin || dmax<-1e30 || dmin>1e30 )  { //bugfix 3235447: all data invalid
-            if ( nmax!=null ) ds.putProperty(QDataSet.VALID_MAX, uc.convert(nmax) );
-            if ( nmin!=null ) ds.putProperty(QDataSet.VALID_MIN, uc.convert(nmin) );
-        }
     }
 
     /* read all the variable attributes into a Map */
@@ -358,8 +347,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
         return props;
     }
 
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend) throws Exception, ParseException {
-        return wrapDataSet( cdf, svariable, constraints, reform, depend, new NullProgressMonitor() );
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> attr ) throws Exception, ParseException {
+        return wrapDataSet( cdf, svariable, constraints, reform, depend, attr, new NullProgressMonitor() );
     }
 
     /**
@@ -373,12 +362,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
      * @throws CDFException
      * @throws ParseException
      */
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon ) throws Exception, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, ProgressMonitor mon ) throws Exception, ParseException {
         Variable variable = cdf.getVariable(svariable);
         if ( variable==null ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
         }
-        HashMap thisAttributes = readAttributes(cdf, variable, 0);
+        if ( thisAttributes==null ) {
+            thisAttributes = readAttributes(cdf, variable, 0); //legacy, use with caution.
+        }
 
         long numRec = variable.getNumberOfValues();
 
@@ -389,9 +380,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
                 // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
                 // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
-                QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false);
+                QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false, null );
                 if (thisAttributes.containsKey("COMPONENT_1")) {
-                    QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false);
+                    QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false, null );
                     if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
                         c0 = DataSetOps.slice0(c0, 0);
                         // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
@@ -466,7 +457,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        MutablePropertyDataSet depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, null);
+                        MutablePropertyDataSet depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
