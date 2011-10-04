@@ -111,7 +111,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
 
-            DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
+            DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
             mon.setTaskSize(files.length*10);
             mon.started();
