@@ -347,7 +347,7 @@ public class CDAWebDB {
     }
 
     /**
-     * @return Map from serviceproviderId to Id
+     * @return Map from serviceproviderId to description
      */
     public Map<String,String> getServiceProviderIds() {
         return ids;
