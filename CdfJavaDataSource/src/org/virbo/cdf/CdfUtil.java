@@ -227,24 +227,24 @@ public class CdfUtil {
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
 
-        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
-        long sizeBytes;
-        int itype=  variable.getType();
-        if ( itype==CDFConstants.CDF_EPOCH16 ) {
-            sizeBytes= 16;            
-        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
-            sizeBytes= 8;
-        } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
-            sizeBytes=8; //sizeBytes= 4;
-        } else if( itype == CDFConstants.CDF_INT2 || itype == CDFConstants.CDF_UINT2  ) {
-            sizeBytes=8; //sizeBytes= 2;
-        } else if( itype == CDFConstants.CDF_INT1 || itype == CDFConstants.CDF_UINT1 || itype==CDFConstants.CDF_BYTE || itype==CDFConstants.CDF_UCHAR || itype==CDFConstants.CDF_CHAR ) {
-            sizeBytes=8; //sizeBytes= 1;
-        } else {
-            throw new IllegalArgumentException("didn't code for type");
-        }
-        size= size*sizeBytes;
-System.out.println("size of "+variable.getName()+": "+size/1024/1024 + "  type: "+ itype );
+//        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
+//        long sizeBytes;
+//        int itype=  variable.getType();
+//        if ( itype==CDFConstants.CDF_EPOCH16 ) {
+//            sizeBytes= 16;
+//        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
+//            sizeBytes= 8;
+//        } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
+//            sizeBytes=8; //sizeBytes= 4;
+//        } else if( itype == CDFConstants.CDF_INT2 || itype == CDFConstants.CDF_UINT2  ) {
+//            sizeBytes=8; //sizeBytes= 2;
+//        } else if( itype == CDFConstants.CDF_INT1 || itype == CDFConstants.CDF_UINT1 || itype==CDFConstants.CDF_BYTE || itype==CDFConstants.CDF_UCHAR || itype==CDFConstants.CDF_CHAR ) {
+//            sizeBytes=8; //sizeBytes= 1;
+//        } else {
+//            throw new IllegalArgumentException("didn't code for type");
+//        }
+//        size= size*sizeBytes;
+//System.out.println("size of "+variable.getName()+": "+size/1024/1024 + "  type: "+ itype );
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
@@ -454,7 +454,7 @@ System.out.println("size of "+variable.getName()+": "+size/1024/1024 + "  type: 
 
         }
 
-System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
+//System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
         if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
             String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
             if ( cdfFile!=null ) {
