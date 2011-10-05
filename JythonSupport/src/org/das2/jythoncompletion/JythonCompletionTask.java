@@ -122,7 +122,12 @@ public class JythonCompletionTask implements CompletionTask {
 
         Logger logger = Logger.getLogger(JythonCompletionTask.class.getName());
 
-        interp.exec(eval);
+        try {
+            interp.exec(eval);
+        } catch ( PyException ex ) {
+            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return;
+        }
 
         PyObject context;
         try {
@@ -239,6 +244,7 @@ public class JythonCompletionTask implements CompletionTask {
                     PyObject o= context.__dir__();
                     label= ss;
                     signature= null;
+                    //String link = "http://docs.python.org/library/"; //TODO: this could probably be done
                 } else {
                     if (po instanceof PyReflectedFunction) {
                         label = ss + "() STATIC JAVA";
