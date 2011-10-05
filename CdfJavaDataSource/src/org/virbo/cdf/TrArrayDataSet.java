@@ -14,6 +14,9 @@ import org.virbo.dataset.AbstractDataSet;
  */
 public abstract class TrArrayDataSet extends AbstractDataSet {
     
+    float fill= Float.NaN;
+    double dfill= Double.NaN;
+
     /**
      * return the array as ArrayDataSet  The array must be a 1-D array and the
      * dimensions of the result are provided in qube.
