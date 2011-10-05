@@ -146,6 +146,9 @@ public class CDAWebDB {
     }
 
     public String getNaming( String spid ) throws IOException {
+        if ( document==null ) {
+            throw new IllegalArgumentException("document has not been read, refresh must be called first");
+        }
         try {
             spid= spid.toUpperCase();
             if ( tmpls.containsKey(spid) ) {
@@ -169,6 +172,9 @@ public class CDAWebDB {
     }
 
     public String getBaseUrl( String spid ) throws IOException {
+        if ( document==null ) {
+            throw new IllegalArgumentException("document has not been read, refresh must be called first");
+        }
         try {
             spid= spid.toUpperCase();
             if ( bases.containsKey(spid) ) {
@@ -243,6 +249,9 @@ public class CDAWebDB {
      * @throws IOException
      */
     public String getTimeRange( String spid ) throws IOException {
+        if ( document==null ) {
+            throw new IllegalArgumentException("document has not been read, refresh must be called first");
+        }
         try {
             spid= spid.toUpperCase();
             XPath xp = XPathFactory.newInstance().newXPath();
@@ -363,6 +372,9 @@ public class CDAWebDB {
      * @throws IOException
      */
     public void refreshServiceProviderIds() throws IOException {
+        if ( document==null ) {
+            throw new IllegalArgumentException("document has not been read, refresh must be called first");
+        }
         try {
             XPath xp = XPathFactory.newInstance().newXPath();
             NodeList nodes = (NodeList) xp.evaluate( "//sites/datasite/dataset", document, XPathConstants.NODESET );
