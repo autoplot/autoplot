@@ -150,7 +150,8 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
 
     @Override
     public double value() {
-        return back[0];
+        float v= back[0];
+        return v==fill ? dfill : v;
     }
 
     @Override
@@ -160,7 +161,8 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i0=" + i0 + " " + this);
             }
         }
-        return back[i0];
+        float v= back[i0];
+        return v==fill ? dfill : v;
     }
 
     @Override
@@ -173,7 +175,8 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i1=" + i1 + " " + this);
             }
         }
-        return back[i0 * len1 + i1];
+        float v= back[i0 * len1 + i1];
+        return v==fill ? dfill : v;
     }
 
     @Override
@@ -189,7 +192,8 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i2=" + i2 + " " + this);
             }
         }
-        return back[i0 * len1 * len2 + i2 * len1 + i1];
+        float v= back[i0 * len1 * len2 + i2 * len1 + i1];
+        return v==fill ? dfill : v;
     }
 
     @Override
@@ -208,7 +212,8 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i3=" + i3 + " " + this);
             }
         }
-        return back[i0*len1*len2*len3 + i3*len2*len1 + i2*len1 +i1];
+        float v= back[i0*len1*len2*len3 + i3*len2*len1 + i2*len1 +i1];
+        return v==fill ? dfill : v;
     }
 
     public void putValue(double value) {
@@ -287,6 +292,12 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
         return DataSetUtil.toString(this);
     }
 
+    @Override
+    public void putProperty(String name, Object value) {
+        super.putProperty(name, value);
+        if ( name.equals(QDataSet.FILL_VALUE) ) checkFill(); // because of rounding errors
+    }
+    
     /**
      * copies the properties, copying depend datasets as well.  
      * @see DataSetUtil.copyProperties, which is a shallow copy.
@@ -328,7 +339,9 @@ public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet,
 
         TrFDataSet result = new TrFDataSet(ds.rank, ds.len0, ds.len1, ds.len2, ds.len3, newback);
         result.properties.putAll(copyProperties(ds)); // TODO: problems... 
-
+        if ( result.properties.containsKey(QDataSet.FILL_VALUE) ) {
+            result.checkFill();
+        }
         return result;
     }
 
