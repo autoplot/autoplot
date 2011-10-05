@@ -7,6 +7,7 @@ package org.virbo.cdf;
 
 import java.lang.reflect.Array;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.QDataSet;
 
 /**
  * echo ArrayDataSet, but [0,3,2,1] transpose
@@ -78,6 +79,21 @@ public abstract class TrArrayDataSet extends AbstractDataSet {
         }
         return Array.getLength( this.getBack() ) * sizePer;
     }
+
+    /**
+     * check for fill property and set local variable.
+     */
+    protected void checkFill() {
+        Number f= (Number) properties.get(QDataSet.FILL_VALUE);
+        if ( f!=null ) {
+            fill= f.floatValue();
+            dfill= f.doubleValue();
+        } else {
+            fill= Float.NaN;
+            dfill= Double.NaN;
+        }
+    }
+    
     /**
      * the slice operator would be better implemented here, but there is no
      * transposed version of the class.
