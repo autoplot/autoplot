@@ -244,8 +244,8 @@ public class CDAWebDB {
 
     /**
      * return the timerange spanning the availability of the dataset.
-     * @param spid
-     * @return
+     * @param spid service provider id.
+     * @return the time range (timerange_start, timerange_stop) for the dataset.
      * @throws IOException
      */
     public String getTimeRange( String spid ) throws IOException {
@@ -256,6 +256,9 @@ public class CDAWebDB {
             spid= spid.toUpperCase();
             XPath xp = XPathFactory.newInstance().newXPath();
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']", spid), document, XPathConstants.NODE );
+            if ( node==null ) {
+                throw new IllegalArgumentException("unable to find node for serviceprovider_ID="+spid);
+            }
             NamedNodeMap attrs= node.getAttributes();
             String start=attrs.getNamedItem("timerange_start").getTextContent();
             String stop= attrs.getNamedItem("timerange_stop").getTextContent();
