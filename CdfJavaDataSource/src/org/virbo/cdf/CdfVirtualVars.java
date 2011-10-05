@@ -147,8 +147,10 @@ public class CdfVirtualVars {
             MutablePropertyDataSet poww= DataSetOps.makePropertiesMutable(pow);
             QDataSet trs1= Ops.add( (QDataSet) pow.property(QDataSet.DEPEND_1),translation.slice(0));
             poww.putProperty( QDataSet.DEPEND_1, trs1 );
-        throw new IllegalArgumentException("untested");
+            throw new IllegalArgumentException("fftPowerDeltaTranslation512 is untested");
             //return poww;
+        } else if ( function.equals("calc_p") ) {
+            return calcP( args );
         } else if ( function.equals("alternate_view") ) {
             return args.get(0);
         } else {
@@ -156,6 +158,17 @@ public class CdfVirtualVars {
         }
     }
 
+    /**
+     * see virtual_funcs.pro functon calc_p
+     */
+    protected static QDataSet calcP( List<QDataSet> args ) {
+        QDataSet coefficient= DataSetUtil.asDataSet( 1.6726e-6 );
+        QDataSet V_GSE_p= args.get(0);
+        QDataSet np= args.get(1);
+        //coefficient*np[i]*V_GSE_p[0,i]^2.0
+        QDataSet pressure = Ops.multiply( Ops.multiply( coefficient, np), Ops.pow( DataSetOps.slice1( V_GSE_p,0 ), 2 ) );
+        return pressure;
+    }
     protected static QDataSet alternateView( QDataSet burley ) {
         // not supported
         return burley;
@@ -181,7 +194,7 @@ public class CdfVirtualVars {
 
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
-                "fftPowerDeltaTranslation512", "alternate_view" );
+                "fftPowerDeltaTranslation512", "alternate_view", "calc_p" );
         return functions.contains(function);
     }
 }
