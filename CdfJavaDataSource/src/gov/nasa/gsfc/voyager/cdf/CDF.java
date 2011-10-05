@@ -275,6 +275,15 @@ public interface CDF {
     public double[] get1D(String varName) throws Throwable;
 
     /**
+     * accessor that can preserve type.
+     * @param varName
+     * @param preserve true will preserve type, false will convert to double array
+     * @return
+     * @throws Throwablel
+     */
+    public Object get1D( String varName, boolean preserve ) throws Throwable;
+
+    /**
      * returns value of 1 dimensional variable at the specified point.
      */
     public double[] get1D(String varName, int point) throws Throwable;
@@ -291,6 +300,8 @@ public interface CDF {
         double[] timeRange, int[] stride) throws Throwable;
     public Object getTimeSeries(String vname, boolean ignoreFill,
         double[] timeRange, int[] stride) throws Throwable;
+    //TODO: need preserve with stride
+
     public double[] get1D(String varName, int first, int last, int[] stride)
         throws Throwable;
     public double [] getTimes(String vname, int[] recordRange,
