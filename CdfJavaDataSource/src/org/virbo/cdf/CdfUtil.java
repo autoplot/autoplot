@@ -268,7 +268,7 @@ public class CdfUtil {
                     //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
                     //System.err.println("reading variable "+variable.getName());
-                    odata= cdf.get1D( variable.getName() ); // this is my hack
+                    odata= cdf.get1D( variable.getName(), true );
                 }
             } else {
                 int[] stride= new int[dims+1];
