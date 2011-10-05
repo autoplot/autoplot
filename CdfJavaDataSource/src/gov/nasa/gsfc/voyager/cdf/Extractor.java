@@ -1593,7 +1593,9 @@ public class Extractor {
             if (!preserve) data = new double[nv*elements];
             longType = true;
         } else {
-            data = new double[nv*elements];
+            if ( ! ( preserve && DataTypes.typeCategory[type] == 0 ) ) { // special case where we just return float[]
+                data = new double[nv*elements];
+            }
         }
 
         Object temp = null;
@@ -1634,7 +1636,7 @@ public class Extractor {
                     do1D(bv, type, temp, ldata, offset, count*elements,
                     preserve);
                 } else {
-                    do1D(bv, type, temp, data, offset, count*elements);
+                    do1D(bv, type, temp, data, offset, count*elements,preserve);
                 }
                 offset += count*elements;
             }
@@ -1642,6 +1644,7 @@ public class Extractor {
         }
         if (offset == 0) return null;
         if (longType && preserve) return ldata;
+        if (DataTypes.typeCategory[type]==0 && preserve ) return temp;
         return data;
     }
 
@@ -1663,9 +1666,11 @@ public class Extractor {
         case 0:
             float[] tf = (float[])temp;
             FloatBuffer bvf = bv.asFloatBuffer();
-            bvf.get(tf, 0, number);
-            for (int n = 0; n < number; n++) {
-                data[offset + n] = tf[n];
+            bvf.get(tf, offset, number);
+            if ( !preserve ) {
+                for (int n = 0; n < number; n++) {
+                    data[offset + n] = tf[n+offset];
+                }
             }
             break;
         case 1:
