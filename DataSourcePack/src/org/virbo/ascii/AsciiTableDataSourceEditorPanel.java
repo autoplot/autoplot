@@ -1196,20 +1196,24 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
             
             model.setRecParser(p);
+
+            Map<Integer,String> list= new LinkedHashMap();
             columns = getColumnNames();
 
             Map<String,String> xx= parser.getRichFields();
             int ij= columns.size();
             for ( Entry<String,String> s: xx.entrySet() ) {
-                columns.put( ij, s.getKey() );
+                list.put( ij, s.getKey() );
                 ij= ij+1;
             }
+
+            list.putAll(columns);
 
             updateColumns();
 
             String lcol = getColumn();
             int icol = jTable1.getSelectedColumn();
-            columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
+            columnsComboBox.setModel(new DefaultComboBoxModel(list.values().toArray()));
             columnsComboBox.setSelectedItem(getColumn());
             if (icol != -1) {
                 setColumn(columns.get(icol));
@@ -1217,7 +1221,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 setColumn(lcol);
             }
 
-            List<String> dep0Values = new ArrayList<String>(columns.values());
+            List<String> dep0Values = new ArrayList<String>(list.values());
             String ldep0 = getDep0();
             dep0Values.add(0, "");
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
