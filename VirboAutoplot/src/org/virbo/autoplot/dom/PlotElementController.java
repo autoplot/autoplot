@@ -1550,10 +1550,14 @@ public class PlotElementController extends DomNodeController {
                     if ( spec==RenderType.colorScatter ) {
                         ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props ); 
                     } else {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); // small problem that we don't support colorScatter here
-                        for ( int i=1; i<fillDs.length(0); i++ ) {
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props ); // small problem that we don't support colorScatter here
+                        for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
                            AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props );
-                           ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                           if ( ydesc1.range.getUnits().isConvertableTo(ydesc.range.getUnits()) ) {
+                               ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                           } else {
+                               break;
+                           }
                         }
                     }
                 } else {
