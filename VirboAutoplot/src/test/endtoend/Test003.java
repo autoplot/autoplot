@@ -55,6 +55,10 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/garageTemps.vap" );
             ScriptContext.writeToPng( "test003_005.png" );
 
+            // ancient vap file version <1.00 still loads in.
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap" );
+            ScriptContext.writeToPng( "test003_006.png" );
+
             if ( headless ) System.exit(0);
             
         } catch ( Exception ex ) {
