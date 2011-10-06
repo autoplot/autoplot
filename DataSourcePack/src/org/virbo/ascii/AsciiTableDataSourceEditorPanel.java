@@ -1170,7 +1170,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 try {
                     String[] columns=  new String[p.fieldCount()];
                     for ( int i=0; i<columns.length; i++ )  columns[i]="";
-                    AsciiHeadersParser.parseMetadata(p.header,columns);
+                    AsciiHeadersParser.parseMetadata(p.header,columns,columns);
                 } catch (ParseException ex) {
                     Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
                     richHeaderWarn = ex;
