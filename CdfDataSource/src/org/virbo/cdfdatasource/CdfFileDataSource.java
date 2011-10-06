@@ -129,7 +129,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, mon ) );
                 if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, mon ) );
                 try {
-                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
+                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr, mon );
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }

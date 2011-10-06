@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -117,26 +118,26 @@ public class CdfVirtualVars {
 //         endcase
 //      endif ;if function defined for this virtual variable
 
-    public static QDataSet execute( String function, List<QDataSet> args ) {
+    public static QDataSet execute( String function, List<QDataSet> args, ProgressMonitor mon ) {
         if ( function.equals("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
         } else if (function.equals("convert_log10")) {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
-            return Ops.fftPower( args.get(0), 512, new NullProgressMonitor() );
+            return Ops.fftPower( args.get(0), 512, mon );
         } else if (function.equals("fftPowerDelta512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
-            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
+            QDataSet pow= Ops.fftPower( waves, 512, mon );
             return pow;
         } else if (function.equals("fftPowerDeltaTranslation512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
             QDataSet translation= args.get(2);  // shift this amount after fft (because it was with respect to another signal
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT.slice(0),Ops.findgen(waves.length(0)) ) );
-            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
+            QDataSet pow= Ops.fftPower( waves, 512, mon );
             MutablePropertyDataSet poww= DataSetOps.makePropertiesMutable(pow);
             QDataSet trs1= Ops.add( (QDataSet) pow.property(QDataSet.DEPEND_1),translation.slice(0));
             poww.putProperty( QDataSet.DEPEND_1, trs1 );
