@@ -59,6 +59,7 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.dataset.DataSetUtil;
 import org.das2.datum.DatumRange;
@@ -801,11 +802,10 @@ public class GuiSupport {
                 if (!f.toString().endsWith(".xml")) {
                     f = new File(f.toString() + ".xml");
                 }
-                String format = Bookmark.formatBooks(parent.applicationModel.getRecent());
                 FileOutputStream out=null;
                 try {
-                    out = new FileOutputStream(f);
-                    out.write(format.getBytes());
+                    out= new FileOutputStream(f);
+                    Bookmark.formatBooks(out,parent.applicationModel.getRecent());
                 } finally {
                     if ( out!=null ) out.close();
                 }
@@ -929,9 +929,12 @@ public class GuiSupport {
                     parent.getBookmarksManager().getModel().importList( books );
                 }
                 parent.setMessage( "imported bookmarks file "+bookmarksFile );
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile + "\n"+ex.getMessage() , "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex ) {
