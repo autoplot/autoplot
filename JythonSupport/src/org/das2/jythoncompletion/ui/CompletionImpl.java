@@ -1194,11 +1194,20 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
         inputMap = new InputMap();
         completionShortcut = null;
         
+        KeyStroke[] keys;
+        if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion() ) {
         // Register completion show
-        KeyStroke[] keys = findEditorKeys( "completion", 
+             keys= findEditorKeys( "completion", 
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK),
                 KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 )
                 );
+            
+        } else {
+        // Register completion show
+            keys= findEditorKeys( "completion", 
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK)
+                );
+        }
         for (int i = 0; i < keys.length; i++) {
             inputMap.put(keys[i], COMPLETION_SHOW);
             if (completionShortcut == null) {
