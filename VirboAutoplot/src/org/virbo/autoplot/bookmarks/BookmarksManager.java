@@ -871,8 +871,10 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            showMessage( "XML error while parsing. " +ex.getMessage(), "Error while parsing", JOptionPane.WARNING_MESSAGE );
         } catch (IOException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            showMessage( "IO Error while parsing. " +ex.getMessage(), "Error while parsing", JOptionPane.WARNING_MESSAGE );
         } finally {
             try {
                 if ( read!=null ) read.close();
@@ -948,6 +950,10 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         });
 
         bookmarksMenu.add(new JSeparator());
+
+        if ( bookmarks==null ) {
+            bookmarks= Collections.singletonList( (Bookmark) new Bookmark.Folder( "Error reading bookmarks" ) );
+        }
 
         addBookmarks( bookmarksMenu, bookmarks, dataSetSelector );
 
