@@ -63,6 +63,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
@@ -74,8 +76,16 @@ import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DomNode;
+import org.virbo.autoplot.state.SerializeUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
+import org.virbo.autoplot.state.Vap1_07Scheme;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 /**
  * This is the original das2 Exception handler dialog, but modified to
@@ -363,144 +373,212 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private void formatException( StringBuffer sb, Throwable th ) {
-        sb.append("  <exception>\n");
-        sb.append("    <type>");
-        escape(sb, th.getClass().getName());
-        sb.append("</type>\n");
-        sb.append("    <message>");
-        escape(sb, th.toString());
-        sb.append("</message>\n");
+    private void formatException( Document doc, Element parent, Throwable th ) {
+        Element ex= doc.createElement("exception");
+        Element type= doc.createElement("type");
+        type.appendChild( doc.createTextNode(th.getClass().getName()) );
+        
+        ex.appendChild(type);
+        
+        Element msg= doc.createElement("message");
+        msg.appendChild( doc.createTextNode(th.toString()) );
+        
+        ex.appendChild(msg);
+
         int hash = hashCode(th);
-        sb.append("    <hash>").append(hash).append("</hash>\n");
+        Element hashe= doc.createElement("hash");
+        hashe.appendChild( doc.createTextNode( String.valueOf(hash) ) );
+
+        ex.appendChild(hashe);
 
         StackTraceElement ste = th.getStackTrace()[0];
-        sb.append("    <location>\n");
-        sb.append("       <class>").append(safe(ste.getClassName())).append("</class>\n");
-        sb.append("       <method>").append(safe(ste.getMethodName())).append("</method>\n");
-        sb.append("       <file>").append(safe(ste.getFileName())).append("</file>\n");
-        sb.append("       <lineNumber>").append(ste.getLineNumber()).append("</lineNumber>\n");
-        sb.append("    </location>\n");
-        sb.append("    <toString><![CDATA[\n");
+
+        Element location= doc.createElement("location");
+        Element ele= doc.createElement("class");
+        ele.appendChild( doc.createTextNode(ste.getClassName()));
+        location.appendChild(ele);
+        ele= doc.createElement("method");
+        ele.appendChild( doc.createTextNode(ste.getMethodName()) );
+        location.appendChild(ele);
+        ele= doc.createElement("file");
+        ele.appendChild( doc.createTextNode(ste.getFileName()) );
+        location.appendChild(ele);
+        ele= doc.createElement("lineNumber");
+        ele.appendChild( doc.createTextNode( String.valueOf(ste.getLineNumber()) ) );
+        location.appendChild(ele);
+
+        ex.appendChild(location);
+
+        ele= doc.createElement("toString");
         StringWriter sw = new StringWriter();
         th.printStackTrace(new PrintWriter(sw));
-        sb.append(sw.toString());
-        sb.append("]]>\n");
-        sb.append("    </toString>\n");
-        sb.append("  </exception>\n");
 
+        ele.appendChild( doc.createTextNode( "\n"+sw.toString() ) );
+
+        ex.appendChild(ele);
+
+        parent.appendChild(ex);
     }
 
-    private void formatBuildInfos( StringBuffer buf, List<String> bis ) {
-        buf.append( "  <buildInfos>\n");
+    private void formatBuildInfos( Document doc, Element parent, List<String> bis ) {
+        Element pp= doc.createElement("buildInfos");
         for ( String s: bis ) {
-            buf.append( "    <jar>" );
-            escape(buf,s);
-            buf.append( "</jar>\n" );
+            Element jar= doc.createElement("jar");
+            jar.appendChild( doc.createTextNode(s) );
+            pp.appendChild(jar);
         }
-        buf.append( "  </buildInfos>\n");
+        parent.appendChild(pp);
 
     }
 
-    private void formatSysProp( StringBuffer buf, String prop ) {
-        buf.append("     <property name=\"").append(prop).append("\" value=\"").append(System.getProperty(prop)).append("\" />\n");
+    private void formatSysProp( Document doc, Element parent,String prop ) {
+        Element ele= doc.createElement("property");
+        ele.setAttribute( "name", prop );
+        ele.setAttribute( "value",System.getProperty(prop) );
+        parent.appendChild(ele);
     }
-    private void formatPlatform( StringBuffer buf ) {
-        buf.append("  <platform>\n");
-        formatSysProp( buf, "java.version" );
-        formatSysProp( buf, "java.vendor" );
-        formatSysProp( buf, "os.name" );
-        formatSysProp( buf, "os.arch" );
-        formatSysProp( buf, "os.version" );
+
+    private void formatPlatform( Document doc, Element parent  ) {
+        Element p= doc.createElement("platform");
+        formatSysProp( doc, p, "java.version" );
+        formatSysProp( doc, p, "java.vendor" );
+        formatSysProp( doc, p, "os.name" );
+        formatSysProp( doc, p, "os.arch" );
+        formatSysProp( doc, p, "os.version" );
         DecimalFormat nf = new DecimalFormat("0.0");
         String mem = nf.format(Runtime.getRuntime().maxMemory() / (1024 * 1024));
         String tmem= nf.format(Runtime.getRuntime().totalMemory() / (1024 * 1024));
         String fmem= nf.format(Runtime.getRuntime().freeMemory() / (1024 * 1024));
-        buf.append("     <property name=\"").append("runtime.maxMemory").append("\" value=\"").append(mem).append(" Mb\" />\n");
-        buf.append("     <property name=\"").append("runtime.totalMemory").append("\" value=\"").append(tmem).append(" Mb\" />\n");
-        buf.append("     <property name=\"").append("runtime.freeMemory").append("\" value=\"").append(fmem).append(" Mb\" />\n");
 
-        buf.append("  </platform>\n");
+        Element ele;
+        ele= doc.createElement("property");
+        ele.setAttribute("runtime.maxMemory", String.valueOf(mem)+" Mb");
+        p.appendChild(ele);
+        ele= doc.createElement("property");
+        ele.setAttribute("runtime.totalMemory", String.valueOf(tmem)+" Mb");
+        p.appendChild(ele);
+        ele= doc.createElement("property");
+        ele.setAttribute("runtime.freeMemory", String.valueOf(fmem)+" Mb");
+        p.appendChild(ele);
+
+        parent.appendChild(p);
+
     }
 
-    private void formatUndos( StringBuffer buf, UndoRedoSupport undo ) {
-        buf.append("  <states>\n");
+    private void formatUndos( Document doc, Element parent, UndoRedoSupport undo ) {
+        Element ele= doc.createElement("states");
         for ( int i= undo.getDepth()-1; i>0; i-- ) {
-            buf.append( String.format( "      <undo pos=%d>",i ) );
-            buf.append( safe( undo.getLongUndoDescription(i) ) );
-            buf.append( "</undo>\n" );
+            Element ele1= doc.createElement("undo");
+            ele1.setAttribute("pos", String.valueOf(i) );
+            ele1.appendChild( doc.createTextNode(undo.getLongUndoDescription(i) ) );
+            ele.appendChild(ele1);
         }
-        buf.append("  </states>\n");
+        parent.appendChild(ele);
     }
 
     private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs, Map<String,Object> data, boolean uncaught, String userComments ) {
-        StringBuffer buf= new StringBuffer();
-        buf.append("<?xml version=\"1.0\"");
+
+        ByteArrayOutputStream out= new ByteArrayOutputStream();
+
+        try {
+            Document doc= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+            Element e= doc.createElement("exceptionReport");
+            e.setAttribute( "version", "1.1" );
+
+            doc.appendChild(e);
+            Element app= doc.createElement("applicationId");
+            app.appendChild( doc.createTextNode("autoplot") );
+
+            e.appendChild(app);
+
+            formatException( doc, e, t );
+
+            Element ele= doc.createElement( "uncaught" );
+            ele.appendChild( doc.createTextNode( String.valueOf(uncaught) ) );
+            e.appendChild(ele);
+
+            Element user= doc.createElement("userComments");
+            user.appendChild( doc.createTextNode(userComments) );
+            e.appendChild(user);
+
+            Element userN= doc.createElement("userName");
+            userN.appendChild( doc.createTextNode((String)data.get(USER_ID)) );
+            e.appendChild(userN);
+
+            Element mail= doc.createElement("email");
+            mail.appendChild( doc.createTextNode((String)data.get(EMAIL)) );
+            e.appendChild(mail);
+
+            Element focus= doc.createElement("focusUri");
+            focus.appendChild( doc.createTextNode((String)data.get(FOCUS_URI)) );
+            e.appendChild(focus);
 
 
-        buf.append(" encoding=\"");
-        buf.append("UTF-8");
-        buf.append("\"");
-        buf.append(" ?>\n");
+            if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
+                if ( appModel!=null ) {
+                    Application state= (Application)appModel.getDocumentModel();
+                    OutputStream vapout= new ByteArrayOutputStream();
 
-        buf.append("<exceptionReport>\n");
+                    Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, new Vap1_07Scheme() );// TODO: look up version
 
-        buf.append("  <applicationId>autoplot</applicationId>\n" );
-        
-        formatException( buf, t );
+                    Element vap= doc.createElement("vap");
+                    vap.appendChild(app1);
 
-        buf.append("  <uncaught>").append(uncaught).append("</uncaught>\n");
-        
-        buf.append("  <userComments><![CDATA[\n").append(userComments).append("]]>\n</userComments>\n");
-
-        String id= (String)data.get(USER_ID);
-        
-        buf.append("  <userName>").append(safe(id)).append("</userName>\n");
-
-        String email= (String)data.get(EMAIL);
-        buf.append("  <email>").append(safe(email)).append("</email>\n");
-
-        String focusUri= (String)data.get(FOCUS_URI);
-        buf.append("  <focusUri>").append(safe(focusUri)).append("</focusUri>\n");
-
-        if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
-            if ( appModel!=null ) {
-                Application dom= (Application)appModel.getDocumentModel();
-                OutputStream vapout= new ByteArrayOutputStream();
-
-                try {
-                    StatePersistence.saveState( vapout, dom, "" );
-                    String vap= vapout.toString();
-                    String head= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-                    if ( vap.startsWith(head) ) {
-                        vap= vap.substring(head.length());
+                    vap.setAttribute( "domVersion", "v1_07" ); // TODO: look up version
+                    try {
+                        vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
+                    } catch ( IOException ex ) {
+                        vap.setAttribute(  "appVersionTag", ex.getMessage() );
                     }
-                    buf.append("  <dom>\n"+vap+"\n</dom>\n");
-                } catch ( IOException ex ) {
-                    ex.printStackTrace();
+
+                    Element dom= doc.createElement("dom");
+                    dom.appendChild(vap);
+
+                    e.appendChild(vap);
+
+                }
+
+                if ( undoRedoSupport!=null ) {
+                    formatUndos( doc, e, undoRedoSupport );
                 }
             }
 
-            if ( undoRedoSupport!=null ) {
-                formatUndos( buf, undoRedoSupport );
+            formatBuildInfos( doc, e, bis );
+
+            formatPlatform( doc, e );
+
+            
+            DOMImplementationLS ls = (DOMImplementationLS)
+                            doc.getImplementation().getFeature("LS", "3.0");
+            LSOutput output = ls.createLSOutput();
+            output.setEncoding("UTF-8");
+            output.setByteStream(out);
+            LSSerializer serializer = ls.createLSSerializer();
+
+            try {
+                if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                    serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                }
+            } catch (Error error) {
+                // Ed's nice trick for finding the implementation
+                //String name = serializer.getClass().getSimpleName();
+                //java.net.URL u = serializer.getClass().getResource(name+".class");
+                //System.err.println(u);
+                error.printStackTrace();
             }
+            serializer.write(doc, output);
+        } catch ( ParserConfigurationException ex ) {
+            
         }
 
-        formatBuildInfos( buf, bis );
+        try {
+            out.close();
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+        }
 
-        formatPlatform( buf );
-        
-       //  this information takes lots of space and has never been useful.
-        //if ( recs!=null ) {
-        //    buf.append( "  <log>\n");
-        //    XMLFormatter formatter= new XMLFormatter();
-        //    for ( LogRecord lr: recs ) {
-        //        buf.append( formatter.format(lr) );
-        //    }
-        //    buf.append( "  </log>\n");
-        //}
-        buf.append("</exceptionReport>\n");
-        return buf.toString();
+        return out.toString();
     }
 
     javax.swing.filechooser.FileFilter getFileNameExtensionFilter( final String desc, final String[] exts ) {
