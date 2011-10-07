@@ -906,7 +906,7 @@ public class GuiSupport {
         }
     }
 
-    public void importBookmarks( String bookmarksFile ) throws ParserConfigurationException {
+    public void importBookmarks( String bookmarksFile )  {
 
         ImportBookmarksGui gui= new ImportBookmarksGui();
         gui.getBookmarksFilename().setText(bookmarksFile+" ?");
