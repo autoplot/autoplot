@@ -202,6 +202,10 @@ public class DataPanel extends javax.swing.JPanel {
 
     private void componentChanged() {
         if ( adjusting ) return;
+        if ( element==null ) {
+            new Exception("Element was null in DataPanel.componentChanged").printStackTrace();
+            return;
+        }
         String scomp= element.getComponent();
         Pattern slicePattern= Pattern.compile("\\|slice(\\d+)\\((\\d+)\\)(\\|transpose)?");
         Matcher m= slicePattern.matcher(scomp);
