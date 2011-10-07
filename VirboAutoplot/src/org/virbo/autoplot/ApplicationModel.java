@@ -612,13 +612,18 @@ public class ApplicationModel {
 
         final File f = new File( f2, nodeName + ".xml");
 
-        String s = Bookmark.formatBooks(newValue);
+        OutputStream out= null;
         try {
-            PrintWriter out = new PrintWriter( new FileOutputStream(f) );
-            out.print(s);
-            out.close();
+            out= new FileOutputStream(f);
+            Bookmark.formatBooks(out,newValue);
         } catch ( IOException ex ) {
             ex.printStackTrace();
+        } finally {
+            try {
+                if ( out!=null ) out.close();
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
+            }
         }
 
         // always tack on the URI to history.dat file
