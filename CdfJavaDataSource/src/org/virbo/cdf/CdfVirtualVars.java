@@ -131,13 +131,16 @@ public class CdfVirtualVars {
         } else if (function.equals("convert_log10")) {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
-            return Ops.fftPower( args.get(0), 512, mon );
+            return Ops.fftPower(args.get(0), 512, new NullProgressMonitor());
+        } else if (function.equals("fftPower")) {
+            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
+            return Ops.fftPower(hanningSet, (int) args.get(1).value(), new NullProgressMonitor());
         } else if (function.equals("fftPowerDelta512")) {
-            QDataSet deltaT= args.get(1);       // time between successive measurements.
+            QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
-            QDataSet pow= Ops.fftPower( waves, 512, mon );
+            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
             return pow;
         } else if (function.equals("fftPowerDeltaTranslation512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
@@ -195,7 +198,7 @@ public class CdfVirtualVars {
 
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
-                "fftPowerDeltaTranslation512", "alternate_view", "calc_p" );
+                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p" );
         return functions.contains(function);
     }
 }
