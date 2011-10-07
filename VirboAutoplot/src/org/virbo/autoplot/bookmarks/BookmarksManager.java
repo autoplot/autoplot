@@ -509,7 +509,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
             iconButton.setText("(no icon)");
         }*/
         descriptionTextField.setText( b.getDescription() );
-        URLTextField.setEnabled(b instanceof Bookmark.Item);
+        URLTextField.setEditable( b instanceof Bookmark.Item );
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUri());
         } else {
@@ -952,7 +952,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         bookmarksMenu.add(new JSeparator());
 
         if ( bookmarks==null ) {
-            bookmarks= Collections.singletonList( (Bookmark) new Bookmark.Folder( "Error reading bookmarks" ) );
+            bookmarks= Collections.emptyList();
         }
 
         addBookmarks( bookmarksMenu, bookmarks, dataSetSelector );
