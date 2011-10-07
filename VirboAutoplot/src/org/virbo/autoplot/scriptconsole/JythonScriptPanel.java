@@ -161,10 +161,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
-
-        CompletionSettings se= JythonCompletionProvider.getInstance().settings();
-        
-        impl.setTabIsCompletion(se.isTabIsCompletion());
     }
 
     /**
