@@ -150,7 +150,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
                         }
                         try {
-                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( function, comps );
+                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( function, comps, mon );
                         } catch (IllegalArgumentException ex ){
                             throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
                         }
