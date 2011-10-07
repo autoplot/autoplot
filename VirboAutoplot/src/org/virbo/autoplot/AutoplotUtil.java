@@ -197,7 +197,12 @@ public class AutoplotUtil {
             if ( ! tu.isValid(max.doubleValue() ) ) max= tu.validMax();
             return new DatumRange( min.doubleValue(), max.doubleValue(), units );
         } else {
-            return new DatumRange(min.doubleValue(), max.doubleValue(), units);
+            try {
+                return new DatumRange(min.doubleValue(), max.doubleValue(), units);
+            } catch ( IllegalArgumentException ex ) {
+                System.err.println("here here");
+                throw ex;
+            }
         }
     }
 
@@ -431,6 +436,16 @@ public class AutoplotUtil {
 
         AutoRangeDescriptor result = new AutoRangeDescriptor();
 
+        // handle ordinal units by simply returning the range.
+        if ( UnitsUtil.isOrdinalMeasurement(u) || UnitsUtil.isNominalMeasurement(u) ) {
+            QDataSet ext= Ops.extent(ds);
+            result.range= DataSetUtil.asDatumRange(ext,true);
+            result.robustMin= result.range.min().doubleValue(u);
+            result.robustMax= result.range.max().doubleValue(u);
+            return result;
+        }
+
+
         double[] dd;
 
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
@@ -460,7 +475,7 @@ public class AutoplotUtil {
 
         if (mono) {
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
-            QDataSet wds= DataSetUtil.weightsDataSet(ds);
+            QDataSet wds= DataSetUtil.weightsDataSet(ds); // use weights rather than checking for fill and valid range.  The weights datset will reflect this information.
             if (cadence == null || cadence.value() > Double.MAX_VALUE / 100)
                 cadence = DRank0DataSet.create(0.);
             if (ds.length() > 1) {
