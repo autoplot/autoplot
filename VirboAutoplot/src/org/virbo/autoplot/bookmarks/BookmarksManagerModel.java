@@ -443,7 +443,7 @@ public class BookmarksManagerModel {
         setList(newList);
     }
 
-    public void addRemoteBookmarks(String surl ) throws MalformedURLException {
+    public void addRemoteBookmarks(String surl ) throws MalformedURLException, SAXException, ParserConfigurationException, IOException {
         addRemoteBookmarks(surl,null);
     }
 
@@ -453,7 +453,7 @@ public class BookmarksManagerModel {
      * @param selectedBookmark location to add the bookmark, can be null.
      * @throws MalformedURLException
      */
-    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedURLException {
+    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedURLException, SAXException, ParserConfigurationException, IOException {
         try {
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
@@ -473,11 +473,7 @@ public class BookmarksManagerModel {
             }
             mergeList(copy,newList);
             setList(newList);
-        } catch (SAXException ex) {
-            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
             Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
         }
 

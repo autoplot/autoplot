@@ -13,6 +13,7 @@ import java.awt.Frame;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
 import java.awt.Image;
@@ -905,10 +906,10 @@ public class GuiSupport {
         }
     }
 
-    public void importBookmarks( String bookmarksFile ) {
+    public void importBookmarks( String bookmarksFile ) throws ParserConfigurationException {
 
         ImportBookmarksGui gui= new ImportBookmarksGui();
-        gui.getBookmarksFilename().setText(bookmarksFile+"?");
+        gui.getBookmarksFilename().setText(bookmarksFile+" ?");
         gui.getRemote().setSelected(true);
         int r = JOptionPane.showConfirmDialog( parent, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
         if (r == JOptionPane.OK_OPTION) {

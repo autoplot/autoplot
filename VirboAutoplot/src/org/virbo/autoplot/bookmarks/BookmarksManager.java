@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,6 +112,38 @@ public class BookmarksManager extends javax.swing.JDialog {
     public BookmarksManagerModel getModel() {
         return model;
     }
+
+    /**
+     * show a message to the user.  Copied from ApplicationModel.
+     * @param message
+     * @param title
+     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.PLAIN_MESSAGE,
+     */
+    private void showMessage( String message, String title, int messageType ) {
+        if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {
+            Component p= SwingUtilities.getRoot(this);
+            if ( p==null ) {
+                if ( messageType==JOptionPane.WARNING_MESSAGE ) {
+                    System.err.println( "WARNING: "+ title + ": " + message  );
+                } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
+                    System.err.println( "INFO: "+ title + ": " + message  );
+                } else {
+                    System.err.println( title + ": " + message  );
+                }
+            } else {
+                JOptionPane.showMessageDialog( p, message, title, messageType );
+            }
+        } else {
+            if ( messageType==JOptionPane.WARNING_MESSAGE ) {
+                System.err.println( "WARNING: "+ title + ": " + message  );
+            } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
+                System.err.println( "INFO: "+ title + ": " + message  );
+            } else {
+                System.err.println( title + ": " + message  );
+            }
+        }
+    }
+
 
     /*private void addIcon() {
         Runnable run = new Runnable() {
@@ -536,10 +569,22 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     if (s != null && !s.equals("")) {
         if ( s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:") ) { // kludge for testing remote bookmarks
             try {
-                // kludge for testing remote bookmarks
+                 // kludge for testing remote bookmarks
                 model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
             } catch (MalformedURLException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                showMessage( "Error parsing "+s, "Malformed URL error "+ex.getMessage(), JOptionPane.WARNING_MESSAGE );
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                showMessage( "Error parsing "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (SAXException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                showMessage( "Error parsing "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (FileNotFoundException ex ) {
+                showMessage( "File not found: "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (IOException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                showMessage( "I/O Error adding "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             }
         } else {
             model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
