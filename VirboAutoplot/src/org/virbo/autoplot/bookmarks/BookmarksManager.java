@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -910,16 +911,19 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     private void formatToFile( File f ) {
         System.err.println("formatting "+f);
-        PrintWriter out = null;
+        OutputStream out = null;
         try {
-            String s = Bookmark.formatBooks(model.getList());
-            out = new PrintWriter(new FileOutputStream(f));
-            out.print(s);
+            out= new FileOutputStream(f);
+            Bookmark.formatBooks(out,model.getList());
             out.close();
         } catch (IOException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            out.close();
+            try {
+                if ( out!=null ) out.close();
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
+            }
         }
     }
 

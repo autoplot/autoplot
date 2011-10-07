@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -351,13 +352,29 @@ public abstract class Bookmark {
         return buf.toString();
 
     }
-    
+
     /**
      * format the bookmarks into xml for persistent storage.
      * @param bookmarks List of Bookmark.List or Bookmark
      * @return
      */
     public static String formatBooks(List<Bookmark> bookmarks) {
+        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        formatBooks( baos,bookmarks );
+        try {
+            return baos.toString("UTF-8");
+        } catch ( UnsupportedEncodingException ex ) {
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    /**
+     * format the bookmarks into xml for persistent storage.
+     * @param bookmarks List of Bookmark.List or Bookmark
+     * @return
+     */
+    public static void formatBooks( OutputStream out, List<Bookmark> bookmarks ) {
 
         try {
             Document doc= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -370,13 +387,11 @@ public abstract class Bookmark {
             }
             doc.appendChild(e);
 
-            ByteArrayOutputStream baos= new ByteArrayOutputStream();
-
             DOMImplementationLS ls = (DOMImplementationLS)
                             doc.getImplementation().getFeature("LS", "3.0");
             LSOutput output = ls.createLSOutput();
             output.setEncoding("UTF-8");
-            output.setByteStream(baos);
+            output.setByteStream(out);
             LSSerializer serializer = ls.createLSSerializer();
 
             try {
@@ -392,7 +407,6 @@ public abstract class Bookmark {
             }
             serializer.write(doc, output);
 
-            return baos.toString("UTF-8");
         } catch ( IOException ex ) {
             throw new RuntimeException(ex);
         } catch ( ParserConfigurationException ex ) {

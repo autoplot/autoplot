@@ -64,9 +64,8 @@ public class Util {
             public void propertyChange(PropertyChangeEvent evt) {
                 PrintStream fout= null;
                 try {
-                    String format = Bookmark.formatBooks(getRecent(sel));
                     fout = new PrintStream(f);
-                    fout.print( format );
+                    Bookmark.formatBooks(fout,getRecent(sel));
                     fout.close();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);

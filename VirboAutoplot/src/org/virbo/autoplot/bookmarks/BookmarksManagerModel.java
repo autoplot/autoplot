@@ -93,9 +93,8 @@ public class BookmarksManagerModel {
             try {
                 File f= chooser.getSelectedFile();
                 if ( !f.toString().endsWith(".xml") ) f= new File( f.toString()+".xml" );
-                String format = Bookmark.formatBooks( list );
                 out = new FileOutputStream(f);
-                out.write(format.getBytes());
+                Bookmark.formatBooks( out, list );
                 
             } catch (IOException e) {
                 e.printStackTrace();
