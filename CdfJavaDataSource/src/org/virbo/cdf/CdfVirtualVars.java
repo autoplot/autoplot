@@ -131,16 +131,16 @@ public class CdfVirtualVars {
         } else if (function.equals("convert_log10")) {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
-            return Ops.fftPower(args.get(0), 512, new NullProgressMonitor());
+            return Ops.fftPower(args.get(0), 512, mon );
         } else if (function.equals("fftPower")) {
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
-            return Ops.fftPower(hanningSet, (int) args.get(1).value(), new NullProgressMonitor());
+            return Ops.fftPower(hanningSet, (int) args.get(1).value(), mon );
         } else if (function.equals("fftPowerDelta512")) {
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
-            QDataSet pow= Ops.fftPower( waves, 512, new NullProgressMonitor() );
+            QDataSet pow= Ops.fftPower( waves, 512, mon );
             return pow;
         } else if (function.equals("fftPowerDeltaTranslation512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
@@ -155,6 +155,8 @@ public class CdfVirtualVars {
             //return poww;
         } else if ( function.equals("calc_p") ) {
             return calcP( args );
+        } else if ( function.equals("conv_pos1") ) {
+            return convPos( args, "ANG-GSE"  );
         } else if ( function.equals("alternate_view") ) {
             return args.get(0);
         } else {
@@ -173,6 +175,12 @@ public class CdfVirtualVars {
         QDataSet pressure = Ops.multiply( Ops.multiply( coefficient, np), Ops.pow( DataSetOps.slice1( V_GSE_p,0 ), 2 ) );
         return pressure;
     }
+    
+    public static QDataSet convPos( List<QDataSet> args, String coordSys) {
+        throw new IllegalArgumentException("not implemented");
+        //return args.get(0);
+    }
+
     protected static QDataSet alternateView( QDataSet burley ) {
         // not supported
         return burley;
