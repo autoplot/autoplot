@@ -190,7 +190,22 @@ public class CDAWebDataSource extends AbstractDataSource {
             if ( result==null ) {
                 result= accum;
             }
-            
+
+            // kludge to get y labels when they are in the skeleton.
+            if ( result.rank()==2 ) {
+                QDataSet labels= (QDataSet) result.property(QDataSet.DEPEND_1);
+                String labelVar= (String)metadata.get( "LABL_PTR_1");
+                if ( labels==null && labelVar!=null ) {
+                    String master= db.getMasterFile( ds.toLowerCase(), mon );
+                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
+                    QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
+                    if ( labelDs!=null ) {
+                        if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
+                        result.putProperty( QDataSet.DEPEND_1, labelDs );
+                    }
+                }
+            }
+
             // we know the ranges for timeseriesbrowse, kludge around autorange 10% bug.
             if ( result!=null ) {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
@@ -201,7 +216,12 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
 
                 Map<String,String> user= new HashMap<String, String>();
-                user.put( "delegate", base + "/" + tmpl );
+                for ( int i=0; i<Math.min( files.length,10); i++ ) {
+                    user.put( "delegate_"+i, fs.toString() + files[i] );
+                }
+                if ( files.length>=10 ) {
+                    user.put( "delegate_10", (files.length-10) + " more files from " + base + "/" + tmpl );
+                }
 
                 result.putProperty( QDataSet.USER_PROPERTIES, user );
             }
