@@ -192,7 +192,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             }
 
             // kludge to get y labels when they are in the skeleton.
-            if ( result.rank()==2 ) {
+            if ( result!=null && result.rank()==2 ) {
                 QDataSet labels= (QDataSet) result.property(QDataSet.DEPEND_1);
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 if ( labels==null && labelVar!=null ) {
