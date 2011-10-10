@@ -43,7 +43,7 @@ public class Test014 {
 
         if ( dep0==null ) dep0= ds;
 
-        final QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, null );
+        final QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, ds );
         
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Guess cadence in %9.3f seconds (%s): %s\n", t, label, uri );
@@ -51,6 +51,12 @@ public class Test014 {
         System.err.printf( "cadence= %s (scale type=%s): \n", String.valueOf(cadence), type  );
 
         QDataSet diff= Ops.diff(dep0);
+        if ( ds.rank()==1 && dep0.rank()==1 ) { // ftp://virbo.org/tmp/poes_n17_20041228.cdf?P1_90[0:300] has every other value=fill.
+            QDataSet r= Ops.where( Ops.valid(ds) );
+            diff=  Ops.diff( DataSetOps.applyIndex( dep0, 0, r, false ) );
+        } else {
+            diff=  Ops.diff( dep0 );
+        }
         System.err.printf( "diffs(dep0)[0:3]= %f %f %f %s\n",
                 diff.value(0), diff.value(1), diff.value(2),
                 String.valueOf(diff.property(QDataSet.UNITS)) );
