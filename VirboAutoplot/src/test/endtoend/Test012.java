@@ -106,6 +106,9 @@ public class Test012 {
             // this should slice by default on the enumeration (labels) dimension.
             doTest( testid,16, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_ffp_32_20090101_v01.cdf?tha_ffp_32" );
 
+            // every other value is fill in Virbo data.  These should be skipped.
+            doTest( testid, 17, "file:///home/jbf/ct/hudson/data.backup/cdf/virbo/poes_n17_20041228.cdf?P1_90[0:300]" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
