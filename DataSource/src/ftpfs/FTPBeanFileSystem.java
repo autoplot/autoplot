@@ -230,7 +230,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         String[] result= listings.get(directory);
         if ( result!=null ) {
             logger.log(Level.FINE, "using cached listing for {0}", directory);
-            return result;
+            return result; //TODO: bug https://sourceforge.net/tracker/?func=detail&aid=3420879&group_id=199733&atid=970682
         }
 
         boolean successOrCancel= false;
