@@ -118,15 +118,25 @@ public class CdfVirtualVars {
 //         endcase
 //      endif ;if function defined for this virtual variable
 
+    /**
+     *
+     * @param function
+     * @param args
+     * @see isSupported
+     * @return
+     */
     public static QDataSet execute( String function, List<QDataSet> args, ProgressMonitor mon ) {
         if ( function.equals("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
         } else if (function.equals("convert_log10")) {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
-            return Ops.fftPower( args.get(0), 512, mon );
+            return Ops.fftPower(args.get(0), 512, mon );
+        } else if (function.equals("fftPower")) {
+            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
+            return Ops.fftPower(hanningSet, (int) args.get(1).value(), mon );
         } else if (function.equals("fftPowerDelta512")) {
-            QDataSet deltaT= args.get(1);       // time between successive measurements.
+            QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
@@ -143,11 +153,32 @@ public class CdfVirtualVars {
             poww.putProperty( QDataSet.DEPEND_1, trs1 );
    throw new IllegalArgumentException("untested");
             //return poww;
+        } else if ( function.equals("calc_p") ) {
+            return calcP( args );
+        } else if ( function.equals("conv_pos1") ) {
+            return convPos( args, "ANG-GSE"  );
         } else if ( function.equals("alternate_view") ) {
             return args.get(0);
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
+    }
+
+    /**
+     * see virtual_funcs.pro functon calc_p
+     */
+    protected static QDataSet calcP( List<QDataSet> args ) {
+        QDataSet coefficient= DataSetUtil.asDataSet( 1.6726e-6 );
+        QDataSet V_GSE_p= args.get(0);
+        QDataSet np= args.get(1);
+        //coefficient*np[i]*V_GSE_p[0,i]^2.0
+        QDataSet pressure = Ops.multiply( Ops.multiply( coefficient, np), Ops.pow( DataSetOps.slice1( V_GSE_p,0 ), 2 ) );
+        return pressure;
+    }
+    
+    public static QDataSet convPos( List<QDataSet> args, String coordSys) {
+        throw new IllegalArgumentException("not implemented");
+        //return args.get(0);
     }
 
     protected static QDataSet alternateView( QDataSet burley ) {
@@ -173,8 +204,9 @@ public class CdfVirtualVars {
         return result;
     }
 
-    protected static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512", "fftPowerDeltaTranslation512", "alternate_view");
+    public static boolean isSupported(String function) {
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
+                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p" );
         return functions.contains(function);
     }
 }
