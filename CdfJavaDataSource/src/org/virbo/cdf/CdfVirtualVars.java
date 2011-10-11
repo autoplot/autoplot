@@ -132,9 +132,11 @@ public class CdfVirtualVars {
             return convertLog10( args.get(0) );
         } else if (function.equals("fftPower512")) {
             return Ops.fftPower(args.get(0), 512, mon );
-        } else if (function.equals("fftPower")) {
-            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
-            return Ops.fftPower(hanningSet, (int) args.get(1).value(), mon );
+        } else if (function.equals("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
+            QDataSet size=  args.get(1);
+            while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
+            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int)size.value(), Ops.FFTFilterType.Hanning);
+            return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor());
         } else if (function.equals("fftPowerDelta512")) {
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
