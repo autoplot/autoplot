@@ -23,6 +23,9 @@ public class Test012 {
     public static void doTest( int testid, int id, String uri ) throws Exception {
         QDataSet ds;
         long t0= System.currentTimeMillis();
+
+        System.err.printf( "== %s ==\n", uri );
+
         ds= Util.getDataSet( uri );
         double t= (System.currentTimeMillis()-t0)/1000.;
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
