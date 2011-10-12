@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -423,6 +424,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         result.putProperty(QDataSet.NAME, svariable);
 
         final boolean doUnits = true;
+        Units units=null;
         if (doUnits) {
             if (thisAttributes.containsKey("UNITS")) {
                 String sunits= (String) thisAttributes.get("UNITS");
@@ -435,11 +437,29 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 Units u = (Units) result.property(QDataSet.UNITS);
                 if (u == null) {
                     result.putProperty(QDataSet.UNITS, mu);
+                    units= mu;
+                } else {
+                    units= u;
                 }
+            } else {
+                units= Units.dimensionless;
             }
+        } else {
+            // doFill must not be true for this branch.
         }
 
-
+        final boolean doFill= true;
+        if ( doFill ) {
+            Object f= thisAttributes.get("FILLVAL");
+            double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+            if ( !Double.isNaN(dv) ) {
+                result.putProperty(QDataSet.FILL_VALUE, dv );
+            }
+            DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
+            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+        }
+        
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
             for (int idep = 0; idep < 3; idep++) {
@@ -519,8 +539,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                                 depDs.putProperty(QDataSet.TITLE, "time offset");
                                 try {
                                     Object o= cdf.getAttribute(deltaTVar.getName(),"UNITS");
-                                    Units units= SemanticOps.lookupUnits( o.toString() );
-                                    depDs.putProperty(QDataSet.UNITS,units );
+                                    Units units2= SemanticOps.lookupUnits( o.toString() );
+                                    depDs.putProperty(QDataSet.UNITS,units2 );
                                 } catch ( Exception e ) {
                                     depDs.putProperty(QDataSet.UNITS, Units.milliseconds );
                                 }
