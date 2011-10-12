@@ -37,6 +37,10 @@ public class Test012 {
 
         QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
         if ( dep0!=null ) {
+            if ( Ops.total( Ops.valid(dep0) ) == 0 ) {
+                Ops.total( Ops.valid(dep0) ) ;
+                throw new IllegalArgumentException("no valid DEPEND_0");
+            }
             MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
             formatDataSet( hist2, label+".dep0.qds");
         } else {
