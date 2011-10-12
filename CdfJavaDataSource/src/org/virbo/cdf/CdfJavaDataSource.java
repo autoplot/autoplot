@@ -448,7 +448,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
             // doFill must not be true for this branch.
         }
 
-        final boolean doFill= true;
+        final boolean doFill= ! UnitsUtil.isTimeLocation(units);
         if ( doFill ) {
             Object f= thisAttributes.get("FILLVAL");
             double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
