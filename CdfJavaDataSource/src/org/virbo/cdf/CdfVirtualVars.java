@@ -161,6 +161,17 @@ public class CdfVirtualVars {
             return convPos( args, "ANG-GSE"  );
         } else if ( function.equals("alternate_view") ) {
             return args.get(0);
+        } else if ( function.equals("region_filt") ) {
+            //return args.get(0);
+            ArrayDataSet real_data = ArrayDataSet.copy( args.get(0) );
+            QDataSet region_data = args.get(1);
+            final Double fill= (Double) real_data.property(QDataSet.FILL_VALUE);
+            for ( int i=0; i<real_data.length(); i++ ) {
+                if ( region_data.value(i) != 1 ) { // 1=solar wind
+                    real_data.putValue(i,fill);
+                }
+            }
+            return real_data;
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
@@ -208,7 +219,7 @@ public class CdfVirtualVars {
 
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
-                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p" );
+                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt" );
         return functions.contains(function);
     }
 }
