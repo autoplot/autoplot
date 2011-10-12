@@ -33,23 +33,27 @@ public class IstpMetadataModel extends MetadataModel {
 
     public static final String USER_PROP_VIRTUAL_COMPONENT_= "COMPONENT_";
 
-    private static final Object VALUE_MIN= "MIN";
-    private static final Object VALUE_MAX= "MAX";
+    public static final Object VALUE_MIN= "MIN";
+    public static final Object VALUE_MAX= "MAX";
 
     /**
      * returns the Entry that is convertible to double as a double.
      * @throws IllegalArgumentException for strings
      */
-    private double doubleValue(Object o, Units units, Object minmax ) {
+    private static double doubleValue(Object o, Units units, Object minmax ) {
         return doubleValue(o, units, Double.NaN, minmax ); 
     }
 
     /**
      * returns the Entry that is convertible to double as a double.
      * When there is an array, throw IllegalArgumentException
+     * @param o the datum in double, int, String, array, etc.
+     * @param units the units of the datum
+     * @param deflt the default value
+     * @param minmax VALUE_MIN or VALUE_MAX or null.
      * @throws IllegalArgumentException for strings
      */
-    private double doubleValue(Object o, Units units, double deflt, Object minmax ) {
+    public static double doubleValue(Object o, Units units, double deflt, Object minmax ) {
         if (o == null) {
             return deflt;
         }
@@ -116,7 +120,7 @@ public class IstpMetadataModel extends MetadataModel {
      * Return the range from VALIDMIN to VALIDMAX.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
-    private DatumRange getValidRange(Map attrs, Units units) {
+    public static DatumRange getValidRange(Map attrs, Units units) {
         double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
         double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
@@ -135,7 +139,7 @@ public class IstpMetadataModel extends MetadataModel {
      * SCALETYP=log.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
-    private DatumRange getRange(Map attrs, Units units) {
+    private static DatumRange getRange(Map attrs, Units units) {
         DatumRange range;
 
         double min, max;
@@ -174,7 +178,7 @@ public class IstpMetadataModel extends MetadataModel {
      * @param attrs
      * @return
      */
-    private String getScaleType(Map attrs) {
+    private static String getScaleType(Map attrs) {
         String type = null;
         if (attrs.containsKey("SCALETYP") && attrs.get("SCALETYP") instanceof String ) { // CAA STAFF
             type = (String) attrs.get("SCALETYP");
@@ -235,6 +239,12 @@ public class IstpMetadataModel extends MetadataModel {
                 double validMax= ((Number)ovalidMax).doubleValue();
                 double validMin= ((Number)ovalidMin).doubleValue();
                 isMillis= validMin<validMax && validMin < 1e8 && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
+            }
+
+            Object ofv= attrs.get( "FILLVAL" );
+            double dv= doubleValue( ofv, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+            if ( !Double.isNaN(dv) ) {
+                properties.put(QDataSet.FILL_VALUE, dv );
             }
 
             boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
