@@ -31,6 +31,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.qstream.SerializeRegistry;
 
 /**
 /**
@@ -202,10 +203,13 @@ public class InlineDataSource extends AbstractDataSource {
                 }
                 String propValue= depp.get(prop);
                 if ( prop.equals("UNITS") ) {
-                    dep0.putProperty("UNITS",SemanticOps.lookupUnits(propValue));
-                } else if ( prop.equals("FILL_VALUE" ) ) {
-                    dep0.putProperty("FILL_VALUE",Double.parseDouble(propValue));
+                    dep0.putProperty( prop,SemanticOps.lookupUnits(propValue));
+                } else if ( prop.equals("FILL_VALUE" )  || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX") ) {
+                    dep0.putProperty( prop,Double.parseDouble(propValue));
+                } else if ( prop.equals("MONOTONIC") ) {
+                    dep0.putProperty( prop, Boolean.parseBoolean(propValue) ); // True or TRUE
                 } else {
+                    // it would be nice if the same code handled DEPEND_0 and the dataset.
                     dep0.putProperty(prop,propValue);
                 }
             }
@@ -214,14 +218,17 @@ public class InlineDataSource extends AbstractDataSource {
         for ( String prop: p.keySet() ) {
             String propValue= p.get(prop);
             if ( prop.equals("UNITS") ) {
-                ds.putProperty("UNITS",SemanticOps.lookupUnits(propValue));
-            } else if ( prop.equals("FILL_VALUE" ) ) {
-                ds.putProperty("FILL_VALUE",Double.parseDouble(propValue));
+                ds.putProperty( prop, SemanticOps.lookupUnits(propValue) );
+            } else if ( prop.equals("FILL_VALUE" ) || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX")) {
+                ds.putProperty( prop, Double.parseDouble(propValue) );
+            } else if ( prop.equals("MONOTONIC") ) {
+                ds.putProperty( prop, Boolean.parseBoolean(propValue) ); // True or TRUE
             } else if ( prop.startsWith("DEPEND_") ) {
                 if ( propValue.equals("") || propValue.equals("None") || propValue.equals("null") ) {
                     ds.putProperty( prop, null);
                 }
             } else {
+                // it would be nice to use QStream's SerializeRegistery here to attempt decode for each type.
                 ds.putProperty(prop,propValue);
             }
         }
