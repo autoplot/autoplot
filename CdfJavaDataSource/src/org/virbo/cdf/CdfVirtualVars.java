@@ -19,105 +19,13 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 /**
- *
+ * Implementations of the CDF virtual variables seen in CDAWeb, but implemented in QDataSet.
+ * These should reflect a subset of those functions, with the IDL implementations at
+ * http://spdf.gsfc.nasa.gov/CDAWlib.html
+ * see ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/unix/CDAWlib.tar.gz, routine read_myCDF.pro
  * @author jbf
  */
 public class CdfVirtualVars {
-// Code in read_myCDF.pro at roughly line 3125:
-//
-//          findex = tagindex('FUNCT', vartags) ; find the FUNCT index number
-//      if (findex(0) ne -1) then begin ;found a virtual value w/ a function definition
-//         if keyword_set(DEBUG) then print,'VV function being called ',$
-//            strlowcase(burley.(vindex).(findex)), ' for variable ',vir_vars.name(i)
-//         case (strlowcase(burley.(vindex).(findex))) of
-//         'crop_image': begin
-//                          burley=crop_image(temporary(burley),orig_names,index=vindex)
-//   		       end
-//         'alternate_view': begin
-//                              burley = alternate_view(temporary(burley),orig_names)
-//                           end
-//         'conv_pos': begin
-//	                ; RCJ 11/21/2003  Added 'index=vindex'. It is necessary if all=1
-//                        burley = conv_pos(temporary(burley),orig_names,$
-//                           tstart=start_time, tstop=stop_time,index=vindex)
-//                     end
-//         'conv_pos_hungarian': begin
-//                        burley = conv_pos_hungarian(temporary(burley),orig_names,index=vindex)
-//                     end
-//         'conv_pos1': begin
-//                         burley = conv_pos(temporary(burley),orig_names,$
-//                            tstart=start_time, tstop=stop_time, $
-//                            COORD="ANG-GSE",INDEX=vindex)
-//                      end
-//         'conv_pos2': begin
-//                         burley = conv_pos(temporary(burley),orig_names,$
-//                            tstart=start_time, tstop=stop_time, $
-//                            COORD="SYN-GEO",INDEX=vindex)
-//                      end
-//         'conv_map_image': begin
-//                              burley = conv_map_image(temporary(burley),orig_names)
-//                           end
-//         'calc_p': begin
-//                      burley = calc_p(temporary(burley),orig_names,INDEX=vindex)
-//                   end
-//         'create_vis': begin
-//                          burley = create_vis(temporary(burley),orig_names)
-//                       end
-//         'create_plain_vis': begin
-//                                burley = create_plain_vis(temporary(burley),orig_names)
-//                             end
-//         'create_plmap_vis': begin
-//                                burley = create_plmap_vis(temporary(burley),orig_names)
-//                             end
-//         'apply_qflag': begin
-//                           burley = apply_qflag(temporary(burley),orig_names,index=vindex)
-//                        end
-//         'region_filt': begin
-//                           burley = region_filt(temporary(burley),orig_names,index=vindex)
-//                        end
-//         'convert_log10': begin
-//                             burley = convert_log10(temporary(burley),orig_names)
-//                          end
-//         'add_51s': begin ;for po_h2_uvi
-//                       burley = Add_seconds(temporary(burley),orig_names,index=vindex,seconds=51)
-//                    end
-//         'add_1800': begin ;for omni
-//                       burley = Add_seconds(temporary(burley),orig_names,index=vindex,seconds=1800)
-//                    end
-//         'comp_themis_epoch': begin ;for computing THEMIS epoch
-//                       burley = comp_themis_epoch(temporary(burley),orig_names,index=vindex)
-//                    end
-//         'comp_themis_epoch16': begin ;for computing THEMIS epoch
-//                       burley = comp_themis_epoch(temporary(burley),orig_names,index=vindex,/sixteen)
-//                    end
-//         'apply_esa_qflag': begin
-//                       burley = apply_esa_qflag(temporary(burley),orig_names,index=vindex)
-//                    end
-//         'compute_magnitude': begin
-//                       burley = compute_magnitude(temporary(burley),orig_names,index=vindex)
-//                    end
-//         'height_isis': begin
-//                       burley = height_isis(temporary(burley),orig_names,index=vindex)
-//                    end
-//         'flip_image': begin
-//                       burley = flip_image(temporary(burley),orig_names,index=vindex)
-//                    end
-//         'wind_plot': begin
-//                         burley = wind_plot(temporary(burley),orig_names,index=vindex)
-//                      end
-//         'error_bar_array': begin
-//                           burley=error_bar_array(temporary(burley), $
-//			                          index=vindex,value=0.02)
-//   		       end
-//         'convert_toev': begin
-//                           burley=convert_toev(temporary(burley), orig_names, index=vindex)
-//                       end
-//         'convert_ni': begin
-//                           burley=convert_Ni(temporary(burley), orig_names, index=vindex)
-//                       end
-//         else : print, 'WARNING= No function for:', vtags(vindex)
-//         endcase
-//      endif ;if function defined for this virtual variable
 
     /**
      * Implementations of CDF virtual functions.  These are a subset of those in the CDAWeb library, plus a couple
