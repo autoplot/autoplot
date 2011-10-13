@@ -331,8 +331,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.finest("inspect cdf for plottable parameters");
             
             try {
-                parameterDescriptions= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false );
-                parameterInfo= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, true );
+                boolean isMaster= fileName.contains("MASTERS");
+                parameterDescriptions= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+                parameterInfo= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, true, isMaster );
             } catch ( Exception ex ) {
                 throw new RuntimeException(ex);
             }
