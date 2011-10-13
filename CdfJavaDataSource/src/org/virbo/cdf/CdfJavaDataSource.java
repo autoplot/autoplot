@@ -27,8 +27,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
-import org.das2.datum.InconvertibleUnitsException;
-import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
@@ -239,7 +237,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
-                
+
             } else { // typical route
                 result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, mon );
 
