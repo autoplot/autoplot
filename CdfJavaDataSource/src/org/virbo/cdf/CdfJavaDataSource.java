@@ -233,7 +233,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, mon ) );
                 if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, mon ) );
                 try {
-                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr, mon );
+                    Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
+                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
