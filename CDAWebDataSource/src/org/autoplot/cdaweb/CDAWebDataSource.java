@@ -7,7 +7,6 @@ package org.autoplot.cdaweb;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +24,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.cdf.CdfJavaDataSource;
-import org.virbo.cdf.CdfJavaDataSourceFactory;
-import org.virbo.cdf.CdfUtil;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -150,7 +147,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
                         }
                         try {
-                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( function, comps, mon );
+                            Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
+                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, mon );
                         } catch (IllegalArgumentException ex ){
                             throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
                         }
