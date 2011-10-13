@@ -108,6 +108,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
         try {
+            if ( ! CDAWebDB.getInstance().getServiceProviderIds().containsKey(ds) ) {
+                messageComponent= new JLabel("<html>Service provider \""+ ds +"\" not found in ftp/cdaweb.gsfc.nasa.gov/pub/cdaweb/all.xml");
+                descriptionLabel.setText("");
+                timeRangeTextField.setText("");
+                paramEditor= null;
+                return;
+            }
             String avail= CDAWebDB.getInstance().getTimeRange(ds);
             availableTextField.setText(avail);
             DatumRange dr= DatumRangeUtil.parseTimeRange( avail );
