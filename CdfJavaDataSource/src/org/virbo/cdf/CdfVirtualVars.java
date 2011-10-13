@@ -7,6 +7,7 @@ package org.virbo.cdf;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -119,13 +120,16 @@ public class CdfVirtualVars {
 //      endif ;if function defined for this virtual variable
 
     /**
-     *
-     * @param function
-     * @param args
+     * Implementations of CDF virtual functions.  These are a subset of those in the CDAWeb library, plus a couple
+     * extra that they will presumably add to the library at some point.
+     * @param metadata the metadata for the new result dataset, in QDataSet semantics such as FILL_VALUE=-1e31
+     * @param function the function name, which is case insensitive.  See code isSupported for list of function names.
+     * @param args list of QDataSets that are the arguments to the function
+     * @param mon monitor for the function
      * @see isSupported
      * @return
      */
-    public static QDataSet execute( String function, List<QDataSet> args, ProgressMonitor mon ) {
+    public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) {
         if ( function.equalsIgnoreCase("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
         } else if (function.equalsIgnoreCase("convert_log10")) {
@@ -165,20 +169,39 @@ public class CdfVirtualVars {
             //return args.get(0);
             ArrayDataSet real_data = ArrayDataSet.copy( args.get(0) );
             QDataSet region_data = args.get(1);
-            final Double fill= (Double) real_data.property(QDataSet.FILL_VALUE);
+            Double fill= (Double) metadata.get(QDataSet.FILL_VALUE);
+            if ( fill==null ) fill= Double.NaN;
             for ( int i=0; i<real_data.length(); i++ ) {
                 if ( region_data.value(i) != 1 ) { // 1=solar wind
                     real_data.putValue(i,fill);
                 }
             }
             return real_data;
+        } else if ( function.equalsIgnoreCase("apply_esa_qflag") ) {
+            ArrayDataSet esa_data= ArrayDataSet.copy(args.get(0));
+            QDataSet quality_data= args.get(1);
+            Double fill= (Double) metadata.get(QDataSet.FILL_VALUE);
+            if ( fill==null ) fill= Double.NaN;
+            int n= DataSetUtil.product(DataSetUtil.qubeDims(esa_data.slice(0)));
+            for ( int i=0; i<quality_data.length(); i++ ) {
+                if ( quality_data.value(i) > 0 ) {
+                    if ( esa_data.rank()==1 ) {
+                        esa_data.putValue(i,fill);
+                    } else {
+                        for ( int j=0; j<n; j++ ) {
+                            esa_data.putValue(i,j,fill); // CAUTION: this uses array aliasing of ArrayDataSet for rank>2
+                        }
+                    }
+                }
+            }
+            return esa_data;
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
     }
 
     /**
-     * see virtual_funcs.pro functon calc_p
+     * see virtual_funcs.pro function calc_p
      */
     protected static QDataSet calcP( List<QDataSet> args ) {
         QDataSet coefficient= DataSetUtil.asDataSet( 1.6726e-6 );
@@ -219,7 +242,7 @@ public class CdfVirtualVars {
 
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftpowerdelta512",
-                "fftpower","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt" );
+                "fftpower","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag");
         return functions.contains(function.toLowerCase());
     }
 }
