@@ -144,7 +144,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         String comp= (String)metadata.get( "COMPONENT_"  + nc );
                         while ( comp!=null ) {
                             CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
-                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                             comps.add( ds1 );
                             nc++;
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
