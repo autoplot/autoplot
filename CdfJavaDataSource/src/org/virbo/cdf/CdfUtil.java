@@ -625,6 +625,8 @@ public class CdfUtil {
         }
 
         for (int i = 0; i < v.length; i++) {
+            String vdescr=null;
+
             Variable var = cdf.getVariable(v[i]);
             if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
                 continue;
@@ -685,7 +687,6 @@ public class CdfUtil {
                 long z1MaxRec = -1;
                 String scatDesc = null;
                 String svarNotes = null;
-
                 try {
                     if ( true || virtual!=null ) {
                         Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
@@ -697,6 +698,23 @@ public class CdfUtil {
                                 if ( !CdfVirtualVars.isSupported(funct) ) {
                                     System.err.println("virtual function not supported: "+funct );
                                     continue;
+                                } else {
+                                    vdescr= funct + "(";
+                                    int icomp=0;
+                                    String comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
+                                    if ( comp!=null ) {
+                                        vdescr= vdescr + comp;
+                                        icomp++;
+                                }
+                                    for ( ; i<5; i++ ) {
+                                        comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
+                                        if ( comp!=null ) {
+                                            vdescr= vdescr+","+comp;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    vdescr= vdescr+")";
                                 }
                             }
                         }
@@ -868,6 +886,10 @@ public class CdfUtil {
                         descbuf.append("").append(scatDesc).append("<br>");
                     if (svarNotes !=null ) {
                         descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
+                    }
+
+                    if ( vdescr!=null && vdescr.length()>0 ) {
+                        descbuf.append("virtual variable implemented by ").append(vdescr).append("<br>");
                     }
 
                     for ( String s: warn ) {
