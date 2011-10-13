@@ -126,25 +126,25 @@ public class CdfVirtualVars {
      * @return
      */
     public static QDataSet execute( String function, List<QDataSet> args, ProgressMonitor mon ) {
-        if ( function.equals("compute_magnitude") ) {
+        if ( function.equalsIgnoreCase("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
-        } else if (function.equals("convert_log10")) {
+        } else if (function.equalsIgnoreCase("convert_log10")) {
             return convertLog10( args.get(0) );
-        } else if (function.equals("fftPower512")) {
+        } else if (function.equalsIgnoreCase("fftPower512")) {
             return Ops.fftPower(args.get(0), 512, mon );
-        } else if (function.equals("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
+        } else if (function.equalsIgnoreCase("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
             QDataSet size=  args.get(1);
             while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int)size.value(), Ops.FFTFilterType.Hanning);
             return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor());
-        } else if (function.equals("fftPowerDelta512")) {
+        } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
             QDataSet pow= Ops.fftPower( waves, 512, mon );
             return pow;
-        } else if (function.equals("fftPowerDeltaTranslation512")) {
+        } else if (function.equalsIgnoreCase("fftPowerDeltaTranslation512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
             QDataSet translation= args.get(2);  // shift this amount after fft (because it was with respect to another signal
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
@@ -155,13 +155,13 @@ public class CdfVirtualVars {
             poww.putProperty( QDataSet.DEPEND_1, trs1 );
             throw new IllegalArgumentException("fftPowerDeltaTranslation512 is untested");
             //return poww;
-        } else if ( function.equals("calc_p") ) {
+        } else if ( function.equalsIgnoreCase("calc_p") ) {
             return calcP( args );
-        } else if ( function.equals("conv_pos1") ) {
+        } else if ( function.equalsIgnoreCase("conv_pos1") ) {
             return convPos( args, "ANG-GSE"  );
-        } else if ( function.equals("alternate_view") ) {
+        } else if ( function.equalsIgnoreCase("alternate_view") ) {
             return args.get(0);
-        } else if ( function.equals("region_filt") ) {
+        } else if ( function.equalsIgnoreCase("region_filt") ) {
             //return args.get(0);
             ArrayDataSet real_data = ArrayDataSet.copy( args.get(0) );
             QDataSet region_data = args.get(1);
@@ -218,8 +218,8 @@ public class CdfVirtualVars {
     }
 
     public static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPowerDelta512",
-                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt" );
-        return functions.contains(function);
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftpowerdelta512",
+                "fftpower","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt" );
+        return functions.contains(function.toLowerCase());
     }
 }
