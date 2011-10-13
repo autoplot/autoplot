@@ -488,7 +488,7 @@ public class CdfUtil {
     }
 
     public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws Exception {
-        return getPlottable(cdf, dataOnly, rankLimit, false);
+        return getPlottable(cdf, dataOnly, rankLimit, false, false);
     }
 
     /**
@@ -542,14 +542,18 @@ public class CdfUtil {
      * keys are the names of the variables. values are descriptions.
      * @param cdf
      * @param dataOnly show only the DATA and not SUPPORT_DATA.  Note I reclaimed this parameter because I wasn't using it.
-     * @param rankLimit
+     * @param rankLimit show only variables with no more than this rank.
+     * @param deep return more detailed descriptions in HTML
+     * @param master cdf is a master cdf, so don't indicate record counts.
      * @return map of parameter name to short description
      * @throws gsfc.nssdc.cdf.CDFException
      */
-    public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit, boolean deep) throws Exception {
+    public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit, boolean deep, boolean master) throws Exception {
 
         Map<String, String> result = new LinkedHashMap<String, String>();
         Map<String, String> dependent= new LinkedHashMap<String, String>();
+
+        boolean isMaster= master; //cdf.getName().contains("MASTERS"); // don't show of Epoch=0, just "Epoch"
 
         logger.fine("getting CDF variables");
         String[] v = cdf.getVariableNames();
@@ -857,7 +861,10 @@ public class CdfUtil {
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName() + "=" + (xMaxRec);
+                    desc += "(" + xDependVariable.getName();
+                    if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                         desc+= "=" + (xMaxRec);
+                    }
                     if (yDependVariable != null) {
                         desc += "," + yDependVariable.getName() + "=" + (yMaxRec + 1);
                         if (zDependVariable != null) {
@@ -889,7 +896,7 @@ public class CdfUtil {
                     }
 
                     if ( vdescr!=null && vdescr.length()>0 ) {
-                        descbuf.append("virtual variable implemented by ").append(vdescr).append("<br>");
+                        descbuf.append("<br>virtual variable implemented by ").append(vdescr).append("<br>");
                     }
 
                     for ( String s: warn ) {
