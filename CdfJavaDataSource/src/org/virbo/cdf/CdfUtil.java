@@ -703,22 +703,22 @@ public class CdfUtil {
                                     System.err.println("virtual function not supported: "+funct );
                                     continue;
                                 } else {
-                                    vdescr= funct + "(";
+                                    vdescr= funct + "( ";
                                     int icomp=0;
                                     String comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
                                     if ( comp!=null ) {
                                         vdescr= vdescr + comp;
                                         icomp++;
-                                }
-                                    for ( ; i<5; i++ ) {
+                                    }
+                                    for ( ; icomp<5; icomp++ ) {
                                         comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
                                         if ( comp!=null ) {
-                                            vdescr= vdescr+","+comp;
+                                            vdescr= vdescr+", "+comp;
                                         } else {
                                             break;
                                         }
                                     }
-                                    vdescr= vdescr+")";
+                                    vdescr= vdescr+" )";
                                 }
                             }
                         }
