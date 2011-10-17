@@ -433,7 +433,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createPngWalkMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JSeparator" name="jSeparator4">
+            <MenuItem class="javax.swing.JSeparator" name="createPngWalkSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="aggregateMenuItem">
               <Properties>
@@ -444,7 +444,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aggregateMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JSeparator" name="jSeparator5">
+            <MenuItem class="javax.swing.JSeparator" name="aggSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="decodeURLItem">
               <Properties>

@@ -180,7 +180,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
     private TimeRangeEditor timeRangeEditor;
-    private List<JMenuItem> expertMenuItems= new ArrayList(); // list of items to hide
+    private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
         
     
@@ -251,6 +251,10 @@ public class AutoplotUI extends javax.swing.JFrame {
         expertMenuItems.add( renderingOptionsMenu );
         expertMenuItems.add( enableFeatureMenu );
         expertMenuItems.add( autoMenu );
+        expertMenuItems.add( pngWalkMenuItem );
+        expertMenuItems.add( createPngWalkMenuItem );
+        expertMenuItems.add( createPngWalkSeparator );
+        expertMenuItems.add( aggSeparator );
         expertMenuItems.add( aggregateMenuItem );
         expertMenuItems.add( decodeURLItem );
 
@@ -1469,9 +1473,9 @@ APSplash.checkTime("init 52");
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JSeparator();
+        createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JSeparator();
+        aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
         exceptionReport = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
@@ -1862,7 +1866,7 @@ APSplash.checkTime("init 52");
             }
         });
         toolsMenu.add(createPngWalkMenuItem);
-        toolsMenu.add(jSeparator4);
+        toolsMenu.add(createPngWalkSeparator);
 
         aggregateMenuItem.setText("Aggregate...");
         aggregateMenuItem.setToolTipText("Attempt to aggregate all the URIs on the product, keeping other DOM settings.\n");
@@ -1872,7 +1876,7 @@ APSplash.checkTime("init 52");
             }
         });
         toolsMenu.add(aggregateMenuItem);
-        toolsMenu.add(jSeparator5);
+        toolsMenu.add(aggSeparator);
 
         decodeURLItem.setText("Decode URL");
         decodeURLItem.setToolTipText("Decode the URL escapes to correct the URL\n");
@@ -2668,6 +2672,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem aboutDas2MenuItem;
     private javax.swing.ButtonGroup addressBarButtonGroup;
     private javax.swing.JMenu addressBarMenu;
+    private javax.swing.JSeparator aggSeparator;
     private javax.swing.JMenuItem aggregateMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
@@ -2680,6 +2685,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem copyDataSetURLMenuItem;
     private javax.swing.JMenuItem copyImageMenuItem;
     private javax.swing.JMenuItem createPngWalkMenuItem;
+    private javax.swing.JSeparator createPngWalkSeparator;
     private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JRadioButtonMenuItem dataSetSelectorMenuItem;
@@ -2707,8 +2713,6 @@ APSplash.checkTime("init -80");
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JCheckBoxMenuItem nnCb;
@@ -2893,7 +2897,7 @@ APSplash.checkTime("init -80");
      */
     public void setExpertMode( boolean expert ) {
         this.autoMenu.setVisible(expert);
-        for ( JMenuItem mi: expertMenuItems ) {
+        for ( JComponent mi: expertMenuItems ) {
             mi.setVisible(expert);
         }
         expertMenu.setText( expert ? "Expert" : "Basic" );
