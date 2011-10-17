@@ -225,8 +225,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         messageComponent= null;
 
-        String desc= CDAWebDB.getInstance().getServiceProviderIds().get(ds);
-        descriptionLabel.setText( "<html><small>"+desc+"</small></html>");
+        if ( ds!=null ) {
+            String desc= CDAWebDB.getInstance().getServiceProviderIds().get(ds);
+            descriptionLabel.setText( "<html><small>"+desc+"</small></html>");
+        } else {
+            descriptionLabel.setText( "<html><small> </small></html>");
+        }
         
         try {
             if ( ds == null ? currentDs != null : !ds.equals(currentDs) ) {
