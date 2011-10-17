@@ -65,6 +65,7 @@ public abstract class Bookmark {
 
     public static final String MSG_NO_REMOTE= "(remote not available)";
     public static final String MSG_REMOTE= "(remote)";
+    public static final String MSG_NOT_LOADED= "(remote not loaded)";
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
         try {
@@ -191,6 +192,8 @@ public abstract class Bookmark {
 
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
+            int remoteStatus=0;
+
             if ( remoteUrlNode!=null && remoteLevel>0 ) { // 2984078
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
                 InputStream in=null;
@@ -257,9 +260,9 @@ public abstract class Bookmark {
                 if ( contents==null || contents.size()==0 ) {
                     System.err.println("unable to parse bookmarks at "+remoteUrl);
                     System.err.println("Maybe using local copy");
-                    title= title + " "+MSG_NO_REMOTE;
+                    remoteStatus= 1;
                 } else {
-                    title= title + " "+MSG_REMOTE;
+                    remoteStatus= 0;
                 }
             } else {
 
@@ -278,7 +281,8 @@ public abstract class Bookmark {
             if ( icon!=null ) book.setIcon(icon);
             if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
             if ( description!=null ) book.setDescription(description);
-
+            book.remoteStatus= remoteStatus;
+            
             book.getBookmarks().addAll(contents);
             for ( int i=0; i<contents.size(); i++ ) {
                 contents.get(i).setParent(book);
@@ -452,11 +456,6 @@ public abstract class Bookmark {
         } else if (bookmark instanceof Bookmark.Folder) {
             Bookmark.Folder f = (Bookmark.Folder) bookmark;
 
-            String title= f.getTitle();
-            if ( f.getRemoteUrl()!=null ) {
-                if ( title.endsWith(" " + MSG_REMOTE) ) title= title.substring(0,title.length()-(1+MSG_REMOTE.length()));
-                if ( title.endsWith(" " + MSG_NO_REMOTE ) ) title= title.substring(0,title.length()-(1+MSG_NO_REMOTE.length()));
-            }
             Element folder= doc.createElement("bookmark-folder");
             if ( f.getRemoteUrl()!=null ) {
                 folder.setAttribute( "remoteUrl", f.getRemoteUrl() );
@@ -512,8 +511,6 @@ public abstract class Bookmark {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
                 String title= f.getTitle();
                 if ( f.getRemoteUrl()!=null ) {
-                    if ( title.endsWith(" " + MSG_REMOTE) ) title= title.substring(0,title.length()-(1+MSG_REMOTE.length()));
-                    if ( title.endsWith(" " + MSG_NO_REMOTE ) ) title= title.substring(0,title.length()-(1+MSG_NO_REMOTE.length()));
                     buf.append("  <bookmark-folder remoteUrl=\"").append(URLEncoder.encode(f.getRemoteUrl(), "UTF-8")).append("\">\n");
                 } else {
                     buf.append("  <bookmark-folder>\n");
@@ -647,6 +644,22 @@ public abstract class Bookmark {
 
         public String getRemoteUrl( ) {
             return this.remoteUrl;
+        }
+
+        /**
+         * remote status indicator.
+         * -1 not loaded
+         * 0 successful
+         * 1 unsuccessful.
+         */
+        int remoteStatus= -1;
+
+        public void setRemoteStatus( int status ) {
+            this.remoteStatus= status;
+        }
+
+        public int getRemoteStatus( ) {
+            return this.remoteStatus;
         }
 
         public Folder(String title) {
