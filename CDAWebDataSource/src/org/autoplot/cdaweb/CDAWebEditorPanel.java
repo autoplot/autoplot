@@ -278,7 +278,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             dsidComboBox.setModel( new DefaultComboBoxModel( new String[] { "error in parsing history.txt" } ) );
         } finally {
             try {
-                r.close();
+                if ( r!=null ) r.close();
             } catch (IOException ex) {
                 Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
             }

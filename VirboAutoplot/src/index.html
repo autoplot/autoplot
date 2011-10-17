@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>"Basic" mode simplifies the GUI and doesn't allow new vaps to be composed.  Also, I've spent much of the month studying performance and finding the limits of the CDAWeb support.</small></p>
+        <p><small>I spent a little more time verifying that automatic locationization didn't result in misformatted numbers.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,24 +22,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Bugfixes:</p>
         <ul>
-            <li>bugfixes with AutoplotServlet</li>
-            <li>bugfix: remote bookmarks files references could not contain query part.</li>
-            <li>bugfix: script editor works properly with script= in URIs, before resource file would load.</li>
-            <li>bugfix 3410461: any changesSupport.performingChange needs try/finally</li>
-            <li>bugfix 3405480: bugs with slicing in autoplot2011, connector since context.</li>
-            <li>bugfix 3405801:	operations key listener when holding key</li>
-            <li>bugfix 3409414: test033 on 2011 branch shows bug with runLater</li>
-            <li>bugfix 3409852:	improvements to the pitch angle distribution renderer</li>
-            <li>bugfix 3405109:	feedback when error in rich ascii</li>
-            <li>other various minor bugfixes.</li>
-        </ul>
-        <p>Older bugfixes:</p>
-        <ul>
-            <li>bugfix: digitizing script works again</li>
-            <li>bugfix: use Ops.safeName to create a filename for a temporary download.</li>
-            <li>bugfix: rich headers RENDER_TYPE=spectrogram</li>
-            <li>PitchAngleDistribution works again, handles fill, and minds both the x and y axes.</li>
-            <li>Many others...</li>
+            <li>bugfix: minor internationalization problems (DigitalRenderer)</li>
+            <li>bugfix: RTE reports are properly formatted XML</li>
+            <li>forward compatibility with autoplot2011 bookmarks</li>
+            <li>bugfix: RTE when CDAWeb panel is entered before anything else is plotted.</li>
         </ul>
         
         <p>Features:</p>

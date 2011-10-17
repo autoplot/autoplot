@@ -78,7 +78,6 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
-import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.state.Vap1_07Scheme;
 import org.w3c.dom.Document;
@@ -518,7 +517,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
                 if ( appModel!=null ) {
                     Application state= (Application)appModel.getDocumentModel();
-                    OutputStream vapout= new ByteArrayOutputStream();
 
                     Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, new Vap1_07Scheme() );// TODO: look up version
 
@@ -700,9 +698,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 map.put( EMAIL, email );
 
                 report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
-                String fname= "rte_"+rteHash+"_" + eventId + "_" + id + ".xml";
+                String fname= "rte_"+rteHash+"_" + eventId + "_" + id.replaceAll(" ","_") + ".xml";
 
                 HttpClient client = new HttpClient();
+                client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
                 PostMethod postMethod = new PostMethod(url);
 
                 Part[] parts= {
