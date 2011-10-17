@@ -227,6 +227,9 @@ public class CompletionSupport {
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                 String contextString= exprBeforeDot(tokens, myTokenIndex-1);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
+            } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.RPAREN ) {
+                String contextString= exprBeforeDot(tokens, myTokenIndex-1);
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, tokens.get(myTokenIndex).image );
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING
                     ||  tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING2 ) {
                 if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
