@@ -2421,7 +2421,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
-        alm.addBooleanSwitchArgument("basic",null,"basic","start in basic (browse) mode" );
+        alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
 
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
@@ -2554,7 +2554,7 @@ APSplash.checkTime("init -80");
                     }
                 });
 
-                if ( alm.getBooleanValue("basic") ) {
+                if ( alm.getValue("mode").equals("basic") ) {
                     app.setExpertMode(false);
                 }
 
