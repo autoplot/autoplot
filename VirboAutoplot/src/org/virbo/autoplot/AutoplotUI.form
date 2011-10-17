@@ -47,7 +47,7 @@
                 <Property name="text" type="java.lang.String" value="Undo..."/>
               </Properties>
             </Menu>
-            <MenuItem class="javax.swing.JSeparator" name="jSeparator2">
+            <MenuItem class="javax.swing.JSeparator" name="editDomSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="editDomMenuItem">
               <Properties>

@@ -247,6 +247,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         
         initComponents();
         expertMenuItems.add( editDomMenuItem );
+        expertMenuItems.add( editDomSeparator );
         expertMenuItems.add( inspectVapFileMenuItem );
         expertMenuItems.add( renderingOptionsMenu );
         expertMenuItems.add( enableFeatureMenu );
@@ -925,7 +926,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     }
 
     private void fillFileMenu() {
-        List<JMenuItem> expertItems= new ArrayList();
+        List<JComponent> expertItems= new ArrayList();
 
         expertItems.add( new JMenuItem(support.createNewApplicationAction()) );
         expertItems.add( new JMenuItem(support.createCloneApplicationAction()) );
@@ -1017,10 +1018,16 @@ APSplash.checkTime("init 52");
         expertItems.add(item);
         fileMenu.add( item );
 
+        JSeparator dumpSep= new JSeparator();
+        expertItems.add( dumpSep );
+
         //fileMenu.add( new )
         //fileMenu.add( GuiSupport.getExportDataAction(AutoplotUI.this) );
 
-        fileMenu.addSeparator();
+
+        fileMenu.add( dumpSep );
+        //fileMenu.addSeparator();
+
 
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed( ActionEvent ev ) {
@@ -1425,7 +1432,7 @@ APSplash.checkTime("init 52");
         undoMenuItem = new javax.swing.JMenuItem();
         redoMenuItem = new javax.swing.JMenuItem();
         undoMultipleMenu = new javax.swing.JMenu();
-        jSeparator2 = new javax.swing.JSeparator();
+        editDomSeparator = new javax.swing.JSeparator();
         editDomMenuItem = new javax.swing.JMenuItem();
         inspectVapFileMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
@@ -1544,7 +1551,7 @@ APSplash.checkTime("init 52");
 
         undoMultipleMenu.setText("Undo...");
         editMenu.add(undoMultipleMenu);
-        editMenu.add(jSeparator2);
+        editMenu.add(editDomSeparator);
 
         editDomMenuItem.setText("Edit DOM");
         editDomMenuItem.setToolTipText("Edit the application state using the property editor");
@@ -2699,6 +2706,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
     private javax.swing.JMenuItem editDomMenuItem;
+    private javax.swing.JSeparator editDomSeparator;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu enableFeatureMenu;
     private javax.swing.JMenuItem exceptionReport;
@@ -2716,7 +2724,6 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
