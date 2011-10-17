@@ -413,7 +413,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
         parameterPanel.add( messageComponent, BorderLayout.NORTH );
         parameterPanel.revalidate();
-
+        parameterPanel.repaint();
         if ( this.isShowing() ) {
             Runnable run= new Runnable() {
                 public void run() {
