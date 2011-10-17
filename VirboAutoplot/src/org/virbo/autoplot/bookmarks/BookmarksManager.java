@@ -977,19 +977,29 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 });
 
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    mi.setToolTipText( "<html>" + ((Bookmark.Item) book).getUri() + "<br><em>"+ book.getDescription() + "</em></html>" );
-                } else {
-                    mi.setToolTipText(((Bookmark.Item) book).getUri());
-                }
+                    String ttext=  "<html><em>"+ book.getDescription()+"</em></html>";
+                    mi.setToolTipText( ttext );
+                } 
                 if (book.getIcon() != null) {
                     mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
                 }
                 bookmarksMenu.add(mi);
             } else {
                 Bookmark.Folder folder = (Bookmark.Folder) book;
-                JMenu subMenu = new JMenu(book.getTitle());
+                String title= book.getTitle();
+                if ( folder.getRemoteUrl()!=null ) {
+                    if ( folder.getRemoteStatus()==0 ) {
+                        title= title + " " + Bookmark.MSG_REMOTE;
+                    } else if ( folder.getRemoteStatus()==1 ) {
+                        title= title + " " + Bookmark.MSG_NOT_LOADED; // we shouldn't use this.
+                    } else {
+                        title= title + " " + Bookmark.MSG_NO_REMOTE;
+                    }
+                }
+                JMenu subMenu = new JMenu(title);
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    subMenu.setToolTipText( "<html>" + "<em>"+ book.getDescription() + "</em></html>" );
+                    String ttext=  "<html><em>"+ book.getDescription()+"</em></html>";
+                    subMenu.setToolTipText( ttext );
                 }
                 addBookmarks(subMenu, folder.getBookmarks(),sel);
                 bookmarksMenu.add(subMenu);
