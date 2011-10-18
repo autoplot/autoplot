@@ -179,7 +179,15 @@ public class CdfUtil {
 
         int[] dimSizes = variable.getDimensions();
         boolean[] dimVaries= variable.getVarys();
-        
+
+        if ( variable.getEffectiveRank() != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+            int[] dimSizes1= new int[ variable.getEffectiveRank() ];
+            for ( int i=0; i<variable.getEffectiveRank(); i++ ) {
+                dimSizes1[i]= dimSizes[i];
+            }
+            dimSizes= dimSizes1;
+        }
+
         int dims;
         if (dimSizes == null) {
             dims = 0;
@@ -295,7 +303,7 @@ public class CdfUtil {
         if ( dims==0 ) dimSizes= new int[0]; // to simplify code
 
         // Nand's library
-        if ( dimVaries.length>0 && dimVaries[0]==false ) {
+        if ( dimVaries.length>0 && dimVaries[0]==false ) { //TODO: I don't think this is necessary now, see above "variable.getEffectiveRank() != dimSizes.length"
             dimSizes= new int[0];
         }
 
@@ -421,9 +429,17 @@ public class CdfUtil {
                 throw new IllegalArgumentException("not handled single array where expected double array");
             }
 
-            double[] back = new double[sdata.length];
+            int[] back = new int[sdata.length];
             for (int i = 0; i < sdata.length; i++) {
-                back[i] = units.createDatum(sdata[i]).doubleValue(units);
+                back[i] = (int)( units.createDatum(sdata[i]).doubleValue(units) );
+            }
+            boolean[] varies= variable.getVarys();
+            boolean canSlice= recCount==-1;
+            if ( canSlice ) {
+                for ( int i=1; i<varies.length; i++ ) canSlice= canSlice && !varies[i];
+            }
+            if ( canSlice ) {
+                qube= new int[] { qube[0] };
             }
             result= ArrayDataSet.wrap( back, qube, false );
             result.putProperty(QDataSet.UNITS, units);
