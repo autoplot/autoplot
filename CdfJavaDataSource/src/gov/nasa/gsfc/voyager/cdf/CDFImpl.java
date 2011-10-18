@@ -1414,7 +1414,7 @@ public abstract class CDFImpl implements java.io.Serializable {
     }
     public class CDFTimeVariableX extends CDFTimeVariable implements
         TimeVariable, Serializable {
-        protected double[] times;
+        protected double[] timesx;
         protected double[] pico;
         protected long[] nano;
         long offset;
@@ -1424,21 +1424,21 @@ public abstract class CDFImpl implements java.io.Serializable {
             name = tname;
             this.precision = precision;
             if (precision == MILLISECOND_PRECISION) {
-                times = (double[])get(tname);
-                firstTime = times[0];
-                recordCount = times.length;
+                timesx = (double[])get(tname);
+                firstTime = timesx[0];
+                recordCount = timesx.length;
             }
             if (precision == MICROSECOND_PRECISION) {
-                times = (double[])get(tname);
+                timesx = (double[])get(tname);
                 firstTime =
-                    (double)((long)(1000*times[0]) + JANUARY_1_1970_LONG);
-                recordCount = times.length;
+                    (double)((long)(1000*timesx[0]) + JANUARY_1_1970_LONG);
+                recordCount = timesx.length;
             }
             if (precision == PICOSECOND_PRECISION) {
-                times = (double [])get(tname, 0);
+                timesx = (double [])get(tname, 0);
                 pico = (double [])get(tname, 1);
-                firstTime = (double)((long)(1e3*times[0] + (pico[0]/1e9)));
-                recordCount = times.length;
+                firstTime = (double)((long)(1e3*timesx[0] + (pico[0]/1e9)));
+                recordCount = timesx.length;
             }
             if (precision == NANOSECOND_PRECISION) {
                 nano = (long[])get(tname);
@@ -1456,31 +1456,31 @@ public abstract class CDFImpl implements java.io.Serializable {
             double [] da = new double[last - first + 1];
             if (precision == MILLISECOND_PRECISION) { // CDF_EPOCH
                 for (int i = first; i <= last; i++) {
-                    da[i - first] = times[i] - (double)base;
+                    da[i - first] = timesx[i] - (double)base;
                 }
             }
             if (precision == MICROSECOND_PRECISION) { // unix time
                 if (offsetUnits == MILLISECOND_PRECISION) {
                     if (base == JANUARY_1_1970_LONG) {
                         for (int i = first; i <= last; i++) {
-                            da[i - first] = times[i]*1.0e3;
+                            da[i - first] = timesx[i]*1.0e3;
                         }
                     } else {
                         offset = base - JANUARY_1_1970_LONG;
                         for (int i = first; i <= last; i++) {
-                            long milli = ((long)times[i])*1000 - offset;
+                            long milli = ((long)timesx[i])*1000 - offset;
                             da[i - first] = (double)(milli);
                         }
                     }
                 } else { // it must be micro second
                     if (base == JANUARY_1_1970) {
                         for (int i = first; i <= last; i++) {
-                            da[i - first] = times[i]*1.0e6;
+                            da[i - first] = timesx[i]*1.0e6;
                         }
                     } else {
                         offset = 1000*(base - JANUARY_1_1970_LONG);
                         for (int i = first; i <= last; i++) {
-                            long micro = ((long)times[i])*1000000 - offset;
+                            long micro = ((long)timesx[i])*1000000 - offset;
                             da[i - first] = (double)(micro);
                         }
                     }
@@ -1516,7 +1516,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 if (offsetUnits == MILLISECOND_PRECISION) {
                     mul = 1000;
                     for (int i = first; i <= last; i++) {
-                        d = (double)(((long)times[i])*mul - base);
+                        d = (double)(((long)timesx[i])*mul - base);
                         da[i - first] = d + (pico[i]/1.0e9);
                     }
                 } else {
@@ -1524,7 +1524,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                         offset = 1000*base;
                         mul = 1000000;
                         for (int i = first; i <= last; i++) {
-                            d = (double)(((long)times[i])*mul - offset);
+                            d = (double)(((long)timesx[i])*mul - offset);
                             da[i - first] = d + (pico[i]/1.0e6);
                         }
                     } else {
@@ -1532,7 +1532,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                             offset = 1000000*base;
                             mul = 1000000000;
                             for (int i = first; i <= last; i++) {
-                                d = (double)(((long)times[i])*mul - offset);
+                                d = (double)(((long)timesx[i])*mul - offset);
                                 da[i - first] = d + (pico[i]/1.0e3);
                             }
                         } else { // pico
