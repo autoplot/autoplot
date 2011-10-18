@@ -591,11 +591,11 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
                 showMessage( "I/O Error adding "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IllegalArgumentException ex ) {
-                if ( ex.toString().contains("URLDecoder") ) {
+                if ( true ) { //ex.toString().contains("URLDecoder") ) {
                     showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-                } else {
-                    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-                }
+                } //else {
+                //    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                //}
             }
         } else {
             model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
