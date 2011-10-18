@@ -49,7 +49,7 @@ public class CompletionSupport {
         //i2= i2- i0;
 	i2= pos;
         i1= i1- i0;
-        i0= i0- i0;
+        i0= 0;
         
         return getCompletionContext( line, pos, i0, i1, i2 );
     }
