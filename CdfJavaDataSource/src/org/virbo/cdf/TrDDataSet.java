@@ -110,6 +110,9 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
 
     private TrDDataSet(int rank, int len0, int len1, int len2, int len3, double[] back) {
         if ( back==null ) throw new NullPointerException("back was null");
+        if ( back.length < len0 * len1 * len2 * len3 ) {
+            throw new IllegalArgumentException("back.length < len0 * len1 * len2 * len3 in TrDDataSet.");
+        }
         this.back = back;
         this.rank = rank;
         this.len0 = len0;
