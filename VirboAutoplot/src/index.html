@@ -7,14 +7,14 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>I spent a little more time verifying that automatic locationization didn't result in misformatted numbers.</small></p>
+        <p><small>CDAWeb support is getting exhaustive testing using python scripts.  Here the PNG Walk Tool is used to review results.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This is the new production branch.
+        <p>This is the Autoplot2011 branch.  Its feature set is finalized and will soon be the production branch.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
@@ -22,35 +22,39 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Bugfixes:</p>
         <ul>
-            <li>bugfix: minor internationalization problems (DigitalRenderer)</li>
-            <li>bugfix: RTE reports are properly formatted XML</li>
-            <li>forward compatibility with autoplot2011 bookmarks</li>
-            <li>bugfix: RTE when CDAWeb panel is entered before anything else is plotted.</li>
+            <li>bugfix: minor bugfixes of the CDAWeb GUI.</li>
+            <li>bugfix: extraneous "(remote)" labels on remote folders</li>
+            <li>clean up of bookmarks GUI</li>
+            <li>pngwalk removed from basic mode, clean up separators</li>
+            <li>round of findbugs to remove most offensive code</li>
+            <li>from the autoplot 2010 production branch:
+              <ul>
+              <li>bugfix: minor internationalization problems (DigitalRenderer)</li>
+              <li>bugfix: RTE reports are properly formatted XML</li>
+              <li>forward compatibility with autoplot2011 bookmarks</li>
+              <li>bugfix: RTE when CDAWeb panel is entered before anything else is plotted.</li>
+            </ul></li>
         </ul>
         
         <p>Features:</p>
         <ul>
-            <li>bug 2985864: Jython editor has option to disable tab completion, so ctrl-space is used for completion and tab is tab</li>
+            <li>--basic command line option added</li>
+            <li>support for more popular CDF virtual functions like "alternate_view", "calc_P", "region_filt", and "apply_esa_qflag"</li>
+            <li>virtual variable functions can report progress, for example fftPower.</li>
+            <li>virtual variable implementation reworked to mirror use at CDAWeb. (ds=I8_H0_MITPLASMA&id=V_fit_rfilt)</li>
+            <li>Java CDF reader preserves float arrays instead of converting to double to conserve memory.</li>
+            <li>2985864: Jython editor has option to disable tab completion, so ctrl-space is used for completion and tab is tab</li>
             <li>3416707: bookmarks file has addresses unnessarily URLencoded.  bookmarks.xml is new file.</li>
             <li>3404248: Improvements for CDF Autoplot2011b: Epoch variables are cached to avoid repeat reads.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>3409891: decorations for zooming</li>
             <li>3409852: improvements to pitch angle distribution renderer</li>
             <li>3405256: true csv reader</li>
             <li>indicate sequence gaps in Pngwalk grid view.</li>
             <li>virtual variables and fixes associated with CDF testing</li>
             <li>3402856: expert/basic mode</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>create/use pngwalks with nested folders ($Y/$m$d)</li>
-            <li>BinaryDataSource supports rank 4 data</li>
-            <li>More rigorous testing of cdf support.</li>
-            <li>scripting waitUntilIdle command</li>
-            <li>scripting getParam improvements and downloadResourceAsTempFile brought over from 2011 branch.</li>
-            <li>improve filesystem completions for action triggers like "pngwalk:/home/jbf/COMP"</li>
-            <li>applot.pro includes code to plot papco dataset model</li>
-            <li>add xunits keyword, so you can say xunits='seconds since 2000-001T00:00'</li>
-            <li>remove extraneous feedback in applot</li>
         </ul>
 
 <p>Known issues:</p>
