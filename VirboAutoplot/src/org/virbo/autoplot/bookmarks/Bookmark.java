@@ -138,18 +138,44 @@ public abstract class Bookmark {
      */
     public static Bookmark parseBookmark( Node element, String vers, int remoteLevel ) throws UnsupportedEncodingException, IOException {
 
-        String url = null;
+        String uri = null; // read this first in case it's useful as the title
         String s = null;
         String title = null;
         ImageIcon icon = null;
         String description= null;
 
         NodeList nl;
+
+        if ( element.getNodeName().equals("bookmark") ) {
+            if ( vers.equals("") ) {
+                nl = ((Element) element).getElementsByTagName("url");
+                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                uri = URLDecoder.decode(s, "UTF-8") ;
+            } else {
+                nl = ((Element) element).getElementsByTagName("uri");
+                if ( nl.getLength()==0 ) {
+                    nl = ((Element) element).getElementsByTagName("url");
+                }
+                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                uri = s;
+            }
+        } else {
+            uri= null;
+        }
+
         nl = ((Element) element).getElementsByTagName("title");
         if (nl.getLength()>0 ) {
-            if ( !nl.item(0).hasChildNodes() ) throw new IllegalArgumentException("bookmark has empty title");
-            s = ((Text) (nl.item(0).getFirstChild())).getData();
-            title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+            if ( !nl.item(0).hasChildNodes() ) {
+                if ( uri==null ) {
+                    throw new IllegalArgumentException("bookmark has empty title");
+                } else {
+                    System.err.println("Using URI for title because title is empty: "+uri );
+                    title= uri;
+                }
+            } else {
+                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+            }
         } else {
             throw new IllegalArgumentException("bookmark has no title");
         }
@@ -168,19 +194,7 @@ public abstract class Bookmark {
         
         if (element.getNodeName().equals("bookmark")) {
 
-            if ( vers.equals("") ) {
-                nl = ((Element) element).getElementsByTagName("url");
-                s = ((Text) (nl.item(0).getFirstChild())).getData();
-                url = URLDecoder.decode(s, "UTF-8") ;
-            } else {
-                nl = ((Element) element).getElementsByTagName("uri");
-                if ( nl.getLength()==0 ) {
-                    nl = ((Element) element).getElementsByTagName("url");
-                }
-                s = ((Text) (nl.item(0).getFirstChild())).getData();
-                url = s;
-            }
-            Bookmark book = new Bookmark.Item(url);
+            Bookmark book = new Bookmark.Item(uri);
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
             if ( description!=null ) book.setDescription(description);
