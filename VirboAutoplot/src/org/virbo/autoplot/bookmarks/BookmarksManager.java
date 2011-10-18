@@ -54,6 +54,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -583,9 +584,18 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                 showMessage( "Error parsing "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (FileNotFoundException ex ) {
                 showMessage( "File not found: "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (HtmlResponseIOException ex ) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                showMessage( "HTML response (not XML) from "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
                 showMessage( "I/O Error adding "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (IllegalArgumentException ex ) {
+                if ( ex.toString().contains("URLDecoder") ) {
+                    showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                } else {
+                    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                }
             }
         } else {
             model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
