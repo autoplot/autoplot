@@ -27,6 +27,9 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -454,8 +457,8 @@ public class BookmarksManagerModel {
      */
     public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedURLException, SAXException, ParserConfigurationException, IOException {
         try {
-            URL url = new URL(surl);
-            Document doc = AutoplotUtil.readDoc(url.openStream());
+            File ff= DataSetURI.downloadResourceAsTempFile( new URL(surl), new NullProgressMonitor() );
+            Document doc = AutoplotUtil.readDoc( new FileInputStream(ff) );
             List<Bookmark> newList= new ArrayList(this.list.size());
             for ( int i=0; i<this.list.size(); i++ ) {
                 newList.add(i,this.list.get(i).copy());
