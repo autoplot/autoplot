@@ -161,7 +161,7 @@ public class ScriptContext extends PyJavaInstance {
             //dsf.setUri(null);
             //dsf.setUri(surl);
             if ( view!=null ) {
-                view.dataSetSelector.setValue(surl);
+                view.dataSetSelector.setValue(surl); 
             }
             model.resetDataSetSourceURL(surl, new NullProgressMonitor());
         }
