@@ -35,7 +35,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
 
 /**
- *
+ *  
  * @author jbf
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
