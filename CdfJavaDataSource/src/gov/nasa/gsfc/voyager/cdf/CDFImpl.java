@@ -377,6 +377,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 AttributeEntry ae = (AttributeEntry)entries.elementAt(e);
                 CDFVariable var = (CDFVariable)
                        getCDFVariable(type, ae.variableNumber);
+                if ( var==null ) continue;
                 var.attributes.add(ae);
             }
         }
