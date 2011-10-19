@@ -26,6 +26,7 @@ import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.cdf.CdfJavaDataSource;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -227,6 +228,13 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.finished();
         }
 
+        if ( result!=null ) {
+            List<String> problems= new ArrayList();
+            if ( ! DataSetUtil.validate(result,problems) ) {
+                System.err.println("here 234");
+                System.err.println(problems);
+            }
+        }
         return result;
 
     }
