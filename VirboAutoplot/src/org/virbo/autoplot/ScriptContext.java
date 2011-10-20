@@ -145,25 +145,27 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * bring up the autoplot with the specified URL.
-     * @param surl a URI or vap file
+     * bring up the autoplot with the specified URL.  Note the URI is resolved
+     * asynchronously, so errors thrown during the load cannot be caught here.
+     * See getDataSet to load data synchronously.
+     * @param suri a URI or vap file
      * @throws java.lang.InterruptedException
      */
-    public static void plot(String surl) throws InterruptedException {
+    public static void plot(String suri) throws InterruptedException {
         maybeInitModel();
-        if ( surl.endsWith(".vap") || surl.contains(".vap?") || surl.endsWith(".vapx") || surl.contains(".vapx?")  ) {
+        if ( suri.endsWith(".vap") || suri.contains(".vap?") || suri.endsWith(".vapx") || suri.contains(".vapx?")  ) {
             if ( view!=null ) {
-                view.dataSetSelector.setValue(surl);
+                view.dataSetSelector.setValue(suri);
             }
-            model.resetDataSetSourceURL(surl, new NullProgressMonitor());
+            model.resetDataSetSourceURL(suri, new NullProgressMonitor());
         } else {
             //DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
             //dsf.setUri(null);
             //dsf.setUri(surl);
             if ( view!=null ) {
-                view.dataSetSelector.setValue(surl); 
+                view.dataSetSelector.setValue(suri);
             }
-            model.resetDataSetSourceURL(surl, new NullProgressMonitor());
+            model.resetDataSetSourceURL(suri, new NullProgressMonitor());
         }
         model.waitUntilIdle(false);
     }
