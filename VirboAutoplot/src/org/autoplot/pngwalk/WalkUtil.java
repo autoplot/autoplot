@@ -5,6 +5,10 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -151,6 +155,25 @@ public class WalkUtil {
         } finally {
             if ( write!=null ) write.close();
         }
+    }
+
+    /**
+     * fast resize based on Java2D.  This is lower quality than ScalePerspectiveImageOp, but much faster.
+     * @param originalImage
+     * @param width
+     * @param height
+     * @return
+     */
+    public static BufferedImage resizeImage( BufferedImage originalImage, int width, int height ) {
+        BufferedImage resizedImage = new BufferedImage( width, height, originalImage.getType() );
+        Graphics2D g = resizedImage.createGraphics();
+        g.setComposite(AlphaComposite.Src);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g.drawImage(originalImage, 0, 0, width, height, null);
+        g.dispose();
+        return resizedImage;
     }
 
 }

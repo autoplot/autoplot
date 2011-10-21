@@ -205,8 +205,9 @@ public class WalkImage  {
         int width = (int) Math.round(height * aspect);
 
         synchronized ( this ) {
-            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
-            thumb = resizeOp.filter(rawThumb, null);
+            //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
+            //thumb = resizeOp.filter(rawThumb, null);
+            thumb = WalkUtil.resizeImage( rawThumb, width, height );
             if (status == Status.THUMB_LOADING) {
                 setStatus(Status.THUMB_LOADED);
             }

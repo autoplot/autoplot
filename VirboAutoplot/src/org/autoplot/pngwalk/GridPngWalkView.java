@@ -1,5 +1,6 @@
 package org.autoplot.pngwalk;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -226,7 +227,6 @@ public class GridPngWalkView extends PngWalkView {
             repaintTimer.restart();
         }
 
-
         @Override
         public void paintComponent(Graphics g1) {
             super.paintComponent(g1);
@@ -251,6 +251,7 @@ public class GridPngWalkView extends PngWalkView {
 
             List<DatumRange> drs= seq.getActiveSubrange();
 
+            int npaint= (rowMax-rowMin)*(colMax-colMin);
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
                     int i = (row * nCols) + col;
@@ -271,8 +272,12 @@ public class GridPngWalkView extends PngWalkView {
                         if (s < 1.0) {
                             int w = (int) (s * thumb.getWidth());
                             int h = (int) (s * thumb.getHeight());
-                            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                            thumb = resizeOp.filter(thumb, null);
+                            if ( npaint<10 ) {
+                                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                                thumb = resizeOp.filter(thumb, null);
+                            } else {
+                                thumb= WalkUtil.resizeImage( thumb, w, h );
+                            }
                         }
                     } else {
                         thumb = loadingImage;
