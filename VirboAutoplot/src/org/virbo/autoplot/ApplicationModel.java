@@ -367,9 +367,9 @@ public class ApplicationModel {
                     throw new RuntimeException(ex);
                 }
             } else {
-                getDataSourceFilterController().resetSuri(surl, mon);
                 dom.getController().setFocusUri(null);
                 dom.getController().setFocusUri(surl);
+                getDataSourceFilterController().resetSuri(surl, mon);
             }
         } catch ( RuntimeException e ) {
             throw e;
