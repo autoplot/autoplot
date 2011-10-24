@@ -123,9 +123,9 @@ class Das2ServerDataSource extends AbstractDataSource {
             params2.remove("resolution");
         }
         
-        params2.put("dataset", URLEncoder.encode(dataset) );
+        params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII") );
         if ( dsParams.length()>0 ) {
-            params2.put("params", URLEncoder.encode(dsParams) );
+            params2.put("params", URLEncoder.encode(dsParams, "US-ASCII") );
         }
         URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
