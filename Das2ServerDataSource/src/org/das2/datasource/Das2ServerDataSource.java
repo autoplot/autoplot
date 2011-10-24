@@ -104,8 +104,8 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         params2.put("server", "dataset");
         if ( timeRange!=null ) {
-            params2.put("start_time", URLEncoder.encode(timeRange.min().toString()) );
-            params2.put("end_time", URLEncoder.encode(timeRange.max().toString()) );
+            params2.put("start_time", URLEncoder.encode(timeRange.min().toString(), "US-ASCII") );
+            params2.put("end_time", URLEncoder.encode(timeRange.max().toString(), "US-ASCII") );
         } else {
             throw new IllegalArgumentException("timeRange is null");
         }
