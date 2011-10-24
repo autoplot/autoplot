@@ -117,16 +117,8 @@ public class Das2StreamDataSource extends AbstractDataSource {
                 return Collections.emptyList();
             }
 
-            public MetadataModel getMetadataModel(URL url) {
-                return MetadataModel.createNullModel();
-            }
-
             public boolean reject(String surl, ProgressMonitor mon) {
                 return false;
-            }
-
-            public String urlForServer(String surl) {
-                return surl; // TODO
             }
         };
     }
