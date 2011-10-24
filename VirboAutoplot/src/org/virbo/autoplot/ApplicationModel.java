@@ -911,7 +911,7 @@ public class ApplicationModel {
                 continue; // findbugs NP_NULL_ON_SOME_PATH
             }
             if ( !srcVal.equals(dstVal) ) {
-                System.err.println( "fixing inconsistent vap where bound values were no equal: "
+                System.err.println( "fixing inconsistent vap where bound values were not equal: "
                         +m.getSrcId()+"."+m.getSrcProperty() +"!="+m.getDstId()+"."+m.getDstProperty() );
                 BeanProperty.create(m.getDstProperty()).setValue(dst,srcVal);
             }
