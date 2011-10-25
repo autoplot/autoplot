@@ -1896,7 +1896,7 @@ public class PlotElementController extends DomNodeController {
                         plot.addRenderer(0,newRenderer);
                     } else {
                         if ( plot==null ) {
-                            System.err.println("here");
+                            throw new IllegalStateException("plot cannot be null");
                         }
                         Renderer[] rends= plot.getRenderers();
                         PlotElement[] pe= new PlotElement[rends.length];
