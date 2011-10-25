@@ -163,23 +163,23 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
             } else if ( tool==Tool.TIMEFORMAT ) {
                 int row= jTable1.getSelectedRow();
-                String val= timeFormatTextField.getText(); // don't clubber existing work
-                val+= jTable1.getModel().getValueAt(row, first);
+                StringBuilder val= new StringBuilder( timeFormatTextField.getText() ); // don't clubber existing work
+                val.append( jTable1.getModel().getValueAt(row, first) );
                 for ( int icol= first+1; icol<=last; icol++ ) {
-                    val+= "+" + jTable1.getModel().getValueAt(row, icol);
+                    val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
                 }
-                timeFormatTextField.setText(val);
+                timeFormatTextField.setText(val.toString());
                 dep0timeCheckBox.setSelected(true);
                 setDep0(columns.get(first));
 
             } else if ( tool==Tool.GUESSTIMEFORMAT ) {
                 int row= jTable1.getSelectedRow();
-                String val= ""; // existing work is clubbered
-                val+= jTable1.getModel().getValueAt(row, first);
+                StringBuilder val= new StringBuilder(); // existing work is clubbered
+                val.append( jTable1.getModel().getValueAt(row, first) );
                 for ( int icol= first+1; icol<=last; icol++ ) {
-                    val+= "+" + jTable1.getModel().getValueAt(row, icol);
+                    val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
                 }
-                timeFormatTextField.setText(val);
+                timeFormatTextField.setText(val.toString());
                 dep0timeCheckBox.setSelected(true);
                 setDep0(columns.get(first));
                 guessTimeFormatButtonAP();
