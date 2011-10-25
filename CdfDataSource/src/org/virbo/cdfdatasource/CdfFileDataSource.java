@@ -333,7 +333,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
-                        if ( idep==0 && depDs!=null ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
+                        if ( idep==0 ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
                             if ( depDs.length()!=result.length() && result.length()==1 ) {
                                 continue;
                             }
@@ -400,7 +400,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
 
                         result.putProperty("DEPEND_" + idep, depDs);
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         e.printStackTrace(); // to support lanl.
                     }
                 } else {
