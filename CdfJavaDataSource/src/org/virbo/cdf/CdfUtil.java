@@ -717,7 +717,9 @@ public class CdfUtil {
                                 String funct= (String)getAttribute( cdf, var.getName(), "FUNCTION" );
                                 if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
                                 if ( !CdfVirtualVars.isSupported(funct) ) {
-                                    System.err.println("virtual function not supported: "+funct );
+                                    if ( !funct.startsWith("comp_themis") ) {
+                                        System.err.println("virtual function not supported: "+funct );
+                                    }
                                     continue;
                                 } else {
                                     vdescr= funct + "( ";
