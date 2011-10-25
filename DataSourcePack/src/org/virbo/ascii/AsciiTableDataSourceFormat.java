@@ -399,7 +399,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         List<QDataSet> planes= new ArrayList<QDataSet>();
         List<Units> planeUnits= new ArrayList<Units>();
-        List<DatumFormatter> planeFormats= new ArrayList<DatumFormatter>();
+//        List<DatumFormatter> planeFormats= new ArrayList<DatumFormatter>();
 
         String head= getParam( "header", "" ); // could be "rich"
         if ( "rich".equals( head ) ) {
@@ -457,12 +457,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.setTaskSize(data.length());
         mon.started();
 
-        if ( data.length()>0 ) {
-            planeFormats= new ArrayList<DatumFormatter>(planes.size());
-            for ( int i=0; i<planes.size(); i++ ) {
-                planeFormats.add(i, planeUnits.get(i).createDatum(planes.get(i).value(i)).getFormatter() );
-            }
-        }
+//        if ( data.length()>0 ) {
+//            planeFormats= new ArrayList<DatumFormatter>(planes.size());
+//            for ( int i=0; i<planes.size(); i++ ) {
+//                planeFormats.add(i, planeUnits.get(i).createDatum(planes.get(i).value(i)).getFormatter() );
+//            }
+//        }
 
         String ft= getParam( "tformat", "ISO8601" );
         DatumFormatter tf= ft.equals("") ? Units.us2000.getDatumFormatterFactory().defaultFormatter() : getTimeFormatter(ft);
