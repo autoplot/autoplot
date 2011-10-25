@@ -44,6 +44,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -384,7 +385,7 @@ public class DodsAdapter {
                     if (sunits.contains("since")) {
                         Units u;
                         try {
-                            u = MetadataUtil.lookupTimeUnits(sunits);
+                            u = SemanticOps.lookupTimeUnits(sunits);
                             dep0.putProperty(QDataSet.UNITS, u);
                         } catch (java.text.ParseException ex) {
                             Logger.getLogger(DodsAdapter.class.getName()).log(Level.SEVERE, null, ex);
