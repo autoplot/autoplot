@@ -49,7 +49,7 @@ public class DodsDataSource extends AbstractDataSource {
     String variable;
     String sMyUrl;
     /**
-     * null if not specfied in uri.
+     * null if not specified in URI.
      */
     String constraint;
     /**
@@ -129,7 +129,7 @@ public class DodsDataSource extends AbstractDataSource {
 
             if (ii != null) {
                 for (int i = 0; i < ii.length; i++) {
-                    dimsStr= "";
+                    dimsStr= ""; //TODO: what?
                     constraint1.append(dimsStr);
                 }
             }
@@ -240,7 +240,7 @@ public class DodsDataSource extends AbstractDataSource {
     }
 
     /**
-     * das must be loaded.
+     * DAS must be loaded.
      * @param variable
      * @return
      */
