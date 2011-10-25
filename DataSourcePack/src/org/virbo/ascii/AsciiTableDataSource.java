@@ -32,6 +32,7 @@ import org.das2.datum.TimeParser;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
@@ -99,10 +100,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * non-null indicates the first record will provide the values for the rows of the rank 2 dataset.
      */
     int[] depend1Values = null;
-    /**
-     * limit the number of records.  Parsing will stop at this point.
-     */
-    int recCount = -1;
+
     private double validMin = Double.NEGATIVE_INFINITY;
     private double validMax = Double.POSITIVE_INFINITY;
 
@@ -712,8 +710,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             props.put("firstRecord", firstRecord);
         }
         List<String> remove= new ArrayList();
-        for ( String k: props.keySet() ) {
-            Object v= props.get(k);
+        for ( Entry<String,Object> e: props.entrySet() ) {
+            String k= e.getKey();
+            Object v= e.getValue();
             if ( v==null ) continue;
             if ( v==null || !( v instanceof Number || v instanceof String || v instanceof org.das2.datum.Datum ) ) remove.add(k);
         }
