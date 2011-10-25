@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -79,31 +80,32 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     }
 
     private String nextExec( LineNumberReader reader, String[] nextLine ) throws IOException {
-        String s;
+        StringBuilder s;
         if ( nextLine[0]!=null ) {
-            s= nextLine[0];
+            s= new StringBuilder(nextLine[0]);
             nextLine[0]= null;
         } else {
-            s = reader.readLine();
+            s = new StringBuilder(reader.readLine());
         }
-        if ( s!=null && ( s.startsWith("def ") || s.startsWith("if") || s.startsWith("else") ) ) {
+        String stest= s.toString();
+        if ( s!=null && ( stest.startsWith("def ") || stest.startsWith("if") || stest.startsWith("else") ) ) {
             String s1= reader.readLine();
             while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
-                s= s+"\n"+s1;
+                s.append("\n").append(s1);
                 s1= reader.readLine();
             }
             while ( s1!=null && s1.startsWith("else") ) {  // TODO: under implementation, use python parser for ideal solution
-                s= s+"\n"+s1;
+                s.append("\n").append(s1);
                 s1= reader.readLine();
                 while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
-                   s= s+"\n"+s1;
+                   s.append("\n").append(s1);
                     s1= reader.readLine();
                 }
             }
             nextLine[0]= s1;
         }
 
-        return s;
+        return s.toString();
     }
 
     private synchronized QDataSet getInlineDataSet(URI uri) throws Exception {
@@ -162,9 +164,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp.set("monitor", mon);
 
                 interp.exec("params=dict()");
-                for (String s : paramsl.keySet()) {
+                for ( Entry<String,String> e : paramsl.entrySet()) {
+                    String s= e.getKey();
                     if (!s.equals("arg_0") && !s.equals("script") ) {
-                        String sval= paramsl.get(s);
+                        String sval= e.getValue();
                         
                         sval= maybeQuoteString( sval );
                         logger.log(Level.FINE, "params[''{0}'']={1}", new Object[]{s, sval});
@@ -345,7 +348,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     Date cacheDate = null;
     String cacheUrl = null;
 
-    private boolean useCache(URI uri) {
+    private synchronized boolean useCache(URI uri) {
         try {
             if ((cacheDate != null && !resourceDate(uri).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(uri)))) {
                 return true;
@@ -380,7 +383,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private String maybeQuoteString(String sval) {
         boolean isNumber= false;
         try {
-            double d=Double.parseDouble(sval);
+            Double.parseDouble(sval);
         } catch ( NumberFormatException ex ) {
             isNumber= false;
         }
