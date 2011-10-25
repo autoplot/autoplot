@@ -95,7 +95,6 @@ public class Main {
         if (args.length == 0) {
             //file= "/net/spot3/mnt/data1/jbf_scratch/papco_data/cdf/ace/swe/2005/ac_k0_swe_20051017_v01.cdf";
             file = "C:/Documents and Settings/jbf/autoplot_data/ftp/cdaweb.gsfc.nasa.gov/pub/istp/polar/mfe/1996/po_k0_mfe_19960316_v02.cdf";
-            file = CdfUtil.win95Name(new File(file));
             file = "c:/po_k0_mfe_19960317_v02.cdf";
         } else {
             file = args[0];
