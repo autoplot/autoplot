@@ -72,7 +72,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         File file= new File( split.resourceUri );
         
-        file.delete();
+        if ( file.exists() && !file.delete() ) {
+            throw new IllegalArgumentException("Unable to delete file"+file);
+        }
         cdf = CDF.create( file.toString() );
 
         nameFor(data); // allocate a good name
@@ -161,7 +163,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private Object doIt1( QDataSet ds, UnitsConverter uc, long type ) {
         Object export;
         QubeDataSetIterator iter = new QubeDataSetIterator(ds);
-        if ( type==CDF_DOUBLE ) {
+        if ( type==CDF_DOUBLE || type==CDF_EPOCH ) {
             double[] dexport= new double[ ds.length() ];
             int i = 0;
             while (iter.hasNext()) {
