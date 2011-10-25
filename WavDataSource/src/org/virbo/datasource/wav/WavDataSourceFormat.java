@@ -37,7 +37,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         
         String type = params.get("type");
 
-        int dep0Len = (dep0 == null ? 0 : 1);
+        int dep0Len = 0; //(dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
         int recSize = typeSize * (dep0Len + 1);
         int size = data.length() * recSize;
@@ -134,7 +134,6 @@ public class WavDataSourceFormat implements DataSourceFormat {
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
 
         URISplit split= URISplit.parse(uri);
-        java.util.Map<String, String> params= URISplit.parseParams(split.params);
 
         QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
 
