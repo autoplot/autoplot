@@ -907,8 +907,6 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     public void addCompletionKeys() {
 
-        JComponent c = SwingUtilities.getRootPane(this);
-
         ActionMap map = dataSetSelector.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
 
