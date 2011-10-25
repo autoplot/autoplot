@@ -94,7 +94,6 @@ public class AggregatingDataSource extends AbstractDataSource {
     /** Creates a new instance of AggregatingDataSource */
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
-        String surl = DataSetURI.fromUri(uri);
         this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
         String stimeRange= super.params.get("timerange");
@@ -282,7 +281,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         //}
 
         if ( altResult!=null ) {
-            ArrayDataSet dep0 = altResult == null ? null : (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
+            ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
             Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
             if ( dep0==null ) {
                 dep0= (ArrayDataSet) altResult.property(QDataSet.JOIN_0);
