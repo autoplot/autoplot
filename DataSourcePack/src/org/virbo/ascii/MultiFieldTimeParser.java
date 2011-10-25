@@ -56,27 +56,27 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         this.firstColumn= firstColumn;
         this.timeFormats= timeFormats;
         this.lastColumn= firstColumn + timeFormats.length - 1;
-        String timeFormat;
+        StringBuilder timeFormat;
 
         isNumber= new boolean[timeFormats.length];
         
         isNumber[0]= isNumber( timeFormats[0] );
         if ( timeFormats[0].length()>1 && timeFormats[0].charAt(1)!='(' ) {
             if ( multiFieldAdjacent(timeFormats[0]) ) {
-                timeFormat= timeFormats[0]; // to have indeterminate length for first field, we need terminator.
+                timeFormat= new StringBuilder(timeFormats[0]); // to have indeterminate length for first field, we need terminator.
             } else {
-                timeFormat= "%-1" + timeFormats[0].substring(1); //kludge for whitespace
+                timeFormat= new StringBuilder("%-1").append( timeFormats[0].substring(1) ); //kludge for whitespace
             }
         } else {
-            timeFormat= timeFormats[0];
+            timeFormat= new StringBuilder(timeFormats[0]);
         }
 
         for ( int i=1; i<timeFormats.length-1; i++ ) {
             isNumber[i]= isNumber( timeFormats[i] );
             if ( multiFieldAdjacent(timeFormats[i]) ) {
-                timeFormat= timeFormat + " "+ timeFormats[i]; // to have indeterminate length for first field, we need terminator.
+                timeFormat.append( " " ).append( timeFormats[i] ); // to have indeterminate length for first field, we need terminator.
             } else {
-                timeFormat= timeFormat + " "+"%-1" + timeFormats[i].substring(1); //kludge for whitespace
+                timeFormat.append( " " ).append("%-1") .append( timeFormats[i].substring(1) ); //kludge for whitespace
             }
         }
 
@@ -85,11 +85,11 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             isNumber[timeFormats.length-1]= true;
         } else {
             lastDigitFormat=null; // we can't use this feature
-            timeFormat= timeFormat + " "+ timeFormats[timeFormats.length-1]; // to have indeterminate length for first field, we need terminator.
+            timeFormat.append( " ").append( timeFormats[timeFormats.length-1] ); // to have indeterminate length for first field, we need terminator.
             isNumber[timeFormats.length-1]= false;
         }
 
-        this.parser= TimeParser.create(timeFormat);
+        this.parser= TimeParser.create(timeFormat.toString());
         //this.parser= parser;
         this.units= units;
     }
