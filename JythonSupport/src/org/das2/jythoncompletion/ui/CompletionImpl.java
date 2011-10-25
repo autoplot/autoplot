@@ -317,9 +317,8 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
             // Caret update should be notified AFTER document modifications
             // thank to document listener priorities
             Result localCompletionResult;
-            synchronized (this) {
-                localCompletionResult = completionResult;
-            }
+            localCompletionResult = completionResult;
+
             if ((completionAutoPopupTimer.isRunning() || localCompletionResult != null)
                 && (!layout.isCompletionVisible() || pleaseWaitDisplayed)
                 && e.getDot() != autoModEndOffset) {
@@ -892,12 +891,13 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
      */
     private void documentationQuery() {
         Result newDocumentationResult = new Result(1); // Estimate for selected item only
+        List<CompletionResultSetImpl> documentationResultSets;
         synchronized (this) {
             assert (docResult == null);
             docResult = newDocumentationResult;
+            documentationResultSets= docResult.getResultSets();
         }
-        List<CompletionResultSetImpl> documentationResultSets = docResult.getResultSets();
-
+        
         CompletionTask docTask;
         CompletionItem selectedItem = layout.getSelectedCompletionItem();
         if (selectedItem != null) {
