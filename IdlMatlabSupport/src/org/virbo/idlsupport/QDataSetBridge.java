@@ -89,7 +89,7 @@ public abstract class QDataSetBridge {
         }
     }
 
-    public void clearPreferredUnits() {
+    public synchronized void clearPreferredUnits() {
         prefUnits= null;
     }
 
@@ -472,6 +472,9 @@ public abstract class QDataSetBridge {
         if ( ds1==null && sliceDep.containsKey(name) ) {
             return sliceDep(name,i);
         }
+        if ( ds1==null ) {
+            throw new IllegalArgumentException("No such dataset: "+name );
+        }
         if (ds1.rank() == 1 ) {
             throw new IllegalArgumentException("dataset is rank 1, slice not allowed");
         } else if (ds1.rank() == 2) {
@@ -626,7 +629,7 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * return the length of the zeroth dimension of the dataset
+     * return the length of the dimensions of the dataset, once sliced at index i.
      * @param name
      * @return
      */
@@ -636,6 +639,9 @@ public abstract class QDataSetBridge {
             ds1= (QDataSet) datasets.get(this.name).slice(i).property(sliceDep.get(name));
             return DataSetUtil.qubeDims(ds1);
         } else {
+            if ( ds1==null ) {
+                throw new IllegalArgumentException("No such dataset: "+name);
+            }
             return DataSetUtil.qubeDims(ds1.slice(i));
         }
     }
