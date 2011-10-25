@@ -54,10 +54,8 @@ import java.awt.font.LineMetrics;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-import java.util.StringTokenizer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -189,7 +187,7 @@ public final class PatchedHtmlRenderer {
                 }
 
                 double chWidth = r.getWidth() / chars.length;
-                int estCharsOver = new Double((r.getWidth() - w) / chWidth).intValue();
+                int estCharsOver = (int) ((r.getWidth() - w) / chWidth);
 
                 if (style == STYLE_TRUNCATE) {
                     int length = chars.length - estCharsOver;
@@ -766,9 +764,7 @@ public final class PatchedHtmlRenderer {
                         if (newWidth > w || _renderHTML(s, 0, g.create(), x, y, Integer.MAX_VALUE, h, f, defaultColor, STYLE_CLIP, false, background, disableColorChange) > w) {
                             double pixelsOff = widthPainted + r.getWidth() - w - dotsWidth;
                             
-                            double estCharsOver = pixelsOff / chWidth;
-                            
-                            length = new Double((w - dotsWidth - widthPainted) / chWidth).intValue();
+                            length = (int)((w - dotsWidth - widthPainted) / chWidth);
                             
                             if (length < 0) {
                                 length = 0;
