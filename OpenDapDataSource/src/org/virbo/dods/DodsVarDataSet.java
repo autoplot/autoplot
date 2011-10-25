@@ -31,14 +31,12 @@ import org.virbo.dataset.WritableDataSet;
  */
 public abstract class DodsVarDataSet implements WritableDataSet {
 
-    DArray array;
     int rank;
     int[] dimSizes = new int[4];
     HashMap properties;
 
     /** Creates a new instance of DodsVarDataSet */
     public DodsVarDataSet(DArray array) {
-        this.array = array;
         int idim = 0;
         for (Enumeration enumm = array.getDimensions(); enumm.hasMoreElements();) {
             DArrayDimension dd = (DArrayDimension) enumm.nextElement();
