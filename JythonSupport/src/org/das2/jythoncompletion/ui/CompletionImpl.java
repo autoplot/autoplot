@@ -1167,8 +1167,8 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
             TextUI ui = getActiveComponent().getUI();
             Keymap km = getActiveComponent().getKeymap();
             if (ui != null && km != null) {
-                EditorKit kit = ui.getEditorKit(getActiveComponent());
-                /*if (kit instanceof BaseKit) {
+                /*EditorKit kit = ui.getEditorKit(getActiveComponent());
+                if (kit instanceof BaseKit) {
                     Action a = ((BaseKit)kit).getActionByName(editorActionName);
                     if (a != null) {
                         KeyStroke[] keys = km.getKeyStrokesForAction(a);
