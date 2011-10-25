@@ -56,7 +56,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
      * @param row
      * @return
      */
-    public boolean isRecord( int row ) {
+    public synchronized boolean isRecord( int row ) {
         return this.isRecord[row - lineStart];
     }
 
@@ -96,7 +96,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
 
     }
 
-    public String getLine(int skip) {
+    public synchronized String getLine(int skip) {
         readLines( skip, LINE_BUFFER_COUNT );
         if (lineCount > 0) {
             return lines[skip - lineStart];
@@ -178,7 +178,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     protected RecordParser recParser = null;
     public static final String PROP_RECPARSER = "recParser";
 
-    public RecordParser getRecParser() {
+    public synchronized RecordParser getRecParser() {
         return recParser;
     }
 
