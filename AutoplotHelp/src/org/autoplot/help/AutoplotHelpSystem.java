@@ -14,8 +14,8 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.SwingHelpUtilities;
 import javax.swing.JPanel;
@@ -30,11 +30,11 @@ public class AutoplotHelpSystem {
     
     private static AutoplotHelpSystem instance;
 
-    private static Logger log= Logger.getLogger("org.autoplot.help");
+    private static final Logger log= Logger.getLogger("org.autoplot.help");
 
     //This is the pathname used for all help EXCEPT main autplot help:
     private HelpSet mainHS;
-    private HelpBroker broker;
+    //private HelpBroker broker;
     //private CSH.DisplayHelpFromSource helper;
 
     private Map<Component,String> helpIds;
@@ -63,7 +63,7 @@ public class AutoplotHelpSystem {
 
         while( hsurls!=null && hsurls.hasMoreElements()) {
             hsurl = hsurls.nextElement();
-            log.fine("found /META-INF/helpsets.txt at " + hsurl);
+            log.log(Level.FINE, "found /META-INF/helpsets.txt at {0}", hsurl);
             BufferedReader read = null;
             try {
                 read= new BufferedReader( new InputStreamReader( hsurl.openStream() ) );
@@ -77,7 +77,7 @@ public class AutoplotHelpSystem {
                     if ( spec.length()>0 ) {
                         URL hsurl1=null;
                         try {
-                            log.fine("Merging external helpset: " + hsurl);
+                            log.log(Level.FINE, "Merging external helpset: {0}", hsurl);
                             if ( spec.startsWith("/") ) {
                                 hsurl1= getClass().getResource(spec);
                             } else {
@@ -85,7 +85,7 @@ public class AutoplotHelpSystem {
                             }
                             mainHS.add(new HelpSet(null, hsurl1));
                         } catch ( Exception ex ) {
-                            log.warning("Error loading helpset " + hsurl1);
+                            log.log(Level.WARNING, "Error loading helpset {0}", hsurl1);
                         }
                     }
                     spec= read.readLine();
@@ -122,7 +122,7 @@ public class AutoplotHelpSystem {
     }
 
     /** Returns a reference to the help system, or <code>null</code> if it hasn't been
-     * intitialized.
+     * initialized.
      */
     public static AutoplotHelpSystem getHelpSystem() {
         return instance;
