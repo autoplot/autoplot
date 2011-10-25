@@ -180,6 +180,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         DatumFormatter[] formats= new DatumFormatter[data.length(0)];
         Units[] uu= new Units[data.length(0)];
 
+        if ( bundleDesc==null ) {
+            throw new IllegalArgumentException("expected to find bundleDesc in dataset!");
+        }
+
         int jj=0; // index into rank2 array
         for ( int i=0; i<bundleDesc.length(); i++ ) {
             jj= i;
@@ -203,10 +207,6 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
             }
             jj++;
-        }
-
-        if ( bundleDesc==null ) {
-            throw new IllegalArgumentException("expected to find bundleDesc in dataset!");
         }
         
         if (bundleDesc != null) {
@@ -512,7 +512,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         if (data.rank() == 2) {
             if ( SemanticOps.isBundle(data) ) {
-                formatBundle( out, data, mon );
+                formatBundle( out, data, mon ); // data should have property BUNDLE_1 because of isBundle==true
             } else {
                 formatRank2(out, data, mon);
             }
