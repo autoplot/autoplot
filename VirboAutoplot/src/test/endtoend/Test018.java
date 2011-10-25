@@ -32,37 +32,6 @@ public class Test018 {
         t0 = System.currentTimeMillis();
     }
 
-    public static void main(String[] args) {
-
-        boolean exit= true;
-
-        try {
-
-            if ( exit==false ) {
-                createGui(); // start up interactive window
-            }
-
-            String testId= "test018";
-
-            setCanvasSize(600, 600);
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getOptions().setCanvasFont("sans-8");
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-
-
-            test1( testId );
-            test2( testId );
-
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-
-        if ( exit ) {
-            System.exit(0);  // TODO: something is firing up the event thread
-        }
-    }
-
     /**
      * try to zoom in and then show context overview
      * @param testId
@@ -124,6 +93,51 @@ public class Test018 {
         }
         writeToPng(testId + "_002.png");
     }
-    
+
+    /**
+     * this shows a bug where switching array-of-vector URIs would result in 12 plot elements instead of 4.
+     * @param testId
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static void test4( String testId ) throws IOException, InterruptedException {
+        load( "file:///home/jbf/ct/hudson/vap/lon/thb_l2_esa_20080907_electrons_less.vap" );
+        assert ( getDocumentModel().getDataSourceFilters(1).getUri().equals("vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl") );
+        plot(1,"vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
+        waitUntilIdle();
+        writeToPng(testId + "_004.png");
+    }
+
+    public static void main(String[] args) {
+
+        boolean exit= true;
+
+        try {
+
+            if ( exit==false ) {
+                createGui(); // start up interactive window
+            }
+
+            String testId= "test018";
+
+            setCanvasSize(600, 600);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getOptions().setCanvasFont("sans-8");
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
+            test1( testId );
+            test2( testId );
+            //no test3, to straighten out the numbering
+            test4( testId );
+
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
+        if ( exit ) {
+            System.exit(0);  // TODO: something is firing up the event thread
+        }
+    }
 
 }
