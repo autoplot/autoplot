@@ -153,20 +153,10 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot(String suri) throws InterruptedException {
         maybeInitModel();
-        if ( suri.endsWith(".vap") || suri.contains(".vap?") || suri.endsWith(".vapx") || suri.contains(".vapx?")  ) {
-            if ( view!=null ) {
-                view.dataSetSelector.setValue(suri);
-            }
-            model.resetDataSetSourceURL(suri, new NullProgressMonitor());
-        } else {
-            //DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
-            //dsf.setUri(null);
-            //dsf.setUri(surl);
-            if ( view!=null ) {
-                view.dataSetSelector.setValue(suri);
-            }
-            model.resetDataSetSourceURL(suri, new NullProgressMonitor());
+        if ( view!=null ) {
+            view.dataSetSelector.setValue(suri);
         }
+        model.resetDataSetSourceURL(suri, new NullProgressMonitor());
         model.waitUntilIdle(false);
     }
 
@@ -186,7 +176,7 @@ public class ScriptContext extends PyJavaInstance {
             List<PlotElement> pes= dom.getController().getPlotElementsFor(dsf);
             PlotElement pe;
             if ( pes.size()>0 ) pe= pes.get(0); else pe=null;
-            Plot p= dom.getController().getPlotFor(pe);
+            Plot p= pe==null ? dom.getPlots(0) : dom.getController().getPlotFor(pe);
             dom.getController().doplot( p, pe, surl1, surl2 );
         }
         model.waitUntilIdle(false);
