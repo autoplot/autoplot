@@ -84,7 +84,6 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     
     public DataSource getDataSource(URI uri) throws Exception {
-        URISplit split= URISplit.parse( uri );
         return new CdfFileDataSource( uri );
     }
     
