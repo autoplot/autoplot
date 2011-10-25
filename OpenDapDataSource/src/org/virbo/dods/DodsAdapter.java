@@ -373,7 +373,10 @@ public class DodsAdapter {
                     rresult.putProperty(QDataSet.DEPEND_0, dss[0] );
                     zresult= rresult;
                 }
-                
+
+                if ( zresult==null ) {
+                    throw new IllegalArgumentException( "Unsupported type: "+ t );
+                }
                 MutablePropertyDataSet dep0 = (MutablePropertyDataSet) zresult.property( QDataSet.DEPEND_0 );
                 
                 String sunits = (String) MetadataUtil.getNode(attributes, new String[]{labels[0], "units"});
