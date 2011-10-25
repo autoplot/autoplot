@@ -48,14 +48,13 @@ public class BindingSupport {
         return new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                Method m;
                 try {
                     if (c == null) {
                         Object oldValue= getter.invoke( p );
                         if ( oldValue==null ) {
                             System.err.println("oldValue is null!!!");
                         }
-                        if ( oldValue.equals(evt.getNewValue() ) ) return;
+                        if ( oldValue!=null && oldValue.equals(evt.getNewValue() ) ) return;
                         setter.invoke(p, evt.getNewValue());
                         if ( new Exception().getStackTrace().length > 300 ) {
                             System.err.println("setter: "+setter);
