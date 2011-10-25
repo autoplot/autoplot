@@ -1046,7 +1046,7 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
             installKeybindings();
             cancel = true;
         }
-        Document document = component.getDocument();
+        Document document = component==null ? null : component.getDocument();
         if (component != null && document != getActiveDocument()) {
             activeProviders = getCompletionProvidersForComponent(component);
             if (debug) {
