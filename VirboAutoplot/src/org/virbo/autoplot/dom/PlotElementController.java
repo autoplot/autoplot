@@ -275,16 +275,16 @@ public class PlotElementController extends DomNodeController {
         }
     };
 
-    private boolean needNewChildren(String[] labels, List<PlotElement> childPeles) {
-        if ( childPeles.isEmpty() ) return true;
-        List<String> ll= Arrays.asList(labels);
-        for ( PlotElement p: childPeles ) {
-            if ( !ll.contains( p.getComponent() ) ) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean needNewChildren(String[] labels, List<PlotElement> childPeles) {
+//        if ( childPeles.isEmpty() ) return true;
+//        List<String> ll= Arrays.asList(labels);
+//        for ( PlotElement p: childPeles ) {
+//            if ( !ll.contains( p.getComponent() ) ) {
+//               return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * the DataSourceFilter id has changed, so we need to stop listening to the
@@ -364,7 +364,7 @@ public class PlotElementController extends DomNodeController {
         } else {
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
                 String[] labels = SemanticOps.getComponentLabels(fillDs);
-                if (plotElement.getComponent().equals("X")) {
+                if (plotElement.getComponent().equals("X")) { //TODO: remove after verify other bug 3427778
                     fillDs = DataSetOps.slice1(fillDs, 0);
                     label = labels[0];
                 } else if (plotElement.getComponent().equals("Y")) {
@@ -869,7 +869,8 @@ public class PlotElementController extends DomNodeController {
 
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
                 QDataSet bdesc= (QDataSet) fillDs.property(QDataSet.BUNDLE_1);
-                if ( null!=bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1) ) {
+                Object context0= bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1); // in a bundleDescriptor, this can be a string.
+                if ( null!=context0 && context0 instanceof String ) {
                     shouldHaveChildren= false;
                 }
             }
@@ -879,8 +880,7 @@ public class PlotElementController extends DomNodeController {
 
             boolean weShallAddChildren=
                     plotElement.isAutoComponent()
-                    && shouldHaveChildren
-                    && needNewChildren( labels, getChildPlotElements() );
+                    && shouldHaveChildren;
 
             if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child plotElements
                 List<PlotElement> childEles= getChildPlotElements();
