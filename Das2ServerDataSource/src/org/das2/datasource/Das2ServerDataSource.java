@@ -98,7 +98,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         String item= (String) otherParams.remove("item");
         String interval= (String)otherParams.remove("interval");
-        String key= (String) otherParams.remove("key");
+        String key1= (String) otherParams.remove("key");
 
         dsParams= (String)  URISplit.formatParams(otherParams);
 
@@ -165,7 +165,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             String groupAccess= (String)dsdfParams.get("groupAccess" );
             if ( groupAccess!=null && groupAccess.trim().length()>0 ) {
-                if ( key==null ) {
+                if ( key1==null ) {
                     Authenticator authenticator;
                     authenticator= new Authenticator( DasServer.create(this.resourceURI.toURL()),groupAccess);
                     Key key2= authenticator.authenticate();
@@ -173,9 +173,8 @@ class Das2ServerDataSource extends AbstractDataSource {
                         params2.put("key", key2.toString() );
                         url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
                     }
-                    key= key2.toString();
                 } else {
-                    params2.put("key", key );
+                    params2.put("key", key1 );
                     url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
                 }
             }
