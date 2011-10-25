@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -613,16 +614,16 @@ public class URISplit {
      * @param parms
      * @return
      */
-    public static String formatParams(Map parms) {
+    public static String formatParams(Map<String,String> parms) {
         StringBuffer result = new StringBuffer("");
-        for (Iterator i = parms.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for ( Entry<String,String> e: parms.entrySet() ) {
+            String key = (String) e.getKey();
             if (key.startsWith("arg_")) {
-                if (!parms.get(key).equals("")) {
-                    result.append("&" + parms.get(key));
+                if (!e.getValue().equals("")) {
+                    result.append("&" + e.getValue());
                 }
             } else {
-                String value = (String) parms.get(key);
+                String value = (String) e.getValue();
                 if (value != null) {
                     value= uriEncode(value);
                     value= value.replaceAll("&", "%26");
