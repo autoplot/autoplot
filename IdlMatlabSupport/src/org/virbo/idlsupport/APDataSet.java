@@ -29,7 +29,7 @@ public class APDataSet extends QDataSetBridge {
 
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.2.2");
+        System.err.println("APDataSet v1.2.3");
     }
 
     /**
@@ -68,13 +68,14 @@ public class APDataSet extends QDataSetBridge {
         return result;
     }
 
+    @Override
     public String toString() {
         QDataSet d= datasets.get( name );
 
         String s= this.surl;
-        for ( String name: datasets.keySet() ) {
-            QDataSet qds= datasets.get(name);
-            s+= "\n" + name + ": " +qds;
+        for ( String name1: datasets.keySet() ) {
+            QDataSet qds= datasets.get(name1);
+            s+= "\n" + name1 + ": " +qds;
             for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
                 if ( d.property("DEPEND_"+i) ==qds ) {
                     s += " (DEPEND_"+i+")";
@@ -85,8 +86,8 @@ public class APDataSet extends QDataSetBridge {
             }
         }
         for ( String n: sliceDep.keySet() ) {
-            QDataSet ds= (QDataSet)datasets.get(name).slice(0).property(sliceDep.get(n));
-            s+= "\nvia slice(0): " + n + ": " + ds + " (" + sliceDep.get(n) + ")";
+            QDataSet ds1= (QDataSet)datasets.get(name).slice(0).property(sliceDep.get(n));
+            s+= "\nvia slice(0): " + n + ": " + ds1 + " (" + sliceDep.get(n) + ")";
         }
         return s;
     }
