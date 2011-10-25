@@ -627,7 +627,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     private void movePlotElement(PlotElement p, Plot src, Plot dst) {
-        assert (p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
+        assert ( src==null || p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
 
         if ( src==dst ) return;
         if ( src!=null ) src.getController().removePlotElement( p );
