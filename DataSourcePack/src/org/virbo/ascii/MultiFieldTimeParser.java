@@ -22,7 +22,6 @@ import org.virbo.dsutil.AsciiParser;
 public class MultiFieldTimeParser implements AsciiParser.FieldParser {
 
     StringBuilder agg;
-    String[] timeFormats;
     int firstColumn;
     int lastColumn;
     TimeParser parser;
@@ -54,7 +53,6 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
 
     MultiFieldTimeParser( int firstColumn, String[] timeFormats, TimeParser parser, Units units ) {
         this.firstColumn= firstColumn;
-        this.timeFormats= timeFormats;
         this.lastColumn= firstColumn + timeFormats.length - 1;
         StringBuilder timeFormat;
 
