@@ -383,7 +383,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private String maybeQuoteString(String sval) {
         boolean isNumber= false;
         try {
-            Double.parseDouble(sval);
+            Double.parseDouble(sval); 
         } catch ( NumberFormatException ex ) {
             isNumber= false;
         }
