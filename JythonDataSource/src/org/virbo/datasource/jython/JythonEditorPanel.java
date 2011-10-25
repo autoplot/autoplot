@@ -47,6 +47,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.jython.JythonDataSourceFactory.Param;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
@@ -202,8 +203,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             paramsPanel.add( new JLabel("<html>This script has these input parameters.  Buttons on the right show default values.<br><br></html>") );
 
-            for ( String s: parms.keySet() ) {
-                JythonDataSourceFactory.Param parm= parms.get(s);
+            for ( Entry<String,Param> e: parms.entrySet() ) {
+                //String s= e.getKey();
+                JythonDataSourceFactory.Param parm= e.getValue();
                 
                 String vname= parm.name;                
                 String label= parm.label;
@@ -401,7 +403,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
-        File f = DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(uri) ), mon );
+        DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(uri) ), mon );
         return true;
     }
 
