@@ -155,14 +155,14 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         BufferedReader reader = null;
 
         try {
-            int lineCount = 0;
+            int lineCount1 = 0;
             reader = new BufferedReader(new FileReader(file));
             String s = reader.readLine();
             while (s != null) {
-                lineCount++;
+                lineCount1++;
                 s = reader.readLine();
             }
-            return lineCount;
+            return lineCount1;
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableTableModel.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
