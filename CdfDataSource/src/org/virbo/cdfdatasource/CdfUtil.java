@@ -804,7 +804,7 @@ public class CdfUtil {
 
     public static boolean hasEntry( Attribute bAttr, Variable var ) {
         try {
-            Entry yEntry = bAttr.getEntry(var);
+            bAttr.getEntry(var);
             return true;
         } catch (CDFException ex) {
             return false;
