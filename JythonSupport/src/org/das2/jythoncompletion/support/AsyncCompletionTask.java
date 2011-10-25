@@ -44,8 +44,6 @@ package org.das2.jythoncompletion.support;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import org.das2.jythoncompletion.support.CompletionResultSet;
-import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -142,7 +140,9 @@ public final class AsyncCompletionTask implements CompletionTask, Runnable {
         assert !cancelled : "refresh() called on canceled task"; // NOI18N
         if (queryInvoked) {
             assert (resultSet != null);
-            refreshResultSet = resultSet;
+            synchronized (this) {
+                refreshResultSet = resultSet;
+            }
             refreshImpl();
         } else {
             query.preQueryUpdate(component);
@@ -215,7 +215,10 @@ public final class AsyncCompletionTask implements CompletionTask, Runnable {
      */
     public void run() {
         // First check whether there was not request yet to stop the query: (queryResultSet == null)
-        CompletionResultSet resultSet = queryResultSet;
+        CompletionResultSet resultSet;
+        synchronized (this) {
+            resultSet = queryResultSet;
+        }
         if (resultSet != null) {
             // Perform the querying (outside of synchronized section)
             query.query(resultSet, doc, queryCaretOffset);
