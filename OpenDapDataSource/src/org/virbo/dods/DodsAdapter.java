@@ -82,19 +82,19 @@ public class DodsAdapter {
         this.variable= variable;
     }
 
-    private String doEscapes(String s) {
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            if (Character.isJavaIdentifierPart(ch) || ch == '%') {
-                result.append(ch);
-            } else {
-                String s2 = Integer.toHexString(ch);
-                result.append("%" + s2.substring(s2.length() - 2));
-            }
-        }
-        return result.toString();
-    }
+//    private String doEscapes(String s) {
+//        StringBuffer result = new StringBuffer();
+//        for (int i = 0; i < s.length(); i++) {
+//            char ch = s.charAt(i);
+//            if (Character.isJavaIdentifierPart(ch) || ch == '%') {
+//                result.append(ch);
+//            } else {
+//                String s2 = Integer.toHexString(ch);
+//                result.append("%" + s2.substring(s2.length() - 2));
+//            }
+//        }
+//        return result.toString();
+//    }
 
     public void setConstraint(String c) {
         if (!c.startsWith("?")) {
@@ -610,15 +610,15 @@ public class DodsAdapter {
         }
     }
 
-    private void putValue(WritableDataSet result, int i, int j, BaseType value) {
-        if (value instanceof DFloat64) {
-            result.putValue(i, j, ((DFloat64) value).getValue());
-        } else if ( value instanceof DFloat32 ) {
-            result.putValue(i, j, ((DFloat32) value).getValue());
-        } else if (value instanceof DArray) {
-            ArrayUtil.putValues(result, i, j, ((DArray) value).getPrimitiveVector().getInternalStorage());
-        } else {
-            throw new IllegalArgumentException("not supported: " + value);
-        }
-    }
+//    private void putValue(WritableDataSet result, int i, int j, BaseType value) {
+//        if (value instanceof DFloat64) {
+//            result.putValue(i, j, ((DFloat64) value).getValue());
+//        } else if ( value instanceof DFloat32 ) {
+//            result.putValue(i, j, ((DFloat32) value).getValue());
+//        } else if (value instanceof DArray) {
+//            ArrayUtil.putValues(result, i, j, ((DArray) value).getPrimitiveVector().getInternalStorage());
+//        } else {
+//            throw new IllegalArgumentException("not supported: " + value);
+//        }
+//    }
 }
