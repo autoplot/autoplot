@@ -11,7 +11,7 @@ import javax.swing.text.Element;
 
 /**
  * This dummy class is used to minimize changes to Netbeans code.  It will never
- * be instanciated.
+ * be instantiated.
  * @author jbf
  */
 public class BaseDocument extends AbstractDocument {
@@ -21,11 +21,11 @@ public class BaseDocument extends AbstractDocument {
     }
 
     public void atomicLock() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        
     }
 
     public void atomicUnlock() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        
     }
 
     
