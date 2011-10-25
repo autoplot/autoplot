@@ -209,7 +209,6 @@ public class TimeSeriesBrowseController {
 
             DatumRange visibleRange = null;
             Datum newResolution = null;
-            CacheTag newCacheTag = null;  // new one we'll retrieve
             CacheTag testCacheTag = null; // sloppy one
             if ( xAxis!=null ) {
                 visibleRange= xAxis.getDatumRange();
@@ -221,7 +220,6 @@ public class TimeSeriesBrowseController {
                 // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
                 testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
-                newCacheTag = new CacheTag(newRange, newResolution);
                 trange= newRange;
                 if ( !UnitsUtil.isTimeLocation( visibleRange.getUnits() ) ) {
                    System.err.println("x-axis for TSB not time location units: " + visibleRange );
@@ -241,8 +239,7 @@ public class TimeSeriesBrowseController {
 
                 }
             } else {
-                newCacheTag = new CacheTag(trange,null);
-                testCacheTag= newCacheTag;
+                testCacheTag= new CacheTag(trange,null);
             }
 
             if (tag == null || !tag.contains(testCacheTag)) {
