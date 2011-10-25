@@ -272,6 +272,7 @@ public class SerializeUtil {
                     try {
                         //System.err.println( e.getAttribute("name") );
                         PropertyDescriptor pd= pp.get( e.getAttribute("name") );
+                        if ( pd==null ) throw new NullPointerException("expected to find attribute \"name\"");
                         String slen= e.getAttribute("length");
                         if ( slen!=null && slen.length()>0 ) {
                             clasName= e.getAttribute("class");
@@ -307,9 +308,6 @@ public class SerializeUtil {
                             String stype= e.getAttribute("type");
                             if ( !stype.equals("DomNode") ) {
                                 Object child= getLeafNode( e );
-                                if ( pd==null ) {
-                                    // we need to drop sliceIndex, etc in xslt
-                                }
                                 pd.getWriteMethod().invoke( node, child );
                             } else {
                                 Node childElement= e.getFirstChild();
