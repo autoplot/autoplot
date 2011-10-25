@@ -173,12 +173,14 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showPluginsScreen() {
-        String msg= "<html>Unable to use the address <br><br>"+ getValue() + "<br><br>Qualify the address by adding a supported plugin id (e.g. vap+dat:)<br>" +
-                "or use an address that matches one of these triggers:<br><br>";
+        StringBuilder msg= new StringBuilder();
+        msg.append("<html>Unable to use the address <br><br>").append(getValue())
+                .append("<br><br>Qualify the address by adding a supported plugin id (e.g. vap+dat:)<br>")
+                .append("or use an address that matches one of these triggers:<br><br>");
         for ( String at: actionTriggers.keySet() ) {
-            msg+= at + "<br>";
+            msg.append( at ).append( "<br>" );
         }
-        msg+= "</html>";
+        msg.append( "</html>" );
 
         JOptionPane.showMessageDialog( this, msg, "Unrecognized address", JOptionPane.OK_OPTION );
 
