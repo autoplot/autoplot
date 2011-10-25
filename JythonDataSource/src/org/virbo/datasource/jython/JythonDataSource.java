@@ -85,10 +85,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             s= new StringBuilder(nextLine[0]);
             nextLine[0]= null;
         } else {
-            s = new StringBuilder(reader.readLine());
+            String ss= reader.readLine();
+            if ( ss==null ) ss="";
+            s = new StringBuilder(ss);
         }
         String stest= s.toString();
-        if ( s!=null && ( stest.startsWith("def ") || stest.startsWith("if") || stest.startsWith("else") ) ) {
+        if ( ( stest.startsWith("def ") || stest.startsWith("if") || stest.startsWith("else") ) ) {
             String s1= reader.readLine();
             while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
                 s.append("\n").append(s1);
