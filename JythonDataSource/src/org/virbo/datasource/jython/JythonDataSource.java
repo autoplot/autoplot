@@ -55,7 +55,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     ExceptionListener listener;
     private Map<String, Object> metadata;
     private final static String PARAM_SCRIPT= "script";
-    private static Logger logger= Logger.getLogger("vap.jythondatasource");
+    private static final Logger logger= Logger.getLogger("vap.jythondatasource");
     private boolean notCheckedTsb= true;
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
@@ -92,7 +92,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 s= s+"\n"+s1;
                 s1= reader.readLine();
             }
-            while ( s1.startsWith("else") ) {  // TODO: under implementation, use python parser for ideal solution
+            while ( s1!=null && s1.startsWith("else") ) {  // TODO: under implementation, use python parser for ideal solution
                 s= s+"\n"+s1;
                 s1= reader.readLine();
                 while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
