@@ -958,7 +958,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
     public boolean prepare( String url, java.awt.Window parent, ProgressMonitor mon) throws Exception {
         split = URISplit.parse(url);
-        File f = DataSetURI.getFile( DataSetURI.toUri(split.file), mon );
+        DataSetURI.getFile( DataSetURI.toUri(split.file), mon );
         return true;
     }
 
