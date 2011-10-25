@@ -484,21 +484,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
-                        if ( idep==0 && depDs!=null ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
+                        if ( idep==0 ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
                             if ( depDs.length()!=result.length() && result.length()==1 ) {
                                 continue;
                             }
                         }
                         
-                        if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
-                            depDs= (MutablePropertyDataSet)depDs.slice(0);
-                            //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
-                        }
-                        if ( idep==0 && depDs!=null ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
-                            if ( depDs.length()!=result.length() && result.length()==1 ) {
-                                continue;
-                            }
-                        }
                         //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
                         if (depDs.rank() == 2 && depDs.length(0) == 2) {
                             MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
