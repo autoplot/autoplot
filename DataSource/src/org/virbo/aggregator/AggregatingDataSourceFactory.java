@@ -9,7 +9,6 @@
 package org.virbo.aggregator;
 
 import org.das2.datum.DatumRangeUtil;
-import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -209,7 +208,6 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
         DataSourceFactory f = delegateFactory;
         List<CompletionContext> result = new ArrayList<CompletionContext>();
-        String afile = getDelegateDataSourceFactoryUri(cc.surl);
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
 
         List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc,mon);
