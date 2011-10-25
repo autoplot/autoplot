@@ -1131,10 +1131,6 @@ APSplash.checkTime("init 52");
             };
     }
 
-    private void plotUrl() {
-        plotUrl( (String) dataSetSelector.getValue() );
-    }
-
     private void plotUrl( String surl ) {
         try {
             Logger.getLogger("ap").log(Level.FINE, "plotUrl({0})", surl);
@@ -2884,7 +2880,9 @@ APSplash.checkTime("init -80");
                 tools.add(book);
             }
         } else {
-            toolsDir.mkdirs();
+            if ( !toolsDir.mkdirs() ) {
+                System.err.println("failed to make tools directory");
+            }
             //File f= new File( toolsDir, "README.txt" );
             //BufferedWriter fw= new BufferedWriter( new FileWriter(f) );
             //fw.write("Scripts in this directory will appear under the tools menu.\n",0);
