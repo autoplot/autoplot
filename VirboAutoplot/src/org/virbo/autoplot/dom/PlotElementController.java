@@ -357,8 +357,10 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             } else {
-                this.processDataSet= null;
-                this.procressStr= null;
+                synchronized (this) {
+                    this.processDataSet= null;
+                    this.procressStr= null;
+                }
                 fillDs = DataSetOps.sprocess(c, fillDs, null);
             }
         } else {
@@ -543,9 +545,11 @@ public class PlotElementController extends DomNodeController {
 
     public void _setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
-        this.dataSet = dataSet;
-        this.processDataSet= null;
-        this.procressStr= null;
+        this.dataSet = dataSet; //TODO: we should probably synchronize dataSet access.
+        synchronized (this) {
+            this.processDataSet= null;
+            this.procressStr= null;
+        }
         if ( ( plotElement.getLegendLabel().contains("%{") || plotElement.getLegendLabel().contains("$(") ) && renderer!=null ) {
             String s= (String)getLabelConverter().convertForward(plotElement.getLegendLabel());
             renderer.setLegendLabel(s);
