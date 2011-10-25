@@ -34,10 +34,10 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
      */
     private ByteBuffer formatRank2( QDataSet data, ProgressMonitor mon, Map<String,String> params ) {
 
-        QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
         
         //dep1 is ignored.
+        //QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         
         String type= params.get("type");
         if ( type==null ) type= "double";
