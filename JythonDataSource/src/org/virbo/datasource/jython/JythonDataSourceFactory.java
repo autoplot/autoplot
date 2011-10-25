@@ -91,7 +91,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static class Param {
+    static class Param {
         String name;
         String label; // the label for the variable used in the script
         Object deft;
@@ -137,8 +137,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                         System.err.println("error handle");
                     } else {
                         parm.type= m.group(3).startsWith("'") ? 'A' : 'F';
-                        String val= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
-                        parm.deft= val;
+                        String sval= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
+                        parm.deft= parm.type=='F' ? Double.parseDouble( sval ) : sval;
                     }
 
                     result.put( parm.name, parm );
