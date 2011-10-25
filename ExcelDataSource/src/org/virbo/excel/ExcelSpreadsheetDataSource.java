@@ -283,7 +283,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                 cell = row.getCell(columnNumber);
                 if (isDate) {
                     Date d = cell.getDateCellValue();
-                    return d.getTime() / 1000;
+                    return d.getTime() / 1000.;
                 } else {
                     if ( cell==null ) {
                         return Double.NaN;
