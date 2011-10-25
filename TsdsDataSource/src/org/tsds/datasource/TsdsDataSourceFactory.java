@@ -24,8 +24,6 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
         return new TsdsDataSource(uri);
     }
     
-    Map<String, List<String>> datasetsList = null;
-
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
 
         List<CompletionContext> result = new ArrayList<CompletionContext>();
