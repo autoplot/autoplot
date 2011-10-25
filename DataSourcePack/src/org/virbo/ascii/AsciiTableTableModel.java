@@ -183,9 +183,12 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     }
 
     public void setRecParser(RecordParser recParser) {
-        RecordParser oldRecParser = this.recParser;
-        this.recParser = recParser;
-        this.fieldCount= recParser.fieldCount();
+        RecordParser oldRecParser;
+        synchronized (this) {
+            oldRecParser = this.recParser;
+            this.recParser = recParser;
+            this.fieldCount= recParser.fieldCount();
+        }
         fireTableStructureChanged();
         fireTableDataChanged();
         propertyChangeSupport.firePropertyChange(PROP_RECPARSER, oldRecParser, recParser);
