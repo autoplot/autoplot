@@ -2339,8 +2339,12 @@ public class Extractor {
             Throwable {
             boolean ignore = ignoreFill.booleanValue();
             int [] recordRange = null;
-            synchronized (ts) {
-                tspec = (ts == null)?null:(TimeSpec)ts.clone();
+            if ( ts!=null ) {
+                synchronized (ts) {
+                    tspec = (TimeSpec)ts.clone();
+                }
+            } else {
+                tspec= null;
             }
             times = ((CDFImpl)thisCDF).getTimes(var, tspec, false);
             if (times == null) throw new Throwable("times not available for " +
