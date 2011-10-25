@@ -1182,24 +1182,4 @@ public class CdfUtil {
         return dependent;
     }
 
-    /**
-     * condition the name so that it works with the library.  My recollection
-     * is that spaces in the name cause problems, so we replace those directory
-     * names with spaces with the dos xxxxxx~1 equivalent. --J Faden
-     */
-    public static String win95Name(File cdfFile) {
-        String f = cdfFile.toString();
-        f = f.replaceAll("\\\\", "/");
-        String[] ss = f.split("/");
-        String result = ss[0];
-        for (int i = 1; i < ss.length - 1; i++) {
-            if (ss[i].indexOf(" ") > -1) {
-                String dosName = ss[i].substring(0, 6) + "~1";
-                ss[i] = dosName;
-            }
-            result += "/" + ss[i];
-        }
-        result += "/" + ss[ss.length - 1];
-        return result;
-    }
 }
