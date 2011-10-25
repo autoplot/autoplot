@@ -122,8 +122,8 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            String suri = getURI();
-            DataSource dss = DataSetURI.getDataSource(suri);
+            String suri1 = getURI();
+            DataSource dss = DataSetURI.getDataSource(suri1);
             QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
             TableModel model= new QDataSetTableModel(ds);
             this.jTable1.setModel(model);
@@ -142,7 +142,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         try {
             this.suri= uri;
             URISplit split = URISplit.parse(uri);
-            File f = DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
+            DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
             Map<String, String> params= URISplit.parseParams( split.params );
             paramsTextArea1.setParams(params);
             paramsTextArea1.setFactory( new BinaryDataSourceFactory(), new ArrayList<String>() );
@@ -180,7 +180,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         URISplit split = URISplit.parse(uri);
-        File f = DataSetURI.getFile(new URL(split.file), mon );
+        DataSetURI.getFile(new URL(split.file), mon );
         return true;
     }
 
