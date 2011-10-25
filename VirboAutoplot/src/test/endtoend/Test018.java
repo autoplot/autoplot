@@ -101,11 +101,24 @@ public class Test018 {
      * @throws InterruptedException
      */
     public static void test4( String testId ) throws IOException, InterruptedException {
-        load( "file:///home/jbf/ct/hudson/vap/lon/thb_l2_esa_20080907_electrons_less.vap" );
-        assert ( getDocumentModel().getDataSourceFilters(1).getUri().equals("vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl") );
-        plot(1,"vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
+        reset();
+        setCanvasSize(400,300);
+
+        System.err.println("+++++++++++++++++++++++++");
+        // this transition works fine
+        plot(0,"http://autoplot.org/data/autoplot.cdf?BGSM");
+        waitUntilIdle();
+        plot(0,"http://autoplot.org/data/autoplot.cdf?BGSEc");
+        waitUntilIdle();
+        writeToPng(testId + "_004a.png");
+
+        System.err.println("+++++++++++++++++++++++++");
+        plot(0,"vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
+        waitUntilIdle();
+        plot(0,"vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
         waitUntilIdle();
         writeToPng(testId + "_004.png");
+        System.err.println("+++++++++++++++++++++++++");
     }
 
     public static void main(String[] args) {
