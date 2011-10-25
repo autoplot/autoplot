@@ -12,14 +12,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.QDataSet;
@@ -72,7 +69,6 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         audioInputStream = new AudioInputStream(targetDataLine);
 
-        audioFormat = audioInputStream.getFormat();
         targetDataLine.start();
 
         audioChannel = Channels.newChannel(audioInputStream);
