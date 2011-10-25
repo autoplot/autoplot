@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
@@ -109,9 +110,10 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             CdfFileDataSourceFactory.closeCDF(cdf);
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-            for ( String key:result.keySet() ) {
+            for ( Entry<String,String> e:result.entrySet() ) {
+                String key= e.getKey();
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        key, this, "arg_0", result.get(key), null, true );
+                        key, this, "arg_0", e.getValue(), null, true );
                 ccresult.add(cc1);
             }
 
@@ -163,7 +165,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             if (!surl.contains("?") || surl.indexOf("?") == surl.length() - 1) {
                 return true;
             }
-            URISplit split = URISplit.parse(surl.toString());
+            URISplit split = URISplit.parse(surl);
             Map<String,String> args= URISplit.parseParams( split.params );
             String param= args.get("arg_0");
             if ( param==null ) {
