@@ -242,6 +242,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     row= null;
                 }
             }
+            if ( row==null ) {
+                throw new IllegalArgumentException("unable to identify first row");
+            }
+
             this.firstRow= firstRow;
             cell = row.getCell(columnNumber);
             units= Units.dimensionless;
