@@ -72,24 +72,24 @@ public class APDataSet extends QDataSetBridge {
     public String toString() {
         QDataSet d= datasets.get( name );
 
-        String s= this.surl;
+        StringBuilder s= new StringBuilder(this.surl);
         for ( String name1: datasets.keySet() ) {
             QDataSet qds= datasets.get(name1);
-            s+= "\n" + name1 + ": " +qds;
+            s.append( "\n" ).append( name1 ).append( ": " ).append( qds.toString() );
             for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
                 if ( d.property("DEPEND_"+i) ==qds ) {
-                    s += " (DEPEND_"+i+")";
+                    s .append( " (DEPEND_" ).append(i) .append(")");
                 }
                 if ( d.property("BUNDLE_"+i) ==qds ) {
-                    s += " (BUNDLE_"+i+")";
+                    s.append( " (BUNDLE_" ).append(i) .append(")");
                 }
             }
         }
         for ( String n: sliceDep.keySet() ) {
             QDataSet ds1= (QDataSet)datasets.get(name).slice(0).property(sliceDep.get(n));
-            s+= "\nvia slice(0): " + n + ": " + ds1 + " (" + sliceDep.get(n) + ")";
+            s.append( "\nvia slice(0): " ).append(n).append( ": " ).append( ds1 ) .append( " (" ). append( sliceDep.get(n) ).append( ")" );
         }
-        return s;
+        return s.toString();
     }
     public static void main(String[] args) {
         APDataSet qds = new APDataSet();
