@@ -66,12 +66,10 @@ public class CdfDataSetUtil {
         
         Basis b1= u1.getBasis();
         Basis b2= u2.getBasis();
-        Basis newBasis;
         Units newUnits;
         
         MutablePropertyDataSet result;
         if ( b1==Basis.physicalZero ) {
-            newBasis= b2;
             newUnits= u2;
             final UnitsConverter uc= Units.getConverter( u1.getOffsetUnits(), u2.getOffsetUnits() );
             result= Ops.applyBinaryOp( operands[0], operands[1], new Ops.BinaryOp() {
@@ -80,7 +78,6 @@ public class CdfDataSetUtil {
                 }
             });            
         } else if ( b2==Basis.physicalZero ) {
-            newBasis= b1;
             newUnits= u1;
             final UnitsConverter uc= Units.getConverter( u2.getOffsetUnits(), u1.getOffsetUnits() );
             result= Ops.applyBinaryOp( operands[0], operands[1], new Ops.BinaryOp() {
