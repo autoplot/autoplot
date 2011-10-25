@@ -16,11 +16,6 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class TestGetDataSet extends QDataSetBridge {
-    private String surl;
-
-    public void setDataSetURL( String surl ) {
-        this.surl= surl;
-    }
     
     @Override
     QDataSet getDataSet( ProgressMonitor mon ) {
@@ -37,13 +32,11 @@ public class TestGetDataSet extends QDataSetBridge {
 
     public static void main( String[] args ) {
         TestGetDataSet qds= new TestGetDataSet();
-        qds.setDataSetURL("");
         qds.doGetDataSet( new NullProgressMonitor() );
         
         String n= qds.name();
         
-        
-        
+        System.err.println(n);
         
     }
 }
