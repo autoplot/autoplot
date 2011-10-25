@@ -183,8 +183,8 @@ public class DodsDataSource extends AbstractDataSource {
         }
 
         if (isIstp) {
-            String constraint1 = getIstpConstraint(adapter, metadata, parser, variable);
-            adapter.setConstraint(constraint1);
+                String constraint1 = getIstpConstraint(adapter, metadata, parser, variable);
+                adapter.setConstraint(constraint1);
 
         } else {
 
@@ -215,8 +215,10 @@ public class DodsDataSource extends AbstractDataSource {
 
         mon.finished();
 
-        AttributeTable at = das.getAttributeTable(variable);
-        ds.putProperty(QDataSet.METADATA,at);
+        synchronized (this) {
+            AttributeTable at = das.getAttributeTable(variable);
+            ds.putProperty(QDataSet.METADATA,at);
+        }
 
         if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
             ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
@@ -242,7 +244,7 @@ public class DodsDataSource extends AbstractDataSource {
      * @param variable
      * @return
      */
-    private Map<String, Object> getMetaData(String variable) {
+    private synchronized Map<String, Object> getMetaData(String variable) {
         AttributeTable at = das.getAttributeTable(variable);
         return getMetaData(at);
     }
