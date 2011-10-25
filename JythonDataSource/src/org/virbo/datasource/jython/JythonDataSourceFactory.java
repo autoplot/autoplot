@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -61,9 +62,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         Map<String, String> params = URISplit.parseParams(split.params);
         try {
             interp.exec("params=dict()");
-            for (String s : params.keySet()) {
+            for ( Entry<String,String> e : params.entrySet()) {
+                String s= e.getKey();
                 if (!s.equals("arg_0")) {
-                    interp.exec("params['" + s + "']=" + params.get(s));
+                    interp.exec("params['" + s + "']=" + e.getValue() );
                 }
             }
 
@@ -99,7 +101,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     protected static Map<String,Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
         BufferedReader reader= null;
-        boolean hasVars= false;
 
         File src = DataSetURI.getFile(uri, new NullProgressMonitor());
 
@@ -115,7 +116,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
             Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
             Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
-            Pattern sp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+sarg+"(\\,"+aarg + ")?\\).*" );
 
             String line= reader.readLine();
             while ( line!=null ) {
@@ -140,8 +140,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                         String val= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
                         parm.deft= val;
                     }
-
-                    hasVars= true;
 
                     result.put( parm.name, parm );
 
