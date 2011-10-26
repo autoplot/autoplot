@@ -58,7 +58,6 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private QualityControlSequence qualitySeq;
 
     private boolean haveThumbs400=true;
-    private Object fs;
 
     /** Create an image sequence based on a URI template.
      *
