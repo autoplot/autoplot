@@ -10,7 +10,7 @@ public class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         setOffsets();
         thisCDF = this;
         IntBuffer ibuf = buf.asIntBuffer();
-        ByteBuffer _buf = getRecord(0);
+        getRecord(0); // _buf
         ibuf.position(2); // skip magic numbers
         ibuf.get(); // Record Size
         ibuf.get(); // Record Size
