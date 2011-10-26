@@ -885,8 +885,8 @@ public class Extractor {
         Integer iend) throws Throwable {
         int start = istart.intValue();
         int end = iend.intValue();
-        int numberOfValues = var.getNumberOfValues();
-        int itemSize = var.getDataItemSize();
+        //int numberOfValues = var.getNumberOfValues();
+        //int itemSize = var.getDataItemSize();
         int type = var.getType();
         long[] ldata = null;
         double[] data = null;
@@ -965,8 +965,8 @@ public class Extractor {
         Integer istart, Integer iend) throws Throwable {
         int start = istart.intValue();
         int end = iend.intValue();
-        int numberOfValues = var.getNumberOfValues();
-        int itemSize = var.getDataItemSize();
+        //int numberOfValues = var.getNumberOfValues();
+        //int itemSize = var.getDataItemSize();
         int elements = (((Integer)elementCount(var).elementAt(0))).intValue();
         double [][] data = new double[end - start + 1][elements];
 
@@ -1047,7 +1047,7 @@ public class Extractor {
         if (!validElement(var, new int[] {element})) return null;
         int start = istart.intValue();
         int end = iend.intValue();
-        int numberOfValues = var.getNumberOfValues();
+        //int numberOfValues = var.getNumberOfValues();
         int size = var.getDataItemSize();
         int type = var.getType();
         long[] ldata = null;
@@ -1128,7 +1128,7 @@ public class Extractor {
         if (!validElement(var, idx)) return null;
         int start = istart.intValue();
         int end = iend.intValue();
-        int numberOfValues = var.getNumberOfValues();
+        //int numberOfValues = var.getNumberOfValues();
         int size = var.getDataItemSize();
         int ne = idx.length;
 
@@ -1268,7 +1268,7 @@ public class Extractor {
         if (!var.recordVariance()) nv = 1;
         int elements = (((Integer)elementCount(var).elementAt(0))).intValue();
         String [][] data = new String[nv][elements];
-        int size = var.getDataItemSize();
+        //int size = var.getDataItemSize();
         int len = var.getNumberOfElements();
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         for (int blk = 0; blk < locations.size(); blk++) {
@@ -1974,7 +1974,7 @@ public class Extractor {
             if ((numpt*_stride) <  numberOfValues) numpt++;
         }
         double [] data = new double[numpt];
-        int size = var.getDataItemSize();
+        //int size = var.getDataItemSize();
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         int next = 0;
         for (int blk = 0; blk < locations.size(); blk++) {
