@@ -4,21 +4,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.URISplit;
 
 /**
  * <p>This class maintains a list of <code>WalkImage</code>s and provides functionality
