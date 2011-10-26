@@ -258,11 +258,11 @@ public class Extractor {
             recordRange = getRecordRange(thisCDF, var, timeRange); 
             if (recordRange == null) return null;
             if (which == null) {
-                o = getRange0(thisCDF, var, new Integer(recordRange[0]),
-                                  new Integer(recordRange[1]));
+                o = getRange0(thisCDF, var, recordRange[0],
+                                  recordRange[1]);
             } else {
                 o = getRangeForElement1(thisCDF, var,
-                    new Integer(recordRange[0]), new Integer(recordRange[1]),
+                    recordRange[0], recordRange[1],
                     which);
             }
         }
@@ -1026,7 +1026,7 @@ public class Extractor {
         int [] dimensions = var.getDimensions();
         Vector ecount = new Vector();
         for (int i = 0; i < dimensions.length; i++) {
-                if (var.getVarys()[i]) ecount.add(new Integer(dimensions[i]));
+                if (var.getVarys()[i]) ecount.add(dimensions[i]);
         }
         return ecount;
     }
@@ -1363,7 +1363,7 @@ public class Extractor {
                 last = end;
             }
         }
-        return new Object[] {bv, new Integer(first), new Integer(last)};
+        return new Object[] {bv, first, last};
     }
     public static double [][][][] getSeries3(CDF thisCDF, Variable var) 
         throws Throwable {
@@ -1894,11 +1894,11 @@ public class Extractor {
             recordRange = getRecordRange(thisCDF, var, timeRange);
             if (recordRange == null) return null;
             if (which == null) {
-                vdata = getRange0(thisCDF, var, new Integer(recordRange[0]),
-                                  new Integer(recordRange[1]), strideObject);
+                vdata = getRange0(thisCDF, var, recordRange[0],
+                                  recordRange[1], strideObject);
             } else {
                 vdata = getRangeForElement1(thisCDF, var,
-                    new Integer(recordRange[0]), new Integer(recordRange[1]),
+                    recordRange[0], recordRange[1],
                     which, strideObject);
             }
         }
@@ -2363,11 +2363,11 @@ public class Extractor {
                 recordRange = getRecordRange(thisCDF, var, timeRange); 
                 if (recordRange == null) throw new Throwable("no record range");
                 if (which == null) {
-                    o = getRange0(thisCDF, var, new Integer(recordRange[0]),
-                                  new Integer(recordRange[1]));
+                    o = getRange0(thisCDF, var, recordRange[0],
+                                  recordRange[1]);
                 } else {
                     o = getRangeForElement1(thisCDF, var,
-                    new Integer(recordRange[0]), new Integer(recordRange[1]),
+                    recordRange[0], recordRange[1],
                     which);
                 }
             }
