@@ -801,7 +801,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getElement not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index)});
+            new Object[] {thisCDF, var, index});
     }
     public Object get(String varName, int[] elements) throws Throwable {
         Variable var = (Variable)variableTable.get(varName);
@@ -820,8 +820,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getElement(i, j) not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2)});
+            new Object[] {thisCDF, var, index1,
+            index2});
     }
     public Object get(String varName, int index1, int index2, int element)
         throws Throwable {
@@ -831,8 +831,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getRangeForElement not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2), new Integer(element)});
+            new Object[] {thisCDF, var, index1,
+            index2, element});
     }
     public Object get(String varName, int index1, int index2, int[] elements)
         throws Throwable {
@@ -842,8 +842,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getRangeForElements not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2), elements});
+            new Object[] {thisCDF, var, index1,
+            index2, elements});
     }
     public Object getPoint(String varName, int index) throws Throwable {
         Variable var = (Variable)variableTable.get(varName);
@@ -852,7 +852,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getPoint not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index)});
+            new Object[] {thisCDF, var, index});
     }
     public Object getRange(String varName, int index1, int index2) throws
         Throwable {
@@ -862,8 +862,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getRange not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2)});
+            new Object[] {thisCDF, var, index1,
+            index2});
     }
     public Object getRange(String varName, int index1, int index2,
         int element) throws Throwable {
@@ -873,8 +873,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getRangeElement not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2), new Integer(element)});
+            new Object[] {thisCDF, var, index1,
+            index2, element});
     }
     public Object getRange(String varName, int index1, int index2,
         int[] elements) throws Throwable {
@@ -884,8 +884,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getRangeElements not " +
            "implemented for " + varName);
         return method.invoke(null,
-            new Object[] {thisCDF, var, new Integer(index1),
-            new Integer(index2), elements});
+            new Object[] {thisCDF, var, index1,
+            index2, elements});
     }
 
     public double[] get1D(String varName) throws Throwable {
@@ -985,7 +985,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getTimeSeries not " +
            "implemented for " + varName);
         return method.invoke(null, new Object [] 
-            {thisCDF, var, new Integer(element), new Boolean(ignoreFill),
+            {thisCDF, var, element, ignoreFill,
             timeRange});
     }
 
@@ -997,7 +997,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getTimeSeriesObject not " +
            "implemented for " + varName);
         return (TimeSeries)method.invoke(null, new Object [] 
-            {thisCDF, var, new Integer(element), new Boolean(ignoreFill),
+            {thisCDF, var, element, ignoreFill,
             timeRange, ts});
     }
 
@@ -1350,7 +1350,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getSampledTimeSeries not " +
            "implemented for " + vname);
         return method.invoke(null, new Object [] 
-            {thisCDF, var, new Boolean(ignoreFill), timeRange, stride});
+            {thisCDF, var, ignoreFill, timeRange, stride});
     }
     public Object getTimeSeries(String vname, int element, boolean ignoreFill,
         double[] timeRange, int[] stride) throws Throwable {
@@ -1360,8 +1360,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getSampledTimeSeries not " +
            "implemented for " + vname);
         return method.invoke(null, new Object [] 
-            {thisCDF, var, new Integer(element), new Boolean(ignoreFill),
-            timeRange, stride});
+            {thisCDF, var, element,
+            ignoreFill, timeRange, stride});
     }
     public double[] get1D(String varName, int first, int last, int[] stride)
         throws Throwable {
