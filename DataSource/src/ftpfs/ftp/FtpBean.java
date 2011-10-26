@@ -1229,8 +1229,8 @@ public class FtpBean
     {
         acquire();    // Acquire the object
         pcs.firePropertyChange("port",
-                                new Integer(this.port),
-                                new Integer(port));
+                                Integer.valueOf(this.port),
+                                Integer.valueOf(port));
         this.port = port;
         release();    // Release the object
     }
