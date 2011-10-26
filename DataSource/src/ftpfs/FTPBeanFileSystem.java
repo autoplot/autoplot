@@ -217,7 +217,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     protected void resetListCache( String directory ) {
         directory = toCanonicalFolderName(directory);
 
-        String[] result= listings.remove(directory);
+        listings.remove(directory);
         new File(localRoot, directory + ".listing").delete();
         
     }
