@@ -1377,7 +1377,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         int numberOfValues = var.getNumberOfValues();
         if (numberOfValues == 0) return null;
         double [] data = new double[numberOfValues];
-        int type = var.getType();
+        //int type = var.getType();
         Vector locations = ((DataLocator)var.getLocator()).locations;
         for (int blk = 0; blk < locations.size(); blk++) {
             int [] loc = (int [])locations.elementAt(blk);
@@ -1559,12 +1559,12 @@ public abstract class CDFImpl implements java.io.Serializable {
         public double [] getTimes() {return getTimes(0, recordCount - 1, null);}
 
         public int[] getRecordRange(double[] timeRange, TimeSpec ts) {
-            int offsetUnits = MILLISECOND_PRECISION;
-            long base = JANUARY_1_1970_LONG;
-            if (ts != null) {
-                base = (long)ts.getBaseTime();
-                offsetUnits = ts.getOffsetUnits();
-            }
+            //int offsetUnits = MILLISECOND_PRECISION;
+            //long base = JANUARY_1_1970_LONG;
+            //if (ts != null) {
+                //base = (long)ts.getBaseTime();
+                //offsetUnits = ts.getOffsetUnits();
+            //}
             double[] temp = getTimes(0, recordCount - 1, ts);
             double start = timeRange[0];
             double stop = timeRange[1];
