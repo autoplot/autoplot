@@ -1245,8 +1245,8 @@ public class FtpBean
     {
         acquire();    // Acquire the object
         pcs.firePropertyChange("socketTimeout",
-                                new Integer(this.timeout),
-                                new Integer(timeout));
+                                Integer.valueOf(this.timeout),
+                                Integer.valueOf(timeout));
         this.timeout = timeout;
         release();    // Release the object
     }
@@ -1320,8 +1320,8 @@ public class FtpBean
     {
         acquire();    // Acquire the object
         pcs.firePropertyChange("passiveModeTransfer",
-                                new Boolean(this.passive),
-                                new Boolean(passive));
+                                Boolean.valueOf(this.passive),
+                                Boolean.valueOf(passive));
         this.passive = passive;
         if(DEBUG)    // debug message
             System.out.println("FtpBean: Set passive transfer - " + passive);
