@@ -88,8 +88,8 @@ class Das2ServerDataSource extends AbstractDataSource {
         mon.started();
         mon.setProgressMessage("sending request");
         
-        Map params2 = new LinkedHashMap();
-        Map otherParams= new LinkedHashMap( params );
+        Map<String,String> params2 = new LinkedHashMap();
+        Map<String,String> otherParams= new LinkedHashMap( params );
         otherParams.remove("start_time");
         otherParams.remove("end_time");
         otherParams.remove("resolution");
