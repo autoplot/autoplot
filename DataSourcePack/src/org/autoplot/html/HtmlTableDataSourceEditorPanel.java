@@ -64,7 +64,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         split = URISplit.parse(uri);
         params = URISplit.parseParams(split.params);
 
-        File f = DataSetURI.getFile(new URL(split.file), mon );
+        DataSetURI.getFile(new URL(split.file), mon );
         return true;
     }
 
