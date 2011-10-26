@@ -176,18 +176,24 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         boolean status;
                         status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), new NullProgressMonitor() );
                         panel.setURI( master );
-//System.err.println( "messageComponent="+messageComponent );
-                        if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
-                        parameterPanel.add( panel, BorderLayout.CENTER );
 
-                        if ( panel instanceof CdfJavaDataSourceEditorPanel ) {
-                            ((CdfJavaDataSourceEditorPanel)panel).setShowAdvancedSubpanel(false);
-                        }
-                        paramEditor= panel;
-                        parameterPanel.revalidate();
-                        messageComponent= null;
+                        if ( !status ) {
+                            messageComponent= new JLabel("<html>CDF file subpanel prepare method failed");
+                            paramEditor= null;
+                        } else {
+//System.err.println( "messageComponent="+messageComponent );
+                            if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
+                            parameterPanel.add( panel, BorderLayout.CENTER );
+
+                            if ( panel instanceof CdfJavaDataSourceEditorPanel ) {
+                                ((CdfJavaDataSourceEditorPanel)panel).setShowAdvancedSubpanel(false);
+                            }
+                            paramEditor= panel;
+                            parameterPanel.revalidate();
+                            messageComponent= null;
 //System.err.println( " after count=" + parameterPanel.getComponentCount() );
-                        refreshDataSet( panel, ds, args );
+                            refreshDataSet( panel, ds, args );
+                        }
                     } catch ( Exception ex ) {
                         messageComponent= new JLabel("<html>Exception:<br>"+ex.toString().replaceAll("\n", "<br>") );
                         paramEditor= null;
