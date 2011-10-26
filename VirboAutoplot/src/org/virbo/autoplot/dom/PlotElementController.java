@@ -366,26 +366,15 @@ public class PlotElementController extends DomNodeController {
         } else {
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
                 String[] labels = SemanticOps.getComponentLabels(fillDs);
-                if (plotElement.getComponent().equals("X")) { //TODO: remove after verify other bug 3427778
-                    fillDs = DataSetOps.slice1(fillDs, 0);
-                    label = labels[0];
-                } else if (plotElement.getComponent().equals("Y")) {
-                    fillDs = DataSetOps.slice1(fillDs, 1);
-                    label = labels[1];
-                } else if (plotElement.getComponent().equals("Z")) {
-                    fillDs = DataSetOps.slice1(fillDs, 2);
-                    label = labels[2];
+                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                    fillDs= DataSetOps.unbundle( fillDs, plotElement.getComponent() ); //TODO: illegal argument exception
+                    label= plotElement.getComponent();
                 } else {
-                    if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                        fillDs= DataSetOps.unbundle( fillDs, plotElement.getComponent() ); //TODO: illegal argument exception
-                        label= plotElement.getComponent();
-                    } else {
-                        for (int i = 0; i < labels.length; i++) {
-                            if (labels[i].equals(plotElement.getComponent())) {
-                                fillDs = DataSetOps.slice1(fillDs, i);
-                                label = labels[i];
-                                break;
-                            }
+                    for (int i = 0; i < labels.length; i++) {
+                        if (labels[i].equals(plotElement.getComponent())) {
+                            fillDs = DataSetOps.slice1(fillDs, i);
+                            label = labels[i];
+                            break;
                         }
                     }
                 }
