@@ -1188,10 +1188,10 @@ public abstract class CDFImpl implements java.io.Serializable {
         return new double[] {times[0], times[times.length - 1]};
     }
 
-    public static int MILLISECOND_PRECISION = 0;
-    public static int MICROSECOND_PRECISION = 1;
-    public static int NANOSECOND_PRECISION = 2;
-    public static int PICOSECOND_PRECISION = 3;
+    public static final int MILLISECOND_PRECISION = 0;
+    public static final int MICROSECOND_PRECISION = 1;
+    public static final int NANOSECOND_PRECISION = 2;
+    public static final int PICOSECOND_PRECISION = 3;
     //public class CDFTimeVariable implements TimeVariable, Serializable {
     public class CDFTimeVariable implements  Serializable {
         protected double[] times;
