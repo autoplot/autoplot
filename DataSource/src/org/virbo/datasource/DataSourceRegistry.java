@@ -332,7 +332,6 @@ public class DataSourceRegistry {
 
     public void registerDataSourceJar( String ext, URL jarFile ) throws IOException {
         URLClassLoader loader= new URLClassLoader( new URL[] {jarFile}, DataSourceRegistry.class.getClassLoader() );
-        List<String> exts= new ArrayList();
 
         Enumeration<URL> re= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
         List<URL> rre= new ArrayList();
