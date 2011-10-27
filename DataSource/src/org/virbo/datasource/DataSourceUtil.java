@@ -502,7 +502,6 @@ public class DataSourceUtil {
      */
     public static long[] parseConstraint(String constraint, long recCount) throws ParseException {
         long[] result = new long[]{0, recCount, 1};
-        final String INT="([+-]?+\\d*)";
         if (constraint == null) {
             return result;
         } else {
@@ -511,7 +510,6 @@ public class DataSourceUtil {
             }
             try {
                 String[] ss= constraint.split(":",-2);
-                int [] ii= new int[ss.length];
                 if ( ss.length>0 && ss[0].length()>0 ) {
                     result[0]= Integer.parseInt(ss[0]);
                     if ( result[0]<0 ) result[0]= recCount+result[0];
