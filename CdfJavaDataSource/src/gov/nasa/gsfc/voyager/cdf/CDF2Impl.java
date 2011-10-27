@@ -26,16 +26,16 @@ public class CDF2Impl extends CDFImpl implements CDF2, java.io.Serializable {
         IntBuffer ibuf = buf.asIntBuffer();
         ByteBuffer _buf = getRecord(0);
         ibuf.position(2);
-        int recordSize = ibuf.get();
+        ibuf.get(); //int recordSize = 
         ibuf.position(3);
-        int recordType = ibuf.get();
+        ibuf.get();// int recordType =
         GDROffset = ibuf.get();
         version = ibuf.get();
         if (version != CDF_VERSION) {
             throw new Throwable("Version " + version +
             "is not accepted by this reader.");
         }
-        release = ibuf.get();
+        ibuf.get(); // release=
         encoding = ibuf.get();
         byteOrder = DataTypes.getByteOrder(encoding);
         setByteOrder(byteOrder);
@@ -53,7 +53,7 @@ public class CDF2Impl extends CDFImpl implements CDF2, java.io.Serializable {
         rVDRHead = buf.getInt();
         zVDRHead = buf.getInt();
         ADRHead = buf.getInt();
-        int CDFSize = buf.getInt();
+        buf.getInt(); //int CDFSize = 
         numberOfRVariables = buf.getInt();
         numberOfAttributes = buf.getInt();
         buf.getInt(); // skip rMaxRec
