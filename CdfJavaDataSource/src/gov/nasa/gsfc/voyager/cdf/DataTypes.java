@@ -29,7 +29,7 @@ public class DataTypes {
     public static final int UNSIGNED_INTEGER = 3;
     public static final int STRING = 4;
     public static final int LONG = 5;
-    public static int LAST_TYPE = 53;
+    public static final int LAST_TYPE = 53;
     public static Method[] method = new Method[LAST_TYPE];
     public static int[] typeCategory = new int[LAST_TYPE];
     public static int[] size = new int[LAST_TYPE];
