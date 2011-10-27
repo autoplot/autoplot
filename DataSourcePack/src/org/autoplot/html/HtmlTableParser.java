@@ -27,8 +27,8 @@ public class HtmlTableParser extends AbstractDataSource {
     /**
      * the parameter name (not label) to plot
      */
-    public static String PARAM_COLUMN= "column";
-    public static String PARAM_TABLE= "table";
+    public static final String PARAM_COLUMN= "column";
+    public static final String PARAM_TABLE= "table";
 
     String cacheUri;
     String stable;
