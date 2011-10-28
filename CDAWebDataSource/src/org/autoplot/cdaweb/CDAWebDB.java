@@ -396,7 +396,7 @@ public class CDAWebDB {
                             //&& nssdc_ID.contains("None") ) {
                              ) {
                         String url= getURL(node);
-                        if ( url!=null && url.startsWith("/") && !url.startsWith("/tower3/private" )) {
+                        if ( url!=null && ( url.startsWith("/") || url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
                             String desc= getDescription(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
                             //String sid=attrs.getNamedItem("ID").getTextContent();
