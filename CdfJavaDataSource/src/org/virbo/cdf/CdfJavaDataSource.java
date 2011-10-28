@@ -93,6 +93,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
             cdf= openFiles.get(fileName);
             if ( cdf==null ) {
                 synchronized (this) {
+                    File cdfFile= new File(fileName);
+                    if ( !cdfFile.exists() ) throw new IllegalArgumentException("CDF file does not exist: "+fileName);
+                    if ( cdfFile.length()==0 ) throw new IllegalArgumentException("CDF file length is zero: "+fileName);
                     cdf = CDFFactory.getCDF(fileName);
                     openFiles.put(fileName, cdf);
                     openFilesRev.put(cdf, fileName);
