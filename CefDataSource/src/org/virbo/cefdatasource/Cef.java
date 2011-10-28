@@ -21,8 +21,8 @@ public class Cef {
     int nrec = 0;
     byte eor = 10;
     String dataUntil;
-    String fileName;
-    String fileFormatVersion;
+    //String fileName;
+    //String fileFormatVersion;
     Map<String, ParamStruct> parameters = new LinkedHashMap<String, ParamStruct>();
     Map<String, GlobalStruct> globals = new LinkedHashMap<String, GlobalStruct>();
 }
