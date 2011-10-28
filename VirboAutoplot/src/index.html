@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>CDAWeb support is getting exhaustive testing using python scripts.  Here the PNG Walk Tool is used to review results.</small></p>
+        <p><small>FindBugs is used to point out possible bugs and sloppy code.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix: CDAWeb all.xml correction handled.  </li>
+            <li>bugfix: FTP shows credentials dialog when anonymous login fails with 530 exception.</li>
+            <li>huge round of FindBugs bug fixes correct minor bugs (probably never observed) and cleans up code.</li>
             <li>bugfix: minor bugfixes of the CDAWeb GUI.</li>
             <li>bugfix: extraneous "(remote)" labels on remote folders</li>
             <li>clean up of bookmarks GUI</li>
@@ -38,6 +41,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>Minor cleanup of timerange GUI.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>--basic command line option added</li>
             <li>support for more popular CDF virtual functions like "alternate_view", "calc_P", "region_filt", and "apply_esa_qflag"</li>
             <li>virtual variable functions can report progress, for example fftPower.</li>
@@ -46,15 +53,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>2985864: Jython editor has option to disable tab completion, so ctrl-space is used for completion and tab is tab</li>
             <li>3416707: bookmarks file has addresses unnessarily URLencoded.  bookmarks.xml is new file.</li>
             <li>3404248: Improvements for CDF Autoplot2011b: Epoch variables are cached to avoid repeat reads.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>3409891: decorations for zooming</li>
-            <li>3409852: improvements to pitch angle distribution renderer</li>
-            <li>3405256: true csv reader</li>
-            <li>indicate sequence gaps in Pngwalk grid view.</li>
-            <li>virtual variables and fixes associated with CDF testing</li>
-            <li>3402856: expert/basic mode</li>
         </ul>
 
 <p>Known issues:</p>
