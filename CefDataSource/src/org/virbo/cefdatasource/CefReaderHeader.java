@@ -25,25 +25,25 @@ public class CefReaderHeader {
         TOP, END, DATA_READ, GLOBAL, PARAM
     }
 
-    private static class Record {
+    static class Record {
 
         String data;
     }
 
-    private static class KeyValue {
+    static class KeyValue {
 
         String key;
         String[] val;
     }
 
-    private static class GlobalStruct {
+    static class GlobalStruct {
 
         //String name;
         List<String> entries;
         String valueType;
     }
 
-    private static class ParamStruct {
+    static class ParamStruct {
 
         String name;
         int[] sizes;
