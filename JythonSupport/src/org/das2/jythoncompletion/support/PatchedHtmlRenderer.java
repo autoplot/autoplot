@@ -762,7 +762,6 @@ public final class PatchedHtmlRenderer {
                     double newWidth = widthPainted + r.getWidth();
                     if (newWidth > (w - dotsWidth)) {
                         if (newWidth > w || _renderHTML(s, 0, g.create(), x, y, Integer.MAX_VALUE, h, f, defaultColor, STYLE_CLIP, false, background, disableColorChange) > w) {
-                            double pixelsOff = widthPainted + r.getWidth() - w - dotsWidth;
                             
                             length = (int)((w - dotsWidth - widthPainted) / chWidth);
                             
@@ -783,7 +782,7 @@ public final class PatchedHtmlRenderer {
 
                         goToNextRow = true;
                         
-                        int lastChar = new Double(nextTag - estCharsOver).intValue();
+                        int lastChar = (int)(nextTag-estCharsOver);
                         
                         //Unlike Swing's word wrap, which does not wrap on tag boundaries correctly, if we're out of space,
                         //we're out of space
