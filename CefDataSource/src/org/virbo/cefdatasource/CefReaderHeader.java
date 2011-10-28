@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,30 +19,31 @@ import java.util.Map;
  */
 public class CefReaderHeader {
 
-    enum State {
+    private static final Logger logger= Logger.getLogger("CefDataSource");
+    private enum State {
 
         TOP, END, DATA_READ, GLOBAL, PARAM
     }
 
-    class Record {
+    private static class Record {
 
         String data;
     }
 
-    class KeyValue {
+    private static class KeyValue {
 
         String key;
         String[] val;
     }
 
-    class GlobalStruct {
+    private static class GlobalStruct {
 
-        String name;
+        //String name;
         List<String> entries;
         String valueType;
     }
 
-    class ParamStruct {
+    private static class ParamStruct {
 
         String name;
         int[] sizes;
@@ -49,7 +51,7 @@ public class CefReaderHeader {
         int[] cefFieldPos;  // start, end inclusive
         Map<String, Object> entries = new LinkedHashMap<String, Object>();
     }
-    private byte eol = 10;
+    private static final byte eol = 10;
 
     private boolean cefReadHeadRec(ReadableByteChannel c, Record record) throws IOException {
 
@@ -196,7 +198,7 @@ public class CefReaderHeader {
                                 state = State.GLOBAL;
                                 gStru = new GlobalStruct();
                                 gName = value[0];
-                                gStru.name = value[0];
+                                //gStru.name = value[0];
                                 gStru.valueType = "CHAR";
                                 eCount = 0;
                             } else if (key.equals("START_VARIABLE")) {     //*** New parameter ***
@@ -213,13 +215,14 @@ public class CefReaderHeader {
                             } else if (key.equals("DATA_UNTIL")) {     //*** Start of data ***
                                 state = State.DATA_READ;
                                 cef.dataUntil = value[0];
+                                logger.finest("dataUntil is read but not used: "+cef.dataUntil);
                             } //*** Special CEF defined items at the top level ***
                             else if (key.equals("FILE_NAME")) {
-                                cef.fileName = value[0];
+                                //cef.fileName = value[0];
                             } else if (key.equals("FILE_FORMAT_VERSION")) {
-                                cef.fileFormatVersion = value[0];
+                                //cef.fileFormatVersion = value[0];
                             } else if (key.equals("END_OF_RECORD_MARKER")) {
-                                cef.eor = (byte) value[0].charAt(0);
+                                //cef.eor = (byte) value[0].charAt(0);
                             } else {
                                 throw new IllegalArgumentException("Unsupported key " + key);
                             }
