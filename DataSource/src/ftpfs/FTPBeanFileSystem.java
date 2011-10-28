@@ -41,6 +41,7 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URISplit;
 
 /**
  * Alternate implementation of FTP that was originally introduced when the
@@ -241,6 +242,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
             String[] listing = f.list();
             return listing;
         }
+
+        URL url= getRootURL();
+        String userInfo=null;
+
         while ( !successOrCancel ) {
             try {
                 new File(localRoot, directory).mkdirs();
@@ -249,15 +254,17 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                     FtpBean bean = new FtpBean();
                     try {
-                        String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
+                        userInfo= KeyChain.getDefault().getUserInfo(url);
                         if ( userInfo!=null ) {
                             String[] userHostArr= userInfo.split(":");
                             if ( userHostArr.length==1 ) {
-                                return new String[] { "not logged in" };
+                                userHostArr= new String[] { userHostArr[0], "pass" };
+                            } else if ( userHostArr.length==0 ) {
+                                userHostArr= new String[] { "user", "pass" };
                             }
-                            bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                            bean.ftpConnect(url.getHost(), userHostArr[0], userHostArr[1]);
                         } else {
-                            bean.ftpConnect(getRootURL().getHost(), "ftp");
+                            bean.ftpConnect(url.getHost(), "ftp");
                         }
                         String cwd= bean.getDirectory(); // URI should not contain remote root.  // will allow for this.
                         bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
@@ -268,8 +275,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         ex2.initCause(ex);
                         throw ex2;
                     } catch (CancelledOperationException ex ) {
-                        successOrCancel= true;
-                        continue;
+                        throw new FileSystemOfflineException("user cancelled credentials");
                     }
 
                     FtpObserver observer = new FtpObserver() {
@@ -300,7 +306,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 return result;
             } catch (FtpException e) {
                 if ( e.getMessage().startsWith("530" ) ) { // invalid login
-                    KeyChain.getDefault().clearUserPassword(getRootURL());
+                    if ( userInfo==null ) {
+                        userInfo="user:pass";
+                        url= new URL( url.getProtocol() + "://"+ userInfo + "@" + url.getHost() + url.getFile() );
+                    }
+                    KeyChain.getDefault().clearUserPassword(url);
                     // loop for them to try again.
                 } else {
                     throw new IOException(e.getMessage()); //JAVA5
