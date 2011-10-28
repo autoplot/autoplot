@@ -715,7 +715,10 @@ public class DataSetURI {
         }
 
         System.err.println( "reading URL "+url );
-        InputStream in = new DasProgressMonitorInputStream( url.openStream(), mon );
+        URLConnection urlc= url.openConnection();
+        urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
+
+        InputStream in = new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
         File newf= new File(filename + "__");
         OutputStream out= new FileOutputStream( newf );
         DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
