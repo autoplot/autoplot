@@ -423,71 +423,92 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
             String[] ss = FileSystem.splitUrl(url.toString());
 
-            try {
-                FtpBean bean = new FtpBean();
 
-                String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
-                if ( userInfo!=null ) {
-                    String[] userHostArr= userInfo.split(":");
-                    bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
-                    String cwd= bean.getDirectory();
-                    bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
-                } else {
-                    bean.ftpConnect(getRootURL().getHost(), "ftp");
-                    String cwd= bean.getDirectory();
-                    bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
-                }
+            url= getRootURL();
+            String userInfo= null;
+            boolean done= false;
+            while ( !done ) {
+                try {
+                    FtpBean bean = new FtpBean();
 
-                File listingFile = new File(targetFile.getParentFile(), ".listing");
-                if (!listingFile.exists()) {
-                    String listing = bean.getDirectoryContentAsString();
-                    FileOutputStream out2 = new FileOutputStream(listingFile);
-                    out2.write(listing.getBytes());
-                    out2.close();
-                }
-
-                long size = this.getFileObject(filename).getSize();
-                mon.setTaskSize(size);
-                mon.started();
-                final long t0 = System.currentTimeMillis();
-
-                FtpObserver observer = new FtpObserver() {
-
-                    int totalBytes = 0;
-
-                    public void byteRead(int bytes) {
-                        totalBytes += bytes;
-                        if (mon.isCancelled()) {
-                            throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                    userInfo= KeyChain.getDefault().getUserInfo(url);
+                    if ( userInfo!=null ) {
+                        String[] userHostArr= userInfo.split(":");
+                        if ( userHostArr.length==1 ) {
+                           userHostArr= new String[] { userHostArr[0], "pass" };
+                        } else if ( userHostArr.length==0 ) {
+                           userHostArr= new String[] { "user", "pass" };
                         }
-                        long dt = Math.max( 1, System.currentTimeMillis() - t0 );
-                        mon.setTaskProgress(totalBytes);
-                        mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
-                        
+                        bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                        String cwd= bean.getDirectory();
+                        bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
+                    } else {
+                        bean.ftpConnect(getRootURL().getHost(), "ftp");
+                        String cwd= bean.getDirectory();
+                        bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
                     }
 
-                    public void byteWrite(int bytes) {
-                        totalBytes += bytes;
-                        mon.setTaskProgress(totalBytes);
+                    File listingFile = new File(targetFile.getParentFile(), ".listing");
+                    if (!listingFile.exists()) {
+                        String listing = bean.getDirectoryContentAsString();
+                        FileOutputStream out2 = new FileOutputStream(listingFile);
+                        out2.write(listing.getBytes());
+                        out2.close();
                     }
-                };
-                bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
-                bean.close();
-                
-            } catch (RuntimeException ex) {
-                ex.printStackTrace();
-                if (ex.getCause() instanceof IOException) {
-                    throw (IOException) ex.getCause();
-                } else {
-                    IOException tex= new IOException(ex.toString()); // TODO Java 1.6 will fix this
-                    tex.initCause(ex);
-                    throw tex;
+
+                    long size = this.getFileObject(filename).getSize();
+                    mon.setTaskSize(size);
+                    mon.started();
+                    final long t0 = System.currentTimeMillis();
+
+                    FtpObserver observer = new FtpObserver() {
+
+                        int totalBytes = 0;
+
+                        public void byteRead(int bytes) {
+                            totalBytes += bytes;
+                            if (mon.isCancelled()) {
+                                throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                            }
+                            long dt = Math.max( 1, System.currentTimeMillis() - t0 );
+                            mon.setTaskProgress(totalBytes);
+                            mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
+
+                        }
+
+                        public void byteWrite(int bytes) {
+                            totalBytes += bytes;
+                            mon.setTaskProgress(totalBytes);
+                        }
+                    };
+                    bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
+                    bean.close();
+                    done= true;
+                    
+                } catch (RuntimeException ex) {
+                    ex.printStackTrace();
+                    if (ex.getCause() instanceof IOException) {
+                        throw (IOException) ex.getCause();
+                    } else {
+                        IOException tex= new IOException(ex.toString()); // TODO Java 1.6 will fix this
+                        tex.initCause(ex);
+                        throw tex;
+                    }
+                } catch (FtpException ex) {
+                    if ( ex.getMessage().startsWith("530" ) ) { // invalid login
+                        if ( userInfo==null ) {
+                            userInfo="user:pass";
+                            url= new URL( url.getProtocol() + "://"+ userInfo + "@" + url.getHost() + url.getFile() );
+                        }
+                        KeyChain.getDefault().clearUserPassword(url);
+                        // loop for them to try again.
+                    } else {
+                        throw new IOException(ex.getMessage()); //JAVA5
+                    }
+
+                } catch ( CancelledOperationException ex ) {
+                    throw new FileSystemOfflineException("user cancelled credentials");
                 }
-            } catch (FtpException ex) {
-                throw new IOException(ex.getMessage());
-
-            } catch ( CancelledOperationException ex ) {
-                throw new IOException(ex.getMessage());
             }
 
             if (copyFile(partFile, targetFile)) {
