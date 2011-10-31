@@ -84,6 +84,8 @@ public class Test024 {
             example2();
             //Jared's dataset is not working--ask Ed about this.... example3();  // Jared's slice
 
+            System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
+
         } catch ( Exception ex ) {
             ex.printStackTrace();
             System.exit(1);
