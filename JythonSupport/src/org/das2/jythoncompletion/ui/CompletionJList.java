@@ -121,7 +121,7 @@ public class CompletionJList extends JList {
     }
 
     public @Override void paint(Graphics g) {
-        Object value = (Map)(Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints")); //NOI18N
+        Object value = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"); //NOI18N
         Map renderingHints = (value instanceof Map) ? (java.util.Map)value : null;
         if (renderingHints != null && g instanceof Graphics2D) {
             Graphics2D g2d = (Graphics2D) g;
