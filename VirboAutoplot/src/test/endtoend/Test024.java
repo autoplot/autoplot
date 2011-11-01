@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import java.io.IOException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
 
@@ -101,6 +102,32 @@ public class Test024 {
 
     }
 
+    /**
+     * this was failing in PaPCo because it was clipping off the "http:" part.
+     */
+    public static void example5() throws InterruptedException, IOException {
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
+        apds.doGetDataSet();
+        if ( apds.getStatus()!=0 ) {
+            System.err.println( apds.getStatusMessage() );
+            return;
+        }
+        System.err.println( apds.toString() );
+
+        apds.setFillValue( -999 );
+        ScriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
+
+        double[] vv= (double[]) apds.values();
+        for ( int i=0; i<vv.length; i++ ) {
+            System.err.printf("%9.3f ",vv[i]);
+        }
+        System.err.println();
+
+        ScriptContext.writeToPng("test024_005");
+
+    }
+
     public static void main( String[] args )  {
         try {
 
@@ -108,6 +135,7 @@ public class Test024 {
             example2();
             //Jared's dataset is not working--ask Ed about this.... example3();  // Jared's slice
             example4();
+            example5();
 
             System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
 
