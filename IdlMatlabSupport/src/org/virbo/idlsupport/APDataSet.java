@@ -13,6 +13,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 
 /**
+ * Extension to QDataSetBridge, which supports reading in data from Autoplot URIs.
  * @author jbf
  */
 public class APDataSet extends QDataSetBridge {
@@ -29,12 +30,13 @@ public class APDataSet extends QDataSetBridge {
 
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.2.3");
+        System.err.println("APDataSet v1.3.1");
     }
 
     /**
      * set the data source URL.  This is an alias for setDataSetURI.
      * @param surl suri the dataset location, such as http://autoplot.org/data/autoplot.dat
+     * @deprecated use setDataSetURI, which takes the same argument.
      */
     public void setDataSetURL(String surl) {
         this.surl = surl;
@@ -52,7 +54,13 @@ public class APDataSet extends QDataSetBridge {
         names.clear();
     }
 
-    public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+    /**
+     * this is not called directly by clients in IDL or Matlab.  This is called by doGetDataSet.
+     * @param mon
+     * @return
+     * @throws Exception
+     */
+    protected QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
         URI uri= DataSetURI.toUri(surl);
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
