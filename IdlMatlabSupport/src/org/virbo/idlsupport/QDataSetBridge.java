@@ -44,7 +44,8 @@ public abstract class QDataSetBridge {
         datasets = new LinkedHashMap<String, QDataSet>();
         names = new LinkedHashMap<QDataSet, String>();
         sliceDep= new LinkedHashMap<String,String>();
-        System.err.println("QDataSetBridge v1.7.01");
+        prefUnits= new ArrayList();
+        System.err.println("QDataSetBridge v1.8.01");
     }
 
     /**
@@ -69,9 +70,6 @@ public abstract class QDataSetBridge {
         } else {
             unit= Units.getByName(sunit);
         }
-        if ( prefUnits==null ) {
-            prefUnits= new ArrayList();
-        }
         boolean add= true;
         for ( int i=0; i<prefUnits.size(); i++ ) {
             if ( prefUnits.get(i).isConvertableTo(unit) ) {
@@ -89,7 +87,7 @@ public abstract class QDataSetBridge {
     }
 
     public synchronized void clearPreferredUnits() {
-        prefUnits= null;
+        prefUnits= new ArrayList();
     }
 
     /**
@@ -758,7 +756,14 @@ public abstract class QDataSetBridge {
         if (prop instanceof QDataSet) {
             return nameFor((QDataSet) prop);
         } else if (prop instanceof Units) {
+            for ( Units u: prefUnits ) {
+                if ( u.isConvertableTo( SemanticOps.getUnits( datasets.get(this.name) )) ) {
+                    return u.toString();
+                }
+            }
             return prop.toString();
+        } else if ( propname.equals(QDataSet.FILL_VALUE) && this.useFill ) {
+            return this.fill;
         } else {
             return prop;
         }
@@ -774,7 +779,10 @@ public abstract class QDataSetBridge {
      * @return
      */
     public Map<String, Object> properties(String name,int i) {
-        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name).slice(i)));
+        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name).slice(i))); //TODO: strange implementation
+        for (String s : result.keySet()) {
+            result.put(s, property(name, s,i));
+        }
         return result;
     }
 
@@ -790,7 +798,15 @@ public abstract class QDataSetBridge {
         if (prop instanceof QDataSet) {
             return nameFor((QDataSet) prop);
         } else if (prop instanceof Units) {
+            Units dsu=  SemanticOps.getUnits( datasets.get(name) );
+            for ( Units u: prefUnits ) {
+                if ( u.isConvertableTo( SemanticOps.getUnits( datasets.get(name) )) ) {
+                    return u.toString();
+                }
+            }
             return prop.toString();
+        } else if ( propname.equals(QDataSet.FILL_VALUE) && this.useFill ) {
+            return this.fill;
         } else {
             return prop;
         }
