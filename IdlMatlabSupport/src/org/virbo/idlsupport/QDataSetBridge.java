@@ -122,6 +122,7 @@ public abstract class QDataSetBridge {
      * 2011-01-01: getStatus or getStatusMessage should be called afterwards to check the result of the load, this will no longer throw an exception.
      */
     public void doGetDataSet() {
+        this.exception= null;
         try {
             this.ds = getDataSet( new NullProgressMonitor() );
 
@@ -154,6 +155,7 @@ public abstract class QDataSetBridge {
      * be done with multiple QDataSetBridge objects.
      */
     public void doGetDataSet(final ProgressMonitor mon)  {
+        this.exception= null;
         Runnable run = new Runnable() {
 
             public void run() {
