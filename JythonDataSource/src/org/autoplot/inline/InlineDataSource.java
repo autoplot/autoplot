@@ -18,11 +18,9 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.util.PythonInterpreter;
-import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -31,7 +29,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
-import org.virbo.qstream.SerializeRegistry;
 
 /**
 /**
@@ -123,6 +120,7 @@ public class InlineDataSource extends AbstractDataSource {
     //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5
     //vap+inline:1,2,3&DEPEND_0=1,2,3&DEPEND_0.UNITS=hours since 2000-001T00:00
     //vap+inline:exp(findgen(20))&UNITS=eV&SCALE_TYPE=log&LABEL=Energy
+    //vap+inline:vap+inline:ripples(1440)&DEPEND_0=timegen('2003-05-01','1 min',1440)
     
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
         String s= getURI();
@@ -131,16 +129,16 @@ public class InlineDataSource extends AbstractDataSource {
         //s= s.replaceAll("\\+"," ");
 
         // this is because URISplit treats it like a file.
-        URISplit uri= URISplit.parse(s);
+        URISplit split= URISplit.parse(s);
         String noFile;
-        if ( uri.file!=null ) {
-            if ( uri.file.startsWith("file:///") ) {
-                noFile= uri.file.substring("file:///".length());
+        if ( split.file!=null ) {
+            if ( split.file.startsWith("file:///") ) {
+                noFile= split.file.substring("file:///".length());
             } else {
-                noFile= uri.file;
+                noFile= split.file;
             }
         } else {
-            noFile= uri.params;
+            noFile= split.params;
         }
         String[] ss= noFile.split("&");
 
