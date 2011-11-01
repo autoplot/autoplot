@@ -5,7 +5,6 @@
 package org.virbo.idlsupport;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,30 +117,41 @@ public abstract class QDataSetBridge {
         this.useFill= false;
     }
     /**
-     * initiates the read after 
+     * performs the read.  Note no progress status is available and this blocks until the read is done.
+     * doGetDataSet(mon) should be called if progress is needed.
+     * 2011-01-01: getStatus or getStatusMessage should be called afterwards to check the result of the load, this will no longer throw an exception.
      */
-    public void doGetDataSet() throws Exception {
-        this.ds = getDataSet( new NullProgressMonitor() );
+    public void doGetDataSet() {
+        try {
+            this.ds = getDataSet( new NullProgressMonitor() );
 
-        datasets.clear();
-        name = nameFor(ds);
+            datasets.clear();
+            name = nameFor(ds);
 
-        datasets.put(name, ds);
+            datasets.put(name, ds);
 
-        for (int i = 0; i < ds.rank(); i++) {
-            QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
-            if (dep != null) datasets.put(nameFor(dep), dep);
-            QDataSet depslice= (QDataSet) ds.property("DEPEND_" + i, 0 );
-            if ( depslice!=null ) {
-                sliceDep.put( nameFor(depslice), "DEPEND_"+i );
+            for (int i = 0; i < ds.rank(); i++) {
+                QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
+                if (dep != null) datasets.put(nameFor(dep), dep);
+                QDataSet depslice= (QDataSet) ds.property("DEPEND_" + i, 0 );
+                if ( depslice!=null ) {
+                    sliceDep.put( nameFor(depslice), "DEPEND_"+i );
+                }
             }
+        } catch ( Exception ex ) {
+            this.exception= ex;
+            ex.printStackTrace(); // print the exception, because Exception handling is inconsistent with Matlab and IDL.
+            return;
         }
     }
 
     /**
      * initiates the read on a separate thread, so this does not block and should
-     * be used with caution.  See getProgressMonitor for use.  
+     * be used with caution.  See getProgressMonitor for use.
      *
+     * Note because there is one exception that is stored, a QDataSetBridge object
+     * is only able to load one dataset at a time.  Simultaneous loads should
+     * be done with multiple QDataSetBridge objects.
      */
     public void doGetDataSet(final ProgressMonitor mon)  {
         Runnable run = new Runnable() {
@@ -155,6 +165,7 @@ public abstract class QDataSetBridge {
                     
                 } catch (Exception ex) {
                     exception= ex;
+                    ex.printStackTrace();
                     mon.setProgressMessage("EXCEPTION");
                     mon.finished();
                     return;
@@ -179,38 +190,72 @@ public abstract class QDataSetBridge {
         new Thread(run).start();
 
     }   
-    
+
+    /**
+     * return the Exception from the last doGetDataSet call.
+     * @return
+     */
     public Exception getException() {
         return exception;
     }
-    
-    public synchronized String nameFor(QDataSet dep0) {
-        String name = names.get(dep0);
 
-        if (name == null) {
-            name = (String) dep0.property(QDataSet.NAME);
-        }
-        if (name == null) {
-            name = "ds_" + names.size();
-        }
-
-        names.put(dep0, name);
-
-        return name;
+    /**
+     * returns 0 for last get operation successful
+     * @return
+     */
+    public int getStatus() {
+        return exception==null ? 0 : 1;
     }
 
+    /**
+     * returns "" for last operation successful, or non-empty indicating the problem.  Note
+     * getException will return the Java exception for deeper inspection.
+     * @return "" or the error message
+     */
+    public String getStatusMessage() {
+        if ( exception==null ) {
+            return "";
+        } else {
+            String s= exception.getMessage();
+            if ( s!=null && s.length()>0 ) {
+                return s;
+            } else {
+                return exception.toString(); // sorry!
+            }
+        }
+    }
+
+    public synchronized String nameFor(QDataSet dep0) {
+        String name1 = names.get(dep0);
+
+        if (name1 == null) {
+            name1 = (String) dep0.property(QDataSet.NAME);
+        }
+        if (name1 == null) {
+            name1 = "ds_" + names.size();
+        }
+
+        names.put(dep0, name1);
+
+        return name1;
+    }
+
+    /**
+     * implementations should provide this method for making the data accessible.
+     * @param mon
+     * @return
+     * @throws Exception if any problem occurs with the read, it will be available to clients in getException or getStatusMessage
+     */
     abstract QDataSet getDataSet(ProgressMonitor mon) throws Exception;
 
     /**
      * returns an object that can be used to monitor the progress of a download.
-     * NOTE: I don't think this would work right now, since getDataSet is
-     * implemented as a synchronous process--meaning it returns after the download
-     * is done.  This should be used with doGetDataSet(monitor)
      * 
      * mon= qds->getProgressMonitor();
-     * qds->getDataSet( mon )
+     * qds->doGetDataSet( mon )
      * while ( ! mon->isFinished() ) do begin
      *    print, strtrim( mon->getTaskProgress(), 2 ) + "  " + strtrim( mon->getTaskSize(), 2 )
+     *    wait, 0.2   ; don't overload the thread
      * endwhile
      * 
      * @return
