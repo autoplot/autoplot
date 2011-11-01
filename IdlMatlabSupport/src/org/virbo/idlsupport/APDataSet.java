@@ -61,7 +61,7 @@ public class APDataSet extends QDataSetBridge {
      * @throws Exception
      */
     protected QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
-        URI uri= DataSetURI.toUri(surl);
+        URI uri= DataSetURI.getURI(surl);
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
         if ( f.reject( surl, mon ) ) {
