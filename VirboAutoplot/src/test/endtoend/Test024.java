@@ -48,7 +48,7 @@ public class Test024 {
 
     public static void example3() throws Exception {
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
-        apds.setDataSetURL("vap:file:///home/jbf/ct/hudson/data.backup/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
+        apds.setDataSetURI("vap:file:///home/jbf/ct/hudson/data.backup/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
         apds.doGetDataSet();
         System.err.println( apds.toString() );
 
@@ -77,12 +77,37 @@ public class Test024 {
 
     }
 
+    public static void example4() throws Exception {
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI("vap+inline:ripplesx(20)");
+        apds.doGetDataSet();
+
+        if ( apds.getStatus()!=0 ) {
+            System.err.println( apds.getStatusMessage() );
+            return;
+        }
+        System.err.println( apds.toString() );
+
+        apds.setFillValue( -999 );
+        ScriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
+
+        double[] vv= (double[]) apds.values();
+        for ( int i=0; i<vv.length; i++ ) {
+            System.err.printf("%9.3f ",vv[i]);
+        }
+        System.err.println();
+
+        ScriptContext.writeToPng("test024_004");
+
+    }
+
     public static void main( String[] args )  {
         try {
 
             example1();
             example2();
             //Jared's dataset is not working--ask Ed about this.... example3();  // Jared's slice
+            example4();
 
             System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
 
