@@ -800,7 +800,7 @@ public abstract class QDataSetBridge {
         } else if (prop instanceof Units) {
             Units dsu=  SemanticOps.getUnits( datasets.get(name) );
             for ( Units u: prefUnits ) {
-                if ( u.isConvertableTo( SemanticOps.getUnits( datasets.get(name) )) ) {
+                if ( u.isConvertableTo( dsu ) ) {
                     return u.toString();
                 }
             }
