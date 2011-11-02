@@ -313,22 +313,18 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
 
             public String getURI() {
-                try {
-                    String stime= URLEncoder.encode( timeRange.min().toString(), "US-ASCII" );
-                    String etime= URLEncoder.encode( timeRange.max().toString(), "US-ASCII" );
-                    String sparams= "dataset="+params.get( "dataset" )
-                            + "&start_time=" + stime
-                            + "&end_time=" + etime;
-                    if ( resolution!=null ) {
-                            sparams+= "&resolution=" + resolution.doubleValue(Units.seconds);
-                    } else {
-                        logger.fine("no resolution specified");
-                    }
-                    if ( dsParams!=null )  sparams+= "&" + dsParams;
-                    return "vap+das2Server:" + resourceURI + "?" + sparams;
-                } catch ( UnsupportedEncodingException ex ) {
-                    throw new RuntimeException(ex);
+                String stime= timeRange.min().toString().replace(" ", "+");
+                String etime= timeRange.max().toString().replace(" ", "+");
+                String sparams= "dataset="+params.get( "dataset" )
+                        + "&start_time=" + stime
+                        + "&end_time=" + etime;
+                if ( resolution!=null ) {
+                        sparams+= "&resolution=" + resolution.doubleValue(Units.seconds);
+                } else {
+                    logger.fine("no resolution specified");
                 }
+                if ( dsParams!=null )  sparams+= "&" + dsParams;
+                return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
             public DatumRange getTimeRange() {
