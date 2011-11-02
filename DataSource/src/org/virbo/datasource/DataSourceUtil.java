@@ -46,15 +46,6 @@ import org.virbo.dsops.Ops;
  */
 public class DataSourceUtil {
 
-    public static final URL FS_URL;
-    static {
-        try {
-            FS_URL= new URL( "file:/" );
-        } catch ( MalformedURLException ex ) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     /**
      * remove escape sequences like %20 to create a human-editable string
      * This contains a kludge that looks for single spaces that are the result of
@@ -74,9 +65,6 @@ public class DataSourceUtil {
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
-    }
-    
-    private DataSourceUtil() {
     }
     
     /**
