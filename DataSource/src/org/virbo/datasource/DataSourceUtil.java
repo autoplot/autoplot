@@ -37,6 +37,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
@@ -407,7 +408,7 @@ public class DataSourceUtil {
      * @return valid Java identifier.
      */
     public static String toJavaIdentifier( String label ) {
-	StringBuffer buf= new StringBuffer(label.length());
+	StringBuilder buf= new StringBuilder(label.length());
 	for ( int i=0; i<label.length(); i++ ) {
 	    char ch= label.charAt(i);
 	    if ( Character.isJavaIdentifierPart(ch) ) {
@@ -433,7 +434,7 @@ public class DataSourceUtil {
     }
 
     public static String strjoin(Collection<String> c, String delim) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String s : c) {
             if (result.length() > 0) {
                 result.append(delim);
@@ -444,22 +445,22 @@ public class DataSourceUtil {
     }
 
     public static String strjoin( long[] dims, String delim ) {
-        StringBuffer sdims= new StringBuffer();
+        StringBuilder sdims= new StringBuilder();
         if ( dims.length>0 ) {
                 sdims.append( dims[0] );
                 for ( int i=1; i<dims.length; i++ ) {
-                        sdims.append( delim +dims[i]);
+                        sdims.append( delim ) .append( dims[i] );
                 }
         }
         return sdims.toString();
     }
 
     public static String strjoin( int[] dims, String delim ) {
-        StringBuffer sdims= new StringBuffer();
+        StringBuilder sdims= new StringBuilder();
         if ( dims.length>0 ) {
                 sdims.append( dims[0] );
                 for ( int i=1; i<dims.length; i++ ) {
-                        sdims.append( delim +dims[i]);
+                        sdims.append( delim ).append( dims[i]);
                 }
         }
         return sdims.toString();
@@ -622,6 +623,15 @@ public class DataSourceUtil {
          } else {
              return false;
          }
+    }
+
+    /**
+     * for IDL, where I can't look up a class
+     * @param dss
+     * @return
+     */
+    public static TimeSeriesBrowse getTimeSeriesBrowse( DataSource dss ) {
+        return dss.getCapability( TimeSeriesBrowse.class );
     }
 
     public static void main(String[] args ) {
