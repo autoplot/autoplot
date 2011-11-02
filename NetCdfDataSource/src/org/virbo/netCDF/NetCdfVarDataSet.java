@@ -30,15 +30,11 @@ import ucar.nc2.dataset.NetcdfDataset;
 /**
  * wraps a rank 1 netCDF variable to present it as a QDataSet.
  *
- * unit  "matlab datenum" are decimal days. 1 corresponds to 1-Jan-0000.
- *
- *
  * @author jbf
  */
 public class NetCdfVarDataSet extends AbstractDataSet {
     Variable v;
     double[] data;
-    double[][] data2;
     int[] shape;
 
     public static NetCdfVarDataSet create( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
