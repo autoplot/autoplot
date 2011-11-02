@@ -282,7 +282,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
 
                 public String getURI() {
-                    return "ds="+ds+"&"+param+"&timerange="+tr.toString().replace(" ", "+");
+                    return "vap+cdaweb:ds="+ds+"&"+param+"&timerange="+tr.toString().replace(" ", "+");
                 }
 
             };
