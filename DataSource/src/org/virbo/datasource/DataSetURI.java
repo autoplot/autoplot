@@ -161,7 +161,7 @@ public class DataSetURI {
     }
 
     public static DataSource getDataSource(String surl) throws Exception {
-        return getDataSource(getURIValid(surl));
+        return getDataSource( toUri(surl) );
     }
 
     /**
