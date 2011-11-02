@@ -32,8 +32,7 @@ public final class AutoplotSettings {
             addPropertyChangeListener(listener);
             loadPreferences();
         } catch ( Exception ex ) {
-            ex.printStackTrace();
-            System.err.println("continuing with autoplot_data in $HOME");
+            System.err.println("Problem encountered when attempting to load user preferences, continuing with autoplot_data in $HOME");
             this.autoplotData= "${HOME}/autoplot_data";
             this.fscache= "${HOME}/autoplot_data/fscache";
         }
