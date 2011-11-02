@@ -13,11 +13,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -62,7 +60,6 @@ public class NetCDFDataSource extends AbstractDataSource {
     private void parseUrl() {
         String surl= DataSetURI.fromUri(uri);
         int i= surl.lastIndexOf('?');
-        URL myUrl;
         if ( i>-1 ) {
             sMyUrl= surl.substring(0, i);
         } else {
@@ -74,11 +71,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             return;
             
         } else {
-            // get the variable
-            i= surl.indexOf('?');
-            String params= surl.substring( i+1 );
-            
-            
+            // get the variable            
             Map p= getParams();
             if ( p.containsKey( "id" ) ) {
                 svariable= (String) p.get( "id" );
