@@ -3,7 +3,6 @@ package org.virbo.datasource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -307,7 +306,7 @@ public class URISplit {
         params.put( name, value );
         split.params= URISplit.formatParams(params);
         if ( split.vapScheme!=null && !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
-        return split.format(split);
+        return format(split);
     }
 
     /**
@@ -615,21 +614,21 @@ public class URISplit {
      * @return
      */
     public static String formatParams(Map<String,String> parms) {
-        StringBuffer result = new StringBuffer("");
+        StringBuilder result = new StringBuilder("");
         for ( Entry<String,String> e: parms.entrySet() ) {
             String key = (String) e.getKey();
             if (key.startsWith("arg_")) {
                 if (!e.getValue().equals("")) {
-                    result.append("&" + e.getValue());
+                    result.append("&").append(e.getValue());
                 }
             } else {
                 String value = (String) e.getValue();
                 if (value != null) {
                     value= uriEncode(value);
                     value= value.replaceAll("&", "%26");
-                    result.append("&" + key + "=" + value );
+                    result.append("&").append(key).append("=").append(value);
                 } else {
-                    result.append("&" + key);
+                    result.append("&").append(key);
                 }
             }
         }
@@ -727,6 +726,7 @@ public class URISplit {
         return surl;
     }
 
+    @Override
     public String toString() {
         return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncaretPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
     }
