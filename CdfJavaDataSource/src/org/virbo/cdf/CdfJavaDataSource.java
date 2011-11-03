@@ -168,7 +168,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
         }
 
+        // Now call the other getDataSet...
         QDataSet result= getDataSet(mon,attributes);
+
         String os1= (String)map.get(PARAM_SLICE1);
         if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
             int is= Integer.parseInt(os1);
