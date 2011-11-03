@@ -256,7 +256,7 @@ public class CdfUtil {
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
-                if ( useBuf && variable.rowMajority() && ( variable.getType()==44 || variable.getType()==21 ) ) {
+                if ( useBuf && variable.rowMajority() && ( variable.getType()==CDFConstants.CDF_FLOAT || variable.getType()==CDFConstants.CDF_REAL4 ) ) {
                     //buf= Extractor.get1DSeriesNio( cdf, variable, null);
                     //odata= cdf.get1D( variable.getName() );
                     VariableDataLocator loc= variable.getLocator();
