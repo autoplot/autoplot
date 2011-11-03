@@ -491,12 +491,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
             e.appendChild(app);
 
-            formatException( doc, e, t );
-
-            Element ele= doc.createElement( "uncaught" );
-            ele.appendChild( doc.createTextNode( String.valueOf(uncaught) ) );
-            e.appendChild(ele);
-
             Element user= doc.createElement("userComments");
             user.appendChild( doc.createTextNode(userComments) );
             e.appendChild(user);
@@ -513,6 +507,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             focus.appendChild( doc.createTextNode((String)data.get(FOCUS_URI)) );
             e.appendChild(focus);
 
+
+            formatException( doc, e, t );
+
+            Element ele= doc.createElement( "uncaught" );
+            ele.appendChild( doc.createTextNode( String.valueOf(uncaught) ) );
+            e.appendChild(ele);
 
             if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
                 if ( appModel!=null ) {
