@@ -179,7 +179,7 @@ public class Test024 {
 
             example1();
             example2();
-            //Jared's dataset is not working--ask Ed about this.... example3();  // Jared's slice
+            example3();  // Jared's slice
             example4();
             example5();
             test6();
