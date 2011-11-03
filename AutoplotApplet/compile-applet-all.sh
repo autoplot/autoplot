@@ -3,7 +3,7 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
-echo "compile-applet-all v.20110926"
+echo "compile-applet-all v.20111103"
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
