@@ -6,6 +6,7 @@
 package org.autoplot.cdaweb;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,7 +40,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -91,48 +91,51 @@ public class CDAWebDB {
             mon.started();
             mon.setTaskSize(3);
             mon.setProgressMessage("downloading file "+dbloc );
+            
+            File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ;
+            FileInputStream fin=null;
+            InputStream altin= null;
+            try {
+                fin= new FileInputStream( f );
 
-            FileInputStream fin= new FileInputStream( DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) );
+                InputSource source = new InputSource( fin );
 
-            if ( mon.isCancelled() ) {
-                return;
-            }
+                mon.setTaskProgress(1);
+                mon.setProgressMessage("parsing file "+dbloc );
+                document = builder.parse(source);
 
-            InputSource source = new InputSource( fin );
+                XPath xp = XPathFactory.newInstance().newXPath();
+                version= xp.evaluate( "/sites/datasite/@version", document );
 
-            mon.setTaskProgress(1);
-            mon.setProgressMessage("parsing file "+dbloc );
-            document = builder.parse(source);
+                mon.setTaskProgress(2);
+                mon.setProgressMessage("reading IDs");
 
-            XPath xp = XPathFactory.newInstance().newXPath();
-            version= xp.evaluate( "/sites/datasite/@version", document );
-
-            mon.setTaskProgress(2);
-            mon.setProgressMessage("reading IDs");
-
-            InputStream in= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
-            if ( in==null ) {
-                throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
-            }
-            BufferedReader rr= new BufferedReader( new InputStreamReader( in ) );
-            String ss= rr.readLine();
-            while ( ss!=null ) {
-                int i= ss.indexOf("#");
-                if ( i>-1 ) ss= ss.substring(0,i);
-                if ( ss.trim().length()>0 ) {
-                    String[] sss= ss.split("\\s+");
-                    bases.put( sss[0], sss[1] );
-                    tmpls.put( sss[0], sss[2] );
+                altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
+                if ( altin==null ) {
+                    throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
                 }
-                ss= rr.readLine();
+                BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
+                String ss= rr.readLine();
+                while ( ss!=null ) {
+                    int i= ss.indexOf("#");
+                    if ( i>-1 ) ss= ss.substring(0,i);
+                    if ( ss.trim().length()>0 ) {
+                        String[] sss= ss.split("\\s+");
+                        bases.put( sss[0], sss[1] );
+                        tmpls.put( sss[0], sss[2] );
+                    }
+                    ss= rr.readLine();
+                }
+                rr.close();
+
+                refreshServiceProviderIds();
+                mon.setTaskProgress(3);
+
+                mon.finished();
+            } finally {
+                if ( fin!=null ) fin.close();
+                if ( altin!=null ) altin.close();
             }
-            rr.close();
-
-            refreshServiceProviderIds();
-            mon.setTaskProgress(3);
-
-            mon.finished();
-
         } catch (XPathExpressionException ex) {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
