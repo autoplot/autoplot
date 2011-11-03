@@ -6,8 +6,14 @@
 package test.endtoend;
 
 import java.io.IOException;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.idlsupport.APDataSet;
 
 /**
  * Tests of the IDL/Matlab interface.
@@ -128,6 +134,46 @@ public class Test024 {
 
     }
 
+    /*
+     * new getTimeSeriesBrowse showed a branch were names with implicit names ("http://" instead of "vap+cdf:http://") and TimeSeriesBrowse
+     * were not parsed correctly.
+     */
+    public static void test6() throws Exception {
+        {
+            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density" );
+            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
+            System.err.println(tsb);
+        }
+        {
+            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
+            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
+            System.err.println(tsb);
+        }
+    }
+
+    private static String checkAPDS( String uri, String tr ) throws Exception {
+        if ( tr!=null ) {
+            // mimic code in papco that is failing
+            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( uri );
+            TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse( dss );
+            DatumRange dr= DatumRangeUtil.parseTimeRange( tr ) ;
+            tsb.setTimeRange(dr);
+            uri= tsb.getURI();
+        }
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI(uri);
+        apds.doGetDataSet();
+        if ( apds.getStatus()!=0 ) {
+            return apds.getStatusMessage();
+        }
+        return apds.toString();
+    }
+
+    public static void test7() throws Exception {
+        String uri= "vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=cassini/mag/mag_vectorQ&start_time=2010-01-01T00:00:00.000Z&end_time=2010-01-02T00:00:00.000Z";
+        System.err.println( checkAPDS( uri, null ) );
+
+    }
     public static void main( String[] args )  {
         try {
 
@@ -136,6 +182,9 @@ public class Test024 {
             //Jared's dataset is not working--ask Ed about this.... example3();  // Jared's slice
             example4();
             example5();
+            test6();
+            test7();
+            checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
 
             System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
 
