@@ -419,7 +419,7 @@ public class URISplit {
      */
     public static URISplit parse( String surl, int caretPos , boolean normalize) {
 
-        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"$0\",$1,$2)", new Object[] { surl, ""+caretPos, ""+normalize } );
+        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"{0}\",{1},{2})", new Object[]{ surl, caretPos, normalize });
 
         if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CARET> on Windows.
             if ( caretPos==surl.length() ) caretPos++;
