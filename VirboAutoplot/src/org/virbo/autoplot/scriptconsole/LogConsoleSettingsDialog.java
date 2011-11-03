@@ -75,8 +75,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
-        verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug", "all" }));
-        verbositySelect.setSelectedIndex(1);
+        verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug (fine)", "debug (finer)", "debug (finest)", "all" }));
         verbositySelect.setToolTipText("filter messages by verbosity.");
         verbositySelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -168,8 +167,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             level = Level.WARNING;
         } else if (o.equals("informational")) {
             level = Level.INFO;
-        } else if (o.equals("debug")) {
+        } else if (o.equals("debug (fine)")) {
+            level = Level.FINE;
+        } else if (o.equals("debug (finer)")) {
             level = Level.FINER;
+        } else if (o.equals("debug (finest)")) {
+            level = Level.FINEST;
         } else if (o.equals("all")) {
             level = Level.ALL;
         } else {
