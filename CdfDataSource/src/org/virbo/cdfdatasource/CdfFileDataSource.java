@@ -75,6 +75,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         mon.started();
         cdfFile = getFile(mon);
+        logger.log(Level.FINE, "reading {0}", resourceURI);
 
         mon.setProgressMessage("retrieving file...");
         String fileName = cdfFile.toString();
@@ -111,7 +112,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             Variable variable = cdf.getVariable(svariable);
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
-                long numRec= variable.getNumWrittenRecords();
+                long numRec= variable.getMaxWrittenRecord()+1;
                 long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
                 attributes = readAttributes(cdf, variable, 0);
                 if ( recs[2]==-1 ) {
@@ -235,7 +236,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
 
-        long numRec = variable.getNumWrittenRecords();
+        long numRec = variable.getMaxWrittenRecord()+1;
 
         if ( mon==null ) mon= new NullProgressMonitor();
 
