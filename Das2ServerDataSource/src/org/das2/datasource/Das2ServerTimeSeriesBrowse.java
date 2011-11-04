@@ -1,0 +1,74 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.das2.datasource;
+
+import java.text.ParseException;
+import java.util.Map;
+import java.util.logging.Logger;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
+import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
+
+/**
+ *
+ * @author jbf
+ */
+public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
+    DatumRange timeRange;
+    Datum resolution;
+    String uri;
+
+    final static Logger logger= Logger.getLogger("das2serverDataSource");
+
+    public void setTimeRange(DatumRange dr) {
+        timeRange= dr;
+    }
+
+    public void setTimeResolution(Datum d) {
+        resolution= d;
+    }
+
+    public String getURI() {
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+
+        String stime= timeRange.min().toString().replace(" ", "+");
+        String etime= timeRange.max().toString().replace(" ", "+");
+
+        params.put( "start_time", stime );
+        params.put( "end_time", etime );
+        params.put( "resolution", resolution==null ? null : String.valueOf(resolution.doubleValue(Units.seconds)) );
+
+        split.params= URISplit.formatParams(params);
+
+        return URISplit.format( split );
+    }
+
+    public DatumRange getTimeRange() {
+        return timeRange;
+    }
+
+    public Datum getTimeResolution() {
+        return resolution;
+    }
+
+    public void setURI(String suri) throws ParseException {
+        this.uri= suri;
+        URISplit split= URISplit.parse(suri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String startTime= params.remove( "start_time" );
+        String endTime= params.get( "end_time" );
+        String sresolution= params.get("resolution");
+        if ( startTime!=null && endTime!=null ) {
+            timeRange= new DatumRange( Units.us2000.parse(startTime), Units.us2000.parse(endTime) );
+        }
+        if ( sresolution!=null ) {
+            resolution= Units.seconds.parse(sresolution);
+        }
+    }
+}

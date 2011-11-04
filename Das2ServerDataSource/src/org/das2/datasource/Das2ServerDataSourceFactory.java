@@ -20,6 +20,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  *
@@ -101,5 +102,12 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         URISplit split= URISplit.parse( surl );
         Map params= URISplit.parseParams(split.params);
         return !( params.containsKey("start_time") && params.containsKey("end_time") && params.containsKey("dataset") );
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz== TimeSeriesBrowse.class ) {
+           return (T) new Das2ServerTimeSeriesBrowse();
+        }
+        return null;
     }
 }

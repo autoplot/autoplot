@@ -4,6 +4,7 @@
  */
 package org.das2.datasource;
 
+import java.text.ParseException;
 import java.util.logging.Level;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
@@ -333,6 +334,20 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             public Datum getTimeResolution() {
                 return resolution;
+            }
+
+            public void setURI(String suri) throws ParseException {
+                URISplit split= URISplit.parse(uri);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String startTime= params.remove( "start_time" );
+                String endTime= params.get( "end_time" );
+                String sresolution= params.get("resolution");
+                if ( startTime!=null && endTime!=null ) {
+                    timeRange= new DatumRange( Units.us2000.parse(startTime), Units.us2000.parse(endTime) );
+                }
+                if ( sresolution!=null ) {
+                    resolution= Units.seconds.parse(sresolution);
+                }
             }
         };
     }
