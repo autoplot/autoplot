@@ -11,8 +11,6 @@ package org.virbo.datasource.capability;
 
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
-import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
 
 /**
  * This capability allows DataSources that know how to produce data sets
