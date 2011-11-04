@@ -39,6 +39,28 @@ import java.util.regex.Pattern;
 public class URISplit {
 
     /**
+     * The following are suggestions for parameter names to encourage consistency between implementations.
+     * See http://autoplot.org/developer.URI_syntax
+     * For example, if your URI accepts a time range like "Nov 2011", then use the timerange=Nov+2011 in your URI. If you
+     * do, then for example DefaultTimeSeriesBrowseEditor will work for you.
+     */
+
+    /**
+     * time range subset.
+     */
+    public static String PARAM_TIME_RANGE= "timerange";
+
+    public static String PARAM_TIME_RESOLUTION="resolution";
+
+    /**
+     * subset of rank 2 data.  For example, columns of excel workbook or ascii table.
+     * rank2=[3,5] or rank2=Bx-Bz
+     */
+    public static String PARAM_RANK2="rank2";
+
+    public static String PARAM_REC_COUNT="recCount";
+
+    /**
      * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
      * then "vap:" is implicit.
      */
