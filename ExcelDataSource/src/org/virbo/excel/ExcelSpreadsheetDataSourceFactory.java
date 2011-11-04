@@ -114,4 +114,8 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     public String urlForServer(String surl) {
         return surl; // TODO
     }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
 }

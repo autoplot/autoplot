@@ -321,6 +321,10 @@ class TsdsDataSource extends AbstractDataSource {
             public Datum getTimeResolution() {
                 return resolution;
             }
+
+            public void setURI(String suri) throws ParseException {
+                
+            }
         };
     }
 

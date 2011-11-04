@@ -8,11 +8,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.DatumRange;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  *
@@ -55,6 +57,14 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
             return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
         } else {
             return !( params.containsKey("StartDate") && params.containsKey("EndDate") && params.containsKey("param1") );
+        }
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz.isInstance( TimeSeriesBrowse.class ) ) {
+           return (T) new TsdsTimeSeriesBrowse();
+        } else {
+            return null;
         }
     }
 }
