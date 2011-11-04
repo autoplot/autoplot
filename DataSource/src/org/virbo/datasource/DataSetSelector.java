@@ -1275,7 +1275,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public void setValue(String value) {
         if (value == null) {
-            throw new NullPointerException("value must not be null");
+            value="";
         }
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
