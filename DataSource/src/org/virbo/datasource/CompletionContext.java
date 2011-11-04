@@ -10,7 +10,6 @@
 package org.virbo.datasource;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  * models a part of a dataset's URI.  This class is used to serve as both the
