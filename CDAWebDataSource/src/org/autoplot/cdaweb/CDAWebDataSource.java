@@ -101,13 +101,20 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.setProgressMessage("refreshing database");
             db.maybeRefresh( new NullProgressMonitor() );
 
+            boolean webService= false;
+            String[] files= null;
+
             String tmpl= db.getNaming(ds.toUpperCase());
             String base= db.getBaseUrl(ds.toUpperCase());
 
             FileSystem fs= FileSystem.create( new URI( base ) );
             FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
 
-            String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
+            if ( webService ) {
+                files= db.getFilesAndRanges( ds.toUpperCase(), tr );
+            } else {
+                files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
+            }
 
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
@@ -125,8 +132,18 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             for ( int i=0; i<files.length; i++ ) {
                 if ( mon.isCancelled() ) break;
+                
+                DatumRange range1=null;
+                
+                String file= files[i];
+                String[] ss= file.split("\\|");
+                if ( webService ) {
+                    file=ss[0];
+                    range1= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
+                }
+
                 mon.setTaskProgress(i*10);
-                mon.setProgressMessage( "load "+files[i] );
+                mon.setProgressMessage( "load "+file );
 
                 ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
 
@@ -141,7 +158,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     if ( function!=null ) {
                         String comp= (String)metadata.get( "COMPONENT_"  + nc );
                         while ( comp!=null ) {
-                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
+                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( file + "?" + comp ) );
                             ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                             comps.add( ds1 );
                             nc++;
@@ -160,13 +177,19 @@ public class CDAWebDataSource extends AbstractDataSource {
                     Map<String,String> fileParams= getParams();
                     fileParams.remove( PARAM_TIMERANGE );
                     fileParams.remove( PARAM_DS );
-                    System.err.println( "loading "+fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
-                    CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
+                    URI file1;
+                    if ( webService ) {
+                        file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                    } else {
+                        file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
+                    }
+                    System.err.println( "loading "+file1 );
+                    CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                 }
 
                 if ( result==null && accum==null ) {
-                    range= fsm.getRangeFor(files[i]);
+                    range= webService ? range1 : fsm.getRangeFor(files[i]);
                     if ( files.length==1 ) {
                         result= (MutablePropertyDataSet)ds1;
                     } else {
@@ -181,7 +204,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         accum.grow( accum.length() + ads1.length() * ( files.length-i) );
                         accum.append( ads1 );
                     }
-                    range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
+                    range= DatumRangeUtil.union( range, webService ? range1 : fsm.getRangeFor(files[i]) );
                 }
 
             }

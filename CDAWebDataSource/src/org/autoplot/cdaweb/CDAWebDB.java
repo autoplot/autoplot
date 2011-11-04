@@ -12,14 +12,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,6 +35,7 @@ import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
@@ -146,6 +151,63 @@ public class CDAWebDB {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    /**
+     * get the list of files from the web service
+     * @param toUpperCase
+     * @param tr
+     * @return  <filename>|<startTime>|<endTime>
+     */
+    String[] getFilesAndRanges(String spid, DatumRange tr) throws IOException {
+        TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
+        String tstart= tp.format(tr.min(),tr.min());
+        String tstop= tp.format(tr.max(),tr.max());
+
+        InputStream ins= null;
+
+        try {
+            URL url = new URL(String.format("http://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/data/%s,%s/ALL-VARIABLES?format=cdf", spid, tstart, tstop));
+            URLConnection urlc;
+            urlc = url.openConnection();
+            urlc.setConnectTimeout(300);
+
+            ins= urlc.getInputStream();
+            InputSource source = new InputSource( ins );
+
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc;
+            doc = builder.parse(source);
+
+            XPath xp = XPathFactory.newInstance().newXPath();
+
+            NodeList set = (NodeList) xp.evaluate( "/DataResult/FileDescription", doc.getDocumentElement(), javax.xml.xpath.XPathConstants.NODESET );
+
+            String[] result= new String[ set.getLength() ];
+            for ( int i=0; i<set.getLength(); i++ ) {
+                Node item= set.item(i);
+                result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
+            }
+
+            return result;
+
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw ex;
+        } catch (SAXException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } finally {
+            if ( ins!=null ) ins.close();
+        }
     }
 
     public String getNaming( String spid ) throws IOException {
@@ -425,13 +487,18 @@ public class CDAWebDB {
      * @param args
      * @throws IOException
      */
-    public static void main( String [] args ) throws IOException {
+    public static void main( String [] args ) throws IOException, ParseException {
         CDAWebDB db= getInstance();
 
         long t0= System.currentTimeMillis();
 
         db.refresh( DasProgressPanel.createFramed("refreshing database") );
 
+        String[] files= db.getFilesAndRanges( "AC_H0_MFI", DatumRangeUtil.parseTimeRange( "20010101T000000Z-20010131T000000Z" ) );
+        for ( String s: files ) {
+            System.err.println(s);
+        }
+        
         Map<String,String> ids= db.getServiceProviderIds( );
 
         for ( String s: ids.keySet() ) {
