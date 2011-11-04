@@ -9,7 +9,6 @@
 
 package org.virbo.netCDF;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -129,6 +128,10 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         } catch ( IOException e ) {
             throw new RuntimeException(e);
         }
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
     }
     
     
