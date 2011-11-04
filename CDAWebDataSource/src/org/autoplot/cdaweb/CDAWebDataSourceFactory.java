@@ -20,8 +20,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  *
@@ -152,6 +154,14 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         }
         return new ArrayList<CompletionContext>() {};
     }
+
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==TimeSeriesBrowse.class ) {
+           return (T) new DefaultTimeSeriesBrowse();
+        }
+        return null;
+    }
+
 
     public boolean reject(String surl, ProgressMonitor mon) {
         URISplit split= URISplit.parse(surl);

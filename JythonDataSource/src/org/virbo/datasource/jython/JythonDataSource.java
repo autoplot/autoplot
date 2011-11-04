@@ -438,8 +438,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             return uri;
         }
 
-    }
+        public void setURI(String suri) throws ParseException {
+            this.uri= suri;
+            this.timeRange= URISplit.parseTimeRange(uri);
+        }
 
+    }
     /**
      * allow scripts to implement TimeSeriesBrowse if they check for the parameter "timerange"
      * @param jythonScript

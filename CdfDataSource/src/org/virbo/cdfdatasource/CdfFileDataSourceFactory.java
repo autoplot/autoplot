@@ -223,5 +223,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         // do nothing
         cdf.close();
     }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
     
 }

@@ -53,4 +53,8 @@ public class ImageDataSourceFactory implements DataSourceFactory {
     public boolean reject(String surl, ProgressMonitor mon) {
         return false;
     }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
 }

@@ -13,8 +13,6 @@ import dods.dap.DDSException;
 import dods.dap.parser.ParseException;
 import dods.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.virbo.metatree.IstpMetadataModel;
 import java.io.IOException;
 import java.net.URI;
@@ -105,5 +103,9 @@ public class DodsDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0", null, null, true));
         }
         return result;
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
     }
 }
