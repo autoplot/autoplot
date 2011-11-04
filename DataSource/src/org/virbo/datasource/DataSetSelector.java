@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -62,13 +63,16 @@ import javax.swing.Timer;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 import org.virbo.datasource.ui.PromptTextField;
 import org.virbo.dsops.Ops;
@@ -442,9 +446,36 @@ public class DataSetSelector extends javax.swing.JPanel {
             final String fsurl= surl;
             Runnable run= new Runnable() {
                 public void run() {
+                    String surl= fsurl;
+                    if ( timeRange!=null && UnitsUtil.isTimeLocation(timeRange.getUnits()) ) {
+                        try {
+                            //For TSB capability, set the default value to the axis setting initially.  So here's the problem: to see if
+                            // something has TSB, I need to a valid URI.  But I don't have a URI, that's why we are entering the editor.
+                            // Let's kludge past this and add the capability to the editor...
+                            DataSourceFactory dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
+                            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                            if (tsb!=null) {
+                                tsb.setURI(surl);
+                                DatumRange r= tsb.getTimeRange();
+                                if ( r==null ) {
+                                    tsb.setTimeRange(timeRange);
+                                    surl= tsb.getURI();
+                                }
+                            }
+                        } catch (ParseException ex ){
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalArgumentException ex) {
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (URISyntaxException ex) {
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
                     boolean proceed;
                     try {
-                        proceed = fedit.prepare(fsurl, window, getMonitor("download file", "downloading file to preparing editor"));
+                        proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file to preparing editor"));
                         setCursor( Cursor.getDefaultCursor() );
                         if ( !proceed ) return;
                     } catch ( java.io.InterruptedIOException ex ) {
@@ -457,11 +488,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                         return;
                     }
 
-                    fedit.setURI(fsurl);
+                    fedit.setURI(surl);
 
                     DataSourceEditorDialog dialog;
 
-                    String title = "Editing URI " + fsurl;
+                    String title = "Editing URI " + surl;
                     if (window instanceof Frame) {
                         dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
                     } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
@@ -477,18 +508,18 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     dialog.setExpertMode(isExpertMode());
 
-                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
-                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
-                            if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
-                                ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
-                            }
-                        }
-                        SwingUtilities.invokeLater( new Runnable() {
-                            public void run() {
-                                ((AggregatingDataSourceEditorPanel)fedit).hintAtCompletion(); 
-                            }
-                        });
-                    }
+//                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
+//                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
+//                            if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
+//                                ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
+//                            }
+//                        }
+//                        SwingUtilities.invokeLater( new Runnable() {
+//                            public void run() {
+//                                ((AggregatingDataSourceEditorPanel)fedit).hintAtCompletion();
+//                            }
+//                        });
+//                    }
 
                     dialog.setVisible(true);
 

@@ -9,6 +9,7 @@
 
 package org.virbo.datasource.capability;
 
+import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 
@@ -57,5 +58,13 @@ public interface TimeSeriesBrowse {
      * return the same dataset!
      */
     String getURI( );
+
+    /**
+     * Added in effort to make it easier to set the timerange if we have a timerange already.  This
+     * allows the timerange part of the URI to be set without having to understand the rest of it.
+     * set the URI, and possibly the timerange part.
+     * @param suri
+     */
+    public void setURI( String suri ) throws ParseException ;
 
 }

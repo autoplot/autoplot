@@ -2,6 +2,7 @@ package org.virbo.datasource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 
 /**
  * Class for containing the elemental parts of a URI, and utility
@@ -746,6 +749,24 @@ public class URISplit {
         //surl = surl.replaceAll("%3F", "?" );
 
         return surl;
+    }
+
+    /**
+     * Helper method to get the timerange from the URI
+     * @param uri
+     * @return the DatumRange if "timerange=" is found, or null if not.
+     * @throws ParseException
+     */
+    public static DatumRange parseTimeRange( String uri ) throws ParseException {
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String str= params.get( URISplit.PARAM_TIME_RANGE );
+        if ( str!=null ) {
+            DatumRange timerange= DatumRangeUtil.parseTimeRange( str );
+            return timerange;
+        } else {
+            return null;
+        }
     }
 
     @Override

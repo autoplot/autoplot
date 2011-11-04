@@ -154,6 +154,10 @@ public class AggregatingDataSource extends AbstractDataSource {
             return "aggtsb: " + viewRange + "@" + ( resolution==null ? "intrinsic" : resolution );
         }
 
+        public void setURI(String suri) throws ParseException {
+            viewRange= URISplit.parseTimeRange(suri);
+        }
+
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {

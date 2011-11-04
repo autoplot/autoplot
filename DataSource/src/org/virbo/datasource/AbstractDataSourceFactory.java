@@ -4,8 +4,6 @@
  */
 package org.virbo.datasource;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
@@ -23,6 +21,10 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
 
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         return Collections.emptyList();
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {

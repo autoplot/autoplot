@@ -30,7 +30,13 @@ public interface DataSourceFactory {
      * displayed more gently, relying on getMessage to aid the human operator.
      */
     public List<CompletionContext> getCompletions( CompletionContext cc, ProgressMonitor mon ) throws Exception;
-    
+
+    /**
+     * return additional tools for creating valid URIs, such as TimeSeriesBrowseEditor.  This may soon include
+     * a file selector, and an automatic GUI created from the completions model.
+     */
+    public <T> T getCapability( Class<T> clazz );
+
     /**
      * quick check to see that an url looks acceptable.  This is introduced to 
      * get Bob's desired behavior, that hitting return after a CDF filename should

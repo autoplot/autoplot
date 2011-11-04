@@ -26,7 +26,9 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/$Y/noaa14_meped1min_sem_$Y$m$d_v01.cdf?timerange=2000-01-01
@@ -261,6 +263,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     public void setDelegateDataSourceFactory(DataSourceFactory delegateFactory) {
         this.delegateFactory= delegateFactory;
+    }
+
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz.isInstance( TimeSeriesBrowse.class ) ) {
+           return (T) new DefaultTimeSeriesBrowse();
+        }
+        return null;
     }
 
 }
