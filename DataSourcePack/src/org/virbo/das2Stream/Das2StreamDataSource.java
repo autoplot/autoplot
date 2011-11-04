@@ -16,22 +16,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.HtmlResponseIOException;
-import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 
@@ -106,20 +99,4 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
     }
 
-    public static DataSourceFactory getFactory() {
-        return new DataSourceFactory() {
-
-            public DataSource getDataSource(URI uri) throws IOException {
-                return new Das2StreamDataSource(uri);
-            }
-
-            public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) {
-                return Collections.emptyList();
-            }
-
-            public boolean reject(String surl, ProgressMonitor mon) {
-                return false;
-            }
-        };
-    }
 }

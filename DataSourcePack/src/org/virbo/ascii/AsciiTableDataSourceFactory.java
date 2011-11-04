@@ -239,4 +239,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         return getFieldNames( file, params, mon );
 
     }
+
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
 }

@@ -106,4 +106,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         return false;
     }
 
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
+
 }

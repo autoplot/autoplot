@@ -69,5 +69,9 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         
     }
 
+    public <T> T getCapability(Class<T> clazz) {
+        return null;
+    }
+
 
 }
