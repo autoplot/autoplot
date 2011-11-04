@@ -81,7 +81,6 @@ import org.virbo.dsops.Ops;
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
     private static int MAX_RECENT=20;
-    private Color foregroundColor;
 
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
@@ -99,7 +98,6 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         addCompletionKeys();
         addAbouts();
-        foregroundColor= getForeground();
         
         maybePlotTimer = new Timer(100, new ActionListener() {
 
@@ -146,7 +144,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     JTextField editor;
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
-    Logger logger = Logger.getLogger("virbo.dataset.ui");
+    static final Logger logger = Logger.getLogger("virbo.dataset.ui");
     MonitorFactory monitorFactory = null;
     Timer maybePlotTimer;
     int keyModifiers = 0;
@@ -890,22 +888,23 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
-    private int stepForSize( int size ) {
-        int step;
-        if ( size<20 ) {
-            step=1;
-        } else if ( size<40 ) {
-            step=2;
-        } else {
-            step=4;
-        }
-        return step;
-    }
+//    private int stepForSize( int size ) {
+//        int step;
+//        if ( size<20 ) {
+//            step=1;
+//        } else if ( size<40 ) {
+//            step=2;
+//        } else {
+//            step=4;
+//        }
+//        return step;
+//    }
+    
     /**
      * THIS MUST BE CALLED AFTER THE COMPONENT IS ADDED.  
      * This is so ENTER works properly.
      */
-    public void addCompletionKeys() {
+    public final void addCompletionKeys() {
 
         ActionMap map = dataSetSelector.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
@@ -971,7 +970,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
     };
 
-    public void addAbouts() {
+    public final void addAbouts() {
         final String regex = "about:(.*)";
         registerActionTrigger(regex, new AbstractAction() {
 
