@@ -627,6 +627,10 @@ public class DataSourceController extends DomNodeController {
             Datum res= getTimeResolution();
             return "inttsb: "+getTimeRange()+" " +( res==null ? "" : "&resolution="+res );
         }
+
+        public void setURI(String suri) throws ParseException {
+            throw new IllegalArgumentException("not implemented");
+        }
         
     }
 
