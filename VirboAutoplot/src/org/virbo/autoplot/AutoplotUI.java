@@ -1125,15 +1125,15 @@ APSplash.checkTime("init 52");
 
     private ProgressMonitor getStatusBarProgressMonitor( final String finishMessage ) {
         return new NullProgressMonitor() {
-                public void setProgressMessage(String message) {
-                    setStatus(BUSY_ICON,message);
-                }
-                @Override
-                public void finished() {
-                    setStatus(IDLE_ICON,finishMessage);
-                }
-
-            };
+            @Override
+            public void setProgressMessage(String message) {
+                setStatus(BUSY_ICON,message);
+            }
+            @Override
+            public void finished() {
+                setStatus(IDLE_ICON,finishMessage);
+            }
+        };
     }
 
     private void plotUrl( String surl ) {
