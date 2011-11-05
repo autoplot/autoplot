@@ -261,16 +261,21 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         jMenuBar1.add( Box.createHorizontalGlue() );
         expertMenu= new JMenu("Expert");
-        expertMenu.add( new JMenuItem( new AbstractAction( "Basic Mode") {
+        JMenuItem mi;
+        mi= new JMenuItem( new AbstractAction( "Basic Mode") {
            public void actionPerformed( ActionEvent e ) {
                setExpertMode(false);
            }
-        }));
-        expertMenu.add( new JMenuItem( new AbstractAction( "Expert Mode") {
+        });
+        mi.setToolTipText("Basic mode allows for browsing products composed by data providers");
+        expertMenu.add( mi );
+        mi= new JMenuItem( new AbstractAction( "Expert Mode") {
            public void actionPerformed( ActionEvent e ) {
                setExpertMode(true);
            }
-        }));
+        });
+        mi.setToolTipText("Expert allows composing new products and scripting");
+        expertMenu.add( mi );
         expertMenu.setToolTipText("<html>Toggle between expert and basic mode.<br>Basic mode allows for browsing products composed by data providers<br>Expert allows composing new products and scripting");
         jMenuBar1.add( expertMenu );
 
