@@ -41,6 +41,7 @@
             <TitledBorder title="Data Post Processing [?]&#xa;"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="When the operations field starts with the pipe (|) character, it is a list of filters that are to be applied to the data.  Otherwise it is the component of the dataset to plot, such as &quot;Bx&quot;.  GUI controls for slicing are provided as well, and these simply control the string."/>
       </Properties>
 
       <Layout>
@@ -167,6 +168,7 @@
             <TitledBorder title="Data Source [?]"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Additional processes applied to the data after loading.  For example, data source typically identifies fill, but in case this is done improperly, the value can be set here."/>
       </Properties>
 
       <Layout>
@@ -260,6 +262,7 @@
             <TitledBorder title="Data Address (URI)"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="The Data Address, or URI, identifies the data that is loaded.  Plug-in data sources, resolved from this address, are used to load in the data for the given URI.  (This is not editable, but will be soon.)"/>
       </Properties>
 
       <Layout>
@@ -267,7 +270,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="uriLabel" pref="410" max="32767" attributes="0"/>
+                  <Component id="uriTextField" pref="410" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -275,16 +278,23 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="uriLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="uriTextField" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="uriLabel">
+        <Component class="javax.swing.JTextField" name="uriTextField">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
+              <FontInfo relative="true">
+                <Font component="uriTextField" property="font" relativeSize="true" size="-2"/>
+              </FontInfo>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jTextField1"/>
+            <Property name="toolTipText" type="java.lang.String" value="After the data is loaded, the plot element can apply additional operations before displaying the data.  "/>
           </Properties>
         </Component>
       </SubComponents>

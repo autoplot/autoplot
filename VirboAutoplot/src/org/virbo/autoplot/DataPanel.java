@@ -354,7 +354,7 @@ public class DataPanel extends javax.swing.JPanel {
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.uriLabel, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.uriTextField, BeanProperty.create("text")));
         try {
             bc.bind();
         } catch ( RuntimeException e ) {
@@ -447,9 +447,10 @@ public class DataPanel extends javax.swing.JPanel {
         fillValueLabel = new javax.swing.JLabel();
         fillValueComboBox = new javax.swing.JComboBox();
         jPanel3 = new javax.swing.JPanel();
-        uriLabel = new javax.swing.JLabel();
+        uriTextField = new javax.swing.JTextField();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Post Processing [?]\n"));
+        jPanel2.setToolTipText("When the operations field starts with the pipe (|) character, it is a list of filters that are to be applied to the data.  Otherwise it is the component of the dataset to plot, such as \"Bx\".  GUI controls for slicing are provided as well, and these simply control the string.");
 
         sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "second", "last" }));
         sliceTypeComboBox.setSelectedIndex(2);
@@ -557,6 +558,7 @@ public class DataPanel extends javax.swing.JPanel {
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Source [?]"));
+        jPanel1.setToolTipText("Additional processes applied to the data after loading.  For example, data source typically identifies fill, but in case this is done improperly, the value can be set here.");
 
         validRangeLabel.setText("Valid Range:");
         validRangeLabel.setToolTipText("Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill.\n");
@@ -611,8 +613,12 @@ public class DataPanel extends javax.swing.JPanel {
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Address (URI)"));
+        jPanel3.setToolTipText("The Data Address, or URI, identifies the data that is loaded.  Plug-in data sources, resolved from this address, are used to load in the data for the given URI.  (This is not editable, but will be soon.)");
 
-        uriLabel.setText("jLabel1");
+        uriTextField.setEditable(false);
+        uriTextField.setFont(uriTextField.getFont().deriveFont(uriTextField.getFont().getSize()-2f));
+        uriTextField.setText("jTextField1");
+        uriTextField.setToolTipText("After the data is loaded, the plot element can apply additional operations before displaying the data.  ");
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -620,13 +626,13 @@ public class DataPanel extends javax.swing.JPanel {
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(uriLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+                .add(uriTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
-                .add(uriLabel)
+                .add(uriTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -731,7 +737,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner sliceIndexSpinner;
     private javax.swing.JComboBox sliceTypeComboBox;
     private javax.swing.JCheckBox transposeCheckBox;
-    private javax.swing.JLabel uriLabel;
+    private javax.swing.JTextField uriTextField;
     private javax.swing.JComboBox validRangeComboBox;
     private javax.swing.JLabel validRangeLabel;
     // End of variables declaration//GEN-END:variables
