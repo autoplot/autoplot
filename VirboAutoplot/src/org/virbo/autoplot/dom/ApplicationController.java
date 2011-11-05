@@ -859,10 +859,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         //domPlot.addPropertyChangeListener(application.childListener);
         domPlot.addPropertyChangeListener(domListener);
 
-        if (plots.size() == 1) {
-            bind(application, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE);
-        }
-
         lock.unlock();
         return domPlot;
     }
