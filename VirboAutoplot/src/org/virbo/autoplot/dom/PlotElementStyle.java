@@ -200,6 +200,7 @@ public class PlotElementStyle extends DomNode {
         if ( !exclude.contains(PROP_PLOT_SYMBOL ) )this.setPlotSymbol( that.getPlotSymbol() );
         if ( !exclude.contains(PROP_SYMBOL_SIZE ) )this.setSymbolSize( that.getSymbolSize() );
         if ( !exclude.contains(PROP_SYMBOL_CONNECTOR ) )this.setSymbolConnector( that.getSymbolConnector() );
+        if ( !exclude.contains(PROP_REBINMETHOD ) ) this.setRebinMethod(that.getRebinMethod());
     }
 
     @Override
@@ -228,6 +229,9 @@ public class PlotElementStyle extends DomNode {
 
         b= that.fillToReference==this.fillToReference;
         if ( !b ) result.add( new PropertyChangeDiff( "fillToReference", that.fillToReference, this.fillToReference ));
+
+        b= that.rebinMethod==this.rebinMethod;
+        if ( !b ) result.add( new PropertyChangeDiff( "rebinMethod", that.rebinMethod, this.rebinMethod ) );
 
         b= that.reference.equals( this.reference );
         if ( !b ) result.add( new PropertyChangeDiff( "reference",  that.reference, this.reference ));
