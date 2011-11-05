@@ -42,7 +42,11 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
 
         params.put( "start_time", stime );
         params.put( "end_time", etime );
-        params.put( "resolution", resolution==null ? null : String.valueOf(resolution.doubleValue(Units.seconds)) );
+        if ( resolution==null ) {
+            params.remove("resolution");
+        } else {
+            params.put( "resolution", String.valueOf(resolution.doubleValue(Units.seconds)) );
+        }
 
         split.params= URISplit.formatParams(params);
 
