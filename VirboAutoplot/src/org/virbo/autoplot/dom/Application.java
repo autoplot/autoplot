@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
+import org.das2.datum.DatumRangeUtil;
 
 /**
  *
@@ -129,7 +129,7 @@ public class Application extends DomNode {
         this.options = options;
     }
 
-    protected DatumRange timeRange = new DatumRange( 0, 100, Units.dimensionless );
+    protected DatumRange timeRange = DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
     /**
      * all time axes should hang off of this.
      */
