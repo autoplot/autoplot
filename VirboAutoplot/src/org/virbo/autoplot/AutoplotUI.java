@@ -1435,6 +1435,7 @@ APSplash.checkTime("init 52");
         undoMultipleMenu = new javax.swing.JMenu();
         editDomSeparator = new javax.swing.JSeparator();
         editDomMenuItem = new javax.swing.JMenuItem();
+        EditOptions = new javax.swing.JMenuItem();
         inspectVapFileMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
@@ -1562,6 +1563,15 @@ APSplash.checkTime("init 52");
             }
         });
         editMenu.add(editDomMenuItem);
+
+        EditOptions.setText("Options...");
+        EditOptions.setToolTipText("Edit user options like background colors and fonts");
+        EditOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditOptionsActionPerformed(evt);
+            }
+        });
+        editMenu.add(EditOptions);
 
         inspectVapFileMenuItem.setText("Inspect Vap File...");
         inspectVapFileMenuItem.setToolTipText("View a vap file from a local disk in the property editor");
@@ -2352,6 +2362,11 @@ private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent
     }
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
+private void EditOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditOptionsActionPerformed
+    PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
+    edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
+}//GEN-LAST:event_EditOptionsActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -2681,6 +2696,7 @@ APSplash.checkTime("init -80");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem EditOptions;
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
     private javax.swing.ButtonGroup addressBarButtonGroup;
