@@ -456,11 +456,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                             TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
                             if (tsb!=null) {
                                 tsb.setURI(surl);
-                                DatumRange r= tsb.getTimeRange();
-                                if ( r==null ) {
-                                    tsb.setTimeRange(timeRange);
-                                    surl= tsb.getURI();
-                                }
+                                //DatumRange r= tsb.getTimeRange();
+                                tsb.setTimeRange(timeRange);
+                                surl= tsb.getURI();
                             }
                         } catch (ParseException ex ){
                             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
