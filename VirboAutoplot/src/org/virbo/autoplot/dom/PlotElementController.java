@@ -336,6 +336,38 @@ public class PlotElementController extends DomNodeController {
      */
     private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException {
         String label= null;
+        if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
+            if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
+                String[] labels = SemanticOps.getComponentLabels(fillDs);
+                String comp= plotElement.getComponent();
+                int ip= comp.indexOf("|");
+                if ( ip!=-1 ) {
+                    comp= comp.substring(0,ip);
+                }
+                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                    fillDs= DataSetOps.unbundle( fillDs,comp ); //TODO: illegal argument exception
+                    label= plotElement.getComponent();
+                } else {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (labels[i].equals(comp)) {
+                            fillDs = DataSetOps.slice1(fillDs, i);
+                            label = labels[i];
+                            break;
+                        }
+                    }
+                }
+                if (label == null && !isPendingChanges()) {
+                    RuntimeException ex = new RuntimeException("component not found " + plotElement.getComponent());
+                    throw ex;
+                }
+            }
+            int idx= c.indexOf("|");
+            if ( idx==-1 ) {
+                c="";
+            } else {
+                c= c.substring(idx);
+            }
+        }
         if (c.length() > 5 && c.startsWith("|")) {
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
@@ -363,27 +395,7 @@ public class PlotElementController extends DomNodeController {
                 }
                 fillDs = DataSetOps.sprocess(c, fillDs, null);
             }
-        } else {
-            if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
-                String[] labels = SemanticOps.getComponentLabels(fillDs);
-                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                    fillDs= DataSetOps.unbundle( fillDs, plotElement.getComponent() ); //TODO: illegal argument exception
-                    label= plotElement.getComponent();
-                } else {
-                    for (int i = 0; i < labels.length; i++) {
-                        if (labels[i].equals(plotElement.getComponent())) {
-                            fillDs = DataSetOps.slice1(fillDs, i);
-                            label = labels[i];
-                            break;
-                        }
-                    }
-                }
-                if (label == null && !isPendingChanges()) {
-                    RuntimeException ex = new RuntimeException("component not found " + plotElement.getComponent());
-                    throw ex;
-                }
-            }
-        }
+        } 
         return fillDs;
     }
 
