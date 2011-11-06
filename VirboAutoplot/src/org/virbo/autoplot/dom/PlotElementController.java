@@ -346,18 +346,23 @@ public class PlotElementController extends DomNodeController {
                 }
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
                     fillDs= DataSetOps.unbundle( fillDs,comp ); //TODO: illegal argument exception
-                    label= plotElement.getComponent();
+                    label= comp;
                 } else {
+                    boolean found= false;
                     for (int i = 0; i < labels.length; i++) {
                         if (labels[i].equals(comp)) {
                             fillDs = DataSetOps.slice1(fillDs, i);
                             label = labels[i];
+                            found= true;
                             break;
                         }
                     }
+                    if ( !found ) {
+                        throw new IllegalArgumentException("component not found: "+comp );
+                    }
                 }
                 if (label == null && !isPendingChanges()) {
-                    RuntimeException ex = new RuntimeException("component not found " + plotElement.getComponent());
+                    RuntimeException ex = new RuntimeException("component not found: " + comp );
                     throw ex;
                 }
             }
@@ -617,7 +622,8 @@ public class PlotElementController extends DomNodeController {
                         setResetPlotElement(false);
                     } catch ( RuntimeException ex ) {
                         setStatus("warning: Exception in process: " + ex );
-                        throw new RuntimeException(ex);
+                        getRenderer().setException(ex);
+                        //throw new RuntimeException(ex);
                     }
                 } else {
                     if (renderer == null) maybeCreateDasPeer();
