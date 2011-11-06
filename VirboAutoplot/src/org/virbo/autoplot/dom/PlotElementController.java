@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
@@ -28,7 +27,6 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
-import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
@@ -37,7 +35,6 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.RequestProcessor;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
@@ -622,13 +619,19 @@ public class PlotElementController extends DomNodeController {
                         setResetPlotElement(false);
                     } catch ( RuntimeException ex ) {
                         setStatus("warning: Exception in process: " + ex );
-                        getRenderer().setException(ex);
-                        //throw new RuntimeException(ex);
+                        //getRenderer().setException(ex);
+                        throw ex;
                     }
                 } else {
                     if (renderer == null) maybeCreateDasPeer();
-                    if (resetRanges) doResetRanges();
-                    setResetPlotElement(false);
+                    try {
+                        if (resetRanges) doResetRanges();
+                        setResetPlotElement(false);
+                    } catch ( RuntimeException ex ) {
+                        setStatus("warning: Exception in process: " + ex );
+                        //getRenderer().setException(ex);
+                        throw ex;
+                    }
                 }
             } else if (resetRanges) {
                 doResetRanges();
