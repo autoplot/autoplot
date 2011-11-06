@@ -341,13 +341,14 @@ public class PlotElementController extends DomNodeController {
                 if ( ip!=-1 ) {
                     comp= comp.substring(0,ip);
                 }
+                comp= Ops.saferName(comp);
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
                     fillDs= DataSetOps.unbundle( fillDs,comp ); //TODO: illegal argument exception
                     label= comp;
                 } else {
                     boolean found= false;
                     for (int i = 0; i < labels.length; i++) {
-                        if (labels[i].equals(comp)) {
+                        if ( Ops.saferName(labels[i]).equals(comp)) {
                             fillDs = DataSetOps.slice1(fillDs, i);
                             label = labels[i];
                             found= true;
