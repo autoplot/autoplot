@@ -41,6 +41,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.dsops.Ops;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -757,7 +758,7 @@ public class CdfUtil {
                 String[] sdata = (String[]) odata;
                 double[] back = new double[sdata.length];
                 for (int i = 0; i < sdata.length; i++) {
-                    back[i] = units.createDatum(sdata[i]).doubleValue(units);
+                    back[i] = units.createDatum( Ops.saferName(sdata[i]) ).doubleValue(units);
                 }
                 result = DDataSet.wrap(back);
                 result.putProperty(QDataSet.UNITS, units);
