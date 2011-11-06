@@ -34,6 +34,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
 //import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
@@ -152,9 +153,24 @@ public class CdfUtil {
         }
     }
 
-    public static MutablePropertyDataSet wrapCdfHyperDataHacked(
-            CDF cdf, Variable variable, long recStart, long recCount, long recInterval ) throws Exception {
-        return wrapCdfHyperDataHacked( cdf, variable, recStart, recCount, recInterval, new NullProgressMonitor() );
+    private static long sizeOf( int dims, int[] dimSizes, long itype, long rc ) {
+        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
+        long sizeBytes;
+        if ( itype==CDFConstants.CDF_EPOCH16 ) {
+            sizeBytes= 16;
+        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
+            sizeBytes= 8;
+        } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
+            sizeBytes=4; //sizeBytes= 4;
+        } else if( itype == CDFConstants.CDF_INT2 || itype == CDFConstants.CDF_UINT2  ) {
+            sizeBytes=8; //sizeBytes= 2;
+        } else if( itype == CDFConstants.CDF_INT1 || itype == CDFConstants.CDF_UINT1 || itype==CDFConstants.CDF_BYTE || itype==CDFConstants.CDF_UCHAR || itype==CDFConstants.CDF_CHAR ) {
+            sizeBytes=8; //sizeBytes= 1;
+        } else {
+            throw new IllegalArgumentException("didn't code for type");
+        }
+        size= size*sizeBytes;
+        return size;
     }
 
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
@@ -174,16 +190,13 @@ public class CdfUtil {
         if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
         
         long varType = variable.getType();
-        long[] dimIndeces = new long[]{0};
 
         int[] dimSizes = variable.getDimensions();
         boolean[] dimVaries= variable.getVarys();
 
         if ( variable.getEffectiveRank() != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ variable.getEffectiveRank() ];
-            for ( int i=0; i<variable.getEffectiveRank(); i++ ) {
-                dimSizes1[i]= dimSizes[i];
-            }
+            System.arraycopy(dimSizes, 0, dimSizes1, 0, variable.getEffectiveRank());
             dimSizes= dimSizes1;
         }
 
@@ -194,29 +207,9 @@ public class CdfUtil {
             dims = dimSizes.length;
         }
 
-        long[] dimCounts;
-        long[] dimIntervals;
-
-        if (dims == 0) {
-            dimCounts = new long[]{0};
-            dimIntervals = new long[]{0};
-        } else if (dims == 1) {
-            dimCounts = new long[]{dimSizes[0]};
-            dimIntervals = new long[]{1};
-        } else if (dims == 2) {
-            dimIndeces = new long[]{0, 0};
-            dimCounts = new long[]{dimSizes[0], dimSizes[1]};
-            dimIntervals = new long[]{1, 1};
-        } else if (dims == 3) {
-            dimIndeces = new long[]{0, 0, 0};
-            dimCounts = new long[]{dimSizes[0], dimSizes[1], dimSizes[2]};
-            dimIntervals = new long[]{1, 1, 1};
-        } else {
+        if (dims > 3 ) {
             if (recCount != -1) {
                 throw new IllegalArgumentException("rank 5 not implemented");
-            } else {
-                dimCounts = new long[]{dimSizes[0]};
-                dimIntervals = new long[]{1};
             }
         }
 
@@ -234,24 +227,7 @@ public class CdfUtil {
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
 
-//        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
-//        long sizeBytes;
-//        int itype=  variable.getType();
-//        if ( itype==CDFConstants.CDF_EPOCH16 ) {
-//            sizeBytes= 16;
-//        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
-//            sizeBytes= 8;
-//        } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
-//            sizeBytes=8; //sizeBytes= 4;
-//        } else if( itype == CDFConstants.CDF_INT2 || itype == CDFConstants.CDF_UINT2  ) {
-//            sizeBytes=8; //sizeBytes= 2;
-//        } else if( itype == CDFConstants.CDF_INT1 || itype == CDFConstants.CDF_UINT1 || itype==CDFConstants.CDF_BYTE || itype==CDFConstants.CDF_UCHAR || itype==CDFConstants.CDF_CHAR ) {
-//            sizeBytes=8; //sizeBytes= 1;
-//        } else {
-//            throw new IllegalArgumentException("didn't code for type");
-//        }
-//        size= size*sizeBytes;
-//System.out.println("size of "+variable.getName()+": "+size/1024/1024 + "  type: "+ itype );
+        logger.log( Level.FINEST, "size of {0}: {1}  type: {2}", new Object[]{variable.getName(), sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
