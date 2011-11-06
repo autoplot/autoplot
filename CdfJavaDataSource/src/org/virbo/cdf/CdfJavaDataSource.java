@@ -415,7 +415,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         MutablePropertyDataSet result;
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, 0, -1, 1);
+            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, 0, -1, 1, new NullProgressMonitor() );
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
             if ( slice ) {
