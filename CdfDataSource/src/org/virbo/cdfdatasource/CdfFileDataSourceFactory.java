@@ -169,7 +169,10 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             Map<String,String> args= URISplit.parseParams( split.params );
             String param= args.get("arg_0");
             if ( param==null ) {
-                return true;
+                param= args.get("id");
+                if ( param==null ) {
+                    return true;
+                }
             }
             File file = DataSetURI.getFile(split.resourceUri, mon);
             if (!file.isFile()) {
