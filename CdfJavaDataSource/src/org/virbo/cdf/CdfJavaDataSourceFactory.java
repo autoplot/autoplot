@@ -133,9 +133,11 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             URISplit split = URISplit.parse(surl.toString());
             Map<String,String> args= URISplit.parseParams( split.params );
             String param= args.get("arg_0");
-            param= param.replaceAll(" ", "+");
             if ( param==null ) {
-                return true;
+                param= args.get("id");
+                if ( param==null ) {
+                    return true;
+                }
             }
             File file = DataSetURI.getFile(split.resourceUri, mon);
             if (!file.isFile()) {
