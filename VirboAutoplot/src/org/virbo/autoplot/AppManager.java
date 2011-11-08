@@ -80,4 +80,12 @@ public class AppManager {
     public WindowListener getWindowListener( final Object app ) {
         return getWindowListener(app,null);
     }
+
+    /**
+     * return the number of running applications this AppManager is managing.
+     * @return
+     */
+    public int getApplicationCount() {
+        return apps.size();
+    }
 }
