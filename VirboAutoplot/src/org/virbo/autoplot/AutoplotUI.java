@@ -1036,6 +1036,18 @@ APSplash.checkTime("init 52");
 
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed( ActionEvent ev ) {
+                if ( AppManager.getInstance().getApplicationCount()==1 ) {
+                    int opt= JOptionPane.showConfirmDialog( AutoplotUI.this,
+                            "Quit application?", "Quit Autoplot", JOptionPane.YES_NO_CANCEL_OPTION );
+                    if ( opt==JOptionPane.YES_OPTION ) {
+                        //normal route
+                    } else if ( opt==JOptionPane.NO_OPTION ) {
+                        AutoplotUI.this.dom.getController().reset();
+                        return;
+                    } else {
+                        return;
+                    }
+                }
                 AutoplotUI.this.dispose();
                 ScriptContext.close();
                 AppManager.getInstance().closeApplication(AutoplotUI.this);
