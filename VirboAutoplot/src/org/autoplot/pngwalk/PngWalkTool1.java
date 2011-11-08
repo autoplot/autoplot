@@ -79,6 +79,7 @@ import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
+import sun.security.krb5.internal.SeqNumber;
 
 /**
  *
@@ -235,34 +236,40 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {
-                String s = tool.getSelectedFile();
-                String template = tool.getTemplate();
-                if ( s.startsWith("file:/") && !s.startsWith("file:///") && template.startsWith("file:///") ) {
-                    s= "file:///"+s.substring(6);
+                String productFile=null;
+                final String suri;
+                if ( tool.seq==null ) {
+                    productFile=null;
+                    suri=null;
+                } else {
+                    String s = tool.getSelectedFile();
+                    String template = tool.getTemplate();
+                    if ( s.startsWith("file:/") && !s.startsWith("file:///") && template.startsWith("file:///") ) {
+                        s= "file:///"+s.substring(6);
+                    }
+                    int i0 = template.indexOf("_$Y");
+                    if ( i0==-1 ) i0= template.indexOf("_%Y");
+                    //int i1 = template.indexOf(".png");
+                    //if ( i1==-1 ) return;
+                    //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
+                    //String timeRange = s.substring(i0 + 1, i1);
+                    TimeParser tp= TimeParser.create( template );
+                    String timeRange = s;
+                    try {
+                        DatumRange dr= tp.parse(timeRange).getTimeRange();
+                        timeRange= dr.toString().replaceAll(" ", "+");
+                    } catch ( ParseException ex ) {
+                        throw new RuntimeException(ex);
+                    }
+                    productFile = template.substring(0, i0) + ".vap";
+                    suri = productFile + "?timeRange=" + timeRange;
                 }
-                int i0 = template.indexOf("_$Y");
-                if ( i0==-1 ) i0= template.indexOf("_%Y");
-                //int i1 = template.indexOf(".png");
-                //if ( i1==-1 ) return;
-                //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
-                //String timeRange = s.substring(i0 + 1, i1);
-                TimeParser tp= TimeParser.create( template );
-                String timeRange = s;
-                try {
-                    DatumRange dr= tp.parse(timeRange).getTimeRange();
-                    timeRange= dr.toString().replaceAll(" ", "+");
-                } catch ( ParseException ex ) {
-                    throw new RuntimeException(ex);
-                }
-                String productFile = template.substring(0, i0) + ".vap";
-
-                final String suri = productFile + "?timeRange=" + timeRange;
 
                 Runnable run = new Runnable() {
                     public void run() {
                         try {
                             ScriptContext.createGui();
-                            ScriptContext.plot(suri);
+                            if ( suri!=null ) ScriptContext.plot(suri);
                             Window apWindow= ScriptContext.getViewWindow();
                             if ( parent==null ) {
                                 apWindow.setVisible(true);
@@ -303,8 +310,17 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
-                AppManager.getInstance().closeApplication(tool);
+                if ( AppManager.getInstance().getApplicationCount()==1 ) {
+                    if ( JOptionPane.OK_OPTION==
+                            JOptionPane.showConfirmDialog( tool,
+                            "Quit application?", "Quit PNG Walk", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        f.dispose();
+                        AppManager.getInstance().closeApplication(tool);
+                    }
+                } else {
+                    f.dispose();
+                    AppManager.getInstance().closeApplication(tool);
+                }
             }
         } );
         fileMenu.add( new AbstractAction( "Quit" ) {
