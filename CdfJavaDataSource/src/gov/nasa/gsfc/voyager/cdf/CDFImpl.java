@@ -652,6 +652,17 @@ public abstract class CDFImpl implements java.io.Serializable {
             System.arraycopy(varies, 0, ba, 0, varies.length);
             return ba;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder dimString= new StringBuilder( this.getName() ). append("[") .append( this.numberOfValues );
+            int[] dims= this.getDimensions();
+            for ( int i=0; i<dims.length; i++ ) {
+                dimString.append( "," ).append( dims[i] );
+            }
+            dimString.append("]");
+            return dimString.toString();
+        }
     }
     public class DataLocator implements VariableDataLocator,
         java.io.Serializable {
