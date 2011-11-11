@@ -344,22 +344,22 @@ public class DataSourceController extends DomNodeController {
                         System.err.println("about to setup Gen for "+this);
                         timeSeriesBrowseController.setupGen( node, propertyName );
                         if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
-                        update(!valueWasAdjusting, !valueWasAdjusting );
+                        update( );
                     } else {
                         System.err.println("unable to use timerange as guide");
                         p.setContext( getTsb().getTimeRange() );
                         timeSeriesBrowseController.setupGen( node, propertyName );
-                        update(!valueWasAdjusting, !valueWasAdjusting );
+                        update( );
                     }
                 } else {
                     System.err.println("using plot context for TSB: "+this.dsf.getUri() );
                     timeSeriesBrowseController.setupGen( node, propertyName );
                     if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
-                    update(!valueWasAdjusting, !valueWasAdjusting );
+                    update( );
                 }
 
             } else {
-                update(!valueWasAdjusting, !valueWasAdjusting );
+                update( );
             }
         }
 
@@ -1073,7 +1073,7 @@ public class DataSourceController extends DomNodeController {
                 for ( PlotElement p: pelements )  {
                     p.getController().setResetRanges(true);
                 }
-                update(true, true);
+                update();
             }
         }
     };
@@ -1096,9 +1096,8 @@ public class DataSourceController extends DomNodeController {
      * update the model and view using the new DataSource to create a new dataset,
      * then inspecting the dataset to decide on axis settings.
      *
-     * NOTE autorange and interpretMeta have no effect!
      */
-    public synchronized void update(final boolean autorange, final boolean interpretMeta) {
+    public synchronized void update() {
         changesSupport.performingChange(this, PENDING_UPDATE);
 
         setDataSet(null);
@@ -1517,7 +1516,7 @@ public class DataSourceController extends DomNodeController {
                         cache1.resetURI(surl);
                         //trigger autorange
                         propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, null, dataSource);
-                        update(true, true);
+                        update();
                         return;
                     }
                 }
