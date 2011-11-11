@@ -271,7 +271,7 @@ public class TimeSeriesBrowseController {
                     }
                 } else {
                     dataSourceController.cancel();
-                    dataSourceController.update(autorange, autorange);
+                    dataSourceController.update();
                     dataSourceController.setTsbSuri(surl);
                 }
             } else {
