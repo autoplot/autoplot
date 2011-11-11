@@ -57,8 +57,10 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
     }
 
     public void setExpertMode( boolean expert ) {
-        overplotButton.setVisible(expert);
-        plotBelowButton.setVisible(expert);
+        if ( overplotButton.isVisible() ) { // support setPlayButton
+            overplotButton.setVisible(expert);
+            plotBelowButton.setVisible(expert);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -194,9 +196,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
      * provide way to hide the play button.
      */
     void setPlayButton(boolean b) {
-        okayButton.setIcon(null);
-        plotBelowButton.setVisible(false);
-        overplotButton.setVisible(false);
+        if ( b ) {
+            okayButton.setIcon(  new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png") ) );
+        } else {
+            okayButton.setIcon(null);
+        }
+        plotBelowButton.setVisible(b);
+        overplotButton.setVisible(b);
     }
 
 }
