@@ -502,9 +502,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     if ( actionListenerList==null || actionListenerList.isEmpty() ) {
                         dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
+                    } else {
+                        dialog.setExpertMode(isExpertMode());
                     }
-
-                    dialog.setExpertMode(isExpertMode());
 
 //                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
 //                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
