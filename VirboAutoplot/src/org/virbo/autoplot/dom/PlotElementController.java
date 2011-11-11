@@ -725,85 +725,90 @@ public class PlotElementController extends DomNodeController {
 
         int lat = -1, lon = -1;
 
-        int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
+        List<Integer> slicePref = new ArrayList( Arrays.asList( 2, 2, 2, 2, 2 ) ); // slicePref big means more likely to slice.
         for (int i = 0; i < depNames.length; i++) {
             String n = depNames[i].toLowerCase();
             Units u= depUnits[i];
             if (n.startsWith("lat")) {
-                slicePref[i] = 0;
+                slicePref.set( i,0 );
                 lat = i;
             } else if (n.startsWith("lon")) {
-                slicePref[i] = 0;
+                slicePref.set( i,0 );
                 lon = i;
             } else if (n.contains("time") ) {
-                slicePref[i] = 1;
+                slicePref.set( i,1 );
             } else if (n.contains("epoch") ) {
-                slicePref[i] = 1;
+                slicePref.set( i,1 );
             } else if (n.contains("angle")) {
-                slicePref[i] = 4;
+                slicePref.set( i,4 );
             } else if (n.contains("alpha") ) { // commonly used for pitch angle in space physics
-                slicePref[i] = 4;
+                slicePref.set( i,4 );
             } else if (n.contains("bundle")) {
-                slicePref[i] = 4;
+                slicePref.set( i,4 );
             } else if ( u instanceof EnumerationUnits ) {
-                slicePref[i]= 5;
+                slicePref.set( i,5 );
             } else if ( fillDs.property( "BUNDLE_"+i )!=null ) {
-                slicePref[i]= 5;
+                slicePref.set( i,5 );
             }
 
         }
 
-        int sliceIndex = 0;
-        int bestSlice = 0;
-        boolean noPref= true;
-        for (int i = 0; i < 3; i++) {
-            if ( i>0 && slicePref[i]!=slicePref[i-1] ) noPref= false;
-            if (slicePref[i] > bestSlice) {
-                sliceIndex = i;
-                bestSlice = slicePref[i];
-            }
+        List<Integer> qube= new ArrayList();
+        int[] a= DataSetUtil.qubeDims(fillDs);
+        for ( int i=0; i<a.length; i++ ) {
+            qube.add(a[i]);
         }
 
-        // if we have large dims and one small dim (image), then pick small dim.
-        if ( noPref ) {
-            int[] qubeDims= DataSetUtil.qubeDims(fillDs);
-            if ( qubeDims!=null ) {
-                int imin= -1;
-                int min= Integer.MAX_VALUE;
-                int nextMin= Integer.MAX_VALUE;
-                for ( int i=0; i<qubeDims.length; i++ ) {
-                    if ( qubeDims[i]<min ) {
-                        nextMin= min;
-                        min= qubeDims[i];
-                        imin= i;
+        String result="";
+        int nslice= fillDs.rank()-2;
+        for ( int islice=0; islice<nslice; islice++ ) {
+            int sliceIndex = 0;
+            int bestSlice = 0;
+            boolean noPref= true;
+            
+            for (int i = 0; i < depNames.length; i++) {
+                if ( i>0 && slicePref.get(i)!=slicePref.get(i-1) ) noPref= false;
+                if (slicePref.get(i) > bestSlice) {
+                    sliceIndex = i;
+                    bestSlice = slicePref.get(i);
+                }
+            }
+
+            // if we have large dims and one small dim (image), then pick small dim.
+            if ( noPref ) {
+                int[] qubeDims= DataSetUtil.qubeDims(fillDs);
+                if ( qubeDims!=null ) {
+                    int imin= -1;
+                    int min= Integer.MAX_VALUE;
+                    int nextMin= Integer.MAX_VALUE;
+                    for ( int i=0; i<qubeDims.length; i++ ) {
+                        if ( qubeDims[i]<min ) {
+                            nextMin= min;
+                            min= qubeDims[i];
+                            imin= i;
+                        }
+                    }
+                    if ( min<4 && nextMin>10 ) {
+                        sliceIndex= imin;
                     }
                 }
-                if ( min<4 && nextMin>10 ) {
-                    sliceIndex= imin;
-                }
             }
-        }
 
-        // pick a slice index near the middle, which is less likely to be all fill.
-        int n=0;
-        if ( sliceIndex==0 ) {
-            n= fillDs.length() / 2;
-        } else if ( sliceIndex==1 ) {
-            n= fillDs.length(0) / 2;
-        } else if ( sliceIndex==2 ) {
-            n= fillDs.length(0,0) / 2;
-        } else if ( sliceIndex==3 ) {
-            n= fillDs.length(0,0,0) / 2;
-        }
+            // pick a slice index near the middle, which is less likely to be all fill.
+            int n= qube.get(sliceIndex)/2;
+            
+            result+= "|slice"+sliceIndex+"("+n+")";
+            if (lat > -1 && lon > -1 && lat < lon) {
+                result+="|transpose()";
+            }
 
-        String result= "|slice"+sliceIndex+"("+n+")";
-        if (lat > -1 && lon > -1 && lat < lon) {
-            result+="|transpose()";
-        }
+            slicePref.remove(sliceIndex);
+            qube.remove(sliceIndex);
 
-        //if ( fillDs.rank()>3 ) {
-        //    result="|slice0(0)"+result;
-        //}
+            //if ( fillDs.rank()>3 ) {
+            //    result="|slice0(0)"+result;
+            //}
+        }
 
         return result;
 
