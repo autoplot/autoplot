@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.MetadataModel;
@@ -115,7 +116,7 @@ public class MetadataUtil {
     }
 
     /**
-     * slice the properties to reduce rank.
+     * slice the properties to reduce rank.  TODO: This all needs review, since the QDataSet model is mature.
      * @param properties
      * @param sliceDimension
      * @return
@@ -146,6 +147,13 @@ public class MetadataUtil {
 
     }
 
+    /**
+     * run the DataSource-provided properties through sprocess.
+     * TODO: this has not been implemented for most operations, and this all needs to be reconsidered
+     * @param c
+     * @param properties
+     * @return
+     */
     public static Map<String,Object> sprocess( String c, Map<String,Object> properties ) {
         int i=1;
         Scanner s= new Scanner( c );
@@ -153,7 +161,24 @@ public class MetadataUtil {
 
         while ( s.hasNext() ) {
             String cmd= s.next();
-            if ( cmd.startsWith("|slice") ) {
+            if ( cmd.equals("|slice") ) {
+                Pattern skipPattern= Pattern.compile("\\':?\\'");
+                List<Object> args= new ArrayList();
+                while ( s.hasNextInt() || s.hasNext( skipPattern ) ) {
+                    if ( s.hasNextInt() ) {
+                        args.add( s.nextInt() );
+                    } else {
+                        args.add( s.next() );
+                    }
+                }
+                int offset=0;
+                for ( int idim=args.size()-1; idim>=0; idim-- ) {
+                    if ( args.get(idim) instanceof Integer ) {
+                        properties= sliceProperties( properties, idim-offset );
+                        offset++;
+                    }
+                }
+            } else if ( cmd.startsWith("|slice") ) {
                 int dim= cmd.charAt(6)-'0';
                 int idx= s.nextInt();
                 properties= sliceProperties( properties, dim );
@@ -166,6 +191,8 @@ public class MetadataUtil {
                 properties= newproperties;
             } else if ( cmd.equals("|transpose") ) {
                 properties= transposeProperties(properties);
+            } else {
+                return new HashMap();
             }
         }
         return properties;
