@@ -46,6 +46,7 @@ import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
+import org.das2.datum.UnitsConverter;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
@@ -471,6 +472,28 @@ public class AutoplotUtil {
 
         if ( properties!=null && "log".equals(properties.get(QDataSet.SCALE_TYPE) ) ) {
             isLog= true;
+        }
+
+        if ( typical==null && SemanticOps.isJoin(ds) ) {
+            result.range= null;
+            result.robustMax= -1* Double.MAX_VALUE;
+            result.robustMin= Double.MAX_VALUE;
+
+            Units units=null;
+            UnitsConverter uc= UnitsConverter.IDENTITY;
+            for ( int i=0; i<ds.length(); i++ ) {
+                AutoRangeDescriptor r1= autoRange( ds.slice(i), properties );
+                if ( units==null ) {
+                    units= r1.range.getUnits();
+                } else {
+                    uc= r1.range.getUnits().getConverter(units);
+                }
+                result.range= result.range==null ? r1.range : DatumRangeUtil.union( result.range, r1.range );
+                if ( r1.log ) result.log= true;
+            }
+            result.robustMin= result.range.min().doubleValue(result.range.getUnits());
+            result.robustMax= result.range.max().doubleValue(result.range.getUnits());
+            return result;
         }
 
         if (mono) {
