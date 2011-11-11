@@ -23,12 +23,13 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.virbo.dsutil.PropertiesTreeModel;
 import org.virbo.metatree.NameValueTreeModel;
@@ -43,8 +44,11 @@ public class MetadataPanel extends javax.swing.JPanel {
     Application dom;
     CombinedTreeModel tree;
     TreeModel dsTree;
+    TreeModel componentDataSetTree=null;
     DataSourceFilter bindToDataSourceFilter = null;  //TODO: these should be weak references or such.
+    PlotElement bindToPlotElement =null;
     private QDataSet dsTreeDs;
+    private QDataSet componentDs;
 
     /** Creates new form MetadataPanel */
     public MetadataPanel(ApplicationModel applicationModel) {
@@ -62,6 +66,12 @@ public class MetadataPanel extends javax.swing.JPanel {
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToDataSourceFilter( dom.getController().getDataSourceFilter() );
+            }
+        });
+
+        dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                bindToPlotElement( dom.getController().getPlotElement() );
             }
         });
 
@@ -83,12 +93,23 @@ public class MetadataPanel extends javax.swing.JPanel {
         }
         dsf.getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
         dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
+        bindToDataSourceFilter= dsf; // BUGFIX
         updateProperties();
         updateStatistics();
     }
 
+    private void bindToPlotElement( PlotElement pe ) {
+        if (bindToPlotElement != null) {
+            PlotElementController pec = bindToPlotElement.getController();
+            pec.removePropertyChangeListener(componentListener);
+        }
+        pe.getController().addPropertyChangeListener(DataSourceController.PROP_DATASET, componentListener );
+        bindToPlotElement= pe;
+        updateComponentDataSet();
 
-    public void updateProperties() {
+    }
+
+    private void updateProperties() {
 
         try {
             DataSourceFilter dsf = dom.getController().getDataSourceFilter();
@@ -168,6 +189,27 @@ public class MetadataPanel extends javax.swing.JPanel {
         }
     };
 
+    /**
+     * update when the fill dataset changes.
+     */
+    transient PropertyChangeListener componentListener = new PropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(PlotElementController.PROP_DATASET )) {
+                updateComponentDataSet();
+            }
+        }
+    };
+
+    private void updateComponentDataSet() {
+        Runnable run= new Runnable() {
+            public void run() {
+                updateComponentDataSetPropertiesView();
+            }
+        };
+        RequestProcessor.invokeLater(run);
+    }
+
     private String format(double d) {
         if (Math.abs(Math.log(d) / Math.log(10)) < 3) {
             DecimalFormat df1 = new DecimalFormat("0.00");
@@ -179,41 +221,41 @@ public class MetadataPanel extends javax.swing.JPanel {
     }
     boolean statisticsDirty;
 
-    private String histStr(QDataSet ds) {
-        QDataSet hist = Ops.histogram(ds, 20);
-        QDataSet dep0 = (QDataSet) hist.property(QDataSet.DEPEND_0);
-        Datum res = DataSetUtil.asDatum((RankZeroDataSet) dep0.property(QDataSet.CADENCE));
-        Units u = (Units) dep0.property(QDataSet.UNITS);
-        if (u == null) {
-            u = Units.dimensionless;
-        }
-
-        String scale;
-        if (metaDataTree.getFont().canDisplay((char) 2581)) {
-            scale = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
-        } else {
-            scale = " .:!#";
-        }
-        int scaleMax = scale.length();
-
-        Integer max = (Integer) hist.property("max");
-
-        StringBuffer s = new StringBuffer();
-
-        s.append("" + Datum.create(dep0.value(0), u, res.doubleValue(u.getOffsetUnits())) + " ");
-        for (int i = 0; i < hist.length(); i++) {
-            int norm = (int) hist.value(i) * scaleMax / max;
-            if (norm == scaleMax) {
-                norm = scaleMax - 1; // make last bin inclusive
-            }            //s.append( (char)(2581+norm) );
-            s.append(scale.charAt(norm));
-        }
-        s.append(" " + Datum.create(dep0.value(dep0.length() - 1), u, res.doubleValue(u.getOffsetUnits())));
-        if ("log".equals(dep0.property(QDataSet.SCALE_TYPE))) {
-            s.append(" log");
-        }
-        return s.toString();
-    }
+//    private String histStr(QDataSet ds) {
+//        QDataSet hist = Ops.histogram(ds, 20);
+//        QDataSet dep0 = (QDataSet) hist.property(QDataSet.DEPEND_0);
+//        Datum res = DataSetUtil.asDatum((RankZeroDataSet) dep0.property(QDataSet.CADENCE));
+//        Units u = (Units) dep0.property(QDataSet.UNITS);
+//        if (u == null) {
+//            u = Units.dimensionless;
+//        }
+//
+//        String scale;
+//        if (metaDataTree.getFont().canDisplay((char) 2581)) {
+//            scale = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+//        } else {
+//            scale = " .:!#";
+//        }
+//        int scaleMax = scale.length();
+//
+//        Integer max = (Integer) hist.property("max");
+//
+//        StringBuffer s = new StringBuffer();
+//
+//        s.append("" + Datum.create(dep0.value(0), u, res.doubleValue(u.getOffsetUnits())) + " ");
+//        for (int i = 0; i < hist.length(); i++) {
+//            int norm = (int) hist.value(i) * scaleMax / max;
+//            if (norm == scaleMax) {
+//                norm = scaleMax - 1; // make last bin inclusive
+//            }            //s.append( (char)(2581+norm) );
+//            s.append(scale.charAt(norm));
+//        }
+//        s.append(" " + Datum.create(dep0.value(dep0.length() - 1), u, res.doubleValue(u.getOffsetUnits())));
+//        if ("log".equals(dep0.property(QDataSet.SCALE_TYPE))) {
+//            s.append(" log");
+//        }
+//        return s.toString();
+//    }
 
     private void updateStatistics() {
         statisticsDirty = true;
@@ -255,6 +297,35 @@ public class MetadataPanel extends javax.swing.JPanel {
                     tree.unmountTree(unmount);
                 }
                 tree.mountTree(dsTree, 30);
+            }
+        });
+    }
+
+    private synchronized void updateComponentDataSetPropertiesView() {
+        assert EventQueue.isDispatchThread() == false;
+        final TreeModel unmount;
+        QDataSet ds= this.bindToPlotElement.getController().getDataSet();
+        if ( ds == null) {
+            unmount = componentDataSetTree;
+            componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
+            this.componentDs = null;
+            //(PropertiesTreeModel( "no dataset", null );
+        } else {
+            if ( ds != this.componentDs) {
+                unmount = componentDataSetTree;
+                componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
+                this.componentDs = ds;
+            } else {
+                unmount = null;
+            }
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                if (unmount != null) {
+                    tree.unmountTree(unmount);
+                }
+                tree.mountTree(componentDataSetTree, 40);
             }
         });
     }
