@@ -27,6 +27,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
+import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
@@ -1151,6 +1152,8 @@ public class PlotElementController extends DomNodeController {
             bindToSeriesRenderer(new SeriesRenderer());
         } else if (renderer instanceof ImageVectorDataSetRenderer) {
             bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
+        } else if (renderer instanceof EventsRenderer ) {
+            bindToEventsRenderer((EventsRenderer)renderer);
         } else {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
@@ -2033,6 +2036,10 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "color", renderer, "color");
     }
 
+    public void bindToEventsRenderer(EventsRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+    }
 
     /**
      * special converter that fills in %{CONTEXT} macro, or inserts it when 
