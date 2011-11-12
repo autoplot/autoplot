@@ -124,8 +124,8 @@ public class MetadataUtil {
     @SuppressWarnings("unchecked")
     public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
         Map result = new LinkedHashMap(properties);
-        List<Object> deps = new ArrayList(3);
-        for (int i = 0; i < 3; i++) {
+        List<Object> deps = new ArrayList(4);
+        for (int i = 0; i < 4; i++) {
             deps.add(i, properties.get("DEPEND_" + i));
         }
 
@@ -161,7 +161,7 @@ public class MetadataUtil {
 
         while ( s.hasNext() ) {
             String cmd= s.next();
-            if ( cmd.equals("|slice") ) {
+            if ( cmd.equals("|slicex") ) {
                 Pattern skipPattern= Pattern.compile("\\':?\\'");
                 List<Object> args= new ArrayList();
                 while ( s.hasNextInt() || s.hasNext( skipPattern ) ) {
@@ -171,11 +171,9 @@ public class MetadataUtil {
                         args.add( s.next() );
                     }
                 }
-                int offset=0;
                 for ( int idim=args.size()-1; idim>=0; idim-- ) {
                     if ( args.get(idim) instanceof Integer ) {
-                        properties= sliceProperties( properties, idim-offset );
-                        offset++;
+                        properties= sliceProperties( properties, idim );
                     }
                 }
             } else if ( cmd.startsWith("|slice") ) {
