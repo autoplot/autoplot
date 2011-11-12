@@ -116,7 +116,7 @@ public class DodsDataSource extends AbstractDataSource {
 
     private String getIstpConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
 
-        StringBuffer constraint1 = new StringBuffer("?");
+        StringBuilder constraint1 = new StringBuilder("?");
 
         constraint1.append(variable);
 
@@ -143,7 +143,7 @@ public class DodsDataSource extends AbstractDataSource {
             if (meta.containsKey(dkey)) {
                 Map val = (Map) meta.get(dkey);
                 String var = (String) val.get("NAME");
-                int[] ii2 = parser.getRecDims(var);
+                //int[] ii2 = parser.getRecDims(var);
                 constraint1.append(",").append(var);
                 if ( dimsStr!=null) constraint1.append(dimsStr);
                 da.setDependName(i, var);
@@ -155,7 +155,6 @@ public class DodsDataSource extends AbstractDataSource {
                 if (m.containsKey(QDataSet.UNITS)) {
                     da.setDimUnits(i, (Units) m.get(QDataSet.UNITS));
                 }
-
 
                 da.setDimProperties(i, m);
 
@@ -192,13 +191,13 @@ public class DodsDataSource extends AbstractDataSource {
         } else {
 
             if (this.constraint == null && adapter.getVariable()!=null ) {
-                StringBuffer constraint1 = new StringBuffer("?");
+                StringBuilder constraint1 = new StringBuilder("?");
                 constraint1.append(adapter.getVariable());
                 if (!adapter.getVariable().contains("[")) {
                     int[] ii = parser.getRecDims(adapter.getVariable());
                     if (ii != null) {
                         for (int i = 0; i < ii.length; i++) {
-                            constraint1.append("[0:1:" + ii[i] + "]");
+                            constraint1.append("[0:1:").append(ii[i]).append("]");
                         }
                     }
                 }
