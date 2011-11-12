@@ -532,7 +532,7 @@ public class DataSourceUtil {
         String specPref= "spectrogram";
 
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
-        if ( srenderType!=null ) {
+        if ( srenderType!=null && srenderType.length()>0 ) {
             return srenderType;
         }
 
