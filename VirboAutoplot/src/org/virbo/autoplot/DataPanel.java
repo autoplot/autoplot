@@ -409,10 +409,10 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( "|exp10()", "plot pow(10,ds)" ) );
         processMenu.add( createMenuItem( "|slice0(0)", "slice the data on the zeroth dimension (often time) at the given index." ) );
         processMenu.add( createMenuItem( "|slice1(0)", "slice the data on the first dimension at the given index." ) );
+        processMenu.add( createMenuItem( "|slices(':',2,3))", "slice the data on the first and second dimensions, leaving the zeroth alone." ) );
         processMenu.add( createMenuItem( "|collapse0()", "average over the zeroth dimension to reduce the dimensionality." ) );
         processMenu.add( createMenuItem( "|collapse1()", "average over the first dimension to reduce the dimensionality." ) );
         processMenu.add( createMenuItem( "|transpose()", "transpose the rank 2 dataset." ) );
-        processMenu.add( createMenuItem( "|fftWindow(128)", "plot power spectrum by breaking waveform data in windows of length size (experimental, not for publication)." ) );
         processMenu.add( createMenuItem( "|fftPower(128)", "plot power spectrum by breaking waveform data in windows of length size (experimental, not for publication)." ) );
         processMenu.add( createMenuItem( "|smooth(5)", "boxcar average over the rank 1 data" ) );
         processMenu.add( createMenuItem( "|diff()", "finite differences between adjacent elements in the rank 1 data." ) );
@@ -424,6 +424,8 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( "|sin()", "sin of the data in radians. (No units check)" ) );
         processMenu.add( createMenuItem( "|toDegrees()", "convert the data to degrees. (No units check)" ) );
         processMenu.add( createMenuItem( "|toRadians()", "convert the data to radians. (No units check) " ) );
+        processMenu.add( createMenuItem( "|magnitude()", "calculate the magnitude of the vectors " ) );
+        processMenu.add( createMenuItem( "|unbundle('Bx')", "unbundle a component " ) );
     }
     void showProcessMenu( MouseEvent ev) {
         initProcessMenu();
