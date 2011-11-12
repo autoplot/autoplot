@@ -22,6 +22,8 @@ causes IDL to suspend until Netbeans connects to the port.  Note hotswap classes
 * 64 bit IDL on linux doesn't appear to work.
 * I read somewhere that on a mac, java 1.3 is always used, Autoplot requires 1.5.
 
+=20111101=
+I was not able to get this working with IDL8.1
 
 
 
