@@ -161,7 +161,7 @@ public class MetadataUtil {
 
         while ( s.hasNext() ) {
             String cmd= s.next();
-            if ( cmd.equals("|slicex") ) {
+            if ( cmd.equals("|slices") ) {
                 Pattern skipPattern= Pattern.compile("\\':?\\'");
                 List<Object> args= new ArrayList();
                 while ( s.hasNextInt() || s.hasNext( skipPattern ) ) {
