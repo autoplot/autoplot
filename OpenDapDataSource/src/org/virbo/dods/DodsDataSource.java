@@ -31,6 +31,7 @@ import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
@@ -57,6 +58,8 @@ public class DodsDataSource extends AbstractDataSource {
      */
     Map<String, Object> metadata;
     DAS das;
+
+    private final static Logger logger= Logger.getLogger("autoplot.dodsdatasource");
 
     /**
      * Creates a new instance of DodsDataSetSource
@@ -284,7 +287,11 @@ public class DodsDataSource extends AbstractDataSource {
                             result.put("DEPEND_" + m.group(1), newVal);
 
                         } else {
-                            result.put(att.getName(), val);
+                            if ( val.length()>0 ) {
+                                result.put(att.getName(), val);
+                            } else {
+                                logger.fine("skipping "+att.getName()+"  because length=0");
+                            }
                         }
                     }
                 } catch (Exception e) {
