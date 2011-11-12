@@ -10,9 +10,11 @@ import org.das2.dataset.VectorUtil;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.graph.DefaultPlotSymbol;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
@@ -35,6 +37,41 @@ public class Test009 {
 
     static void resetTimer() {
         t0= System.currentTimeMillis();
+    }
+
+    // tests at limits of rendering
+    private static void extremes() throws InterruptedException, IOException {
+
+        Application dom= ScriptContext.getDocumentModel();
+
+        ScriptContext.reset();
+        ScriptContext.setCanvasSize(640,480);
+        dom.getCanvases(0).setFont("sans-14");
+
+        ScriptContext.plot( "vap+inline:6.28" ); // single-point series
+        dom.getPlotElements(0).getStyle().setSymbolSize(10);
+        dom.getPlotElements(0).getStyle().setPlotSymbol(DefaultPlotSymbol.STAR);
+
+        writePng( "test009_040.png" );
+        ScriptContext.plot( "vap+inline:ripples(1,30)" ); // 1-record spectrogram  //TODO: image not limited in X
+        writePng( "test009_041.png" );
+        ScriptContext.plot( "vap+inline:1,2,3,4,5" );
+        dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.newDimensionless( 1.9999, 2.0001 ) );
+        dom.getPlots(0).getYaxis().setRange( DatumRangeUtil.newDimensionless( 2.9999, 3.0001 ) );
+        dom.getPlots(0).setTitle("Colinear points are not colinear when you zoom in");
+        writePng( "test009_042.png" );
+        
+        ScriptContext.plot( "vap+inline:ripples(50)" );
+        dom.getCanvases(0).setFont("sans-16");
+        dom.getPlots(0).setTitle(".......... This is a really really really really really really really really long title, yes it is ........!cwith a subtitle and extreme symbols: &Sigma;&tau;&prime;&diams;&euro;&Dagger;!c");
+
+        String l= "B-GSM!n!u2!r!d3!n!uUP"; //TODO: shows a bug with GrannyTextRender, I think.  Yep, !r without !s causes exception.
+        l= "B-GSM!s!n!u2!r!d3!n!kUP!n";
+
+        dom.getPlots(0).getXaxis().setLabel("... This is a really really really really really really really really long label ...!c"+l );
+        dom.getPlots(0).getYaxis().setLabel("... This is a really really really really really really really really long label ...!c"+l );
+        writePng( "test009_043.png" );
+
     }
 
     public static void main(String[] args)  {
@@ -127,6 +164,8 @@ public class Test009 {
             //writePng( "test009_017.png" );
             //dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("1990-01-01 03:15:01 to 03:15:02") );
             //writePng( "test009_018.png" );
+
+            extremes();
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
