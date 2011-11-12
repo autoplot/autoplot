@@ -147,6 +147,13 @@ public class CdfUtil {
             intersects= true;
         }
 
+        if ( u instanceof EnumerationUnits  )  {
+            EnumerationUnits eu= (EnumerationUnits)u;
+            if ( nmax.intValue()<=eu.getHighestOrdinal() ) {
+                nmax= Integer.valueOf(eu.getHighestOrdinal()+1); // rbsp-e_L1_mageisLOW-sp_20110922_V.06.0.0.cdf?channel_num
+            }
+        }
+        
         if ( intersects || dmax==dmin || dmax<-1e30 || dmin>1e30 )  { //bugfix 3235447: all data invalid
             if ( nmax!=null ) ds.putProperty(QDataSet.VALID_MAX, uc.convert(nmax) );
             if ( nmin!=null ) ds.putProperty(QDataSet.VALID_MIN, uc.convert(nmin) );
