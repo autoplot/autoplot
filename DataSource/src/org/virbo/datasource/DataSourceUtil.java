@@ -484,7 +484,7 @@ public class DataSourceUtil {
 
 
     /**
-     * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
+     * returns [ start, stop, stride ] or [ start, -1, -1 ] for slicex.  This is
      * provided to reduce code and for uniform behavior.
      * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
      * @return
@@ -510,7 +510,7 @@ public class DataSourceUtil {
                 if ( ss.length>2 && ss[2].length()>0 ) {
                     result[2]= Integer.parseInt(ss[2]);
                 }
-                if ( ss.length==1 ) { // slice
+                if ( ss.length==1 ) { // slicex
                     result[1]= -1;
                     result[2]= -1;
                 }
