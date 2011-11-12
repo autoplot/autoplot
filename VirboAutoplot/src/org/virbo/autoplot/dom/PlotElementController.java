@@ -1233,6 +1233,7 @@ public class PlotElementController extends DomNodeController {
                 //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); // Why do we do this again?  Boy I wish I'd made some tests...
                 //}
 
+                logger.fine("doAutoranging");
                 doAutoranging( peleCopy,props,fillDs );
 
                 //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
