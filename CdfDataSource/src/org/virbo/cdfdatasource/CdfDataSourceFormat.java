@@ -431,7 +431,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
 
         String displayType= (String)ds.property( QDataSet.RENDER_TYPE );
-        if ( displayType==null ) {
+        if ( displayType==null || displayType.length()==0 ) {
             displayType= DataSourceUtil.guessRenderType(ds);
         }
         if ( displayType.equals("nnSpectrogram") || displayType.equals("spectrogram") ) {
