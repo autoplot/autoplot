@@ -148,10 +148,16 @@ public class DataPanel extends javax.swing.JPanel {
             String s= componentTextField.getText();
             int cp= componentTextField.getCaretPosition();
             String match= ".*\\|slice\\d\\(\\d*";
+            String match2= ".*\\|slices\\((\\d+,)*\\d*";
             if ( cp<s.length() ) {
                 Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
                 if ( m.matches() ) {
                     s= doAdjust( s, cp, amount );
+                } else {
+                    Matcher m2= Pattern.compile(match2).matcher( s.substring(0,cp) );
+                    if ( m2.matches() ) {
+                        s= doAdjust( s, cp, amount );
+                    }
                 }
             } else {
                 return;
