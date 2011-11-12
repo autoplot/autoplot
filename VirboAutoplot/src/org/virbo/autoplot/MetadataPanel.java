@@ -81,6 +81,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         //applicationModel.addPropertyChangeListener(this.appModelListener);
         updateProperties();
         updateStatistics();
+        updateComponentDataSet();
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "metadataPanel");
     }
@@ -304,19 +305,30 @@ public class MetadataPanel extends javax.swing.JPanel {
     private synchronized void updateComponentDataSetPropertiesView() {
         assert EventQueue.isDispatchThread() == false;
         final TreeModel unmount;
-        QDataSet ds= this.bindToPlotElement.getController().getDataSet();
-        if ( ds == null) {
+        PlotElement pe= dom.getController().getPlotElement();
+        if ( pe==null ) {
             unmount = componentDataSetTree;
             componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
             this.componentDs = null;
             //(PropertiesTreeModel( "no dataset", null );
         } else {
-            if ( ds != this.componentDs) {
+            QDataSet ds= pe.getController().getDataSet();
+            if ( ds == null) {
                 unmount = componentDataSetTree;
-                componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
-                this.componentDs = ds;
+                componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
+                this.componentDs = null;
+                //(PropertiesTreeModel( "no dataset", null );
+            //} else if ( ds==this.dsTreeDs ) {
+            //    unmount = componentDataSetTree;
+            //    componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
             } else {
-                unmount = null;
+                if ( ds != this.componentDs) {
+                    unmount = componentDataSetTree;
+                    componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
+                    this.componentDs = ds;
+                } else {
+                    unmount = null;
+                }
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
