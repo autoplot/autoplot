@@ -701,7 +701,7 @@ public class AutoplotUtil {
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
                     }
-                    if ( d2>1.1 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                    if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
                         range= DatumRangeUtil.rescaleLog( range, 0, 2 );
                         d2= d2/2;
                         d1= d1/2;
@@ -717,7 +717,7 @@ public class AutoplotUtil {
                         d1 = DatumRangeUtil.normalize(range, result.range.min());
                         d2 = DatumRangeUtil.normalize(range, result.range.max());
                     }
-                    if ( d2>1.1 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                    if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range //TODO: I don't understand this...
                         range= DatumRangeUtil.rescale( range, 0, 2 );
                         d2= d2/2;
                         d1= d1/2;
