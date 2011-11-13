@@ -128,6 +128,9 @@ public class CsvDataSource extends AbstractDataSource {
                         headers[i]= "column_"+i;
                     }
                 }
+                if ( idep0column==-1 && reader.getColumnCount()==2 ) {
+                    idep0column= 0;
+                }
                 Units oldDep0u= dep0u;
                 Units oldU= u;
 
