@@ -79,13 +79,16 @@ import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
-import sun.security.krb5.internal.SeqNumber;
 
 /**
- *
+ * GUI for browsing PNGWalks, or sets of PNG images.  These typically contain files named to make a time series, such as
+ * product_$Y$m$d.png, but this can browse any set of images using wildcards.  This provides a number of views of the
+ * images, such as a grid of thumbnails and the coverflow view which shows an image and the preceeding and succeeding images.
+ * This also contains a hook to get back into Autoplot, if product.vap (or vap named like the images) is found.
+ * 
  * @author jbf
  */
-public class PngWalkTool1 extends javax.swing.JPanel {
+public final class PngWalkTool1 extends javax.swing.JPanel {
     private static boolean ENABLE_QUALITY_CONTROL;
     private QualityControlPanel qcPanel=null;
 
@@ -99,8 +102,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     Pattern actionMatch=null;
     String actionCommand=null;
 
-    static Logger logger= Logger.getLogger("org.autoplot.pngwalk");
-    private static String RESOURCES= "/org/virbo/autoplot/resources/";
+    static final Logger logger= Logger.getLogger("org.autoplot.pngwalk");
+    private static final String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
     public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
