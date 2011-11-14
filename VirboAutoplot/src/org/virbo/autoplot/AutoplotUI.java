@@ -2460,45 +2460,48 @@ private void updateFrameTitle() {
 
             public void newActivation(String[] argv) {
                 alm.process(argv);
-                for (int i = 0; i < argv.length; i++) {
-                    System.err.println(String.format("arg %d: %s\n", i, argv[i]));
-                }
+                boolean raise= false;
                 String url = alm.getValue("URL");
                 if (url == null) {
-                    int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Start a second window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
+                    int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
                     if (action == JOptionPane.YES_OPTION) {
                         model.newApplication();
+                    } else {
+                        raise= true;
                     }
                 } else {
                     String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                            String.format( "<html>Replace URI, replacing data with data from<br>%s?", url ),
+                            String.format( "<html>Autoplot is already running.<br>Replace URI, replacing data with<br>%s?", url ),
                             "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                             new String[] { "New Window", "Replace" }, "Replace" );
                     if (action.equals("Replace")) {
                         model.setDataSourceURL(url);
+                        raise= true;
                     } else if (action.equals("New Window")) {
                         ApplicationModel nmodel = model.newApplication();
                         nmodel.setDataSourceURL(url);
                     }
                 }
-                final JFrame frame = (JFrame) ScriptContext.getViewWindow();
-                EventQueue.invokeLater(new Runnable() {
+                if ( raise ) {
+                    final JFrame frame = (JFrame) ScriptContext.getViewWindow();
+                    EventQueue.invokeLater(new Runnable() {
 
-                    public void run() {
-                        System.err.println("bring to front");
-                        
-                        // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
-                        frame.setVisible(true);
-                        int state = frame.getExtendedState();
-                        state &= ~JFrame.ICONIFIED;
-                        frame.setExtendedState(state);
-                        frame.setAlwaysOnTop(true); // security exception
-                        frame.toFront();
-                        frame.requestFocus();
-                        frame.setAlwaysOnTop(false); // security exception
-                        System.err.println("done bring to front");
-                    }
-                });
+                        public void run() {
+                            System.err.println("bring to front");
+
+                            // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+                            frame.setVisible(true);
+                            int state = frame.getExtendedState();
+                            state &= ~JFrame.ICONIFIED;
+                            frame.setExtendedState(state);
+                            frame.setAlwaysOnTop(true); // security exception
+                            frame.toFront();
+                            frame.requestFocus();
+                            frame.setAlwaysOnTop(false); // security exception
+                            System.err.println("done bring to front");
+                        }
+                    });
+                }
             }
         };
         sis.addSingleInstanceListener(sisL);
