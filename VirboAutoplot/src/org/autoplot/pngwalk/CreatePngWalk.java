@@ -174,7 +174,7 @@ public class CreatePngWalk {
                     }
                 }
                 if ( !ImageIO.write(thumb400, "png", outf ) ) {
-                    throw new IllegalArgumentException("couldn't write png");
+                    throw new IllegalArgumentException("no appropriate writer is found");
                 }
             }
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
