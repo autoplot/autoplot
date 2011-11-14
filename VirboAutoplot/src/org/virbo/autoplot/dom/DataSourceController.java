@@ -323,15 +323,15 @@ public class DataSourceController extends DomNodeController {
             } else if ( getTsb()!=null && ps.size()==0 ) {
                 timeSeriesBrowseController = new TimeSeriesBrowseController(this,null);
 
-                DomNode node;
+                DomNode node1;
                 String propertyName;
 
                 Plot p= dom.controller.getFirstPlotFor(dsf);
                 if ( p==null ) {
-                    node= dom;
+                    node1= dom;
                     propertyName= Application.PROP_TIMERANGE;
                 } else {
-                    node= p;
+                    node1= p;
                     propertyName= Plot.PROP_CONTEXT;
                 }
 
@@ -342,19 +342,19 @@ public class DataSourceController extends DomNodeController {
                         p.setContext( getTsb().getTimeRange() );
                         this.dom.setTimeRange( getTsb().getTimeRange() );
                         System.err.println("about to setup Gen for "+this);
-                        timeSeriesBrowseController.setupGen( node, propertyName );
-                        if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                        timeSeriesBrowseController.setupGen( node1, propertyName );
+                        if ( node1!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                         update( );
                     } else {
                         System.err.println("unable to use timerange as guide");
                         p.setContext( getTsb().getTimeRange() );
-                        timeSeriesBrowseController.setupGen( node, propertyName );
+                        timeSeriesBrowseController.setupGen( node1, propertyName );
                         update( );
                     }
                 } else {
                     System.err.println("using plot context for TSB: "+this.dsf.getUri() );
-                    timeSeriesBrowseController.setupGen( node, propertyName );
-                    if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                    timeSeriesBrowseController.setupGen( node1, propertyName );
+                    if ( node1!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                     update( );
                 }
 
@@ -403,7 +403,7 @@ public class DataSourceController extends DomNodeController {
         List<String> problems = new ArrayList<String>();
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
-            StringBuffer message = new StringBuffer("data set is invalid:\n");
+            StringBuilder message = new StringBuilder("data set is invalid:\n");
             new Exception("data set is invalid").printStackTrace();
             for (String s : problems) {
                 message.append(s).append("\n");
