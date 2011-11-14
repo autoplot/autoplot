@@ -92,7 +92,12 @@ echo "sign the jar files..."
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo
 echo "repeat normalize/sign (workaround for known bug with large files...)"
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo
+
+if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo; then
+   echo "Failed to sign resources!"
+   exit 1
+fi
+
 echo "pack the jar file..."
 $JAVA5_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
 #echo "done packing."
