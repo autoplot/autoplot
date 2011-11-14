@@ -89,11 +89,11 @@ echo "done make jumbo jar file..."
 echo "normalize jar file for signing..."
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 echo "sign the jar files..."
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo
+$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar $ALIAS
 echo "repeat normalize/sign (workaround for known bug with large files...)"
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
-if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo; then
+if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar $ALIAS; then
    echo "Failed to sign resources!"
    exit 1
 fi
