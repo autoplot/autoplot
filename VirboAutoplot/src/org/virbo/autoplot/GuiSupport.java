@@ -589,15 +589,7 @@ public class GuiSupport {
     public Action createNewApplicationAction() {
         return new AbstractAction("New Window") {
             public void actionPerformed( ActionEvent e ) {
-                ApplicationModel model = new ApplicationModel();
-                model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
-                model.addDasPeersToApp();
-                AutoplotUI view = new AutoplotUI(model);
-                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-                view.setVisible(true);
-                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
-                opc.loadPreferencesWithEvents();
-
+                parent.applicationModel.newApplication();
             }
         };
     }
@@ -605,16 +597,7 @@ public class GuiSupport {
     public Action createCloneApplicationAction() {
         return new AbstractAction("Clone to New Window") {
             public void actionPerformed( ActionEvent e ) {
-                ApplicationModel model = new ApplicationModel();
-                model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
-                model.addDasPeersToApp();
-                AutoplotUI view = new AutoplotUI(model);
-                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-                view.setVisible(true);
-                model.dom.syncTo( parent.applicationModel.dom );
-                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
-                opc.loadPreferencesWithEvents();
-
+                parent.applicationModel.cloneApplication();
             }
         };
     }
