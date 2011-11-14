@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -162,10 +163,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
     private static String readPngwalkFile( String template ) {
         URISplit split= URISplit.parse(template);
+        InputStream in=null;
         try {
             Properties p= new Properties();
             File local= FileSystemUtil.doDownload( split.file, new NullProgressMonitor() );
-            p.load( new FileInputStream( local ) );
+            in= new FileInputStream( local );
+            p.load( in );
             String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") + ".png";
             template= t;
         } catch (FileSystemOfflineException ex) {
@@ -177,6 +180,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
+        } finally {
+            try {
+                if ( in!=null ) in.close();
+            } catch ( IOException ex ) { }
         }
         return template;
 
