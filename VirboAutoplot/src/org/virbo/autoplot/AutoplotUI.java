@@ -58,6 +58,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.help.CSH;
+import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -66,6 +67,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -126,7 +128,7 @@ import org.w3c.dom.Element;
  */
 public class AutoplotUI extends javax.swing.JFrame {
     private static final String TAB_SCRIPT = "script";
-    
+
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
     final String TAB_TOOLTIP_AXES = "<html>Adjust selected plot axes.<br>%s<html>";
     final String TAB_TOOLTIP_LOGCONSOLE = "<html>Log console displays log messages and stdout/stderr.<br>%s</html>";
@@ -2439,6 +2441,70 @@ private void updateFrameTitle() {
     }
 
 }
+
+    /**
+     * add a listener to the webstart interface so that there is only one running Autoplot at a time.  This
+     * registers a SingleInstanceListener with webstart, which will prompt the user to add a new plot or to
+     * replace the current one.
+     * @param alm
+     * @param model
+     */
+    private static void addSingleInstanceListener(final ArgumentList alm, final ApplicationModel model) {
+        javax.jnlp.SingleInstanceService sis;
+        try {
+            sis = (javax.jnlp.SingleInstanceService) javax.jnlp.ServiceManager.lookup( "javax.jnlp.SingleInstanceService" );
+        } catch (javax.jnlp.UnavailableServiceException ex) {
+            sis = null;
+        }
+        final SingleInstanceListener sisL = new SingleInstanceListener() {
+
+            public void newActivation(String[] argv) {
+                alm.process(argv);
+                for (int i = 0; i < argv.length; i++) {
+                    System.err.println(String.format("arg %d: %s\n", i, argv[i]));
+                }
+                String url = alm.getValue("URL");
+                if (url == null) {
+                    int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Start a second window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
+                    if (action == JOptionPane.YES_OPTION) {
+                        model.newApplication();
+                    }
+                } else {
+                    String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
+                            String.format( "<html>Replace URI, replacing data with data from<br>%s?", url ),
+                            "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
+                            new String[] { "New Window", "Replace" }, "Replace" );
+                    if (action.equals("Replace")) {
+                        model.setDataSourceURL(url);
+                    } else if (action.equals("New Window")) {
+                        ApplicationModel nmodel = model.newApplication();
+                        nmodel.setDataSourceURL(url);
+                    }
+                }
+                final JFrame frame = (JFrame) ScriptContext.getViewWindow();
+                EventQueue.invokeLater(new Runnable() {
+
+                    public void run() {
+                        System.err.println("bring to front");
+                        
+                        // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+                        frame.setVisible(true);
+                        int state = frame.getExtendedState();
+                        state &= ~JFrame.ICONIFIED;
+                        frame.setExtendedState(state);
+                        frame.setAlwaysOnTop(true); // security exception
+                        frame.toFront();
+                        frame.requestFocus();
+                        frame.setAlwaysOnTop(false); // security exception
+                        System.err.println("done bring to front");
+                    }
+                });
+            }
+        };
+        sis.addSingleInstanceListener(sisL);
+    }
+
+
     /**
      * @param args the command line arguments
      */
@@ -2533,7 +2599,12 @@ private void updateFrameTitle() {
         }
 
         logger.fine("invokeLater()");
-        
+
+        boolean addSingleInstanceListener= true;
+        if ( addSingleInstanceListener ) {
+            addSingleInstanceListener(alm, model);
+        }
+
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
@@ -2546,7 +2617,6 @@ private void updateFrameTitle() {
                 } else {
                     System.err.println("this is autoplot "+APSplash.getVersion());
                 }
-APSplash.checkTime("init -100");
 APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
