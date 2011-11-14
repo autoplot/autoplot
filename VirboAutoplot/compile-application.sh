@@ -32,6 +32,10 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
+if [ "" = "$ALIAS" ]; then
+    ALIAS=virbo
+fi
+
 if [ "" = "$KEYPASS" ]; then
     echo "KEYPASS NEEDED!"
     KEYPASS=virbo1
@@ -226,8 +230,8 @@ echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
 
 echo "sign and pack the jar file..."
-echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
-if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo; then
+echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
+if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
    echo "Fail to sign resources!"
    exit 1
 fi
