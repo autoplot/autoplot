@@ -79,7 +79,6 @@ public class WalkImageSequence implements PropertyChangeListener  {
         List<URI> uris;
 
         if ( template==null ) {
-            uris= new ArrayList<URI>();
             throw new IllegalStateException("template was null");
         } else {
             try {
