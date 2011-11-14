@@ -588,7 +588,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         } else {
             timeRangeTextField.setText( DEFAULT_TIMERANGE );
         }
-        String resolution= params.remove("resolution");
         String interval= params.remove("interval");
         if ( interval!=null ) {
             tcaTextField.setText(interval);
@@ -718,14 +717,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return result;
     }
 
-    private boolean expert;
+    //private boolean expert;
     
     /**
      * call this before prepare.
      * @param expert
      */
     public void setExpertMode( boolean expert ) {
-        this.expert= expert;
+        //this.expert= expert;
         this.discoveryCb.setSelected(!expert);
     }
 }
