@@ -54,7 +54,9 @@ public class CreatePngWalk {
             File outf= new File( filename );
             File parentf= outf.getParentFile();
             if ( parentf!=null && !parentf.exists() ) {
-                parentf.mkdirs();
+                if ( !parentf.mkdirs() ) {
+                    throw new IllegalArgumentException("failed to make directories "+parentf);
+                }
             }
             out= new java.io.FileOutputStream(filename);
             image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
@@ -167,9 +169,13 @@ public class CreatePngWalk {
                 File outf= new java.io.File(String.format("%sthumbs400/%s_%s.png", params.outputFolder, params.product, i) );
                 File parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
-                    parentf.mkdirs();
+                    if ( !parentf.mkdirs() ) {
+                        throw new IllegalArgumentException("failed to make directories: "+parentf);
+                    }
                 }
-                ImageIO.write(thumb400, "png", outf );
+                if ( !ImageIO.write(thumb400, "png", outf ) ) {
+                    throw new IllegalArgumentException("couldn't write png");
+                }
             }
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
             //etaSec= (n-count) / imagesPerSec
