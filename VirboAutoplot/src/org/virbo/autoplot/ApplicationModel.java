@@ -90,6 +90,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.datasource.HtmlResponseIOException;
 /**
  * Internal model of the application to separate model from view.
@@ -1260,6 +1261,39 @@ public class ApplicationModel {
      */
     public DataSourceController getDataSourceFilterController() {
         return dom.getController().getDataSourceFilter().getController();
+    }
+
+    /**
+     * clone the application into a new AutoplotUI
+     * @return
+     */
+    ApplicationModel newApplication() {
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler( getExceptionHandler() );
+        model.addDasPeersToApp();
+        AutoplotUI view = new AutoplotUI(model);
+        view.setDefaultCloseOperation( javax.swing.JFrame.DISPOSE_ON_CLOSE );
+        view.setVisible(true);
+        OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+        opc.loadPreferencesWithEvents();
+        return model;
+    }
+
+    /**
+     * clone the application into a new AutoplotUI
+     * @return
+     */
+    ApplicationModel cloneApplication() {
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler(getExceptionHandler());
+        model.addDasPeersToApp();
+        AutoplotUI view = new AutoplotUI(model);
+        view.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+        view.setVisible(true);
+        model.dom.syncTo(dom);
+        OptionsPrefsController opc = new OptionsPrefsController(model.dom.getOptions());
+        opc.loadPreferencesWithEvents();
+        return model;
     }
 }
 
