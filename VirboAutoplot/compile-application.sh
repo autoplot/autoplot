@@ -224,16 +224,19 @@ echo "done make jumbo jar files..."
 
 echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
+
 echo "sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
-${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
-echo "  verify signed jar file..."
-if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16; then
-   echo "Fail to signed resources!"
+if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo; then
+   echo "Fail to sign resources!"
    exit 1
 fi
+
+echo "sign and pack the jar file..."
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
+
+${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16
 echo "  verify signed and unpacked jar file..."
 ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -16
 
