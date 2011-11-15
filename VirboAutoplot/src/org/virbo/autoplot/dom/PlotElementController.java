@@ -579,6 +579,7 @@ public class PlotElementController extends DomNodeController {
                     //    plotElement.setComponent("");
                     //} else {
                         plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
+                        plotElement.autoComponent=true;
                     //}
                     setResetComponent(false);
                 }
@@ -898,7 +899,10 @@ public class PlotElementController extends DomNodeController {
 
             String[] labels = null;
             if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
-
+if ( plotElement.isAutoComponent()
+                    || !plotElement.isAutoComponent() ) {
+    System.err.println("here here");
+}
             boolean weShallAddChildren=
                     plotElement.isAutoComponent()
                     && shouldHaveChildren;
