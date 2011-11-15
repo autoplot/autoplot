@@ -5,8 +5,12 @@
 package org.virbo.jythonsupport;
 
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.DatumUtil;
 import org.python.core.PyLong;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
@@ -21,6 +25,7 @@ import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
+import org.python.core.PyString;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -623,6 +628,12 @@ public class PyQDataSet extends PyJavaInstance {
                     return do2;
                 }
                 
+            } else if (arg0 instanceof PyString ) {
+                try {
+                    return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString()));
+                } catch (ParseException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
             } else if (arg0.isSequenceType()) {
                 return PyQDataSetAdapter.adaptList((PyList) arg0);
             } else {
