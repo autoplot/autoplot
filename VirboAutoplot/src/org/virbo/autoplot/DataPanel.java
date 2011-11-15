@@ -688,7 +688,7 @@ public class DataPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
 
     private void componentTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_componentTextFieldActionPerformed
-        applicationController.getPlotElement().setComponent( componentTextField.getText() );
+        applicationController.getPlotElement().setComponentAutomatically( componentTextField.getText() );
         setAdjusting(false);
         componentChanged();
         setAdjusting(true);
