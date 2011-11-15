@@ -456,7 +456,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         AppManager.getInstance().addApplication(this);
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
             public void actionPerformed(ActionEvent e) {
-                ScriptContext.close();
+                if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
+                    ScriptContext.close();
+                }
             }
         }) );
         
