@@ -838,22 +838,35 @@ public class PlotElementController extends DomNodeController {
      * @param ele
      */
     private void addParentComponentListener( PlotElement plotElement, final PlotElement ele ) {
-        plotElement.addPropertyChangeListener( new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
+        PropertyChangeListener pcl= new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals(PlotElement.PROP_COMPONENT) ) {
+                    if ( DataSetOps.changesDimensions((String)evt.getOldValue(),(String)evt.getNewValue()) ) {
+                        return;
+                    }
                     Object v= evt.getNewValue();
                     int i= ele.getComponent().indexOf("|unbundle");
+                    if ( i==-1 ) {
+                        throw new IllegalArgumentException("expected to see unbundle");
+                    }
+                    String tail = ele.getComponent().substring(i);
                     if ( i!=-1 ) {
                         String sv= (String)v;
-                        if ( sv.length()>=i ) {
-                            ele.setComponent( sv.substring(0,i)+ele.getComponent().substring(i) );
-                        }
+                        ele.setComponent( sv+tail );
                     }
                 }
             }
-        } );
+        };
+        plotElement.addPropertyChangeListener( pcl );
+
+        ele.getController().setParentComponentListener( pcl );
     }
+
     /**
+     * This is the heart of the PlotElementController, and to some degree Autoplot.  In this routine, we are given
+     * dataset and a renderType, and we need to reconfigure Autoplot to implement this.  This will add child elements when
+     * children are needed, for example when a Vector time series is plotted, we need to add children for each component.
+     *
      * preconditions:
      *   the new renderType has been identified.
      *   The dataset to be rendered has been identified.
@@ -899,10 +912,7 @@ public class PlotElementController extends DomNodeController {
 
             String[] labels = null;
             if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
-if ( plotElement.isAutoComponent()
-                    || !plotElement.isAutoComponent() ) {
-    System.err.println("here here");
-}
+
             boolean weShallAddChildren=
                     plotElement.isAutoComponent()
                     && shouldHaveChildren;
@@ -910,8 +920,14 @@ if ( plotElement.isAutoComponent()
             if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child plotElements
                 List<PlotElement> childEles= getChildPlotElements();
                 for ( PlotElement p : childEles ) {
-                    if ( dom.plotElements.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
+                    if ( dom.plotElements.contains(p) ) { 
                         dom.controller.deletePlotElement(p);
+                        PropertyChangeListener parentListener= p.getController().getParentComponentLister();
+                        if ( parentListener!=null ) {
+                            this.plotElement.removePropertyChangeListener( parentListener );
+                        }
+                        this.removePropertyChangeListener(dsfListener);
+
                     }
                     plotElement.getStyle().removePropertyChangeListener( p.getController().parentStyleListener );
                 }
@@ -972,7 +988,7 @@ if ( plotElement.isAutoComponent()
                             }
                         } else {
                             s= s+"|unbundle('"+labels[i]+"')";
-                            //addParentComponentListener(plotElement,ele);
+                            addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
                         ele.setDisplayLegend(true);
@@ -2114,5 +2130,15 @@ if ( plotElement.isAutoComponent()
     @Override
     public String toString() {
         return "" + this.plotElement + " controller";
+    }
+
+    private PropertyChangeListener parentComponentLister;
+
+    private void setParentComponentListener(PropertyChangeListener pcl) {
+        this.parentComponentLister= pcl;
+    }
+
+    private PropertyChangeListener getParentComponentLister() {
+        return parentComponentLister;
     }
 }
