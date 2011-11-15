@@ -8,10 +8,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.DatumUtil;
-import org.python.core.PyLong;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -519,7 +516,7 @@ public class PyQDataSet extends PyJavaInstance {
             }
             if ( allLists ) {
                 int n= lists[0].length();
-                QDataSet val= coerce_ds_int(  arg1 );
+                QDataSet val= coerceDsInternal(  arg1 );
                 QubeDataSetIterator it = new QubeDataSetIterator( val );
                 if ( ds.rank()==1 ) {
                     for ( int i=0;i<n;i++ ) {
@@ -579,7 +576,7 @@ public class PyQDataSet extends PyJavaInstance {
         for (int i = 0; i < iter.rank(); i++) {
             qube[i] = iter.length(i);
         }
-        QDataSet val = coerce_ds_int(arg1);
+        QDataSet val = coerceDsInternal(arg1);
 
         // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
@@ -608,7 +605,7 @@ public class PyQDataSet extends PyJavaInstance {
      * @param arg0
      * @return
      */
-    private QDataSet coerce_ds_int( PyObject arg0) {
+    private QDataSet coerceDsInternal( PyObject arg0) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
             if (arg0.isNumberType()) {
@@ -681,12 +678,12 @@ public class PyQDataSet extends PyJavaInstance {
 
 // coerce logic doesn't seem to kick in, so I do it!
     private QDataSet coerce_ds(PyObject arg0) {
-        return coerce_ds_int( arg0);
+        return coerceDsInternal( arg0);
     }
 
     @Override
     public Object __coerce_ex__(PyObject arg0) {
-        return coerce_ds_int( arg0);
+        return coerceDsInternal( arg0);
     }
 
     @Override
