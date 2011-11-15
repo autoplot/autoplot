@@ -305,7 +305,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
 
                 public String getURI() {
-                    return "vap+cdaweb:ds="+ds+"&"+param+"&timerange="+tr.toString().replace(" ", "+");
+                    return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+");
                 }
 
                 public void setURI(String suri) throws ParseException {
