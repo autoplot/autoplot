@@ -5,8 +5,10 @@
 
 package org.virbo.jythonsupport;
 
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.DatumUtil;
 import org.python.core.Py;
 import org.python.core.PyArray;
 import org.virbo.dataset.QubeDataSetIterator;
@@ -15,6 +17,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -102,6 +105,12 @@ public class JythonOps {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyFloat ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyString ) {
+            try {
+               return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())); //TODO: someone is going to want lookupUnits that will allocate new units.
+            } catch (ParseException ex) {
+               throw Py.SyntaxError( "unable to parse string: "+arg0 );
+            }
         } else {
             throw Py.TypeError("unable to coerce "+arg0+" to QDataSet");
         }
