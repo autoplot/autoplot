@@ -64,7 +64,7 @@ public class CreatePngWalk {
             encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new java.util.Date().toString());
             encoder.write(image, out);
         } finally {
-            out.close();
+            if ( out!=null ) out.close();
         }
         if ( image==null ) throw new IllegalArgumentException("image not assigned, this shouldn't happen.");
         return image;
