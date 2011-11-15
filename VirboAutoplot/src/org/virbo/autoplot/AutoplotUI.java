@@ -2456,6 +2456,12 @@ private void updateFrameTitle() {
         } catch (javax.jnlp.UnavailableServiceException ex) {
             sis = null;
         }
+
+        if ( sis==null ) {
+            logger.fine("not running with webstart");
+            return;
+        }
+
         final SingleInstanceListener sisL = new SingleInstanceListener() {
 
             public void newActivation(String[] argv) {
