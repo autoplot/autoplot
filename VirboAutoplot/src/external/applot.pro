@@ -87,7 +87,13 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
      endelse
    endfor
 
-   if ( ascii eq 0 ) then swap_endian_inplace, data, /swap_if_little_endian
+   if ( ascii eq 0 ) then begin
+      r= where( finite( data ) eq 0 )
+      swap_endian_inplace, data, /swap_if_little_endian
+      if ( r[0] ne -1 ) then begin
+         data[r]= !values.d_nan
+      endif 
+   endif
 
    for i=0L, nr-1 do begin
       writeu, unit, byte(':01:')
