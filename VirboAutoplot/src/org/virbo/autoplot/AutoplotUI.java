@@ -2528,7 +2528,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
-        alm.addOptionalSwitchArgument("open", "o", "open", "", "open this URI (to support javaws)");
+        alm.addOptionalSwitchArgument("open", "o", "open", null, "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
         alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +
                 "Arguments following are " +
@@ -2577,18 +2577,14 @@ private void updateFrameTitle() {
         if (alm.getValue("URL") != null) {
             initialURL = alm.getValue("URL");
             logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);
-
-            bookmarks = alm.getValue("bookmarks");
-            
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open");
-            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);
-            bookmarks= null;
-            
+            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);            
         } else {
             initialURL = null;
-            bookmarks = null;
         }
+
+        bookmarks= alm.getValue("bookmarks");
 
         if (alm.getBooleanValue("scriptPanel")) {
             logger.fine("enable scriptPanel");
@@ -2699,6 +2695,7 @@ APSplash.checkTime("init -80");
                         public void run() {
                             try {
                                 final URL url = new URL(bookmarks);
+                                System.err.println("Reading bookmarks from "+url);
                                 Document doc = AutoplotUtil.readDoc(url.openStream());
                                 Bookmark.parseBookmarks(doc.getDocumentElement());  // findbugs DLS_DEAD_LOCAL_STORE fixed
                             } catch (Exception ex) {
