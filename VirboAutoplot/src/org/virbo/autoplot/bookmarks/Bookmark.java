@@ -735,6 +735,7 @@ public abstract class Bookmark {
             Bookmark.Folder result = new Bookmark.Folder(getTitle());
             result.description= this.description;
             result.remoteUrl= remoteUrl;
+            result.remoteStatus= remoteStatus;
             result.bookmarks = new ArrayList<Bookmark>(this.bookmarks);
             return result;
         }
