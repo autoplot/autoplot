@@ -29,7 +29,7 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
 
-        System.err.println("org.virbo.autoplot.AutoplotServer "+APSplash.getVersion());
+        System.err.println("org.virbo.autoplot.AutoplotServer 20111116");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
