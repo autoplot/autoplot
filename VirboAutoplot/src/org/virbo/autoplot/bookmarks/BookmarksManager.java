@@ -1000,7 +1000,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()==0 ) {
                         title= title + " " + Bookmark.MSG_REMOTE;
-                    } else if ( folder.getRemoteStatus()==1 ) {
+                    } else if ( folder.getRemoteStatus()==-1 ) {
                         title= title + " " + Bookmark.MSG_NOT_LOADED; // we shouldn't use this.
                     } else {
                         title= title + " " + Bookmark.MSG_NO_REMOTE;
