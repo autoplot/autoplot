@@ -209,10 +209,14 @@ public abstract class Bookmark {
             int remoteStatus=0;
 
             if ( remoteUrlNode!=null && remoteLevel>0 ) { // 2984078
+
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
+
+                System.err.println( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
+
                 InputStream in=null;
                 try {
-                    System.err.println("opening "+remoteUrl+"...");
+
                     URL rurl= new URL(remoteUrl);
                     //URLConnection connect= rurl.openConnection();
                     //connect.setConnectTimeout(1000);
@@ -244,9 +248,11 @@ public abstract class Bookmark {
                     XPath xpath= (XPath) factory.newXPath();
                     Object o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
                     nl= (NodeList)o;
+
+                    String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
                     //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
                     Element flist = (Element) nl.item(0);
-                    contents = parseBookmarks( flist, null, remoteLevel-1 );
+                    contents = parseBookmarks( flist, vers1, remoteLevel-1 );
 
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
@@ -282,12 +288,12 @@ public abstract class Bookmark {
 
             }
             
-            if ( contents==null || contents.size()==0 ) {
+            if ( remoteUrl==null && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty.
                 nl = ((Element) element).getElementsByTagName("bookmark-list");
                 if ( nl.getLength()==0 ) {
-                    throw new IllegalArgumentException("bookmark-folder should contain only bookmark-list");
+                    throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
                 }
-                Element flist = (Element) nl.item(0);
+                Element flist = (Element) nl.item(0); // and they may only contain one folder
                 contents = parseBookmarks( flist, vers, remoteLevel );
             }
 
@@ -317,6 +323,7 @@ public abstract class Bookmark {
 
     /**
      * parse the bookmarks in the element root into a list of folders and bookmarks.
+     * The root element should be a bookmark-list containing <bookmark-folder> and <bookmark>
      * @param root
      * @param vers null or the version string.  If null, then check for a version attribute.
      * @return
@@ -545,16 +552,26 @@ public abstract class Bookmark {
     }
 
     public static void main(String[] args) throws Exception {
-        String data = "<!-- note title is not supported yet --><bookmark-list>    <bookmark>        <title>demo autoplot</title>        <url>http://autoplot.org/autoplot.vap</url>    </bookmark>    <bookmark>        <title>Storm Event</title>        <url>http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density</url>    </bookmark></bookmark-list>";
+        //String data = "<!-- note title is not supported yet --><bookmark-list>    <bookmark>        <title>demo autoplot</title>        <url>http://autoplot.org/autoplot.vap</url>    </bookmark>    <bookmark>        <title>Storm Event</title>        <url>http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density</url>    </bookmark></bookmark-list>";
 
-        Reader in = new BufferedReader(new StringReader(data));
+        //Reader in = new BufferedReader(new StringReader(data));
+
+        Reader in = new FileReader("/home/jbf/CDAWebShort.xml");
 
         DocumentBuilder builder;
         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         InputSource source = new InputSource(in);
         Document document = builder.parse(source);
 
-        System.err.println(parseBookmarks(document.getDocumentElement()));
+        List<Bookmark> bs= parseBookmarks(document.getDocumentElement());
+        for ( Bookmark b: bs ) {
+            System.err.println(b);
+            if ( b instanceof Bookmark.Folder ) {
+                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks());
+            } else {
+
+            }
+        }
     }
 
     private Bookmark(String title) {
