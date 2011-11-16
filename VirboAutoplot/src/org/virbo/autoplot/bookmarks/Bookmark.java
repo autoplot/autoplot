@@ -666,6 +666,7 @@ public abstract class Bookmark {
          * a remote bookmark is one that is a copy of a folder at the remote
          * location.  If it's a remote folder, then we use it to maintain the
          * bookmarks.  We'll keep a local copy, but this may be updated.
+         * null indicates that this this a note a remote bookmark.
          */
         String remoteUrl= null;
 
@@ -725,7 +726,7 @@ public abstract class Bookmark {
                 Bookmark.Folder that= (Bookmark.Folder) obj;
                 return that.bookmarks.equals(this.bookmarks)
                         && ( that.getTitle().equals(this.getTitle()) )
-                        && ( that.getParent()==null || that.getParent().getTitle().equals(this.getParent().getTitle()) );
+                        && ( that.getParent()==null || ( this.getParent()!=null && that.getParent().getTitle().equals(this.getParent().getTitle()) ) );
             } else {
                 return false;
             }
