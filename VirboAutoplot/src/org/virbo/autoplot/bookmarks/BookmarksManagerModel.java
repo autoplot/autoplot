@@ -304,9 +304,6 @@ public class BookmarksManagerModel {
         }
         for ( int i=0; i<newList.size(); i++  ) {
             Bookmark bookmark= newList.get(i);
-            if ( bookmark.getTitle().contains("foo") ) {
-                System.err.println("jhere");
-            }
             if ( bookmark instanceof Bookmark.Folder ) {
                 if ( bookmark.equals(book) ) {
                     newList.set( i, null );
@@ -360,6 +357,12 @@ public class BookmarksManagerModel {
 
     private void addChildNodes(MutableTreeNode parent, List<Bookmark> bookmarks) {
         for (Bookmark b : bookmarks) {
+            String node= b.toString();
+            if (b instanceof Bookmark.Folder) {
+                if ( ((Bookmark.Folder)b).remoteUrl!=null ) {
+                    node= node + " (remote)";
+                }
+            }
             MutableTreeNode child = new DefaultMutableTreeNode(b);
             parent.insert(child, parent.getChildCount());
             if (b instanceof Bookmark.Folder) {
