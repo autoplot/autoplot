@@ -785,6 +785,7 @@ public class DataSetURI {
      * used.  Note URIs may contain prefix like vap+bin:http://www.cdf.org/data.cdf.  The
      * result will start with an Autoplot scheme like "vap:" or "vap+cdf:"
      *
+     * Note 20111117: "vap+cdaweb:" -> URI( "vap+cdaweb:file:///"  that's why this works to toUri doesn't.
      * @return the URI or null if it's clearly not a URI.
      * 
      */
