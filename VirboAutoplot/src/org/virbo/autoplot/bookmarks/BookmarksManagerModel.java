@@ -28,7 +28,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -124,6 +123,10 @@ public class BookmarksManagerModel {
     }
 
     public void setList(List<Bookmark> list) {
+        System.err.println("setting list to "+list);
+        if ( list==null ) {
+            new Exception("set list to null").printStackTrace();
+        }
         List<Bookmark> oldList = this.list;
         this.list = list;
         propertyChangeSupport.firePropertyChange(PROP_LIST, oldList, list);
