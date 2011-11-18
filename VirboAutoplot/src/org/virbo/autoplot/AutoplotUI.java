@@ -2492,23 +2492,24 @@ private void updateFrameTitle() {
                 }
                 if ( raise ) {
                     final JFrame frame = (JFrame) ScriptContext.getViewWindow();
-                    EventQueue.invokeLater(new Runnable() {
+                    if ( frame!=null ) {
+                        EventQueue.invokeLater(new Runnable() {
+                            public void run() {
+                                System.err.println("bring to front");
 
-                        public void run() {
-                            System.err.println("bring to front");
-
-                            // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
-                            frame.setVisible(true);
-                            int state = frame.getExtendedState();
-                            state &= ~JFrame.ICONIFIED;
-                            frame.setExtendedState(state);
-                            frame.setAlwaysOnTop(true); // security exception
-                            frame.toFront();
-                            frame.requestFocus();
-                            frame.setAlwaysOnTop(false); // security exception
-                            System.err.println("done bring to front");
-                        }
-                    });
+                                // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+                                frame.setVisible(true);
+                                int state = frame.getExtendedState();
+                                state &= ~JFrame.ICONIFIED;
+                                frame.setExtendedState(state);
+                                frame.setAlwaysOnTop(true); // security exception
+                                frame.toFront();
+                                frame.requestFocus();
+                                frame.setAlwaysOnTop(false); // security exception
+                                System.err.println("done bring to front");
+                            }
+                        });
+                    }
                 }
             }
         };
