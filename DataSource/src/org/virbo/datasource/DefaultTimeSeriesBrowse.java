@@ -38,6 +38,9 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         params.put( URISplit.PARAM_TIME_RANGE, dr.toString().replaceAll(" ","+"));
+        if ( split.file.equals("file:///") ) {
+            split.file= null; //grr... TODO: figure out why this is back.  DataSetURI.toURI vs DataSetURI.asUri...
+        }
         split.params= URISplit.formatParams(params);
         this.uri= URISplit.format(split);
         timeRange= dr;
