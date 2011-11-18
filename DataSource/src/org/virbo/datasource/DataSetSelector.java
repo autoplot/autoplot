@@ -7,7 +7,6 @@ package org.virbo.datasource;
 
 import java.awt.AWTKeyStroke;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
@@ -63,13 +62,11 @@ import javax.swing.Timer;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -279,8 +276,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                             AggregatingDataSourceFactory aggf= (AggregatingDataSourceFactory) f;
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                 try {
-                                    String delegateUri= aggf.getDelegateDataSourceFactoryUri(surl);
-                                    DataSourceFactory ddsf= aggf.getDelegateDataSourceFactory(surl);
+                                    String delegateUri= AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl);
+                                    DataSourceFactory ddsf= AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
                                     if ( !ddsf.reject( delegateUri, mon) ) {
                                         surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
                                         if ( !f.reject(surl1, mon) ) {
@@ -993,7 +990,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
 
         public void actionPerformed(ActionEvent e) {
-            String about = support.getPluginsText();
+            String about = DataSetSelectorSupport.getPluginsText();
 
             JOptionPane.showMessageDialog(DataSetSelector.this, about);
         }
