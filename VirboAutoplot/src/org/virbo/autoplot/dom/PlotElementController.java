@@ -969,6 +969,15 @@ public class PlotElementController extends DomNodeController {
                     Plot domPlot = dom.controller.getPlotFor(plotElement);
                     List<PlotElement> cp = new ArrayList<PlotElement>(fillDs.length(0));
                     int nsubsample= 1 + ( fillDs.length(0)-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
+
+                    //check for non-unique labels.
+                    boolean uniqLabels= true;
+                    for ( int i=0;i<labels.length; i++ ) {
+                        for ( int j=i+1; j<labels.length; j++ ) {
+                            if ( labels[i].equals(labels[j]) ) uniqLabels= false;
+                        }
+                    }
+
                     for (int i = 0; i < fillDs.length(0); i++) {
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
                         ele.controller.getRenderer().setActive(false);
@@ -979,7 +988,7 @@ public class PlotElementController extends DomNodeController {
                         ele.getStyle().setFillColor( deriveColor(fc,i/nsubsample).brighter() );
                         String s= plotElement.getComponent();
                         String label1= labels[i];
-                        if ( s.equals("") ) {
+                        if ( s.equals("") && uniqLabels ) {
                             s= labels[i];
                             QDataSet ds1= DataSetOps.unbundle(fillDs,i);
                             String l1= (String) ds1.property(QDataSet.LABEL);
@@ -987,7 +996,11 @@ public class PlotElementController extends DomNodeController {
                                 label1= l1;
                             }
                         } else {
-                            s= s+"|unbundle('"+labels[i]+"')";
+                            if ( uniqLabels ) {
+                                s= s+"|unbundle('"+labels[i]+"')";
+                            } else {
+                                s= s+"|unbundle('ch_"+i+"')";
+                            }
                             addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
