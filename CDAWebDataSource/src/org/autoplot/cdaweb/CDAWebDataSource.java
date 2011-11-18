@@ -5,6 +5,7 @@
 
 package org.autoplot.cdaweb;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -99,7 +100,15 @@ public class CDAWebDataSource extends AbstractDataSource {
 
         try {
             mon.setProgressMessage("refreshing database");
-            db.maybeRefresh( new NullProgressMonitor() );
+
+            try {
+                db.maybeRefresh( new NullProgressMonitor() );
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
+                mon.setProgressMessage("unable to connect via ftp");
+                Thread.sleep(1000);
+                throw ex;
+            }
 
             boolean webService= false;
             String[] files= null;
