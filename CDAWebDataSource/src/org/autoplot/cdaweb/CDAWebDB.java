@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -372,6 +371,7 @@ public class CDAWebDB {
                 master= fsm.getRepresentativeFile(p);
                 dr= fsm.getRangeFor(master);
             }
+            //String[] files1= getFilesAndRanges( ds, dr );
 
             String[] files= fsm.getBestNamesFor( dr, p );
             if ( files.length==0 ) {
