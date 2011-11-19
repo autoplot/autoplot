@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>FindBugs is used to point out possible bugs and sloppy code.</small></p>
+        <p><small>The IDL interface to Autoplot makes it easy to add an Autoplot module to the legacy software PaPCo.  (Now almost anything Autoplot can plot is available in PaPCo.)  PaPCo's batch mode is used to exercise the module, and Autoplot's PngWalkTool is used to verify the result.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -19,8 +19,25 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
-        
+
         <p>Bugfixes:</p>
+        <ul>
+            <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
+            <li>Ops.interpolate preserves metadata</li>
+            <li>fill not identified in Ops.magnitude</li>
+            <li>Operations pipeline correctly handles metadata by dropping external metadata for unsupported functions.  Before we would just ignore them</li>
+            <li>3436569: Double-slicing (Rank 4 to Rank 2, |slice2(0)|slice1(0)) would not be properly reported in Operations field</li>
+            <li>3436922: in slicing of SpaceWeather(20,8,3) where changing the slice wouldn't reset properly</li>
+            <li>3436911: in automatic slicing of vap+inline:ripples(20,8,3).  Adjusting slice index wouldn't adjust child slices.
+            <li>Spectrogram render type correctly restored from vap file.  Before the renderType node would get close, but NoInterpolate mode would not work.</li>
+            <li>3437327: two column csv without time location units wouldn't plot as it would have with the AsciiDataSource, now it does.</li>
+            <li>3438527: getViewWindow() returns null after second is closed</li>
+            <li>3439598: CDF variable with three channels having same name</li>
+            <li>bugfixes with remote bookmarks, when remote folder contains other remote folders</li>
+            <li>in applot.pro, check for NaN's before byteswap</li>
+            <li>expert/basic mode code accidentally turned overplot button back on in add plots GUI.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>bugfix loading rank 4 CDF files</li>
             <li>bugfix: CDAWeb all.xml correction handled.  <b>Earlier development releases will no longer work.</b></li>
@@ -43,20 +60,18 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <p>Features:</p>
         <ul>
             <li>Java Webstart supports "single instance", so relaunching will recycle running app instead of opening a second window</li>
-
-            <li>Minor cleanup of timerange GUI.</li>
-
+            <li>rfe 3433860: Data operations can contain both component and process string, as in "Bx|histogram()"</li>
+            <li>slices function introduced, to clarify high-rank slicing. |slices('',16,4) instead of |slice1(16)|slice1(4)</li>
+            <li>Greek and Math symbols added to the font chooser dialog sample text</li>
+            <li>TimeSeriesBrowse used to initialize GUIs.</li>
+            <li>more findbugs cleanup of source code.</li>
+            <li>python codes can convert strings like "10 nT" into datasets.  e.g. ds+'10 nT' works now.</li>
+            <li>&lt;update check="background"&gt; should speed up launch a little more</li>
+            <li>ask before quitting when "close" is pressed and this is the last panel</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>--basic command line option added</li>
-            <li>support for more popular CDF virtual functions like "alternate_view", "calc_P", "region_filt", and "apply_esa_qflag"</li>
-            <li>virtual variable functions can report progress, for example fftPower.</li>
-            <li>virtual variable implementation reworked to mirror use at CDAWeb. (ds=I8_H0_MITPLASMA&id=V_fit_rfilt)</li>
-            <li>Java CDF reader preserves float arrays instead of converting to double to conserve memory.</li>
-            <li>2985864: Jython editor has option to disable tab completion, so ctrl-space is used for completion and tab is tab</li>
-            <li>3416707: bookmarks file has addresses unnessarily URLencoded.  bookmarks.xml is new file.</li>
-            <li>3404248: Improvements for CDF Autoplot2011b: Epoch variables are cached to avoid repeat reads.</li>
+            <li>Minor cleanup of timerange GUI.</li>
         </ul>
 
 <p>Known issues:</p>
