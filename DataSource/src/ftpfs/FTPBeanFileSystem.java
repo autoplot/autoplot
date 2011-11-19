@@ -41,7 +41,6 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.URISplit;
 
 /**
  * Alternate implementation of FTP that was originally introduced when the
@@ -58,6 +57,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             this.listDirectory("/"); // list the root to see if it is offline.
         } catch (IOException ex) {
             //TODO: how to distinguist UnknownHostException to be offline?  avoid firing an event until I come up with a way.
+            ex.printStackTrace();
             this.offline= true;
         }
         
@@ -223,15 +223,39 @@ public class FTPBeanFileSystem extends WebFileSystem {
         
     }
 
-    Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
+    public static final int LISTING_TIMEOUT_MS = 20000;
+    private final Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
+    private final Map<String,Long> listingFreshness= Collections.synchronizedMap( new HashMap() );
+
+    public void resetListingCache() {
+        synchronized (listings) {
+            this.listings.clear();
+            this.listingFreshness.clear();
+        }
+    }
+
+    public boolean isListingCached( String directory ) {
+        directory = HttpFileSystem.toCanonicalFilename(directory);
+        if ( !listings.containsKey(directory) ) {
+            return false;
+        } else {
+            return ((Long)listingFreshness.get(directory))-System.currentTimeMillis() > 0 ;
+        }
+    }
 
     public synchronized final String[] listDirectory(String directory) throws IOException {
         directory = toCanonicalFolderName(directory);
 
-        String[] result= listings.get(directory);
-        if ( result!=null ) {
-            logger.log(Level.FINE, "using cached listing for {0}", directory);
-            return result; //TODO: bug https://sourceforge.net/tracker/?func=detail&aid=3420879&group_id=199733&atid=970682
+        String[] result;
+        if ( isListingCached(directory) ) {
+            result= listings.get(directory);
+            if ( result!=null ) {
+                logger.log(Level.FINE, "using cached listing for {0}", directory);
+                //Arrays.copyOf(result, result.length) when we switch to Java 1.6
+                String[] resultc= new String[result.length];
+                System.arraycopy( result, 0, resultc, 0, result.length );
+                return resultc;
+            }
         }
 
         boolean successOrCancel= false;
@@ -250,51 +274,38 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 new File(localRoot, directory).mkdirs();
                 File listing = new File(localRoot, directory + ".listing");
-                if (!listing.canRead()) {
 
-                    FtpBean bean = new FtpBean();
-                    try {
-                        userInfo= KeyChain.getDefault().getUserInfo(url);
-                        if ( userInfo!=null ) {
-                            String[] userHostArr= userInfo.split(":");
-                            if ( userHostArr.length==1 ) {
-                                userHostArr= new String[] { userHostArr[0], "pass" };
-                            } else if ( userHostArr.length==0 ) {
-                                userHostArr= new String[] { "user", "pass" };
-                            }
-                            bean.ftpConnect(url.getHost(), userHostArr[0], userHostArr[1]);
-                        } else {
-                            bean.ftpConnect(url.getHost(), "ftp");
+                FtpBean bean = new FtpBean();
+                try {
+                    userInfo= KeyChain.getDefault().getUserInfo(url);
+                    if ( userInfo!=null ) {
+                        String[] userHostArr= userInfo.split(":");
+                        if ( userHostArr.length==1 ) {
+                            userHostArr= new String[] { userHostArr[0], "pass" };
+                        } else if ( userHostArr.length==0 ) {
+                            userHostArr= new String[] { "user", "pass" };
                         }
-                        String cwd= bean.getDirectory(); // URI should not contain remote root.  // will allow for this.
-                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
-
-                    } catch (NullPointerException ex) {
-                        ex.printStackTrace();
-                        IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost());
-                        ex2.initCause(ex);
-                        throw ex2;
-                    } catch (CancelledOperationException ex ) {
-                        throw new FileSystemOfflineException("user cancelled credentials");
+                        bean.ftpConnect(url.getHost(), userHostArr[0], userHostArr[1]);
+                    } else {
+                        bean.ftpConnect(url.getHost(), "ftp");
                     }
+                    String cwd= bean.getDirectory(); // URI should not contain remote root.  // will allow for this.
+                    bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
 
-                    FtpObserver observer = new FtpObserver() {
-                        int totalBytes = 0;
-                        public void byteRead(int bytes) {
-                            totalBytes += bytes;
-                        }
-                        public void byteWrite(int bytes) {
-                            totalBytes += bytes;
-                        }
-                    };
-
-                    String ss = bean.getDirectoryContentAsString();
-                    FileWriter fw = new FileWriter(listing);
-                    fw.write(ss);
-                    fw.close();
-
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                    IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost());
+                    ex2.initCause(ex);
+                    throw ex2;
+                } catch (CancelledOperationException ex ) {
+                    throw new FileSystemOfflineException("user cancelled credentials");
                 }
-                listing.deleteOnExit();
+
+                String ss = bean.getDirectoryContentAsString();
+                FileWriter fw = new FileWriter(listing);
+                fw.write(ss);
+                fw.close();
+
                 successOrCancel= true;
                 
                 DirectoryEntry[] des = parseLsl(directory, listing);
@@ -303,7 +314,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
                 }
                 listings.put(directory, result);
-                return result;
+                listingFreshness.put( directory, System.currentTimeMillis()+LISTING_TIMEOUT_MS );
+                String[] resultc= new String[result.length];
+                System.arraycopy( result, 0, resultc, 0, result.length );
+
+                listing.delete();
+                
+                return resultc;
+                
             } catch (FtpException e) {
                 if ( e.getMessage().startsWith("530" ) ) { // invalid login
                     if ( userInfo==null ) {
