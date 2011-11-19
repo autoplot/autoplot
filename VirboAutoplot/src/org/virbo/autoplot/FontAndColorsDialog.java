@@ -16,6 +16,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import org.das2.graph.GraphUtil;
+import org.das2.util.Entities;
+import org.python.parser.ast.Unicode;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Options;
@@ -192,8 +194,11 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         JFontChooser chooser = new JFontChooser((JFrame) this.getOwner());
-        String sci= "2 \u00d7 10E7";
-        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n");
+        String sci= Entities.decodeEntities("2 &times; 10E7  &aacute;");
+        String greek= Entities.decodeEntities("Greek Symbols: &Alpha; &Beta; &Delta; &alpha; &beta; &delta; &pi; &rho; &omega;");
+        String math= Entities.decodeEntities("Math Symbols: &sum; &plusmn;");
+
+        chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
         chooser.setFont(app.getCanvas().getBaseFont());
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             app.getCanvas().setBaseFont(chooser.getFont());
