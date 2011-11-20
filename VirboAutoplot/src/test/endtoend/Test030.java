@@ -42,6 +42,13 @@ public class Test030 {
 
         String label= String.format( "test030_%03d", id );
 
+//        if ( id==2 ) {
+//            QDataSet Rx_geo = DataSetOps.unbundle( ds, "R_geo" );
+//            System.err.println(Rx_geo.property(QDataSet.DEPEND_1));
+//            QDataSet lshell= DataSetOps.unbundle( ds, "L" );
+//            System.err.println(lshell.property(QDataSet.DEPEND_1));
+//        }
+
         writeToPng( label+".png" );
         //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
         formatDataSet( ds, label+".qds");
@@ -86,6 +93,8 @@ public class Test030 {
 
     public static void main(String[] args) throws Exception  {
         try {
+            doTestBundle( 2, TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?rank2" );
+            
             doTestBundle( 0, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?rank2" );
 
             //TODO: DEPEND_0 is lost here.
