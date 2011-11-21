@@ -198,7 +198,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (icol == -1) {
                 throw new IllegalArgumentException("bad depend0 parameter: " + depend0 + ", should be field1, or 1, or <name>");
             }
-            dep0 = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+            if ( ds.property(QDataSet.BUNDLE_1)!=null ) {
+                dep0 = ArrayDataSet.copy(DataSetOps.unbundle(ds,icol)); // avoid warning message about slicing to unbundle
+            } else {
+                dep0 = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+            }
             dep0.putProperty(QDataSet.UNITS, parser.getUnits(icol));
             if (DataSetUtil.isMonotonic(dep0)) {
                 dep0.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
