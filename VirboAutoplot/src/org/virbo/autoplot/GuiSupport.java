@@ -74,6 +74,7 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
@@ -580,10 +581,43 @@ public class GuiSupport {
         };
     }
 
+    /**
+     * clone the application into a new AutoplotUI
+     * @return
+     */
+    ApplicationModel newApplication() {
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
+        model.addDasPeersToApp();
+        AutoplotUI view = new AutoplotUI(model);
+        view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+        view.setVisible(true);
+        OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+        opc.loadPreferencesWithEvents();
+        return model;
+    }
+
+    /**
+     * clone the application into a new AutoplotUI
+     * @return
+     */
+    ApplicationModel cloneApplication() {
+        ApplicationModel model = new ApplicationModel();
+        model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
+        model.addDasPeersToApp();
+        AutoplotUI view = new AutoplotUI(model);
+        view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+        view.setVisible(true);
+        model.dom.syncTo( parent.applicationModel.dom );
+        OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+        opc.loadPreferencesWithEvents();
+        return model;
+    }
+    
     public Action createNewApplicationAction() {
         return new AbstractAction("New Window") {
             public void actionPerformed( ActionEvent e ) {
-                parent.applicationModel.newApplication();
+                newApplication();
             }
         };
     }
@@ -591,7 +625,7 @@ public class GuiSupport {
     public Action createCloneApplicationAction() {
         return new AbstractAction("Clone to New Window") {
             public void actionPerformed( ActionEvent e ) {
-                parent.applicationModel.cloneApplication();
+                cloneApplication();
             }
         };
     }
