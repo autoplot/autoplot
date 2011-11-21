@@ -2453,7 +2453,7 @@ private void updateFrameTitle() {
      * @param alm
      * @param model
      */
-    private static void addSingleInstanceListener(final ArgumentList alm, final ApplicationModel model) {
+    private static void addSingleInstanceListener(final ArgumentList alm, final AutoplotUI app ) {
         javax.jnlp.SingleInstanceService sis;
         try {
             sis = (javax.jnlp.SingleInstanceService) javax.jnlp.ServiceManager.lookup( "javax.jnlp.SingleInstanceService" );
@@ -2475,7 +2475,7 @@ private void updateFrameTitle() {
                 if (url == null) {
                     int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
                     if (action == JOptionPane.YES_OPTION) {
-                        model.newApplication();
+                        app.support.newApplication();
                     } else {
                         raise= true;
                     }
@@ -2485,10 +2485,10 @@ private void updateFrameTitle() {
                             "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                             new String[] { "New Window", "Replace" }, "Replace" );
                     if (action.equals("Replace")) {
-                        model.setDataSourceURL(url);
+                        app.applicationModel.setDataSourceURL(url);
                         raise= true;
                     } else if (action.equals("New Window")) {
-                        ApplicationModel nmodel = model.newApplication();
+                        ApplicationModel nmodel = app.support.newApplication();
                         nmodel.setDataSourceURL(url);
                     }
                 }
@@ -2610,11 +2610,6 @@ private void updateFrameTitle() {
 
         logger.fine("invokeLater()");
 
-        boolean addSingleInstanceListener= true;
-        if ( addSingleInstanceListener ) {
-            addSingleInstanceListener(alm, model);
-        }
-
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
@@ -2643,6 +2638,11 @@ APSplash.checkTime("init -80");
                 final AutoplotUI app;
                 if ( !headless ) {
                     app= new AutoplotUI(model);
+                    boolean addSingleInstanceListener= true;
+                    if ( addSingleInstanceListener ) {
+                        addSingleInstanceListener( alm, app );
+                    }
+
                 } else {
                     app= null;
                 }
