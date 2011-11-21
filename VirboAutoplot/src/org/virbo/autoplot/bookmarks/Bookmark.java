@@ -188,12 +188,16 @@ public abstract class Bookmark {
 
         nl = ((Element) element).getElementsByTagName("description");
         if (nl.getLength() > 0) {
-            s = ((Text) (nl.item(0).getFirstChild())).getData();
-            description = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+            Node child= (nl.item(0).getFirstChild());
+            if ( child==null ) {
+                description= "";
+            } else {
+                s = ((Text)child).getData();
+                description = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+            }
         }
         
         if (element.getNodeName().equals("bookmark")) {
-
             Bookmark book = new Bookmark.Item(uri);
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
