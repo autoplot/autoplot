@@ -1364,7 +1364,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlotElements(0).controller.setDsfReset(true);
             application.getPlots(0).getZaxis().setVisible(false);
             
-            application.setTimeRange( application.getPlots(0).getXaxis().getRange() );
+            application.setTimeRange( Application.DEFAULT_TIME_RANGE );
             application.getPlots(0).setTicksURI("");
             application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() ); //TODO: this will be a timerange soon
 
