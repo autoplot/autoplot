@@ -730,13 +730,15 @@ public class AutoplotUI extends javax.swing.JFrame {
                         //undoRedoSupport.pushState(evt,messages.get(0));
                         undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
                     }
-                } else {
+                } else if ( messages.size()==1 ) {
                     if ( messages.get(0).contains(" from ") ) {
                         undoRedoSupport.pushState(evt);
                     } else {
                         undoRedoSupport.pushState(evt,messages.get(0)); // named undo operation
                     }
-                    
+                } else {
+                    //I've hit this state before when loading empty vap file: file:///home/jbf/ct/autoplot/script/demos/interpolateToCommonTags2.vap
+                    logger.fine("tickleTimer contained no messages.");
                 }
 
                 stateSupport.markDirty();
