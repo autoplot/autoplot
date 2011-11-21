@@ -112,6 +112,10 @@
             <Property name="text" type="java.lang.String" value="jTextField1"/>
             <Property name="toolTipText" type="java.lang.String" value="X axis title"/>
           </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
@@ -136,7 +140,7 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="zAxisRangePanel" alignment="0" pref="300" max="32767" attributes="2"/>
+                      <Component id="zAxisRangePanel" alignment="0" pref="302" max="32767" attributes="2"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="zLog" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -145,7 +149,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="zTitleTextField" pref="250" max="32767" attributes="2"/>
+                          <Component id="zTitleTextField" pref="252" max="32767" attributes="2"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -192,6 +196,10 @@
             <Property name="text" type="java.lang.String" value="jTextField1"/>
             <Property name="toolTipText" type="java.lang.String" value="Colorbar title"/>
           </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JCheckBox" name="cbVisibleCB">
           <Properties>
@@ -285,6 +293,10 @@
             <Property name="text" type="java.lang.String" value="jTextField1"/>
             <Property name="toolTipText" type="java.lang.String" value="Y axis title"/>
           </Properties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
@@ -312,7 +324,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="titleTextField" pref="258" max="32767" attributes="0"/>
+                          <Component id="titleTextField" pref="260" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="legendEnableCheckbox" min="-2" max="-2" attributes="0"/>
@@ -367,6 +379,10 @@
           <BindingProperties>
             <BindingProperty name="enabled" source="legendEnableCheckbox" sourcePath="${selected}" target="legendTextField" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <Events>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="legendTextFieldMousePressed"/>
+            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="legendTextFieldMouseReleased"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

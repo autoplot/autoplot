@@ -8,10 +8,16 @@ package org.virbo.autoplot;
 import java.awt.event.FocusEvent;
 import org.das2.components.DatumRangeEditor;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
@@ -239,6 +245,14 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xTitleTextField.setText("jTextField1");
         xTitleTextField.setToolTipText("X axis title");
+        xTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+        });
 
         jLabel1.setText("Label:");
 
@@ -281,6 +295,14 @@ public class AxisPanel extends javax.swing.JPanel {
 
         zTitleTextField.setText("jTextField1");
         zTitleTextField.setToolTipText("Colorbar title");
+        zTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+        });
 
         cbVisibleCB.setText("Visible");
         cbVisibleCB.setToolTipText("hide/show colorbar");
@@ -294,7 +316,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(zAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(zLog)
                         .add(18, 18, 18)
@@ -302,7 +324,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)))
+                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -335,6 +357,14 @@ public class AxisPanel extends javax.swing.JPanel {
 
         yTitleTextField.setText("jTextField1");
         yTitleTextField.setToolTipText("Y axis title");
+        yTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                axisMouseAction(evt);
+            }
+        });
 
         jLabel2.setText("Label:");
 
@@ -386,6 +416,15 @@ public class AxisPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, legendEnableCheckbox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), legendTextField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        legendTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                legendTextFieldMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                legendTextFieldMouseReleased(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -396,7 +435,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
                         .add(jLabel6)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))
+                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
                         .add(legendEnableCheckbox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -445,6 +484,24 @@ public class AxisPanel extends javax.swing.JPanel {
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void legendTextFieldMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_legendTextFieldMousePressed
+        if ( evt.isPopupTrigger() ) {
+            showLabelMenu(evt);
+        }
+    }//GEN-LAST:event_legendTextFieldMousePressed
+
+    private void legendTextFieldMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_legendTextFieldMouseReleased
+        if ( evt.isPopupTrigger() ) {
+            showLabelMenu(evt);
+        }
+    }//GEN-LAST:event_legendTextFieldMouseReleased
+
+    private void axisMouseAction(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_axisMouseAction
+        if ( evt.isPopupTrigger() ) {
+            showAxisMenu(evt);
+        }
+    }//GEN-LAST:event_axisMouseAction
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbVisibleCB;
     private javax.swing.JCheckBox isotropicCheckBox;
@@ -471,5 +528,39 @@ public class AxisPanel extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
+        JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+            public void actionPerformed(ActionEvent e) {
+                String v= componentTextField.getText();
+                int i= componentTextField.getCaretPosition();
+                componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );
+            }
+        });
+        result.setToolTipText(doc);
+        return result;
+    }
 
+    JPopupMenu initLabelMenu( JTextField tf ) {
+        JPopupMenu processMenu;
+        processMenu= new JPopupMenu();
+        processMenu.add( createMenuItem( tf, "%{COMPONENT}", "Component property from the dataset" ) );
+        return processMenu;
+    }
+
+    void showLabelMenu( MouseEvent ev) {
+        JPopupMenu processMenu= initLabelMenu( (JTextField)ev.getSource() );
+        processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+    }
+
+    JPopupMenu initAxisMenu( JTextField tf ) {
+        JPopupMenu processMenu;
+        processMenu= new JPopupMenu();
+        processMenu.add( createMenuItem( tf, "%{UNITS}", "Units of the axis" ) );
+        return processMenu;
+    }
+
+    void showAxisMenu( MouseEvent ev) {
+        JPopupMenu processMenu= initAxisMenu( (JTextField)ev.getSource() );
+        processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+    }    
 }
