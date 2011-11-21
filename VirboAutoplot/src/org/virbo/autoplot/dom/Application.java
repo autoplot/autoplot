@@ -18,6 +18,8 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class Application extends DomNode {
 
+    public static final DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+
     public Application() {
     }
     
@@ -129,7 +131,7 @@ public class Application extends DomNode {
         this.options = options;
     }
 
-    protected DatumRange timeRange = DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+    protected DatumRange timeRange = DEFAULT_TIME_RANGE;
     /**
      * all time axes should hang off of this.
      */
