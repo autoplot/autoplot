@@ -24,7 +24,7 @@ public class Test003 {
             ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
             ScriptContext.setCanvasSize( 800, 600 );
-            
+
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/geo_pitch_stack_test1_local_1.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_001.png" );
@@ -55,7 +55,6 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/garageTemps.vap" );
             ScriptContext.writeToPng( "test003_005.png" );
 
-            // ancient vap file version <1.00 still loads in.
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap" );
             ScriptContext.writeToPng( "test003_006.png" );
 
