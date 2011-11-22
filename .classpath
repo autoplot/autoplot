@@ -57,5 +57,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/netCDF/netcdf-4.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/json-2011-01-27-gitrelease.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/javacsv.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/javaws.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
