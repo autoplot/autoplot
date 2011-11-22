@@ -63,16 +63,8 @@ public class AggregatingDataSource extends AbstractDataSource {
         try {
             String[] ss = fsm.getNamesFor(timeRange);
             if (ss.length == 0) {
-                String ff= fsm.getRepresentativeFile( new NullProgressMonitor() );
-                if ( ff==null ) {
-                    return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
-                } else {
-                    String f1= fsm.getFilenameFor( timeRange.min(), timeRange.min() );
-                    String f2= fsm.getFilenameFor( timeRange.max(), timeRange.max() );
-                    DatumRange dr1= fsm.getRangeFor(f1);
-                    DatumRange dr2= fsm.getRangeFor(f2);
-                    return DatumRangeUtil.union( dr1, dr2 );
-                }
+                //TODO: Juno uses wildcard in the name.
+                return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
             }
             DatumRange result = fsm.getRangeFor(ss[0]);
             for (int i = 0; i < ss.length; i++) {
