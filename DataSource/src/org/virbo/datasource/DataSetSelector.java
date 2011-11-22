@@ -1270,6 +1270,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @param value New value of property value.
      */
     public void setValue(String value) {
+        //String oldvalue= this.editor.getText();
         if (value == null) {
             value="";
         }
@@ -1277,6 +1278,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
         this.editor.setText(value);
+        //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
     //doItemStateChange = true;
     }
     /**
