@@ -2457,6 +2457,25 @@ private void updateFrameTitle() {
 }
 
     /**
+     * raise the application window
+     * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+     */
+    private static void raiseApplicationWindow( java.awt.Frame frame ) {
+        System.err.println("bring to front");
+
+        // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+        frame.setVisible(true);
+        int state = frame.getExtendedState();
+        state &= ~JFrame.ICONIFIED;
+        frame.setExtendedState(state);
+        frame.setAlwaysOnTop(true); // security exception
+        frame.toFront();
+        frame.requestFocus();
+        frame.setAlwaysOnTop(false); // security exception
+        System.err.println("done bring to front");
+    }
+
+    /**
      * add a listener to the webstart interface so that there is only one running Autoplot at a time.  This
      * registers a SingleInstanceListener with webstart, which will prompt the user to add a new plot or to
      * replace the current one.
@@ -2481,6 +2500,12 @@ private void updateFrameTitle() {
             public void newActivation(String[] argv) {
                 alm.process(argv);
                 boolean raise= false;
+
+                final JFrame frame = (JFrame) ScriptContext.getViewWindow();
+                if ( frame!=null ) {
+                     raiseApplicationWindow(frame);
+                }
+
                 String url = alm.getValue("URL");
                 if (url == null) {
                     int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
@@ -2503,22 +2528,10 @@ private void updateFrameTitle() {
                     }
                 }
                 if ( raise ) {
-                    final JFrame frame = (JFrame) ScriptContext.getViewWindow();
                     if ( frame!=null ) {
                         EventQueue.invokeLater(new Runnable() {
                             public void run() {
-                                System.err.println("bring to front");
-
-                                // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
-                                frame.setVisible(true);
-                                int state = frame.getExtendedState();
-                                state &= ~JFrame.ICONIFIED;
-                                frame.setExtendedState(state);
-                                frame.setAlwaysOnTop(true); // security exception
-                                frame.toFront();
-                                frame.requestFocus();
-                                frame.setAlwaysOnTop(false); // security exception
-                                System.err.println("done bring to front");
+                                raiseApplicationWindow(frame);
                             }
                         });
                     }
