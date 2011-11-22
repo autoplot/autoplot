@@ -2203,8 +2203,8 @@ private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent ev
     if (applicationModel.getDocumentModel().getOptions().isServerEnabled()) {
         initServer();
     } else {
-        JOptionPane.showMessageDialog( rootPane, "The server cannot be stopped." );
         stopServer();
+        JOptionPane.showMessageDialog( rootPane, "<html>The server will not be stopped completely.<br>https://sourceforge.net/tracker/?func=detail&aid=3441071&group_id=199733&atid=970682" );
     }
     serverCheckBoxMenuItem.setSelected( rlistener!=null );
     applicationModel.getDocumentModel().getOptions().setServerEnabled( rlistener!=null );
