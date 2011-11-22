@@ -578,7 +578,8 @@ public class PlotElementController extends DomNodeController {
                     //if ( !plotElement.component.equals("") )  {
                     //    plotElement.setComponent("");
                     //} else {
-                        plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
+                    plotElement.setComponent("");
+                    //    plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
                         plotElement.autoComponent=true;
                     //}
                     setResetComponent(false);
