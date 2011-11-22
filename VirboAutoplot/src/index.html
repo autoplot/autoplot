@@ -35,6 +35,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>3439598: CDF variable with three channels having same name</li>
             <li>bugfixes with remote bookmarks, when remote folder contains other remote folders</li>
             <li>in applot.pro, check for NaN's before byteswap</li>
+            <li>logic for guessing timerange supports non-aggregating data sources, and guesses before entering GUI.</li>
             <li>expert/basic mode code accidentally turned overplot button back on in add plots GUI.</li>
         </ul>
         <p>Older Bugfixes:</p>
@@ -68,6 +69,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>python codes can convert strings like "10 nT" into datasets.  e.g. ds+'10 nT' works now.</li>
             <li>&lt;update check="background"&gt; should speed up launch a little more</li>
             <li>ask before quitting when "close" is pressed and this is the last panel</li>
+            <li>popup menus for axis tab</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
@@ -81,6 +83,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
 	<p>data is input from:
+        <ul>
 	<li>ASCII files (.dat,.txt)</li>
         <li>Binary files (.bin)</li>
         <li>CDF files(.cdf)</li>
@@ -96,11 +99,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <li>Fits Format Files</li>
         <li>Images (.jpg, .png, .gif)</li>
         <li>Wav audio files</li>
+        </ul>
 	</p>
 	<p>This is not complete, and limitations include:</p>
+        <ul>
 	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
 	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
-         
+        </ul>
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>
          
