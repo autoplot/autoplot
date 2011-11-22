@@ -92,7 +92,7 @@ public class FtpFileObject extends WebFileObject {
                 return false;
             }
         } else {
-            FileSystem.getExceptionHandler().handleUncaught( new IOException("local listing file not found") );
+            FileSystem.getExceptionHandler().handleUncaught( new IOException("local listing file (.listing) not found") );
             return false;
         }
     }
