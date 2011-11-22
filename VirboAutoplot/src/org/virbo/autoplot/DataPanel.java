@@ -209,13 +209,16 @@ public class DataPanel extends javax.swing.JPanel {
         if ( transposeCheckBox.isSelected() ) {
             sprocess+="|transpose";
         }
-        element.setComponentAutomatically(sprocess);
+        if ( element!=null ) {
+            element.setComponentAutomatically(sprocess);
+        } else {
+            new Exception("who entered this code").printStackTrace();
+        }
     }
 
     private void componentChanged() {
         if ( adjusting ) return;
         if ( element==null ) {
-            new Exception("Element was null in DataPanel.componentChanged").printStackTrace();
             return;
         }
         String scomp= element.getComponent();
