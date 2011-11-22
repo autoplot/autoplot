@@ -992,7 +992,7 @@ public class DataSetURI {
 
         Arrays.sort(s);
 
-        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
+        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(FileSystem.PROP_CASE_INSENSITIVE));
         if (foldCase) {
             prefix = prefix.toLowerCase();
         }
