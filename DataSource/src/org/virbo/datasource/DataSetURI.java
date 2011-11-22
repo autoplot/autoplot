@@ -583,7 +583,7 @@ public class DataSetURI {
                     if ( tfile.exists() ) tfile.delete(); // it shouldn't, but to be safe...
                     tfile1.renameTo(tfile);
                 } else {
-                    throw new IllegalArgumentException("file does not exist: "+url );
+                    throw new FileNotFoundException("File not found: "+url );
                 }
             }
             return tfile;
