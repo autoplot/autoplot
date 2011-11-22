@@ -224,10 +224,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
         if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
+        messageComponent= new JLabel("<html><em>Loading file...</em></html>"); // this causes problem when droplist is used.
+        parameterPanel.add( messageComponent, BorderLayout.NORTH );
+
         URISplit split= URISplit.parse(suri);
         final Map<String,String> args= URISplit.parseParams(split.params);
 
-        messageComponent= null;
+        //messageComponent= null;
 
         if ( ds!=null ) {
             String desc= CDAWebDB.getInstance().getServiceProviderIds().get(ds);
