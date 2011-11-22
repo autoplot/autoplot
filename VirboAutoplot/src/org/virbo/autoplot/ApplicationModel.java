@@ -478,6 +478,10 @@ public class ApplicationModel {
         return recent;
     }
 
+    /**
+     * read the default bookmarks in, or those from the user's "bookmarks" pref node.  
+     * @return the bookmarks of the legacy user.
+     */
     public List<Bookmark> getLegacyBookmarks() {
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
         String sbookmark = prefs.get("bookmarks", "");
