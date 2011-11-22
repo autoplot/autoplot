@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
  */
 public class BookmarksManagerModel {
 
+    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
+    
     protected void doImport(Component c) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -123,7 +125,7 @@ public class BookmarksManagerModel {
     }
 
     public void setList(List<Bookmark> list) {
-        System.err.println("setting list to "+list);
+        logger.log(Level.FINE, "setting list to {0}", list);
         if ( list==null ) {
             new Exception("set list to null").printStackTrace();
         }
