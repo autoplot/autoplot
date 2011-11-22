@@ -22,6 +22,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>aggregation didn't allow wildcards like (.*) to be used.  Now it does.</li>
             <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
             <li>Ops.interpolate preserves metadata</li>
             <li>fill not identified in Ops.magnitude</li>
