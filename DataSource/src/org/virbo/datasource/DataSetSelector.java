@@ -665,7 +665,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 //dataSetSelector.setSelectedItem(s1.completion);
                 setValue(s1.completion);
                 if (s1.maybePlot) {
-                    maybePlot(false);
+                    maybePlot(true);
                 }
             }
         };
