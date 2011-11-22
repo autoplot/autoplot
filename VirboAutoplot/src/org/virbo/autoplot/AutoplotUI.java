@@ -1132,12 +1132,14 @@ APSplash.checkTime("init 52");
 
     private void initServer() {
         String result = JOptionPane.showInputDialog(this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345);
+        if ( result==null ) return;
         int iport = Integer.parseInt(result);
         setupServer(iport, applicationModel);
     }
 
     private void stopServer() {
-        rlistener.stopListening();
+        if ( rlistener!=null ) rlistener.stopListening();
+        rlistener= null;
     }
 
 
@@ -2201,8 +2203,11 @@ private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent ev
     if (applicationModel.getDocumentModel().getOptions().isServerEnabled()) {
         initServer();
     } else {
+        JOptionPane.showMessageDialog( rootPane, "The server cannot be stopped." );
         stopServer();
     }
+    serverCheckBoxMenuItem.setSelected( rlistener!=null );
+    applicationModel.getDocumentModel().getOptions().setServerEnabled( rlistener!=null );
 }//GEN-LAST:event_serverCheckBoxMenuItemActionPerformed
 
 private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -2753,9 +2758,12 @@ APSplash.checkTime("init -80");
 
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
+                    if ( rlistener==null ) {
+                        logger.log( Level.FINE, "the server is no longer listening");
+                        return;
+                    }
                     Socket socket= rlistener.getSocket();
-                    SocketAddress addr=  socket.getRemoteSocketAddress();
-                    System.err.println(addr);
+                    logger.log(Level.FINE, "connection from {0}", socket);
                     rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
                 } catch (IOException ex) {
                     ex.printStackTrace();
