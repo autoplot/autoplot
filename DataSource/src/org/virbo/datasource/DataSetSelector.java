@@ -62,6 +62,7 @@ import javax.swing.Timer;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
@@ -451,7 +452,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             // Let's kludge past this and add the capability to the editor...
                             DataSourceFactory dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
                             TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-                            if (tsb!=null) {
+                            if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
                                 tsb.setURI(surl);
                                 //DatumRange r= tsb.getTimeRange();
                                 tsb.setTimeRange(timeRange);
