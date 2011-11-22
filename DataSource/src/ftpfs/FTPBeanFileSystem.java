@@ -31,15 +31,13 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.util.FileUtil;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -218,29 +216,45 @@ public class FTPBeanFileSystem extends WebFileSystem {
     protected void resetListCache( String directory ) {
         directory = toCanonicalFolderName(directory);
 
-        listings.remove(directory);
-        new File(localRoot, directory + ".listing").delete();
+        File f= new File(localRoot, directory + ".listing");
+        if ( ! f.delete() ) {
+            throw new IllegalArgumentException("unable to delete .listing file: "+f);
+        }
         
     }
 
     public static final int LISTING_TIMEOUT_MS = 20000;
-    private final Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
-    private final Map<String,Long> listingFreshness= Collections.synchronizedMap( new HashMap() );
 
     public void resetListingCache() {
-        synchronized (listings) {
-            this.listings.clear();
-            this.listingFreshness.clear();
+        if ( !FileUtil.deleteWithinFileTree(localRoot,".listing") ) {
+            throw new IllegalArgumentException("unable to delete all .listing files");
         }
     }
 
+    /**
+     * returns true if the .listing file exists in the local cache and has a recent (LISTING_TIMEOUT_MS=20000) timestamp
+     * @param directory
+     * @return
+     */
     public boolean isListingCached( String directory ) {
-        directory = HttpFileSystem.toCanonicalFilename(directory);
-        if ( !listings.containsKey(directory) ) {
-            return false;
+        File listing = listingFile( directory );
+        if ( listing.exists() && ( System.currentTimeMillis() - listing.lastModified() ) < LISTING_TIMEOUT_MS ) {
+            logger.fine(String.format( "listing date is %f5.2 seconds old", (( System.currentTimeMillis() - listing.lastModified() ) /1000.) ));
+            return true;
         } else {
-            return ((Long)listingFreshness.get(directory))-System.currentTimeMillis() > 0 ;
+            return false;
         }
+    }
+
+    /**
+     * return the File for the cached listing, even if it does not exist.
+     * @param directory
+     * @return
+     */
+    private File listingFile( String directory ) {
+        new File(localRoot, directory).mkdirs();
+        File listing = new File(localRoot, directory + ".listing");
+        return listing;
     }
 
     public synchronized final String[] listDirectory(String directory) throws IOException {
@@ -248,14 +262,16 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         String[] result;
         if ( isListingCached(directory) ) {
-            result= listings.get(directory);
-            if ( result!=null ) {
-                logger.log(Level.FINE, "using cached listing for {0}", directory);
-                //Arrays.copyOf(result, result.length) when we switch to Java 1.6
-                String[] resultc= new String[result.length];
-                System.arraycopy( result, 0, resultc, 0, result.length );
-                return resultc;
+            logger.log(Level.FINE, "using cached listing for {0}", directory);
+
+            File listing= listingFile(directory);
+            DirectoryEntry[] des = parseLsl(directory, listing);
+
+            result = new String[des.length];
+            for (int i = 0; i < des.length; i++) {
+                result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
             }
+            return result;
         }
 
         boolean successOrCancel= false;
@@ -274,6 +290,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 new File(localRoot, directory).mkdirs();
                 File listing = new File(localRoot, directory + ".listing");
+                File listingt = new File(localRoot, directory + ".listing.temp");
 
                 FtpBean bean = new FtpBean();
                 try {
@@ -302,10 +319,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
 
                 String ss = bean.getDirectoryContentAsString();
-                FileWriter fw = new FileWriter(listing);
+                FileWriter fw = new FileWriter(listingt);
                 fw.write(ss);
                 fw.close();
 
+                listingt.renameTo(listing);
                 successOrCancel= true;
                 
                 DirectoryEntry[] des = parseLsl(directory, listing);
@@ -313,14 +331,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 for (int i = 0; i < des.length; i++) {
                     result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
                 }
-                listings.put(directory, result);
-                listingFreshness.put( directory, System.currentTimeMillis()+LISTING_TIMEOUT_MS );
-                String[] resultc= new String[result.length];
-                System.arraycopy( result, 0, resultc, 0, result.length );
 
-                listing.delete();
-                
-                return resultc;
+                return result;
                 
             } catch (FtpException e) {
                 if ( e.getMessage().startsWith("530" ) ) { // invalid login
