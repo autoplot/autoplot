@@ -11,7 +11,6 @@
 
 package org.autoplot.cdaweb;
 
-import java.awt.Window;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.DefaultListModel;
