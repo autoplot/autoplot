@@ -137,22 +137,6 @@ public class DataPanel extends javax.swing.JPanel {
             }
         } );
 
-        componentTextField.getDocument().addDocumentListener( new DocumentListener() {
-
-            public void insertUpdate(DocumentEvent e) {
-                System.err.println("insert -->"+ componentTextField.getText());
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                System.err.println("remove -->"+ componentTextField.getText() );
-                new Exception().printStackTrace();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                System.err.println("change "+e);
-            }
-        } );
-
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
