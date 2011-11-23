@@ -6,8 +6,8 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
-	<img src="screen.png">
-        <p><small>The IDL interface to Autoplot makes it easy to add an Autoplot module to the legacy software PaPCo.  (Now almost anything Autoplot can plot is available in PaPCo.)  PaPCo's batch mode is used to exercise the module, and Autoplot's PngWalkTool is used to verify the result.</small></p>
+        <img alt="screen shot"  src="screen.png">
+        <p><small>Have a nice break!</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +22,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
-            <li>aggregation didn't allow wildcards like (.*) to be used.  Now it does.</li>
+            <li>aggregation didn't allow wildcards like (.*) to be used, now it does.</li>
             <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
             <li>Ops.interpolate preserves metadata</li>
             <li>fill not identified in Ops.magnitude</li>
@@ -74,6 +74,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>ask before quitting when "close" is pressed and this is the last panel</li>
             <li>popup menus for axis tab show macros like %{RANGE}</li>
             <li>processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
+            <li>values in metadata tab are now the first twenty and last three values</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
