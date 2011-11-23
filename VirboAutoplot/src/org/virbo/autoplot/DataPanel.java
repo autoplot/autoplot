@@ -12,6 +12,7 @@
 package org.virbo.autoplot;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -27,9 +28,12 @@ import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -60,7 +64,6 @@ public class DataPanel extends javax.swing.JPanel {
     
     private final static Logger logger = Logger.getLogger("virbo.autoplot");
 
-    /** Creates new form DataPanel */
     public DataPanel( Application dom ) {
         initComponents();
 
@@ -134,6 +137,21 @@ public class DataPanel extends javax.swing.JPanel {
             }
         } );
 
+        componentTextField.getDocument().addDocumentListener( new DocumentListener() {
+
+            public void insertUpdate(DocumentEvent e) {
+                System.err.println("insert -->"+ componentTextField.getText());
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                System.err.println("remove -->"+ componentTextField.getText() );
+                new Exception().printStackTrace();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                System.err.println("change "+e);
+            }
+        } );
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
@@ -263,15 +281,6 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     private BindingGroup elementBindingGroup;
-    private transient PropertyChangeListener elementListener= new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-            if ( evt.getPropertyName().equals( PlotElement.PROP_COMPONENT ) ) {
-                String oldval= componentTextField.getText();
-                componentTextField.setText((String) evt.getNewValue());
-                if ( !oldval.equals(evt.getNewValue()) ) componentChanged();
-            }
-        }
-    };
 
     transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -311,33 +320,19 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }
 
-    private void doElementBindings() {
+    private synchronized void doElementBindings() {
         BindingGroup bc = new BindingGroup();
-        if ( element!=null ) {
-            element.removePropertyChangeListener(elementListener);
-        }
         if (elementBindingGroup != null) elementBindingGroup.unbind();
-
-        if ( compListener!=null ) {
-            element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
-        }
 
         PlotElement p = applicationController.getPlotElement();
         element= p;
-        element.addPropertyChangeListener(elementListener);
 
         componentTextField.setText(p.getComponent());
 
         componentChanged();
-
-        compListener= new PropertyChangeListener() {
-           public void propertyChange( PropertyChangeEvent ev ) {
-               String txt= (String)ev.getNewValue();
-               componentTextField.setText( txt );
-           }  
-        };
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.componentTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
 
         elementBindingGroup = bc;
         bc.bind();
