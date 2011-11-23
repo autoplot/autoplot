@@ -26,16 +26,18 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
             <li>Ops.interpolate preserves metadata</li>
             <li>fill not identified in Ops.magnitude</li>
-            <li>Operations pipeline correctly handles metadata by dropping external metadata for unsupported functions.  Before we would just ignore them</li>
+            <li>Operations pipeline correctly handles metadata by dropping external metadata for unsupported functions.  Before we would just ignore them, so data and metadata would not match up.</li>
             <li>3436569: Double-slicing (Rank 4 to Rank 2, |slice2(0)|slice1(0)) would not be properly reported in Operations field</li>
             <li>3436922: in slicing of SpaceWeather(20,8,3) where changing the slice wouldn't reset properly</li>
             <li>3436911: in automatic slicing of vap+inline:ripples(20,8,3).  Adjusting slice index wouldn't adjust child slices.
+            <li>bugfix label of in-line dataset in rich ASCII files</li>
             <li>Spectrogram render type correctly restored from vap file.  Before the renderType node would get close, but NoInterpolate mode would not work.</li>
             <li>3437327: two column csv without time location units wouldn't plot as it would have with the AsciiDataSource, now it does.</li>
             <li>3438527: getViewWindow() returns null after second is closed</li>
             <li>3439598: CDF variable with three channels having same name</li>
             <li>bugfixes with remote bookmarks, when remote folder contains other remote folders</li>
             <li>in applot.pro, check for NaN's before byteswap</li>
+            <li>in IDL/Matlab bridge, error reporting is improved.</li>
             <li>logic for guessing timerange supports non-aggregating data sources, and guesses before entering GUI.</li>
             <li>expert/basic mode code accidentally turned overplot button back on in add plots GUI.</li>
         </ul>
@@ -70,7 +72,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>python codes can convert strings like "10 nT" into datasets.  e.g. ds+'10 nT' works now.</li>
             <li>&lt;update check="background"&gt; should speed up launch a little more</li>
             <li>ask before quitting when "close" is pressed and this is the last panel</li>
-            <li>popup menus for axis tab</li>
+            <li>popup menus for axis tab show macros like %{RANGE}</li>
+            <li>processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
