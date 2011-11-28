@@ -40,6 +40,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class Util {
 
+    private static final Logger logger= Logger.getLogger("virbo.jython");
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
@@ -51,14 +52,13 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet( String surl, String stimeRange, ProgressMonitor mon ) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{surl, stimeRange} );
         URI uri = DataSetURI.getURI(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
-
-        QDataSet qds;
 
         TimeSeriesBrowse tsb= result.getCapability( TimeSeriesBrowse.class );
         if ( tsb!=null ) {
@@ -100,6 +100,7 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0})", surl );
         URI uri = DataSetURI.getURIValid(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
@@ -145,6 +146,8 @@ public class Util {
      * @throws java.lang.Exception
      */
     public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
+        logger.log( Level.FINE, "getMetaData({0})", surl );
+
         if (surl.equals(metadataSurl)) {
             return metadata;
         } else {
@@ -183,6 +186,7 @@ public class Util {
      * @throws java.lang.Exception
      */
     public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0},InputStream)", new Object[]{spec} );
         String[] ss= spec.split(":",-2);
         String ext;
         int i= ss[0].indexOf("+");
@@ -233,6 +237,7 @@ public class Util {
      * @throws java.io.IOException
      */
     public static String[] listDirectory(String surl) throws IOException, URISyntaxException {
+        logger.log(Level.FINE, "listDirectory({0})", surl);
         String[] ss = FileSystem.splitUrl(surl);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(ss[2]));
         String glob = ss[3].substring(ss[2].length());
