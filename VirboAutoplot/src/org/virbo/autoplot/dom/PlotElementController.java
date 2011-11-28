@@ -54,11 +54,12 @@ import org.virbo.metatree.MetadataUtil;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
- *
- * Three state flags:
- *   * resetRanges means all work needs to be done
- *   * resetPlotElement means we might need to introduce child plotElements and reset the rendertype
- *   * resetRenderType means we might need to refresh the peer.
+ * Once the data is loaded, the listening PlotElementController receives the update and does the following:
+ *   1. resolve the plot type: spectrogram, lineplot, stack of lineplot, etc, using AutoplotUtil.guessRenderType(fillDs);
+ *   2. reset the plot element, setting the plot type and creating children if needed.  For example, a B-GSM (demo 5) is
+ *      resolved by creating three children, and handing the components off to them.
+ *   3. if the component property is not empty, then we implement the component and display that.
+ *   4. adjusting the component slice index will not affect ranging when the index is changed.
  * @author jbf
  */
 public class PlotElementController extends DomNodeController {
