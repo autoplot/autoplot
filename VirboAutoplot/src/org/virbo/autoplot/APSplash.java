@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -35,7 +36,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JWindow;
 import org.das2.util.AboutUtil;
 
 /**
@@ -142,7 +142,7 @@ public class APSplash extends JFrame {
         try {
             for ( int i=0; i<6; i++ ) {
                 Thread.sleep(500);
-                Logger.getLogger("").warning("i="+i);
+                Logger.getLogger("").log(Level.WARNING, "i={0}", i);
                 //Splash.getInstance().messageLabel.setText( "ii-="+i );
             }
         } catch ( java.lang.InterruptedException e ) {}
