@@ -1301,26 +1301,9 @@ public class DataSetURI {
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
-            // identify the implicit parameter names--THIS IS GOING AWAY!
             Map params = URISplit.parseParams(split.params);
-            boolean hasImplicit = false;
-            for (int i = 0; i < 3; i++) { // NOTE THERE ARE ONLY THREE ALLOWED arg_<i> PARAMETERS!
-                String arg = (String) params.get("arg_" + i);
-                if (arg != null) {
-                    for (CompletionContext cc1 : completions) {
-                        if (cc1.context == CompletionContext.CONTEXT_PARAMETER_NAME && cc1.implicitName != null && cc1.completable.equals(arg)) {
-                            params.put(cc1.implicitName, arg);
-                            hasImplicit = true;
-                        }
-
-                    }
-                }
-            }
-            if (!hasImplicit) {  // TODO: we still don't have this right.  We want to replace the key that was mistaken for a positional argument for a named parameter.                
-                for (int i = 0; i < 3; i++) {
-                    params.remove("arg_" + i);
-                }
-
+            for (int i = 0; i < 3; i++) {
+                params.remove("arg_" + i);
             }
 
             int i = 0;
