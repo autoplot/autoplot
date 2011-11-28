@@ -890,6 +890,24 @@ public class CdfUtil {
         } catch (CDFException e) {
         }
 
+        int skipCount=0;
+        for (int i=0; i<v.size(); i++ ) {
+            Variable var = (Variable) v.get(i);
+            if ( dataOnly ) {
+               if ( hasEntry( varType, var ) ) {
+                   Entry varTypeEntry= varType.getEntry( var );
+                   if ( !( String.valueOf( varTypeEntry.getData() ).equals( VAR_TYPE_DATA ) ) ) {
+                       skipCount++;
+                   }
+                }
+            }
+        }
+        if ( skipCount==v.size() ) {
+            System.err.println( "turning off dataOnly because it rejects everything");
+            dataOnly= false;
+        }
+
+
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
             if (var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) {
