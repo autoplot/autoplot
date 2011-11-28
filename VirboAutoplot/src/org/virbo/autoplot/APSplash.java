@@ -28,9 +28,9 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Handler;
-import java.util.logging.Level;
+//import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -48,7 +48,7 @@ public class APSplash extends JFrame {
 
     private Handler handler;
     private JLabel messageLabel;
-    private long t0; // time of application start
+    //private long t0; // time of application start
 
     public static String getVersion() {
         try {
@@ -88,7 +88,7 @@ public class APSplash extends JFrame {
     public synchronized static APSplash getInstance() {
         if ( instance==null ) {
             instance= new APSplash();
-            instance.t0= System.currentTimeMillis();
+            //instance.t0= System.currentTimeMillis();
         }
         return instance;
     }
@@ -135,18 +135,18 @@ public class APSplash extends JFrame {
         this.setLocationRelativeTo(null);
     }
 
-    public static void main( String[] args ) {
-        System.out.println("This is das2 version "+getVersion());
-        APSplash.showSplash();
-        Logger.getLogger("").addHandler( APSplash.getInstance().getLogHandler() );
-        try {
-            for ( int i=0; i<6; i++ ) {
-                Thread.sleep(500);
-                Logger.getLogger("").log(Level.WARNING, "i={0}", i);
-                //Splash.getInstance().messageLabel.setText( "ii-="+i );
-            }
-        } catch ( java.lang.InterruptedException e ) {}
-        APSplash.hideSplash();
-    }
+//    public static void main( String[] args ) {
+//        System.out.println("This is das2 version "+getVersion());
+//        APSplash.showSplash();
+//        Logger.getLogger("").addHandler( APSplash.getInstance().getLogHandler() );
+//        try {
+//            for ( int i=0; i<6; i++ ) {
+//                Thread.sleep(500);
+//                Logger.getLogger("").log(Level.WARNING, "i={0}", i);
+//                //Splash.getInstance().messageLabel.setText( "ii-="+i );
+//            }
+//        } catch ( java.lang.InterruptedException e ) {}
+//        APSplash.hideSplash();
+//    }
 
 }
