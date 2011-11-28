@@ -8,14 +8,13 @@ package external;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.PlotSymbol;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
@@ -76,7 +75,6 @@ public class PlotCommand extends PyObject {
      */
     private Object getEnumElement( Class c, String ele ) {
         int PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
-        Object result;
         if (c.isEnum()) {
             Object[] vals = c.getEnumConstants();
             for (Object o : vals) {
@@ -89,9 +87,11 @@ public class PlotCommand extends PyObject {
             for ( Field f: fields ) {
                 try {
                     String name = f.getName();
-                    Object value = f.get(null);
-                    if ( ( ( f.getModifiers() & PUBLIC_STATIC_FINAL) == PUBLIC_STATIC_FINAL ) && name.equals(ele) && value!=null && c.isInstance(value) ) {
-                        return value;
+                    if ( ( ( f.getModifiers() & PUBLIC_STATIC_FINAL) == PUBLIC_STATIC_FINAL ) ) {
+                        Object value = f.get(null);
+                        if ( name.equals(ele) && value!=null && c.isInstance(value) ) {
+                            return value;
+                        }
                     }
                 } catch (IllegalAccessException iae) {
                     IllegalAccessError err = new IllegalAccessError(iae.getMessage());
@@ -116,7 +116,10 @@ public class PlotCommand extends PyObject {
                 "xlog", "ylog", "zlog",
                 "title",
                 "renderType",
-                "color", },
+                "color",
+                "symsize","linewidth",
+                "symbol",
+        },
                 new PyObject[] { Py.None, Py.None,
                         Py.None, Py.None,
                         Py.None, Py.None,
@@ -124,7 +127,10 @@ public class PlotCommand extends PyObject {
                         False, False, False,
                         Py.None,
                         Py.None,
-                        Py.None, } );
+                        Py.None,
+                        Py.None,Py.None,
+                        Py.None,
+        } );
         //Map<String,PyObject> foo= fs.args( args, keywords );
         //TODO: check on this with Ed.
         fs.args( args, keywords );
@@ -194,77 +200,86 @@ public class PlotCommand extends PyObject {
         // NOTE THERE'S A BUG HERE, for a moment the application is idle and a waiting process could proceed.
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);
-        
-        int chNum= iplot;
 
-        while ( dom.getDataSourceFilters().length <= chNum ) {
-            Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
-            dom.getController().setPlot(p);
-            dom.getController().addPlotElement( null, null  );
-        }
-        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
-        List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
+        try {
+            int chNum= iplot;
 
-        Plot plot= dom.getController().getPlotFor(elements.get(0));
-
-        for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
-            String kw= keywords[i-nparm];
-            PyObject val= args[i];
-
-            String sval= (String) val.__str__().__tojava__(String.class);
-            if ( kw.equals("ytitle") ) {
-                plot.getYaxis().setLabel( sval);
-            } else if ( kw.equals("yrange") ) {
-                DatumRange dr= plot.getYaxis().getRange();
-                Units u= dr.getUnits();
-                PyList plval= (PyList)val;
-                plot.getYaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                       ((Number)plval.get(1)).doubleValue(), u ) );
-            } else if ( kw.equals("ylog") ) {
-                plot.getYaxis().setLog( "1".equals(sval) );
-            } else if ( kw.equals("xtitle") ) {
-                plot.getXaxis().setLabel( sval);
-            } else if ( kw.equals("xrange") ) {
-                DatumRange dr= plot.getXaxis().getRange();
-                Units u= dr.getUnits();
-                PyList plval= (PyList)val;
-                plot.getXaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                       ((Number)plval.get(1)).doubleValue(), u ) );
-            } else if ( kw.equals("xlog") ) {
-                plot.getXaxis().setLog( "1".equals(sval) );
-            } else if ( kw.equals("ztitle") ) {
-                plot.getZaxis().setLabel( sval);
-            } else if ( kw.equals("zrange") ) {
-                DatumRange dr= plot.getZaxis().getRange();
-                Units u= dr.getUnits();
-                PyList plval= (PyList)val;
-                plot.getZaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                       ((Number)plval.get(1)).doubleValue(), u ) );
-            } else if ( kw.equals("zlog") ) {
-                plot.getZaxis().setLog( "1".equals(sval) );
-            } else if ( kw.equals("color" ) ) {
-                if ( sval!=null ) {
-                   Color c;
-                   try {
-                       c= Color.decode( sval );
-                   } catch ( NumberFormatException ex ) {
-                       c= (Color)getEnumElement( Color.class, sval );
-                   }
-                   if ( c!=null ) {
-                       elements.get(0).getStyle().setColor( c );
-                   } else {
-                       throw new IllegalArgumentException("unable to identify color: "+sval);
-                   }
-                }
-            } else if ( kw.equals("title") ) {
-                plot.setTitle(sval);
-            } else if ( kw.equals("renderType") ) {
-                RenderType rt= RenderType.valueOf(sval);
-                elements.get(0).setRenderType(rt);
+            while ( dom.getDataSourceFilters().length <= chNum ) {
+                Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
+                dom.getController().setPlot(p);
+                dom.getController().addPlotElement( null, null  );
             }
-        }
+            DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+            List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
 
-        dom.getController().changePerformed(this,this);
+            Plot plot= dom.getController().getPlotFor(elements.get(0));
+
+            for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
+                String kw= keywords[i-nparm];
+                PyObject val= args[i];
+
+                String sval= (String) val.__str__().__tojava__(String.class);
+                if ( kw.equals("ytitle") ) {
+                    plot.getYaxis().setLabel( sval);
+                } else if ( kw.equals("yrange") ) {
+                    DatumRange dr= plot.getYaxis().getRange();
+                    Units u= dr.getUnits();
+                    PyList plval= (PyList)val;
+                    plot.getYaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
+                           ((Number)plval.get(1)).doubleValue(), u ) );
+                } else if ( kw.equals("ylog") ) {
+                    plot.getYaxis().setLog( "1".equals(sval) );
+                } else if ( kw.equals("xtitle") ) {
+                    plot.getXaxis().setLabel( sval);
+                } else if ( kw.equals("xrange") ) {
+                    DatumRange dr= plot.getXaxis().getRange();
+                    Units u= dr.getUnits();
+                    PyList plval= (PyList)val;
+                    plot.getXaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
+                           ((Number)plval.get(1)).doubleValue(), u ) );
+                } else if ( kw.equals("xlog") ) {
+                    plot.getXaxis().setLog( "1".equals(sval) );
+                } else if ( kw.equals("ztitle") ) {
+                    plot.getZaxis().setLabel( sval);
+                } else if ( kw.equals("zrange") ) {
+                    DatumRange dr= plot.getZaxis().getRange();
+                    Units u= dr.getUnits();
+                    PyList plval= (PyList)val;
+                    plot.getZaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
+                           ((Number)plval.get(1)).doubleValue(), u ) );
+                } else if ( kw.equals("zlog") ) {
+                    plot.getZaxis().setLog( "1".equals(sval) );
+                } else if ( kw.equals("color" ) ) {
+                    if ( sval!=null ) {
+                       Color c;
+                       try {
+                           c= Color.decode( sval );
+                       } catch ( NumberFormatException ex ) {
+                           c= (Color)getEnumElement( Color.class, sval );
+                       }
+                       if ( c!=null ) {
+                           elements.get(0).getStyle().setColor( c );
+                       } else {
+                           throw new IllegalArgumentException("unable to identify color: "+sval);
+                       }
+                    }
+                } else if ( kw.equals("title") ) {
+                    plot.setTitle(sval);
+                } else if ( kw.equals("symsize") ) {
+                    elements.get(0).getStyle().setSymbolSize( Double.valueOf(sval) );
+                } else if ( kw.equals("linewidth") ) {
+                    elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
+                } else if ( kw.equals("symbol") ) {
+                    elements.get(0).getStyle().setPlotSymbol( (PlotSymbol) getEnumElement( DefaultPlotSymbol.class, sval ));
+                } else if ( kw.equals("renderType") ) {
+                    RenderType rt= RenderType.valueOf(sval);
+                    elements.get(0).setRenderType(rt);
+                }
+            }
+
+        } finally {
+            dom.getController().changePerformed(this,this);
+        }
 
         return Py.None;
     }
