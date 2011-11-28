@@ -66,6 +66,8 @@
                           <Component id="sliceIndexLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="sliceIndexSpinner" min="-2" pref="104" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -89,6 +91,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="sliceIndexLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="sliceIndexSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="sliceAutorangesCB" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="transposeCheckBox" min="-2" max="-2" attributes="0"/>
@@ -159,6 +162,12 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="doSliceCheckBoxActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="sliceAutorangesCB">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Slice Autoranges"/>
+            <Property name="toolTipText" type="java.lang.String" value="Changing the slice index will re-autorange the data"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

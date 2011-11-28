@@ -72,7 +72,7 @@ public class DataPanel extends javax.swing.JPanel {
         this.applicationController= this.dom.getController();
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                doElementBindings();
+                doPlotElementBindings();
             }
         });
         this.applicationController.addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
@@ -188,7 +188,7 @@ public class DataPanel extends javax.swing.JPanel {
 
 
     public void doBindings() {
-        doElementBindings();
+        doPlotElementBindings();
         doDataSourceFilterBindings();
         componentChanged(); // force update
     }
@@ -244,11 +244,13 @@ public class DataPanel extends javax.swing.JPanel {
             transposeCheckBox.setSelected( m.group(3)!=null );
             setAdjusting(false);
         }
-        doSliceCheckBox.setEnabled(m.matches());
-        sliceIndexSpinner.setEnabled(m.matches());
-        sliceIndexLabel.setEnabled(m.matches());
-        sliceTypeComboBox.setEnabled(m.matches());
-        transposeCheckBox.setEnabled(m.matches());
+        boolean canSlice= m.matches();
+        doSliceCheckBox.setEnabled(canSlice);
+        sliceIndexSpinner.setEnabled(canSlice);
+        sliceIndexLabel.setEnabled(canSlice);
+        sliceAutorangesCB.setEnabled(canSlice);
+        sliceTypeComboBox.setEnabled(canSlice);
+        transposeCheckBox.setEnabled(canSlice);
 
     }
 
@@ -308,7 +310,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }
 
-    private synchronized void doElementBindings() {
+    private synchronized void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         if (elementBindingGroup != null) elementBindingGroup.unbind();
         if ( element!=null ) element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
@@ -322,6 +324,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.componentTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
 
         elementBindingGroup = bc;
         bc.bind();
@@ -437,6 +440,7 @@ public class DataPanel extends javax.swing.JPanel {
         operationsLabel = new javax.swing.JLabel();
         componentTextField = new javax.swing.JTextField();
         doSliceCheckBox = new javax.swing.JCheckBox();
+        sliceAutorangesCB = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         validRangeLabel = new javax.swing.JLabel();
         validRangeComboBox = new javax.swing.JComboBox();
@@ -511,6 +515,9 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
+        sliceAutorangesCB.setText("Slice Autoranges");
+        sliceAutorangesCB.setToolTipText("Changing the slice index will re-autorange the data");
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -531,7 +538,9 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(12, 12, 12)
                         .add(sliceIndexLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(sliceAutorangesCB))
                     .add(transposeCheckBox))
                 .addContainerGap())
         );
@@ -548,7 +557,8 @@ public class DataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(sliceIndexLabel)
-                    .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(sliceAutorangesCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
                 .addContainerGap(86, Short.MAX_VALUE))
@@ -730,6 +740,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel operationsLabel;
+    private javax.swing.JCheckBox sliceAutorangesCB;
     private javax.swing.JLabel sliceIndexLabel;
     private javax.swing.JSpinner sliceIndexSpinner;
     private javax.swing.JComboBox sliceTypeComboBox;
