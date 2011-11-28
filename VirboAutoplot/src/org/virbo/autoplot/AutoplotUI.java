@@ -1608,7 +1608,7 @@ APSplash.checkTime("init 52");
         editMenu.add(inspectVapFileMenuItem);
         editMenu.add(jSeparator1);
 
-        pasteDataSetURLMenuItem.setText("Paste URL");
+        pasteDataSetURLMenuItem.setText("Paste URI");
         pasteDataSetURLMenuItem.setToolTipText("Paste a data address in the system clipboard into the address bar");
         pasteDataSetURLMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1617,7 +1617,7 @@ APSplash.checkTime("init 52");
         });
         editMenu.add(pasteDataSetURLMenuItem);
 
-        copyDataSetURLMenuItem.setText("Copy URL");
+        copyDataSetURLMenuItem.setText("Copy URI");
         copyDataSetURLMenuItem.setToolTipText("Copy the data address in the address bar into the system clipboard");
         copyDataSetURLMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

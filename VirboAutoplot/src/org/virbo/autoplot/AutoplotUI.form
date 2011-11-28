@@ -80,7 +80,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="pasteDataSetURLMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Paste URL"/>
+                <Property name="text" type="java.lang.String" value="Paste URI"/>
                 <Property name="toolTipText" type="java.lang.String" value="Paste a data address in the system clipboard into the address bar"/>
               </Properties>
               <Events>
@@ -89,7 +89,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="copyDataSetURLMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Copy URL"/>
+                <Property name="text" type="java.lang.String" value="Copy URI"/>
                 <Property name="toolTipText" type="java.lang.String" value="Copy the data address in the address bar into the system clipboard"/>
               </Properties>
               <Events>
