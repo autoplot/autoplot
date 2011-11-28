@@ -105,8 +105,6 @@ public class PlotCommand extends PyObject {
 
     @Override
     public PyObject __call__(PyObject[] args, String[] keywords) {
-        System.err.println( Arrays.asList(args) );
-        System.err.println( Arrays.asList(keywords) );
 
         PyObject False= Py.newBoolean(false);
 
@@ -164,9 +162,6 @@ public class PlotCommand extends PyObject {
 
         Application dom= ScriptContext.getDocumentModel();
 
-//        dom.getController().registerPendingChange( this, this );
-//        dom.getController().performingChange(this,this);
-
         if ( nargs==1 && po0 instanceof PyString ) {
             try {
                 ScriptContext.plot(((PyString) po0).toString());
@@ -194,6 +189,11 @@ public class PlotCommand extends PyObject {
             }
         }
         // we're done plotting, now for the arguments 
+
+        // we can't use this up above because ScriptContext.plot hangs because we've locked the application and it can't wait until idle.
+        // NOTE THERE'S A BUG HERE, for a moment the application is idle and a waiting process could proceed.
+        dom.getController().registerPendingChange( this, this );  
+        dom.getController().performingChange(this,this);
         
         int chNum= iplot;
 
@@ -264,7 +264,7 @@ public class PlotCommand extends PyObject {
             }
         }
 
-//        dom.getController().changePerformed(plot, plot);
+        dom.getController().changePerformed(this,this);
 
         return Py.None;
     }
