@@ -52,13 +52,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                          <Component id="componentTextField" pref="273" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="componentTextField" pref="318" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="doSliceCheckBox" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="sliceTypeComboBox" min="-2" pref="215" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="sliceTypeComboBox" pref="260" max="32767" attributes="0"/>
+                          <EmptySpace min="18" pref="18" max="18" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="12" pref="12" max="12" attributes="0"/>
@@ -68,7 +69,7 @@
                       </Group>
                       <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="57" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -293,7 +294,7 @@
                 <Font component="uriTextField" property="font" relativeSize="true" size="-2"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" value="jTextField1"/>
+            <Property name="text" type="java.lang.String" value="This will be the current focus URI"/>
             <Property name="toolTipText" type="java.lang.String" value="After the data is loaded, the plot element can apply additional operations before displaying the data.  "/>
           </Properties>
         </Component>

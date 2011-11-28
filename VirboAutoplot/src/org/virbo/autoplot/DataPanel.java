@@ -12,7 +12,6 @@
 package org.virbo.autoplot;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -28,7 +27,6 @@ import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -137,6 +135,12 @@ public class DataPanel extends javax.swing.JPanel {
             }
         } );
 
+        compListener= new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                componentChanged();
+            }
+        };
+        
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
@@ -307,6 +311,7 @@ public class DataPanel extends javax.swing.JPanel {
     private synchronized void doElementBindings() {
         BindingGroup bc = new BindingGroup();
         if (elementBindingGroup != null) elementBindingGroup.unbind();
+        if ( element!=null ) element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
 
         PlotElement p = applicationController.getPlotElement();
         element= p;
@@ -320,6 +325,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         elementBindingGroup = bc;
         bc.bind();
+
     }
 
     private synchronized void doDataSourceFilterBindings() {
@@ -515,18 +521,19 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(operationsLabel)
                         .add(18, 18, 18)
-                        .add(componentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
+                        .add(componentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(doSliceCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceTypeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(sliceTypeComboBox, 0, 260, Short.MAX_VALUE)
+                        .add(18, 18, 18))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(sliceIndexLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(transposeCheckBox))
-                .add(57, 57, 57))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -607,7 +614,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         uriTextField.setEditable(false);
         uriTextField.setFont(uriTextField.getFont().deriveFont(uriTextField.getFont().getSize()-2f));
-        uriTextField.setText("jTextField1");
+        uriTextField.setText("This will be the current focus URI");
         uriTextField.setToolTipText("After the data is loaded, the plot element can apply additional operations before displaying the data.  ");
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
