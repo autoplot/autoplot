@@ -319,7 +319,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             
             String fileName= cdfFile.toString();
 
-            logger.fine("opening cdf file "+fileName);
+            logger.log(Level.FINE, "opening cdf file {0}", fileName);
             CDF cdf;
             try {
                 cdf = CDFFactory.getCDF(fileName);
