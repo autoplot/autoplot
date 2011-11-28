@@ -130,6 +130,15 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * @param xXx  mixed case string
+     * @param xx   lower case match
+     * @return
+     */
+    private static boolean containsIgnoreCase( String xXx, String xx ) {
+        return xXx.toLowerCase().contains(xx);
+    }
+
     final class MyTreeModel implements TreeModel {
 
         private final Object root= new Object();
@@ -165,6 +174,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                 String filt= RecentUrisGUI.this.filter;
                 if ( filt!=null && filt.length()==0 ) filt=null;
+                if ( filt!=null ) filt= filt.toLowerCase();
 
                 long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
 
@@ -180,7 +190,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
                         }
                         try {
-                            if ( filt!=null && !ss[1].contains(filt) ) {
+                            if ( filt!=null && ! containsIgnoreCase(ss[1],filt) ) {
                                 continue;
                             }
                             if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
