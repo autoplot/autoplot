@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -209,6 +211,11 @@ public class PlotElementController extends DomNodeController {
                 String newv= (String)evt.getNewValue();
                 if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), newv ) ) { //TODO: why two methods see axisDimensionsChange 10 lines above
                     logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
+                    setResetPlotElement(true);
+                    setResetRanges(true);
+                    if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
+                }
+                if ( sliceAutoranges ) {
                     setResetPlotElement(true);
                     setResetRanges(true);
                     if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
@@ -485,7 +492,9 @@ public class PlotElementController extends DomNodeController {
         String comp= plotElement.getComponent();
         try {
             if ( fillDs!=null ) {
+
                 if ( comp.length()>0 ) fillDs = processDataSet(comp, fillDs );
+
                 if ( checkUnits && doUnitsCheck( fillDs ) ) { // bug 3104572: slicing would drop units, so old vaps wouldn't work
                     Plot plot= this.dom.getController().getPlotFor(plotElement);
                     PlotController pc= plot.getController();
@@ -950,6 +959,15 @@ public class PlotElementController extends DomNodeController {
 
             if ( shouldSlice ) {
                 String component= guessSlice( fillDs );
+                Units[] us= getDimensionUnits(fillDs);
+                Pattern p= Pattern.compile("\\|slice(\\d)\\(\\d+\\)");
+                Matcher m= p.matcher(component);
+                if ( m.matches() ) {
+                    int dim= Integer.parseInt( m.group(1) );
+                    if ( UnitsUtil.isNominalMeasurement(us[dim]) ) {
+                        setSliceAutoranges(true);
+                    }
+                }
                 String existingComponent= plotElement.getComponent();
                 if ( !existingComponent.equals("") ) {
                     plotElement.setComponentAutomatically( existingComponent + component );
@@ -1162,6 +1180,23 @@ public class PlotElementController extends DomNodeController {
         this.dsfReset = dsfReset;
         propertyChangeSupport.firePropertyChange(PROP_DSFRESET, oldDsfReset, dsfReset);
     }
+
+    /**
+     * when true, changing the slice index should cause autorange.
+     */
+    private boolean sliceAutoranges = false;
+    public static final String PROP_SLICEAUTORANGES = "sliceAutoranges";
+
+    public boolean isSliceAutoranges() {
+        return sliceAutoranges;
+    }
+
+    public void setSliceAutoranges(boolean sliceAutoranges) {
+        boolean oldSliceAutoranges = this.sliceAutoranges;
+        this.sliceAutoranges = sliceAutoranges;
+        propertyChangeSupport.firePropertyChange(PROP_SLICEAUTORANGES, oldSliceAutoranges, sliceAutoranges);
+    }
+
 
     protected Renderer renderer = null;
 
