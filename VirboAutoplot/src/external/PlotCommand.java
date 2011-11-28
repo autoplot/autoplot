@@ -6,9 +6,12 @@
 package external;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
@@ -65,6 +68,41 @@ public class PlotCommand extends PyObject {
         }
     }
 
+    /**
+     * return the object or null for this string  "RED" -> Color.RED
+     * @param c
+     * @param ele
+     * @return
+     */
+    private Object getEnumElement( Class c, String ele ) {
+        int PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
+        Object result;
+        if (c.isEnum()) {
+            Object[] vals = c.getEnumConstants();
+            for (Object o : vals) {
+                Enum e = (Enum) o;
+                if ( e.toString().equals(ele) ) return e;
+            }
+
+        } else {
+            Field[] fields = c.getDeclaredFields();
+            for ( Field f: fields ) {
+                try {
+                    String name = f.getName();
+                    Object value = f.get(null);
+                    if ( ( ( f.getModifiers() & PUBLIC_STATIC_FINAL) == PUBLIC_STATIC_FINAL ) && name.equals(ele) && value!=null && c.isInstance(value) ) {
+                        return value;
+                    }
+                } catch (IllegalAccessException iae) {
+                    IllegalAccessError err = new IllegalAccessError(iae.getMessage());
+                    err.initCause(iae);
+                    throw err;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public PyObject __call__(PyObject[] args, String[] keywords) {
         System.err.println( Arrays.asList(args) );
@@ -103,19 +141,24 @@ public class PlotCommand extends PyObject {
         int iplot=0;
         int nargs= nparm;
 
+        // If the first (zeroth) argument is an int, than this is the data source where the value should be inserted.  Additional
+        // data sources and plots will be added until there are enough.
         PyObject po0= args[0];
         if ( po0 instanceof PyInteger ) {
             iplot= ((PyInteger)po0).getValue();
+            PyObject[] newArgs= new PyObject[args.length-1];
             for ( int i=0; i<args.length-1; i++ ) {
-                args[i]= args[i+1];
+                newArgs[i]= args[i+1];
             }
+            args= newArgs;
             nargs= nargs-1;
+            nparm= args.length - keywords.length;
         }
 
-        if ( args[nargs-1] instanceof PyInteger ) {  // NEW! last positional argument can be plot position
-            iplot= ((PyInteger)args[nargs-1]).getValue();
-            nargs= nargs-1;
-        }
+        //if ( args[nargs-1] instanceof PyInteger ) {  // NEW! last positional argument can be plot position.  Where is this used?  I think it should go away.
+        //    iplot= ((PyInteger)args[nargs-1]).getValue();
+        //    nargs= nargs-1;
+        //}
 
         QDataSet[] qargs= new QDataSet[nargs];
 
@@ -164,7 +207,7 @@ public class PlotCommand extends PyObject {
 
         Plot plot= dom.getController().getPlotFor(elements.get(0));
 
-        for ( int i=nparm; i<args.length; i++ ) {
+        for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
             String kw= keywords[i-nparm];
             PyObject val= args[i];
 
@@ -200,8 +243,19 @@ public class PlotCommand extends PyObject {
             } else if ( kw.equals("zlog") ) {
                 plot.getZaxis().setLog( "1".equals(sval) );
             } else if ( kw.equals("color" ) ) {
-                Color c= Color.decode( sval );
-                if ( sval!=null ) elements.get(0).getStyle().setColor( c );
+                if ( sval!=null ) {
+                   Color c;
+                   try {
+                       c= Color.decode( sval );
+                   } catch ( NumberFormatException ex ) {
+                       c= (Color)getEnumElement( Color.class, sval );
+                   }
+                   if ( c!=null ) {
+                       elements.get(0).getStyle().setColor( c );
+                   } else {
+                       throw new IllegalArgumentException("unable to identify color: "+sval);
+                   }
+                }
             } else if ( kw.equals("title") ) {
                 plot.setTitle(sval);
             } else if ( kw.equals("renderType") ) {
