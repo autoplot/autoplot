@@ -61,6 +61,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
         initComponents();
+        tearoffTabbedPane1.hideMouseAdapter();
 
         support= new ScriptPanelSupport(textArea);
         support.addCaretLabel(caretPositionLabel);
