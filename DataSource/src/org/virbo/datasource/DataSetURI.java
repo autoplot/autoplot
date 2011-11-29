@@ -348,7 +348,7 @@ public class DataSetURI {
         }
 
         String ext = DataSetURI.getExplicitExt( suri );
-        if (ext != null) {
+        if (ext != null && !suri.startsWith("vap+X:") ) {
             return DataSourceRegistry.getInstance().getSource(ext);
         }
 
@@ -396,7 +396,7 @@ public class DataSetURI {
 
 
         if (factory == null) {
-            if (ext.equals("")) {
+            if (ext.equals("") || ext.equals("X") ) {
                 throw new NonResourceException("resource has no extension or mime type");
             } else {
                 factory = DataSourceRegistry.getInstance().getSource(ext);
