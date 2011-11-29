@@ -777,7 +777,7 @@ private void guessTimeFormatButtonAP( ) {
     String text= timeFormatTextField.getText().trim();
     String[] ss= text.split("\\+");
     int curr= TimeUtil.YEAR;
-    StringBuffer template= new StringBuffer();
+    StringBuilder template= new StringBuilder();
     boolean giveUp= false;
     for ( int i=0; i<ss.length; i++ ) {
         String s= ss[i];
@@ -1048,7 +1048,6 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
     public String getURI() {
 
-        String args = "";
         if ( skipLines > 0 ) {
             params.put("skipLines", "" + skipLines);
         } else {
@@ -1168,9 +1167,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             boolean isRichHeader = AsciiParser.isRichHeader(p.header);
             if (isRichHeader) {
                 try {
-                    String[] columns=  new String[p.fieldCount()];
-                    for ( int i=0; i<columns.length; i++ )  columns[i]="";
-                    AsciiHeadersParser.parseMetadata(p.header,columns,columns);
+                    String[] columns1=  new String[p.fieldCount()];
+                    for ( int i=0; i<columns1.length; i++ )  columns1[i]="";
+                    AsciiHeadersParser.parseMetadata(p.header,columns1,columns1);
                 } catch (ParseException ex) {
                     Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
                     richHeaderWarn = ex;
