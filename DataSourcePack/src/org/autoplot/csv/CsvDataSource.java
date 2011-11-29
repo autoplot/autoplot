@@ -6,23 +6,29 @@
 package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
- *
+ * Specialized reader only reads csv files.  These csv files must be simple tables with the same number of fields in each record.
  * @author jbf
  */
 public class CsvDataSource extends AbstractDataSource {
@@ -31,14 +37,42 @@ public class CsvDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    private static Units getUnits( String header, String u ) {
+    QDataSet parseHeader( int icol, String header, String sval ) {
+        header= header.trim();
+        DDataSet result= DDataSet.create( new int[0] ); // rank 0 dataset
+
+        Units u= guessUnits(sval);
+        if ( u!=Units.dimensionless ) result.putProperty( QDataSet.UNITS, u );
+        if ( UnitsUtil.isTimeLocation(u) ) result.putProperty( QDataSet.NAME, "UTC" );
+        if ( header.length()==0 ) {
+            try {
+                result.putValue(u.parse(sval).doubleValue(u));
+            } catch (ParseException ex) {
+                Logger.getLogger(CsvDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return result;
+        } else {
+            Pattern p= Pattern.compile( "([a-zA-Z0-9\\-\\+ ]*)(\\(([a-zA-Z-0-9\\-\\+ ]*)\\))?");
+            Matcher m= p.matcher(header);
+            if ( m.matches() ) {
+                String label= m.group(1).trim();
+                String sunits= m.group(3);
+                if ( header.length()>0 ) result.putProperty( QDataSet.NAME, Ops.safeName(label) );
+                result.putProperty(QDataSet.LABEL,label);
+                if ( sunits!=null ) result.putProperty(QDataSet.UNITS, SemanticOps.lookupUnits(sunits.trim()) );
+            }
+            return result;
+        }
+    }
+
+    private static Units guessUnits( String sval ) {
         try {
-            Units.dimensionless.parse(u);
+            Units.dimensionless.parse(sval);
             return Units.dimensionless;
         } catch ( Exception ex ) {
         }
         try {
-            Units.us2000.parse(u);
+            Units.us2000.parse(sval);
             return Units.us2000;
         } catch ( Exception ex ) {
         }
@@ -48,8 +82,9 @@ public class CsvDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        File f= getFile(uri, mon);
-        CsvReader reader= new CsvReader( new FileReader(f) );
+        InputStream in = DataSetURI.getInputStream(uri, mon);
+
+        CsvReader reader= new CsvReader( new InputStreamReader(in) );
 
         int ncol=-1;
 
@@ -70,6 +105,7 @@ public class CsvDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("column not found: "+column);
             }
         }
+        QDataSet icolumnDs=null; // metadata for column
 
         String bundle= getParam( "bundle", null );
         int[] cols;
@@ -90,11 +126,10 @@ public class CsvDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("column not found: "+dep0column);
             }
         }
+        QDataSet dep0ds= null;
 
         Units dep0u= Units.dimensionless;
         Units u= Units.dimensionless;
-
-        boolean init= true;
 
         int hline=2; // allow top two lines to be header lines.
 
@@ -134,8 +169,14 @@ public class CsvDataSource extends AbstractDataSource {
                 Units oldDep0u= dep0u;
                 Units oldU= u;
 
-                if ( idep0column>=0 && !(dep0u instanceof TimeLocationUnits) ) dep0u= getUnits( reader.getHeader(idep0column),reader.get(idep0column) );
-                if ( !( u instanceof TimeLocationUnits ) ) u= getUnits( reader.getHeader(icolumn),reader.get(icolumn) );
+                if ( idep0column>=0 && !(dep0u instanceof TimeLocationUnits) ) {
+                    dep0ds= parseHeader( idep0column, reader.getHeader(idep0column),reader.get(idep0column) );
+                    dep0u= SemanticOps.getUnits(dep0ds);
+                }
+                if ( !( u instanceof TimeLocationUnits ) ) {
+                    icolumnDs= parseHeader( icolumn, reader.getHeader(icolumn),reader.get(icolumn) );
+                    u= SemanticOps.getUnits(icolumnDs);
+                }
                 hline= hline-1;
 
                 if ( hline==0 ) {
@@ -203,13 +244,13 @@ public class CsvDataSource extends AbstractDataSource {
         if ( idep0column>=0 ) {
             DDataSet tds= tbuilder.getDataSet();
             tds.putProperty(QDataSet.UNITS,dep0u);
-            tds.putProperty(QDataSet.NAME,Ops.safeName(headers[idep0column]));
-            tds.putProperty(QDataSet.LABEL,headers[idep0column]);
+            tds.putProperty(QDataSet.NAME,dep0ds.property(QDataSet.NAME));
+            tds.putProperty(QDataSet.LABEL,dep0ds.property(QDataSet.LABEL));
             ds.putProperty(QDataSet.DEPEND_0, tds);
         }
         ds.putProperty(QDataSet.UNITS,u);
-        ds.putProperty(QDataSet.NAME,Ops.safeName(headers[icolumn]));
-        ds.putProperty(QDataSet.LABEL,headers[icolumn]);
+        ds.putProperty(QDataSet.NAME,icolumnDs.property(QDataSet.NAME));
+        ds.putProperty(QDataSet.LABEL,icolumnDs.property(QDataSet.LABEL));
 
         return ds;
     }
