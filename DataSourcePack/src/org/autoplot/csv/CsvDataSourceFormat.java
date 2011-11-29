@@ -14,6 +14,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceFormat;
@@ -38,12 +39,17 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         int col=0;
 
         QDataSet[] dss;
+        QDataSet[] wdss;
+        
         List<QDataSet> ldss= new ArrayList();
+        List<QDataSet> lwdss= new ArrayList();
         if ( data.property(QDataSet.DEPEND_0)!=null ) {
             ldss.add( (QDataSet) data.property(QDataSet.DEPEND_0));
+            lwdss.add( DataSetUtil.weightsDataSet((QDataSet) data.property(QDataSet.DEPEND_0) ) );
             col++;
         }
         ldss.add(data);
+        lwdss.add(DataSetUtil.weightsDataSet(data));
         if ( data.rank()==1 ) {
             col++;
         } else if ( data.rank()==2 ) {
@@ -52,7 +58,7 @@ public class CsvDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("rank limit");
         }
         dss= ldss.toArray( new QDataSet[ldss.size()] );
-
+        wdss= lwdss.toArray( new QDataSet[lwdss.size()] );
         values= new String[col];
         labels= new String[col];
 
@@ -101,10 +107,18 @@ public class CsvDataSourceFormat implements DataSourceFormat {
             for ( int ids=0; ids<dss.length; ids++ ) {
                 Units u= SemanticOps.getUnits(dss[ids]);
                 if ( dss[ids].rank()==1 ) {
-                    values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i) ), u );
+                    if ( wdss[ids].value(i)==0 ) {
+                        values[col++]= "NaN";
+                    } else {
+                        values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i) ), u );
+                    }
                 } else {
                     for ( int j=0;j<dss[ids].length(0); j++ ) {
-                        values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i,j) ), u );
+                        if ( wdss[ids].value(i,j)==0 ) {
+                            values[col++]= "NaN";
+                        } else {
+                            values[col++]= formats[ids].format( u.createDatum( dss[ids].value(i,j) ), u );
+                        }
                     }
                 }
             }
