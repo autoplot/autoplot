@@ -15,8 +15,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -1234,9 +1232,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
               }
             }
 
-            ComboBoxModel model= commentComboBox.getModel();
-            for ( int i=0; i<model.getSize(); i++ ) {
-                if ( ((String)model.getElementAt(i)).startsWith(comment) ) {
+            ComboBoxModel model1= commentComboBox.getModel();
+            for ( int i=0; i<model1.getSize(); i++ ) {
+                if ( ((String)model1.getElementAt(i)).startsWith(comment) ) {
                     commentComboBox.setSelectedIndex(i);
                 }
             }
