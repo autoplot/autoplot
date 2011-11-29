@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import org.das2.DasApplication;
-import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemSettings;
 import org.virbo.autoplot.AutoplotApplet;
 import org.virbo.autoplot.state.StatePersistence;
 
@@ -170,7 +170,7 @@ public class TestApplet001 {
         params.put("java_arguments", "-Djnlp.packEnabled=true");
 
         DasApplication.setRestrictPermission(true);
-        FileSystem.settings().setRestrictPermission(true);
+        FileSystemSettings.setRestrictPermission(true);
 
         try {
             doTest( params, headless, "height", "200", "width", "600" );
