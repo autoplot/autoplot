@@ -150,6 +150,21 @@ public class WalkImage  {
     }
 
     /**
+     * return a file, that is never type=0.  This was a bug on Windows.
+     * @param f
+     * @return
+     */
+    public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
+        BufferedImage im= ImageIO.read( f );
+        if ( im.getType()==0 ) {
+            BufferedImage imNew= new BufferedImage( im.getWidth(), im.getHeight(), BufferedImage.TYPE_INT_ARGB );
+            imNew.getGraphics().drawImage( im, 0, 0, null );
+            im= imNew;
+        }
+        return im;
+    }
+
+    /**
      * attempt to create the thumbnail on the current thread.  If there is no
      * "thumbs400" directory and the image is not yet loaded, then no
      * action takes place.
@@ -165,7 +180,7 @@ public class WalkImage  {
                 FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
 
                 File localFile = fo.getFile();
-                rawThumb = ImageIO.read(localFile);
+                rawThumb = readImage(localFile);
 
                 if ( rawThumb==null ) {
                     throw new RuntimeException( "Unable to read: "+localFile );
@@ -310,7 +325,7 @@ public class WalkImage  {
 
             Thread.yield();
 
-            im = ImageIO.read(localFile);
+            im = readImage(localFile);
 
             if ( im==null ) {
                 throw new RuntimeException( "unable to read: "+localFile );
