@@ -390,31 +390,44 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         ex.appendChild(hashe);
 
-        StackTraceElement ste = th.getStackTrace()[0];
+        StackTraceElement[] stes= th.getStackTrace();
 
-        Element location= doc.createElement("location");
-        Element ele= doc.createElement("class");
-        ele.appendChild( doc.createTextNode(ste.getClassName()));
-        location.appendChild(ele);
-        ele= doc.createElement("method");
-        ele.appendChild( doc.createTextNode(ste.getMethodName()) );
-        location.appendChild(ele);
-        ele= doc.createElement("file");
-        ele.appendChild( doc.createTextNode(ste.getFileName()) );
-        location.appendChild(ele);
-        ele= doc.createElement("lineNumber");
-        ele.appendChild( doc.createTextNode( String.valueOf(ste.getLineNumber()) ) );
-        location.appendChild(ele);
+        Element location;
+        location= doc.createElement("location");
 
-        ex.appendChild(location);
+        if ( stes.length>0 ) {
+            StackTraceElement ste = stes[0];
+    
+            Element ele= doc.createElement("class");
+            ele.appendChild( doc.createTextNode(ste.getClassName()));
+            location.appendChild(ele);
+            ele= doc.createElement("method");
+            ele.appendChild( doc.createTextNode(ste.getMethodName()) );
+            location.appendChild(ele);
+            ele= doc.createElement("file");
+            ele.appendChild( doc.createTextNode(ste.getFileName()) );
+            location.appendChild(ele);
+            ele= doc.createElement("lineNumber");
+            ele.appendChild( doc.createTextNode( String.valueOf(ste.getLineNumber()) ) );
+            location.appendChild(ele);
 
-        ele= doc.createElement("toString");
-        StringWriter sw = new StringWriter();
-        th.printStackTrace(new PrintWriter(sw));
+            ex.appendChild(location);
+            
+            ele= doc.createElement("toString");
+            StringWriter sw = new StringWriter();
+            th.printStackTrace(new PrintWriter(sw));
 
-        ele.appendChild( doc.createTextNode( "\n"+sw.toString() ) );
+            ele.appendChild( doc.createTextNode( "\n"+sw.toString() ) );
 
-        ex.appendChild(ele);
+            ex.appendChild(ele);
+
+        } else {
+            Element ele= doc.createElement("noStackTrace");
+            location.appendChild(ele);
+            ex.appendChild(location);
+
+        }
+
 
         parent.appendChild(ex);
     }
