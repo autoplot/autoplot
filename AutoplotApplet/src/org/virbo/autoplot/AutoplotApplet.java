@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
@@ -51,8 +49,6 @@ import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
-import org.das2.util.filesystem.FileObject;
-import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
@@ -82,7 +78,7 @@ public class AutoplotApplet extends JApplet {
     ApplicationModel model;
     Application dom;
     boolean initializing = true;
-    static Logger logger = Logger.getLogger("autoplot.applet");
+    private static final Logger logger = Logger.getLogger("autoplot.applet");
     String statusCallback;
     String timeCallback;
     String clickCallback;
@@ -481,13 +477,13 @@ public class AutoplotApplet extends JApplet {
                 dsource = null;
             }
 
-            DatumRange timeRange = null;
+            DatumRange timeRange1 = null;
             if (!stimeRange.equals("")) {
-                timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
+                timeRange1 = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                 TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                 if (tsb != null) {
                     System.err.println("do tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
-                    tsb.setTimeRange(timeRange);
+                    tsb.setTimeRange(timeRange1);
                     System.err.println("done tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
                 }
             }
@@ -499,6 +495,7 @@ public class AutoplotApplet extends JApplet {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
+                        System.err.println("loaded ds: "+ds );
                         System.err.println("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
@@ -522,7 +519,7 @@ public class AutoplotApplet extends JApplet {
                     Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
-                    dom.setTimeRange(timeRange);
+                    dom.setTimeRange(timeRange1);
                 }
             }
             setInitializationStatus("dataSetLoaded");
@@ -756,28 +753,28 @@ public class AutoplotApplet extends JApplet {
         frame.setVisible(true);
     }
 
-    private void testDownload() {
-        try {
-            FileSystem fs = FileSystem.create(new URI("http://www.das2.org/wiki/data/"));
-            String[] files = fs.listDirectory("/");
-            FileObject fo = fs.getFileObject("afile.dat");
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(fo.getInputStream()));
-
-            String s = r.readLine();
-            while (s != null) {
-                System.err.println(s);
-                s = r.readLine();
-            }
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-
-    }
+//    private void testDownload() {
+//        try {
+//            FileSystem fs = FileSystem.create(new URI("http://www.das2.org/wiki/data/"));
+//            String[] files = fs.listDirectory("/");
+//            FileObject fo = fs.getFileObject("afile.dat");
+//
+//            BufferedReader r = new BufferedReader(new InputStreamReader(fo.getInputStream()));
+//
+//            String s = r.readLine();
+//            while (s != null) {
+//                System.err.println(s);
+//                s = r.readLine();
+//            }
+//        } catch (URISyntaxException ex) {
+//            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//
+//
+//    }
 
     public void setDataSetURL(final String surl) {
         try {
@@ -794,24 +791,24 @@ public class AutoplotApplet extends JApplet {
                     } else if (surl.equals("about:autoplot")) {
 
                         try {
-                            StringBuffer buffy = new StringBuffer();
+                            StringBuilder buffy = new StringBuilder();
                             URL aboutHtml = ApplicationModel.class.getResource("aboutAutoplot.html");
 
                             BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
                             String s = reader.readLine();
                             while (s != null) {
-                                buffy.append(s + "");
+                                buffy.append(s).append("");
                                 s = reader.readLine();
                             }
                             reader.close();
 
                             buffy.append("    <h2>Build Information:</h2>");
                             buffy.append("<ul>");
-                            buffy.append("<li>release tag: " + AboutUtil.getReleaseTag() + "</li>");
+                            buffy.append("<li>release tag: ").append(AboutUtil.getReleaseTag()).append("</li>");
 
                             List<String> bi = Util.getBuildInfos();
                             for (String ss : bi) {
-                                buffy.append("    <li>" + ss + "");
+                                buffy.append("    <li>").append(ss).append("");
                             }
                             buffy.append("<ul>    </p></html>");
 
