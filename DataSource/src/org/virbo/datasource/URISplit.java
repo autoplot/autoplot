@@ -508,7 +508,16 @@ public class URISplit {
         String ext = null;
         if (file != null) {
             i = file.lastIndexOf(".");
-            ext = i == -1 ? "" : file.substring(i);
+            if (i>-1 ) {
+                int i2= file.indexOf("/",i);
+                if ( i2==-1 ) {
+                    ext= file.substring(i);
+                } else {
+                    ext= "";
+                }
+            } else {
+                ext =  "";
+            }
             if ( ext.length()>0 && ext.contains("&") ) { // catch errors when & is used instead of ?: .../WAV_2011227_SRV_V17.PKT&type=B
                 throw new IllegalArgumentException("The extension of a filename cannot contain ampersand (&): "+ surl);
             }
