@@ -470,6 +470,7 @@ public class AutoplotApplet extends JApplet {
             DataSource dsource;
             try {
                 dsource = DataSetURI.getDataSource(surl);
+                System.err.println("get dsource for " + surl +" @ " + (System.currentTimeMillis() - t0) + " msec");
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
