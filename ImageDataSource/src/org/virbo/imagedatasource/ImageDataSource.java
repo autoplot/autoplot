@@ -44,10 +44,10 @@ class ImageDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    private final double toHSV(int rgb, int channel) {
+    private double toHSV(int rgb, int channel) {
         double r = (rgb & 0xFF0000) >> 16;
         double g = (rgb & 0x00FF00) >> 8;
-        double b = (rgb & 0x0000FF) >> 0;
+        double b = (rgb &     0xFF);
 
         r = r / 255;
         g = g / 255;
@@ -137,7 +137,7 @@ class ImageDataSource extends AbstractDataSource {
                     public double value(int rgb) {
                         int r = rgb & 0xFF0000 >> 16;
                         int g = rgb & 0x00FF00 >> 8;
-                        int b = rgb & 0x0000FF >> 0;
+                        int b = rgb &     0xFF;
                         return 0.3 * r + 0.59 * g + 0.11 * b;
                     }
                 };
@@ -199,7 +199,7 @@ class ImageDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
 
-        String ext = getExt(resourceURI);
+        String ext = getExt(resourceURI).toLowerCase();
 
         if (ext.equals(".jpg")) {
             return getJpegExifMetaData(mon);
