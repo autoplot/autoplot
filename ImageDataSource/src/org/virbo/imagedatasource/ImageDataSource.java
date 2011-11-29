@@ -168,7 +168,11 @@ class ImageDataSource extends AbstractDataSource {
         }
 
         ImageDataSet result = new ImageDataSet(image, c, op);
-        result.putProperty( QDataSet.RENDER_TYPE, "image" );
+
+        if ( channel==null ) {
+            result.putProperty( QDataSet.RENDER_TYPE, "image" );
+        }
+        
         mon.finished();
 
         return result;
