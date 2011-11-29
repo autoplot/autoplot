@@ -52,6 +52,7 @@ public class Test027 {
 
     private static void doTestComp( int id, String uri ) throws Exception {
         // test completions
+        System.err.print( String.format( "=== %d %s ===", id, uri ) );
         for ( int i=0; i<uri.length(); i++ ) {
             try {
                 System.err.print( uri.substring(0,i)+"<C>...");
@@ -85,6 +86,10 @@ public class Test027 {
             doTest( 12, "Enter Data Set" ); //TODO: fix NullPointer
             doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
             doTest( 14, "c:/Users/sarah/Desktop/x.vap" );
+            doTest( 15, "http://sarahandjeremy.net:8080/albumServer/PhotoServer?image=20080201_misc_geothermal/IMG_2414crop.JPG&size=600&width=500&rotate=0");
+
+            //this would get confused because it would use the .net as the start of the extension.
+            doTest( 16, "file:///home/jbf/autoplot_data/fscache/temp/http/sarahandjeremy.net/albumServer/PhotoServer__imageeq20080201_misc_geothermaldivIMG_2414cropptJPG_sizeeq600_widtheq500_rotateeq0?channel=hue");
             
             doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTestComp( 101, "Enter Data Set" );
