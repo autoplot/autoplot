@@ -247,6 +247,10 @@ class Das2ServerDataSource extends AbstractDataSource {
                 throw new RuntimeException("failed to get dataset, without explanation!  (Possibly no records)");
             }
 
+            if ( ds.getXLength()==0 ) {
+                throw new RuntimeException("empty dataset returned");
+            }
+            
             AbstractDataSet result;
             if ( item==null || item.equals("") || item.equals("0") ) {
                 result= DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
