@@ -22,6 +22,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -29,6 +31,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +46,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.util.Base64;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -68,6 +74,10 @@ public abstract class Bookmark {
     public static final String MSG_NOT_LOADED= "(remote not loaded)";
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
+        return parseBookmarks(data,0);
+    }
+
+    public static List<Bookmark> parseBookmarks(String data,int depth) throws SAXException, IOException {
         try {
 
             Reader in = new BufferedReader(new StringReader(data));
@@ -77,7 +87,8 @@ public abstract class Bookmark {
             InputSource source = new InputSource(in);
             Document document = builder.parse(source);
 
-            return parseBookmarks(document.getDocumentElement());
+            List<Bookmark> books= parseBookmarks(document.getDocumentElement(),depth);
+            return books;
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
@@ -131,8 +142,8 @@ public abstract class Bookmark {
      * parse the bookmarks in this node.
      * @param element
      * @param vers null, empty string <2011, or version number
-     * @param remoteLevel if >0, then allow remote to be retrieved
-     * @return
+     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels)
+     * @return Bookmark.  If it's a folder, then bookmark.remoteStatus can be used to determine if it needs to be reloaded.
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
@@ -210,95 +221,123 @@ public abstract class Bookmark {
 
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
-            int remoteStatus=0;
+            int remoteStatus=-1;
+            boolean remoteRemote= false;  // remote folder contains references to remote folder
 
-            if ( remoteUrlNode!=null && remoteLevel>0 ) { // 2984078
+            if ( remoteUrlNode!=null ) { // 2984078
 
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
 
-                System.err.println( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
+                if ( remoteLevel>0 ) {
+                    System.err.println( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
 
-                InputStream in=null;
-                try {
+                    InputStream in=null;
+                    try {
 
-                    URL rurl= new URL(remoteUrl);
-                    //URLConnection connect= rurl.openConnection();
-                    //connect.setConnectTimeout(1000);
-                    //connect.setReadTimeout(1000);
+                        URL rurl= new URL(remoteUrl);
 
-                    // copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
-                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
-                    ByteArrayOutputStream boas=new ByteArrayOutputStream();
-                    WritableByteChannel dest = Channels.newChannel(boas);
-                    ReadableByteChannel src = Channels.newChannel(in);
-                    DataSourceUtil.transfer(src, dest);
-                    in.close();
-                    in= null; // don't close it again.
-
-                    String sin= new String( boas.toByteArray() );
-
-                    if ( !sin.startsWith("<book") && !sin.startsWith("<?xml") ) {
-                        System.err.println("not a bookmark xml file: "+rurl );
-                        throw new IllegalArgumentException("not a bookmark xml file: "+rurl );
-                    }
-                    
-                    DocumentBuilder builder;
-                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    InputSource source = new InputSource( new StringReader(sin) );
-                    Document document = builder.parse(source);
-
-                    XPathFactory factory= XPathFactory.newInstance();
-
-                    XPath xpath= (XPath) factory.newXPath();
-                    Object o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
-                    nl= (NodeList)o;
-
-                    String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
-                    //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
-                    Element flist = (Element) nl.item(0);
-                    contents = parseBookmarks( flist, vers1, remoteLevel-1 );
-
-                } catch (XPathExpressionException ex) {
-                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SAXException ex) {
-                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
-                } catch (ParserConfigurationException ex) {
-                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
-                } catch ( IllegalArgumentException ex ) {
-                    ex.printStackTrace();
-                } catch ( FileNotFoundException ex ) {
-                    ex.printStackTrace();
-                } catch ( IOException ex ) {
-                    ex.printStackTrace();
-                } finally {
-                    if ( in!=null ) {
+                        // Copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
+                        // See if the URI is file-like, not containing query parameters, in which case we allow caching to occur.
                         try {
-                            in.close();
-                        } catch ( IOException ex ) {
-                            ex.printStackTrace();
+                            URI ruri= rurl.toURI();
+                            URI parentUri= FileSystemUtil.isCacheable( ruri );
+                            if ( parentUri!=null ) {
+                                FileSystem fd= FileSystem.create(parentUri);
+                                FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
+                                in= fo.getInputStream();
+                            } else {
+                                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
+                            }
+                        } catch ( URISyntaxException ex ) {
+                            in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
+                        }
+
+                        ByteArrayOutputStream boas=new ByteArrayOutputStream();
+                        WritableByteChannel dest = Channels.newChannel(boas);
+                        ReadableByteChannel src = Channels.newChannel(in);
+                        DataSourceUtil.transfer(src, dest);
+                        in.close();
+                        in= null; // don't close it again.
+
+                        String sin= new String( boas.toByteArray() );
+
+                        if ( !sin.startsWith("<book") && !sin.startsWith("<?xml") ) {
+                            System.err.println("not a bookmark xml file: "+rurl );
+                            throw new IllegalArgumentException("not a bookmark xml file: "+rurl );
+                        }
+
+                        DocumentBuilder builder;
+                        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                        InputSource source = new InputSource( new StringReader(sin) );
+                        Document document = builder.parse(source);
+
+                        XPathFactory factory= XPathFactory.newInstance();
+
+                        XPath xpath= (XPath) factory.newXPath();
+                        Object o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
+                        nl= (NodeList)o;
+
+                        Element flist = (Element) nl.item(0);
+                        if ( flist==null ) {
+                            contents= Collections.emptyList(); // The remote folder itself can contain remote folders,
+                            String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
+                            if ( remoteUrl2.length()>0 ) {
+                                remoteRemote= true; // avoid warning
+                            }
+                        } else {
+                            String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
+                            contents = parseBookmarks( flist, vers1, remoteLevel-1 );
+                        }
+
+                    } catch (XPathExpressionException ex) {
+                        Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SAXException ex) {
+                        Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                        ex.printStackTrace();
+                    } catch (ParserConfigurationException ex) {
+                        Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                        ex.printStackTrace();
+                    } catch ( IllegalArgumentException ex ) {
+                        ex.printStackTrace();
+                    } catch ( FileNotFoundException ex ) {
+                        ex.printStackTrace();
+                    } catch ( IOException ex ) {
+                        ex.printStackTrace();
+                    } finally {
+                        if ( in!=null ) {
+                            try {
+                                in.close();
+                            } catch ( IOException ex ) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
+                    if ( ( contents==null || contents.size()==0 ) & !remoteRemote ) {
+                        System.err.println("unable to parse bookmarks at "+remoteUrl);
+                        System.err.println("Maybe using local copy");
+                        remoteStatus= 1;
+                    } else {
+                        remoteStatus= 0;
+                    }
                 }
-                if ( contents==null || contents.size()==0 ) {
-                    System.err.println("unable to parse bookmarks at "+remoteUrl);
-                    System.err.println("Maybe using local copy");
-                    remoteStatus= 1;
-                } else {
-                    remoteStatus= 0;
-                }
+                
             } else {
-
+                if ( remoteUrlNode==null ) remoteStatus= 0;
+                
             }
             
-            if ( remoteUrl==null && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty.
+            if ( ( remoteUrl==null || remoteStatus==-1 ) && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty, but local folders must not.
                 nl = ((Element) element).getElementsByTagName("bookmark-list");
                 if ( nl.getLength()==0 ) {
-                    throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
+                    if ( remoteStatus==-1 ) { // only if a remote folder is not resolved is this okay
+                        contents= Collections.emptyList();
+                    } else {
+                        throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
+                    }
+                } else {
+                    Element flist = (Element) nl.item(0); // and they may only contain one folder
+                    contents = parseBookmarks( flist, vers, remoteLevel );
                 }
-                Element flist = (Element) nl.item(0); // and they may only contain one folder
-                contents = parseBookmarks( flist, vers, remoteLevel );
             }
 
             Bookmark.Folder book = new Bookmark.Folder(title);
@@ -323,6 +362,17 @@ public abstract class Bookmark {
     public static List<Bookmark> parseBookmarks(Element root ) {
         String vers= root.getAttribute("version");
         return parseBookmarks( root, vers, 1 );
+    }
+
+    /**
+     * parse the bookmarks, checking to see what version scheme should be used.
+     * @param root the root node, from which the version scheme should be read
+     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels)
+     * @return
+     */
+    public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) {
+        String vers= root.getAttribute("version");
+        return parseBookmarks( root, vers, remoteLevel );
     }
 
     /**
@@ -535,6 +585,9 @@ public abstract class Bookmark {
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
                 String title= f.getTitle();
+                if ( title.equals("CDAWeb") ) {
+                    System.err.println("here CDAWeb");
+                }
                 if ( f.getRemoteUrl()!=null ) {
                     buf.append("  <bookmark-folder remoteUrl=\"").append(URLEncoder.encode(f.getRemoteUrl(), "UTF-8")).append("\">\n");
                 } else {
