@@ -22,20 +22,20 @@ public class BindingModel {
         this.dstProperty= dstProp;
     }
 
-    protected String bindingContextId = null;
+    protected String bindingContextId = "";
 
     public String getBindingContextId() {
         return bindingContextId;
     }
 
 
-    protected String srcId = null;
+    protected String srcId = "";
 
     public String getSrcId() {
         return srcId;
     }
 
-    protected String dstId;
+    protected String dstId="";
 
     public String getDstId() {
         return dstId;
