@@ -22,6 +22,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3430414: sc->getCompletions null when complete</li>
+            <li>3440253: consider filesystem caching in memory vs .listing files</li>
             <li>aggregation didn't allow wildcards like (.*) to be used, now it does.</li>
             <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
             <li>Ops.interpolate preserves metadata</li>
@@ -63,6 +65,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>remote bookmark folders are allowed to be cached using the normal mechanism, if they come from a simple web folder</li>
             <li>Java Webstart supports "single instance", so relaunching will recycle running app instead of opening a second window</li>
             <li>rfe 3433860: Data operations can contain both component and process string, as in "Bx|histogram()"</li>
             <li>slices function introduced, to clarify high-rank slicing. |slices('',16,4) instead of |slice1(16)|slice1(4)</li>
