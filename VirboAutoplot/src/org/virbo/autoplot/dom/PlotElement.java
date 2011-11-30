@@ -21,7 +21,7 @@ public class PlotElement extends DomNode {
     /**
      * reference to the datasource of this element.  Several elements can share the same data source.
      */
-    protected String dataSourceFilterId;
+    protected String dataSourceFilterId="";
     public static final String PROP_DATASOURCEFILTERID = "dataSourceFilterId";
 
     public String getDataSourceFilterId() {
@@ -85,7 +85,7 @@ public class PlotElement extends DomNode {
     /**
      * id of the plotDefaults containing the element.
      */
-    protected String plotId = null;
+    protected String plotId = "";
     public static final String PROP_PLOTID = "plotId";
 
     public String getPlotId() {

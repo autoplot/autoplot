@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Column extends DomNode {
 
-    protected String parent;
+    protected String parent="";
 
     /**
      * the parent Column, or the canvas id.

@@ -277,7 +277,7 @@ public class DataSourceController extends DomNodeController {
             setCaching(null);
             setTsb(null);
             setTsbSuri(null);
-            if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) {
+            if ( dsf.getUri().length()>0 && !dsf.getUri().startsWith("vap+internal" ) ) {
                 dsf.setUri("vap+internal:"); //TODO: when is this supposed to happen?  Test033 is hitting here.
             }
 
@@ -295,7 +295,7 @@ public class DataSourceController extends DomNodeController {
                     setTsb(null);
                 }
             }
-            if ( dsf.getUri()==null ) {
+            if ( dsf.getUri().length()>0 ) {
                 dsf.setUri( dataSource.getURI() );
                 setUriNeedsResolution(false);
             }
@@ -635,7 +635,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     private synchronized void resolveParents() {
-        if ( dsf.getUri()==null ) return; //TODO: remove
+        if ( dsf.getUri().length()==0 ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri()); 
         if ( !dsf.getUri().startsWith("vap+internal:") ) {
             System.err.println("unbinding because this doesn't have parents.");
@@ -1036,7 +1036,7 @@ public class DataSourceController extends DomNodeController {
 
                 if ( dataSet!=null ) {
                     setStatus("done loading dataset");
-                    if ( dsf.getUri()==null ) {
+                    if ( dsf.getUri().length()==0 ) {
                         System.err.println("dsf.getUri was null");
                         return;
                     }
@@ -1343,7 +1343,7 @@ public class DataSourceController extends DomNodeController {
             // Call the data source to get the data set.
             result = getDataSource().getDataSet(mymon);
 
-            if ( dsf.getUri()!=null ) this.model.addRecent(dsf.getUri());
+            if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
@@ -1362,12 +1362,12 @@ public class DataSourceController extends DomNodeController {
             setException(ex);
             setDataSet(null); //TODO: maybe we should allow the old dataset to stay, in case TSB....
             setStatus("interrupted");
-            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } catch (CancelledOperationException ex) {
             setException(ex);
             setDataSet(null);
             setStatus("operation cancelled");
-            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } catch (NoDataInIntervalException e) {
             setException(e);
             setDataSet(null);
@@ -1427,14 +1427,14 @@ public class DataSourceController extends DomNodeController {
                 setStatus("error: " + e.getMessage());
                 handleException(e);
             }
-            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), e );
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), e );
         } catch (Exception e) {
             setException(e);
             setDataSet(null);
             e.printStackTrace();
             setStatus("error: " + e.getMessage());
             handleException(e);
-            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), e );
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), e );
         } finally {
             // don't trust the data sources to call finished when an exception occurs.
             mymon.finished();
@@ -1464,8 +1464,8 @@ public class DataSourceController extends DomNodeController {
      */
     public synchronized void resetSuri(String suri, ProgressMonitor mon) {
         String old = dsf.getUri();
-        if (old != null && old.equals(suri)) {
-            dsf.setUri(null);
+        if (  old.length()>0 && old.equals(suri)) {
+            dsf.setUri("");
         }
         setSuri(suri, mon);
     }
@@ -1496,7 +1496,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
         String surl = dsf.getUri();
-        if (surl == null) {
+        if ( surl.length()==0 ) {
             getApplication().getController().deleteParentsOfDataSourceFilter(dsf);
             clearParentSources();
             resetDataSource(valueWasAdjusting,null);

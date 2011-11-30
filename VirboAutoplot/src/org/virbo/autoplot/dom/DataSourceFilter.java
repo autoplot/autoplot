@@ -14,7 +14,7 @@ import org.virbo.datasource.URISplit;
  */
 public class DataSourceFilter extends DomNode {
     
-    protected String uri = null;
+    protected String uri = "";
     public static final String PROP_URI = "uri";
 
     public String getUri() {
@@ -22,7 +22,10 @@ public class DataSourceFilter extends DomNode {
     }
 
     public void setUri(String uri) {
-        if ( uri!=null && !uri.equals("") ) {
+        if ( uri==null ) {
+            throw new IllegalArgumentException("uri cannot be set to null now, use \"\" instead");
+        }
+        if ( !uri.equals("") ) {
             URISplit split= URISplit.parse(uri);
             uri= URISplit.format(split); // make canonical
         }

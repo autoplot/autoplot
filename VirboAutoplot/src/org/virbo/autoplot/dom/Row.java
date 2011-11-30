@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Row extends DomNode {
 
-    protected String parent;
+    protected String parent="";
 
     protected RowController controller;
     

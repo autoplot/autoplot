@@ -554,7 +554,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
             application.setPlotElements(elements.toArray(new PlotElement[elements.size()]));
         } else {
-            dsf.setUri(null);  // this panel and the dsf should go together
+            dsf.setUri("");  // this panel and the dsf should go together
             pelement.setLegendLabelAutomatically("");
             pelement.setActive(true);
         }
@@ -648,7 +648,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             PlotElement p = (PlotElement) evt.getSource();
             String srcid = (String) evt.getOldValue();
             String dstid = (String) evt.getNewValue();
-            if ( srcid==null ) srcid="";
+            if ( srcid==null ) srcid=""; //TODO: this can probably be removed
             if ( dstid==null ) dstid="";
             Plot src = srcid.length()==0 ? null : ( Plot) DomUtil.getElementById(application, srcid);
             Plot dst = dstid.length()==0 ? null : (Plot) DomUtil.getElementById(application, dstid);
@@ -1089,7 +1089,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             final boolean dataSetNeedsLoading = dsfsrc.controller.isDataSetNeedsLoading();
 
             dsfnew.controller.setResetDimensions(false);
-            if (dsfsrc.getUri() != null) {
+            if ( dsfsrc.getUri().length()>0  ) {
                 dsfnew.setUri(dsfsrc.getUri());
             }
 
@@ -1818,7 +1818,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         Pattern p= Pattern.compile("vap\\+internal:([a-z][a-z_0-9]*)(,([a-z][a-z_0-9]*))*");
         if ( f==null ) { // no one refers to dsf directly, look for vap+internal:
             for ( DataSourceFilter dsf1: application.getDataSourceFilters() ) {
-                if ( dsf1.getUri()!=null ) {
+                if ( dsf1.getUri().length()>0 ) {
                     Matcher m= p.matcher(dsf1.getUri());
                     if ( m.matches() ) {
                         int n= m.groupCount()+1;

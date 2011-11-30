@@ -66,7 +66,7 @@ public class ApplicationControllerSupport {
 
     void plot( Plot plot, PlotElement panel, String primaryUri) {
         if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
-        panel.getController().getDataSourceFilter().setUri(null); // this has the side effect of removing parents
+        panel.getController().getDataSourceFilter().setUri(""); // this has the side effect of removing parents
         panel.getController().getDataSourceFilter().setUri(primaryUri);
     }
 
@@ -74,7 +74,7 @@ public class ApplicationControllerSupport {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
-        panel.getController().getDataSourceFilter().setUri(null);
+        panel.getController().getDataSourceFilter().setUri("");
         panel.getController().getDataSourceFilter().setUri("vap+internal:" + dsf1.getId() + "," + dsf2.getId());
         dsf1.setUri(secondaryUri);
         dsf2.setUri(primaryUri);
@@ -85,7 +85,7 @@ public class ApplicationControllerSupport {
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         DataSourceFilter dsf3 = controller.addDataSourceFilter();
         if (panel==null) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
-        panel.getController().getDataSourceFilter().setUri(null);
+        panel.getController().getDataSourceFilter().setUri("");
         panel.getController().getDataSourceFilter().setUri("vap+internal:" +  dsf1.getId() + "," + dsf2.getId()+","+dsf3.getId() );
         dsf1.setUri(secondaryUri);
         dsf2.setUri(teriaryUri);
