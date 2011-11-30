@@ -48,6 +48,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.HtmlResponseIOException;
@@ -836,6 +837,44 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
      */
     File bookmarksFile= null;
 
+    private boolean checkUnresolved( List<Bookmark> book ) {
+        boolean unresolved= false;
+        for ( Bookmark b: book ) {
+            if ( b instanceof Bookmark.Folder ) {
+                Bookmark.Folder bf= (Bookmark.Folder)b;
+                if ( bf.remoteStatus==-1 ) {
+                    unresolved= true;
+                }
+            }
+        }
+        return unresolved;
+    }
+
+    private Runnable loadBooksRunnable( final String start, final int depthf ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
+                    model.setList(book);
+                    if ( checkUnresolved(book) && depthf<2 ) {
+                        Runnable run= loadBooksRunnable( start, depthf+1 );
+                        RequestProcessor.invokeLater(run);
+                    }
+                } catch (SAXException ex) {
+                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        return run;
+    }
+
     /**
      * setting this makes the manager the authority on bookmarks.
      * @param nodeName
@@ -866,8 +905,18 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                     s= read.readLine();
                 } while ( s!=null );
 
-                List<Bookmark> book= Bookmark.parseBookmarks(buff.toString());
+                int depth=0;
+                List<Bookmark> book= Bookmark.parseBookmarks(buff.toString(),depth);
                 model.setList(book);
+
+                boolean unresolved;
+                unresolved= checkUnresolved(book);
+                if ( unresolved ) {
+                    final String start= buff.toString();
+                    Runnable run= loadBooksRunnable( start, depth+1 );
+                    RequestProcessor.invokeLater(run);
+                }
+
             }
 
             bookmarksFile= f;
