@@ -155,7 +155,6 @@ public class MetadataUtil {
      * @return
      */
     public static Map<String,Object> sprocess( String c, Map<String,Object> properties ) {
-        int i=1;
         Scanner s= new Scanner( c );
         s.useDelimiter("[\\(\\),]");
 
