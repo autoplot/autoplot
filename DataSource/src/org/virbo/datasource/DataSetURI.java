@@ -668,6 +668,8 @@ public class DataSetURI {
      * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
      * it's needed.
      *
+     * This will always download, no caching is done.
+     * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
      * TODO: what about Tomcat and other long java processes?
