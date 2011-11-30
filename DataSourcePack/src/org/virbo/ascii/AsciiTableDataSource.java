@@ -41,6 +41,7 @@ import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -657,7 +658,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("units");
         if (o != null) {
             String sunits = o;
-            Units u = MetadataUtil.lookupUnits(sunits);
+            Units u = SemanticOps.lookupUnits(sunits);
             if (column != null) {
                 int icol = parser.getFieldIndex(column);
                 parser.setUnits(icol, u);
