@@ -43,7 +43,7 @@ public class BindingModel {
 
 
 
-    protected String srcProperty;
+    protected String srcProperty="";
 
     public String getSrcProperty() {
         return srcProperty;
@@ -51,7 +51,7 @@ public class BindingModel {
 
 
 
-    protected String dstProperty;
+    protected String dstProperty="";
 
     public String getDstProperty() {
         return dstProperty;
