@@ -111,12 +111,16 @@ public class PlotStylePanel extends javax.swing.JPanel {
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_DRAWMINORGRID ), minorGridCheckBox, BeanProperty.create("selected") );
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), resizeRadioButton, BeanProperty.create("selected") );
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FONT ), fontLabel, BeanProperty.create("text") );
+        bc.addBinding(b);
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), fittedCB, BeanProperty.create("selected") );
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_HEIGHT ), heightTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_WIDTH ), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
         bc.addBinding(b);
+        //b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), resizeRadioButton, BeanProperty.create("selected") );
+        //bc.addBinding(b);
         bc.bind();
     }
 
@@ -184,13 +188,12 @@ public class PlotStylePanel extends javax.swing.JPanel {
         fontLabel = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         pickFontButton = new javax.swing.JButton();
-        resizeRadioButton = new javax.swing.JRadioButton();
-        fixedRadioButton = new javax.swing.JRadioButton();
         widthLabel = new javax.swing.JLabel();
         widthTextField = new javax.swing.JFormattedTextField();
         heightTextField = new javax.swing.JFormattedTextField();
         heightLabel = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        fittedCB = new javax.swing.JCheckBox();
 
         setPreferredSize(new java.awt.Dimension(688, 300));
 
@@ -250,25 +253,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         });
 
-        buttonGroup1.add(resizeRadioButton);
-        resizeRadioButton.setSelected(true);
-        resizeRadioButton.setText("Resize to Fit");
-        resizeRadioButton.setToolTipText("Allow the canvas to resize with the GUI");
-        resizeRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resizeRadioButtonActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(fixedRadioButton);
-        fixedRadioButton.setText("Fixed Size");
-        fixedRadioButton.setToolTipText("Set the canvas to a fixed size");
-        fixedRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fixedRadioButtonActionPerformed(evt);
-            }
-        });
-
         widthLabel.setText("Width:");
         widthLabel.setEnabled(false);
 
@@ -286,6 +270,13 @@ public class PlotStylePanel extends javax.swing.JPanel {
         heightLabel.setEnabled(false);
 
         jLabel7.setText("Canvas Size:");
+
+        fittedCB.setText("Resize with application resize (fitted)");
+        fittedCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fittedCBActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout plotPanelLayout = new org.jdesktop.layout.GroupLayout(plotPanel);
         plotPanel.setLayout(plotPanelLayout);
@@ -321,7 +312,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                     .add(plotPanelLayout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                        .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                         .add(6, 6, 6)
                         .add(pickFontButton)
                         .addContainerGap())
@@ -342,10 +333,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
                             .add(plotPanelLayout.createSequentialGroup()
                                 .add(jLabel7)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(resizeRadioButton)
-                                .add(18, 18, 18)
-                                .add(fixedRadioButton)))
-                        .addContainerGap(68, Short.MAX_VALUE))))
+                                .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
 
         plotPanelLayout.linkSize(new java.awt.Component[] {backgroundColorButton, foregroundColorButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
@@ -374,9 +363,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
                     .add(pickFontButton))
                 .add(18, 18, 18)
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(resizeRadioButton)
-                    .add(fixedRadioButton)
-                    .add(jLabel7))
+                    .add(jLabel7)
+                    .add(fittedCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(widthLabel)
@@ -385,7 +373,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(heightLabel)
                     .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(plotPanel);
@@ -456,22 +444,18 @@ public class PlotStylePanel extends javax.swing.JPanel {
         }
 }//GEN-LAST:event_pickFontButtonActionPerformed
 
-    private void fixedRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedRadioButtonActionPerformed
-        boolean s= fixedRadioButton.isSelected();
+    private void fittedCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fittedCBActionPerformed
+        boolean s= ! fittedCB.isSelected();
         widthTextField.setEnabled(s);
         heightTextField.setEnabled(s);
         widthLabel.setEnabled(s);
         heightLabel.setEnabled(s);
-    }//GEN-LAST:event_fixedRadioButtonActionPerformed
-
-    private void resizeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resizeRadioButtonActionPerformed
-        fixedRadioButtonActionPerformed(evt);
-    }//GEN-LAST:event_resizeRadioButtonActionPerformed
+    }//GEN-LAST:event_fittedCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backgroundColorButton;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JRadioButton fixedRadioButton;
+    private javax.swing.JCheckBox fittedCB;
     private javax.swing.JLabel fontLabel;
     private javax.swing.JComboBox foreBackColorsList;
     private javax.swing.JButton foregroundColorButton;
@@ -488,7 +472,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox minorGridCheckBox;
     private javax.swing.JButton pickFontButton;
     private javax.swing.JPanel plotPanel;
-    private javax.swing.JRadioButton resizeRadioButton;
     private javax.swing.JPanel stylePanel;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JFormattedTextField widthTextField;
