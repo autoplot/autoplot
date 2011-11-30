@@ -225,7 +225,7 @@ public class GuiSupport {
                 DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(groups[i]) );
                 if ( dsf==null ) {
                     selectors[i].setValue( m.group(groups[i]) );
-                } else if ( dsf.getUri()==null ) {
+                } else if ( dsf.getUri().length()==0 ) {
                     selectors[i].setValue( m.group(groups[i]) ); //TODO: interesting branch that I hit on a telecon with Reiner.
                 } else if ( dsf.getUri().startsWith("vap+internal:")) {
                     selectors[i].setValue( m.group(groups[i]) ); //TODO: does this work, multiple levels?
@@ -1345,7 +1345,7 @@ public class GuiSupport {
                 PlotElement pelement = controller.getPlotElement();
                 if (controller.getApplication().getPlotElements().length < 2) {
                     DataSourceFilter dsf= controller.getDataSourceFilterFor(controller.getApplication().getPlotElements(0));
-                    dsf.setUri(null);
+                    dsf.setUri("");
                     pelement.setLegendLabelAutomatically(""); //TODO: null should reset everything.
                     pelement.setActive(true);
                     return;
