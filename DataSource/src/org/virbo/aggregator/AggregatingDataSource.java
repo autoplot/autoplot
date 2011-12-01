@@ -130,6 +130,9 @@ public class AggregatingDataSource extends AbstractDataSource {
             mparams.put("timerange", stimeRange);
             split.params = URISplit.formatParams(mparams);
 
+            URISplit split2= URISplit.parse(AggregatingDataSource.this.uri);
+            split.vapScheme= split2.vapScheme;
+
             return URISplit.format(split);
         }
 
