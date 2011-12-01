@@ -960,6 +960,16 @@ public class ApplicationModel {
 
     }
 
+    public static interface ResizeRequestListener {
+        void resize( int w, int h );
+    }
+
+    ResizeRequestListener resizeRequestListener=null;
+
+    public void setResizeRequestListener( ResizeRequestListener list ) {
+        this.resizeRequestListener= list;
+    }
+
     /**
      * open the serialized DOM, apply additional modifications to the DOM, then
      * sync the application to this.
@@ -1037,6 +1047,13 @@ public class ApplicationModel {
             this.dom.getController().reset();
         }
 
+        if ( this.resizeRequestListener!=null ) {
+            resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
+            state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
+            state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
+            state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
+        }
+        
         //logger.fine("" + state.diffs(this.dom));
         restoreState(state);
         setUseEmbeddedDataSet(false);

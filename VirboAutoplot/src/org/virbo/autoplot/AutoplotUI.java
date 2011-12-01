@@ -208,6 +208,12 @@ public class AutoplotUI extends javax.swing.JFrame {
             ScriptContext.setView(this);
         }
 
+        model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
+            public void resize(int w,int h) {
+                resizeForCanvasSize(w, h);
+            }
+        });
+
         APSplash.checkTime("init 10");
 
         this.dom= model.getDocumentModel();
@@ -1168,9 +1174,6 @@ APSplash.checkTime("init 52");
             }
             applicationModel.resetDataSetSourceURL(surl, mon );
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
-                // reset canvas size to vap file pixel size
-                resizeForCanvasSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getHeight() );
-
                 tickleTimer.tickle(); 
             }
         } catch (RuntimeException ex) {
@@ -1270,7 +1273,14 @@ APSplash.checkTime("init 52");
         GraphicsConfiguration gc= getGraphicsConfiguration();
         Dimension screenSize = gc.getBounds().getSize();
 
-        if ( w<640 || h<480 || dout.width>screenSize.getWidth() || dout.height>screenSize.getHeight() ) {
+        if ( w<640 || h<480 ) {
+            this.applicationModel.dom.getCanvases(0).setFitted(false);
+            setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
+            this.applicationModel.dom.getCanvases(0).setHeight(h);
+            this.applicationModel.dom.getCanvases(0).setWidth(w);
+            
+        } else if ( dout.width>screenSize.getWidth() || dout.height>screenSize.getHeight() ) {
+
             String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
             int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
                     options, options[1] );
