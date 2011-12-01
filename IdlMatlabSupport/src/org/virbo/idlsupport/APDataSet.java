@@ -65,14 +65,16 @@ public class APDataSet extends QDataSetBridge {
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
         if ( f.reject( surl, mon ) ) {
-            System.err.println( "URI was rejected by the datasource: "+f );
-            return null;
+            throw new Exception("URI was rejected by the datasource: "+surl +" rejected by "+ f );
         }
 
         DataSource dsource = f.getDataSource(uri);
 
         QDataSet result = dsource.getDataSet( mon);
 
+        if ( result==null ) {
+            throw new Exception("getDataSet did not result in dataset: "+surl );
+        }
         return result;
     }
 
