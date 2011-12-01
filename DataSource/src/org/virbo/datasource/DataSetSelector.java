@@ -1449,6 +1449,10 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         return support.openLocalAction();
     }
 
+    public Action getOpenLocalVapAction() {
+        return support.openLocalVapAction();
+    }
+
     public JMenu getRecentMenu() {
         return support.recentMenu();
     }

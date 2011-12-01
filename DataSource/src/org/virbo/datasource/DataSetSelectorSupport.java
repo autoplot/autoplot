@@ -28,6 +28,8 @@ public class DataSetSelectorSupport {
     DataSetSelector ui;
     public static final String PREF_LAST_OPEN_FOLDER = "last_open_folder";
     public static final String PREF_RECENTLY_OPENED_FILES = "recently_opened_files";
+    public static final String PREF_LAST_OPEN_VAP_FOLDER= "last_open_vap_folder";
+    
     private JMenu recentMenu = null;
 
     DataSetSelectorSupport(DataSetSelector ui) {
@@ -36,6 +38,51 @@ public class DataSetSelectorSupport {
 
     private static File userHome() {
         return new File(System.getProperty("user.home"));
+    }
+    public static String browseLocalVap( java.awt.Component parent ) {
+        Preferences prefs = Preferences.userNodeForPackage(DataSetSelectorSupport.class);
+
+        String currentDirectory = prefs.get( PREF_LAST_OPEN_VAP_FOLDER, prefs.get(PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
+
+        JFileChooser chooser = new JFileChooser(currentDirectory);
+
+        FileFilter ff;
+        ff = new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+                String t = f.toString();
+                if (t==null ) {
+                    System.err.println("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
+                    t= "" + f;
+                    return false;
+                }
+                return t.endsWith(".vap");
+            }
+
+            @Override
+            public String getDescription() {
+                return ".vap files";
+            }
+        };
+
+
+        chooser.addChoosableFileFilter(ff);
+        FileFilter select = ff;
+
+        chooser.setFileFilter(select);
+
+        int result = chooser.showOpenDialog(parent);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            prefs.put(PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent().toString());
+            return chooser.getSelectedFile().toURI().toString();
+        } else {
+            return null;
+        }
+
     }
 
     public static String browseLocal( java.awt.Component parent ) {
@@ -60,19 +107,14 @@ public class DataSetSelectorSupport {
                     t= "" + f;
                     return false;
                 }
-                try {
-                    String ext = DataSetURI.getExt(t);
-                    if ( ext!=null ) ext= "."+ext;
-                    return t.endsWith(".vap") || ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && exts.containsKey(ext));
-                } catch ( NullPointerException ex ) {
-                    ex.printStackTrace();
-                    return false;
-                }
+                String ext = DataSetURI.getExt(t);
+                if ( ext!=null ) ext= "."+ext;
+                return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && exts.containsKey(ext));
             }
 
             @Override
             public String getDescription() {
-                return "supported formats and .vap files";
+                return "supported formats";
             }
         };
 
@@ -108,14 +150,8 @@ public class DataSetSelectorSupport {
 
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-            try {
-                prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent().toString());
-                return chooser.getSelectedFile().toURI().toURL().toString();
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(DataSetSelectorSupport.class.getName()).log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
-                return null;
-            }
+            prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent().toString());
+            return chooser.getSelectedFile().toURI().toString();
         } else {
             return null;
         }
@@ -123,7 +159,7 @@ public class DataSetSelectorSupport {
     }
 
     public Action openLocalAction() {
-        return new AbstractAction("Open File...") {
+        return new AbstractAction("Open Data File...") {
 
             public void actionPerformed(ActionEvent e) {
                 String result= browseLocal(ui);
@@ -137,6 +173,22 @@ public class DataSetSelectorSupport {
         };
     }
 
+
+    public Action openLocalVapAction() {
+        return new AbstractAction("Open .vap File...") {
+
+            public void actionPerformed(ActionEvent e) {
+                String result= browseLocalVap(ui);
+
+                if (result != null ) {
+                    ui.setValue(result);
+                    ui.maybePlot(false);
+                }
+
+            }
+        };
+    }
+    
     protected void refreshRecentFilesMenu() {
         if (recentMenu != null) {
             recentMenu.removeAll();
