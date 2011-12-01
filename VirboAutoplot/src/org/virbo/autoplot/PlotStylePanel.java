@@ -5,7 +5,6 @@
  */
 package org.virbo.autoplot;
 
-import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,12 +22,12 @@ import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.GraphUtil;
-import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Canvas;
@@ -111,6 +110,22 @@ public class PlotStylePanel extends javax.swing.JPanel {
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_DRAWMINORGRID ), minorGridCheckBox, BeanProperty.create("selected") );
         bc.addBinding(b);
+        Converter colorIconConverter= new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                return GraphUtil.colorIcon( ((Color)s), ICON_SIZE, ICON_SIZE );
+            }
+            @Override
+            public Object convertReverse(Object t) {
+                return Color.RED; // shouldn't enter here.
+            }
+        };
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_FOREGROUND ), foregroundColorButton, BeanProperty.create("icon") );
+        b.setConverter( colorIconConverter );
+        bc.addBinding(b);
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_BACKGROUND ), backgroundColorButton, BeanProperty.create("icon") );
+        b.setConverter( colorIconConverter );
+        bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FONT ), fontLabel, BeanProperty.create("text") );
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), fittedCB, BeanProperty.create("selected") );
@@ -119,8 +134,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_WIDTH ), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
         bc.addBinding(b);
-        //b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), resizeRadioButton, BeanProperty.create("selected") );
-        //bc.addBinding(b);
         bc.bind();
     }
 
@@ -172,7 +185,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jSplitPane2 = new javax.swing.JSplitPane();
         stylePanel = new javax.swing.JPanel();
         plotPanel = new javax.swing.JPanel();
@@ -271,7 +283,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         jLabel7.setText("Canvas Size:");
 
-        fittedCB.setText("Resize with application resize (fitted)");
+        fittedCB.setText("Adjust to Fit into Application");
         fittedCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fittedCBActionPerformed(evt);
@@ -286,55 +298,49 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(plotPanelLayout.createSequentialGroup()
+                        .add(jLabel12)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(majorTicksCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(minorGridCheckBox))
+                    .add(plotPanelLayout.createSequentialGroup()
                         .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(plotPanelLayout.createSequentialGroup()
-                                .add(jLabel12)
+                                .add(10, 10, 10)
+                                .add(jLabel2)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(majorTicksCheckBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(minorGridCheckBox))
+                                .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jLabel1))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(plotPanelLayout.createSequentialGroup()
-                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(plotPanelLayout.createSequentialGroup()
-                                        .add(10, 10, 10)
-                                        .add(jLabel2)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                    .add(jLabel1))
+                                .add(jLabel3)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(plotPanelLayout.createSequentialGroup()
-                                        .add(jLabel3)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                    .add(foreBackColorsList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                        .add(55, 55, 55))
+                                .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(foreBackColorsList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                     .add(plotPanelLayout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                        .add(6, 6, 6)
-                        .add(pickFontButton)
-                        .addContainerGap())
+                        .add(fontLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(pickFontButton))
                     .add(plotPanelLayout.createSequentialGroup()
+                        .add(12, 12, 12)
                         .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(widthLabel)
+                            .add(heightLabel))
+                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(plotPanelLayout.createSequentialGroup()
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(heightTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
                             .add(plotPanelLayout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(widthLabel)
-                                    .add(heightLabel))
-                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                    .add(plotPanelLayout.createSequentialGroup()
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(heightTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
-                                    .add(plotPanelLayout.createSequentialGroup()
-                                        .add(12, 12, 12)
-                                        .add(widthTextField))))
-                            .add(plotPanelLayout.createSequentialGroup()
-                                .add(jLabel7)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                                .add(widthTextField))))
+                    .add(plotPanelLayout.createSequentialGroup()
+                        .add(jLabel7)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)))
+                .add(12, 12, 12))
         );
 
         plotPanelLayout.linkSize(new java.awt.Component[] {backgroundColorButton, foregroundColorButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
@@ -373,7 +379,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(heightLabel)
                     .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(38, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(plotPanel);
@@ -382,7 +388,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -410,38 +416,33 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
-        foreBackColorsList.setSelectedIndex(fores.length);
-        List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
-        for ( PlotElement p: pe ) {
-            if ( p.getStyle().getColor().equals( dom.getCanvases(0).getController().getDasCanvas().getForeground())) {
-                p.getStyle().setColor(c);
+        if ( c!=null ) {
+            foreBackColorsList.setSelectedIndex(fores.length);
+            List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
+            for ( PlotElement p: pe ) {
+                if ( p.getStyle().getColor().equals( dom.getOptions().getForeground() ) ) {
+                    p.getStyle().setColor(c);
+                }
             }
+            foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            dom.getCanvases(0).getController().getDasCanvas().setForeground(c);
+            dom.getOptions().setForeground(c);
+            dom.getOptions().setColor(c);
         }
-        foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
-        dom.getOptions().setForeground(c);
-        dom.getOptions().setForeground(c);
-        dom.getOptions().setColor(c);
 }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
-        foreBackColorsList.setSelectedIndex(fores.length);
-        backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
-        dom.getOptions().setBackground(c);
+        if ( c!=null ) {
+            foreBackColorsList.setSelectedIndex(fores.length);
+            backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            dom.getOptions().setBackground(c);
+        }
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
-        JFontChooser chooser = new JFontChooser((JFrame) SwingUtilities.getWindowAncestor(this) );
-        String sci= "2 \u00d7 10E7";
-        String greek= "Greek: \u03C0 \u03F4 \u0394";
-        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n"+greek);
-        chooser.setFont( Font.decode( dom.getOptions().getCanvasFont() ) );
-        if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-            dom.getController().getDasCanvas().setBaseFont(chooser.getFont());
-            Font f = dom.getController().getDasCanvas().getFont();
-            fontLabel.setText( DomUtil.encodeFont(f));
-            dom.getOptions().setCanvasFont( DomUtil.encodeFont(f) );
-        }
+        Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), applicationModel );
+        if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
 }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void fittedCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fittedCBActionPerformed
@@ -454,7 +455,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backgroundColorButton;
-    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox fittedCB;
     private javax.swing.JLabel fontLabel;
     private javax.swing.JComboBox foreBackColorsList;
