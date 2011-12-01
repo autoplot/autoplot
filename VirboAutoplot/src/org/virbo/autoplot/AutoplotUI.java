@@ -1083,29 +1083,6 @@ APSplash.checkTime("init 52");
         }
     }
 
-    private String browseLocal(String surl) {
-        try {
-            int i = surl.lastIndexOf("/");
-            String surlDir;
-            if (i <= 0 || surl.charAt(i - 1) == '/') {
-                surlDir = surl;
-            } else {
-                surlDir = surl.substring(0, i);
-            }
-            File dir = DataSetURI.getFile(DataSetURI.getURL(surlDir), new NullProgressMonitor());
-            JFileChooser chooser = new JFileChooser(dir);
-            int r = chooser.showOpenDialog(this);
-            String result;
-            if (r == JFileChooser.APPROVE_OPTION) {
-                result = chooser.getSelectedFile().toString();
-            } else {
-                result = surl;
-            }
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private void initLogConsole() throws SecurityException {
         logConsole = new LogConsole();
@@ -1277,11 +1254,15 @@ APSplash.checkTime("init 52");
      * @param h
      */
     public void resizeForCanvasSize( int w, int h ) {
-        Dimension dout= this.getSize();
+        
+        Component parentToAdjust;
+        if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
+            parentToAdjust= this;
+        } else {
+            parentToAdjust= SwingUtilities.getWindowAncestor(applicationModel.getCanvas());
+        }
+        Dimension dout= parentToAdjust.getSize();
         Dimension din= this.applicationModel.getCanvas().getSize();
-        System.err.println( "app:" + dout );
-        System.err.println( "canvas: " + din ); // findbugs DLS_DEAD_LOCAL_STORE
-        //assume is fitted
 
         dout.width= dout.width + (  w - din.width );
         dout.height= dout.height + ( h - din.height );
@@ -1290,12 +1271,31 @@ APSplash.checkTime("init 52");
         Dimension screenSize = gc.getBounds().getSize();
 
         if ( w<640 || h<480 || dout.width>screenSize.getWidth() || dout.height>screenSize.getHeight() ) {
-            this.applicationModel.dom.getCanvases(0).setFitted(false);
-            setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
-            this.applicationModel.dom.getCanvases(0).setHeight(h);
-            this.applicationModel.dom.getCanvases(0).setWidth(w);
+            String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
+            int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
+                    options, options[1] );
+            if ( i!= JOptionPane.CLOSED_OPTION ) {
+                if ( i==0 ) {
+                    double aspect= 1.0*h/w;
+                    int nw, nh;
+                    if ( 1.0 * screenSize.getHeight() / screenSize.getWidth() > aspect ) {
+                        nw= screenSize.width * 4 / 5 ;
+                        nh= (int)( nw * aspect );
+                    } else {
+                        nh= screenSize.height * 4 / 5 ; // slightly smaller to accommodate GUI controls
+                        nw= (int)( nh / aspect );
+                    }
+                    parentToAdjust.setSize( nw, nh );
+
+                } else if ( i==1 ) {
+                    this.applicationModel.dom.getCanvases(0).setFitted(false);
+                    setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
+                    this.applicationModel.dom.getCanvases(0).setHeight(h);
+                    this.applicationModel.dom.getCanvases(0).setWidth(w);
+                }
+            }
         } else {
-            this.setSize( dout.width, dout.height );
+            parentToAdjust.setSize( dout.width, dout.height );
         }
         
     }
