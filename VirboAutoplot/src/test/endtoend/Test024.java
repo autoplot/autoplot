@@ -151,6 +151,13 @@ public class Test024 {
         }
     }
 
+    /**
+     * model PaPCo's use of the interface, which also uses TSB.
+     * @param uri
+     * @param tr
+     * @return
+     * @throws Exception
+     */
     private static String checkAPDS( String uri, String tr ) throws Exception {
         if ( tr!=null ) {
             // mimic code in papco that is failing
@@ -185,6 +192,7 @@ public class Test024 {
             test6();
             test7();
             checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
+            checkAPDS( "vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
 
             System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
 
