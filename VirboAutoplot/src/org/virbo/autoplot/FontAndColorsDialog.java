@@ -5,22 +5,18 @@
  */
 package org.virbo.autoplot;
 
-import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import org.das2.graph.DasCanvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import org.das2.graph.GraphUtil;
-import org.das2.util.Entities;
-import org.python.parser.ast.Unicode;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.autoplot.dom.Options;
 
 /**
  *
@@ -78,7 +74,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         foregroundColorButton = new javax.swing.JButton();
         backgroundColorButton = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        pickFontButton = new javax.swing.JButton();
         dismissButton = new javax.swing.JButton();
         fontLabel = new javax.swing.JLabel();
 
@@ -110,10 +106,10 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
         jLabel4.setText("Font:");
 
-        jButton1.setText("Pick");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        pickFontButton.setText("Pick");
+        pickFontButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                pickFontButtonActionPerformed(evt);
             }
         });
 
@@ -153,7 +149,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton1))
+                        .add(pickFontButton))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, dismissButton))
                 .addContainerGap())
         );
@@ -176,7 +172,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
-                    .add(jButton1)
+                    .add(pickFontButton)
                     .add(fontLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 130, Short.MAX_VALUE)
                 .add(dismissButton)
@@ -192,21 +188,10 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_dismissButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JFontChooser chooser = new JFontChooser((JFrame) this.getOwner());
-        String sci= Entities.decodeEntities("2 &times; 10E7  &aacute;");
-        String greek= Entities.decodeEntities("Greek Symbols: &Alpha; &Beta; &Delta; &alpha; &beta; &delta; &pi; &rho; &omega;");
-        String math= Entities.decodeEntities("Math Symbols: &sum; &plusmn;");
-
-        chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
-        chooser.setFont(app.getCanvas().getBaseFont());
-        if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-            app.getCanvas().setBaseFont(chooser.getFont());
-            Font f = app.getCanvas().getFont();
-            fontLabel.setText(DomUtil.encodeFont(f));
-            app.getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f) );
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
+        Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), app );
+        if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
+    }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
@@ -254,11 +239,11 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private javax.swing.JButton dismissButton;
     private javax.swing.JLabel fontLabel;
     private javax.swing.JButton foregroundColorButton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JButton pickFontButton;
     // End of variables declaration//GEN-END:variables
 }
