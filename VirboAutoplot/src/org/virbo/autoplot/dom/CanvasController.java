@@ -218,7 +218,7 @@ public class CanvasController extends DomNodeController {
      * reset this stack of rows, trying to preserve weights.
      * @param rows
      */
-    static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow) {
+    private static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow, boolean preserveOverlaps) {
 
         int[] weights = new int[rows.size()]; // in per milli.
 
@@ -242,23 +242,26 @@ public class CanvasController extends DomNodeController {
             totalWeight += weights[i];
         }
 
-        // look for overlaps--at least two panels.
-        for ( int i=0; i<rows.size(); i++ ) {
-            for ( int j=0; j<rows.size(); j++ ) {
-                if ( i==j ) continue;
-                if ( rows.get(i)==newRow || rows.get(j)==newRow ) {
-                    continue;
-                }
-                if ( maxs[i]>mins[j] && mins[i]<maxs[j] ) {
-                    count[i]++;
-                    if ( overlaps[i]==null ) {
-                        overlaps[i]= rows.get(j).id;
-                    } else {
-                        overlaps[i]= overlaps[i] + " " + rows.get(j).id;
+        if ( preserveOverlaps ) {
+            // look for overlaps--at least two panels.
+            for ( int i=0; i<rows.size(); i++ ) {
+                for ( int j=0; j<rows.size(); j++ ) {
+                    if ( i==j ) continue;
+                    if ( rows.get(i)==newRow || rows.get(j)==newRow ) {
+                        continue;
+                    }
+                    if ( maxs[i]>mins[j] && mins[i]<maxs[j] ) {
+                        count[i]++;
+                        if ( overlaps[i]==null ) {
+                            overlaps[i]= rows.get(j).id;
+                        } else {
+                            overlaps[i]= overlaps[i] + " " + rows.get(j).id;
+                        }
                     }
                 }
             }
         }
+
         for ( int i=0; i<rows.size(); i++ ) {
             if ( count[i]>1 ) {
                 totalWeight-= weights[i];
@@ -336,7 +339,7 @@ public class CanvasController extends DomNodeController {
     }
 
     void removeGaps() {
-        removeGapsAndOverlaps( this.application, Arrays.asList(canvas.getRows()) , null);
+        removeGapsAndOverlaps( this.application, Arrays.asList(canvas.getRows()), null, true);
         repaintSoon();
     }
 
@@ -373,7 +376,7 @@ public class CanvasController extends DomNodeController {
             if (d.size() > 0) {
                 row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
             }
-            removeGapsAndOverlaps( this.application, rows, row );
+            removeGapsAndOverlaps( this.application, rows, row, true );
         } finally {
             lock.unlock();
         }
