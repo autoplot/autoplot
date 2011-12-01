@@ -8,7 +8,9 @@
  */
 package org.virbo.autoplot;
 
+import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Frame;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -66,6 +68,7 @@ import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
+import org.das2.util.Entities;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
@@ -1425,4 +1428,26 @@ public class GuiSupport {
         }
     }
 
+    /**
+     * show the pick font dialog.  The font chosen, is applied and returned, or null if cancel was pressed. 
+     * 
+     * @return
+     */
+    public static Font pickFont( Frame parent, ApplicationModel app ) {
+        JFontChooser chooser = new JFontChooser( parent );
+        String sci= Entities.decodeEntities("2 &times; 10E7  &aacute;");
+        String greek= Entities.decodeEntities("Greek Symbols: &Alpha; &Beta; &Delta; &alpha; &beta; &delta; &pi; &rho; &omega;");
+        String math= Entities.decodeEntities("Math Symbols: &sum; &plusmn;");
+
+        chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
+        chooser.setFont(app.getCanvas().getBaseFont());
+        if (chooser.showDialog() == JFontChooser.OK_OPTION) {
+            app.getCanvas().setBaseFont(chooser.getFont());
+            Font f = app.getCanvas().getFont();
+            app.getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f) );
+            return f;
+        } else {
+            return null;
+        }
+    }
 }
