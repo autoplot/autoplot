@@ -417,7 +417,7 @@ public class ApplicationModel {
         final File f = new File( f2, nodeName + ".xml");
         if ( f.exists() ) {
             try {
-                recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
+                recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
             } catch (SAXException ex) {
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 return new ArrayList<Bookmark>();
