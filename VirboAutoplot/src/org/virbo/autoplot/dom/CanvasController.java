@@ -233,8 +233,11 @@ public class CanvasController extends DomNodeController {
             try {
                 double nmin = DasDevicePosition.parseFormatStr(rows.get(i).getTop())[0];
                 double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
-                mins[i]= nmin;
-                maxs[i]= nmax;
+                if ( rows.get(i).getController().dasRow.getParent().getHeight()<10 ) {
+                    throw new IllegalArgumentException("canvas is not yet valid");
+                }
+                mins[i]= rows.get(i).getController().dasRow.getDMinimum();
+                maxs[i]= rows.get(i).getController().dasRow.getDMaximum(); // bugfix: need to take em offsets into account
                 weights[i] = (int) Math.round((nmax - nmin) * 1000);
             } catch (ParseException ex) {
                 weights[i] = 200;
