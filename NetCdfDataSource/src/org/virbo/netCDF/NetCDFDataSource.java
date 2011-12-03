@@ -28,7 +28,7 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.ncml.NcMLReader;
 
 /**
- *
+ * Read Data from NetCDF and HDF5 files.
  * @author jbf
  */
 public class NetCDFDataSource extends AbstractDataSource {
@@ -157,7 +157,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         } else {
             for ( int i=0; i<variables.size(); i++ ) {
                 Variable v= variables.get(i);
-                if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) {
+                if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
                     variable= v;
                 }
             }
@@ -169,6 +169,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         return new NetCDFDataSourceFactory();
     }
     
+    @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
         mon.started();
         mon.setProgressMessage("reading metadata");
