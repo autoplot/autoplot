@@ -7,7 +7,9 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>Have a nice break!</small></p>
+        <p><small>Craig had out a nice bug where the em offsets in the layout resulted in code 
+                misidentifying overlapping plots, and the layout would be destroyed.  Also outside labels are coming, along with a
+                number of features available below controller nodes in the DOM that are not saved in .vap files.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,6 +23,18 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>3441461: plotx with multiple parameters</li>
+            <li>3441434: data post processing stays insensitive, basic mode</li>
+            <li>3444673: Remote bookmark files can be cached so loading is only done when necessary</li>
+            <li>3198392: remote bookmarks loaded immediately and on event thread.  Show local first, then load remote 10sec later</li>
+            <li>3440253: consider filesystem caching in memory vs .listing files.  Http file systems now cache listings on disk.</li>
+            <li>3373605: avoid null use in the DOM.</li>
+            <li>3399323: Background and foreground colors do not update on style tab.</li>
+            <li>2997820: Clean up automatic insertion of timerange so that 2010-01-01 is not used when it was never entered</li>
+            <li>3448593: Craig's overlap/add plot bug.  Add/delete additional plot would destroy layout because em offsets were ignored when identifying overlaps</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>3430414: sc->getCompletions null when complete</li>
             <li>3440253: consider filesystem caching in memory vs .listing files</li>
@@ -43,27 +57,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>logic for guessing timerange supports non-aggregating data sources, and guesses before entering GUI.</li>
             <li>expert/basic mode code accidentally turned overplot button back on in add plots GUI.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>bugfix loading rank 4 CDF files</li>
-            <li>bugfix: CDAWeb all.xml correction handled.  <b>Earlier development releases will no longer work.</b></li>
-            <li>bugfix: FTP shows credentials dialog when anonymous login fails with 530 exception.</li>
-            <li>huge round of FindBugs bug fixes correct minor bugs (probably never observed) and cleans up code.</li>
-            <li>bugfix: minor bugfixes of the CDAWeb GUI.</li>
-            <li>bugfix: extraneous "(remote)" labels on remote folders</li>
-            <li>clean up of bookmarks GUI</li>
-            <li>pngwalk removed from basic mode, clean up separators</li>
-            <li>round of findbugs to remove most offensive code</li>
-            <li>from the autoplot 2010 production branch:
-              <ul>
-              <li>bugfix: minor internationalization problems (DigitalRenderer)</li>
-              <li>bugfix: RTE reports are properly formatted XML</li>
-              <li>forward compatibility with autoplot2011 bookmarks</li>
-              <li>bugfix: RTE when CDAWeb panel is entered before anything else is plotted.</li>
-            </ul></li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>3446504: separate open file into open vap file and open data file</li>
+            <li>3154463: restore vap to correct size when loading.  Prompt if the product is too big scale or scrollbars</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>remote bookmark folders are allowed to be cached using the normal mechanism, if they come from a simple web folder</li>
             <li>Java Webstart supports "single instance", so relaunching will recycle running app instead of opening a second window</li>
@@ -78,10 +78,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>popup menus for axis tab show macros like %{RANGE}</li>
             <li>processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
             <li>values in metadata tab are now the first twenty and last three values</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Minor cleanup of timerange GUI.</li>
         </ul>
 
 <p>Known issues:</p>
