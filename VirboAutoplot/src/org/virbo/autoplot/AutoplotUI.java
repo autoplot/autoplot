@@ -97,6 +97,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
@@ -860,10 +861,28 @@ public class AutoplotUI extends javax.swing.JFrame {
                 bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, doyCB, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_USE_TIME_RANGE_EDITOR, timeRangeSelectorMenuItem, "selected" );
-                bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
+                // be more precise about this now.  bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                 bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
                 bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, timeRangeEditor, "useDoy" );
                 bc.bind();
+
+                dom.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        BindingModel[] bms= dom.getBindings();
+                        boolean isBound=false;
+                        for ( int i=0; i<bms.length; i++ ) {
+                            if ( bms[i].getSrcProperty().equals("timeRange") ) {
+                                isBound= true;
+                            }
+                        }
+                        if ( isBound ) {
+                            dom.getController().bind( dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
+                        } else {
+                            dom.getController().unbind( dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
+                            dataSetSelector.setTimeRange(null);
+                        }
+                    }
+                });
 
             }
         };
