@@ -1505,15 +1505,29 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
+    /**
+     * bind the dom node to another object.
+     * @param src
+     * @param srcProp string containing the property name.
+     * @param dst
+     * @param dstProp
+     */
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
         bind(src, srcProp, dst, dstProp, null );
     }
 
-    protected void unbind( DomNode src, String srcProp, Object dst, String dstProp ) {
+    /**
+     * unbind the binding between a dom node and another object.
+     * @param src
+     * @param srcProp the property name.
+     * @param dst
+     * @param dstProp the property name.
+     */
+    public void unbind( DomNode src, String srcProp, Object dst, String dstProp ) {
         bindingSupport.unbind( src, srcProp, dst, dstProp );
     }
     /**
-     * unbindDsf the object.  For example, when the object is about to be deleted.
+     * unbind the object, removing any binding to this node.  For example, when the object is about to be deleted.
      * @param src
      */
     public void unbind(DomNode src) {
