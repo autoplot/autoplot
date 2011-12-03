@@ -280,7 +280,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     String delegateUri= AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl);
                                     DataSourceFactory ddsf= AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
                                     if ( !ddsf.reject( delegateUri, mon) ) {
-                                        surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
+                                        surl1= URISplit.putParam( surl, "timerange", timeRange.toString() );
                                         if ( !f.reject(surl1, mon) ) {
                                             setMessage("accepted aggregation after setting timerange");
                                             int modifiers= this.keyModifiers;
@@ -1491,6 +1491,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
     /**
      * set default timeRange when aggregation is used, or for dialogs.
+     * null is allowed, indicating there is no focus timerange
      * @param timeRange
      */
     public void setTimeRange(DatumRange timerange) {
