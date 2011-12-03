@@ -72,6 +72,7 @@ public abstract class Bookmark {
     public static final String MSG_NO_REMOTE= "(remote not available)";
     public static final String MSG_REMOTE= "(remote)";
     public static final String MSG_NOT_LOADED= "(remote not loaded)";
+    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
         return parseBookmarks(data,0);
@@ -371,6 +372,7 @@ public abstract class Bookmark {
      * @return
      */
     public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) {
+        logger.log(Level.FINE, "parseBookmarks {0}", remoteLevel);
         String vers= root.getAttribute("version");
         return parseBookmarks( root, vers, remoteLevel );
     }
@@ -585,9 +587,6 @@ public abstract class Bookmark {
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
                 String title= f.getTitle();
-                if ( title.equals("CDAWeb") ) {
-                    System.err.println("here CDAWeb");
-                }
                 if ( f.getRemoteUrl()!=null ) {
                     buf.append("  <bookmark-folder remoteUrl=\"").append(URLEncoder.encode(f.getRemoteUrl(), "UTF-8")).append("\">\n");
                 } else {
