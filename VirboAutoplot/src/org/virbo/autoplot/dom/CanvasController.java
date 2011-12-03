@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -234,7 +234,10 @@ public class CanvasController extends DomNodeController {
                 double nmin = DasDevicePosition.parseFormatStr(rows.get(i).getTop())[0];
                 double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
                 if ( rows.get(i).getController().dasRow.getParent().getHeight()<10 ) {
-                    throw new IllegalArgumentException("canvas is not yet valid");
+                        //TODO: why don't we do this right off the bat?  Hudson test autoplot-test034
+                        dom.controller.getDasCanvas().setSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getWidth() );
+                        dom.controller.getDasCanvas().setFont( Font.decode( dom.getOptions().getCanvasFont() ) );
+                        rows.get(i).getController().dasRow.getParent().getHeight();
                 } 
                 mins[i]= rows.get(i).getController().dasRow.getDMinimum();
                 maxs[i]= rows.get(i).getController().dasRow.getDMaximum(); // bugfix: need to take em offsets into account
