@@ -6,7 +6,7 @@ import org.das2.util.monitor.ProgressMonitor;
 /**
  * Interface for discovering a GUI editor for an URL.
  * Note the correct order to use a GUI is:
- *    reject( String uri ) is the URI close enough that we can create an editor for it?  Editors that never reject "allow discovery"
+ *    reject( String uri ) is the URI close enough that we can create an editor for it?  Editors that never reject, "allow discovery"
  *      setExpertMode( boolean ) if available, then expert mode is supported and the options should be restricted to reliable options.
  *    prepare( String uri, Window parent, ProgressMonitor mon )  prepare the GUI, maybe by downloading resources, etc
  *    setURI( String uri ) set the URI for editing.  This is the oldest method and is a bit redundant.
@@ -51,6 +51,7 @@ public interface DataSourceEditorPanel {
      * reject the URI, perhaps because we aren't close enough to identify a resource.
      * For example, a CDF URI contains the name of the file but not the variable to plot,
      * so we need to enter the editor panel to complete the URI.
+     * Leaving the editor should never result in a URI that would reject.
      * @param uri
      * @return true if the URI is not usable.
      */
