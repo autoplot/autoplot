@@ -855,7 +855,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             public void run() {
                 try {
                     try {
-                        Thread.sleep(60000);
+                        Thread.sleep(10000); // sleep 10 seconds before making second pass
                     } catch (InterruptedException ex) {
                         Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -985,7 +985,6 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
 
     public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
-        JMenuItem item;
 
         List<Bookmark> bookmarks= model.getList();
 
@@ -1047,7 +1046,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                     if ( folder.getRemoteStatus()==0 ) {
                         title= title + " " + Bookmark.MSG_REMOTE;
                     } else if ( folder.getRemoteStatus()==-1 ) {
-                        title= title + " " + Bookmark.MSG_NOT_LOADED; // we shouldn't use this.
+                        title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
                     } else {
                         title= title + " " + Bookmark.MSG_NO_REMOTE;
                     }
