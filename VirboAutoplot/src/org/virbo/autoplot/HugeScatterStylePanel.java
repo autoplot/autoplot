@@ -5,19 +5,15 @@
  */
 package org.virbo.autoplot;
 
-import java.beans.PropertyChangeEvent;
 import org.das2.components.propertyeditor.ColorEditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.beans.PropertyChangeListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 
@@ -53,7 +49,6 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
     public synchronized void doElementBindings(PlotElement element) {
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
-        Binding b;
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
         
