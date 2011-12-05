@@ -8,7 +8,6 @@ package org.virbo.autoplot;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.color.ColorSpace;
 import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
@@ -35,6 +34,7 @@ import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.dom.PlotElementStyle;
 
 /**
  *
@@ -57,6 +57,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
     ColorEditor fillColorEditor;
     DatumEditor referenceEditor;
     BindingGroup elementBindingContext;
+    PlotElement currentElement;
 
     Application dom;
 
@@ -144,8 +145,20 @@ public class PlotStylePanel extends javax.swing.JPanel {
         }
     };
 
+    private transient PropertyChangeListener colorListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            checkColors();
+        }
+    };
+
     private synchronized void doElementBindings() {
         //TODO: why null?
+
+        if ( currentElement!=null ) {
+            currentElement.getStyle().removePropertyChangeListener(colorListener);
+            currentElement.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
+        }
+
         PlotElement element= dom.getController().getPlotElement();
         if ( element==null ) return;
 
@@ -167,10 +180,12 @@ public class PlotStylePanel extends javax.swing.JPanel {
         editorPanel.doElementBindings(element);
 
         stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
-
-        element.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
+        //TODO: verify
         element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+        element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
 
+        currentElement= element;
+        
         repaint();
         validate(); // paint the new GUI
         
