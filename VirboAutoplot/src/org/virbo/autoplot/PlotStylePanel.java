@@ -152,10 +152,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
     };
 
     private synchronized void doElementBindings() {
-        //TODO: why null?
 
         if ( currentElement!=null ) {
-            currentElement.getStyle().removePropertyChangeListener(colorListener);
+            currentElement.getStyle().removePropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener);
             currentElement.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
         }
 
@@ -237,7 +236,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
         for ( PlotElement p: pe ) {
             System.err.printf( "%s %s\n" , p.getStyle().getColor() ,dom.getCanvases(0).getController().getDasCanvas().getForeground() );
             if ( closeColors( p.getStyle().getColor(), back ) ) {
-                p.getStyle().setColor(color);
+                final PlotElement pf= p;
+                final Color colorf= color;
+                SwingUtilities.invokeLater( new Runnable() { public void run() { pf.getStyle().setColor(colorf); } } );
             }
         }
     }
