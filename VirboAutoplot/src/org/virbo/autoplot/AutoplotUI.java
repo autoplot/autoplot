@@ -539,11 +539,13 @@ public class AutoplotUI extends javax.swing.JFrame {
             uris.add(((Bookmark.Item) b).getUri());
         }
         dataSetSelector.setRecent(uris);
-        if (uris.size() > 1) {
-            if ( dataSetSelector.getEditor().getText().equals("") ) {
-                dataSetSelector.getEditor().setText(uris.get(uris.size() - 1)); // avoid firing event
-            }
-        }
+        //some other bug had been preventing this code from working.  I actually like the bug behavior better, where the value is
+        //not the most recent one, so I'm commenting this out to restore this behavior.
+//        if (uris.size() > 1) {
+//            if ( dataSetSelector.getEditor().getText().equals("") ) {
+//                dataSetSelector.getEditor().setText(uris.get(uris.size() - 1)); // avoid firing event
+//            }
+//        }
 
         //since bookmarks can contain remote folder, get these after making the gui.
         Runnable run= new Runnable() {
