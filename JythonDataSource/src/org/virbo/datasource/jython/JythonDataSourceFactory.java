@@ -206,7 +206,12 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     @Override
     public boolean reject(String surl, ProgressMonitor mon) {
         if (surl.contains("?")) {
-            return false;
+            URISplit split= URISplit.parse(surl);
+            if ( split.params.length()>0 ) {
+                return false;
+            } else {
+                return true;
+            }
         } else {
             try {
                 URISplit split= URISplit.parse(surl);
