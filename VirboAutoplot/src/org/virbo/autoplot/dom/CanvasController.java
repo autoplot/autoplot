@@ -235,7 +235,7 @@ public class CanvasController extends DomNodeController {
                 double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
                 if ( rows.get(i).getController().dasRow.getParent().getHeight()<10 ) {
                         //TODO: why don't we do this right off the bat?  Hudson test autoplot-test034
-                        dom.controller.getDasCanvas().setSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getWidth() );
+                        dom.controller.getDasCanvas().setSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getHeight() );
                         dom.controller.getDasCanvas().setFont( Font.decode( dom.getOptions().getCanvasFont() ) );
                         rows.get(i).getController().dasRow.getParent().getHeight();
                 } 
