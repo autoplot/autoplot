@@ -8,6 +8,7 @@ package org.virbo.autoplot;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.color.ColorSpace;
 import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
@@ -175,6 +176,55 @@ public class PlotStylePanel extends javax.swing.JPanel {
         
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
 
+    }
+
+    /**
+     * return true if the colors are unacceptably close.
+     * @param cA
+     * @param cB
+     * @return
+     */
+    private static boolean closeColors( Color cA, Color cB ) {
+        if ( cA.equals(cB) ) return true;
+        float[] colorA = new float[] { cA.getRed(), cA.getGreen(), cA.getBlue() };
+        float[] colorB = new float[] { cB.getRed(), cB.getGreen(), cB.getBlue() };
+        double dist= Math.sqrt( Math.pow( colorA[0]-colorB[0], 2 )
+                + Math.pow( colorA[1]-colorB[1], 2 )
+                + Math.pow( colorA[2]-colorB[2], 2 ) );
+        return ( dist<5 ) ;
+    }
+
+    /**
+     * check to see that foreground!=background.  Check for each plot element, foreground!=background
+     */
+    private void checkColors() {
+        Color back= dom.getOptions().getBackground();
+        Color fore= dom.getOptions().getForeground();
+        Color color= dom.getOptions().getColor();
+
+        if ( closeColors( fore, back ) ) {
+            if ( back.getRed()<128 ) {
+                fore= Color.WHITE;
+            } else {
+                fore= Color.BLACK;
+            }
+            dom.getOptions().setForeground(fore);
+        }
+        if ( closeColors( color, back ) ) {
+            if ( back.getRed()<128 ) {
+                color= Color.WHITE;
+            } else {
+                color= Color.BLACK;
+            }
+            dom.getOptions().setColor(color);
+        }
+        List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
+        for ( PlotElement p: pe ) {
+            System.err.printf( "%s %s\n" , p.getStyle().getColor() ,dom.getCanvases(0).getController().getDasCanvas().getForeground() );
+            if ( closeColors( p.getStyle().getColor(), back ) ) {
+                p.getStyle().setColor(color);
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -412,10 +462,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
             dom.getOptions().setColor(fores[i]);
             dom.getOptions().setBackground(backs[i]);
         }
+        checkColors();
 }//GEN-LAST:event_foreBackColorsListActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
-        Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
+        Color c = JColorChooser.showDialog(this, "Foreground Color", foregroundColorButton.getBackground());
         if ( c!=null ) {
             foreBackColorsList.setSelectedIndex(fores.length);
             List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
@@ -428,15 +479,17 @@ public class PlotStylePanel extends javax.swing.JPanel {
             dom.getCanvases(0).getController().getDasCanvas().setForeground(c);
             dom.getOptions().setForeground(c);
             dom.getOptions().setColor(c);
+            checkColors();
         }
 }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
-        Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
+        Color c = JColorChooser.showDialog(this, "Background Color", backgroundColorButton.getBackground());
         if ( c!=null ) {
             foreBackColorsList.setSelectedIndex(fores.length);
             backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
             dom.getOptions().setBackground(c);
+            checkColors();
         }
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
