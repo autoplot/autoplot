@@ -983,6 +983,8 @@ APSplash.checkTime("init 52");
         expertItems.add(mi);
         fileMenu.add(mi);
 
+        fileMenu.add( new JSeparator() );
+        
         mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
         mi.setToolTipText("Open local data file");
         expertItems.add(mi);
