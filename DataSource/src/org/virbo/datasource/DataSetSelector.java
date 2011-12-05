@@ -15,6 +15,7 @@ import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
+import javax.swing.event.DocumentEvent;
 import org.das2.DasApplication;
 import java.util.logging.Level;
 import javax.swing.text.BadLocationException;
@@ -59,6 +60,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -1261,7 +1263,12 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public String getValue() {
         //String s2= (String)this.dataSetSelector.getEditor().getItem(); //TODO why not use this if selectedItem is null?
-        return ((String) this.dataSetSelector.getSelectedItem()).trim();
+        String val= (String)this.dataSetSelector.getSelectedItem();
+        if ( val==null ) {
+            return "";
+        } else {
+            return val.trim();
+        }
     }
     private boolean doItemStateChange = false;
 
@@ -1384,13 +1391,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public void setRecent(List<String> recent) {
         List<String> oldRecent = this.recent;
         this.recent = recent;
-        String value = getValue();
+        String value = editor.getText();
         ArrayList<String> r = new ArrayList<String>(recent);
         Collections.reverse(r);
         dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
-        if (recent.contains(value)) {
-            //dataSetSelector.setSelectedItem(value); causes event to fire
-        }
+        editor.setText(value); // don't show most recent one.
         support.refreshRecentFilesMenu();
         firePropertyChange( PROP_RECENT, oldRecent, recent);
     }
