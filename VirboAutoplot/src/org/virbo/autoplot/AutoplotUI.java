@@ -989,7 +989,7 @@ APSplash.checkTime("init 52");
         fileMenu.add(mi);
 
         mi= new JMenuItem(dataSetSelector.getOpenLocalVapAction() );
-        mi.setToolTipText("Open local .vap (application layout) file");
+        mi.setToolTipText("Open local .vap application state file");
         fileMenu.add(mi);
 
         mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
