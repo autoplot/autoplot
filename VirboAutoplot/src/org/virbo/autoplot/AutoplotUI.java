@@ -983,15 +983,9 @@ APSplash.checkTime("init 52");
         expertItems.add(mi);
         fileMenu.add(mi);
 
-        fileMenu.add( new JSeparator() );
-        
         mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
         mi.setToolTipText("Open local data file");
         expertItems.add(mi);
-        fileMenu.add(mi);
-
-        mi= new JMenuItem(dataSetSelector.getOpenLocalVapAction() );
-        mi.setToolTipText("Open local .vap application state file");
         fileMenu.add(mi);
 
         mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
@@ -1012,6 +1006,12 @@ APSplash.checkTime("init 52");
         mi.setToolTipText("Open recent URIs dialog");
         fileMenu.add( mi );
         //fileMenu.add(dataSetSelector.getRecentMenu());
+
+        fileMenu.add( new JSeparator() );
+
+        mi= new JMenuItem(dataSetSelector.getOpenLocalVapAction() );
+        mi.setToolTipText("Open local .vap application state file");
+        fileMenu.add(mi);
 
         mi= new JMenuItem(stateSupport.createSaveAsAction() );
         mi.setToolTipText("Save the application state to a file");
