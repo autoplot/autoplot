@@ -179,7 +179,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         editorPanel.doElementBindings(element);
 
         stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
-        //TODO: verify
+        
         element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
         element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
 
