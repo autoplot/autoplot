@@ -29,7 +29,8 @@ public class DataSetSelectorSupport {
     public static final String PREF_LAST_OPEN_FOLDER = "last_open_folder";
     public static final String PREF_RECENTLY_OPENED_FILES = "recently_opened_files";
     public static final String PREF_LAST_OPEN_VAP_FOLDER= "last_open_vap_folder";
-    
+    public static final String PREF_LAST_OPEN_VAP_FILE= "last_open_vap_file";
+
     private JMenu recentMenu = null;
 
     DataSetSelectorSupport(DataSetSelector ui) {
@@ -40,12 +41,16 @@ public class DataSetSelectorSupport {
         return new File(System.getProperty("user.home"));
     }
     public static String browseLocalVap( java.awt.Component parent ) {
-        Preferences prefs = Preferences.userNodeForPackage(DataSetSelectorSupport.class);
+        Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( PREF_LAST_OPEN_VAP_FOLDER, prefs.get(PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
-
+        String currentFile=  prefs.get( PREF_LAST_OPEN_VAP_FILE, "" );
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
+        if ( currentFile.length()>0 ) {
+            chooser.setSelectedFile( new File( currentFile ) );
+        }
+        
         FileFilter ff;
         ff = new FileFilter() {
 
