@@ -11,6 +11,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.das2.datum.UnitsUtil;
@@ -187,7 +189,14 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     public Map<String, Object> properties(Map<String, Object> meta) {
-        Map attrs = meta;
+        Map attrs;
+        if ( meta==null ) {
+            new Exception("null attributes").printStackTrace();
+            attrs= Collections.emptyMap();
+        } else {
+            attrs= new HashMap(meta);
+        }
+
         Map<String,Object> user= new LinkedHashMap<String,Object>();
 
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
@@ -231,8 +240,8 @@ public class IstpMetadataModel extends MetadataModel {
 
             // we need to distinguish between ms and epoch times.
             boolean isMillis=false;
-            Object ovalidMax= meta.get("VALIDMAX");
-            Object ovalidMin= meta.get("VALIDMIN");
+            Object ovalidMax= attrs.get("VALIDMAX");
+            Object ovalidMin= attrs.get("VALIDMIN");
             if ( ovalidMax!=null && ovalidMin!=null 
                     && ovalidMax instanceof Number && ovalidMin instanceof Number
                     && units==Units.milliseconds ) {
