@@ -237,8 +237,6 @@ public class DomOps {
 
         Canvas canvas= dom.getCanvases(0);
 
-        System.err.println( String.format( "Canvas Height is canvas.height=%d\n", canvas.height ) );
-
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
         double pixelsToEm= 1/emToPixels;
 
@@ -254,8 +252,6 @@ public class DomOps {
                TotalPlotHeight= TotalPlotHeight + dasRow.getHeight();
             }
         }
-
-        System.err.println( String.format( "Total Plot Height is TotalHeight=%f\n", TotalPlotHeight ) );
 
         double [] MaxUp= new double[ nrow ];
         double [] MaxDown= new double[ nrow ];
@@ -292,9 +288,6 @@ public class DomOps {
             PlotHeight[i]= NewPlotTotalHeight * RelativePlotHeight[i];
         }
 
-        System.err.println( String.format( "NewPlotTotalHeight=%f", NewPlotTotalHeight ));
-
-        // NormalPlotHeight_i= ( PlotHeight_i + MaxUp_i + MaxDown_i ) / TotalPlotHeight
         double[] NormalPlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
              NormalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / canvas.height;
@@ -303,17 +296,11 @@ public class DomOps {
         double position=0;
 
         for ( int i=0; i<nrow; i++ ) {
-            System.err.printf("Row %3d:  ",i);
             String newTop=  String.format( "%.2f%%%+.1fem", 100*position, MaxUp[i] * pixelsToEm );
             rows[i].setTop( newTop );
-//            System.err.print( newTop );
             position+= NormalPlotHeight[i];
             String newBottom= String.format(   "%.2f%%%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
             rows[i].setBottom( newBottom );
-//            System.err.print( newBottom );
-//            System.err.printf( String.format( "  plotHeight=%5.2f", PlotHeight[i] ) );
-//            System.err.printf( String.format( "  relHeight=%5.2f", RelativePlotHeight[i] ) );
-//            System.err.println();
 
         }
 
