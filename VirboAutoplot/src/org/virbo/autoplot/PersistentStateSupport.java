@@ -46,6 +46,8 @@ import javax.xml.parsers.ParserConfigurationException;
 //import org.apache.xml.serialize.OutputFormat;
 //import org.apache.xml.serialize.XMLSerializer;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.datasource.AutoplotSettings;
+import org.virbo.datasource.DataSetSelectorSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -298,9 +300,9 @@ public class PersistentStateSupport {
                     
                     saveImpl(f,scheme);
                     
-                    Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
-                    prefs.put( PREF_FILE+ext, new File( getCurrentFile() ).getAbsolutePath() );
-                    prefs.put( PREF_DIR+ext, new File( getCurrentFile() ).getParent() );
+                    Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
+                    prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
+                    prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
                     setSaving( false );
                     setDirty( false );
                     update();
