@@ -255,8 +255,10 @@ public class DomOps {
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 String axisTitle= plots[j].getXaxis().getLabel();
                 String axisTickFormat= ( plots[j].getXaxis().isVisible() && plots[j].getXaxis().isDrawTickLabels() ) ? "0.0" : "";  //TODO: do this
-                double axisTickLength= plots[j].getXaxis().isVisible() ? 0 : 0.66;
-                MaxDownJEm= axisTickLength + axisTickFormat.split("\n").length + axisTitle.split("\n").length;
+                double axisTickFormatEms= axisTickFormat.trim().length()==0 ? 0 : axisTickFormat.split("\n").length;
+                double axisTitleEms= axisTitle.trim().length()==0 ? 0 : axisTitle.split("\n").length;
+                double axisTickLength= plots[j].getXaxis().isVisible() ? 1.0 : 0.;
+                MaxDownJEm= axisTickLength + axisTickFormatEms + axisTitleEms;
                 MaxDown[i]= Math.max( MaxDown[i], MaxDownJEm*emToPixels );
             }
         }
@@ -289,14 +291,16 @@ public class DomOps {
 
         for ( int i=0; i<nrow; i++ ) {
             System.err.printf("Row %3d:  ",i);
-            //rows[i].top= String.format( "%5.2f%+5.1fem", 100*position, MaxUp[i] / emToPixels );
-            System.err.printf( String.format( "%.2f%+.1fem", 100*position, MaxUp[i] * pixelsToEm ) );
+            String newTop=  String.format( "%.2f%%%+.1fem", 100*position, MaxUp[i] * pixelsToEm );
+            rows[i].setTop( newTop );
+//            System.err.print( newTop );
             position+= NormalPlotHeight[i];
-            //rows[i].bottom= String.format( "%5.2f%+5.1fem", 100*position, MaxDown[i] / emToPixels );
-            System.err.printf( String.format( "  %.2f%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm ) );
-            System.err.printf( String.format( "  plotHeight=%5.2f", PlotHeight[i] ) );
-            System.err.printf( String.format( "  relHeight=%5.2f", RelativePlotHeight[i] ) );
-            System.err.println();
+            String newBottom= String.format(   "%.2f%%%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
+            rows[i].setBottom( newBottom );
+//            System.err.print( newBottom );
+//            System.err.printf( String.format( "  plotHeight=%5.2f", PlotHeight[i] ) );
+//            System.err.printf( String.format( "  relHeight=%5.2f", RelativePlotHeight[i] ) );
+//            System.err.println();
 
         }
 
