@@ -5,10 +5,13 @@
 
 package org.virbo.autoplot.dom;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.das2.datum.DatumVector;
 import org.das2.graph.DasRow;
+import org.das2.graph.TickVDescriptor;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -213,6 +216,19 @@ public class DomOps {
     }
 
     /**
+     * count the number of lines in the string.
+     * @param s
+     * @return
+     */
+    private static int lineCount( String s ) {
+        if ( s.trim().length()==0 ) {
+            return 0;
+        } else {
+            return s.split("![cC]").length;
+        }
+    }
+
+    /**
      * play with new canvas layout.  This started as a Jython Script, but it's faster to implement here.
      * See http://autoplot.org/developer.autolayout#Algorithm
      * @param dom
@@ -224,7 +240,6 @@ public class DomOps {
         System.err.println( String.format( "Canvas Height is canvas.height=%d\n", canvas.height ) );
 
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
-        double pixelToNorm= 1./canvas.height;
         double pixelsToEm= 1/emToPixels;
 
         Row[] rows= canvas.getRows();
@@ -248,18 +263,16 @@ public class DomOps {
         for ( int i=0; i<nrow; i++ ) {
             Plot[] plots= DomOps.getPlotsFor( dom, rows[i], true ).toArray( new Plot[0] );
             double MaxUpJEm= 0.;
-            double MaxDownJEm= 0.;
+            double MaxDownJ= 0.;
             for ( int j=0; j<plots.length; j++ ) {
                 String title= plots[j].getTitle();
-                MaxUpJEm= title.trim().length()==0 ? 0 : 1 * title.split("\n").length + 1;
+                MaxUpJEm= lineCount(title);
+                if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                String axisTitle= plots[j].getXaxis().getLabel();
-                String axisTickFormat= ( plots[j].getXaxis().isVisible() && plots[j].getXaxis().isDrawTickLabels() ) ? "0.0" : "";  //TODO: do this
-                double axisTickFormatEms= axisTickFormat.trim().length()==0 ? 0 : axisTickFormat.split("\n").length;
-                double axisTitleEms= axisTitle.trim().length()==0 ? 0 : axisTitle.split("\n").length;
-                double axisTickLength= plots[j].getXaxis().isVisible() ? 1.0 : 0.;
-                MaxDownJEm= axisTickLength + axisTickFormatEms + axisTitleEms;
-                MaxDown[i]= Math.max( MaxDown[i], MaxDownJEm*emToPixels );
+                Rectangle plot= plots[j].getController().getDasPlot().getBounds();
+                Rectangle axis= plots[j].getXaxis().getController().getDasAxis().getBounds();
+                MaxDownJ= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 3 );
+                MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
             }
         }
 
