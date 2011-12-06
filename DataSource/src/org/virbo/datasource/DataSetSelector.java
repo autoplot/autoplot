@@ -399,6 +399,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                 || ex.toString().contains("file not found")
                 || ex.toString().contains("root does not exist") )
               && msg.length()>0 ) {
+            if ( msg.startsWith("File not found: ") ) {
+                String[] ss= msg.split(":",2);
+                msg= "<html>"+ss[0]+":<br>"+ss[1]+"</html>";
+            }
             JOptionPane.showMessageDialog( DataSetSelector.this, msg, "No Such File", JOptionPane.WARNING_MESSAGE );
             setMessage("" + ex.getMessage());
             return true;
@@ -474,7 +478,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                     boolean proceed;
                     try {
                         proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file to preparing editor"));
-                        setCursor( Cursor.getDefaultCursor() );
                         if ( !proceed ) return;
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
@@ -484,6 +487,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                             throw new RuntimeException(ex);
                         }
                         return;
+                    } finally {
+                        setCursor( Cursor.getDefaultCursor() );
                     }
 
                     fedit.setURI(surl);
