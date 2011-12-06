@@ -8,6 +8,7 @@ package org.virbo.autoplot.dom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.das2.graph.DasRow;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -209,5 +210,96 @@ public class DomOps {
             }
         }
         return result;
+    }
+
+    /**
+     * play with new canvas layout.  This started as a Jython Script, but it's faster to implement here.
+     * See http://autoplot.org/developer.autolayout#Algorithm
+     * @param dom
+     */
+    public static void newCanvasLayout( Application dom ) {
+
+        Canvas canvas= dom.getCanvases(0);
+
+        System.err.println( String.format( "Canvas Height is canvas.height=%d\n", canvas.height ) );
+
+        double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
+        double pixelToNorm= 1./canvas.height;
+        double pixelsToEm= 1/emToPixels;
+
+        Row[] rows= canvas.getRows();
+        int nrow= rows.length;
+
+        double TotalPlotHeight= 0;
+        for ( int i=0; i<nrow; i++ ) {
+           Plot[] plots= DomOps.getPlotsFor( dom, rows[i], true ).toArray( new Plot[0] );
+
+           if ( plots.length>0 ) {
+               DasRow dasRow= rows[i].getController().dasRow;
+               TotalPlotHeight= TotalPlotHeight + dasRow.getHeight();
+            }
+        }
+
+        System.err.println( String.format( "Total Plot Height is TotalHeight=%f\n", TotalPlotHeight ) );
+
+        double [] MaxUp= new double[ nrow ];
+        double [] MaxDown= new double[ nrow ];
+
+        for ( int i=0; i<nrow; i++ ) {
+            Plot[] plots= DomOps.getPlotsFor( dom, rows[i], true ).toArray( new Plot[0] );
+            double MaxUpJEm= 0.;
+            double MaxDownJEm= 0.;
+            for ( int j=0; j<plots.length; j++ ) {
+                String title= plots[j].getTitle();
+                MaxUpJEm= title.trim().length()==0 ? 0 : 1 * title.split("\n").length + 1;
+                MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
+                String axisTitle= plots[j].getXaxis().getLabel();
+                String axisTickFormat= ( plots[j].getXaxis().isVisible() && plots[j].getXaxis().isDrawTickLabels() ) ? "0.0" : "";  //TODO: do this
+                double axisTickLength= plots[j].getXaxis().isVisible() ? 0 : 0.66;
+                MaxDownJEm= axisTickLength + axisTickFormat.split("\n").length + axisTitle.split("\n").length;
+                MaxDown[i]= Math.max( MaxDown[i], MaxDownJEm*emToPixels );
+            }
+        }
+
+        double [] RelativePlotHeight= new double[ nrow ];
+        for ( int i=0; i<nrow; i++ ) {
+            DasRow dasRow= rows[i].getController().dasRow;
+            RelativePlotHeight[i]= 1.0 * dasRow.getHeight() / TotalPlotHeight;
+        }
+
+        double NewPlotTotalHeight= canvas.height;
+        for ( int i=0; i<nrow; i++ ) {
+            NewPlotTotalHeight = NewPlotTotalHeight - MaxUp[i] - MaxDown[i];
+        }
+
+        double [] PlotHeight= new double[ nrow ];
+        for ( int i=0; i<nrow; i++ ) {
+            PlotHeight[i]= NewPlotTotalHeight * RelativePlotHeight[i];
+        }
+
+        System.err.println( String.format( "NewPlotTotalHeight=%f", NewPlotTotalHeight ));
+
+        // NormalPlotHeight_i= ( PlotHeight_i + MaxUp_i + MaxDown_i ) / TotalPlotHeight
+        double[] NormalPlotHeight= new double[ nrow ];
+        for ( int i=0; i<nrow; i++ ) {
+             NormalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / canvas.height;
+        }
+
+        double position=0;
+
+        for ( int i=0; i<nrow; i++ ) {
+            System.err.printf("Row %3d:  ",i);
+            //rows[i].top= String.format( "%5.2f%+5.1fem", 100*position, MaxUp[i] / emToPixels );
+            System.err.printf( String.format( "%.2f%+.1fem", 100*position, MaxUp[i] * pixelsToEm ) );
+            position+= NormalPlotHeight[i];
+            //rows[i].bottom= String.format( "%5.2f%+5.1fem", 100*position, MaxDown[i] / emToPixels );
+            System.err.printf( String.format( "  %.2f%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm ) );
+            System.err.printf( String.format( "  plotHeight=%5.2f", PlotHeight[i] ) );
+            System.err.printf( String.format( "  relHeight=%5.2f", RelativePlotHeight[i] ) );
+            System.err.println();
+
+        }
+
+
     }
 }
