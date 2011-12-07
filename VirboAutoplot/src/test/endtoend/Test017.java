@@ -252,6 +252,10 @@ public class Test017 {
         "050 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
         "051 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
         "052 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
+
+        // these are known to cause faults
+        "100 file:///home/jbf/ct/autoplot/data.backup/examples/dat/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1
+
     };
 
     private static void doTest( final String s, final String label, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
