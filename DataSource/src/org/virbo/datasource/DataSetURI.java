@@ -580,8 +580,14 @@ public class DataSetURI {
                     File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
                     tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
                     org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
-                    if ( tfile.exists() ) tfile.delete(); // it shouldn't, but to be safe...
-                    tfile1.renameTo(tfile);
+                    if ( tfile.exists() ) {
+                        if ( ! tfile.delete() ) {
+                            throw new IllegalArgumentException("unable to delete "+tfile );
+                        }
+                    } // it shouldn't, but to be safe...
+                    if ( ! tfile1.renameTo(tfile) ) {
+                        throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
+                    }
                 } else {
                     throw new FileNotFoundException("File not found: "+url );
                 }
@@ -730,7 +736,9 @@ public class DataSetURI {
 
         checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...  
 
-        newf.renameTo( result );
+        if ( ! newf.renameTo( result ) ) {
+            throw new IllegalArgumentException("unable to rename "+newf + " to "+ result );
+        }
         return result;
     }
 
