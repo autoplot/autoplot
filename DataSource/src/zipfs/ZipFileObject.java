@@ -100,8 +100,12 @@ public class ZipFileObject extends FileObject {
         File tmpDir = tmpFile.getParentFile();
 
         // We're blindly unpacking and not checking age of possibly existing cache file
-        tmpDir.mkdirs();
-        tmpFile.createNewFile();
+        if ( ! tmpDir.mkdirs() ) {
+            throw new IllegalArgumentException("unable to mkdirs "+tmpDir );
+        }
+        if ( ! tmpFile.createNewFile() ) {
+            throw new IllegalArgumentException("unable to create file "+tmpFile );
+        }
 
         InputStream zStream = zfs.getZipFile().getInputStream(zipEntry);
         FileSystemUtil.dumpToFile(zStream, tmpFile);
