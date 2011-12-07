@@ -75,7 +75,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         local = new File(local, s);
 
-        local.mkdirs();
+        if ( ! local.mkdirs() ) {
+            throw new IllegalArgumentException("unable to mkdirs "+local );
+        }
         return local;
 
     }
@@ -252,7 +254,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
      * @return
      */
     private File listingFile( String directory ) {
-        new File(localRoot, directory).mkdirs();
+        File f= new File(localRoot, directory);
+        if ( ! f.mkdirs() ) {
+            throw new IllegalArgumentException("unable to mkdir "+f);
+        }
         File listing = new File(localRoot, directory + ".listing");
         return listing;
     }
@@ -288,7 +293,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         while ( !successOrCancel ) {
             try {
-                new File(localRoot, directory).mkdirs();
+                File newDir= new File(localRoot, directory);
+                if ( ! newDir.mkdirs() ) {
+                    throw new IllegalArgumentException("unable to mkdirs "+newDir );
+                }
                 File listing = new File(localRoot, directory + ".listing");
                 File listingt = new File(localRoot, directory + ".listing.temp");
 
@@ -323,7 +331,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 fw.write(ss);
                 fw.close();
 
-                listingt.renameTo(listing);
+                if ( ! listingt.renameTo(listing) ) {
+                    throw new IllegalArgumentException("unable to rename file "+listingt+ " to "+ listing );
+                }
                 successOrCancel= true;
                 
                 DirectoryEntry[] des = parseLsl(directory, listing);
@@ -541,8 +551,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
             }
 
-            if (copyFile(partFile, targetFile)) {
-                partFile.delete();
+            if ( copyFile(partFile, targetFile) ) {
+                if ( ! partFile.delete() ) {
+                    throw new IllegalArgumentException("unable to delete file "+partFile );
+                }
             }
 
         } catch (IOException e) {
@@ -552,7 +564,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             if (is != null) {
                 is.close();
             }
-            partFile.delete();
+            if ( !partFile.delete() ) {
+                throw new IllegalArgumentException("unable to delete file "+partFile);
+            }
             throw e;
             
         } finally {
