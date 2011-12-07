@@ -362,7 +362,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
-                if ( !( script.endsWith(".jy") || script.endsWith(".JY") ) ) {
+                if ( !( script.endsWith(".jy") || script.endsWith(".JY") || script.endsWith(".py") || script.endsWith(".PY") ) ) {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 } else {
