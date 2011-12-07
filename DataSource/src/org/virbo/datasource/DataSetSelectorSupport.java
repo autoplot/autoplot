@@ -82,7 +82,7 @@ public class DataSetSelectorSupport {
 
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-            prefs.put(PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent().toString());
+            prefs.put(PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
             return chooser.getSelectedFile().toURI().toString();
         } else {
             return null;
@@ -155,7 +155,7 @@ public class DataSetSelectorSupport {
 
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-            prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent().toString());
+            prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent() );
             return chooser.getSelectedFile().toURI().toString();
         } else {
             return null;
