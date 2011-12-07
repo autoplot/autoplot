@@ -134,6 +134,9 @@ public class CompletionSupport {
                         && tokens.get(i-5).kind==PythonGrammarConstants.NAME ) {
                     contextString= tokens.get(i-5).image + tokens.get(i-4).image + tokens.get(i-3).image + tokens.get(i-2).image + tokens.get(i-1).image + contextString;
                     i=i-5;
+                } else if ( tokens.get(i-2).kind==PythonGrammarConstants.RPAREN && i>4 && tokens.get(i-3).kind==PythonGrammarConstants.LPAREN ) {
+                    contextString= tokens.get(i-4).image + tokens.get(i-3).image + tokens.get(i-2).image;
+                    i=i-4;
                 } else {
                     contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
                     i=i-2;
