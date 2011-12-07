@@ -325,6 +325,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     private static int hashCode( Throwable t ) {
         int rteHash= 0;
+        if ( t.getCause()!=null ) {
+            t= t.getCause();
+        }
 
         StackTraceElement[] ee= t.getStackTrace();
         for ( int i=0; i<ee.length && i<5; i++ ) {
