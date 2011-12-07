@@ -264,7 +264,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
         map.put( INCLDOM, form.isAllowDom() );
         map.put( EMAIL, form.getEmailTextField().getText() );
-        map.put( USER_ID, form.getUsernameTextField().getText() );
+        map.put( USER_ID, form.getUsernameTextField().getText().replaceAll(" ","_") );
 
         return formatReport( t, bis, recs, map, uncaught, userComments );
     }
@@ -678,9 +678,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             if ( option==2 ) {
                 return;
             } else if ( option==1 ) {
-                id= form.getUsernameTextField().getText();
+                id= form.getUsernameTextField().getText().replaceAll(" ","_");
                 if ( id.trim().equals("") ) id= "anon";
-                map.put( USER_ID, form.getUsernameTextField().getText() );
+                map.put( USER_ID, id );
 
                 String email= form.getEmailTextField().getText();
                 map.put( EMAIL, email );
@@ -689,7 +689,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                 JFileChooser chooser= new JFileChooser();
                 chooser.setFileFilter( this.getFileNameExtensionFilter("xml files", new String[] { ".xml" } ) );
-                String fname= "rte_"+rteHash+"_" + eventId + "_" + id + ".xml";
+                String fname= String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
                 chooser.setSelectedFile( new File(fname) );
                 if ( chooser.showSaveDialog(form) == JFileChooser.APPROVE_OPTION ) {
                     try {
@@ -706,15 +706,15 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             } else if ( option==3 ) {
 
             //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
-                id= form.getUsernameTextField().getText();
+                id= form.getUsernameTextField().getText().replaceAll(" ", "_");
                 if ( id.trim().equals("") ) id= "anon";
-                map.put( USER_ID, form.getUsernameTextField().getText() );
+                map.put( USER_ID, id );
 
                 String email= form.getEmailTextField().getText();
                 map.put( EMAIL, email );
 
                 report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
-                String fname= "rte_"+rteHash+"_" + eventId + "_" + id.replaceAll(" ","_") + ".xml";
+                String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
 
                 HttpClient client = new HttpClient();
                 client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
@@ -744,9 +744,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     JOptionPane.showMessageDialog( null, ex.toString() );
                 }
             } else if ( option==0 ) {
-                id= form.getUsernameTextField().getText();
+                id= form.getUsernameTextField().getText().replaceAll(" ","_");
                 if ( id.trim().equals("") ) id= "anon";
-                map.put( USER_ID, form.getUsernameTextField().getText() );
+                map.put( USER_ID, id );
 
                 String email= form.getEmailTextField().getText();
                 map.put( EMAIL, email );
