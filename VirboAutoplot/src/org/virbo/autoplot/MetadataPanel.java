@@ -379,7 +379,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 }
                 map.put("Mean", s);
 
-                if (validCount > 1) {
+                if (validCount > 1 && moments.property("stddev")!=null ) {
                     s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
                 } else {
                     s = "";
