@@ -204,7 +204,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         if ( ff==null ) {
                             formats[jj]= getDataFormatter( df, uu[jj] );
                         } else {
-                            formats[jj]= getDataFormatter( ff, uu[jj] ); //TODO: what is user wants to override format?
+                            formats[jj]= getDataFormatter( ff, uu[jj] ); //TODO: what is user wants to override format? 
                         }
                     }
                 }
