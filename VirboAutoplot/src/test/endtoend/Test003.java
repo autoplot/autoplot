@@ -51,10 +51,6 @@ public class Test003 {
 
             ScriptContext.reset();
 
-            // ancient vap file version <1.00 still loads in.
-            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/garageTemps.vap" );
-            ScriptContext.writeToPng( "test003_005.png" );
-
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap" );
             ScriptContext.writeToPng( "test003_006.png" );
 
