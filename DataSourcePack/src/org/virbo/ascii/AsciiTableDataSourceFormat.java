@@ -190,8 +190,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             uu[jj] = (Units) bundleDesc.property(QDataSet.UNITS,i);
             if (uu[jj] == null) uu[jj] = Units.dimensionless;
             if ( !( uu[jj] instanceof EnumerationUnits ) ) {
+                String ff= (String) bundleDesc.property(QDataSet.FORMAT,jj);
                 if ( df.equals("") ) {
-                    String ff= (String) bundleDesc.property(QDataSet.FORMAT,jj);
                     if ( ff==null ) {
                         formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
                     } else {
@@ -201,7 +201,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     if ( UnitsUtil.isTimeLocation( uu[jj] ) ) {
                         formats[jj]= tf;
                     } else {
-                        formats[jj]= getDataFormatter( df, uu[jj] );
+                        if ( ff==null ) {
+                            formats[jj]= getDataFormatter( df, uu[jj] );
+                        } else {
+                            formats[jj]= getDataFormatter( ff, uu[jj] ); //TODO: what is user wants to override format?
+                        }
                     }
                 }
             } else {
