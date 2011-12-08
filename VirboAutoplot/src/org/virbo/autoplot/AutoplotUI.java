@@ -1208,7 +1208,7 @@ APSplash.checkTime("init 52");
                     JPanel p= new JPanel( new BorderLayout( ) );
                     p.add( new JLabel(  "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause().getMessage()+ "<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
                     JPanel p1= new JPanel( new BorderLayout() );
-                    p1.add( new JButton( new AbstractAction("View qPage") {
+                    p1.add( new JButton( new AbstractAction("View Page") {
                         public void actionPerformed( ActionEvent ev ) {
                             AutoplotUtil.openBrowser(link);
                         }
