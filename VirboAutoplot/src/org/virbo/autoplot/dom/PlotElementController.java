@@ -1823,7 +1823,11 @@ public class PlotElementController extends DomNodeController {
         } else if ( spec==RenderType.eventsBar ) {
 
             return true;
-            
+
+        } else if ( spec==RenderType.digital ) {
+
+            return true;
+
         } else {
 
             QDataSet depend0;
