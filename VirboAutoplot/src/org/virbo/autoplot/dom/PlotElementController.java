@@ -1672,7 +1672,6 @@ public class PlotElementController extends DomNodeController {
                     if ( peleCopy.getRenderType()==RenderType.series )
                         peleCopy.setRenderType( RenderType.scatter );
                 }
-                peleCopy.getStyle().setLineWidth(1.0f);
 
             }
 
