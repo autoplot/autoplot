@@ -75,7 +75,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         local = new File(local, s);
 
-        if ( ! local.mkdirs() ) {
+        try {
+            FileSystemUtil.maybeMkdirs(local);
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException("unable to mkdirs "+local );
         }
         return local;
@@ -255,7 +257,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
      */
     private File listingFile( String directory ) {
         File f= new File(localRoot, directory);
-        if ( ! f.mkdirs() ) {
+        try {
+            FileSystemUtil.maybeMkdirs(f);;
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException("unable to mkdir "+f);
         }
         File listing = new File(localRoot, directory + ".listing");
@@ -294,9 +298,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         while ( !successOrCancel ) {
             try {
                 File newDir= new File(localRoot, directory);
-                if ( ! newDir.mkdirs() ) {
-                    throw new IllegalArgumentException("unable to mkdirs "+newDir );
-                }
+                FileSystemUtil.maybeMkdirs(newDir);
                 File listing = new File(localRoot, directory + ".listing");
                 File listingt = new File(localRoot, directory + ".listing.temp");
 

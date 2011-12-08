@@ -100,9 +100,7 @@ public class ZipFileObject extends FileObject {
         File tmpDir = tmpFile.getParentFile();
 
         // We're blindly unpacking and not checking age of possibly existing cache file
-        if ( ! tmpDir.mkdirs() ) {
-            throw new IllegalArgumentException("unable to mkdirs "+tmpDir );
-        }
+        FileSystemUtil.maybeMkdirs(tmpDir);
         if ( ! tmpFile.createNewFile() ) {
             throw new IllegalArgumentException("unable to create file "+tmpFile );
         }
