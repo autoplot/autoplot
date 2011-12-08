@@ -40,15 +40,15 @@ public class Test002 {
         t0 = System.currentTimeMillis();
     }
 
-    private static void doTest(final String s, final String label ) throws IOException, InterruptedException, Exception {
+    private static void doTest(final String s, final String label) throws IOException, InterruptedException, Exception {
 
-       ScriptContext.load(s);
-       int width= ScriptContext.getDocumentModel().getCanvases(0).getWidth();
-       int height= ScriptContext.getDocumentModel().getCanvases(0).getHeight();
-       ScriptContext.setCanvasSize( width,height ); // TODO: why?  I shouldn't have to set this...
-       ScriptContext.writeToPng(label + ".png");
+        ScriptContext.load(s);
+        int width = ScriptContext.getDocumentModel().getCanvases(0).getWidth();
+        int height = ScriptContext.getDocumentModel().getCanvases(0).getHeight();
+        ScriptContext.setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
+        ScriptContext.writeToPng(label + ".png");
 
-       System.err.printf("wrote to %s.png %dx%d\n",label,width,height);
+        System.err.printf("wrote to %s.png %dx%d\n", label, width, height);
 
 
     }
@@ -69,10 +69,13 @@ public class Test002 {
             "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.vap",
             "012 file:///home/jbf/ct/hudson/vap/cassini_kp.vap", // das2Server
             "013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
+            "014 file:///home/jbf/ct/hudson/vap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
             "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
             "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
-            "021 file:///home/jbf/ct/hudson/vap/auto4.vap",};
+            "021 file:///home/jbf/ct/hudson/vap/auto4.vap",
+        };
+
 
         for (String s : uris) {
 
@@ -83,7 +86,7 @@ public class Test002 {
 
             try {
 
-                doTest(s, label );
+                doTest(s, label);
 
             } catch (Exception ex) {
                 PrintWriter pw = new PrintWriter(label + ".error");
@@ -103,7 +106,7 @@ public class Test002 {
     }
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
-        
+
         QDataSet ds = Util.getDataSet("file:///home/jbf/ct/hudson/data.backup/wav/fireworks.wav");
         final Application dom = ScriptContext.getDocumentModel();
         dom.getCanvases(0).setFitted(false);
