@@ -1179,7 +1179,9 @@ public class AutoplotUtil {
             spec= RenderType.digital;
 
         } else {
-            if (fillds.length() > 80000) {
+            if ( SemanticOps.getUnits(fillds) instanceof EnumerationUnits ) {
+                spec= RenderType.eventsBar;
+            } else if (fillds.length() > 80000) {
                 spec = RenderType.hugeScatter;
             } else {
                 spec = RenderType.series;
