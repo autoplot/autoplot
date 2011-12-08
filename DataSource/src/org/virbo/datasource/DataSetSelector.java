@@ -942,7 +942,8 @@ public class DataSetSelector extends javax.swing.JPanel {
         map.put("complete", new AbstractAction("completionsPopup") {
 
             public void actionPerformed(ActionEvent ev) {
-                String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
+                String context= (String) dataSetSelector.getEditor().getItem();
+                //String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
                 if ( context==null ) context= "";
 
                 // hooks for browsing, such as "vap+internal"
