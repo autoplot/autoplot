@@ -1820,6 +1820,10 @@ public class PlotElementController extends DomNodeController {
                 xunits= yunits;
             }
 
+        } else if ( spec==RenderType.eventsBar ) {
+
+            return true;
+            
         } else {
 
             QDataSet depend0;
