@@ -43,6 +43,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
@@ -78,6 +79,11 @@ public class SimpleServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        //register java cdf as .cdf handler
+        if ( DataSourceRegistry.getInstance().getSource("cdf")==null ) {
+            DataSourceRegistry.getInstance().registerExtension( "org.virbo.cdf.CdfJavaDataSourceFactory", "cdf", "cdf files read by the Java CDF reader" );
+        }
 
         //System.err.println( "requestMethod="+request.getMethod() );
         long t0 = System.currentTimeMillis();
