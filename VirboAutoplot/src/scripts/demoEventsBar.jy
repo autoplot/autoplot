@@ -39,7 +39,7 @@ bds.putProperty( 'UNITS__0', tu )
 bds.putProperty( 'NAME__1', 'Duration' )
 bds.putProperty( 'UNITS__1', dtu )
 bds.putProperty( 'NAME__2', 'Color' )
-bds.putProperty( 'FORMAT__2', '%08x' )  # format as hex
+bds.putProperty( 'FORMAT__2', '0x%08x' )  # format as hex
 bds.putProperty( 'NAME__3', 'Event' )
 bds.putProperty( 'UNITS__3', evu )
 
