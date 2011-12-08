@@ -1267,7 +1267,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public String getValue() {
         //String s2= (String)this.dataSetSelector.getEditor().getItem(); //TODO why not use this if selectedItem is null?
-        String val= (String)this.dataSetSelector.getSelectedItem();
+        String val= (String)this.dataSetSelector.getSelectedItem(); //TODO: check this vs getEditor().getItem() on different platforms
         if ( val==null ) {
             return "";
         } else {
