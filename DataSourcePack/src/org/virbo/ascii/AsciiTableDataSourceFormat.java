@@ -198,14 +198,18 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         formats[jj]= getDataFormatter( ff, uu[jj] );
                     }
                 } else {
-                    formats[jj]= getDataFormatter( df, uu[jj] );
+                    if ( UnitsUtil.isTimeLocation( uu[jj] ) ) {
+                        formats[jj]= tf;
+                    } else {
+                        formats[jj]= getDataFormatter( df, uu[jj] );
+                    }
                 }
             } else {
                 formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
             }
-            if ( formats[jj] instanceof EnumerationDatumFormatter ) {
+            //if ( formats[jj] instanceof EnumerationDatumFormatter ) {
                 //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
-            }
+            //}
             jj++;
         }
         
