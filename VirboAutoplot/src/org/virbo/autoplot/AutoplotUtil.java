@@ -1178,10 +1178,15 @@ public class AutoplotUtil {
         } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
             spec= RenderType.digital;
 
-        } else {
-            if ( SemanticOps.getUnits(fillds) instanceof EnumerationUnits ) {
+        } else if ( SemanticOps.getUnits(fillds) instanceof EnumerationUnits ) {
+            QDataSet dep0= (QDataSet) fillds.property(QDataSet.DEPEND_0);
+            if ( dep0==null ) {
+                spec= RenderType.digital;
+            } else {
                 spec= RenderType.eventsBar;
-            } else if (fillds.length() > 80000) {
+            }
+        } else {
+            if (fillds.length() > 80000) {
                 spec = RenderType.hugeScatter;
             } else {
                 spec = RenderType.series;
