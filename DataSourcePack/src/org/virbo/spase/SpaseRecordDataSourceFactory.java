@@ -27,6 +27,7 @@ import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -57,7 +58,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     public boolean reject( String surl, ProgressMonitor mon ) throws IllegalArgumentException {
 
         DocumentBuilder builder= null;
-        Element pos= null;
+        
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
@@ -68,22 +69,31 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
             InputStream in=  url.openStream() ;
             InputSource source = new InputSource(in );
             Document document = builder.parse(source);
-
-            String[] lookFor= new String[] { "Spase", "NumericalData", "AccessInformation", "AccessURL", "URL" };
-
-            NodeList list= document.getElementsByTagName(lookFor[0]);
-            pos= (Element)list.item(0);
-            
             in.close();
 
+            //String[] lookFor= new String[] { "Spase", "NumericalData", "AccessInformation", "AccessURL", "URL" };
+
+            Node n= document.getDocumentElement();
+
+            //String localName= n.getLocalName();  //TODO: why doesn't this work?
+            String localName= n.getNodeName();
+            int i= localName.indexOf(":");
+            if ( i>-1  ) {
+                localName= localName.substring(i+1);
+            }
+
+            if ( localName.equals("Spase") ) {  // Spase record
+                return false;
+            } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
+                return false;
+            } else {
+                return true;
+            }
+            
         } catch ( Exception ex) {
             Logger.getLogger(SpaseRecordDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             return true;
         }
-        if ( pos==null ) {
-            throw new IllegalArgumentException("Unable to find node Space/NumericalData/AccessInformation/AccessURL/URL in "+surl );
-        }
-        return false;
     }
 
     public String urlForServer(String surl) {
