@@ -2098,6 +2098,7 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_TO_REFERENCE, seriesRenderer, "fillToReference");
         ac.bind(plotElement.style, "reference", seriesRenderer, "reference");
         ac.bind(plotElement.style, "antiAliased", seriesRenderer, "antiAliased");
+        ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, seriesRenderer, "cadenceCheck");
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {

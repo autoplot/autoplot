@@ -82,6 +82,24 @@ public class PlotElement extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
         this.setAutoRenderType(true);
     }
+
+    /**
+     * cadence check disabled will always connect valid points.
+     */
+    protected boolean cadenceCheck = true;
+    public static final String PROP_CADENCECHECK = "cadenceCheck";
+
+    public boolean isCadenceCheck() {
+        return cadenceCheck;
+    }
+
+    public void setCadenceCheck(boolean cadenceCheck) {
+        boolean oldCadenceCheck = this.cadenceCheck;
+        this.cadenceCheck = cadenceCheck;
+        propertyChangeSupport.firePropertyChange(PROP_CADENCECHECK, oldCadenceCheck, cadenceCheck);
+    }
+
+
     /**
      * id of the plotDefaults containing the element.
      */
@@ -270,6 +288,7 @@ public class PlotElement extends DomNode {
         result.controller= null;
         result.style = (PlotElementStyle) style.copy();
         result.plotDefaults = (Plot) plotDefaults.copy();
+        result.cadenceCheck= cadenceCheck;
         return result;
     }
 
@@ -319,6 +338,10 @@ public class PlotElement extends DomNode {
             result.add( new PropertyChangeDiff(  PROP_COMPONENT, that.component, this.component ) );
         }
 
+        if ( !( that.cadenceCheck==this.cadenceCheck )  ) {
+            result.add( new PropertyChangeDiff(  PROP_CADENCECHECK, that.cadenceCheck, this.cadenceCheck ) );
+        }
+
         //TODO: we don't do anything with parent property, seems we should have code like the
         //   following.  It could be super.diffs is really doing all the work.
         //if ( !that.parent.equals( this.parent ) ) {
@@ -354,6 +377,7 @@ public class PlotElement extends DomNode {
         if ( !exclude.contains( PROP_PLOT_DEFAULTS ) )this.plotDefaults.syncTo(that.plotDefaults,exclude);
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         if ( !exclude.contains( PROP_AUTOCOMPONENT ) ) this.setAutoComponent(that.isAutoComponent());
+        if ( !exclude.contains( PROP_CADENCECHECK ) ) this.setCadenceCheck(that.isCadenceCheck() );
     }
 
     @Override
