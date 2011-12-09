@@ -1537,13 +1537,15 @@ APSplash.checkTime("init 52");
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         toolsMenu = new javax.swing.JMenu();
-        jMenu3 = new javax.swing.JMenu();
+        cacheMenu = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        fixLayoutMenuItem = new javax.swing.JMenuItem();
         createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
@@ -1897,7 +1899,7 @@ APSplash.checkTime("init 52");
 
         toolsMenu.setText("Tools");
 
-        jMenu3.setText("Cache");
+        cacheMenu.setText("Cache");
 
         jMenuItem3.setText("Manage Files...");
         jMenuItem3.setToolTipText("Manage cache of downloaded data files.");
@@ -1906,7 +1908,7 @@ APSplash.checkTime("init 52");
                 jMenuItem3ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem3);
+        cacheMenu.add(jMenuItem3);
 
         jMenuItem4.setText("Clear Cache");
         jMenuItem4.setToolTipText("Delete all downloaded data files.");
@@ -1915,7 +1917,7 @@ APSplash.checkTime("init 52");
                 jMenuItem4ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem4);
+        cacheMenu.add(jMenuItem4);
 
         jMenuItem7.setText("Move Cache...");
         jMenuItem7.setToolTipText("Move file cache to new location");
@@ -1924,9 +1926,9 @@ APSplash.checkTime("init 52");
                 jMenuItem7ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem7);
+        cacheMenu.add(jMenuItem7);
 
-        toolsMenu.add(jMenu3);
+        toolsMenu.add(cacheMenu);
         toolsMenu.add(jSeparator3);
 
         pngWalkMenuItem.setText("PNG Walk Viewer");
@@ -1946,10 +1948,20 @@ APSplash.checkTime("init 52");
             }
         });
         toolsMenu.add(createPngWalkMenuItem);
+        toolsMenu.add(jSeparator2);
+
+        fixLayoutMenuItem.setText("Fix Layout");
+        fixLayoutMenuItem.setToolTipText("Run new layout routine that removes spaces between plots");
+        fixLayoutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixLayoutMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(fixLayoutMenuItem);
         toolsMenu.add(createPngWalkSeparator);
 
         aggregateMenuItem.setText("Aggregate...");
-        aggregateMenuItem.setToolTipText("Attempt to aggregate all the URIs on the product, keeping other DOM settings.\n");
+        aggregateMenuItem.setToolTipText("Combine files into a time series");
         aggregateMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 aggregateMenuItemActionPerformed(evt);
@@ -2432,6 +2444,15 @@ private void EditOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 }//GEN-LAST:event_EditOptionsActionPerformed
 
+private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
+    Runnable run= new Runnable() {
+        public void run() {
+            org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        }
+    };
+    new Thread(run,"canvas layout").start();
+}//GEN-LAST:event_fixLayoutMenuItemActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -2866,6 +2887,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem autoplotHelpMenuItem;
     private javax.swing.JMenuItem autoplotHomepageButton;
     private javax.swing.JMenu bookmarksMenu;
+    private javax.swing.JMenu cacheMenu;
     private javax.swing.JMenuItem canvasSizeMenuItem;
     private javax.swing.JMenuItem copyDataSetURLMenuItem;
     private javax.swing.JMenuItem copyImageMenuItem;
@@ -2884,11 +2906,11 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenu enableFeatureMenu;
     private javax.swing.JMenuItem exceptionReport;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem fixLayoutMenuItem;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenuItem gettingStartedMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem inspectVapFileMenuItem;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -2897,6 +2919,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;

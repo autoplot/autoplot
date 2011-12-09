@@ -388,7 +388,7 @@
             <Property name="text" type="java.lang.String" value="Tools"/>
           </Properties>
           <SubComponents>
-            <Menu class="javax.swing.JMenu" name="jMenu3">
+            <Menu class="javax.swing.JMenu" name="cacheMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cache"/>
               </Properties>
@@ -442,12 +442,23 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createPngWalkMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="fixLayoutMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Fix Layout"/>
+                <Property name="toolTipText" type="java.lang.String" value="Run new layout routine that removes spaces between plots"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fixLayoutMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JSeparator" name="createPngWalkSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="aggregateMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Aggregate..."/>
-                <Property name="toolTipText" type="java.lang.String" value="Attempt to aggregate all the URIs on the product, keeping other DOM settings.&#xa;"/>
+                <Property name="toolTipText" type="java.lang.String" value="Combine files into a time series"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aggregateMenuItemActionPerformed"/>
