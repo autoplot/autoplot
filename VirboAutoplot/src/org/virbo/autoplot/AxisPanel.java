@@ -66,7 +66,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                doPanelBindings();
+                doPlotElementBindings();
             }
         });
         initComponents();
@@ -116,8 +116,7 @@ public class AxisPanel extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             public void run() {
                 doPlotBindings();
-                doPanelBindings();
-                doApplicationBindings();
+                doPlotElementBindings();
             }
         };
         SwingUtilities.invokeLater(run);
@@ -136,17 +135,6 @@ public class AxisPanel extends javax.swing.JPanel {
         };
     }
 
-    private void doApplicationBindings() {
-
-        Binding b;
-        //BindingGroup bc = new BindingGroup();
-
-        //bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autoranging"), this.allowAutoRangingCheckBox, BeanProperty.create( "selected")));
-        //bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolabelling"), this.autolabellingCheckbox, BeanProperty.create( "selected")));
-        //bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolayout"), this.autolayoutCheckbox,BeanProperty.create(  "selected")));
-        //bc.bind();
-    }
-
     BindingGroup plotBindingGroup;
 
     private BindingGroup doPlotBindings() {
@@ -160,6 +148,7 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.log"), xLog, BeanProperty.create("selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.drawTickLabels"), showXAxisLabelsCB, BeanProperty.create("selected")));
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("yaxis.label"), yTitleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("yaxis.range"), yredit,BeanProperty.create( "value")));
@@ -184,7 +173,7 @@ public class AxisPanel extends javax.swing.JPanel {
     
     PlotElement panel;
 
-    private void doPanelBindings() {
+    private void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         
         if (panelBindingGroup != null) panelBindingGroup.unbind();
@@ -215,6 +204,7 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisRangePanel = new javax.swing.JPanel();
         xTitleTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        showXAxisLabelsCB = new javax.swing.JCheckBox();
         zAxisPanel = new javax.swing.JPanel();
         zLog = new javax.swing.JCheckBox();
         zAxisRangePanel = new javax.swing.JPanel();
@@ -255,6 +245,9 @@ public class AxisPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Label:");
 
+        showXAxisLabelsCB.setText("Show Labels");
+        showXAxisLabelsCB.setToolTipText("Hide the axis labels of the bound axis");
+
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
         xAxisPanelLayout.setHorizontalGroup(
@@ -263,7 +256,10 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
-                    .add(xLog)
+                    .add(xAxisPanelLayout.createSequentialGroup()
+                        .add(xLog)
+                        .add(18, 18, 18)
+                        .add(showXAxisLabelsCB))
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -279,7 +275,9 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(xLog)
+                .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(xLog)
+                    .add(showXAxisLabelsCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -511,6 +509,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox legendEnableCheckbox;
     private javax.swing.JTextField legendTextField;
+    private javax.swing.JCheckBox showXAxisLabelsCB;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JPanel xAxisPanel;
     private javax.swing.JPanel xAxisRangePanel;
