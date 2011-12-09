@@ -236,10 +236,12 @@ public class DataPanel extends javax.swing.JPanel {
             sliceTypeComboBox.setSelectedIndex(Integer.parseInt(m.group(1)));
 
             if ( dsf!=null ) {
-                int max = dsf.getController().getMaxSliceIndex(sliceTypeComboBox.getSelectedIndex());
-                if (max > 0) max--;
-                sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, max, 1));
-                sliceIndexSpinner.setValue(Integer.parseInt(m.group(2)));
+                if ( sliceTypeComboBox.getSelectedIndex()>-1 ) { // transient state?
+                    int max = dsf.getController().getMaxSliceIndex(sliceTypeComboBox.getSelectedIndex());
+                    if (max > 0) max--;
+                    sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, max, 1));
+                    sliceIndexSpinner.setValue(Integer.parseInt(m.group(2)));
+                }
             }
             transposeCheckBox.setSelected( m.group(3)!=null );
             setAdjusting(false);
