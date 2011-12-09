@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
+import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -117,6 +118,9 @@ public class SpaseRecordDataSource implements DataSource {
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
+        mon.started();
+        mon.setProgressMessage( "parse xml file");
+        
         readXML();
 
         String surl=null;
@@ -130,7 +134,13 @@ public class SpaseRecordDataSource implements DataSource {
                 //surl= findSurl();
                 delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
 
-                return delegate.getDataSet(mon);
+                mon.setProgressMessage("reading "+delegate.getURI() );
+                
+                QDataSet result= delegate.getDataSet(mon);
+
+                mon.finished();
+                return result;
+
             } else if ( type==TYPE_HELM ) {
 
                 NodeList nl= (NodeList) xpath.evaluate( "//Eventlist/Event", document, XPathConstants.NODESET );
@@ -144,9 +154,16 @@ public class SpaseRecordDataSource implements DataSource {
                 timespans.putProperty(QDataSet.UNITS, Units.us2000 );
                 timespans.putProperty(QDataSet.BINS_1,"min,max");
 
+                mon.setTaskSize(nl.getLength());
+                mon.setProgressMessage( "reading events" );
+
                 for ( int j=0; j<nl.getLength(); j++ ) {
                     Node item= nl.item(j);
+                    mon.setTaskProgress(j);
+                    if ( mon.isCancelled() ) throw new CancelledOperationException("User pressed cancel");
+
                     String desc= (String) xpath.evaluate( "Description/text()", item, XPathConstants.STRING );
+
                     String startDate= (String) xpath.evaluate( "TimeSpan/StartDate/text()", item, XPathConstants.STRING );
                     String stopDate= (String) xpath.evaluate( "TimeSpan/StopDate/text()", item, XPathConstants.STRING );
                     if ( startDate.compareTo(stopDate)>0 ) {
@@ -163,6 +180,8 @@ public class SpaseRecordDataSource implements DataSource {
                     timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
                 }
 
+                mon.finished();
+                
                 DDataSet dd= description.getDataSet();
                 dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
 
