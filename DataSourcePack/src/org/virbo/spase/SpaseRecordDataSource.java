@@ -19,15 +19,21 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.Units;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsutil.DataSetBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,6 +50,9 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class SpaseRecordDataSource implements DataSource {
+
+    protected static final Object TYPE_HELM = "HELM";
+    protected static final Object TYPE_SPASE = "SPASE";
     
     /**
      * the DataSource URL found within Bob's SPASE record.
@@ -60,8 +69,9 @@ public class SpaseRecordDataSource implements DataSource {
      * DataSource delegate that will do the loading
      */
     DataSource delegate;
-    
-    
+
+    Object type;
+
     /** Creates a new instance of SpaseRecordDataSource */
     public SpaseRecordDataSource( URI uri ) throws IllegalArgumentException, IOException, SAXException, Exception {
         try {
@@ -69,26 +79,6 @@ public class SpaseRecordDataSource implements DataSource {
         } catch (MalformedURLException ex) {
             System.err.println("Failed to convert URI to URL");
             throw new RuntimeException(ex);
-        }
-        readXML();
-        
-        String surl=null;
-        
-        try {
-            XPathFactory factory= XPathFactory.newInstance();
-            XPath xpath= factory.newXPath();
-            //XPathExpression expr= xpath.compile( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()" );
-            //XPathExpression expr= xpath.compile( "//Spase/NumericalData/AccessInformation/AccessURL()" );
-            //XPathExpression expr= xpath.compile( "//book/title/text()" );
-            //surl= xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
-            surl= findSurl();
-            delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
-        } catch ( XPathExpressionException ex) {
-            throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
-        } catch ( MalformedURLException ex) {
-            throw new IllegalArgumentException("Spase record AccessURL is malformed: "+surl );
-        } catch ( Exception ex ) {
-            throw ex;
         }
         
     }
@@ -126,11 +116,76 @@ public class SpaseRecordDataSource implements DataSource {
     
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        return delegate.getDataSet(mon);
+
+        readXML();
+
+        String surl=null;
+
+        try {
+            XPathFactory factory= XPathFactory.newInstance();
+            XPath xpath= factory.newXPath();
+
+            if ( type==TYPE_SPASE ) {
+                surl= (String) xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
+                //surl= findSurl();
+                delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
+
+                return delegate.getDataSet(mon);
+            } else if ( type==TYPE_HELM ) {
+
+                NodeList nl= (NodeList) xpath.evaluate( "//Eventlist/Event", document, XPathConstants.NODESET );
+
+                DataSetBuilder timespans= new DataSetBuilder(2,100,2);
+                DataSetBuilder description= new DataSetBuilder(1,100);
+
+                EnumerationUnits eu= new EnumerationUnits("eventDesc");
+
+                description.putProperty(QDataSet.UNITS,eu );
+                timespans.putProperty(QDataSet.UNITS, Units.us2000 );
+                timespans.putProperty(QDataSet.BINS_1,"min,max");
+
+                for ( int j=0; j<nl.getLength(); j++ ) {
+                    Node item= nl.item(j);
+                    String desc= (String) xpath.evaluate( "Description/text()", item, XPathConstants.STRING );
+                    String startDate= (String) xpath.evaluate( "TimeSpan/StartDate/text()", item, XPathConstants.STRING );
+                    String stopDate= (String) xpath.evaluate( "TimeSpan/StopDate/text()", item, XPathConstants.STRING );
+                    if ( startDate.compareTo(stopDate)>0 ) {
+                        //throw new IllegalArgumentException("startDate is after stopDate");
+                        Exception e= new IllegalArgumentException("StartDate is after StopDate: "+startDate );
+                        e.printStackTrace();
+                        timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                        timespans.putValue(j, 1, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                        description.putValue(j,eu.createDatum(e.getMessage()).doubleValue(eu) );
+                        continue;
+                    }
+                    description.putValue(j,eu.createDatum( desc ).doubleValue(eu) );
+                    timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                    timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
+                }
+
+                DDataSet dd= description.getDataSet();
+                dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
+
+                String title= (String)xpath.evaluate("//Eventlist/ResourceHeader/Description", document, XPathConstants.STRING );
+                dd.putProperty( QDataSet.TITLE,title );
+                
+                return dd;
+
+            } else {
+                throw new IllegalArgumentException( "Unsupported XML type, root node should be Spase or Eventlist"); // see else above
+            }
+
+        } catch ( XPathExpressionException ex) {
+            throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
+        } catch ( MalformedURLException ex) {
+            throw new IllegalArgumentException("Spase record AccessURL is malformed: "+surl );
+        } catch ( Exception ex ) {
+            throw ex;
+        }
     }
     
     public boolean asynchronousLoad() {
-        return delegate.asynchronousLoad();
+        return true;
     }
     
     private void readXML() throws IOException, SAXException {
@@ -142,10 +197,33 @@ public class SpaseRecordDataSource implements DataSource {
         }
         InputSource source = new InputSource( url.openStream() );
         document = builder.parse(source);
+
+        Node n= document.getDocumentElement();
+
+        //String localName= n.getLocalName();  //TODO: why doesn't this work?
+        String localName= n.getNodeName();
+        int i= localName.indexOf(":");
+        if ( i>-1  ) {
+            localName= localName.substring(i+1);
+        }
+
+        if ( localName.equals("Spase") ) {
+            type= TYPE_SPASE;
+        } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
+            type= TYPE_HELM;
+        } else {
+            throw new IllegalArgumentException("Unsupported XML type, root node should be Spase or Eventlist");
+        }
+
         
     }
     
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
+
+        if ( document==null ) {
+            readXML();
+        }
+
         // If we're using a DOM Level 2 implementation, then our Document
         // object ought to implement DocumentTraversal
         DocumentTraversal traversal = (DocumentTraversal)document;
@@ -195,7 +273,11 @@ public class SpaseRecordDataSource implements DataSource {
     }
 
     public MetadataModel getMetadataModel() {
-        return new SpaseMetadataModel();
+        if ( type==TYPE_SPASE ) {
+            return new SpaseMetadataModel();
+        } else {
+            return null;
+        }
     }
     
     
