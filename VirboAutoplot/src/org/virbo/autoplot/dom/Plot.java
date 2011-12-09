@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.graph.DasColorBar;
+import org.das2.graph.LegendPosition;
 
 /**
  *
@@ -67,6 +68,19 @@ public class Plot extends DomNode {
         String oldTitle = this.title;
         this.title = title;
         propertyChangeSupport.firePropertyChange(PROP_TITLE, oldTitle, title);
+    }
+
+    protected LegendPosition legendPosition = LegendPosition.NE;
+    public static final String PROP_LEGENDPOSITION = "legendPosition";
+
+    public LegendPosition getLegendPosition() {
+        return legendPosition;
+    }
+
+    public void setLegendPosition(LegendPosition legendPosition) {
+        LegendPosition oldLegendPosition = this.legendPosition;
+        this.legendPosition = legendPosition;
+        propertyChangeSupport.firePropertyChange(PROP_LEGENDPOSITION, oldLegendPosition, legendPosition);
     }
 
     /**
@@ -239,6 +253,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_VISIBLE)) this.setVisible(that.isVisible());
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
+        if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
     }
 
     @Override
@@ -283,6 +298,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_CONTEXT, that.context, this.context));
         b= that.ticksURI.equals(this.ticksURI);
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
+        b= that.legendPosition.equals(this.legendPosition);
+        if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));

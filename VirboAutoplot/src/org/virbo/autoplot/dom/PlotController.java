@@ -279,6 +279,8 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getYAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
 
+        ac.bind(this.plot, Plot.PROP_LEGENDPOSITION, dasPlot1, DasPlot.PROP_LEGENDPOSITION );
+
         ac.bind(application.getOptions(), Options.PROP_OVERRENDERING, dasPlot1, "overSize");
 
         ac.bind(this.plot, Plot.PROP_VISIBLE, dasPlot1, "visible" );

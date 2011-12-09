@@ -22,6 +22,7 @@ import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.LegendPosition;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
@@ -54,6 +55,7 @@ public class SerializeUtil {
         SerializeRegistry.register( SpectrogramRenderer.RebinnerEnum.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( RenderType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( PlotSymbol.class, new TypeSafeEnumSerializeDelegate() );
+        SerializeRegistry.register( LegendPosition.class, new TypeSafeEnumSerializeDelegate() );
     }
     
     public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
