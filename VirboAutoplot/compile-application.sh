@@ -240,9 +240,16 @@ echo "sign and pack the jar file..."
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
 
-${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16
+if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16; then
+   echo "jarsigner verify failed on pack_gz file!"
+   exit 1
+fi
+
 echo "  verify signed and unpacked jar file..."
-${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -16
+if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -16; then
+   echo "jarsigner verify  failed on pack_gz file!"
+   exit 1
+fi
 
 echo "=== create jnlp file for build..."
 cp src/autoplot.jnlp dist
