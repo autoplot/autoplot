@@ -7,9 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>Craig had out a nice bug where the em offsets in the layout resulted in code 
-                misidentifying overlapping plots, and the layout would be destroyed.  Also outside labels are coming, along with a
-                number of features available below controller nodes in the DOM that are not saved in .vap files.</small></p>
+        <p><small>The contouring routine is used to contour the cookie in the jpeg's saturation space.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -25,6 +23,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <p>Bugfixes:</p>
         <ul>
             <li>3441461: plotx with multiple parameters</li>
+            <li>3399323: Background and foreground colors do not update</li>
+            <li>3449573: code to check for white on white, etc, more aggressively</li>
             <li>3441434: data post processing stays insensitive, basic mode</li>
             <li>3444673: Remote bookmark files can be cached so loading is only done when necessary</li>
             <li>3198392: remote bookmarks loaded immediately and on event thread.  Show local first, then load remote 10sec later</li>
@@ -60,8 +60,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>Initial support for VxOs HELM Events file format</li>
+            <li>3452647: New layout engine to manage inter-plot spacing and margins. (Tools->Fix Layout)</li>
             <li>3446504: separate open file into open vap file and open data file</li>
+            <li>Use events bar when Y(X) has Y with ordinal units.</li>
+            <li>Use digital renderer with Y when Y has ordinal units.</li>
             <li>3154463: restore vap to correct size when loading.  Prompt if the product is too big scale or scrollbars</li>
+            <li>3454475: vap/DOM version 1.08 changes allow ticklen, legend position, cadence check control.</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
@@ -76,7 +81,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>&lt;update check="background"&gt; should speed up launch a little more</li>
             <li>ask before quitting when "close" is pressed and this is the last panel</li>
             <li>popup menus for axis tab show macros like %{RANGE}</li>
-            <li>processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
+            <li>3455548: processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
             <li>values in metadata tab are now the first twenty and last three values</li>
         </ul>
 
