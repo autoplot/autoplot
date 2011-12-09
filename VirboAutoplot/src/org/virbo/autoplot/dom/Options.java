@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Bean for holding AP configuration options
+ * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.
  * @author jbf
  */
 public class Options extends DomNode {
@@ -180,6 +180,34 @@ public class Options extends DomNode {
         this.fillColor = new Color(fillColor.getRGB()); //otherwise can't serialize
         propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
     }
+
+
+    protected String ticklen = "0.66em";
+    public static final String PROP_TICKLEN = "ticklen";
+
+    public String getTicklen() {
+        return ticklen;
+    }
+
+    public void setTicklen(String ticklen) {
+        String oldTicklen = this.ticklen;
+        this.ticklen = ticklen;
+        propertyChangeSupport.firePropertyChange(PROP_TICKLEN, oldTicklen, ticklen);
+    }
+
+    protected boolean flipColorbarLabel = false;
+    public static final String PROP_FLIPCOLORBARLABEL = "flipColorbarLabel";
+
+    public boolean isFlipColorbarLabel() {
+        return flipColorbarLabel;
+    }
+
+    public void setFlipColorbarLabel(boolean flipColorbarLabel) {
+        boolean oldFlipColorbarLabel = this.flipColorbarLabel;
+        this.flipColorbarLabel = flipColorbarLabel;
+        propertyChangeSupport.firePropertyChange(PROP_FLIPCOLORBARLABEL, oldFlipColorbarLabel, flipColorbarLabel);
+    }
+
 
     protected boolean specialEffects = false;
     /**
@@ -384,6 +412,8 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_FILLCOLOR) )this.setFillColor(that.getFillColor());
         if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
         if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
+        if ( !exclude.contains(PROP_FLIPCOLORBARLABEL) ) this.setFlipColorbarLabel(that.isFlipColorbarLabel());
+        if ( !exclude.contains(PROP_TICKLEN) ) this.setTicklen( that.getTicklen() );
     }
 
     @Override
@@ -411,6 +441,10 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
         b = that.isUseTimeRangeEditor() == this.isUseTimeRangeEditor();
         if (!b) result.add(new PropertyChangeDiff(PROP_USE_TIME_RANGE_EDITOR, that.isUseTimeRangeEditor(), this.isUseTimeRangeEditor()));
+        b = that.isFlipColorbarLabel()==this.isFlipColorbarLabel();
+        if (!b) result.add(new PropertyChangeDiff(PROP_FLIPCOLORBARLABEL, that.isFlipColorbarLabel(), this.isFlipColorbarLabel() ));
+        b = that.getTicklen().equals(this.getTicklen() );
+        if (!b) result.add(new PropertyChangeDiff(PROP_TICKLEN, that.getTicklen(), this.getTicklen()));
         return result;
     }
 
@@ -423,6 +457,8 @@ public class Options extends DomNode {
         that.setFillColor( this.getFillColor() );
         that.setCanvasFont( this.getCanvasFont() );
         that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
+        that.setFlipColorbarLabel( this.isFlipColorbarLabel() );
+        that.setTicklen( this.getTicklen() );
         return that;
     }
 

@@ -90,6 +90,9 @@ public class OptionsPrefsController {
         options.setTextAntiAlias ( prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias) );
         options.setDayOfYear( prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear) );
         options.setNearestNeighbor( prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor) );
+        options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
+        options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
+
     }
 
     public void loadPreferences() {
@@ -126,5 +129,7 @@ public class OptionsPrefsController {
         options.textAntiAlias = prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias);
         options.dayOfYear= prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear);
         options.nearestNeighbor= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor);
+        options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
+        options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
     }
 }
