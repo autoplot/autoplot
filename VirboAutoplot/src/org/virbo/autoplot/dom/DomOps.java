@@ -221,11 +221,12 @@ public class DomOps {
      * @return
      */
     private static int lineCount( String s ) {
-        if ( s.trim().length()==0 ) {
-            return 0;
-        } else {
-            return s.split("![cC]").length;
+        String[] ss= s.split("![cC]");
+        int emptyLines=0;
+        while ( emptyLines<ss.length && ss[emptyLines].trim().length()==0 ) {
+            emptyLines++;
         }
+        return ss.length - emptyLines;
     }
 
     /**
