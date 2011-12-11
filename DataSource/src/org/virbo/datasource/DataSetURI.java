@@ -1130,7 +1130,7 @@ public class DataSetURI {
             List<String> files= new LinkedList( Arrays.asList(s2) );
             List<String> saggs= DataSourceUtil.findAggregations( files, true );
             if ( onlyAgg ) {
-                completions.removeAll(completions);
+                completions.clear();
             }
 
             for ( String sagg: saggs ) {
