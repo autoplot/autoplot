@@ -33,6 +33,8 @@ public class ImageDataSourceFactory implements DataSourceFactory {
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "channel=", "channel to extract"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rotate=", "rotate image clockwise in degrees.  Image size is not affected"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "blur=", "apply boxcar blur square kernel"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("channel")) {
@@ -43,6 +45,10 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "hue" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "saturation" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "value" ) );
+            } else if ( paramName.equals("rotate") ) {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0", "rotate image clockwise in degrees" ) );
+            } else if ( paramName.equals("blur") ) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
             }
         }
 

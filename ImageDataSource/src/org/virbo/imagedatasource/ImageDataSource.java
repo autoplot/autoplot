@@ -10,7 +10,12 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifDirectory;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -107,6 +112,39 @@ class ImageDataSource extends AbstractDataSource {
         //BufferedImage image = ImageIO.read(DataSetURI.getFile(uri, mon));
         BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
 
+        String rot= getParam( "rotate", "0" );
+        if ( !rot.equals("0") ) {
+
+            int h= image.getHeight();
+            int w= image.getWidth();
+
+            double drot= Double.parseDouble(rot);
+
+            AffineTransform at= AffineTransform.getTranslateInstance(w/2,h/2);
+            at.concatenate( AffineTransform.getRotateInstance( Math.PI*drot/180 ) );
+            at.concatenate( AffineTransform.getTranslateInstance( -w/2, -h/2) );
+
+            BufferedImage dest= new BufferedImage( w, h, image.getType() );
+
+            ((Graphics2D)dest.getGraphics()).drawImage( image,at, null );
+
+            image= dest;
+        }
+
+        String blur= getParam( "blur", "1" );
+        if ( !blur.equals("1") ) {
+            int iblur= Integer.parseInt(blur);
+            if ( iblur<1 || iblur>51 ) throw new IllegalArgumentException("blur must be between 1 and 51");
+            BufferedImage dest= new BufferedImage( image.getWidth(), image.getHeight(), image.getType() );
+            int n= iblur*iblur;
+            float[] matrix= new float[n];
+            for ( int i=0; i<matrix.length; i++) matrix[i]= 1.0f/n;
+
+            BufferedImageOp op = new ConvolveOp( new Kernel( iblur, iblur, matrix) );
+            BufferedImage blurredImage = op.filter( image, dest );
+
+            image= blurredImage;
+        }
         String channel = params.get("channel");
 
         Color c = null;
