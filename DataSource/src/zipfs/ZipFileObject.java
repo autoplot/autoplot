@@ -105,8 +105,14 @@ public class ZipFileObject extends FileObject {
             throw new IllegalArgumentException("unable to create file "+tmpFile );
         }
 
-        InputStream zStream = zfs.getZipFile().getInputStream(zipEntry);
-        FileSystemUtil.dumpToFile(zStream, tmpFile);
+        InputStream zStream = null;
+        try {
+            zStream= zfs.getZipFile().getInputStream(zipEntry);
+            FileSystemUtil.dumpToFile(zStream, tmpFile);
+        } finally {
+            zStream.close();
+        }
+
         return tmpFile;
     }
 
