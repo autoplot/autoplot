@@ -274,7 +274,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                     ProgressMonitor mon= getMonitor();
                     if (f.reject(surl1,mon)) {
                         if ( f instanceof AggregatingDataSourceFactory ) {
-                            AggregatingDataSourceFactory aggf= (AggregatingDataSourceFactory) f;
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                 try {
                                     String delegateUri= AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl);

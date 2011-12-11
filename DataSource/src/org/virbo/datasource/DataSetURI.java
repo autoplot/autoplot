@@ -433,9 +433,6 @@ public class DataSetURI {
         try {
             URI spath = getWebURL( DataSetURI.toUri(split.path)).toURI();
             FileSystem fs = FileSystem.create(spath);
-            String filename = split.file.substring(split.path.length());
-            if (fs instanceof LocalFileSystem)
-                filename = DataSourceUtil.unescape(filename);
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
                 logger.log(Level.INFO, "downloading file {0}", fo.getNameExt());
@@ -764,12 +761,7 @@ public class DataSetURI {
      * @throws IOException
      */
     public static File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
-        try {
-            URI uri= url.toURI();
-            return getFile( url.toString(), true, mon );
-        } catch ( URISyntaxException ex ) {
-            throw new RuntimeException(ex);
-        }
+        return getFile( url.toString(), true, mon );
     }
     /**
      * get a URI from the string which is believed to be valid.  This was introduced
@@ -982,14 +974,6 @@ public class DataSetURI {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
-        String params = null; // possibly the params, not with question mark.
-        int iq = surl.indexOf("?");
-        if (iq > -1) {
-            int islash = surl.lastIndexOf("/");
-            if (islash <= carotpos) {
-                params = surl.substring(iq + 1);
-            }
-        }
 
         mon.setLabel("getting remote listing");
 
@@ -1042,14 +1026,6 @@ public class DataSetURI {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
-        String params = null; // possibly the params, not with question mark.
-        int iq = surl.indexOf("?");
-        if (iq > -1) {
-            int islash = surl.lastIndexOf("/");
-            if (islash <= carotpos) {
-                params = surl.substring(iq + 1);
-            }
-        }
 
         mon.setLabel("getting remote listing");
 

@@ -62,7 +62,7 @@ public class DataSetSelectorSupport {
                 String t = f.toString();
                 if (t==null ) {
                     System.err.println("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
-                    t= "" + f;
+                    //t= "" + f; // TODO: do we still get this?
                     return false;
                 }
                 return t.endsWith(".vap");
@@ -109,7 +109,7 @@ public class DataSetSelectorSupport {
                 String t = f.toString();
                 if (t==null ) {
                     System.err.println("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
-                    t= "" + f;
+                    //t= "" + f;  //TODO: do we still get this?
                     return false;
                 }
                 String ext = DataSetURI.getExt(t);
