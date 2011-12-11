@@ -221,7 +221,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         directory = toCanonicalFolderName(directory);
 
         File f= new File(localRoot, directory + ".listing");
-        if ( ! f.delete() ) {
+        if ( f.exists() && ! f.delete() ) {
             throw new IllegalArgumentException("unable to delete .listing file: "+f);
         }
         
