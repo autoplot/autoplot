@@ -133,8 +133,10 @@ public class FtpFileObject extends WebFileObject {
      * returns an output stream that writes to a local file in the file cache, then
      * sends over the result when it is closed.  So this will not work with applets,
      * but this is no big deal.
+     *
+     * Note that the file MUST BE CLOSED.  This is where it is uploaded to the FTP server.
      * 
-     * @param append
+     * @param append Append to the remote file.  We append to the local copy before uploading it.
      * @return
      */
     public OutputStream getOutputStream( boolean append ) throws IOException {
@@ -150,14 +152,9 @@ public class FtpFileObject extends WebFileObject {
         try {
             return new FileOutputStream(getLocalFile(),append) {
                 @Override
-                public void close() {
-                    try {
-                        super.close();
-                        System.err.println("closing");
-                        ftpfs.uploadFile( getNameExt(), getLocalFile(), new NullProgressMonitor() );
-                    } catch ( IOException ex ) {
-                        ex.printStackTrace();
-                    }
+                public void close() throws IOException {
+                    super.close();
+                    ftpfs.uploadFile( getNameExt(), getLocalFile(), new NullProgressMonitor() );
                 }
             };
         } catch ( IOException ex ) {
