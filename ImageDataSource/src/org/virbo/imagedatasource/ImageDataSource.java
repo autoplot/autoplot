@@ -120,9 +120,9 @@ class ImageDataSource extends AbstractDataSource {
 
             double drot= Double.parseDouble(rot);
 
-            AffineTransform at= AffineTransform.getTranslateInstance(w/2,h/2);
+            AffineTransform at= AffineTransform.getTranslateInstance( w/2., h/2. );
             at.concatenate( AffineTransform.getRotateInstance( Math.PI*drot/180 ) );
-            at.concatenate( AffineTransform.getTranslateInstance( -w/2, -h/2) );
+            at.concatenate( AffineTransform.getTranslateInstance( -w/2., -h/2.) );
 
             BufferedImage dest= new BufferedImage( w, h, image.getType() );
 
