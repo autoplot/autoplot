@@ -329,9 +329,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
 
                 String ss = bean.getDirectoryContentAsString();
-                FileWriter fw = new FileWriter(listingt);
-                fw.write(ss);
-                fw.close();
+                FileWriter fw=null;
+                try {
+                    fw= new FileWriter(listingt);
+                    fw.write(ss);
+                } finally {
+                    if ( fw!=null ) fw.close();
+                }
 
                 if ( ! listingt.renameTo(listing) ) {
                     throw new IllegalArgumentException("unable to rename file "+listingt+ " to "+ listing );
@@ -566,7 +570,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             if (is != null) {
                 is.close();
             }
-            if ( !partFile.delete() ) {
+            if ( partFile.exists() && !partFile.delete() ) {
                 throw new IllegalArgumentException("unable to delete file "+partFile);
             }
             throw e;
