@@ -1372,6 +1372,9 @@ public class FtpBean
             line = in.readLine();
             if(!checkReply(line))
                 break;
+            if ( line.contains("Transfer complete") ) {
+                break;
+            }
             replymessage = replymessage.concat(line).concat("\n");
         } while(true);
         setReplyMessage(replymessage);
