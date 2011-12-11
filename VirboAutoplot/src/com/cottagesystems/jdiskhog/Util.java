@@ -33,7 +33,7 @@ public class Util {
             if (children[i].isDirectory()) {
                 success = success && deleteFileTree(children[i]);
             } else {
-                success = success && children[i].delete();
+                success = success && ( !children[i].exists() || children[i].delete() );
                 if (!success) {
                     throw new IllegalArgumentException("unable to delete file " + children[i]);
                 }
