@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
 import org.das2.datum.UnitsUtil;
@@ -43,7 +44,6 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -62,7 +62,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
     /**
      * if non-null, then this is used to parse the times.  For a fixed-column parser, a field
-     * handler is added to the parser.  For delim parser, then the
+     * handler is added to the parser.  
      */
     TimeParser timeParser;
     /**
@@ -79,7 +79,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     int timeColumn = -1;
     DDataSet ds = null;
     /**
-     * non-null indicates the columns should be interpretted as rank2.  rank2[0] is first column, rank2[1] is last column exclusive.
+     * non-null indicates the columns should be interpreted as rank2.  rank2[0] is first column, rank2[1] is last column exclusive.
      */
     int[] rank2 = null;
 
@@ -213,7 +213,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, null );
                 if ( cadence!=null && !"log".equals( cadence.property(QDataSet.SCALE_TYPE) ) ) {
                     double add= cadence.value()/2; //DANGER--should really check units.
-                    logger.fine("adding half-interval width to dep0 because of "+PARAM_INTERVAL_TAG+": "+cadence);
+                    logger.log( Level.FINE, "adding half-interval width to dep0 because of %s: %s", new Object[] { PARAM_INTERVAL_TAG, cadence } );
                     for ( int i=0; i<dep0.length(); i++ ) {
                         dep0.putValue( i, dep0.value(i)+add );
                     }
