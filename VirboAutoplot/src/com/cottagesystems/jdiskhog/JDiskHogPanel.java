@@ -63,7 +63,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                         continue;
                     }
                     if (f.isFile()) {
-                        okay = f.delete();
+                        if ( f.exists() ) {
+                            okay = f.delete();
+                        }
                     } else {
                         try {
                             okay = Util.deleteFileTree(f);
