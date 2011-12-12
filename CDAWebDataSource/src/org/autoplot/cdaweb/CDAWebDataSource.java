@@ -170,13 +170,14 @@ public class CDAWebDataSource extends AbstractDataSource {
                             Map<String,String> fileParams= new HashMap(getParams());
                             fileParams.remove( PARAM_TIMERANGE );
                             fileParams.remove( PARAM_DS );
+                            fileParams.put( PARAM_ID, comp );
                             URI file1;
                             if ( webService ) {
                                 file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
                             } else {
                                 file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                             }
-                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( file1 + "?" + comp ) );
+                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                             ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                             comps.add( ds1 );
                             nc++;
