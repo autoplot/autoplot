@@ -388,6 +388,9 @@ public abstract class Bookmark {
         if ( vers==null ) {
             vers= root.getAttribute("version");
         }
+        if ( ! root.getNodeName().equals("bookmark-list") ) {
+            throw new IllegalArgumentException( String.format( "Expected XML element to be \"bookmark-list\" not \"%s\"", root.getNodeName() ) );
+        }
         ArrayList<Bookmark> result = new ArrayList<Bookmark>();
         NodeList list = root.getChildNodes();
         Bookmark lastBook=null;
