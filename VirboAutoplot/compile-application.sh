@@ -226,27 +226,33 @@ cd ..
 
 echo "done make jumbo jar files..."
 
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
 echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
+${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
 
-echo "sign and pack the jar file..."
+echo "=== sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
 if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
    echo "Fail to sign resources!"
    exit 1
 fi
 
-echo "sign and pack the jar file..."
+echo "=== verify the jar file..."
+${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
+
+echo "=== sign and pack the jar file..."
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
 
-if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16; then
+if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
    echo "jarsigner verify failed on pack_gz file!"
    exit 1
 fi
 
-echo "  verify signed and unpacked jar file..."
-if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -16; then
+echo "=== verify signed and unpacked jar file..."
+if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
    echo "jarsigner verify  failed on pack_gz file!"
    exit 1
 fi
