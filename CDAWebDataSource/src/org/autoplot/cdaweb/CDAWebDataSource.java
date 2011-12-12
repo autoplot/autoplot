@@ -167,7 +167,16 @@ public class CDAWebDataSource extends AbstractDataSource {
                     if ( function!=null ) {
                         String comp= (String)metadata.get( "COMPONENT_"  + nc );
                         while ( comp!=null ) {
-                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( file + "?" + comp ) );
+                            Map<String,String> fileParams= new HashMap(getParams());
+                            fileParams.remove( PARAM_TIMERANGE );
+                            fileParams.remove( PARAM_DS );
+                            URI file1;
+                            if ( webService ) {
+                                file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                            } else {
+                                file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
+                            }
+                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( file1 + "?" + comp ) );
                             ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                             comps.add( ds1 );
                             nc++;
@@ -183,7 +192,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
                     }
                 } else {
-                    Map<String,String> fileParams= getParams();
+                    Map<String,String> fileParams= new HashMap(getParams());
                     fileParams.remove( PARAM_TIMERANGE );
                     fileParams.remove( PARAM_DS );
                     URI file1;
