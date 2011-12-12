@@ -228,6 +228,7 @@ echo "done make jumbo jar files..."
 
 # See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
 # See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
+# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
 echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
