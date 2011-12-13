@@ -62,8 +62,8 @@ public class BindingSupport {
                             System.err.println("this is that bad state!");
                         }
                     } else {
-                        if ( Thread.currentThread().getStackTrace().length>70 ) {
-                            System.err.println("Problem detected in stack trace, circular call");
+                        if ( Thread.currentThread().getStackTrace().length>100 ) {
+                            System.err.println("Problem detected in stack trace, circular call indicated by stackTraceLength>100");
                             return; // put an end to it so it doesn't crash
                         }
                         if (forward) {
