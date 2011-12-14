@@ -32,6 +32,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -494,7 +495,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                                 continue;
                             }
                         }
-                        
+
                         //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
                         if (depDs.rank() == 2 && depDs.length(0) == 2) {
                             MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
@@ -515,7 +516,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 //                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
 //                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
 //                            }
-                        }
+            }
 
                         if ( "Data_No".equals( depName ) ) {
                             // kludge for UIowa Radio and Plasma Wave Group.
@@ -529,7 +530,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                                     deltaT = cdf.get1D(deltaTVar.getName())[0];
                                 } catch (Throwable ex) {
                                     throw new RuntimeException(ex);
-                                }
+        }
                                 depDs= DDataSet.maybeCopy( Ops.multiply( DataSetUtil.asDataSet(deltaT), depDs ) );
                                 depDs.putProperty(QDataSet.TITLE, "time offset");
                                 try {
@@ -676,5 +677,85 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
         }
         return attributes;
+    }
+
+    private QDataSet labelToBundleDs( QDataSet depDs ) {
+        IDataSet result= IDataSet.createRank2(depDs.length(),1);
+
+        Units u= (Units) depDs.property(QDataSet.UNITS);
+        for ( int i=0; i<depDs.length(); i++ ) {
+            String labl1=  u.createDatum(depDs.value()).toString();
+            result.putProperty( "LABEL__"+i, labl1 );
+            result.putProperty( "NAME__"+i, Ops.safeName(labl1) );
+            result.putValue( i, 0, 1 );
+        }
+        return result;
+
+    }
+
+    private void newDepLogic( CDF cdf, Variable variable, String constraints, Map<String, Object> thisAttributes, int idep, MutablePropertyDataSet result ) throws Exception {
+
+        Map<String,Object> dep= (Map<String, Object>) thisAttributes.get("DEPEND_"+idep);
+        String labl = (String) thisAttributes.get("LABL_PTR_" + idep);  // DANGER--this will probably change from String to Map.
+        if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + idep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+
+        if ( dep!=null ) {
+            String depName= (String)dep.get("NAME");
+            boolean reformDep= idep > 0;  // make a rank 2 [1,ny] into rank 1 [ny]
+            if ( reformDep && cdf.getVariable( depName ).recordVariance() ) {
+                reformDep= false;
+            }
+
+            MutablePropertyDataSet depDs = wrapDataSet( cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, null );
+
+            if ( idep>0 && reformDep==false && depDs.length()==1 && variable.getNumberOfValues()>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
+                depDs= (MutablePropertyDataSet)depDs.slice(0);
+                //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
+            }
+            if ( idep==0 ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
+                if ( depDs.length()!=result.length() && result.length()==1 ) {
+                    return;
+                }
+            }
+
+            //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
+            if (depDs.rank() == 2 && depDs.length(0) == 2) {
+                MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
+                QDataSet binmax = DataSetOps.slice1(depDs, 1);
+                QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
+                depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
+                depDs = depDs1;
+            }
+
+            if (DataSetUtil.isMonotonic(depDs)) {
+                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+            } else {
+//                            if (sidep == 0) {
+//                                logger.info("sorting dep0 to make depend0 monotonic");
+//                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
+//                                result = DataSetOps.applyIndex(result, idep, sort, false);
+//                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
+//                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+//                            }
+            }
+
+
+            result.putProperty("DEPEND_" + idep, depDs);
+
+        }
+
+        if ( labl!=null ) {
+            try {
+                if ( cdf.getVariable(labl)==null ) {
+                    throw new IllegalArgumentException("no such variable: "+labl+" referred to by variable: "+ variable.getName() );
+                }
+                MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                QDataSet bds= labelToBundleDs( depDs );
+                result.putProperty("BUNDLE_" + idep, bds );
+            } catch (Exception e) {
+                e.printStackTrace(); // to support lanl.
+            }
+        }
     }
 }
