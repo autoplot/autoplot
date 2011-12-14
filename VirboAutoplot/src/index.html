@@ -22,6 +22,17 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix: circular call detector depth=70 was too shallow, sometimes it's actually that deep.  New limit is 100.</li>
+            <li>bugfix: code in QStream StreamDescriptor seemed to imply that native byte order was the default for the stream, it should be little_endian.  </li>
+            <li>3458256: virtual variables would use the wrong filename</li>
+            <li>3454451: ArrayIndexOutOfBoundsException sequence Bob noticed.  check bounds</li>
+            <li>ASCII file reader left open an input stream, causing problems with long IDL batch processes.</li>
+            <li>3454378: old code reseting link thickness and symbol size removed from in autorange.</li>
+            <li>3398551: bug in bug reporting system meant that only the linenumber was used to create the hash.</li>
+            <li>3002087: ds= dom.controller.getDataSourceFilter().controller.<COMP>.</li>
+            <li>3380223: hourglass cursor icon after inspect icon.  reset to normal cursor in finally block.  Scott B at Iowa observed that if the resource is not found then the hourglass is left on.
+            <li>bugfix: don't show last URI from history when starting. </li>
+            <li>3448593: I now need to reset the size for use within scripts, and I had a typo in the setSize( getWidth(), getWidth() )</li>
             <li>3441461: plotx with multiple parameters</li>
             <li>3399323: Background and foreground colors do not update</li>
             <li>3449573: code to check for white on white, etc, more aggressively</li>
@@ -60,6 +71,11 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>more findbugs code cleanup.</li>
+            <li>vap 1.07 contains options.ticklen, options.flipColorbarLabel, plotElement.cadenceCheck, plot.legendPosition</li>
+            <li>more datasets plotted as we detect event lists</li>
+            <li>add blur and rotate parameters to image reader as Jeremy was playing</li>
+            <li>add checkbox for hiding xaxis label</li>
             <li>Initial support for VxOs HELM Events file format</li>
             <li>3452647: New layout engine to manage inter-plot spacing and margins. (Tools->Fix Layout)</li>
             <li>3446504: separate open file into open vap file and open data file</li>
