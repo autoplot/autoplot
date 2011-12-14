@@ -248,13 +248,13 @@ ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile
 ${JAVA5_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
 
 if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
-   echo "jarsigner verify failed on pack_gz file!"
+   echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
    exit 1
 fi
 
 echo "=== verify signed and unpacked jar file..."
 if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
-   echo "jarsigner verify  failed on pack_gz file!"
+   echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
    exit 1
 fi
 
