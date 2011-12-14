@@ -1088,6 +1088,7 @@ public class AutoplotUtil {
 
     /**
      * See DataSource org.virbo.datasource.DataSourceUtil.guessRenderType, which will become the official version.
+     * See http://autoplot.org/developer.guessRenderType
      * @param fillds
      * @return
      */
