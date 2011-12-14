@@ -115,6 +115,9 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=org.virbo.datasource.DataSourceEditorPanel.extensions
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
+file=org.virbo.datasource.DataSourceFormatEditorPanel.extensions
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
+
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
@@ -202,6 +205,11 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceF
 done
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+   echo ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+done
+cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
    if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
