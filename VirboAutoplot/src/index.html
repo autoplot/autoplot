@@ -22,6 +22,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix: Format editor panels were not being loaded into release.</li>
             <li>bugfix: circular call detector depth=70 was too shallow, sometimes it's actually that deep.  New limit is 100.</li>
             <li>bugfix: code in QStream StreamDescriptor seemed to imply that native byte order was the default for the stream, it should be little_endian.  </li>
             <li>3458256: virtual variables would use the wrong filename</li>
