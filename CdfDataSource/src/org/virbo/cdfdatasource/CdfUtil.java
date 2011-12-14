@@ -894,10 +894,14 @@ public class CdfUtil {
         for (int i=0; i<v.size(); i++ ) {
             Variable var = (Variable) v.get(i);
             if ( dataOnly ) {
-               if ( hasEntry( varType, var ) ) {
-                   Entry varTypeEntry= varType.getEntry( var );
-                   if ( !( String.valueOf( varTypeEntry.getData() ).equals( VAR_TYPE_DATA ) ) ) {
-                       skipCount++;
+                if ( varType==null ) {
+                    skipCount++;
+                } else {
+                   if ( hasEntry( varType, var ) ) {
+                       Entry varTypeEntry= varType.getEntry( var );
+                       if ( !( String.valueOf( varTypeEntry.getData() ).equals( VAR_TYPE_DATA ) ) ) {
+                           skipCount++;
+                       }
                    }
                 }
             }
