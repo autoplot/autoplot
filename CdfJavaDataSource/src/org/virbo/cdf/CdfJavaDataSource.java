@@ -256,10 +256,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_1, null );
                 result.putProperty( QDataSet.DEPEND_2, null );
                 result.putProperty( QDataSet.DEPEND_3, null );
-                attr1.remove( "DEPEND_0" );
-                attr1.remove( "DEPEND_1" );
-                attr1.remove( "DEPEND_2" );
-                attr1.remove( "DEPEND_3" );
+                if ( attr1!=null ) {
+                    attr1.remove( "DEPEND_0" );
+                    attr1.remove( "DEPEND_1" );
+                    attr1.remove( "DEPEND_2" );
+                    attr1.remove( "DEPEND_3" );
+                }
             }
 
             if (!"no".equals(interpMeta)) {
