@@ -130,12 +130,22 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     }
 
     Action getCopyToAction(final JTree jtree) {
+        FSTreeModel model = (FSTreeModel) jtree.getModel();
+        TreePath[] paths = jtree.getSelectionPaths();
+        final File f;
+        if ( paths!=null && paths.length==1 ) {
+            f= model.getFile(paths[0]);
+        } else {
+            f= null;
+        }
         return new AbstractAction("Copy To...") {
 
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setCurrentDirectory( new File("foo").getParentFile() ); //http://www.rgagnon.com/javadetails/java-0370.html
+                File p=  new File("foo").getAbsoluteFile().getParentFile();
+                chooser.setCurrentDirectory( p ); //http://www.rgagnon.com/javadetails/java-0370.html
+                if ( f!=null ) chooser.setSelectedFile( new File(p,f.getName() ) );
                 chooser.setAcceptAllFileFilterUsed(false);
                 if (chooser.showSaveDialog(jtree) == JFileChooser.APPROVE_OPTION) {
                     File destdir = chooser.getSelectedFile();
@@ -143,6 +153,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                     FSTreeModel model = (FSTreeModel) jtree.getModel();
 
                     TreePath[] paths = jtree.getSelectionPaths();
+                    if ( paths==null ) return;
 
                     for (int i = 0; i < paths.length; i++) {
                         File f = model.getFile(paths[i]);
