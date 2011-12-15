@@ -146,10 +146,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_1, null );
                 result.putProperty( QDataSet.DEPEND_2, null );
                 result.putProperty( QDataSet.DEPEND_3, null );
-                attributes.remove( "DEPEND_0" );
-                attributes.remove( "DEPEND_1" );
-                attributes.remove( "DEPEND_2" );
-                attributes.remove( "DEPEND_3" );
+                if ( attributes!=null ) {
+                    attributes.remove( "DEPEND_0" );
+                    attributes.remove( "DEPEND_1" );
+                    attributes.remove( "DEPEND_2" );
+                    attributes.remove( "DEPEND_3" );
+                }
             }
 
             if (!"no".equals(interpMeta)) {
