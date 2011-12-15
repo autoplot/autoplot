@@ -556,57 +556,11 @@ public class CdfUtil {
         String[] v = cdf.getVariableNames();
         logger.log(Level.FINE, "got {0} variables", v.length);
 
-        Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
-        Attribute blAttr = null, clAttr = null, dlAttr = null;
-
-        Attribute catDesc = null;
-        Attribute varNotes= null;
         Attribute virtual= null;
-        Attribute function= null;
 
         logger.fine("getting CDF attributes");
         try {
-            aAttr = (Attribute) cdf.getAttribute("DEPEND_0");
-        } catch (Exception ex) {
-        }
-        try {
-            bAttr = (Attribute) cdf.getAttribute("DEPEND_1");  // check for PB5, Vectors
-        } catch (Exception e) {
-        }
-        try {
-            cAttr = (Attribute) cdf.getAttribute("DEPEND_2");  // check for too many dimensions
-        } catch (Exception e) {
-        }
-        try {
-            dAttr = (Attribute) cdf.getAttribute("DEPEND_3");  // check for too many dimensions
-        } catch (Exception e) {
-        }
-        try {
-            blAttr = (Attribute) cdf.getAttribute("LABL_PTR_1");
-        } catch (Exception e) {
-        }
-        try {
-            clAttr = (Attribute) cdf.getAttribute("LABL_PTR_2");  // check for too many dimensions
-        } catch (Exception e) {
-        }
-        try {
-            dlAttr = (Attribute) cdf.getAttribute("LABL_PTR_3");  // check for too many dimensions
-        } catch (Exception e) {
-        }
-        try {
-            catDesc = (Attribute) cdf.getAttribute("CATDESC");
-        } catch (Exception e) {
-        }
-        try {
-            varNotes= (Attribute) cdf.getAttribute("VAR_NOTES");
-        } catch (Exception e) {
-        }
-        try {
             virtual= (Attribute) cdf.getAttribute("VIRTUAL");
-        } catch (Exception e) {
-        }
-        try {
-            function= (Attribute) cdf.getAttribute("FUNCTION"); //TODO: need to support CDF Virtual vars
         } catch (Exception e) {
         }
 
@@ -635,7 +589,7 @@ public class CdfUtil {
 
             List<String> warn= new ArrayList();
 
-            long maxRec = var.getNumberOfValues(); //TODO: might be off by one.
+            long maxRec = var.getNumberOfValues(); 
 
             int rank;
             int[] dims = var.getDimensions();
@@ -657,11 +611,6 @@ public class CdfUtil {
                 continue;
             }
 
-          //  if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) ) {
-          //      logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
-          //      continue;
-          //  }
-
             if ( var.getName().equals("Time_PB5") ) {
                 logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", var.getName());
                 continue;
@@ -681,11 +630,11 @@ public class CdfUtil {
                 Variable xDependVariable = null;
                 long xMaxRec = -1;
                 Variable yDependVariable = null;
-                long yMaxRec = -1;
+                long yNumRec = -1;
                 Variable zDependVariable = null;
-                long zMaxRec = -1;
+                long zNumRec = -1;
                 Variable z1DependVariable = null;
-                long z1MaxRec = -1;
+                long z1NumRec = -1;
                 String scatDesc = null;
                 String svarNotes = null;
                 try {
@@ -750,11 +699,11 @@ public class CdfUtil {
                         if ( att!=null && rank>1 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            yMaxRec = yDependVariable.getNumberOfValues();
-                            if (yMaxRec == 1) {
-                                yMaxRec = yDependVariable.getDimensions()[0] - 1;  //TODO: check
+                            yNumRec = yDependVariable.getNumberOfValues();
+                            if (yNumRec == 1) {
+                                yNumRec = yDependVariable.getDimensions()[0] - 1;  //TODO: check
                             }
-                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
+                            if ( dims.length>0 && (yNumRec)!=dims[0] ) {
                                 warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
                             }
                         }
@@ -764,16 +713,16 @@ public class CdfUtil {
                 }
 
                 try {
-                    if ( yMaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_1" ) ) {  // check for metadata for LABL_PTR_1
+                    if ( yNumRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_1" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_1" );
                         if ( att!=null && rank>1  ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            yMaxRec = yDependVariable.getNumberOfValues();
-                            if (yMaxRec == 1) {
-                                yMaxRec = yDependVariable.getDimensions()[0] - 1;
+                            yNumRec = yDependVariable.getNumberOfValues();
+                            if (yNumRec == 1) {
+                                yNumRec = yDependVariable.getDimensions()[0] - 1;
                             }
-                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
+                            if ( dims.length>0 && (yNumRec)!=dims[0] ) {
                                 warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
                             }
                         }
@@ -788,9 +737,9 @@ public class CdfUtil {
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            zMaxRec = zDependVariable.getNumberOfValues();
-                            if (zMaxRec == 1) {
-                                zMaxRec = zDependVariable.getDimensions()[0] - 1; //TODO: check
+                            zNumRec = zDependVariable.getNumberOfValues();
+                            if (zNumRec == 1) {
+                                zNumRec = zDependVariable.getDimensions()[0] - 1; //TODO: check
                             }
                         }
                     }
@@ -799,14 +748,14 @@ public class CdfUtil {
                 }
 
                 try {
-                    if ( zMaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_2" ) ) {  // check for metadata for LABL_PTR_1
+                    if ( zNumRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_2" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_2" );
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            zMaxRec = zDependVariable.getNumberOfValues();
-                            if (zMaxRec == 0) {
-                                zMaxRec = zDependVariable.getDimensions()[0] - 1;
+                            zNumRec = zDependVariable.getNumberOfValues();
+                            if (zNumRec == 0) {
+                                zNumRec = zDependVariable.getDimensions()[0] - 1;
                             }
                         }
                     }
@@ -819,9 +768,9 @@ public class CdfUtil {
                         if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_3 entry for {0}", var.getName());
                             z1DependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            z1MaxRec = z1DependVariable.getNumberOfValues();
-                            if (z1MaxRec == 1) {
-                                z1MaxRec = z1DependVariable.getDimensions()[0] - 1; //TODO: check
+                            z1NumRec = z1DependVariable.getNumberOfValues();
+                            if (z1NumRec == 1) {
+                                z1NumRec = z1DependVariable.getDimensions()[0] - 1; //TODO: check
                             }
                         }
                     }
@@ -830,14 +779,14 @@ public class CdfUtil {
                 }
 
                 try {
-                    if ( z1MaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_3" ) ) {  // check for metadata for LABL_PTR_1
+                    if ( z1NumRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_3" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_3" );
                         if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_3 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
-                            z1MaxRec = zDependVariable.getNumberOfValues();
-                            if (z1MaxRec == 0) {
-                                z1MaxRec = zDependVariable.getDimensions()[0] - 1;
+                            z1NumRec = zDependVariable.getNumberOfValues();
+                            if (z1NumRec == 0) {
+                                z1NumRec = zDependVariable.getDimensions()[0] - 1;
                             }
                         }
                     }
@@ -858,18 +807,18 @@ public class CdfUtil {
                     }
                 }
 
-                String desc = "" + var.getName();
+                String desc = var.getName();
                 if (xDependVariable != null) {
                     desc += "(" + xDependVariable.getName();
                     if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
                          desc+= "=" + (xMaxRec);
                     }
                     if (yDependVariable != null) {
-                        desc += "," + yDependVariable.getName() + "=" + (yMaxRec + 1);
+                        desc += "," + yDependVariable.getName() + "=" + (yNumRec);
                         if (zDependVariable != null) {
-                            desc += "," + zDependVariable.getName() + "=" + (zMaxRec + 1);
+                            desc += "," + zDependVariable.getName() + "=" + (zNumRec);
                             if (z1DependVariable != null) {
-                                desc += "," + z1DependVariable.getName() + "=" + (z1MaxRec + 1);
+                                desc += "," + z1DependVariable.getName() + "=" + (z1NumRec);
                             }
                         }
                     } else if ( rank>1 ) {
@@ -881,7 +830,6 @@ public class CdfUtil {
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                    StringBuilder sdims= new StringBuilder();
                     String recDesc= ""+ CdfUtil.getStringDataType(var.getType());
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
