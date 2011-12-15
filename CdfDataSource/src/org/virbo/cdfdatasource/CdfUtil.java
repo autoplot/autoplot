@@ -1008,7 +1008,7 @@ public class CdfUtil {
                         xMaxRec = xDependVariable.getMaxWrittenRecord();
                         if ( xMaxRec!=maxRec ) {
                             if ( maxRec==-1 ) maxRec+=1; //why?
-                            warn.add("depend0 length is inconsistent with length ("+maxRec+")" );
+                            warn.add("depend0 length is inconsistent with length ("+(maxRec+1)+")" );
                             //TODO: warnings are incorrect for Themis data.
                         }
                     }
