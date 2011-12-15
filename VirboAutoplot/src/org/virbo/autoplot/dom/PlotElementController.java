@@ -186,7 +186,19 @@ public class PlotElementController extends DomNodeController {
                 } else {
                     if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                         resetRanges= true;
-                        resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
+                        if ( plotElement.getComponent().equals("") ) {
+                            resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
+                        } else {
+                            QDataSet sliceDs= getDataSet();
+                            if ( sliceDs==null ) {
+                                System.err.println("sliceDs was null where it was expected to be non-null."); //TODO: evaluate if this ever happens.
+                                sliceDs= getDataSourceFilter().getController().getFillDataSet();
+                                plotElement.setComponent("");
+                                resetPlotElement(sliceDs,plotElement.getRenderType());
+                            } else {
+                                resetPlotElement( sliceDs, plotElement.getRenderType()); // I'm assuming that getDataSet() has been set already, which should be the case.
+                            }
+                        }
                     } else {
                         doResetRenderType(newRenderType);
                         updateDataSet();
@@ -381,6 +393,7 @@ public class PlotElementController extends DomNodeController {
             }
         }
         if (c.length() > 5 && c.startsWith("|")) {
+            logger.log( Level.FINE, "component={0}", c);
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
                 synchronized (this) {
@@ -606,6 +619,27 @@ public class PlotElementController extends DomNodeController {
         }
 
     };
+
+    /**
+     * indicate if changing slice index should result in autoranging being redone.  Presently, this is done when the
+     * dimension we're slicing is nominal (ordinal).
+     * @param fillDs
+     * @param component
+     * @return
+     * @throws NumberFormatException
+     */
+    private boolean sliceShouldAutorange(QDataSet fillDs, String component) throws NumberFormatException {
+        Units[] us = getDimensionUnits(fillDs);
+        Pattern p = Pattern.compile("\\|slice(\\d)\\(\\d+\\)");
+        Matcher m = p.matcher(component);
+        if (m.matches()) {
+            int dim = Integer.parseInt(m.group(1));
+            if (UnitsUtil.isNominalMeasurement(us[dim])) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * get the dataset from the dataSourceFilter, and plot it possibly after
@@ -959,15 +993,7 @@ public class PlotElementController extends DomNodeController {
 
             if ( shouldSlice ) {
                 String component= guessSlice( fillDs );
-                Units[] us= getDimensionUnits(fillDs);
-                Pattern p= Pattern.compile("\\|slice(\\d)\\(\\d+\\)");
-                Matcher m= p.matcher(component);
-                if ( m.matches() ) {
-                    int dim= Integer.parseInt( m.group(1) );
-                    if ( UnitsUtil.isNominalMeasurement(us[dim]) ) {
-                        setSliceAutoranges(true);
-                    }
-                }
+                setSliceAutoranges( sliceShouldAutorange(fillDs, component) );
                 String existingComponent= plotElement.getComponent();
                 if ( !existingComponent.equals("") ) {
                     plotElement.setComponentAutomatically( existingComponent + component );
