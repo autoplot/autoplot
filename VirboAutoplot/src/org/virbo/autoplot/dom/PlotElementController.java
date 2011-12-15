@@ -191,10 +191,9 @@ public class PlotElementController extends DomNodeController {
                         } else {
                             QDataSet sliceDs= getDataSet();
                             if ( sliceDs==null ) {
-                                System.err.println("sliceDs was null where it was expected to be non-null."); //TODO: evaluate if this ever happens.
-                                sliceDs= getDataSourceFilter().getController().getFillDataSet();
-                                plotElement.setComponent("");
-                                resetPlotElement(sliceDs,plotElement.getRenderType());
+                                // This happens when we load a vap.
+                                sliceDs= getDataSourceFilter().getController().getFillDataSet(); // Since this is null, I suspect we can do the same behavior in either case.
+                                resetPlotElement( sliceDs, plotElement.getRenderType() );
                             } else {
                                 resetPlotElement( sliceDs, plotElement.getRenderType()); // I'm assuming that getDataSet() has been set already, which should be the case.
                             }
