@@ -21,6 +21,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.das2.dataset.NoDataInIntervalException;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -39,7 +40,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException, NoDataInIntervalException {
 
         InputStream in = DataSetURI.getInputStream(uri, mon);
 
@@ -66,6 +67,8 @@ public class Das2StreamDataSource extends AbstractDataSource {
                             throw new HtmlResponseIOException( "Expected QStream but got html: "+resp, DataSetURI.getWebURL(uri) );
                         } 
                     }
+                } else if ( se.getMessage().equals("NoDataInInterval") ) {
+                    throw new NoDataInIntervalException(se.getMessage());
                 }
                 throw se;
             }
