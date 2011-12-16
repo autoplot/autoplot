@@ -1093,6 +1093,15 @@ public class DataSourceController extends DomNodeController {
     }
     
     /**
+     * support legacy.  reloadAllUris.jy calls this.
+     * @param x
+     * @param y
+     */
+    public synchronized void update( final boolean autorange, final boolean interpretMeta ) {
+        update();
+    }
+
+    /**
      * update the model and view using the new DataSource to create a new dataset,
      * then inspecting the dataset to decide on axis settings.
      *
