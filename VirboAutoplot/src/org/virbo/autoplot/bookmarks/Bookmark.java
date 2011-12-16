@@ -179,7 +179,7 @@ public abstract class Bookmark {
         if (nl.getLength()>0 ) {
             if ( !nl.item(0).hasChildNodes() ) {
                 if ( uri==null ) {
-                    throw new IllegalArgumentException("bookmark has empty title");
+                    title= "(untitled)";
                 } else {
                     System.err.println("Using URI for title because title is empty: "+uri );
                     title= uri;
@@ -189,7 +189,7 @@ public abstract class Bookmark {
                 title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
             }
         } else {
-            throw new IllegalArgumentException("bookmark has no title");
+            title= "(untitled)";
         }
 
         nl = ((Element) element).getElementsByTagName("icon");
