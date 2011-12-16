@@ -55,7 +55,7 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         } else if ( data.rank()==2 ) {
             col+= data.length(0);
         } else {
-            throw new IllegalArgumentException("rank limit");
+            throw new IllegalArgumentException("rank limit, data must be rank 1 or rank 2");
         }
         dss= ldss.toArray( new QDataSet[ldss.size()] );
         wdss= lwdss.toArray( new QDataSet[lwdss.size()] );
