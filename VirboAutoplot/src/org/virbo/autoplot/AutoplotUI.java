@@ -925,6 +925,32 @@ public class AutoplotUI extends javax.swing.JFrame {
         return result;
     }
 
+    private void fillAddDataFromMenuImmediately(final List<String> exts) {
+        addDataFromMenu.removeAll();
+        for ( String ext: exts ) {
+            if ( ext.startsWith(".") ) ext= ext.substring(1);
+            final String fext= ext;
+            Action a= new AbstractAction( ext ) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        String uri = "vap+" + fext + ":";
+                        String refuri= (String) dataSetSelector.getEditor().getText();
+                        if ( refuri.startsWith(uri) ) {
+                            dataSetSelector.browseSourceType();
+                        } else {
+                            dataSetSelector.setValue(uri);
+                            dataSetSelector.maybePlot( true );
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            JMenuItem item= new JMenuItem( a );
+            addDataFromMenu.add(item);
+        }
+    }
+    
     /**
      * look up the discoverable extensions--the sources that can be added with
      * just "vap+<ext>:" because we can enter a GUI right away.  This should be
@@ -934,30 +960,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         final List<String> exts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
         Runnable run= new Runnable() {
             public void run() {
-                addDataFromMenu.removeAll();
-                for ( String ext: exts ) {
-                    if ( ext.startsWith(".") ) ext= ext.substring(1);
-                    final String fext= ext;
-                    Action a= new AbstractAction( ext ) {
-                        public void actionPerformed(ActionEvent e) {
-                            try {
-                                String uri = "vap+" + fext + ":";
-                                String refuri= dataSetSelector.getValue();
-                                if ( refuri.startsWith(uri) ) {
-                                    dataSetSelector.browseSourceType();
-                                } else {
-                                    dataSetSelector.setValue(uri);
-                                    dataSetSelector.maybePlot( true );
-                                }
-                            } catch (Exception ex) {
-                                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    };
-                    JMenuItem item= new JMenuItem( a );
-                    addDataFromMenu.add(item);
-                }
-
+                fillAddDataFromMenuImmediately(exts);
             }
         };
         SwingUtilities.invokeLater(run);
