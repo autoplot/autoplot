@@ -88,14 +88,25 @@ public class EditorContextMenu {
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
+            Action a;
+            JMenuItem item;
             JMenu insertCodeMenu= new JMenu("Insert Code");
-            insertCodeMenu.add( new AbstractAction("getDataSet()") {
+            a= new AbstractAction("getDataSet()") {
                 public void actionPerformed(ActionEvent e) {
+                    String var= editor.getSelectedText();
                     String surl= dataSetSelector.getValue();
-                    insertCode( "getDataSet('"+surl+"')\n");
+                    if ( var==null || var.length()==0 ) {
+                        insertCode( "ds= getDataSet('"+surl+"')\n");
+                    } else {
+                        insertCode( var + "= getDataSet('"+surl+"')\n");
+                    }
                 }
-            });
-            insertCodeMenu.add( new AbstractAction("getParam()") {
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>load the dataset from the specified URL into a variable.</html>");
+            insertCodeMenu.add( item );
+
+            a= new AbstractAction("getParam()") {
                 public void actionPerformed(ActionEvent e) {
                     String var= editor.getSelectedText();
                     if ( var==null || var.length()==0 ) {
@@ -104,7 +115,11 @@ public class EditorContextMenu {
                         insertCode( var + "= getParam( '"+var+"', 0.0, 'parameter "+var+" (default=0.0)' )\n" );
                     }
                 }
-            });
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>get a parameter for the script, for example, from the URI or command line depending on context<br>The first argument is the parameter name,<br>second is the default value,<br>optional third is description</html>");
+            insertCodeMenu.add( item );
+
             JMenu fragmentsMenu= new JMenu("Code Fragments");
             fragmentsMenu.add( createInsertMenuItem( "procedure", "def myproc(x,y):\n  z=x+y\n  return z\n" ) );
 
@@ -128,7 +143,7 @@ public class EditorContextMenu {
                     editor.plot(doThis);
                 }
             } );
-            mi.setToolTipText("Plot dataset reference in a second Autoplot with server port open");
+            mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
             actionsMenu.add( mi );
             menu.add( actionsMenu );
             JMenu settingsMenu= new JMenu("Settings");
