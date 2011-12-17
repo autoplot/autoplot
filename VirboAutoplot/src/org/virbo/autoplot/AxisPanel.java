@@ -246,7 +246,7 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel1.setText("Label:");
 
         showXAxisLabelsCB.setText("Show Labels");
-        showXAxisLabelsCB.setToolTipText("Hide the axis labels of the bound axis");
+        showXAxisLabelsCB.setToolTipText("Hide the axis labels of the axis, to make a stack of plots more efficient.  Run Tools->\"Fix Layout\" to pack the plots.");
 
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);

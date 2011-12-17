@@ -132,7 +132,7 @@
         <Component class="javax.swing.JCheckBox" name="showXAxisLabelsCB">
           <Properties>
             <Property name="text" type="java.lang.String" value="Show Labels"/>
-            <Property name="toolTipText" type="java.lang.String" value="Hide the axis labels of the bound axis"/>
+            <Property name="toolTipText" type="java.lang.String" value="Hide the axis labels of the axis, to make a stack of plots more efficient.  Run Tools-&gt;&quot;Fix Layout&quot; to pack the plots."/>
           </Properties>
         </Component>
       </SubComponents>
