@@ -314,7 +314,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
-            for (int idep = 0; idep < 3; idep++) {
+            for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
                 int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
