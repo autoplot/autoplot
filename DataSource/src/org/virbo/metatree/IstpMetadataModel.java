@@ -316,9 +316,9 @@ public class IstpMetadataModel extends MetadataModel {
 
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
             String key = "DEPEND_" + i;
-            Object o= attrs.get(key);
+            Object o= attrs.get(key); //TODO: probably should ensure no infinite recursion Dep0->Dep0->Dep0->...
             if ( o==null ) continue;
             if ( !( o instanceof Map ) ) {
                 new RuntimeException("String where Map was expected").printStackTrace();
@@ -326,7 +326,7 @@ public class IstpMetadataModel extends MetadataModel {
                 continue;
             }
             Map<String, Object> props = (Map<String, Object>) o;
-            for ( int j=0; j<4; j++ ) {
+            for ( int j=0; j<QDataSet.MAX_RANK; j++ ) {
                 if ( props.containsKey("DEPEND_"+j ) ) {
                     props.remove("DEPEND_"+j); // remove DEPEND property from DEPEND property.
                 }
