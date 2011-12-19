@@ -186,8 +186,14 @@ public class Test011 {
 
             timer("test units");
 
+            QDataSet r;
+
+            ds= Ops.ripples(20);
+            r= Ops.where( Ops.eq( Ops.valid( ds ), DataSetUtil.asDataSet(0)) );
+            System.err.println(r.slice(0));
+
             ds= Ops.ripples(20,20);
-            QDataSet r= Ops.where( Ops.lt( ds, DataSetUtil.asDataSet(0) ) );
+            r= Ops.where( Ops.lt( ds, DataSetUtil.asDataSet(0) ) );
             System.err.println(r);
 
             timer("test where");
