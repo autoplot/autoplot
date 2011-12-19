@@ -147,6 +147,9 @@ public class Test011 {
                 ff.format(bds, new FileOutputStream("test011_001.qds"), true);
             }
 
+            timer("test bundle of rank 0");
+
+
             //test bundle of rank 1 datasets.
             {
                 BundleDataSet bds = BundleDataSet.createRank1Bundle();
@@ -173,11 +176,21 @@ public class Test011 {
 
             }
 
+            timer("test bundle of rank 1");
+
             Units u= SemanticOps.lookupUnits("[foos]");
             Units u2= SemanticOps.lookupUnits("foos");
             if ( !u.isConvertableTo(u2) ) {
                 throw new IllegalArgumentException("[foos] is not convertable to foos");
             }
+
+            timer("test units");
+
+            ds= Ops.ripples(20,20);
+            QDataSet r= Ops.where( Ops.lt( ds, DataSetUtil.asDataSet(0) ) );
+            System.err.println(r);
+
+            timer("test where");
 
             if (true) {
                 System.exit(0);
