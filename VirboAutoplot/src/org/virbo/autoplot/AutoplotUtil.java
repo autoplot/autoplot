@@ -124,10 +124,10 @@ public class AutoplotUtil {
         c.add(result, row, col);
         c.revalidate();
         c.validate();
-        System.err.println(c.getBounds());
-        System.err.println(row);
+        System.err.println("c.getBounts(): "+c.getBounds());
+        System.err.println("row: "+row);
         result.resize();
-        System.err.println(result.getBounds());
+        System.err.println("result.getBounds(): " +result.getBounds());
         return result;
     }
 
