@@ -2652,7 +2652,7 @@ private void updateFrameTitle() {
             if ( tag!=null ) welcome+=" ("+tag+")";
         } catch (IOException ex) {
             Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            System.err.println(ex);
+            ex.printStackTrace();
         }
 
         System.err.println(welcome);
