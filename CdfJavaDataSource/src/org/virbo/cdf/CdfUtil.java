@@ -156,6 +156,10 @@ public class CdfUtil {
             if ( nmax!=null ) ds.putProperty(QDataSet.VALID_MAX, uc.convert(nmax) );
             if ( nmin!=null ) ds.putProperty(QDataSet.VALID_MIN, uc.convert(nmin) );
         }
+
+        String t= (String) props.get(QDataSet.SCALE_TYPE);
+        if ( t!=null ) ds.putProperty( QDataSet.SCALE_TYPE, t );
+
     }
 
     private static long sizeOf( int dims, int[] dimSizes, long itype, long rc ) {
