@@ -189,6 +189,11 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     public Map<String, Object> properties(Map<String, Object> meta) {
+        return properties( meta, true );
+    }
+
+    public Map<String, Object> properties(Map<String, Object> meta, boolean recurse ) {
+
         Map attrs;
         if ( meta==null ) {
             new Exception("null attributes").printStackTrace();
@@ -316,22 +321,24 @@ public class IstpMetadataModel extends MetadataModel {
 
         }
 
-        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
-            String key = "DEPEND_" + i;
-            Object o= attrs.get(key); //TODO: probably should ensure no infinite recursion Dep0->Dep0->Dep0->...
-            if ( o==null ) continue;
-            if ( !( o instanceof Map ) ) {
-                new RuntimeException("String where Map was expected").printStackTrace();
-                //TODO: track this down: vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/fast/ies/1998/fa_k0_ies_19980102_v02.cdf?ion_0
-                continue;
-            }
-            Map<String, Object> props = (Map<String, Object>) o;
-            for ( int j=0; j<QDataSet.MAX_RANK; j++ ) {
-                if ( props.containsKey("DEPEND_"+j ) ) {
-                    props.remove("DEPEND_"+j); // remove DEPEND property from DEPEND property.
+        if ( recurse ) {
+            for (int i = 0; i < QDataSet.MAX_RANK; i++) {
+                String key = "DEPEND_" + i;
+                Object o= attrs.get(key);
+                if ( o==null ) continue;
+                if ( !( o instanceof Map ) ) {
+                    new RuntimeException("String where Map was expected").printStackTrace();
+                    //TODO: track this down: vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/fast/ies/1998/fa_k0_ies_19980102_v02.cdf?ion_0
+                    continue;
                 }
+                Map<String, Object> props = (Map<String, Object>) o;
+                for ( int j=0; j<QDataSet.MAX_RANK; j++ ) {
+                    if ( props.containsKey("DEPEND_"+j ) ) {
+                        props.remove("DEPEND_"+j); // remove DEPEND property from DEPEND property.
+                    }
+                }
+                properties.put(key, properties(props,false));
             }
-            properties.put(key, properties(props));
         }
 
         if ( !user.isEmpty() ) {
