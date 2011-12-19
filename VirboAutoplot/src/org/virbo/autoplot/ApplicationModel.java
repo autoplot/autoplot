@@ -501,12 +501,12 @@ public class ApplicationModel {
             try {
                 bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(sbookmark.getBytes())).getDocumentElement());
             } catch (SAXException e) {
-                System.err.println(sbookmark);
+                System.err.println("SAXException sbookmark: "+sbookmark);
                 e.printStackTrace();
                 return new ArrayList<Bookmark>();
             //throw new RuntimeException(e);
             } catch (Exception e) {
-                System.err.println(sbookmark);
+                System.err.println("Exception sbookmark: "+sbookmark);
                 e.printStackTrace();
                 return new ArrayList<Bookmark>();
             }
