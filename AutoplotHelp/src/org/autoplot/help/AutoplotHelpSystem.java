@@ -163,7 +163,6 @@ public class AutoplotHelpSystem {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.err.println(e);
                 super.mouseClicked(e);
                 c.requestFocus();
             }
