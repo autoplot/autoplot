@@ -55,15 +55,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
         
         return Collections.emptyList();
     }
-    
-    public MetadataModel getMetadataModel(URL url) {
-        //if ( url.toString().contains(".cdf.") ) {
-            return new IstpMetadataModel();
-        //} else {
-        //    return MetadataModel.createNullModel();
-       // }
-    }
-    
+
     public boolean reject( String surl, ProgressMonitor mon) {
         if ( surl.contains("?") ) {
             return false;
