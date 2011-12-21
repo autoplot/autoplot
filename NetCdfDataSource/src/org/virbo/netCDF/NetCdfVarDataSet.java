@@ -10,12 +10,16 @@
 package org.virbo.netCDF;
 
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.TimeParser;
+import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
@@ -23,6 +27,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
+import org.virbo.metatree.IstpMetadataModel;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -55,8 +60,13 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
         ucar.ma2.Array a = v.read();
 
+        char[] cdata=null;
         try {
-            data= (double[])a.get1DJavaArray( Double.class );
+            if ( a.getElementType()==char.class ) { // NASA/Goddard formats times as ISO8601 times.
+                cdata= (char[])a.get1DJavaArray( char.class );
+            } else {
+                data= (double[])a.get1DJavaArray( Double.class );
+            }
         } catch ( ClassCastException ex ) {
             throw new IllegalArgumentException("data cannot be converted to numbers",ex);
         }
@@ -75,8 +85,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 Variable dv= cv;
                 if ( dv!=variable && dv.getRank()==1 ) {
                     mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
-                    QDataSet depend0= create( dv , ncfile, new NullProgressMonitor() );
-                    properties.put( "DEPEND_"+ir, depend0 );
+                    QDataSet dependi= create( dv , ncfile, new NullProgressMonitor() );
+                    properties.put( "DEPEND_"+ir, dependi );
                 } else {
                     isCoordinateVariable= true;
                 }
@@ -116,10 +126,54 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             }
         }
         
+        if ( data==null && attributes.containsKey("VAR_TYPE") && shape.length==2 ) { // NASA/Goddard translation service formats Times as strings, check for this.
+            data= new double[shape[0]];
+            String ss= new String(cdata);
+            for ( int i=0; i<shape[0]; i++ ) {
+                int n= i*shape[1];
+                String s= ss.substring( n, n+shape[1] );
+                try {
+                    data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
+                } catch (ParseException ex) {
+                    data[i]= Units.us2000.getFillDouble();
+                }
+            }
+            properties.put(QDataSet.UNITS,Units.us2000);
+            shape= new int[] { shape[0] };
+        } else {
+            data= (double[])a.get1DJavaArray( Double.class ); // whoops, it wasn't NASA/Goddard data after all.
+        }
+
         if ( attributes.containsKey("_FillValue" ) ) {
             double fill= Double.parseDouble( (String) attributes.get("_FillValue") );
             for ( int i=0; i<data.length; i++ ) {
-                if ( data[i]==fill ) data[i]= -1e31;
+                if ( data[i]==fill ) data[i]= -1e31;  //TODO: this is probably not necessary now.
+            }
+        }
+
+
+        if ( attributes.containsKey("VAR_TYPE") ) { // LANL want to create HDF5 files with ISTP metadata
+            properties.put( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+            Map<String,Object> istpProps= new IstpMetadataModel().properties(attributes);
+            if ( properties.get( QDataSet.UNITS )==Units.us2000 ) {
+                UnitsConverter uc= UnitsConverter.getConverter(Units.cdfEpoch, Units.us2000 );
+                if ( istpProps.containsKey(QDataSet.VALID_MIN) ) istpProps.put( QDataSet.VALID_MIN, uc.convert( (Number)istpProps.get(QDataSet.VALID_MIN ) ) );
+                if ( istpProps.containsKey(QDataSet.VALID_MAX) ) istpProps.put( QDataSet.VALID_MAX, uc.convert( (Number)istpProps.get(QDataSet.VALID_MAX ) ) );
+                if ( istpProps.containsKey(QDataSet.TYPICAL_MIN) ) istpProps.put( QDataSet.TYPICAL_MIN, uc.convert( (Number)istpProps.get(QDataSet.TYPICAL_MIN ) ) );
+                if ( istpProps.containsKey(QDataSet.TYPICAL_MAX) ) istpProps.put( QDataSet.TYPICAL_MAX, uc.convert( (Number)istpProps.get(QDataSet.TYPICAL_MAX ) ) );
+                istpProps.put(QDataSet.UNITS,Units.us2000);
+            }
+            properties.putAll(istpProps);
+
+            for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
+                String s= (String) attributes.get("DEPEND_"+i);
+                if ( s!=null ) {
+                    Variable dv= ncfile.findVariable(s);
+                    if ( dv!=null && dv!=variable ) {
+                        QDataSet dependi= create( dv , ncfile, new NullProgressMonitor() );
+                        properties.put( "DEPEND_"+i, dependi );
+                    }
+                }
             }
         }
         
@@ -132,7 +186,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     
     
     public int rank() {
-        return v.getRank();
+        return shape.length;
     }
     
     @Override
