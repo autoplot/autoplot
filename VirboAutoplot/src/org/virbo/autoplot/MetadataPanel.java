@@ -19,6 +19,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -131,7 +133,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
             } else if (dataSource != null) {
                 tree = new CombinedTreeModel("" + dataSource.getURI());
-                Map<String, Object> meta = dsfc.getRawProperties();
+                Map<String, Object> meta = dsfc.getRawProperties(); //TODO: consider that dataSource.getMetadata() might be better.  This might result in extra read for some sources.
                 MetadataModel model = dataSource.getMetadataModel();
                 String root = "Metadata";
                 if (model != null) {
