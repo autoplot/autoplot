@@ -543,6 +543,7 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             Document doc = AutoplotUtil.readDoc(url.openStream());
             List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement() );
             model.setList(book);
+            formatToFile( bookmarksFile );
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
@@ -656,6 +657,8 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             }
             model.mergeList(importBook, newList);
             model.setList(newList);
+            formatToFile( bookmarksFile );
+
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -894,6 +897,8 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             }
             
             final File f = new File( f2, nodeName + ".xml");
+            bookmarksFile= f;
+
             if ( !f.exists() )  {
                 model.setList( new ArrayList<Bookmark>() );
             } else {
@@ -919,7 +924,6 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
             }
 
-            bookmarksFile= f;
             model.addPropertyChangeListener( new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     formatToFile(bookmarksFile);
@@ -928,10 +932,10 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            showMessage( "XML error while parsing. " +ex.getMessage(), "Error while parsing", JOptionPane.WARNING_MESSAGE );
+            showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
         } catch (IOException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            showMessage( "IO Error while parsing. " +ex.getMessage(), "Error while parsing", JOptionPane.WARNING_MESSAGE );
+            showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
         } finally {
             try {
                 if ( read!=null ) read.close();
@@ -1083,7 +1087,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
         newValue.add(item);
 
-        if ( prefNode==null ) {
+        if ( prefNode==null ) { //TODO: I suspect this is old code that can be removed.
             Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
             prefs.put("bookmarks", Bookmark.formatBooks(newValue));
             try {
@@ -1096,6 +1100,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         }
 
         model.setList(newValue);
+        formatToFile( bookmarksFile );
 
         return item;
     }
