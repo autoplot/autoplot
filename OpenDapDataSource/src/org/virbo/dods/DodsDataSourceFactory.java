@@ -13,7 +13,6 @@ import dods.dap.DDSException;
 import dods.dap.parser.ParseException;
 import dods.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
-import org.virbo.metatree.IstpMetadataModel;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -25,11 +24,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Reads OpenDAP streams.
  * @author jbf
  */
 public class DodsDataSourceFactory implements DataSourceFactory {
