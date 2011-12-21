@@ -9,6 +9,8 @@
 
 package org.virbo.netCDF;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -192,6 +195,14 @@ public class NetCDFDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
+        if (variable==null ) {
+            try {
+                readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
+            } catch (IOException ex) {
+                System.err.println("exception when trying to readData to test for ISTP props, returning null model");
+                return MetadataModel.createNullModel();
+            }
+        }
         List attr= variable.getAttributes();
         if ( attr==null ) return null; // transient state
         for( int i=0; i<attr.size(); i++ ) {
