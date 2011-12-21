@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>New features are included in vap files now, including outside labels, ticklen, and disable cadence check.</small></p>
+        <p><small>ISTP metadata is detected and used in NetCDF files.  Also, an old NetCDF file is plotted.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,6 +21,11 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>bugfixes with CDF reader metadata with high-rank CDF files.</li>
+            <li>bugfix: where didn't check for fill data, and eq returns fill.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>3461160: QStream Typical_MIN can't be Number, even though spec says Number is okay</li>
             <li>3461159: Add plot from bug sequence</li>
@@ -54,31 +59,12 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>2997820: Clean up automatic insertion of timerange so that 2010-01-01 is not used when it was never entered</li>
             <li>3448593: Craig's overlap/add plot bug.  Add/delete additional plot would destroy layout because em offsets were ignored when identifying overlaps</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3430414: sc->getCompletions null when complete</li>
-            <li>3440253: consider filesystem caching in memory vs .listing files</li>
-            <li>aggregation didn't allow wildcards like (.*) to be used, now it does.</li>
-            <li>3395693: FTP filesystem caching assumed a static remote site, now new listings are made up to once every 20 seconds (as with http)</li>
-            <li>Ops.interpolate preserves metadata</li>
-            <li>fill not identified in Ops.magnitude</li>
-            <li>Operations pipeline correctly handles metadata by dropping external metadata for unsupported functions.  Before we would just ignore them, so data and metadata would not match up.</li>
-            <li>3436569: Double-slicing (Rank 4 to Rank 2, |slice2(0)|slice1(0)) would not be properly reported in Operations field</li>
-            <li>3436922: in slicing of SpaceWeather(20,8,3) where changing the slice wouldn't reset properly</li>
-            <li>3436911: in automatic slicing of vap+inline:ripples(20,8,3).  Adjusting slice index wouldn't adjust child slices.
-            <li>bugfix label of in-line dataset in rich ASCII files</li>
-            <li>Spectrogram render type correctly restored from vap file.  Before the renderType node would get close, but NoInterpolate mode would not work.</li>
-            <li>3437327: two column csv without time location units wouldn't plot as it would have with the AsciiDataSource, now it does.</li>
-            <li>3438527: getViewWindow() returns null after second is closed</li>
-            <li>3439598: CDF variable with three channels having same name</li>
-            <li>bugfixes with remote bookmarks, when remote folder contains other remote folders</li>
-            <li>in applot.pro, check for NaN's before byteswap</li>
-            <li>in IDL/Matlab bridge, error reporting is improved.</li>
-            <li>logic for guessing timerange supports non-aggregating data sources, and guesses before entering GUI.</li>
-            <li>expert/basic mode code accidentally turned overplot button back on in add plots GUI.</li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>support ISTP metadata in NC files for LANL</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>more findbugs code cleanup.</li>
             <li>vap 1.07 contains options.ticklen, options.flipColorbarLabel, plotElement.cadenceCheck, plot.legendPosition</li>
@@ -93,22 +79,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>3154463: restore vap to correct size when loading.  Prompt if the product is too big scale or scrollbars</li>
             <li>3454475: vap/DOM version 1.07 changes allow ticklen, legend position, cadence check control.</li>
             <li>QStream exceptions are supported, so that servers can convey error conditions.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>remote bookmark folders are allowed to be cached using the normal mechanism, if they come from a simple web folder</li>
-            <li>Java Webstart supports "single instance", so relaunching will recycle running app instead of opening a second window</li>
-            <li>rfe 3433860: Data operations can contain both component and process string, as in "Bx|histogram()"</li>
-            <li>slices function introduced, to clarify high-rank slicing. |slices('',16,4) instead of |slice1(16)|slice1(4)</li>
-            <li>Greek and Math symbols added to the font chooser dialog sample text</li>
-            <li>TimeSeriesBrowse used to initialize GUIs.</li>
-            <li>more findbugs cleanup of source code.</li>
-            <li>python codes can convert strings like "10 nT" into datasets.  e.g. ds+'10 nT' works now.</li>
-            <li>&lt;update check="background"&gt; should speed up launch a little more</li>
-            <li>ask before quitting when "close" is pressed and this is the last panel</li>
-            <li>popup menus for axis tab show macros like %{RANGE}</li>
-            <li>3455548: processed data result (e.g. after slicing) is shown on metadata tab.  (Buggy)</li>
-            <li>values in metadata tab are now the first twenty and last three values</li>
         </ul>
 
 <p>Known issues:</p>
