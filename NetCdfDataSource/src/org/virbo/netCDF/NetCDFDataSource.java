@@ -20,7 +20,9 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.TransposeRankNDataSet;
+import org.virbo.metatree.IstpMetadataModel;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -177,7 +179,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         List attr= variable.getAttributes();
         
         if ( attr==null ) return null; // transient state
-        
+
         Map<String,Object> result= new LinkedHashMap<String, Object>();
         for( int i=0; i<attr.size(); i++ ) {
             Attribute at= (Attribute) attr.get(i);
@@ -187,5 +189,20 @@ public class NetCDFDataSource extends AbstractDataSource {
         return result;
         
     }
+
+    @Override
+    public MetadataModel getMetadataModel() {
+        List attr= variable.getAttributes();
+        if ( attr==null ) return null; // transient state
+        for( int i=0; i<attr.size(); i++ ) {
+            Attribute at= (Attribute) attr.get(i);
+            if ( at.getName().equals("VAR_TYPE") ) {
+                return new IstpMetadataModel();
+            }
+        }
+        return MetadataModel.createNullModel();
+    }
+
+
     
 }
