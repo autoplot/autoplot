@@ -185,7 +185,12 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 }
             }
         }
-        
+
+        // LANL produces data with obvious fill values, but no documentation for them.  Go ahead and specify that -1e90 is the valid min.
+        if ( properties.get(QDataSet.FILL_VALUE)==null && properties.get(QDataSet.VALID_MIN)==null ) {
+            properties.put( QDataSet.VALID_MIN, -1e90 );
+        }
+
         if ( isCoordinateVariable ) {
             properties.put( QDataSet.CADENCE, DataSetUtil.guessCadenceNew(this,null) );
         }
