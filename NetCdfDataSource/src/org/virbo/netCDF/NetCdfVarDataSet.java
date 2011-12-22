@@ -42,6 +42,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     double[] data;
     int[] shape;
 
+    private static final Logger logger= Logger.getLogger("virbo.netcdf");
+
     public static NetCdfVarDataSet create( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
         NetCdfVarDataSet result = new NetCdfVarDataSet(  );
         result.read( variable, ncfile, mon );
@@ -125,23 +127,30 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 properties.put( QDataSet.MONOTONIC, Boolean.TRUE );
             }
         }
-        
-        if ( data==null && attributes.containsKey("VAR_TYPE") && shape.length==2 ) { // NASA/Goddard translation service formats Times as strings, check for this.
-            data= new double[shape[0]];
-            String ss= new String(cdata);
-            for ( int i=0; i<shape[0]; i++ ) {
-                int n= i*shape[1];
-                String s= ss.substring( n, n+shape[1] );
-                try {
-                    data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
-                } catch (ParseException ex) {
-                    data[i]= Units.us2000.getFillDouble();
-                }
+
+        if ( data==null ) {
+            if ( cdata==null ) {
+                throw new RuntimeException("Either data or cdata should be defined at this point");
             }
-            properties.put(QDataSet.UNITS,Units.us2000);
-            shape= new int[] { shape[0] };
-        } else {
-            data= (double[])a.get1DJavaArray( Double.class ); // whoops, it wasn't NASA/Goddard data after all.
+            //20110101T00:00 is 14 chars long.  2011-Jan-01T00:00:00.000000000 is 30 chars long.
+            if ( shape.length==2 && shape[1]>=14 && shape[1]<=30 ) { // NASA/Goddard translation service formats Times as strings, check for this.
+                logger.fine("parsing times formatted in char arrays");
+                data= new double[shape[0]];
+                String ss= new String(cdata);
+                for ( int i=0; i<shape[0]; i++ ) {
+                    int n= i*shape[1];
+                    String s= ss.substring( n, n+shape[1] );
+                    try {
+                        data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
+                    } catch (ParseException ex) {
+                        data[i]= Units.us2000.getFillDouble();
+                    }
+                }
+                properties.put(QDataSet.UNITS,Units.us2000);
+                shape= new int[] { shape[0] };
+            } else {
+                data= (double[])a.get1DJavaArray( Double.class ); // whoops, it wasn't NASA/Goddard data after all.
+            }
         }
 
         if ( attributes.containsKey("_FillValue" ) ) {
