@@ -7,7 +7,6 @@ package org.virbo.datasource;
 
 import java.net.URI;
 import java.util.Map;
-import org.virbo.datasource.URISplit;
 
 /**
  * provides getParam to extensions and the file part.  
