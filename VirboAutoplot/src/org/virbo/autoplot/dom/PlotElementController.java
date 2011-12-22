@@ -1776,7 +1776,7 @@ public class PlotElementController extends DomNodeController {
         Units yunits;
         Units zunits;
 
-        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ||  spec== RenderType.pitchAngleDistribution ) {
+        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
 
             QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             if (xds == null) {
@@ -1841,16 +1841,13 @@ public class PlotElementController extends DomNodeController {
             yunits= SemanticOps.getUnits(yds);
             zunits= SemanticOps.getUnits(fillDs);
 
-            if ( spec==RenderType.pitchAngleDistribution ) {
-                xunits= yunits;
-            }
+        } else if ( spec==RenderType.pitchAngleDistribution ) {
+            return true;
 
         } else if ( spec==RenderType.eventsBar ) {
-
             return true;
 
         } else if ( spec==RenderType.digital ) {
-
             return true;
 
         } else {
