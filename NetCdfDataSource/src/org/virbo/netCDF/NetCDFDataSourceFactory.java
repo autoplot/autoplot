@@ -24,6 +24,7 @@ import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
+import ucar.ma2.DataType;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -56,7 +57,8 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             for ( int j=0; j<vars.size();j++ ) {
                 Variable v= vars.get(j);
                 if ( v.getDimensions().size()==0 ) continue;
-                if ( !v.getDataType().isNumeric() ) continue;
+                boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
+                if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
                 result.add( new CompletionContext(
                         CompletionContext.CONTEXT_PARAMETER_NAME,
                         v.getName(), this, "arg_0",
