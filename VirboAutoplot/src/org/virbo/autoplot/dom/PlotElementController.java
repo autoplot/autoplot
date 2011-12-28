@@ -1530,6 +1530,11 @@ public class PlotElementController extends DomNodeController {
 
         RenderType spec = peleCopy.getRenderType();
 
+        if ( fillDs.rank()==0 ) {
+            //System.err.println("rank 0");
+            spec= RenderType.digital;
+        }
+
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
