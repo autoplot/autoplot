@@ -390,6 +390,13 @@ public class ScriptContext extends PyJavaInstance {
         setStatus("wrote to "+filename);
     }
 
+    private static void maybeMakeParent( String filename ) {
+        File file= new File(filename);
+        if ( !file.getParentFile().exists() ) {
+            file.getParentFile().mkdirs();
+        }
+    }
+
     /**
      * write out the current canvas to a png file.
      * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
@@ -407,6 +414,8 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
+
+        maybeMakeParent(filename);
         
         final FileOutputStream out1 = new FileOutputStream(filename);
 
@@ -427,6 +436,8 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     public static void writeToPng( BufferedImage image, String filename ) throws IOException {
+
+        maybeMakeParent(filename);
 
         final FileOutputStream out1 = new FileOutputStream(filename);
 
@@ -498,6 +509,9 @@ public class ScriptContext extends PyJavaInstance {
         model.getCanvas().setSize( width, height );
         model.getCanvas().validate();
         model.waitUntilIdle(false);
+
+        maybeMakeParent(filename);
+
         model.getCanvas().writeToPDF(filename);
         setStatus("wrote to "+filename);
     }
