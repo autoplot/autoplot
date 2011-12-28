@@ -392,8 +392,10 @@ public class ScriptContext extends PyJavaInstance {
 
     private static void maybeMakeParent( String filename ) {
         File file= new File(filename);
-        if ( !file.getParentFile().exists() ) {
-            file.getParentFile().mkdirs();
+        if ( file.getParentFile()!=null ) { // relative filenames are okay.
+            if ( !file.getParentFile().exists() ) {
+                file.getParentFile().mkdirs();
+            }
         }
     }
 
