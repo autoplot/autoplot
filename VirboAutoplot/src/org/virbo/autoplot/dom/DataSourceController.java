@@ -181,6 +181,9 @@ public class DataSourceController extends DomNodeController {
         if (sliceDimension == 0) {
             return getDataSet().length();
         }
+        if (sliceDimension==-1 ) { // rank 0
+            return 0;
+        }
         int[] qube = DataSetUtil.qubeDims(getDataSet());
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
