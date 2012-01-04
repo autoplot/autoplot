@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>ISTP metadata is detected and used in NetCDF files.  Also, an old NetCDF file is plotted.</small></p>
+        <p><small>The old bug where gaps in the spectrograms would appear is addressed.  The code is more liberal about painting gaps now.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3237397: gaps in das2 spectrograms</li>
+            <li>3469219: handle units in append.  Before we would assume the units were unchanging and wouldn't check for this.</li>
+            <li>bugfix: UNITS were set in Jython applyBinaryOp, when the caller should set the units.  This would result in "200 s" / "10 s" = "20 s"</li>
             <li>bugfixes with CDF reader metadata with high-rank CDF files.</li>
             <li>bugfix: where didn't check for fill data, and eq returns fill.</li>
             <li>bugfix: improvements to NN rendering, where single points were not enlarged</li>
@@ -66,7 +69,12 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
-            <li>support ISTP metadata in NC files for LANL</li>
+            <li>getDataSet completion in Jython editor guesses default name from URI instead of "ds"</li>
+            <li>support ISTP metadata in NC and HDF5 files for LANL</li>
+            <li>automatically treat -1e99 as fill in NC and HDF5 files.</li>
+            <li>handle ISO8601 formatted times in HDF5 and NC files.  The CDF folks and LANL were both producing files like this.</li>
+            <li>add icon for events renderer</li>
+            <li>writeToPng and writeToPdf in scripts will now make the directory if it doesn't exist.</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
