@@ -4,7 +4,6 @@
  */
 package org.virbo.autoplot;
 
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
@@ -55,7 +54,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
-import org.virbo.qstream.StreamTool;
 
 /**
  *
@@ -792,6 +790,31 @@ public class ScriptContext extends PyJavaInstance {
                 org.das2.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
             }
         }
+    }
+
+    /**
+     * make the directory.  This must be a local file right now, but may start with "file://"
+     * @param dir
+     */
+    public static void mkdir( String dir ) {
+        URISplit split= URISplit.parse(dir);
+        if ( !split.file.endsWith("/") ) {
+            throw new IllegalArgumentException("folder name must end in /");
+        }
+        String s= split.file;
+        
+        if ( !s.startsWith("file://") ) {
+            throw new IllegalArgumentException("must start with file://: "+dir);
+        } else {
+            s= s.substring(7);
+        }
+        File f= new File(s);
+        if ( !f.exists() ) {
+            if ( !f.mkdirs() ) {
+                throw new IllegalArgumentException("unable to make directory: "+f );
+            }
+        }
+        return;
     }
 
     /**
