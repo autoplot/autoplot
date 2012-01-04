@@ -10,10 +10,9 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
-import org.virbo.idlsupport.APDataSet;
 
 /**
  * Tests of the IDL/Matlab interface.
@@ -181,6 +180,17 @@ public class Test024 {
         System.err.println( checkAPDS( uri, null ) );
 
     }
+
+    public static void testGuessNameFor() {
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux") );
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?id=Flux" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/my.txt?column=Flux" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+inline:sin(linspace(0,1000,2000))" ) );
+        System.err.println( DataSourceUtil.guessNameFor("" ) );
+
+        DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
+
+    }
     public static void main( String[] args )  {
         try {
 
@@ -193,6 +203,8 @@ public class Test024 {
             test7();
             checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
             checkAPDS( "vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
+
+            testGuessNameFor();
 
             System.exit(0);  // TODO: something is firing up the event thread.  Note, we finally figured out that this is das2's request processor threads.
 
