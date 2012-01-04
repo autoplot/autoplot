@@ -51,17 +51,30 @@ public class URISplit {
     /**
      * time range subset.
      */
-    public static String PARAM_TIME_RANGE= "timerange";
+    public static final String PARAM_TIME_RANGE= "timerange";
 
-    public static String PARAM_TIME_RESOLUTION="resolution";
+    public static final String PARAM_TIME_RESOLUTION="resolution";
 
     /**
      * subset of rank 2 data.  For example, columns of excel workbook or ascii table.
      * rank2=[3,5] or rank2=Bx-Bz
      */
-    public static String PARAM_RANK2="rank2";
+    public static final String PARAM_RANK2="rank2";
 
-    public static String PARAM_REC_COUNT="recCount";
+    /**
+     * used for the number of records to read.
+     */
+    public static final String PARAM_REC_COUNT="recCount";
+
+    /**
+     * first positional parameter, typically interpreted the same as PARAM_ID
+     */
+    public static final String PARAM_ARG_0="arg_0";
+
+    /**
+     * typically the dataset id.
+     */
+    public static final String PARAM_ID="id";
 
     /**
      * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
