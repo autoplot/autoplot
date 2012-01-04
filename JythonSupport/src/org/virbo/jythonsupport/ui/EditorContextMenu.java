@@ -112,7 +112,7 @@ public class EditorContextMenu {
                 public void actionPerformed(ActionEvent e) {
                     String var= editor.getSelectedText();
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "p1= getParam( 'p1', 0.0 , 'parameter p1 (default=0.0)' )\n");
+                        insertCode( "p1= getParam( 'p1', 0.0, 'parameter p1 (default=0.0)' )\n");
                     } else {
                         insertCode( var + "= getParam( '"+var+"', 0.0, 'parameter "+var+" (default=0.0)' )\n" );
                     }
