@@ -374,7 +374,7 @@ public abstract class QDataSetBridge {
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
-                for (int i2 = 0; i2 < ds1.length(i0); i2++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
                     if ( useFill && wds.value(i0, i1, i2 )==0 ) {
                         result[i0][i1][i2] = fill;
                     } else {
