@@ -639,6 +639,13 @@ public class DataSourceUtil {
         } else if ( args.containsKey("column") ) {
             name= Ops.safeName( args.get("column") );
         }
+        // identifiers starting with upper case are going to bug me.  reset the case. UPPER->upper and UpperCase->upperCase
+        if ( name.length()>1 && Character.isUpperCase(name.charAt(0)) && Character.isUpperCase(name.charAt(1) ) ) {
+            name= name.toLowerCase();
+        } else if ( name.length()>0 && Character.isUpperCase(name.charAt(0) ) ) {
+            name= name.substring(0,1).toLowerCase() + name.substring(1);
+        }
+        
         return name;
     }
 
