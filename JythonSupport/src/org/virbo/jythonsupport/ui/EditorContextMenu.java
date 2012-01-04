@@ -22,6 +22,7 @@ import javax.swing.text.DefaultEditorKit;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -96,7 +97,8 @@ public class EditorContextMenu {
                     String var= editor.getSelectedText();
                     String surl= dataSetSelector.getValue();
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "ds= getDataSet('"+surl+"')\n");
+                        String name= DataSourceUtil.guessNameFor(surl);
+                        insertCode( name + "= getDataSet('"+surl+"')\n");
                     } else {
                         insertCode( var + "= getDataSet('"+surl+"')\n");
                     }
