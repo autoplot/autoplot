@@ -133,6 +133,35 @@ public class Test024 {
 
     }
 
+    /**
+     * we have a case where Reiner is getting zeros in a rank 3 dataset.  It was an indexing bug.
+     * @throws Exception
+     */
+    public static void example6() throws Exception {
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI("vap+h5:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
+        apds.doGetDataSet();
+        if ( apds.getStatus()!=0 ) {
+            System.err.println( apds.getStatusMessage() );
+            return;
+        }
+        System.err.println( apds.toString() );
+
+        apds.setFillValue( -999 );
+
+        double[][][] vv= (double[][][]) apds.values();
+
+        for ( int i=0; i<vv.length; i++ ) {
+            for ( int j=0; j<vv[i].length; j++ ) {
+                System.err.printf("%9.3f ",vv[i][j][17]);                
+            }
+            System.err.println();
+        }
+        System.err.println();
+
+
+    }
+
     /*
      * new getTimeSeriesBrowse showed a branch were names with implicit names ("http://" instead of "vap+cdf:http://") and TimeSeriesBrowse
      * were not parsed correctly.
@@ -199,6 +228,8 @@ public class Test024 {
             example3();  // Jared's slice
             example4();
             example5();
+            example6();
+            
             test6();
             test7();
             checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
