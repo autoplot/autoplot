@@ -50,20 +50,28 @@ public class CdfVirtualVars {
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int)size.value(), Ops.FFTFilterType.Hanning);
             return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor());
         } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
+            //introduced to support PlasmaWaveGroup
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
             QDataSet pow= Ops.fftPower( waves, 512, mon );
             return pow;
-        } else if (function.equals("fftPowerDelta2048")) {
+        } else if (function.equalsIgnoreCase("fftPowerDelta1024")) {
+            QDataSet deltaT = args.get(1);       // time between successive measurements.
+            MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
+            while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
+            waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
+            QDataSet pow= Ops.fftPower( waves, 1024, mon );
+            return pow;
+        } else if (function.equalsIgnoreCase("fftPowerDelta2048")) {
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
             waves.putProperty( QDataSet.DEPEND_1, Ops.multiply(deltaT,Ops.findgen(waves.length(0)) ) );
             QDataSet pow= Ops.fftPower( waves, 2048, mon );
             return pow;
-        } else if (function.equals("fftPowerDeltaTranslation512")) {
+        } else if (function.equalsIgnoreCase("fftPowerDeltaTranslation512")) {
             QDataSet deltaT= args.get(1);       // time between successive measurements.
             QDataSet translation= args.get(2);  // shift this amount after fft (because it was with respect to another signal
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
@@ -156,7 +164,8 @@ public class CdfVirtualVars {
     }
 
     public static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftpowerdelta512", "fftpowerdelta2048",
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
+                "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
                 "fftpower","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag");
         return functions.contains(function.toLowerCase());
     }

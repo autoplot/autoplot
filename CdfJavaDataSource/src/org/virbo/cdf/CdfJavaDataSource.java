@@ -511,53 +511,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
-//                            if (sidep == 0) {
-//                                logger.info("sorting dep0 to make depend0 monotonic");
-//                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
-//                                result = DataSetOps.applyIndex(result, idep, sort, false);
-//                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
-//                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
-//                            }
-            }
-
-                        if ( "Data_No".equals( depName ) ) {
-                            // kludge for UIowa Radio and Plasma Wave Group.
-                            // They have a variable "DELTA_T" that gives time between measurements,
-                            // and "Translation" gives offset for the waveform (e.g. 500KHz-525KHz)
-                            // see .../po_h7_pwi_1996040423_v01.cdf
-                            Variable deltaTVar= cdf.getVariable("Delta_T");
-                            if ( deltaTVar!=null ) {
-                                double deltaT;
-                                try {
-                                    deltaT = cdf.get1D(deltaTVar.getName())[0];
-                                } catch (Throwable ex) {
-                                    throw new RuntimeException(ex);
-        }
-                                depDs= DDataSet.maybeCopy( Ops.multiply( DataSetUtil.asDataSet(deltaT), depDs ) );
-                                depDs.putProperty(QDataSet.TITLE, "time offset");
-                                try {
-                                    Object o= cdf.getAttribute(deltaTVar.getName(),"UNITS");
-                                    Units units2= SemanticOps.lookupUnits( o.toString() );
-                                    depDs.putProperty(QDataSet.UNITS,units2 );
-                                } catch ( Exception e ) {
-                                    depDs.putProperty(QDataSet.UNITS, Units.milliseconds );
-                                }
-                                Map<String,Object> fixAttr= (Map<String, Object>) attributes.get("DEPEND_" + idep);
-                                fixAttr.put( "CATDESC", "time offset" );
-                                fixAttr.put( "FIELDNAM", "time_offset" );
-                                fixAttr.put( "LABLAXIS", "time_offset" );
-                            }
-
-                            Variable offsetVar= cdf.getVariable("Translation");
-                            if ( offsetVar!=null ) {
-                                MutablePropertyDataSet transDs= wrapDataSet( cdf, "Translation", constraints, reform, false, null );
-                                if ( transDs.property(QDataSet.UNITS)==null ) {
-                                    transDs.putProperty( QDataSet.UNITS, Units.kiloHertz );
-                                }
-                                Map <String,Object> user= new HashMap();
-                                user.put( "FFT_Translation", transDs );
-                                depDs.putProperty( QDataSet.USER_PROPERTIES, user );
-                            }
                         }
 
                         result.putProperty("DEPEND_" + idep, depDs);
