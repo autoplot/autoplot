@@ -147,16 +147,21 @@ public class DataSourceUtil {
         return i;
     }
 
+    public static List<String> findAggregations( List<String> files, boolean remove ) {
+        return findAggregations( files, remove, false );
+    }
+
     /**
-     * return the aggregations we can find.  
+     * return the aggregations we can find.
      * If remove is true, then the input list will have all items
      * removed that are not part of an aggregation.
-     * 
+     *
      * @param files
      * @param remove remove the files that are accounted for by the aggregation.
+     * @param loose only only one file to qualify for an aggregation.  We need this to support case where we know it's from an agg.
      * @return list of aggregations found.
      */
-    public static List<String> findAggregations( List<String> files, boolean remove ) {
+    public static List<String> findAggregations( List<String> files, boolean remove, boolean loose ) {
         List<String> accountedFor= new ArrayList<String>();
         List<String> result= new ArrayList<String>();
         List<String> nonAgg= new ArrayList<String>();
@@ -213,7 +218,7 @@ public class DataSourceUtil {
             double nc= dr.width().divide(dr1.width()).doubleValue(Units.dimensionless); // number of intervals estimate
             
             // more than one file, and then five files or fairly continuous.
-            if ( moveUs.size()>0 && ( moveUs.size()>4 || nc<((1+moveUs.size())*2)  ) ) { // reject small aggregations
+            if ( loose || moveUs.size()>0 && ( moveUs.size()>4 || nc<((1+moveUs.size())*2)  ) ) { // reject small aggregations
                 notAccountedFor.removeAll(moveUs);
                 accountedFor.addAll(moveUs);
                 result.add( URISplit.putParam(sagg, "timerange", dr.toString()) );
@@ -339,15 +344,15 @@ public class DataSourceUtil {
         String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
         String yyyyjjj= "(?<!\\d)(19|20)\\d{2}\\d{3}(?!\\d)";
         String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
-        String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_])\\d{2}\\1\\d{2}(?!\\d)";
-        String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_])\\d{3}(?!\\d)";
+        String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
+        String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\-)\\d{2}(?!\\d)"; //"(\\d{8})";
 
         String version= "([Vv])\\d{2}";
 
         String result= surl;
 
-        String[] abs= new String[] { yyyymmdd_HH, yyyymmdd, yyyy_mm_dd, yyyy_jjj, yyyyjjj, yyyymm };
+        String[] abs= new String[] { yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm };
 
         String timeRange=null;
         for ( int i= 0; i<abs.length; i++ ) {
