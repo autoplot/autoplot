@@ -91,7 +91,7 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         colortableTypePanel.setLayout(new java.awt.BorderLayout());
 
         jLabel4.setText("Colortable:");
-        jLabel4.setToolTipText("colortable for spectrograms");
+        jLabel4.setToolTipText("Color table for spectrograms");
 
         jLabel5.setText("Rebin:");
         jLabel5.setToolTipText("method for binning to pixel resolution");

@@ -82,7 +82,7 @@
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
             <Property name="text" type="java.lang.String" value="Colortable:"/>
-            <Property name="toolTipText" type="java.lang.String" value="colortable for spectrograms"/>
+            <Property name="toolTipText" type="java.lang.String" value="Color table for spectrograms"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">

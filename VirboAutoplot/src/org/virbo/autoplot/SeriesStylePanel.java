@@ -149,10 +149,6 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         jLabel2.setText("Symbol Size:");
         jLabel2.setToolTipText("size of the plot symbols");
 
-        lineThickSpinner.setToolTipText("thickness of the plot trace");
-
-        symSizeSpinner.setToolTipText("size of the plot symbols");
-
         colorPanel.setLayout(new java.awt.BorderLayout());
 
         jLabel6.setText("Color:");

@@ -142,14 +142,8 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="lineThickSpinner">
-          <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="thickness of the plot trace"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="symSizeSpinner">
-          <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="size of the plot symbols"/>
-          </Properties>
         </Component>
         <Container class="javax.swing.JPanel" name="colorPanel">
 

@@ -286,14 +286,15 @@ public class PlotStylePanel extends javax.swing.JPanel {
         majorTicksCheckBox.setToolTipText("Draw grid lines at major ticks ");
 
         jLabel12.setText("Grid:");
+        jLabel12.setToolTipText("Draw grid lines at major and minor ticks");
 
         minorGridCheckBox.setText("minor ticks");
         minorGridCheckBox.setToolTipText("Draw grid lines at minor ticks ");
 
         jLabel1.setText("Fore/Back Colors:");
+        jLabel1.setToolTipText("Set foreground and background colors");
 
         foreBackColorsList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "black on white", "white on black", "white on blue", "custom" }));
-        foreBackColorsList.setToolTipText("Set foreground and background colors");
         foreBackColorsList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 foreBackColorsListActionPerformed(evt);
@@ -301,17 +302,17 @@ public class PlotStylePanel extends javax.swing.JPanel {
         });
 
         jLabel3.setText("Background:");
+        jLabel3.setToolTipText("Pick background color");
 
         jLabel2.setText("Foreground:");
+        jLabel2.setToolTipText("Pick foreground color");
 
-        foregroundColorButton.setToolTipText("Pick foreground color");
         foregroundColorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 foregroundColorButtonActionPerformed(evt);
             }
         });
 
-        backgroundColorButton.setToolTipText("Pick background color");
         backgroundColorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundColorButtonActionPerformed(evt);
@@ -321,6 +322,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         fontLabel.setText("jLabel5");
 
         jLabel4.setText("Canvas Font:");
+        jLabel4.setToolTipText("Pick the font for the canvas");
 
         pickFontButton.setText("Pick");
         pickFontButton.setToolTipText("Pick canvas font");
@@ -331,6 +333,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         });
 
         widthLabel.setText("Width:");
+        widthLabel.setToolTipText("Canvas width in pixels");
         widthLabel.setEnabled(false);
 
         widthTextField.setText("100");
@@ -344,11 +347,14 @@ public class PlotStylePanel extends javax.swing.JPanel {
         heightTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
 
         heightLabel.setText("Height:");
+        heightLabel.setToolTipText("Canvas height in pixels");
         heightLabel.setEnabled(false);
 
         jLabel7.setText("Canvas Size:");
+        jLabel7.setToolTipText("Control canvas size, allowing it to adjust or specifying width and height");
 
         fittedCB.setText("Adjust to Fit into Application");
+        fittedCB.setToolTipText("When selected, the canvas is resized to fit into the application.");
         fittedCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fittedCBActionPerformed(evt);
@@ -387,7 +393,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(fontLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 29, Short.MAX_VALUE)
                         .add(pickFontButton))
                     .add(plotPanelLayout.createSequentialGroup()
                         .add(12, 12, 12)
@@ -404,7 +410,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                     .add(plotPanelLayout.createSequentialGroup()
                         .add(jLabel7)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)))
+                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)))
                 .add(12, 12, 12))
         );
 
@@ -453,7 +459,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

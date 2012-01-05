@@ -474,6 +474,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
 
         sliceIndexLabel.setText("Slice Index:");
+        sliceIndexLabel.setToolTipText("Slice Index of the slice function");
 
         transposeCheckBox.setText("Transpose");
         transposeCheckBox.setToolTipText("Transpose the rank 2 dataset after slicing.\n"); // NOI18N
@@ -487,7 +488,6 @@ public class DataPanel extends javax.swing.JPanel {
         operationsLabel.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
 
         componentTextField.setText(" ");
-        componentTextField.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         componentTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 componentTextFieldMousePressed(evt);
@@ -511,6 +511,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
 
         doSliceCheckBox.setText("Slice Dimension");
+        doSliceCheckBox.setToolTipText("Slice dimension of the slice function");
         doSliceCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 doSliceCheckBoxActionPerformed(evt);
@@ -574,7 +575,6 @@ public class DataPanel extends javax.swing.JPanel {
 
         validRangeComboBox.setEditable(true);
         validRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e30 to 1e30", "-1 to 101", "0 to 1e38" }));
-        validRangeComboBox.setToolTipText("Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill. ");
         validRangeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 validRangeComboBoxActionPerformed(evt);
@@ -586,7 +586,6 @@ public class DataPanel extends javax.swing.JPanel {
 
         fillValueComboBox.setEditable(true);
         fillValueComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e31", "0.0", "-1" }));
-        fillValueComboBox.setToolTipText("This value is used to identify invalid data that should not be plotted.");
         fillValueComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fillValueComboBoxActionPerformed(evt);

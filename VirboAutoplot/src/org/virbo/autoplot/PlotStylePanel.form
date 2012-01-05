@@ -103,7 +103,7 @@
                               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="fontLabel" min="-2" pref="191" max="-2" attributes="0"/>
-                              <EmptySpace pref="276" max="32767" attributes="1"/>
+                              <EmptySpace pref="29" max="32767" attributes="1"/>
                               <Component id="pickFontButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -126,7 +126,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="fittedCB" pref="549" max="32767" attributes="0"/>
+                              <Component id="fittedCB" pref="252" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
@@ -174,7 +174,7 @@
                           <Component id="heightLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="heightTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="26" max="32767" attributes="0"/>
+                      <EmptySpace pref="30" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -189,6 +189,7 @@
             <Component class="javax.swing.JLabel" name="jLabel12">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Grid:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Draw grid lines at major and minor ticks"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JCheckBox" name="minorGridCheckBox">
@@ -200,6 +201,7 @@
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Fore/Back Colors:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Set foreground and background colors"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="foreBackColorsList">
@@ -212,7 +214,6 @@
                     <StringItem index="3" value="custom"/>
                   </StringArray>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Set foreground and background colors"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="foreBackColorsListActionPerformed"/>
@@ -221,25 +222,21 @@
             <Component class="javax.swing.JLabel" name="jLabel3">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Background:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Pick background color"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Foreground:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Pick foreground color"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="foregroundColorButton">
-              <Properties>
-                <Property name="toolTipText" type="java.lang.String" value="Pick foreground color"/>
-              </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="foregroundColorButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="backgroundColorButton">
-              <Properties>
-                <Property name="toolTipText" type="java.lang.String" value="Pick background color"/>
-              </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="backgroundColorButtonActionPerformed"/>
               </Events>
@@ -252,6 +249,7 @@
             <Component class="javax.swing.JLabel" name="jLabel4">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Canvas Font:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Pick the font for the canvas"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="pickFontButton">
@@ -266,6 +264,7 @@
             <Component class="javax.swing.JLabel" name="widthLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Width:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Canvas width in pixels"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
@@ -288,17 +287,20 @@
             <Component class="javax.swing.JLabel" name="heightLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Height:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Canvas height in pixels"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel7">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Canvas Size:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Control canvas size, allowing it to adjust or specifying width and height"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JCheckBox" name="fittedCB">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Adjust to Fit into Application"/>
+                <Property name="toolTipText" type="java.lang.String" value="When selected, the canvas is resized to fit into the application."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fittedCBActionPerformed"/>
