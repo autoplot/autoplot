@@ -214,6 +214,7 @@ public class Test024 {
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux") );
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?id=Flux" ) );
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/my.txt?column=Flux" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+cdf:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.cdf?Flux[::2]" ) );
         System.err.println( DataSourceUtil.guessNameFor("vap+inline:sin(linspace(0,1000,2000))" ) );
         System.err.println( DataSourceUtil.guessNameFor("" ) );
 
