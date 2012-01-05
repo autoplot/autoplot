@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
+import ucar.ma2.InvalidRangeException;
+import ucar.ma2.Range;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -44,9 +47,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
     private static final Logger logger= Logger.getLogger("virbo.netcdf");
 
-    public static NetCdfVarDataSet create( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
+    public static NetCdfVarDataSet create( Variable variable, String constraint, NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
         NetCdfVarDataSet result = new NetCdfVarDataSet(  );
-        result.read( variable, ncfile, mon );
+        result.read( variable, ncfile, constraint, mon );
         return result;
     }
 
@@ -54,13 +57,92 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
     }
 
+    public static String sliceConstraint( String constraint, int i ) {
+        if ( constraint==null ) {
+            return null;
+        } else {
+            return constraint;
+        }
+    }
+    /**
+     * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
+     * provided to reduce code and for uniform behavior.
+     * 
+     * See CdfJavaDataSource, which is where this was copied from.
+     * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
+     * @return [ start, stop, stride ] or [ start, -1, -1 ] for slice.
+     */
+     public static long[] parseConstraint(String constraint, long recCount) throws ParseException {
+        long[] result = new long[]{0, recCount, 1};
+        if (constraint == null) {
+            return result;
+        } else {
+            if ( constraint.startsWith("[") && constraint.endsWith("]") ) {
+                constraint= constraint.substring(1,constraint.length()-1);
+            }
+            try {
+                String[] ss= constraint.split(":",-2);
+                if ( ss.length>0 && ss[0].length()>0 ) {
+                    result[0]= Integer.parseInt(ss[0]);
+                    if ( result[0]<0 ) result[0]= recCount+result[0];
+                }
+                if ( ss.length>1 && ss[1].length()>0 ) {
+                    result[1]= Integer.parseInt(ss[1]);
+                    if ( result[1]<0 ) result[1]= recCount+result[1];
+                }
+                if ( ss.length>2 && ss[2].length()>0 ) {
+                    result[2]= Integer.parseInt(ss[2]);
+                }
+                if ( ss.length==1 ) { // slice
+                    result[1]= -1;
+                    result[2]= -1;
+                }
+            } catch ( NumberFormatException ex ) {
+                throw new ParseException("expected integer: "+ex.toString(),0);
+            }
+            return result;
+        }
+    }
+
     //TODO: NetCDF has a variable.slice().
     
-    private void read( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon )  throws IOException {
+    private void read( Variable variable, NetcdfDataset ncfile, String constraints, ProgressMonitor mon )  throws IOException {
         this.v= variable;
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
-        ucar.ma2.Array a = v.read();
+
+        shape= v.getShape();
+
+        ucar.ma2.Array a;
+        if ( constraints!=null ) {
+            if ( constraints.startsWith("[") && constraints.endsWith("]") ) {
+                try {
+                    constraints= constraints.substring(1,constraints.length()-1);
+                    String[] cc= constraints.split(",");
+                    List<Range> ranges= new ArrayList( v.getRanges() );
+                    for ( int i=0; i<cc.length; i++ ) {
+                        long[] ir= parseConstraint( cc[i],ranges.get(i).last()+1 );
+                        if ( ir[1]==-1 ) {
+                            ranges.set( i, new Range((int)ir[0],(int)ir[0]) );
+                            shape[i]= 1;
+                        } else {
+                            ranges.set( i, new Range( (int)ir[0], (int)ir[1]-1, (int)ir[2] ) );
+                            shape[i]= (int)( (ir[1]-ir[0])/ir[2] );
+                        }
+                    }
+                    a= v.read(ranges);
+
+                } catch ( ParseException ex ) {
+                    throw new RuntimeException(ex);
+                } catch ( InvalidRangeException ex ) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                throw new RuntimeException("constraint must start with [ and end with ]");
+            }
+        } else {
+            a= v.read();
+        }
 
         char[] cdata=null;
         try {
@@ -73,7 +155,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             throw new IllegalArgumentException("data cannot be converted to numbers",ex);
         }
        
-        shape= v.getShape();
         properties.put( QDataSet.NAME, Ops.safeName(variable.getName()) );
         if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
         
@@ -87,7 +168,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 Variable dv= cv;
                 if ( dv!=variable && dv.getRank()==1 ) {
                     mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
-                    QDataSet dependi= create( dv , ncfile, new NullProgressMonitor() );
+                    QDataSet dependi= create( dv, sliceConstraint(constraints,ir), ncfile, new NullProgressMonitor() );
                     properties.put( "DEPEND_"+ir, dependi );
                 } else {
                     isCoordinateVariable= true;
@@ -179,7 +260,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 if ( s!=null ) {
                     Variable dv= ncfile.findVariable(s);
                     if ( dv!=null && dv!=variable ) {
-                        QDataSet dependi= create( dv , ncfile, new NullProgressMonitor() );
+                        QDataSet dependi= create( dv,  sliceConstraint(constraints,i), ncfile, new NullProgressMonitor() ); // TODO: slice constaint
                         properties.put( "DEPEND_"+i, dependi );
                     }
                 }

@@ -99,9 +99,14 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
-            String lookfor= (String)params.get("arg_0");
+            String svariable= (String)params.get("arg_0");
+            
+            int ic= svariable.indexOf("[");
+            if ( ic>-1 ) {
+                svariable= svariable.substring(0,ic);
+            }
 
-            if ( lookfor!=null ) lookfor= lookfor.replaceAll(" ", "+");  // change space back to plus
+            if ( svariable!=null ) svariable= svariable.replaceAll(" ", "+");  // change space back to plus
             boolean haveIt= false;
             
             for ( int j=0; j<vars.size();j++ ) {
@@ -115,7 +120,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
                         depCount++;
                     }
                 }
-                if ( v.getName().replaceAll(" ", "+").equals(lookfor) ) haveIt= true;
+                if ( v.getName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
             }
             
             if ( depCount==1 ) {
