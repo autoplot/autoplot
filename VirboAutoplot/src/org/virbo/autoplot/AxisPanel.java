@@ -233,7 +233,6 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         xTitleTextField.setText("jTextField1");
-        xTitleTextField.setToolTipText("X axis title");
         xTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 axisMouseAction(evt);
@@ -244,6 +243,7 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
         jLabel1.setText("Label:");
+        jLabel1.setToolTipText("X axis title");
 
         showXAxisLabelsCB.setText("Show Labels");
         showXAxisLabelsCB.setToolTipText("Hide the axis labels of the axis, to make a stack of plots more efficient.  Run Tools->\"Fix Layout\" to pack the plots.");
@@ -291,7 +291,6 @@ public class AxisPanel extends javax.swing.JPanel {
         zAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         zTitleTextField.setText("jTextField1");
-        zTitleTextField.setToolTipText("Colorbar title");
         zTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 axisMouseAction(evt);
@@ -305,6 +304,7 @@ public class AxisPanel extends javax.swing.JPanel {
         cbVisibleCB.setToolTipText("hide/show colorbar");
 
         jLabel3.setText("Label:");
+        jLabel3.setToolTipText("Colorbar title");
 
         org.jdesktop.layout.GroupLayout zAxisPanelLayout = new org.jdesktop.layout.GroupLayout(zAxisPanel);
         zAxisPanel.setLayout(zAxisPanelLayout);
@@ -349,11 +349,10 @@ public class AxisPanel extends javax.swing.JPanel {
         yLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         isotropicCheckBox.setText("Isotropic");
-        isotropicCheckBox.setToolTipText("When units are convertable to X Axis units, automatically set y axis to ensure pixel:data ratio is the same.");
+        isotropicCheckBox.setToolTipText("When Y axis units are convertable to X axis units, automatically set Y axis range to ensure pixel:data ratio is the same.");
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         yTitleTextField.setText("jTextField1");
-        yTitleTextField.setToolTipText("Y axis title");
         yTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 axisMouseAction(evt);
@@ -364,6 +363,7 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
         jLabel2.setText("Label:");
+        jLabel2.setToolTipText("Y axis title");
 
         org.jdesktop.layout.GroupLayout yAxisPanelLayout = new org.jdesktop.layout.GroupLayout(yAxisPanel);
         yAxisPanel.setLayout(yAxisPanelLayout);
@@ -400,15 +400,14 @@ public class AxisPanel extends javax.swing.JPanel {
         jPanel1.setToolTipText("click title for help");
 
         titleTextField.setText("title will go here");
-        titleTextField.setToolTipText("title for the selected plot.\n");
 
         jLabel6.setText("Title:");
+        jLabel6.setToolTipText("title for the selected plot. ");
 
         legendEnableCheckbox.setText("Legend Label:");
-        legendEnableCheckbox.setToolTipText("when selected, the label is added to the legend of the plot.\n\n");
+        legendEnableCheckbox.setToolTipText("when selected, the label is added to the legend of the plot for the selected plot element.\n\n");
 
         legendTextField.setText("label will go here");
-        legendTextField.setToolTipText("a short label indentifying the selected panel");
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, legendEnableCheckbox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), legendTextField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);

@@ -117,7 +117,6 @@
         <Component class="javax.swing.JTextField" name="xTitleTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="jTextField1"/>
-            <Property name="toolTipText" type="java.lang.String" value="X axis title"/>
           </Properties>
           <Events>
             <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
@@ -127,6 +126,7 @@
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
             <Property name="text" type="java.lang.String" value="Label:"/>
+            <Property name="toolTipText" type="java.lang.String" value="X axis title"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="showXAxisLabelsCB">
@@ -207,7 +207,6 @@
         <Component class="javax.swing.JTextField" name="zTitleTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="jTextField1"/>
-            <Property name="toolTipText" type="java.lang.String" value="Colorbar title"/>
           </Properties>
           <Events>
             <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
@@ -223,6 +222,7 @@
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
             <Property name="text" type="java.lang.String" value="Label:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Colorbar title"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -293,7 +293,7 @@
         <Component class="javax.swing.JCheckBox" name="isotropicCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Isotropic"/>
-            <Property name="toolTipText" type="java.lang.String" value="When units are convertable to X Axis units, automatically set y axis to ensure pixel:data ratio is the same."/>
+            <Property name="toolTipText" type="java.lang.String" value="When Y axis units are convertable to X axis units, automatically set Y axis range to ensure pixel:data ratio is the same."/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                 <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -304,7 +304,6 @@
         <Component class="javax.swing.JTextField" name="yTitleTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="jTextField1"/>
-            <Property name="toolTipText" type="java.lang.String" value="Y axis title"/>
           </Properties>
           <Events>
             <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="axisMouseAction"/>
@@ -314,6 +313,7 @@
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
             <Property name="text" type="java.lang.String" value="Label:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Y axis title"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -370,24 +370,23 @@
         <Component class="javax.swing.JTextField" name="titleTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="title will go here"/>
-            <Property name="toolTipText" type="java.lang.String" value="title for the selected plot.&#xa;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
             <Property name="text" type="java.lang.String" value="Title:"/>
+            <Property name="toolTipText" type="java.lang.String" value="title for the selected plot. "/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="legendEnableCheckbox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Legend Label:"/>
-            <Property name="toolTipText" type="java.lang.String" value="when selected, the label is added to the legend of the plot.&#xa;&#xa;"/>
+            <Property name="toolTipText" type="java.lang.String" value="when selected, the label is added to the legend of the plot for the selected plot element.&#xa;&#xa;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="legendTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="label will go here"/>
-            <Property name="toolTipText" type="java.lang.String" value="a short label indentifying the selected panel"/>
           </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="legendEnableCheckbox" sourcePath="${selected}" target="legendTextField" targetPath="enabled" updateStrategy="0" immediately="false"/>
