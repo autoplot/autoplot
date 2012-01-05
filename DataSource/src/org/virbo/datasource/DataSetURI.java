@@ -1046,9 +1046,12 @@ public class DataSetURI {
 
         boolean onlyAgg= false;
 
-        if ( surlDir.endsWith("/$Y/") ) { // this will be generalized after verified
-            String s1= surlDir.substring(0,surlDir.length()-3);
-            String s2= surlDir.substring(surlDir.length()-3,surlDir.length()-1);  //$Y
+        String prefixPrefix= "";
+
+        if ( surlDir.contains("$Y") ) { // $Y must be first for now.  This will be generalized after verified
+            int ip= surlDir.indexOf("$Y");
+            String s1= surlDir.substring(0,ip);
+            String s2= surlDir.substring(ip,surlDir.length()-1);
             FileSystem fsp= FileSystem.create( DataSetURI.toUri(s1), mon );
             FileStorageModelNew fsm= FileStorageModelNew.create( fsp, s2 );
 
@@ -1056,9 +1059,10 @@ public class DataSetURI {
             List<String> ss= new ArrayList();
             String [] ss2= fsm.getNamesFor(null);
 
-            int nn= Math.min( 1, ss2.length );
-            
+            int nn= Math.min( 2, ss2.length );
+
             for ( int i=0; i<nn; i++ ) {
+                if ( i==1 ) i=ss2.length-1; // look at the first and last
                 FileSystem fsm2= FileSystem.create( DataSetURI.toUri( s1+ss2[i]) );
                 String[] ss3= fsm2.listDirectory("/");
                 for ( int ii=0; ii<ss3.length; ii++ ) {
@@ -1070,6 +1074,7 @@ public class DataSetURI {
             s= ss.toArray( new String[ss.size()] );
             surlDir= s1;
             onlyAgg= true;
+            prefixPrefix= s2 + '/'; // prefix the prefix with this
             
         } else {
             // Since FileSystem.create can't throw IOExceptions, the error is hidden in an IllegalArgumentException.
@@ -1118,6 +1123,10 @@ public class DataSetURI {
             prefix = prefix.toLowerCase();
         }
 
+        if ( prefixPrefix.length()>0 ) {
+            prefix= prefixPrefix + prefix;
+        }
+        
         List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
 
         String[] s2= new String[s.length];
@@ -1128,7 +1137,7 @@ public class DataSetURI {
         if ( s2.length>0 && inclAgg ) {
             //String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
             List<String> files= new LinkedList( Arrays.asList(s2) );
-            List<String> saggs= DataSourceUtil.findAggregations( files, true );
+            List<String> saggs= DataSourceUtil.findAggregations( files, true, onlyAgg );
             if ( onlyAgg ) {
                 completions.clear();
             }
