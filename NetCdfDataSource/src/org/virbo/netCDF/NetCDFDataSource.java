@@ -42,6 +42,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     String sMyUrl;
     String svariable;
     NetcdfDataset ncfile;
+    String constraint; // null, or string like [:,:,4,5]
 
 /*    static {
         try {
@@ -81,8 +82,15 @@ public class NetCDFDataSource extends AbstractDataSource {
             if ( p.containsKey( "id" ) ) {
                 svariable= (String) p.get( "id" );
             } else {
-                svariable= (String) p.get("arg_0"); // legacy support
+                svariable= (String) p.get("arg_0"); 
                 svariable= svariable.replaceAll(" ","+");
+            }
+            int ic= svariable.indexOf("[");
+            if ( ic>-1 ) {
+                constraint= svariable.substring(ic);
+                svariable= svariable.substring(0,ic);
+            } else {
+                constraint= null;
             }
         }
     }
@@ -90,7 +98,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         mon.started();
         readData( mon );
-        NetCdfVarDataSet result= NetCdfVarDataSet.create( variable , ncfile, mon );
+        NetCdfVarDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon );
         QDataSet qresult= checkLatLon(result);
         mon.finished();
         return qresult;
