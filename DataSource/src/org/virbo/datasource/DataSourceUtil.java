@@ -491,6 +491,7 @@ public class DataSourceUtil {
     /**
      * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
      * provided to reduce code and for uniform behavior.
+     * See CdfJavaDataSource, which is where this was copied from.
      * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
      * @return
      */
