@@ -92,7 +92,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             URISplit split = URISplit.parse( surl );
             Map params= URISplit.parseParams( split.params );
 
-            DataSetURI.getFile( new URI(surl), mon ); // check for non-ncml.  We always download now because ncml can be slow.
+            DataSetURI.getFile( surl, mon ); // check for non-ncml.  We always download now because ncml can be slow.
 
             NetcdfDataset dataset= getDataSet( split.file );
 
@@ -101,12 +101,15 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             
             String svariable= (String)params.get("arg_0");
             
-            int ic= svariable.indexOf("[");
-            if ( ic>-1 ) {
-                svariable= svariable.substring(0,ic);
+
+            if ( svariable!=null ) {
+                int ic= svariable.indexOf("[");
+                if ( ic>-1 ) {
+                    svariable= svariable.substring(0,ic);
+                }
+                if ( svariable!=null ) svariable= svariable.replaceAll(" ", "+");  // change space back to plus
             }
 
-            if ( svariable!=null ) svariable= svariable.replaceAll(" ", "+");  // change space back to plus
             boolean haveIt= false;
             
             for ( int j=0; j<vars.size();j++ ) {
@@ -128,8 +131,6 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             } else {
                 return !haveIt;
             }
-        } catch ( URISyntaxException e ) {
-            return false;
         } catch ( HtmlResponseIOException e ) {
             return false;
         } catch ( IOException e ) {
