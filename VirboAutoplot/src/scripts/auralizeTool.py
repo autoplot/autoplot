@@ -29,7 +29,7 @@ def boxSelected(event):
     a= org.das2.graph.Auralizor( play )
 
     a.playSound()
-    formatDataSet( play, 'file:/tmp/auralizeTool.wav' )
+    #formatDataSet( play, 'file:/tmp/auralizeTool.wav' )
     
 plot= dom.plots[0].controller.dasPlot
 from org.das2.event import BoxSelectorMouseModule
