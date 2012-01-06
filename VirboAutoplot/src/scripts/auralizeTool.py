@@ -3,7 +3,8 @@
 
 import org.das2.graph
 
-ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
+ds= getDataSet( 'vap+wav:file:///home/jbf/heartBeats.15weeks.wav' )
+#ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
 #ds= dom.dataSourceFilters[0].controller.dataSet
 
 plot( 0, ds )
@@ -16,14 +17,14 @@ def boxSelected(event):
     tmin= event.getXRange().min().doubleValue( u )
     tmax= event.getXRange().max().doubleValue( u )
 
-    from org.virbo.dataset import DataSetUtil, DataSetOps, VectorDataSetAdapter
+    from org.virbo.dataset import DataSetUtil, DataSetOps
 
     imin= DataSetUtil.closest( dep0, tmin, -1 )
     imax= DataSetUtil.closest( dep0, tmax, imin )
 
     play= DataSetOps.trim( ds, imin, imax-imin )
 
-    a= org.das2.graph.Auralizor( VectorDataSetAdapter.create(play) )
+    a= org.das2.graph.Auralizor( play )
 
     a.playSound()
     formatDataSet( play, 'file:/tmp/auralizeTool.wav' )
