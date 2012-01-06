@@ -452,7 +452,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
 
         String line= reader.readLine();
-        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-z]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-zA-Z]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
         while ( line!=null ) {
             Matcher m= s.matcher(line);
             if ( m.matches() ) {
