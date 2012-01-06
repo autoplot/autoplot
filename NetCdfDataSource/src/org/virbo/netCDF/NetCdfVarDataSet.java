@@ -10,7 +10,6 @@
 package org.virbo.netCDF;
 
 import java.text.ParseException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -36,7 +34,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
- * wraps a rank 1 netCDF variable to present it as a QDataSet.
+ * wraps a netCDF variable to present it as a QDataSet.
  *
  * @author jbf
  */
@@ -112,6 +110,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
 
         shape= v.getShape();
+        boolean[] slice= new boolean[4];
 
         ucar.ma2.Array a;
         if ( constraints!=null ) {
@@ -125,6 +124,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                         if ( ir[1]==-1 ) {
                             ranges.set( i, new Range((int)ir[0],(int)ir[0]) );
                             shape[i]= 1;
+                            slice[i]= true;
                         } else {
                             ranges.set( i, new Range( (int)ir[0], (int)ir[1]-1, (int)ir[2] ) );
                             shape[i]= (int)( (ir[1]-ir[0])/ir[2] );
@@ -266,6 +266,16 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 }
             }
         }
+
+        // perform the slices
+        ArrayList<Integer> newShape= new ArrayList(shape.length);
+        for ( int i=0; i<shape.length; i++ ) {
+            if ( !slice[i] ) {
+                newShape.add( shape[i] );
+            }
+        }
+        shape= new int[newShape.size()];
+        for ( int i=0; i<newShape.size(); i++ ) shape[i]= newShape.get(i);
 
         // LANL produces data with obvious fill values, but no documentation for them.  Go ahead and specify that -1e90 is the valid min.
         if ( properties.get(QDataSet.FILL_VALUE)==null && properties.get(QDataSet.VALID_MIN)==null ) {
