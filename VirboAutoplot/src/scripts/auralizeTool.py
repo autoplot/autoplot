@@ -1,11 +1,13 @@
-# a waveform should be in the first plot.  Run this script, then
-# draw a box to hear the waveform at the selected time.
+# Set ds to a data set that is rank 1 signal that is a function of time.  The
+# dataset will be plotted in the top plot, and the fft spectrum timeseries will
+# be plotted below.  Draw a box to hear the waveform within the selected time.
+#
 
 import org.das2.graph
 
 ds= getDataSet( 'vap+wav:file:///home/jbf/heartBeats.15weeks.wav' )
+#ds= getDataSet( 'vap+jyds:file:///home/jbf/project/autoplot/jyds/auralizeHfwr.jyds' )
 #ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
-#ds= dom.dataSourceFilters[0].controller.dataSet
 
 plot( 0, ds )
 plot( 1, fftWindow( ds, 256 ) )
