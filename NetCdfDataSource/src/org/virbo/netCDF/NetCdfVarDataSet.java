@@ -110,7 +110,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
 
         shape= v.getShape();
-        boolean[] slice= new boolean[4];
+        boolean[] slice= new boolean[shape.length];
 
         ucar.ma2.Array a;
         if ( constraints!=null ) {
