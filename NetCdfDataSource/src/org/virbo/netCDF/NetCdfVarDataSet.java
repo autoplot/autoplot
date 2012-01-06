@@ -55,11 +55,21 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
     }
 
-    public static String sliceConstraint( String constraint, int i ) {
-        if ( constraint==null ) {
+    public static String sliceConstraints( String constraints, int i ) {
+        if ( constraints==null ) {
             return null;
         } else {
-            return constraint;
+            if ( constraints.startsWith("[") && constraints.endsWith("]") ) {
+                constraints= constraints.substring(1,constraints.length()-1);
+            }
+            String[] cc= constraints.split(",");
+            if ( i>=cc.length ) {
+                return null;
+            } else if ( cc[i].equals(":") ) {
+                return null;
+            } else {
+                return cc[i]; // TODO: this doesn't address depend variable that is rank 2, but this is not supported in NetCDF anyway.
+            }
         }
     }
     /**
@@ -102,8 +112,22 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
     }
 
-    //TODO: NetCDF has a variable.slice().
-    
+     private int sliceCount( boolean [] slice, int idim ) {
+         int result= 0;
+         for ( int i=0; i<idim; i++ ) {
+             if ( slice[i] ) result++;
+         }
+         return result;
+     }
+
+    /**
+     * Read the NetCDF data.
+     * @param variable
+     * @param ncfile
+     * @param constraints null, or string like "[0:10]"  Note it's allowed for the constraint to not have [] because this is called recursively.
+     * @param mon
+     * @throws IOException
+     */
     private void read( Variable variable, NetcdfDataset ncfile, String constraints, ProgressMonitor mon )  throws IOException {
         this.v= variable;
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
@@ -115,33 +139,35 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         ucar.ma2.Array a;
         if ( constraints!=null ) {
             if ( constraints.startsWith("[") && constraints.endsWith("]") ) {
-                try {
-                    constraints= constraints.substring(1,constraints.length()-1);
-                    String[] cc= constraints.split(",");
-                    List<Range> ranges= new ArrayList( v.getRanges() );
-                    for ( int i=0; i<cc.length; i++ ) {
-                        long[] ir= parseConstraint( cc[i],ranges.get(i).last()+1 );
-                        if ( ir[1]==-1 ) {
-                            ranges.set( i, new Range((int)ir[0],(int)ir[0]) );
-                            shape[i]= 1;
-                            slice[i]= true;
-                        } else {
-                            ranges.set( i, new Range( (int)ir[0], (int)ir[1]-1, (int)ir[2] ) );
-                            shape[i]= (int)( (ir[1]-ir[0])/ir[2] );
-                        }
-                    }
-                    a= v.read(ranges);
+                constraints= constraints.substring(1,constraints.length()-1);
+            }
+            try {
 
-                } catch ( ParseException ex ) {
-                    throw new RuntimeException(ex);
-                } catch ( InvalidRangeException ex ) {
-                    throw new RuntimeException(ex);
+                String[] cc= constraints.split(",");
+                List<Range> ranges= new ArrayList( v.getRanges() );
+                for ( int i=0; i<cc.length; i++ ) {
+                    long[] ir= parseConstraint( cc[i],ranges.get(i).last()+1 );
+                    if ( ir[1]==-1 ) {
+                        ranges.set( i, new Range((int)ir[0],(int)ir[0]) );
+                        shape[i]= 1;
+                        slice[i]= true;
+                    } else {
+                        ranges.set( i, new Range( (int)ir[0], (int)ir[1]-1, (int)ir[2] ) );
+                        shape[i]= (int)( (ir[1]-ir[0])/ir[2] );
+                    }
                 }
-            } else {
-                throw new RuntimeException("constraint must start with [ and end with ]");
+                
+                a= v.read(ranges);
+
+            } catch ( ParseException ex ) {
+                throw new RuntimeException(ex);
+            } catch ( InvalidRangeException ex ) {
+                throw new RuntimeException(ex);
             }
         } else {
+
             a= v.read();
+
         }
 
         char[] cdata=null;
@@ -161,17 +187,19 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         boolean isCoordinateVariable= false;
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
-            ucar.nc2.Dimension d= v.getDimension(ir);
+            if ( !slice[ir] ) {
+                ucar.nc2.Dimension d= v.getDimension(ir);
 
-            Variable cv = ncfile.findVariable(d.getName());
-            if ((cv != null) && cv.isCoordinateVariable()) {
-                Variable dv= cv;
-                if ( dv!=variable && dv.getRank()==1 ) {
-                    mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
-                    QDataSet dependi= create( dv, sliceConstraint(constraints,ir), ncfile, new NullProgressMonitor() );
-                    properties.put( "DEPEND_"+ir, dependi );
-                } else {
-                    isCoordinateVariable= true;
+                Variable cv = ncfile.findVariable(d.getName());
+                if ((cv != null) && cv.isCoordinateVariable()) {
+                    Variable dv= cv;
+                    if ( dv!=variable && dv.getRank()==1 ) {
+                        mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
+                        QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
+                        properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
+                    } else {
+                        isCoordinateVariable= true;
+                    }
                 }
             }
         }
@@ -255,13 +283,13 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             }
             properties.putAll(istpProps);
 
-            for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
-                String s= (String) attributes.get("DEPEND_"+i);
+            for ( int ir=0; ir<a.getRank(); ir++ ) {
+                String s= (String) attributes.get("DEPEND_"+ir);
                 if ( s!=null ) {
                     Variable dv= ncfile.findVariable(s);
                     if ( dv!=null && dv!=variable ) {
-                        QDataSet dependi= create( dv,  sliceConstraint(constraints,i), ncfile, new NullProgressMonitor() ); // TODO: slice constaint
-                        properties.put( "DEPEND_"+i, dependi );
+                        QDataSet dependi= create( dv,  sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() ); // TODO: slice constaint
+                        properties.put( "DEPEND_"+(ir-sliceCount(slice,ir)), dependi );
                     }
                 }
             }
