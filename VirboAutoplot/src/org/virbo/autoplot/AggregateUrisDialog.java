@@ -11,8 +11,10 @@
 
 package org.virbo.autoplot;
 
-import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomOps;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -29,6 +31,26 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         initComponents();
         this.dom= dom;
         this.dataSetSelector= sel;
+
+        previewDataSetSelector.setHidePlayButton(true);
+        String s = dataSetSelector.getValue();
+        String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
+        if (agg != null) {
+            previewDataSetSelector.setValue(agg);
+        } else {
+            this.jLabel5.setText( this.jLabel5.getText()+"  (Unable to create aggregation spec, couldn't find yyyymmdd.)");
+            previewDataSetSelector.setValue(s);
+        }
+
+        Application dom2= (Application)dom.copy();
+        DomOps.aggregateAll(dom2);
+        for ( DataSourceFilter dsf: dom2.getDataSourceFilters() ) {
+            if ( !dsf.getUri().startsWith("vap+internal:") ) {
+                allUrisTA.insert( dsf.getUri() + "\n", allUrisTA.getCaretPosition() );
+            }
+        }
+        allUrisTA.setEditable(false);
+
     }
 
     /** This method is called from within the constructor to
@@ -42,71 +64,94 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        addressBarUriButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
+        allUrisButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        previewDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        allUrisTA = new javax.swing.JTextArea();
 
-        jLabel4.setText("<html>Autoplot has two ways of turning URIs of single files into aggregations that will combine data when the first dimension is time.  An aggregation URI is one with wildcards that allows Autoplot to fetch multiple files to cover a time range.</html> ");
+        jLabel4.setText("<html>Autoplot has two ways of turning URIs of single files into aggregations that will combine data when the first dimension is time.  An aggregation URI is one with wildcards (like $Y for year) that allows Autoplot to fetch multiple files to cover a time range.</html> ");
         jLabel4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        jButton3.setText("Address Bar");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        addressBarUriButton.setText("Address Bar");
+        addressBarUriButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                addressBarUriButtonActionPerformed(evt);
             }
         });
 
-        jLabel5.setText("<html>Attempt to make a URI from the address in the address bar.  Enter must be pressed to accept the new URI.</html>");
+        jLabel5.setText("<html>Autoplot has attempted to make a URI from the address in the address bar.  Pressing the button will accept the new URI:</html>");
         jLabel5.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        jButton4.setText("All URIs");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        allUrisButton.setText("All URIs");
+        allUrisButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                allUrisButtonActionPerformed(evt);
             }
         });
 
         jLabel6.setText("<html>Attempt to aggregate all URIs in the application.  If successful, this will generally affect the application immediately.</html>");
         jLabel6.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
+        allUrisTA.setColumns(20);
+        allUrisTA.setRows(5);
+        jScrollPane1.setViewportView(allUrisTA);
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
+                .add(24, 24, 24)
+                .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE)
+                .addContainerGap())
+            .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jButton3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
-                    .add(jButton4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel6, 0, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
-                .addContainerGap())
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                                .add(addressBarUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 144, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                                .add(allUrisButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 143, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)))
+                        .add(0, 0, 0))))
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+                    .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(76, 76, 76)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(92, 92, 92)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton3))
+                    .add(addressBarUriButton)
+                    .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 21, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton4))
-                .addContainerGap(34, Short.MAX_VALUE))
+                    .add(allUrisButton)
+                    .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
                     .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(141, Short.MAX_VALUE)))
+                    .addContainerGap(251, Short.MAX_VALUE)))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -121,28 +166,35 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        String s = dataSetSelector.getValue();
-        String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
-        if (agg != null) {
-            dataSetSelector.setValue(agg);
-        } else {
-            JOptionPane.showMessageDialog(dataSetSelector, "Unable to create aggregation spec, couldn't find yyyymmdd.");
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void addressBarUriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addressBarUriButtonActionPerformed
+        String s = previewDataSetSelector.getEditor().getText();
+        dataSetSelector.setValue(s);
+        dataSetSelector.maybePlot(evt.getModifiers());
+        SwingUtilities.getWindowAncestor(this).setVisible(false);
+    }//GEN-LAST:event_addressBarUriButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/aggregateAll.jy"), dom, null );
-    }//GEN-LAST:event_jButton4ActionPerformed
+    private void allUrisButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allUrisButtonActionPerformed
+        Application dom2= (Application)dom.copy();
+        DomOps.aggregateAll(dom2);
+        dom.syncTo(dom2);
+        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+        for ( DataSourceFilter dsf: dsfs ) {
+            dsf.getController().update();
+        }
+        SwingUtilities.getWindowAncestor(this).setVisible(false);
+    }//GEN-LAST:event_allUrisButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton addressBarUriButton;
+    private javax.swing.JButton allUrisButton;
+    private javax.swing.JTextArea allUrisTA;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private org.virbo.datasource.DataSetSelector previewDataSetSelector;
     // End of variables declaration//GEN-END:variables
 
 }
