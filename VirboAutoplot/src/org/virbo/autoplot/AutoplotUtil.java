@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -1097,8 +1098,9 @@ public class AutoplotUtil {
 
         RenderType specPref= RenderType.spectrogram;
         Options o= new Options();
-        new OptionsPrefsController(o).loadPreferences();
-        if ( o.isNearestNeighbor() ) {
+        Preferences prefs= Preferences.userNodeForPackage( o.getClass() );  //TODO: because this is static?
+        boolean nn= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,o.isNearestNeighbor());
+        if ( nn ) {
             specPref = RenderType.nnSpectrogram;
         }
 
