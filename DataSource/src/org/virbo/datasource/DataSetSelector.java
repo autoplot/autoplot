@@ -1276,7 +1276,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     private boolean doItemStateChange = false;
 
     /**
-     * Setter for property value.
+     * Set the current value for the editor.  This does not fire an event, so call maybePlot() to accept the value.
      * @param value New value of property value.
      */
     public void setValue(String value) {
