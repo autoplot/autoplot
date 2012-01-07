@@ -11,6 +11,7 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Font;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
@@ -41,9 +42,12 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
             this.jLabel5.setText( this.jLabel5.getText()+"  (Unable to create aggregation spec, couldn't find yyyymmdd.)");
             previewDataSetSelector.setValue(s);
         }
+        Font f= previewDataSetSelector.getEditor().getFont().deriveFont(8.f);
+        previewDataSetSelector.getEditor().setFont(f);
 
         Application dom2= (Application)dom.copy();
         DomOps.aggregateAll(dom2);
+        allUrisTA.setText("");
         for ( DataSourceFilter dsf: dom2.getDataSourceFilters() ) {
             if ( !dsf.getUri().startsWith("vap+internal:") ) {
                 allUrisTA.insert( dsf.getUri() + "\n", allUrisTA.getCaretPosition() );
@@ -96,7 +100,9 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         jLabel6.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         allUrisTA.setColumns(20);
+        allUrisTA.setFont(allUrisTA.getFont().deriveFont((float)8));
         allUrisTA.setRows(5);
+        allUrisTA.setText("vap+dat:http://autoplot.org/data/autoplot.dat\n");
         jScrollPane1.setViewportView(allUrisTA);
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -134,7 +140,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(92, 92, 92)
+                .add(110, 110, 110)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(addressBarUriButton)
                     .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
