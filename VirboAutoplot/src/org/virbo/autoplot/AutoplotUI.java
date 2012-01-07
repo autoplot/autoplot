@@ -645,6 +645,7 @@ public class AutoplotUI extends javax.swing.JFrame {
      * @return
      */
     private static List<String> cleanMessages( List<String> messages ) {
+        messages= new ArrayList(messages); // make local copy to avoid concurrent modifications
         List<String> result= new LinkedList<String>(messages);
         for ( String s: messages ) {
             if ( s.equals("Delete Plot" ) ) {
