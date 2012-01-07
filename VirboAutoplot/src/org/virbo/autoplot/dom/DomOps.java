@@ -8,10 +8,12 @@ package org.virbo.autoplot.dom;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.das2.datum.DatumVector;
 import org.das2.graph.DasRow;
 import org.das2.graph.TickVDescriptor;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -305,6 +307,26 @@ public class DomOps {
 
         }
 
+
+    }
+
+    /**
+     * aggregate all the URIs within the dom.
+     * @param dom
+     */
+    public static void aggregateAll( Application dom ) {
+        Application oldDom= (Application) dom.copy(); // axis settings, etc.
+        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+        for ( DataSourceFilter dsf: dsfs ) {
+            if ( dsf.uri==null || dsf.uri.length()==0 ) continue;
+            if ( dsf.uri.startsWith("vap+internal:") ) continue;
+            String agg= DataSourceUtil.makeAggregation( dsf.uri );
+            if ( agg!=null ) {
+                dsf.uri= agg;
+            }
+        }
+        dom.setDataSourceFilters(dsfs);
+        dom.syncTo( oldDom, Collections.singletonList( "dataSourceFilters" ) );
 
     }
 }
