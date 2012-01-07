@@ -348,7 +348,7 @@ public class DataSourceUtil {
         String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\-)\\d{2}(?!\\d)"; //"(\\d{8})";
 
-        String version= "([Vv])\\d{2}";
+        //String version= "([Vv])\\d{2}";
 
         String result= surl;
 
