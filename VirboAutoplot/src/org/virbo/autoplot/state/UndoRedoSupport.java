@@ -193,9 +193,21 @@ public class UndoRedoSupport {
         boolean axisRangeOnly = true;
         boolean zaxisRangeOnly = true;
         boolean axisAuto = false;
+        String focus=null;
+
         for (Diff s : diffs) {
             if (s.getDescription().contains("plotDefaults")) {
                 continue;
+            }
+            String thisDiffFocus=null;
+            int i= s.propertyName().indexOf(".");
+            if ( i>-1 ) thisDiffFocus= s.propertyName().substring(0,i);
+            if ( focus==null ) {
+                focus= thisDiffFocus;
+            } else {
+                if ( !focus.equals(thisDiffFocus) ) {
+                    focus=""; // indicate there is no one element
+                }
             }
             count++;
             docBuf.append("<br>");
@@ -215,6 +227,8 @@ public class UndoRedoSupport {
                 }
             }
         }
+        if (focus==null ) focus= "";
+
         docString = docBuf.length() > 4 ? docBuf.substring(4) : "";
         docString = "<html>" + docString + "</html>";
         if (diffs.isEmpty()) {
@@ -222,17 +236,17 @@ public class UndoRedoSupport {
             element.deltaDesc = "unidentified change";
             element.docString = "change was detected but could not be identified.";
             return element;
-        } else if (zaxisRangeOnly && count > 1) {
+        } else if (zaxisRangeOnly && focus.length()>0 && count > 1) {
             if (axisAuto) {
-                labelStr = "Z range changes (now manual)";
+                labelStr = focus + " first Z range change";
             } else {
-                labelStr = "Z range changes"; // (this shouldn't happen, because count will equal 1.)
+                labelStr = focus + " Z range change"; // (this shouldn't happen, because count will equal 1.)
             }
-        } else if (axisRangeOnly && count > 1) {
+        } else if (axisRangeOnly && focus.length()>0 && count > 1) {
             if (axisAuto) {
-                labelStr = "XY range changes (now manual)";
+                labelStr = focus + " first XY range changes";
             } else {
-                labelStr = "XY range changes";
+                labelStr = focus + " XY range changes";
             }
         } else if (count > 3) {
             labelStr = "" + count + " changes";
