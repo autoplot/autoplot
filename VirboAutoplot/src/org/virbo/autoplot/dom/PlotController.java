@@ -931,12 +931,16 @@ public class PlotController extends DomNodeController {
      * delete the das peer that implements this node.
      */
     void deleteDasPeer() {
-        DasPlot p = getDasPlot();
-        DasColorBar cb = getDasColorBar();
-        DasCanvas c= p.getCanvas();
+        final DasPlot p = getDasPlot();
+        final DasColorBar cb = getDasColorBar();
+        final DasCanvas c= p.getCanvas();
         if ( c!=null ) {
-            c.remove(p);
-            c.remove(cb);
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    c.remove(p);
+                    c.remove(cb);
+                }
+            } );
         }
     }
 
