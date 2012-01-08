@@ -6,14 +6,12 @@
 package org.virbo.autoplot;
 
 import java.awt.event.FocusEvent;
-import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
-import java.beans.PropertyChangeListener;
 import javax.swing.SpinnerNumberModel;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DefaultPlotSymbol;
@@ -24,7 +22,6 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 
