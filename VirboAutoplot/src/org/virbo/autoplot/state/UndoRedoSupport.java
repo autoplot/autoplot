@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -48,17 +49,25 @@ public class UndoRedoSupport {
 
     public void refreshUndoMultipleMenu(JMenu undoMultipleMenu) {
         undoMultipleMenu.removeAll();
-        for (int i = stateStackPos - 1; i > Math.max(0, stateStackPos - 10); i--) {
-            StateStackElement prevState = stateStack.get(i);
+
+        int lstateStackPos;
+        List<StateStackElement> lstateStack;
+        synchronized (this) {
+            lstateStackPos= stateStackPos;
+            lstateStack= new ArrayList( stateStack );
+        }
+
+        for (int i = lstateStackPos - 1; i > Math.max(0, lstateStackPos - 10); i--) {
+            StateStackElement prevState = lstateStack.get(i);
             String label = prevState.deltaDesc;
-            final int ii = stateStackPos - i;
+            final int ii = lstateStackPos - i;
             JMenuItem item= new JMenuItem(new AbstractAction(label) {
                 public void actionPerformed(ActionEvent e) {
                     undo(ii);
                 }
             });
             item.setToolTipText(prevState.docString);
-            item.setIcon( new ImageIcon( stateStack.get(i-1).thumb ) ); // not sure why, but...
+            item.setIcon( new ImageIcon( lstateStack.get(i-1).thumb ) ); // not sure why, but...
             undoMultipleMenu.add(item);
         }
     }
@@ -125,7 +134,7 @@ public class UndoRedoSupport {
         undo(1);
     }
 
-    public void undo(int level) {
+    public synchronized void undo(int level) {
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
         stateStackPos -= level;
@@ -147,14 +156,13 @@ public class UndoRedoSupport {
 
     public Action getRedoAction() {
         return new AbstractAction("redo") {
-
             public void actionPerformed(ActionEvent e) {
                 redo();
             }
         };
     }
 
-    public void redo() {
+    public synchronized void redo() {
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
         if (stateStackPos >= stateStack.size()) {
@@ -334,7 +342,7 @@ public class UndoRedoSupport {
 
     }
 
-    public String getUndoDescription() {
+    public synchronized String getUndoDescription() {
         if (stateStackPos > 1) {
             return stateStack.get(stateStackPos - 1).docString;
         } else {
@@ -345,7 +353,7 @@ public class UndoRedoSupport {
      * returns a label describing the undo operation, or null if the operation
      * doesn't exist.
      */
-    public String getUndoLabel() {
+    public synchronized String getUndoLabel() {
         if (stateStackPos > 1) {
             return "Undo " + stateStack.get(stateStackPos - 1).deltaDesc;
         } else {
