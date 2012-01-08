@@ -183,7 +183,9 @@ public class ApplicationController extends DomNodeController implements RunLater
     PropertyChangeListener controllerListener= new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.log(Level.FINEST, "controller change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
+            
+            // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
+            if ( logger.isLoggable(Level.FINEST) ) logger.log(Level.FINEST, "controller change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             //if( evt.getPropertyName().equals("resetDimensions") && evt.getNewValue().equals(Boolean.TRUE) ) {
             //    System.err.println("here here here");
             //}
@@ -195,7 +197,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         public void propertyChange(PropertyChangeEvent evt) {
 
-            logger.log(Level.FINEST, "dom change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
+            // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
+            if ( logger.isLoggable(Level.FINEST) ) logger.log(Level.FINEST, "dom change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
 
             Object src = evt.getSource();
             if ( src instanceof DomNode ) {
