@@ -71,10 +71,14 @@ public class UndoRedoSupport {
         BufferedImage thumb;
 
         public StateStackElement(Application state, String deltaDesc, String docString, BufferedImage thumb ) {
+            this( state, deltaDesc, docString );
+            this.thumb= thumb;
+        }
+
+        public StateStackElement(Application state, String deltaDesc, String docString ) {
             this.state = state;
             this.deltaDesc = deltaDesc;
             this.docString= docString;
-            this.thumb= thumb;
         }
 
         public String toString() {
@@ -173,7 +177,102 @@ public class UndoRedoSupport {
         pushState(ev,null);
     }
 
-    public void pushState( PropertyChangeEvent ev, String label ) {
+    /**
+     * provide a human-readable description of the given diffs.
+     * @param diffs list of differences to describe.
+     * @param element really only provided to contain the output.
+     * @return
+     */
+    private StateStackElement describeChanges( List<Diff> diffs, StateStackElement element ) {
+
+        String docString;
+        String labelStr;
+
+        StringBuilder docBuf = new StringBuilder();
+        int count = 0;
+        boolean axisRangeOnly = true;
+        boolean zaxisRangeOnly = true;
+        boolean axisAuto = false;
+        for (Diff s : diffs) {
+            if (s.getDescription().contains("plotDefaults")) {
+                continue;
+            }
+            count++;
+            docBuf.append("<br>");
+            docBuf.append(s.getDescription());
+            if (s.propertyName().endsWith("axis.range")) {
+                if (s.propertyName().endsWith("zaxis.range")) {
+                    axisRangeOnly = false;
+                } else {
+                    zaxisRangeOnly = false;
+                }
+            } else {
+                if (s.propertyName().endsWith("autoRange")) {
+                    axisAuto = true;
+                } else {
+                    axisRangeOnly = false;
+                    zaxisRangeOnly = false;
+                }
+            }
+        }
+        docString = docBuf.length() > 4 ? docBuf.substring(4) : "";
+        docString = "<html>" + docString + "</html>";
+        if (diffs.isEmpty()) {
+            //state.diffs(elephant.state);  for debugging
+            element.deltaDesc = "unidentified change";
+            element.docString = "change was detected but could not be identified.";
+            return element;
+        } else if (zaxisRangeOnly && count > 1) {
+            if (axisAuto) {
+                labelStr = "Z range changes (now manual)";
+            } else {
+                labelStr = "Z range changes"; // (this shouldn't happen, because count will equal 1.)
+            }
+        } else if (axisRangeOnly && count > 1) {
+            if (axisAuto) {
+                labelStr = "XY range changes (now manual)";
+            } else {
+                labelStr = "XY range changes";
+            }
+        } else if (count > 3) {
+            labelStr = "" + count + " changes";
+        } else {
+            StringBuilder buf = new StringBuilder();
+            for (Diff s : diffs) {
+                if (s.getDescription().contains("plotDefaults")) {
+                    continue;
+                }
+                buf.append(", ").append(s.getLabel());
+            }
+            labelStr = buf.length() > 2 ? buf.substring(2) : "";
+        }
+        if (labelStr.length() > 30) {
+            StringTokenizer tok = new StringTokenizer(labelStr, ".,[", true);
+            StringBuilder buf = new StringBuilder();
+            while (tok.hasMoreTokens()) {
+                String ss = tok.nextToken();
+                buf.append(ss.substring(0, Math.min(ss.length(), 12)));
+            }
+            labelStr = buf.toString();
+        }
+
+        element.deltaDesc = labelStr;
+        element.docString = docString;
+        return element;
+    }
+
+    /**
+     * remove old states from the bottom of the stack, adjusting stateStackPos as well.
+     */
+    private synchronized void removeOldStates( ) {
+        int len=50;
+        while ( stateStack.size()>len ) {
+            stateStack.remove(0);
+            stateStackPos--;
+        }
+    }
+
+    public synchronized void pushState( PropertyChangeEvent ev, String label ) {
         if (ignoringUpdates) {
             return;
         }
@@ -191,47 +290,13 @@ public class UndoRedoSupport {
         }
         String labelStr = "initial";
         String docString= "initial state of application";
+        StateStackElement element= new StateStackElement( state, labelStr, docString );
+
         if (elephant != null) {
             List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
-            StringBuilder docBuf= new StringBuilder();
-
-            int count=0;
-            for (Diff s : diffss) {
-                if ( s.getDescription().contains("plotDefaults" ) ) continue;
-                count++;
-                docBuf.append("<br>");
-                docBuf.append(s.getDescription());
-            }
-            docString= docBuf.length()>4 ? docBuf.substring(4) : "";
-            docString= "<html>"+docString+"</html>";
-
-            if ( diffss.isEmpty() ) {
-                state.diffs(elephant.state);
-                labelStr = "unidentified change";
-                docString= "change was detected but could not be identified.";
-                return;
-            } else if (count > 3) {
-                if ( label!=null ) {
-                   labelStr = label;
-                } else {
-                    labelStr = "" + count + " changes";
-                }
-            } else {
-                StringBuilder buf = new StringBuilder();
-                for (Diff s : diffss) {
-                    if ( s.getDescription().contains("plotDefaults") ) continue;
-                    buf.append(", ").append(s.getLabel());
-                }
-                labelStr = buf.length() > 2 ? buf.substring(2) : "";
-            }
-            if (labelStr.length() > 30) {
-                StringTokenizer tok = new StringTokenizer(labelStr, ".,[", true);
-                StringBuilder buf = new StringBuilder();
-                while (tok.hasMoreTokens()) {
-                    String ss = tok.nextToken();
-                    buf.append(ss.substring(0, Math.min(ss.length(), 12)));
-                }
-                labelStr = buf.toString();
+            element= describeChanges( diffss, element );
+            if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
+                element.deltaDesc= label;
             }
         }
 
@@ -241,15 +306,17 @@ public class UndoRedoSupport {
         BufferedImage thumb= applicationModel.getThumbnail(50);
         //System.err.println( String.format( "time for thumbnail : %d ms", System.currentTimeMillis()- t0 ) );
 
-        stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString,thumb));
+        element.thumb= thumb;
+        stateStack.add(stateStackPos, element );
 
         while (stateStack.size() > (1 + stateStackPos)) {
             stateStack.removeLast();
         }
         stateStackPos++;
 
+        removeOldStates();
+
         propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, stateStackPos);
-        
 
     }
 
