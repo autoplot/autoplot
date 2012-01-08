@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
@@ -1150,10 +1151,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         unbind(domPlot.getYaxis());
         unbind(domPlot.getZaxis());
 
-        DasPlot p = domPlot.controller.getDasPlot();
-        this.getDasCanvas().remove(p);
-        DasColorBar cb = domPlot.controller.getDasColorBar();
-        this.getDasCanvas().remove(cb);
+        final DasPlot p = domPlot.controller.getDasPlot();
+        final DasColorBar cb = domPlot.controller.getDasColorBar();
+        final DasCanvas lcanvas= this.getDasCanvas();
+        SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
+            public void run() {
+                lcanvas.remove(p);
+                lcanvas.remove(cb);
+            }
+        } );
 
         synchronized (this) {
             List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
