@@ -406,12 +406,7 @@ public class PyQDataSet extends PyJavaInstance {
                     resultIter.next();
                     resultIter.putValue(result, d);
                 }
-                result.putProperty( QDataSet.UNITS, ds.property(QDataSet.UNITS) );
-                result.putProperty( QDataSet.LABEL, ds.property(QDataSet.LABEL) );
-                result.putProperty( QDataSet.NAME, ds.property(QDataSet.NAME) );
-                result.putProperty( QDataSet.VALID_MAX, ds.property(QDataSet.VALID_MAX) );
-                result.putProperty( QDataSet.VALID_MIN, ds.property(QDataSet.VALID_MIN) );
-                result.putProperty( QDataSet.FILL_VALUE, ds.property(QDataSet.FILL_VALUE) );
+                DataSetUtil.copyDimensionProperties( ds, result );
 
                 return new PyQDataSet(result);
             } else {
@@ -448,12 +443,7 @@ public class PyQDataSet extends PyJavaInstance {
             if ( dep0!=null && dep0.length()==result.length() ) {
                 result.putProperty( QDataSet.DEPEND_0, dep0 ); // yeah, we did it right!
             }
-            result.putProperty( QDataSet.UNITS, ds.property(QDataSet.UNITS) );
-            result.putProperty( QDataSet.LABEL, ds.property(QDataSet.LABEL) );
-            result.putProperty( QDataSet.NAME, ds.property(QDataSet.NAME) );
-            result.putProperty( QDataSet.VALID_MAX, ds.property(QDataSet.VALID_MAX) );
-            result.putProperty( QDataSet.VALID_MIN, ds.property(QDataSet.VALID_MIN) );
-            result.putProperty( QDataSet.FILL_VALUE, ds.property(QDataSet.FILL_VALUE) );
+            DataSetUtil.copyDimensionProperties( ds, result );
             
             return new PyQDataSet(result);
         }
