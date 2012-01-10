@@ -1269,7 +1269,7 @@ public class GuiSupport {
                         }
                     }
                 };
-                RequestProcessor.invokeLater(run);
+                SwingUtilities.invokeLater(run);
                 //run.run();
             }
         });
@@ -1292,7 +1292,7 @@ public class GuiSupport {
                         domPlot.getController().contextOverview();
                     }
                 };
-                RequestProcessor.invokeLater(run);
+                SwingUtilities.invokeLater(run);
                 //run.run();
             }
         });
