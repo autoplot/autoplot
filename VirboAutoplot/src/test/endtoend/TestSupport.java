@@ -84,8 +84,12 @@ public class TestSupport {
 
     public static MutablePropertyDataSet sampleQube1( double off1, double off2, int len1, int len2 ) {
         DDataSet result= (DDataSet) Ops.randn(len1,len2);
-        result.putProperty( QDataSet.DEPEND_0, Ops.add( DataSetUtil.asDataSet(off1), Ops.dindgen(len1) ) );
-        result.putProperty( QDataSet.DEPEND_1, Ops.add( DataSetUtil.asDataSet(off2), Ops.dindgen(len2) ) );
+        MutablePropertyDataSet xx= (MutablePropertyDataSet)Ops.add( DataSetUtil.asDataSet(off1), Ops.dindgen(len1) );
+        xx.putProperty(QDataSet.NAME, "xx" );
+        result.putProperty( QDataSet.DEPEND_0, xx );
+        MutablePropertyDataSet yy= (MutablePropertyDataSet) Ops.add( DataSetUtil.asDataSet(off2), Ops.dindgen(len2) );
+        yy.putProperty(QDataSet.NAME, "yy" );
+        result.putProperty( QDataSet.DEPEND_1, yy );
         result.putProperty( QDataSet.NAME, "x_"+String.valueOf(off1).replaceAll("\\.", "_") );
         return result;
     }
