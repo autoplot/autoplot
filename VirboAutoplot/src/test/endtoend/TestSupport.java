@@ -50,6 +50,7 @@ public class TestSupport {
         MutablePropertyDataSet rank2Rand= (MutablePropertyDataSet) Ops.add( Ops.randomn(-12345, len0,len1),
                     Ops.sin( Ops.add( Ops.outerProduct( Ops.linspace( 0, 1000.,len0), Ops.replicate(1,len1)),
                                         Ops.outerProduct( Ops.replicate(1,len0), Ops.linspace(0,10,len1) ) ) ) );
+        rank2Rand.putProperty( QDataSet.NAME, "Randomn" );
         return rank2Rand;
     }
     /**
@@ -60,7 +61,9 @@ public class TestSupport {
     public static MutablePropertyDataSet sampleDataRank1( int len0 ) {
         MutablePropertyDataSet rank1Rand= (MutablePropertyDataSet) Ops.accum( Ops.randomn(-12345,len0) );
         try {
-            rank1Rand.putProperty(QDataSet.DEPEND_0, Ops.timegen("2050-001T00:00", "75.23 ms", len0));
+            MutablePropertyDataSet xx= (MutablePropertyDataSet) Ops.timegen("2050-001T00:00", "75.23 ms", len0);
+            xx.putProperty(QDataSet.NAME, "Time" );
+            rank1Rand.putProperty(QDataSet.DEPEND_0, xx );
         } catch (ParseException ex) {
             Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -75,6 +78,7 @@ public class TestSupport {
             }
         }
         wds.putProperty( QDataSet.VALID_MIN, -1e30 );
+        rank1Rand.putProperty(QDataSet.NAME,"Random");
         return rank1Rand;
     }
 
@@ -82,6 +86,7 @@ public class TestSupport {
         DDataSet result= (DDataSet) Ops.randn(len1,len2);
         result.putProperty( QDataSet.DEPEND_0, Ops.add( DataSetUtil.asDataSet(off1), Ops.dindgen(len1) ) );
         result.putProperty( QDataSet.DEPEND_1, Ops.add( DataSetUtil.asDataSet(off2), Ops.dindgen(len2) ) );
+        result.putProperty( QDataSet.NAME, "x_"+String.valueOf(off1).replaceAll("\\.", "_") );
         return result;
     }
 
@@ -99,7 +104,8 @@ public class TestSupport {
 
     /**
      * run all tests.  This was introduced to allow running of all the tests so we could
-     * try to exercise as much code as possible without committing new changes.
+     * try to exercise as much code as possible without committing new changes.  Note
+     * JBF runs a separate Hudson server now, so this isn't so necessary.
      */
     public static void runAllTests() {
         String[] args= new String[0];
