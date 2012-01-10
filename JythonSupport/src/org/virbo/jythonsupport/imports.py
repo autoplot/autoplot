@@ -3,6 +3,7 @@ from org.virbo.jythonsupport.JythonOps import *
 from org.virbo.jythonsupport.Util import *
 from org.virbo.dataset import QDataSet
 from org.virbo.dsutil.BinAverage import *
+from org.virbo.dsutil import DataSetBuilder
 
 from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
 from java.net import URL
