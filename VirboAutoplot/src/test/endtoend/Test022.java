@@ -179,11 +179,44 @@ public class Test022 {
         }
     }
 
+    /**
+     * test code for identifying dataset schemes
+     */
+    private static void testSchemes( ) {
+        QDataSet ds;
+        System.err.println( "---" );
+        ds= TestSupport.sampleDataRank1(99);
+        System.err.println( ds );
+        System.err.println( "x: "+SemanticOps.xtagsDataSet( ds ) );
+        System.err.println( "y: "+SemanticOps.ytagsDataSet( ds ) );
+
+        System.err.println( "---" );
+        ds= TestSupport.sampleDataRank2(99,20);
+        System.err.println( ds );
+        System.err.println( "x: "+SemanticOps.xtagsDataSet( ds ) );
+        System.err.println( "y: "+SemanticOps.ytagsDataSet( ds ) );
+
+        System.err.println( "---" );
+        ds= TestSupport.sampleQube1( 3.4, 4.5, 22, 32 );
+        System.err.println( ds );
+        System.err.println( "x: "+SemanticOps.xtagsDataSet( ds ) );
+        System.err.println( "y: "+SemanticOps.ytagsDataSet( ds ) );
+
+        System.err.println( "---" );
+        ds= TestSupport.sampleRank3Join();
+        System.err.println( ds );
+        System.err.println( "x: "+SemanticOps.xtagsDataSet( ds ) );
+        System.err.println( "y: "+SemanticOps.ytagsDataSet( ds ) );
+        
+    }
+
     public static void main(String[] args)  {
         try {
             doTest( TestSupport.sampleDataRank1(100), null );
             //dumpRank3Ds( TestSupport.sampleRank3Join() );
             doTest( TestSupport.sampleRank3Join(), null );
+            testSchemes();
+
         } catch ( Exception ex ) {
             ex.printStackTrace();
             System.exit(1);
