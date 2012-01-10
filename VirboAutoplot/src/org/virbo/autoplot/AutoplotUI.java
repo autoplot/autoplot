@@ -2359,6 +2359,10 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
 private void aggregateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aggregateMenuItemActionPerformed
     AggregateUrisDialog dia= new AggregateUrisDialog( dom, dataSetSelector );
     JOptionPane.showConfirmDialog( rootPane, dia, "Aggregate URIs", JOptionPane.OK_CANCEL_OPTION ); //TODO: OKAY button is confusing, but how to hide it?
+    //AggregateUrisDialog2 dia= new AggregateUrisDialog2( dom, dataSetSelector );
+    //if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( rootPane, dia, "Aggregate URIs", JOptionPane.OK_CANCEL_OPTION ) ) { //TODO: OKAY button is confusing, but how to hide it?
+    //    dia.doAction();
+    //}
 }//GEN-LAST:event_aggregateMenuItemActionPerformed
 
 private void decodeURLItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decodeURLItemActionPerformed
