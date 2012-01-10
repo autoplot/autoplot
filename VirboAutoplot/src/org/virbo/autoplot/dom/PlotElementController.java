@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -1984,13 +1985,13 @@ public class PlotElementController extends DomNodeController {
     }
 
     protected void maybeCreateDasPeer(){
-        Renderer oldRenderer = getRenderer();
+        final Renderer oldRenderer = getRenderer();
         DasColorBar cb= null;
         if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
 
         setupStyle( plotElement );
 
-        Renderer newRenderer =
+        final Renderer newRenderer =
                 AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
                 oldRenderer, cb, false );
 
@@ -2003,64 +2004,74 @@ public class PlotElementController extends DomNodeController {
                 setRenderer(newRenderer);
             }
 
-            DasPlot plot = getDasPlot();
-            if ( plot==null ) {
-                System.err.println("brace yourself for crash...");
-                plot = getDasPlot(); // for debugging  Spectrogram->Series
-                if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
+            Runnable run = new Runnable() {
+                public void run() {
+                    DasPlot plot = getDasPlot();
+                    if ( plot==null ) {
+                        System.err.println("brace yourself for crash...");
+                        plot = getDasPlot(); // for debugging  Spectrogram->Series
+                        if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
 
-                }
-            }
-
-            DasPlot oldPlot=null;
-            if (oldRenderer != null) {
-                oldPlot= oldRenderer.getParent();
-                if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
-                if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
-            }
-            if ( oldPlot==null || oldRenderer!=newRenderer ) {
-                synchronized ( dom ) {
-                    if ( newRenderer instanceof SpectrogramRenderer ) {
-                        plot.addRenderer(0,newRenderer);
-                    } else {
-                        if ( plot==null ) {
-                            throw new IllegalStateException("plot cannot be null");
                         }
-                        Renderer[] rends= plot.getRenderers();
-                        PlotElement[] pe= new PlotElement[rends.length];
-                        for ( int i=0; i<rends.length; i++ ) {
-                            PlotElement pe1= dom.controller.findPlotElement(rends[i]);
-                            pe[i]= pe1;
-                        }
-                        int best=-1;
-                        int myPos= -1;
-                        for ( int i=0; i<dom.getPlotElements().length; i++ ) {
-                            if ( dom.getPlotElements(i)==plotElement ) myPos= i;
-                        }
-
-                        List<Renderer> arends= Arrays.asList(rends);
-
-                        Renderer lastRend= null;
-                        int i;
-                        for ( i=0; i<myPos; i++ ) {
-                            if ( i>best && i<myPos 
-                                    && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
-                                    && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
-                        }
-
-                        // find the index of the renderer that is just underneath this one.
-                        int indexUnder= -1;
-                        for ( int j=0; j<rends.length; j++ ) {
-                            if ( rends[j]==lastRend ) indexUnder= j;
-                        }
-
-                        plot.addRenderer(indexUnder+1,newRenderer);
                     }
-                }
 
+                    DasPlot oldPlot=null;
+                    if (oldRenderer != null) {
+                        oldPlot= oldRenderer.getParent();
+                        if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
+                        if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
+                    }
+                    if ( oldPlot==null || oldRenderer!=newRenderer ) {
+                        synchronized ( dom ) {
+                            if ( newRenderer instanceof SpectrogramRenderer ) {
+                                plot.addRenderer(0,newRenderer);
+                            } else {
+                                if ( plot==null ) {
+                                    throw new IllegalStateException("plot cannot be null");
+                                }
+                                Renderer[] rends= plot.getRenderers();
+                                PlotElement[] pe= new PlotElement[rends.length];
+                                for ( int i=0; i<rends.length; i++ ) {
+                                    PlotElement pe1= dom.controller.findPlotElement(rends[i]);
+                                    pe[i]= pe1;
+                                }
+                                int best=-1;
+                                int myPos= -1;
+                                for ( int i=0; i<dom.getPlotElements().length; i++ ) {
+                                    if ( dom.getPlotElements(i)==plotElement ) myPos= i;
+                                }
+
+                                List<Renderer> arends= Arrays.asList(rends);
+
+                                Renderer lastRend= null;
+                                int i;
+                                for ( i=0; i<myPos; i++ ) {
+                                    if ( i>best && i<myPos
+                                            && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
+                                            && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
+                                }
+
+                                // find the index of the renderer that is just underneath this one.
+                                int indexUnder= -1;
+                                for ( int j=0; j<rends.length; j++ ) {
+                                    if ( rends[j]==lastRend ) indexUnder= j;
+                                }
+
+                                plot.addRenderer(indexUnder+1,newRenderer);
+                            }
+                        }
+
+                    }
+                    logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
+
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeLater(run);
             }
 
-            logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
             //if (getDataSourceFilter().controller.getFillDataSet() != null) {
                 // this is danger code, I think inserted to support changing render type.
                 // when we change renderType on vector dataset, this is called.
