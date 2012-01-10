@@ -5,6 +5,7 @@
     spec="1.0+" 
     codebase="#{codebase}"
     href="autoplot.jnlp">
+    <!-- codebase="http://autoplot.org/jnlp/${tag}/" -->
    
     <information> 
         <title>Autoplot(#{tag})</title> 
