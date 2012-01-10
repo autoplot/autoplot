@@ -1250,6 +1250,8 @@ public class PlotElementController extends DomNodeController {
             bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
         } else if (renderer instanceof EventsRenderer ) {
             bindToEventsRenderer((EventsRenderer)renderer);
+        } else if (renderer instanceof DigitalRenderer ) {
+            bindToDigitalRenderer((DigitalRenderer)renderer);
         } else {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
@@ -2158,6 +2160,11 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "color", renderer, "color");
     }
 
+    public void bindToDigitalRenderer(DigitalRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+    }
+    
     /**
      * special converter that fills in %{CONTEXT} macro, or inserts it when 
      * label is consistent with macro.  Also now does %{COMPONENT}.  Note
