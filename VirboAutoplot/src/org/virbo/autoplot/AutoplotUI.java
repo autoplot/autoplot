@@ -479,14 +479,22 @@ public class AutoplotUI extends javax.swing.JFrame {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
-                    List<String> urls = new ArrayList<String>();
+                    final List<String> urls = new ArrayList<String>();
                     List<Bookmark> recent = applicationModel.getRecent();
                     for (Bookmark b : recent) {
                         urls.add(((Bookmark.Item) b).getUri());
                     }
-                    dataSetSelector.setRecent(urls);
+                    SwingUtilities.invokeLater(
+                        new Runnable() { public void run() {
+                            dataSetSelector.setRecent(urls);
+                        }
+                    } );
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
-                    updateBookmarks();
+                    SwingUtilities.invokeLater(
+                        new Runnable() { public void run() {
+                            updateBookmarks();
+                        }
+                    } );
                 }
             }
         });
