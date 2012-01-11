@@ -139,6 +139,8 @@ public class Test014 {
             doTest( 2, "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency", null );
             doTest( 3, "file:/home/jbf/ct/hudson/data.backup/dat/cl_ttag_study.dat?column=field0", null );
             doTest( 5, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt", null );
+
+            doTest( 6, "file:///home/jbf/ct/hudson/data.backup/cdf/rbsp-b_WFR-spectral-matrix_emfisis-L1_20121015120844_v1.2.2.cdf?BuBu", null );
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
