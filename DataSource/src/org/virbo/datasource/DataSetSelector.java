@@ -1388,7 +1388,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     /**
-     * Setter for property recent.
+     * Setter for property recent.  Should be called from the event thread.
      * @param recent New value of property recent.
      */
     public void setRecent(List<String> recent) {
