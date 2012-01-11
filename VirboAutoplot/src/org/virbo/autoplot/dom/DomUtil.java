@@ -623,7 +623,7 @@ public class DomUtil {
      * returns true if the dom structure changes.  For example the number of
      * plotElements changes, then this returns true.  If only the range of
      * an axis changes, then return false;
-     * 
+     * 2012-01-11: check axis units after failure in test002_003 showed that old dataset was used for autoranging.
      * @param dom
      * @param state
      * @return true if the dom structure changes.
@@ -634,6 +634,13 @@ public class DomUtil {
         if ( dom.dataSourceFilters.size()!=state.dataSourceFilters.size() ) return true;
         if ( dom.plots.size()!=state.plots.size() ) return true;
         if ( dom.plotElements.size()!=state.plotElements.size() ) return true;
+        for ( int i=0; i<dom.plots.size(); i++ ) {
+            Plot pd= dom.plots.get(i);
+            Plot ps= state.plots.get(i);
+            if ( ! pd.getXaxis().getRange().getUnits().isConvertableTo( ps.getXaxis().getRange().getUnits() ) ) return true;
+            if ( ! pd.getYaxis().getRange().getUnits().isConvertableTo( ps.getYaxis().getRange().getUnits() ) ) return true;
+            if ( ! pd.getZaxis().getRange().getUnits().isConvertableTo( ps.getZaxis().getRange().getUnits() ) ) return true;
+        }
         return false;
     }
 
