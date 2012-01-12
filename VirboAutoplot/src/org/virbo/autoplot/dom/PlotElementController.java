@@ -950,6 +950,8 @@ public class PlotElementController extends DomNodeController {
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
                 QDataSet bdesc= (QDataSet) fillDs.property(QDataSet.BUNDLE_1);
                 Object context0= bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1); // in a bundleDescriptor, this can be a string.
+                if ( context0==null ) context0=  bdesc.property(QDataSet.DEPEND_0,bdesc.length()-1); // according to guessRenderType DEPEND_0 should be used.
+                if ( context0==null ) context0=  bdesc.property(QDataSet.DEPENDNAME_0,bdesc.length()-1); 
                 if ( null!=context0 && context0 instanceof String ) {
                     shouldHaveChildren= false;
                 }
