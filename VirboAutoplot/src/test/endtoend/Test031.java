@@ -42,12 +42,19 @@ public class Test031 {
     }
 
     public static void main(String[] args) throws Exception  {
-        Application dom= getDocumentModel();
-        dom.getPlots(0).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
-        dom.getPlots(0).getYaxis().getController().getDasAxis().setUseDomainDivider(true);
-        dom.getPlots(0).getZaxis().getController().getDasAxis().setUseDomainDivider(true);
+        try {
+            Application dom= getDocumentModel();
+            dom.getPlots(0).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
+            dom.getPlots(0).getYaxis().getController().getDasAxis().setUseDomainDivider(true);
+            dom.getPlots(0).getZaxis().getController().getDasAxis().setUseDomainDivider(true);
 
-        doTest( 0, TestSupport.TEST_DATA + "qds/bad_ticks.qds" );
+            doTest( 0, TestSupport.TEST_DATA + "qds/bad_ticks.qds" );
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
+        System.exit(0);
     }
     
 }
