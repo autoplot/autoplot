@@ -15,9 +15,11 @@ import org.virbo.dataset.IndexListDataSetIterator;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.Py;
 import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 import org.python.core.PyIterator;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
+import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PySequence;
@@ -368,8 +370,16 @@ public class PyQDataSet extends PyJavaInstance {
                 }
                 
             } else if (arg0.isSequenceType()) {
-                QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 PySequence slices = (PySequence) arg0;
+                if ( slices.__len__()==2 && slices.__getitem__(1) instanceof PyInteger ) { // optimize for ds[:,0] to use unbundle
+                    if ( slices.__getitem__(0) instanceof PySlice ) {
+                        PySlice slice = (PySlice) slices.__getitem__(0);
+                        if ( slice.start instanceof PyNone && slice.stop instanceof PyNone && slice.step instanceof PyNone ) {
+                            return new PyQDataSet( DataSetOps.unbundle( rods, ((Number)slices.__getitem__(1).__tojava__( Number.class )).intValue() ) );
+                        }
+                    }
+                }
+                QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
                     QubeDataSetIterator.DimensionIteratorFactory fit;
