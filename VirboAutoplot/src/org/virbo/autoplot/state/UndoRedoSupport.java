@@ -342,7 +342,7 @@ public class UndoRedoSupport {
 
     }
 
-    public synchronized String getUndoDescription() {
+    public String getUndoDescription() {
         if (stateStackPos > 1) {
             return stateStack.get(stateStackPos - 1).docString;
         } else {
@@ -353,7 +353,7 @@ public class UndoRedoSupport {
      * returns a label describing the undo operation, or null if the operation
      * doesn't exist.
      */
-    public synchronized String getUndoLabel() {
+    public String getUndoLabel() {
         if (stateStackPos > 1) {
             return "Undo " + stateStack.get(stateStackPos - 1).deltaDesc;
         } else {
