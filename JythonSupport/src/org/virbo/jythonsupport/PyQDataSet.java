@@ -388,7 +388,7 @@ public class PyQDataSet extends PyJavaInstance {
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                        // TODO: ds[:,0] where ds is a bundle is effectively an unbundle operation.
+                        // TODO: ds[:,0] where ds is a bundle is effectively an unbundle operation.  See https://sourceforge.net/tracker/?func=detail&aid=3473406&group_id=199733&atid=970682
                     } else {
                         QDataSet that = coerce_ds(a);
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
