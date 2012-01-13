@@ -8,6 +8,8 @@ package external;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,22 +77,27 @@ public class PlotCommand extends PyObject {
      */
     private Object getEnumElement( Class c, String ele ) {
         int PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
+        List lvals;
         if (c.isEnum()) {
             Object[] vals = c.getEnumConstants();
             for (Object o : vals) {
                 Enum e = (Enum) o;
-                if ( e.toString().equals(ele) ) return e;
+                if ( e.toString().equalsIgnoreCase(ele) ) return e;
             }
-
+            lvals= Arrays.asList(vals);
         } else {
             Field[] fields = c.getDeclaredFields();
+            lvals= new ArrayList();
             for ( Field f: fields ) {
                 try {
                     String name = f.getName();
                     if ( ( ( f.getModifiers() & PUBLIC_STATIC_FINAL) == PUBLIC_STATIC_FINAL ) ) {
                         Object value = f.get(null);
-                        if ( name.equals(ele) && value!=null && c.isInstance(value) ) {
-                            return value;
+                        if ( value!=null && c.isInstance(value) ) {
+                            lvals.add(value);
+                            if ( name.equalsIgnoreCase(ele) || value.toString().equalsIgnoreCase(ele) ) {
+                               return value;
+                            }
                         }
                     }
                 } catch (IllegalAccessException iae) {
@@ -100,6 +107,7 @@ public class PlotCommand extends PyObject {
                 }
             }
         }
+        System.err.printf( "looking for %s, found %s\n", ele, lvals.toString() );
         return null;
     }
 
@@ -270,7 +278,12 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("linewidth") ) {
                     elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
                 } else if ( kw.equals("symbol") ) {
-                    elements.get(0).getStyle().setPlotSymbol( (PlotSymbol) getEnumElement( DefaultPlotSymbol.class, sval ));
+                    PlotSymbol p= (PlotSymbol) getEnumElement( DefaultPlotSymbol.class, sval );
+                    if ( p!=null ) {
+                        elements.get(0).getStyle().setPlotSymbol( p );
+                    } else {
+                        throw new IllegalArgumentException("unable to identify symbol: "+sval);
+                    }
                 } else if ( kw.equals("renderType") ) {
                     RenderType rt= RenderType.valueOf(sval);
                     elements.get(0).setRenderType(rt);
