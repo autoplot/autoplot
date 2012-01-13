@@ -418,16 +418,11 @@ public class PyQDataSet extends PyJavaInstance {
             DataSetIterator iter = new QubeDataSetIterator(ds);
 
             QDataSet dep0= null;
-            if ( ds.rank()>1 ) {
-                iter= new IndexListDataSetIterator( that );
-                //don't do anything with dep0 for now...
-            } else {
-                QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
-                ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
-                dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
-                if ( dep0!=null ) {
-                    dep0= DataSetOps.applyIndex( dep0, 0, that, false );
-                }
+            QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+            ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
+            dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+            if ( dep0!=null ) {
+                dep0= DataSetOps.applyIndex( dep0, 0, that, false );
             }
 
             DDataSet result= iter.createEmptyDs();
