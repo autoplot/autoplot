@@ -7,20 +7,43 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>The old bug where gaps in the spectrograms would appear is addressed.  The code is more liberal about painting gaps now.</small></p>
+        <p><small>Dataset scheme for representing X,Y,Z buckshot data is supported in the SeriesRenderer.  The page http://autoplot.org/Cooking_at_LANL shows how to make this plot.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This is the Autoplot2011 branch.  This is the first production release of this branch.
+        <p>This is the Autoplot2011 branch.  This is an update to the production version containing bugfixes and minor new features.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>3469219: handle units in append.  For example LANL has files where timetags are always from start of day</li>
+            <li>bugfix: Turns out "ms since 1992-09-13T00:00" in a QStream would not be interpreted as a time.  Now SemanticOps.lookupUnits is used.</li>
+            <li>bugfix: rank3 copyValues IDL/Matlab adapter failed because the length(i0) was used instead of length(i0,i1), leaving result mostly zeroes.</li>
+            <li>bugfix: migrate changes from the CDF Java library to support the same virtual variables</li>
+            <li>3469880: tooltips should go on field labels, not on the label itself. </li>
+            <li>bugfix: getParam( 'timerange', '1997-Jan' ) wouldn't support TimeSeriesBrowse because "Jan" was not [a-z]*</li>
+            <li>updates to auralizeTool so that it works again</li>
+            <li>clean up aggregate GUI, so previews are shown and one code is used to form aggregations</li>
+            <li>bugfix: extra messages "autolayout was set to false" because all prefs were read just to get NN</li>
+            <li>profiling to find problem spots for long batch runs</li>
+            <li>3471016: move more GUI operations to event thread to avoid deadlocks</li>
+            <li>ytagsDataSet gave Y[X] -> indgen() instead of Y.</li>
+            <li>bugfix: digital renderer color was not bound to foreground color.</li>
+            <li>bugfix: rank 2 [:,[X,Y,Z]] scheme supported in SeriesRenderer.</li>
+            <li>update contour function to return bundle [:,[X,Y,Z]]</li>
+            <li>bugfix: python supports ds[:,0] as unbundle, before it would drop metadata making it useless for bundles</li>
+            <li>bugfix: in plotx, allow symbol='stars' by loosing up code that looks for values in enumeration</li>
+            <li>bugfix: guard against ordinal units getting into axis setting.<li>
+            <li>bugfix: rank 4 was never coded for TrimStrideWrapper.java, so python ds[:,:,:,4:6] would fail, clean up to today's qdataset</li>
+            <li>bugfix: python supports ds[:,0] as shorthand for unbundle, before it would drop metadata making it useless for bundles</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>bugfix: qstreams would not look up time location units like "ms since 1992-09-20T00:00:00.000Z"</li>
             <li>3237397: gaps in das2 spectrograms</li>
@@ -33,42 +56,20 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>bugfix: pitch angle distribution renderer was flipped left-to-right!  This is still young code.  Please let us know if you were affected!</li>
             <li>bugfix: bottom plot can provide context for top plot when connector is used.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3461160: QStream Typical_MIN can't be Number, even though spec says Number is okay</li>
-            <li>3461159: Add plot from bug sequence</li>
-            <li>3456234: script editor context menu needs tooltips</li>
-            <li>3458258: No feedback for bad bookmarks file.  Handle untitled folders</li>
-            <li>3436922: Returning from rank 3 stack of plots to spectrogram would fail because the process string was not handled properly.</li>
-            <li>averageGen, script command for reducing data, property handling cleaned up</li>
-            <li>CDF lengths of high rank datasets in editor properly reported (+1 errors).</li>
-            <li>New CDF code assumed that var_type existed</li>
-            <li>bugfix: Format editor panels were not being loaded into release.</li>
-            <li>bugfix: circular call detector depth=70 was too shallow, sometimes it's actually that deep.  New limit is 100.</li>
-            <li>bugfix: code in QStream StreamDescriptor seemed to imply that native byte order was the default for the stream, it should be little_endian.  </li>
-            <li>3458256: virtual variables would use the wrong filename</li>
-            <li>3454451: ArrayIndexOutOfBoundsException sequence Bob noticed.  check bounds</li>
-            <li>ASCII file reader left open an input stream, causing problems with long IDL batch processes.</li>
-            <li>3454378: old code reseting link thickness and symbol size removed from in autorange.</li>
-            <li>3398551: bug in bug reporting system meant that only the linenumber was used to create the hash.</li>
-            <li>3002087: ds= dom.controller.getDataSourceFilter().controller.&lt;COMP&gt;.</li>
-            <li>3380223: hourglass cursor icon after inspect icon.  reset to normal cursor in finally block.  Scott B at Iowa observed that if the resource is not found then the hourglass is left on.
-            <li>bugfix: don't show last URI from history when starting. </li>
-            <li>3448593: I now need to reset the size for use within scripts, and I had a typo in the setSize( getWidth(), getWidth() )</li>
-            <li>3441461: plotx with multiple parameters</li>
-            <li>3399323: Background and foreground colors do not update</li>
-            <li>3449573: code to check for white on white, etc, more aggressively</li>
-            <li>3441434: data post processing stays insensitive, basic mode</li>
-            <li>3444673: Remote bookmark files can be cached so loading is only done when necessary</li>
-            <li>3198392: remote bookmarks loaded immediately and on event thread.  Show local first, then load remote 10sec later</li>
-            <li>3440253: consider filesystem caching in memory vs .listing files.  Http file systems now cache listings on disk.</li>
-            <li>3373605: avoid null use in the DOM.</li>
-            <li>3399323: Background and foreground colors do not update on style tab.</li>
-            <li>2997820: Clean up automatic insertion of timerange so that 2010-01-01 is not used when it was never entered</li>
-            <li>3448593: Craig's overlap/add plot bug.  Add/delete additional plot would destroy layout because em offsets were ignored when identifying overlaps</li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>guessNameFor(URI) introduced, and Jython script getDataSet completion attempts to suggest better name than "ds"</li>
+            <li>add fftPowerDelta1024 to CDF virtual variable functions</li>
+            <li>improve support for filesystem completions like .../1wire/dot4_data/$Y/$m/$d/10.&lt;COMP&gt;</li>
+            <li>LSpec code updated to work with today's Autoplot, and included in single-jar release</li>
+            <li>NetCDF/HDF5 reader supports constraints like ds[0:10] to allow read of huge files.</li>
+            <li>box zoom detected and described efficiently in undo list</li>
+            <li>add  Ops.flatten function, before we had only flattenRank2</li>
+            <li>introduce SemanticOps.getLooseUnitsConverter, which allows a ratiometric unit to be compared to a dimensionless. (2 kg).gt(1) </li>
+            <li>simplify code and allow ds[r] to be used where ds is rank 2 and r is rank 1</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add mkdir function to ScriptContext.</li>
             <li>getDataSet completion in Jython editor guesses default name from URI instead of "ds"</li>
@@ -77,22 +78,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>handle ISO8601 formatted times in HDF5 and NC files.  The CDF folks and LANL were both producing files like this.</li>
             <li>add icon for events renderer</li>
             <li>writeToPng and writeToPdf in scripts will now make the directory if it doesn't exist.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>more findbugs code cleanup.</li>
-            <li>vap 1.07 contains options.ticklen, options.flipColorbarLabel, plotElement.cadenceCheck, plot.legendPosition</li>
-            <li>more datasets plotted as we detect event lists</li>
-            <li>add blur and rotate parameters to image reader as Jeremy was playing</li>
-            <li>add checkbox for hiding xaxis label</li>
-            <li>Initial support for VxOs HELM Events file format</li>
-            <li>3452647: New layout engine to manage inter-plot spacing and margins. (Tools->Fix Layout)</li>
-            <li>3446504: separate open file into open vap file and open data file</li>
-            <li>Use events bar when Y(X) has Y with ordinal units.</li>
-            <li>Use digital renderer with Y when Y has ordinal units.</li>
-            <li>3154463: restore vap to correct size when loading.  Prompt if the product is too big scale or scrollbars</li>
-            <li>3454475: vap/DOM version 1.07 changes allow ticklen, legend position, cadence check control.</li>
-            <li>QStream exceptions are supported, so that servers can convey error conditions.</li>
         </ul>
 
 <p>Known issues:</p>
