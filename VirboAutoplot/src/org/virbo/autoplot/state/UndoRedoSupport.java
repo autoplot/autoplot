@@ -201,6 +201,7 @@ public class UndoRedoSupport {
         boolean axisRangeOnly = true;
         boolean zaxisRangeOnly = true;
         boolean axisAuto = false;
+        boolean timeRange= false;
         String focus=null;
 
         for (Diff s : diffs) {
@@ -213,14 +214,16 @@ public class UndoRedoSupport {
             if ( focus==null ) {
                 focus= thisDiffFocus;
             } else {
-                if ( !focus.equals(thisDiffFocus) ) {
+                if ( !focus.equals(thisDiffFocus) && !s.propertyName().equals("timeRange") ) {
                     focus=""; // indicate there is no one element
+                } else if ( s.propertyName().equals("timeRange") ) {
+                    timeRange= true;
                 }
             }
             count++;
             docBuf.append("<br>");
             docBuf.append(s.getDescription());
-            if (s.propertyName().endsWith("axis.range")) {
+            if (s.propertyName().endsWith("axis.range") || s.propertyName().equals("timeRange") ) {
                 if (s.propertyName().endsWith("zaxis.range")) {
                     axisRangeOnly = false;
                 } else {
@@ -252,9 +255,9 @@ public class UndoRedoSupport {
             }
         } else if (axisRangeOnly && focus.length()>0 && count > 1) {
             if (axisAuto) {
-                labelStr = focus + " first XY range changes";
+                labelStr = focus + " first range change";
             } else {
-                labelStr = focus + " XY range changes";
+                labelStr = focus + " range changes";
             }
         } else if (count > 3) {
             labelStr = "" + count + " changes";
