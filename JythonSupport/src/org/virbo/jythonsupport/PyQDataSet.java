@@ -373,9 +373,18 @@ public class PyQDataSet extends PyJavaInstance {
                 PySequence slices = (PySequence) arg0;
                 if ( slices.__len__()==2 && slices.__getitem__(1) instanceof PyInteger ) { // sf 3473406: optimize for ds[:,0] to use unbundle
                     if ( slices.__getitem__(0) instanceof PySlice ) {
+                        int index= ((Number)slices.__getitem__(1).__tojava__( Number.class )).intValue();
+                        if ( index<0 ) index= rods.length(0) + index;
+                        QDataSet unb1= DataSetOps.unbundle( rods, index );
                         PySlice slice = (PySlice) slices.__getitem__(0);
                         if ( slice.start instanceof PyNone && slice.stop instanceof PyNone && slice.step instanceof PyNone ) {
-                            return new PyQDataSet( DataSetOps.unbundle( rods, ((Number)slices.__getitem__(1).__tojava__( Number.class )).intValue() ) );
+                            return new PyQDataSet( unb1 );
+                        } else if ( slice.step instanceof PyNone || ((Number)slice.step.__tojava__(Number.class)).intValue()==1 ) { // use native trim if possible.
+                            int start= slice.start.isNumberType() ? ((Number)slice.start.__tojava__( Number.class )).intValue() : 0;
+                            int stop=  slice.stop.isNumberType() ? ((Number)slice.stop.__tojava__( Number.class )).intValue() : unb1.length();
+                            if ( start<0 ) start= unb1.length()+start;
+                            if ( stop<0 ) stop= unb1.length()+stop;
+                            return new PyQDataSet( unb1.trim(start,stop) );
                         }
                     }
                 }
