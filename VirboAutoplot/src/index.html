@@ -39,7 +39,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>update contour function to return bundle [:,[X,Y,Z]]</li>
             <li>bugfix: python supports ds[:,0] as unbundle, before it would drop metadata making it useless for bundles</li>
             <li>bugfix: in plotx, allow symbol='stars' by loosing up code that looks for values in enumeration</li>
-            <li>bugfix: guard against ordinal units getting into axis setting.<li>
+            <li>bugfix: guard against ordinal units getting into axis setting.</li>
             <li>bugfix: rank 4 was never coded for TrimStrideWrapper.java, so python ds[:,:,:,4:6] would fail, clean up to today's qdataset</li>
             <li>bugfix: python supports ds[:,0] as shorthand for unbundle, before it would drop metadata making it useless for bundles</li>
         </ul>
