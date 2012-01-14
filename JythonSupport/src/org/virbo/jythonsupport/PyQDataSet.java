@@ -394,7 +394,7 @@ public class PyQDataSet extends PyJavaInstance {
                     QubeDataSetIterator.DimensionIteratorFactory fit;
                     if (a instanceof PySlice) {
                         PySlice slice = (PySlice) a;
-                        Number start = (Number) getNumber(slice.start);
+                        Number start = (Number) getNumber(slice.start); // TODO: for the 0th index and step=1, native trim can be used.
                         Number stop = (Number)  getNumber(slice.stop);
                         Number step = (Number)  getNumber(slice.step);
                         fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
@@ -407,7 +407,6 @@ public class PyQDataSet extends PyJavaInstance {
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                        // TODO: ds[:,0] where ds is a bundle is effectively an unbundle operation.  See https://sourceforge.net/tracker/?func=detail&aid=3473406&group_id=199733&atid=970682
                     } else {
                         QDataSet that = coerce_ds(a);
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
