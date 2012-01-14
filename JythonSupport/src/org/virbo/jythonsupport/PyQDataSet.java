@@ -371,7 +371,7 @@ public class PyQDataSet extends PyJavaInstance {
                 
             } else if (arg0.isSequenceType()) {
                 PySequence slices = (PySequence) arg0;
-                if ( slices.__len__()==2 && slices.__getitem__(1) instanceof PyInteger ) { // optimize for ds[:,0] to use unbundle
+                if ( slices.__len__()==2 && slices.__getitem__(1) instanceof PyInteger ) { // sf 3473406: optimize for ds[:,0] to use unbundle
                     if ( slices.__getitem__(0) instanceof PySlice ) {
                         PySlice slice = (PySlice) slices.__getitem__(0);
                         if ( slice.start instanceof PyNone && slice.stop instanceof PyNone && slice.step instanceof PyNone ) {
