@@ -9,6 +9,7 @@
 package org.virbo.autoplot;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -28,6 +29,7 @@ import org.das2.datum.Units;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -35,6 +37,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URISplit;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
@@ -82,6 +87,13 @@ public class AutoplotDataServer {
             formatD2S( ds, out );
         } else if ( format.equals("qds") ) {
             new SimpleStreamFormatter().format(ds, out, true );
+        } else if ( format.equals("dat") || format.equals("xls") ) {
+            File file= File.createTempFile( "autoplotDataServer", "."+format );
+            formatDataSet( ds, file.toString() );
+            FileInputStream fin= new FileInputStream(file);
+            DataSourceUtil.transfer( fin, out );
+        } else {
+            throw new IllegalAccessException("bad format");
         }
     }
 
@@ -148,6 +160,17 @@ public class AutoplotDataServer {
             format = "qds";
         } else if (outfile.endsWith(".d2s")) {
             format = "d2s";
+        } else if ( outfile.contains(".") ) {
+            URISplit split= URISplit.parse(outfile);
+            format= split.ext;
+            if ( format==null ) {
+                split= URISplit.parse("file:///"+outfile);
+                format= split.ext;
+            }
+        }
+
+        if ( format.startsWith(".") ) {
+            format= format.substring(1);
         }
 
         ProgressMonitor mon= new NullProgressMonitor();
