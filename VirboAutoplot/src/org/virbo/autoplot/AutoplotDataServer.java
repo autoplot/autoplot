@@ -85,7 +85,7 @@ public class AutoplotDataServer {
             formatD2S( ds, out );
         } else if ( format.equals("qds") ) {
             new SimpleStreamFormatter().format(ds, out, true );
-        } else if ( format.equals("dat") || format.equals("xls") ) {
+        } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile( "autoplotDataServer", "."+format );
             formatDataSet( ds, file.toString() );
             FileInputStream fin= new FileInputStream(file);
