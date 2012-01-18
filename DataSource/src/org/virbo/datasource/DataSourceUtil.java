@@ -10,6 +10,8 @@
 package org.virbo.datasource;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -489,6 +491,25 @@ public class DataSourceUtil {
         src.close();
     }
 
+
+    /**
+     * transfers the data from one channel to another.  src and dest are
+     * closed after the operation is complete.
+     * @param src
+     * @param dest
+     * @throws java.io.IOException
+     */
+    public static void transfer( InputStream src, OutputStream dest ) throws IOException {
+        final byte[] buffer = new byte[ 16 * 1024 ];
+
+        int i= src.read(buffer);
+        while ( i != -1) {
+            dest.write(buffer,0,i);
+            i= src.read(buffer);
+        }
+        dest.close();
+        src.close();
+    }
 
     /**
      * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
