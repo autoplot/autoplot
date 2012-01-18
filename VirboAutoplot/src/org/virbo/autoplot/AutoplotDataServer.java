@@ -29,7 +29,6 @@ import org.das2.datum.Units;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
-import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -37,7 +36,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.qstream.SimpleStreamFormatter;
