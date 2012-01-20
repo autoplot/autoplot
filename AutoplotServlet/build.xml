@@ -27,7 +27,7 @@
 	        username="admin"
 	        password="nimda!exist"
 	            path="/AutoplotServlet"
-	             war="file:/Users/shengli/Documents/workspace/autoplot/AutoplotServlet/dist/AutoplotServlet.war"/>
+	             war="file:./dist/AutoplotServlet.war"/>
 
 	  </target>
 	
@@ -37,7 +37,7 @@
 
 	  	<tstamp/>
 
-		<undeploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager/html"
+		<undeploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager"
 			   username="admin"
 				        password="nimda!exist"
 				            path="/AutoplotServlet"/>
