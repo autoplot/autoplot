@@ -13,8 +13,18 @@
 
     <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
     <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
-	  <taskdef name="deploy"  classname="org.apache.catalina.ant.DeployTask"/>
-	  <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
+	 
+	<taskdef name="deploy"  classname="org.apache.catalina.ant.DeployTask"/>
+	<taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
+	
+	<target name="release" depends="" >
+		<tstamp/>
+		<sshexec host="ec2-174-129-62-39.compute-1.amazonaws.com"
+			username="ubuntu"
+			keyfile="${user.home}/ec2/ec2-keypair.pem"
+			command="cp apache-tomcat-6.0.35/webapps/AutoplotServlet.war release/ &amp;&amp; mv release/AutoplotServlet.war release/AutoplotServlet-${DSTAMP}.war"/>
+	</target>
+	
 	<target name="deploy" depends="default"
 	   description="Deploy application to a remote servlet container">
 
