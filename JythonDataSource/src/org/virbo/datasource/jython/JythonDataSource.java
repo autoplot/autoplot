@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -35,6 +36,7 @@ import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -297,6 +299,23 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     tsb= tsb1;
                 }
                 notCheckedTsb= false;
+            }
+
+            // add cache tag to avoid unnecessary reads.
+            if ( tsb!=null ) {
+                // check for cache tag from script
+                QDataSet dep0= (QDataSet) res.property(QDataSet.DEPEND_0);
+                if ( dep0!=null ) {
+                    CacheTag tag= (CacheTag) dep0.property(QDataSet.CACHE_TAG);
+                    if ( tag==null ) {
+                        tag= new CacheTag( tsb.getTimeRange(), null ); // note if the script reduces data, then it must specify cache tag.  But they can't anyway...
+                        MutablePropertyDataSet mdep0= DataSetOps.makePropertiesMutable(dep0);
+                        mdep0.putProperty( QDataSet.CACHE_TAG, tag );
+                        MutablePropertyDataSet mres= DataSetOps.makePropertiesMutable(res);
+                        mres.putProperty( QDataSet.DEPEND_0, mdep0 );
+                        res= mres;
+                    }
+                }
             }
 
             if (causedBy != null) {
