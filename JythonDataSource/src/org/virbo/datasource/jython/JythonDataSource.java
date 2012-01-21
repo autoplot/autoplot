@@ -308,7 +308,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 if ( dep0!=null ) {
                     CacheTag tag= (CacheTag) dep0.property(QDataSet.CACHE_TAG);
                     if ( tag==null ) {
-                        tag= new CacheTag( tsb.getTimeRange(), null ); // note if the script reduces data, then it must specify cache tag.  But they can't anyway...
+                        tag= new CacheTag( tsb.getTimeRange(), null ); // note if the script reduces data, then it must specify cache tag. 
                         MutablePropertyDataSet mdep0= DataSetOps.makePropertiesMutable(dep0);
                         mdep0.putProperty( QDataSet.CACHE_TAG, tag );
                         MutablePropertyDataSet mres= DataSetOps.makePropertiesMutable(res);
