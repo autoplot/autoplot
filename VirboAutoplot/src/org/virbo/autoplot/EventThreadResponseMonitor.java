@@ -52,7 +52,7 @@ public final class EventThreadResponseMonitor {
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-            buf.append("[ ").append(evt).append("]\n");
+            buf.append("[ ").append(evt.getSource()).append("->").append(evt).append("]\n");
             queue.add(evt);
         }
 
