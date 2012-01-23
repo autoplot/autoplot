@@ -499,7 +499,7 @@ public class AutoplotApplet extends JApplet {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
-                        for ( int i=0; i<5; i++ ) {
+                        for ( int i=0; i<8; i++ ) {
                             System.err.printf("ds[%d]=%s\n",i,ds.slice(i));
                         }
                         System.err.println("loaded ds: "+ds );
