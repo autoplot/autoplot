@@ -499,8 +499,10 @@ public class AutoplotApplet extends JApplet {
                 if (tsb == null) {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
-                        ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
                         System.err.println("  dsource="+dsource );
+                        System.err.println("  dsource.getClass()="+dsource.getClass() );
+
+                        ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
                         for ( int i=0; i<Math.min(12,ds.length()); i++ ) {
                             System.err.printf("ds[%d]=%s\n",i,ds.slice(i));
                         }
