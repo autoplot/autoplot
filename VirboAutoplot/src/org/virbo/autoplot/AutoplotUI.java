@@ -2635,6 +2635,7 @@ private void updateFrameTitle() {
                 "passed into the script as sys.argv");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
+        alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
 
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -2776,6 +2777,7 @@ APSplash.checkTime("init -80");
                         public void run() {
                             app.applicationModel.canvas.repaint();
                             app.setVisible(true);
+                            if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
                     } );
 
