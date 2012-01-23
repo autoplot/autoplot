@@ -475,6 +475,7 @@ public class AutoplotApplet extends JApplet {
                 dsource = DataSetURI.getDataSource(surl);
                 System.err.println("get dsource for " + surl +" @ " + (System.currentTimeMillis() - t0) + " msec");
                 System.err.println("  got dsource="+dsource );
+                System.err.println("  dsource.getClass()="+dsource.getClass() );
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
@@ -500,7 +501,8 @@ public class AutoplotApplet extends JApplet {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         System.err.println("  dsource="+dsource );
-                        System.err.println("  dsource.getClass()="+dsource.getClass() );
+                        System.err.println("  dsource.getClass()="+dsource.getClass() ) ;
+                        if ( dsource.getClass().toString().contains("CsvDataSource") ) System.err.println( " WHY IS THIS CsvDataSource!?!?" );
 
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
                         for ( int i=0; i<Math.min(12,ds.length()); i++ ) {
