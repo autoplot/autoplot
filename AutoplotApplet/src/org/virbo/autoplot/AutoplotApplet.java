@@ -38,6 +38,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.autoplot.csv.CsvDataSourceFactory;
+import org.autoplot.csv.CsvDataSourceFormat;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -58,6 +60,7 @@ import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.das2Stream.Das2StreamDataSourceFormat;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -496,6 +499,9 @@ public class AutoplotApplet extends JApplet {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
+                        for ( int i=0; i<5; i++ ) {
+                            System.err.printf("ds[%d]=%s\n",i,ds.slice(i));
+                        }
                         System.err.println("loaded ds: "+ds );
                         System.err.println("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                     } catch (Exception ex) {
