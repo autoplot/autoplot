@@ -38,11 +38,14 @@ public final class EventThreadResponseMonitor {
 
     public static synchronized String dumpPendingEvents() {
         StringBuilder buf= new StringBuilder();
-        buf.append("---------------------------------------------------------------\n");
         Queue queue= new LinkedList();
         AWTEvent evt;
 
         EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
+        if ( instance.peekEvent()!=null ) {
+            buf.append("---------------------------------------------------------------\n");
+        }
+        
         while ( instance.peekEvent()!=null ) {
             try {
                 evt= instance.getNextEvent();
@@ -52,7 +55,8 @@ public final class EventThreadResponseMonitor {
             buf.append("[ ").append(evt).append("]\n");
             queue.add(evt);
         }
-        buf.append("-----e--n--d-----------------------------------------------------");
+
+        if ( instance.peekEvent()!=null ) buf.append("-----e--n--d-----------------------------------------------------");
         while ( queue.size() > 0 ) {
             instance.postEvent((AWTEvent)queue.remove());
         }
@@ -73,9 +77,10 @@ public final class EventThreadResponseMonitor {
                         }
                         lastPost= System.currentTimeMillis();
 
-                        //pending= dumpPendingEvents();
+                        //System.err.print( dumpPendingEvents() );
 
                         SwingUtilities.invokeAndWait( responseRunnable() );
+                        
                     } catch ( InterruptedException ex ) {
 
                     } catch ( InvocationTargetException ex ) {
@@ -97,13 +102,14 @@ public final class EventThreadResponseMonitor {
                     if ( pending!=null ) {
                         System.err.printf( "events pending:\n");
                         System.err.printf( pending );
-                        System.err.printf( "current event when we posted is not included.\n");
                     }
-
                     
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
+
+                //pending= dumpPendingEvents();
+                //TODO: this would be the correct time to dumpPendingEvents.
             }
         };
     }
