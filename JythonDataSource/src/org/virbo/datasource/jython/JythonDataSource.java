@@ -157,6 +157,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             resourceURI= null;
             jythonScript= getFile(new NullProgressMonitor());
         }
+
+        boolean allowCaching= !( "F".equals( params.get("allowCaching") ) );
         
         PyException causedBy = null;
         try {
@@ -222,9 +224,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
                 reader=null;
                 
-                if (causedBy == null) {
+                if (causedBy == null && allowCaching ) {
                     cacheDate = resourceDate(this.uri);
                     cacheUrl = cacheUrl(this.uri);
+                } else if ( !allowCaching ) {
+                    interp= null;
                 }
             }
 
