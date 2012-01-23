@@ -49,7 +49,7 @@
 
 		<undeploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager"
 			   username="admin"
-				        password="nimda!exist"
+				        password=""
 				            path="/AutoplotServlet"/>
 
 	</target>
