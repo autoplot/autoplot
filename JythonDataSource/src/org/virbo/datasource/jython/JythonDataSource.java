@@ -230,6 +230,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     cacheDate = resourceDate(this.uri);
                     cacheUrl = cacheUrl(this.uri);
                 } 
+            } else {
+                System.err.println("using existing interpreter to provide caching");
+
             }
 
             String expr = params.get("arg_0");
