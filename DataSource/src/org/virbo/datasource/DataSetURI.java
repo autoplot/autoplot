@@ -435,7 +435,7 @@ public class DataSetURI {
             FileSystem fs = FileSystem.create(spath);
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
-                logger.log(Level.INFO, "downloading file {0}", fo.getNameExt());
+                logger.log(Level.INFO, "getInputStream(URL): downloading file {0} from {1}", new Object[] { fo.getNameExt(), url.toString() } );
             }
             return fo.getInputStream(mon);
 
@@ -453,7 +453,7 @@ public class DataSetURI {
             filename = DataSourceUtil.unescape(filename);
         FileObject fo = fs.getFileObject(filename);
         if (!fo.isLocal()) {
-            logger.log(Level.INFO, "downloading file {0}", fo.getNameExt());
+            logger.log(Level.INFO, "getInputStream(URI): downloading file {0} from {1}", new Object[] { fo.getNameExt(), uri.toString() } );
         }
         return fo.getInputStream(mon);
 
@@ -563,7 +563,7 @@ public class DataSetURI {
                 filename = DataSourceUtil.unescape(filename);
             FileObject fo = fs.getFileObject(filename);
             if (!fo.isLocal()) {
-                logger.log(Level.FINE, "downloading file {0}", fo.getNameExt());
+                logger.log(Level.FINE, "getFile: downloading file {0} from {1}", new Object[] { fo.getNameExt(), url.toString() } );
             } else {
                 logger.log(Level.FINE, "using local copy of {0}", fo.getNameExt());
             }
