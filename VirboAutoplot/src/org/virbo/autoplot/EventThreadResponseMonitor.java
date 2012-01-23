@@ -5,18 +5,25 @@
 
 package org.virbo.autoplot;
 
+import java.awt.AWTEvent;
+import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.Queue;
 import javax.swing.SwingUtilities;
 
 /**
  * This utility regularly posts events on the event thread, and measures processing time.
  * This should never be more than 500ms (warnLevel below).
+ * See org.das2.util.awt.LoggingEventQueue, which was a similar experiment from 2005.
  * @author jbf
  */
 public final class EventThreadResponseMonitor {
 
     long lastPost;
     long response;
+    String pending;
 
     int testFrequency = 300;
     int warnLevel= 500; // acceptable millisecond delay in processing
@@ -28,7 +35,30 @@ public final class EventThreadResponseMonitor {
     public void start() {
         new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
     }
-    
+
+    public static synchronized String dumpPendingEvents() {
+        StringBuilder buf= new StringBuilder();
+        buf.append("---------------------------------------------------------------\n");
+        Queue queue= new LinkedList();
+        AWTEvent evt;
+
+        EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
+        while ( instance.peekEvent()!=null ) {
+            try {
+                evt= instance.getNextEvent();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            buf.append("[ ").append(evt).append("]\n");
+            queue.add(evt);
+        }
+        buf.append("-----e--n--d-----------------------------------------------------");
+        while ( queue.size() > 0 ) {
+            instance.postEvent((AWTEvent)queue.remove());
+        }
+        return buf.toString();
+    }
+
     Runnable createRunnable() {
         lastPost= System.currentTimeMillis();
         return new Runnable() {
@@ -42,6 +72,9 @@ public final class EventThreadResponseMonitor {
                             sleep= nextPost - System.currentTimeMillis();
                         }
                         lastPost= System.currentTimeMillis();
+
+                        //pending= dumpPendingEvents();
+
                         SwingUtilities.invokeAndWait( responseRunnable() );
                     } catch ( InterruptedException ex ) {
 
@@ -61,7 +94,13 @@ public final class EventThreadResponseMonitor {
 
                 if ( levelms>warnLevel ) {
                     System.err.printf( "CURRENT EVENT QUEUE CLEAR TIME: %5.3f sec\n", levelms/1000. );
-                    //TODO: try to identify what caused delay
+                    if ( pending!=null ) {
+                        System.err.printf( "events pending:\n");
+                        System.err.printf( pending );
+                        System.err.printf( "current event when we posted is not included.\n");
+                    }
+
+                    
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
