@@ -453,7 +453,7 @@ public class DataSetURI {
             filename = DataSourceUtil.unescape(filename);
         FileObject fo = fs.getFileObject(filename);
         if (!fo.isLocal()) {
-            logger.log(Level.INFO, "getInputStream(URI): downloading file {0} from {1}", new Object[] { fo.getNameExt(), uri.toString() } );
+            logger.log(Level.INFO, "getInputStream(URI): downloading file {0} from {1}/{2}", new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
         }
         return fo.getInputStream(mon);
 
