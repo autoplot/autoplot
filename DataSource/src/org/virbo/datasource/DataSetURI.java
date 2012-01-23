@@ -445,7 +445,6 @@ public class DataSetURI {
     }
 
     public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
-Thread.currentThread().dumpStack();
         URISplit split = URISplit.parse( uri );
         FileSystem fs;
         fs = FileSystem.create( DataSetURI.toUri(split.path) );
