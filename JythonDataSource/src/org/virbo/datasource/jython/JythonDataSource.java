@@ -159,6 +159,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
 
         boolean allowCaching= !( "F".equals( params.get("allowCaching") ) );
+
+        if ( !allowCaching ) interp= null;
         
         PyException causedBy = null;
         try {
@@ -227,9 +229,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 if (causedBy == null && allowCaching ) {
                     cacheDate = resourceDate(this.uri);
                     cacheUrl = cacheUrl(this.uri);
-                } else if ( !allowCaching ) {
-                    interp= null;
-                }
+                } 
             }
 
             String expr = params.get("arg_0");
@@ -330,6 +330,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 throw causedBy;
             }
 
+            if ( !allowCaching ) {
+                interp= null;
+            }
+
             mon.finished();
             return res;
 
@@ -376,7 +380,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private synchronized boolean useCache(URI uri) {
         try {
             if ((cacheDate != null && !resourceDate(uri).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(uri)))) {
-                return true;
+                if ( uri.toString().contains("allowCaching=F") ) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
             return false;
         } catch (IOException ex) {
