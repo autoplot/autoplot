@@ -337,6 +337,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     if ( fw!=null ) fw.close();
                 }
 
+                //Windows7 cannot clobber the old filename.  Delete it manually.  TODO: locks...
+                if ( listing.exists() ) {
+                    if ( !listing.delete() ) {
+                        throw new IllegalArgumentException("unable to delete old listing file");
+                    }
+                }
                 if ( ! listingt.renameTo(listing) ) {
                     throw new IllegalArgumentException("unable to rename file "+listingt+ " to "+ listing );
                 }
