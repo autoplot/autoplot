@@ -146,7 +146,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         Window w= SwingUtilities.getWindowAncestor(this);
         DasProgressPanel mon;
         if ( w==null ) { 
-            mon= DasProgressPanel.createFramed("getting master CDF");
+            mon= DasProgressPanel.createFramed("getting master CDF");  //TODO: this message no longer appears
         } else {
             mon= DasProgressPanel.createFramed(w,"getting master CDF");
         }
@@ -224,7 +224,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
         if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
-        messageComponent= new JLabel("<html><em>Loading file...</em></html>"); // this causes problem when droplist is used.
+        messageComponent= new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
         parameterPanel.add( messageComponent, BorderLayout.NORTH );
 
         URISplit split= URISplit.parse(suri);
