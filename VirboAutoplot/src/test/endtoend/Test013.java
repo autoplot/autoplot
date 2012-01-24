@@ -323,6 +323,36 @@ public class Test013 {
 
     }
 
+    private static void test009() throws ParseException, FileNotFoundException, StreamException, IOException {
+        int nrec = 1000;
+        MutablePropertyDataSet tags = (MutablePropertyDataSet) Ops.timegen("2003-09-09", "1 " + Units.days, nrec);
+        tags.putProperty(QDataSet.NAME, "time");
+
+        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.randomn(12345, nrec, 21);
+        ds.putProperty(QDataSet.DEPEND_0, tags);
+        ds.putProperty(QDataSet.DEPEND_1, Ops.linspace( 10,15,21 ) );
+        ds.putProperty(QDataSet.NAME, "Spectrogram");
+
+        MutablePropertyDataSet labels = (MutablePropertyDataSet) Ops.findgen(3);
+        labels.putProperty(QDataSet.NAME, "dimLabels");
+
+        MutablePropertyDataSet rank1= (MutablePropertyDataSet)Ops.ripples(nrec);
+        rank1.putProperty( QDataSet.NAME, "density" ) ;
+
+        MutablePropertyDataSet result= (MutablePropertyDataSet) Ops.bundle( Ops.bundle( tags, ds ), rank1 );
+
+        FileOutputStream out=null;
+        try {
+            out= new FileOutputStream("test013_test9.qds");
+            SimpleStreamFormatter format = new SimpleStreamFormatter();
+            format.format( result, out, false );
+
+            System.err.println( "time: "+ ( System.currentTimeMillis()-t0) );
+        } finally {
+            if ( out!=null ) out.close();
+        }
+    }
+
     public static void parseBenchmark() throws FileNotFoundException, StreamException, org.das2.stream.StreamException {
         readAsciiQds();
         readBinaryQds();
@@ -429,6 +459,9 @@ public class Test013 {
 
             test7();
             xxx("test7");
+
+            test009();
+            xxx("test9");
 
             testBundle();
             xxx("testBundle");
