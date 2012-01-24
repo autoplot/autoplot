@@ -516,9 +516,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         initialize(uri);
 
-        CDAWebDB.getInstance().maybeRefresh(mon);
-        refresh(uri);
-
+        try {
+           CDAWebDB.getInstance().maybeRefresh(mon);
+           refresh(uri);
+        } catch ( IOException ex ) {
+           throw ex;  // do nothing for now.
+        }
         return true;
     }
 
