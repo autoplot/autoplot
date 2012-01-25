@@ -228,7 +228,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 System.err.println("META-INF/org.virbo.datasource.DataSourceFactory.extensions contains extension that contains period: ");
-                                System.err.println(url);
+                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
                                 System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 System.err.println("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
@@ -281,7 +281,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 System.err.println("META-INF/org.virbo.datasource.DataSourceFormat.extensions contains extension that contains period: ");
-                                System.err.println(url);
+                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
                                 System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 System.err.println("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
@@ -311,7 +311,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 System.err.println("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
-                                System.err.println(url);
+                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
                                 System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 System.err.println("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
@@ -340,7 +340,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 System.err.println("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
-                                System.err.println(url);
+                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
                                 System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 System.err.println("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
