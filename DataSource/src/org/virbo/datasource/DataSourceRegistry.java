@@ -226,6 +226,13 @@ public class DataSourceRegistry {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
+                            if ( ss[i].contains(".") ) {
+                                System.err.println("META-INF/org.virbo.datasource.DataSourceFactory.extensions contains extension that contains period: ");
+                                System.err.println(url);
+                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                System.err.println("");
+                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                            }
                             registry.registerExtension(ss[0], ss[i], null);
                         }
                     }
@@ -272,6 +279,13 @@ public class DataSourceRegistry {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
+                            if ( ss[i].contains(".") ) {
+                                System.err.println("META-INF/org.virbo.datasource.DataSourceFormat.extensions contains extension that contains period: ");
+                                System.err.println(url);
+                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                System.err.println("");
+                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                            }
                             registry.registerFormatter(ss[0], ss[i]);
                         }
                     }
@@ -295,6 +309,13 @@ public class DataSourceRegistry {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
+                            if ( ss[i].contains(".") ) {
+                                System.err.println("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
+                                System.err.println(url);
+                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                System.err.println("");
+                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                            }
                             registry.registerEditor(ss[0], ss[i]);
                         }
                     }
@@ -317,6 +338,13 @@ public class DataSourceRegistry {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
+                            if ( ss[i].contains(".") ) {
+                                System.err.println("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
+                                System.err.println(url);
+                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                System.err.println("");
+                                throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
+                            }
                             registry.registerFormatEditor(ss[0], ss[i]);
                         }
                     }
@@ -459,7 +487,7 @@ public class DataSourceRegistry {
     public synchronized DataSourceFactory getSource(String extension) {
         if ( extension==null ) return null;
         extension= getExtension(extension);
-        Object o = dataSourcesByExt.get(extension);
+         Object o = dataSourcesByExt.get(extension);
         if (o == null) {
             return null;
         }
