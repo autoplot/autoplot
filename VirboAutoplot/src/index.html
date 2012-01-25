@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>Dataset scheme for representing X,Y,Z buckshot data is supported in the SeriesRenderer.  The page http://autoplot.org/Cooking_at_LANL shows how to make this plot.</small></p>
+        <p><small>On a plane trip I decided to implement the feature request where tabs can be dropped into torn off panes.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,6 +21,11 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>3479676: improve feedback with misformatted extension files. Applet had been failing to compile and I finally tracked this down.</li>
+            <li>cacheTag added to result of Jython data source script when TimeSeriesBrowse is detected, so that the script is not called for zoom in.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>3469219: handle units in append.  For example LANL has files where timetags are always from start of day</li>
             <li>bugfix: Turns out "ms since 1992-09-13T00:00" in a QStream would not be interpreted as a time.  Now SemanticOps.lookupUnits is used.</li>
@@ -44,21 +49,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>bugfix: rank 4 was never coded for TrimStrideWrapper.java, so python ds[:,:,:,4:6] would fail, clean up to today's qdataset</li>
             <li>bugfix: python supports ds[:,0] as shorthand for unbundle, before it would drop metadata making it useless for bundles</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>bugfix: qstreams would not look up time location units like "ms since 1992-09-20T00:00:00.000Z"</li>
-            <li>3237397: gaps in das2 spectrograms</li>
-            <li>3469219: handle units in append.  Before we would assume the units were unchanging and wouldn't check for this.</li>
-            <li>bugfix: UNITS were set in Jython applyBinaryOp, when the caller should set the units.  This would result in "200 s" / "10 s" = "20 s"</li>
-            <li>bugfixes with CDF reader metadata with high-rank CDF files.</li>
-            <li>bugfix: where didn't check for fill data, and eq returns fill.</li>
-            <li>bugfix: improvements to NN rendering, where single points were not enlarged</li>
-            <li>bugfix: old kludge for dimensionless values in vap files removed to fix pitch angle distributions</li>
-            <li>bugfix: pitch angle distribution renderer was flipped left-to-right!  This is still young code.  Please let us know if you were affected!</li>
-            <li>bugfix: bottom plot can provide context for top plot when connector is used.</li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>3479591: tearoff tabs can be dropped into child container</li>
+            <li>removeBackground1 and removeBackground0 provide in-line means of running background removal on data.</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>guessNameFor(URI) introduced, and Jython script getDataSet completion attempts to suggest better name than "ds"</li>
             <li>add fftPowerDelta1024 to CDF virtual variable functions</li>
@@ -69,16 +66,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>add  Ops.flatten function, before we had only flattenRank2</li>
             <li>introduce SemanticOps.getLooseUnitsConverter, which allows a ratiometric unit to be compared to a dimensionless. (2 kg).gt(1) </li>
             <li>simplify code and allow ds[r] to be used where ds is rank 2 and r is rank 1</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add mkdir function to ScriptContext.</li>
-            <li>getDataSet completion in Jython editor guesses default name from URI instead of "ds"</li>
-            <li>support ISTP metadata in NC and HDF5 files for LANL</li>
-            <li>automatically treat -1e99 as fill in NC and HDF5 files.</li>
-            <li>handle ISO8601 formatted times in HDF5 and NC files.  The CDF folks and LANL were both producing files like this.</li>
-            <li>add icon for events renderer</li>
-            <li>writeToPng and writeToPdf in scripts will now make the directory if it doesn't exist.</li>
         </ul>
 
 <p>Known issues:</p>
