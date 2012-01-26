@@ -79,10 +79,6 @@ public class TimeSeriesBrowseController {
         if ( p!=null ) {
             this.plot = panelController.getDasPlot();
             this.xAxis = panelController.getDasPlot().getXAxis();
-            if ( this.domPlot.getXaxis().isAutoRange() ) {
-                this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
-                this.domPlot.getXaxis().setAutoRange(false);
-            }
         }
     }
 
@@ -139,6 +135,10 @@ public class TimeSeriesBrowseController {
     }
 
     protected void setup( boolean valueWasAdjusting ) {
+        if ( p!=null && !valueWasAdjusting ) {
+            this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
+        }
+
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
             try {
