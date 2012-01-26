@@ -2697,7 +2697,9 @@ private void updateFrameTitle() {
             model.getDocumentModel().getOptions().setLogConsoleVisible(true);
         }
 
-        if (alm.getBooleanValue("nativeLAF")) {
+        final boolean headless=  "true".equals( System.getProperty("java.awt.headless") ) ;
+
+        if ( !headless && alm.getBooleanValue("nativeLAF")) {
             logger.fine("nativeLAF");
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
@@ -2713,7 +2715,6 @@ private void updateFrameTitle() {
             public void run() {
                 logger.fine("enter invokeLater");
 
-                final boolean headless=  "true".equals( System.getProperty("java.awt.headless") ) ;
                 if ( ! headless ) {
                     logger.addHandler( APSplash.getInstance().getLogHandler() );
                     APSplash.showSplash();
@@ -2724,7 +2725,9 @@ APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
 APSplash.checkTime("init -90");
-                APSplash.showSplash();
+                if ( ! headless ) {
+                    APSplash.showSplash();
+                }
 
                 model.addDasPeersToApp();
 APSplash.checkTime("init -80");
