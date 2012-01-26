@@ -1358,7 +1358,14 @@ public class DataSourceController extends DomNodeController {
             if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
+
+            if ( getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
+                // we had turned off the autoranging, but turns out we need to turn it back on.
+                timeSeriesBrowseController.domPlot.getXaxis().setAutoRange(true);
+            }
+
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
+
             // look again to see if it has timeSeriesBrowse now--JythonDataSource
             if ( getTsb()==null && getDataSource().getCapability( TimeSeriesBrowse.class ) !=null ) {
                 TimeSeriesBrowse tsb1= getDataSource().getCapability( TimeSeriesBrowse.class );
