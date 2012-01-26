@@ -241,22 +241,23 @@ public class LogConsole extends javax.swing.JPanel {
 
             public synchronized void publish(LogRecord rec) {
                 synchronized (LogConsole.this) {
-                    //if ( !records.get(records.size()-1).equals(rec)) {
-                    records.add(rec);
+                    LogRecord copy= new LogRecord( rec.getLevel(), rec.getMessage() ); //bug 3479791: make a string of datasets
+                    Object[] parms= rec.getParameters();
+                    if ( parms!=null ) {
+                        for ( int i=0; i<parms.length; i++ ) {
+                            parms[i]= String.valueOf(parms[i]);
+                        }
+                    }
+                    copy.setParameters(parms);
+                    records.add(copy);
                     timer2.restart();
-                    //timer.tickle();
                     if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
                         eventThreadId = rec.getThreadID();
                     }
-                //}
                 }
                 if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
                     if (LogConsole.this.oldStdErr != null) {
                         String recMsg;
-//                        if ( rec.getMessage().contains("org.das2.graph") ) {
-//                           System.err.println("27245: here");
-//                            new Exception().printStackTrace();
-//                        }
                         String msg= rec.getMessage();
                         Object[] parms= rec.getParameters();
                         if ( parms==null || parms.length==0 ) {
