@@ -753,7 +753,7 @@ public class DataSetURI {
                     }
                     newName= new File( filename );
                 }
-                if ( !newName.equals(result) ) {
+                if ( !newName.equals(result) ) { // DANGER: I think there may be a bug here where another thread has handed off a file reference, but it has not been used.
                     if ( !result.renameTo(newName) ) {  // move old files out of the way.  This is surely going to cause problems on Windows...
                         System.err.println("unable to move old file out of the way.  Using alternate name "+ newName );
                         result= newName;
@@ -763,6 +763,7 @@ public class DataSetURI {
                 System.err.println("this thread will downloading temp resource " + newf );
                 action= ACTION_DOWNLOAD;
                 OutputStream out= new FileOutputStream(result);  // touch the file
+                out.write( "DataSetURI.downloadResourceAsTempFile: This should not be used.\n".getBytes() ); // I bet we see this message again!
                 out.close();
                 OutputStream outf= new FileOutputStream(newf);
                 outf.close();
