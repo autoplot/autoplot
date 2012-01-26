@@ -81,6 +81,7 @@ public class TimeSeriesBrowseController {
             this.xAxis = panelController.getDasPlot().getXAxis();
             if ( this.domPlot.getXaxis().isAutoRange() ) {
                 this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
+                this.domPlot.getXaxis().setAutoRange(false);
             }
         }
     }
