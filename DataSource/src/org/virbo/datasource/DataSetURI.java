@@ -753,7 +753,7 @@ public class DataSetURI {
                     }
                     newName= new File( filename );
                 }
-                if ( !newName.equals(result) ) { // DANGER: I think there may be a bug here where another thread has handed off a file reference, but it has not been used.
+                if ( !newName.equals(result) ) { // DANGER: I think there may be a bug here where another thread has handed off a file reference, but it has not been opened.
                     if ( !result.renameTo(newName) ) {  // move old files out of the way.  This is surely going to cause problems on Windows...
                         System.err.println("unable to move old file out of the way.  Using alternate name "+ newName );
                         result= newName;
