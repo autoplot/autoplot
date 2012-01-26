@@ -56,6 +56,7 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.dataset.QDataSet;
 import org.xml.sax.SAXException;
 
 /**
@@ -241,14 +242,16 @@ public class LogConsole extends javax.swing.JPanel {
 
             public synchronized void publish(LogRecord rec) {
                 synchronized (LogConsole.this) {
-                    LogRecord copy= new LogRecord( rec.getLevel(), rec.getMessage() ); //bug 3479791: make a string of datasets
                     Object[] parms= rec.getParameters();
-                    if ( parms!=null ) {
-                        for ( int i=0; i<parms.length; i++ ) {
-                            parms[i]= String.valueOf(parms[i]);
-                        }
+
+                    String recMsg;
+                    if ( parms==null || parms.length==0 ) {
+                        recMsg = rec.getMessage();
+                    } else {
+                        recMsg = MessageFormat.format( rec.getMessage(), parms );
                     }
-                    copy.setParameters(parms);
+                    LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
+
                     records.add(copy);
                     timer2.restart();
                     if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
