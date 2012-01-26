@@ -56,6 +56,9 @@ import org.virbo.dsops.Ops;
  *
  */
 public class DataSetURI {
+    private static final Object ACTION_WAIT_EXISTS = "WAIT_EXISTS";
+    private static final Object ACTION_DOWNLOAD = "DOWNLOAD";
+    private static final Object ACTION_USE_CACHE = "USE_CACHE";
 
     private static final Logger logger = Logger.getLogger("virbo.datasource");
 
@@ -719,16 +722,52 @@ public class DataSetURI {
             filename= filename+"__"+safe;
         }
 
-        System.err.println( "reading URL "+url );
-        URLConnection urlc= url.openConnection();
-        urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
+        Object action="";
+        File result= new File( filename );  // final name
+        File newf= new File(filename + ".temp");
 
-        InputStream in = new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
-        File newf= new File(filename + "__");
-        OutputStream out= new FileOutputStream( newf );
-        DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+        synchronized (DataSetURI.class) {
+            //TODO: check expires tag and delete after this time.
+            if ( result.exists() && System.currentTimeMillis()-result.lastModified() < 10000 && !newf.exists() ) {
+                System.err.println("using <10sec old temp file");
+                action= ACTION_USE_CACHE;
+            } else if ( newf.exists() ) {
+                System.err.println("waiting for other thread to load temp resource");
+                action= ACTION_WAIT_EXISTS;
+            } else {
+                action= ACTION_DOWNLOAD;
+                OutputStream out= new FileOutputStream(result);  // touch the file
+                out.close();
+                OutputStream outf= new FileOutputStream(newf);
+                outf.close();
+            }
+        }
 
-        File result= new File(filename);
+        if ( action==ACTION_USE_CACHE ) {
+            return result;
+
+        } else if (action==ACTION_WAIT_EXISTS ) {
+            while ( newf.exists() ) {
+                try {
+                    Thread.sleep(100);
+                    System.err.println("sleepng while another thread is downloading file");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            return result;
+
+        } else {
+            InputStream in;
+            System.err.println( "reading URL "+url );
+            URLConnection urlc= url.openConnection();
+            urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
+            in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
+            OutputStream out= new FileOutputStream( newf );
+            DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+        }
+
         result.deleteOnExit();
 
         checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...  
