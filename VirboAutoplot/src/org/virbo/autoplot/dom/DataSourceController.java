@@ -1359,7 +1359,7 @@ public class DataSourceController extends DomNodeController {
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
 
-            if ( getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
+            if ( result!=null && getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
                 timeSeriesBrowseController.domPlot.getXaxis().setAutoRange(true);
             }
