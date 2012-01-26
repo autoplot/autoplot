@@ -674,7 +674,7 @@ public class DataSetURI {
      * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
      * it's needed.
      *
-     * This will always download, no caching is done.
+     * This will always always download, no caching is done.  We allow subsequent calls within 10 seconds to use the same file.
      * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
@@ -716,11 +716,18 @@ public class DataSetURI {
 
         if ( split.params!=null && split.params.length()>0 ) {
             String safe= split.params;
+            //safe= safe.replaceAll("\\:","%3A"); // mimic wget on Windows
+            //safe= safe.replaceAll("\\&","__");  // except our filenames can't contain ampersands.
+
             safe= safe.replaceAll("\\+","_"); // 2011 safeName uses "plus" for this
             safe= safe.replaceAll("-","."); // 2011 safeName uses "_" for this, but it should be different than "+"
             safe= Ops.safeName(safe); // create a Java identifier from this, that will be safe.
-            filename= filename+"__"+safe;
+            filename= filename.replaceAll("@","_")+"@"+safe.replaceAll("@","_"); // mimic wget on Windows
+        } else {
+            filename= filename.replaceAll("@","_")+"@";
         }
+
+        //filename= filename + "@" + String.format("%16d", System.currentTimeMillis() );
 
         Object action="";
         File result= new File( filename );  // final name
@@ -729,12 +736,31 @@ public class DataSetURI {
         synchronized (DataSetURI.class) {
             //TODO: check expires tag and delete after this time.
             if ( result.exists() && System.currentTimeMillis()-result.lastModified() < 10000 && !newf.exists() ) {
-                System.err.println("using <10sec old temp file");
+                System.err.println("using <10sec old temp file "+result);
                 action= ACTION_USE_CACHE;
             } else if ( newf.exists() ) {
-                System.err.println("waiting for other thread to load temp resource");
+                System.err.println("waiting for other thread to load temp resource " + newf );
                 action= ACTION_WAIT_EXISTS;
             } else {
+                File newName= result;
+                while ( newName.exists() ) {
+                    String[] ss= filename.toString().split("@",-2);
+                    if ( ss.length==2 ) {
+                        filename= ss[0] + "@" + ss[1] + "@0";
+                    } else {
+                        int i= Integer.parseInt(ss[2]);
+                        filename= ss[0] + "@" + ss[1] + "@" + ( i+1 );
+                    }
+                    newName= new File( filename );
+                }
+                if ( !newName.equals(result) ) {
+                    if ( !result.renameTo(newName) ) {  // move old files out of the way.  This is surely going to cause problems on Windows...
+                        System.err.println("unable to move old file out of the way.  Using alternate name "+ newName );
+                        result= newName;
+                        newf= new File( filename + ".temp" );
+                    }
+                }
+                System.err.println("this thread will downloading temp resource " + newf );
                 action= ACTION_DOWNLOAD;
                 OutputStream out= new FileOutputStream(result);  // touch the file
                 out.close();
@@ -747,15 +773,17 @@ public class DataSetURI {
             return result;
 
         } else if (action==ACTION_WAIT_EXISTS ) {
+            long t0= System.currentTimeMillis();
             while ( newf.exists() ) {
                 try {
-                    Thread.sleep(100);
-                    System.err.println("sleepng while another thread is downloading file");
+                    Thread.sleep(300);
+                    if ( System.currentTimeMillis()-t0 > 60000 ) {
+                        System.err.println("waiting for other process to finish loading %s..." + newf );
+                    }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
             return result;
 
         } else {
@@ -772,8 +800,13 @@ public class DataSetURI {
 
         checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...  
 
-        if ( ! newf.renameTo( result ) ) {
-            throw new IllegalArgumentException("unable to rename "+newf + " to "+ result );
+        synchronized ( DataSetURI.class ) {
+            if ( ! result.delete() ) { // on Windows, rename cannot clobber
+                throw new IllegalArgumentException("unable to delete "+result + " to make way for "+ newf );
+            }
+            if ( ! newf.renameTo( result ) ) {
+                throw new IllegalArgumentException("unable to rename "+newf + " to "+ result );
+            }
         }
         return result;
     }
