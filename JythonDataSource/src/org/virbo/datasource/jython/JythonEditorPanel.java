@@ -458,7 +458,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     split.authority= ruriSplit.authority;
                     split.path= ruriSplit.path;
                     split.file= ruriSplit.file;
-
+                    if ( split.vapScheme==null ) split.vapScheme= "vap+jyds";
                 } else {
                     params.put( name, value );
                 }
@@ -470,7 +470,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 split.authority= ruriSplit.authority;
                 split.path= ruriSplit.path;
                 split.file= ruriSplit.file;
-
+                if ( split.vapScheme==null ) split.vapScheme= "vap+jyds"; // DANGER--this ought-not to be hard coded, but this is all I can do for now...
             }
         }
 
