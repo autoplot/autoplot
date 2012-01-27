@@ -1654,7 +1654,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
             }
 
-        } else if ( spec==RenderType.digital || spec==RenderType.eventsBar || spec==RenderType.image ) {
+        } else if ( spec==RenderType.digital ) {
             QDataSet qube= DigitalRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
@@ -1662,7 +1662,22 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
-
+        } else if ( spec==RenderType.eventsBar ) {
+            QDataSet qube= EventsRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
+        } else if ( spec==RenderType.image ) {
+            QDataSet qube= RGBImageRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }       
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
