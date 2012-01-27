@@ -235,8 +235,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 if ( parm.type=='R' ) {
 
                     String val= params.get(vname);
-                    if ( val.startsWith("'") ) val= val.substring(1);
-                    if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    if ( val!=null ) {
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= String.valueOf( parm.deft );
+                    }
 
                     final String fval= val;
 
@@ -247,8 +251,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     
                     Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
                     JButton filesButton= new JButton( fileIcon );
-                    filesButton.setMaximumSize( new Dimension(16,16) );
-                    filesButton.setMinimumSize( new Dimension(16,16) );
+//                    filesButton.setMaximumSize( new Dimension(16,16) );
+//                    filesButton.setMinimumSize( new Dimension(16,16) );
                     filesButton.addActionListener( new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             JFileChooser c= new JFileChooser();
@@ -445,11 +449,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     params.put( name, value );
                 } else if ( type=='R' ) {
                     if ( params.get("script")!=null ) {
-                        try {
-                            split.resourceUri= new URI(value);
-                        } catch ( URISyntaxException ex ) {
-                            throw new RuntimeException(ex);
-                        }
+                        URISplit ruriSplit= URISplit.parse(value);
+                        split.resourceUri= ruriSplit.resourceUri;
+                        split.scheme= ruriSplit.scheme;
+                        split.authority= ruriSplit.authority;
+                        split.path= ruriSplit.path;
+                        split.file= ruriSplit.file;
                     }
                 } else {
                     params.put( name, value );
