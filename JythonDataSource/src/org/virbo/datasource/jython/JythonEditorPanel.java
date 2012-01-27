@@ -297,13 +297,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 
 
                 final String fdeft= parm.type=='R' ? "default" : String.valueOf(parm.deft);
+                final String fvalue= String.valueOf(parm.deft);
                 final JComponent ftf= ctf;
                 JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
                     public void actionPerformed( ActionEvent e ) {
                         if ( ftf instanceof DataSetSelector ) {
-                            ((DataSetSelector)ftf).setValue(fdeft);
+                            ((DataSetSelector)ftf).setValue(fvalue);
                         } else {
-                            ((JTextField)ftf).setText(fdeft);
+                            ((JTextField)ftf).setText(fvalue);
                         }
                     }
                 });
@@ -459,6 +460,13 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } else {
                     params.put( name, value );
                 }
+            } else if ( type=='R' && value.equals(deft) && !split.resourceUri.toString().equals(deft) ) {
+                URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
+                split.resourceUri= ruriSplit.resourceUri;
+                split.scheme= ruriSplit.scheme;
+                split.authority= ruriSplit.authority;
+                split.path= ruriSplit.path;
+                split.file= ruriSplit.file;
             }
         }
 
