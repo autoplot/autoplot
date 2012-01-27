@@ -184,7 +184,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
 
                 
-                interp.set("resourceURI", resourceURI);
+                if ( resourceURI!=null ) {
+                    interp.set("resourceURI", resourceURI); // legacy
+                    interp.exec("params['resourceURI']="+ maybeQuoteString( resourceURI ) );
+                }
 
                 mon.setProgressMessage( "executing script");
                 
