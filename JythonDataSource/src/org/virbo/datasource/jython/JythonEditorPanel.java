@@ -14,10 +14,15 @@ package org.virbo.datasource.jython;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,14 +32,17 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
@@ -52,8 +60,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     ScriptPanelSupport support;
     String suri;
     File file;
+    URI resourceUri;
     boolean hasVariables= false;
-    List<JTextField> tflist;
+    List<JComponent> tflist;
     List<String> paramsList;
     List<String> deftsList;
     List<Character> typesList;  // only 'A' and 'F' right now
@@ -221,42 +230,91 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 JPanel valuePanel= new JPanel(  );
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
 
-                JTextField tf= new JTextField(50);
-                Dimension x= tf.getPreferredSize();
-                x.width= Integer.MAX_VALUE;
-                tf.setMaximumSize(x);
-                tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                JComponent ctf= null;
 
-                String val;
-                if ( params.get(vname)!=null ) {
-                    val= params.get(vname);
+                if ( parm.type=='R' ) {
+
+                    String val= params.get(vname);
                     if ( val.startsWith("'") ) val= val.substring(1);
                     if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+
+                    final String fval= val;
+
+                    final JTextField tf= new JTextField(50);
+                    Dimension x= tf.getPreferredSize();
+                    x.width= Integer.MAX_VALUE;
+                    tf.setMaximumSize(x);
+                    
+                    Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
+                    JButton filesButton= new JButton( fileIcon );
+                    filesButton.setMaximumSize( new Dimension(16,16) );
+                    filesButton.setMinimumSize( new Dimension(16,16) );
+                    filesButton.addActionListener( new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            JFileChooser c= new JFileChooser();
+                            URISplit split2= URISplit.parse(fval);
+                            if ( split2.scheme.equals("file") ) {
+                                c.setSelectedFile( new File( split2.file.substring(7)) );
+                            }
+                            int r= c.showOpenDialog(jLabel1);
+                            if ( r==JFileChooser.APPROVE_OPTION) {
+                                tf.setText("file://"+c.getSelectedFile().toString());
+                            }
+                        }
+                    });
+                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+
+                    tf.setText( val );
+                    ctf= tf;
+                    valuePanel.add( ctf );
+                    filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                    valuePanel.add( filesButton );
+
                 } else {
-                    val= String.valueOf( parm.deft );
+                    JTextField tf= new JTextField(50);
+                    Dimension x= tf.getPreferredSize();
+                    x.width= Integer.MAX_VALUE;
+                    tf.setMaximumSize(x);
+                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+
+                    String val;
+                    if ( params.get(vname)!=null ) {
+                        val= params.get(vname);
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= String.valueOf( parm.deft );
+                    }
+
+                    tf.setText( val );
+                    ctf= tf;
+                    valuePanel.add( ctf );
                 }
+                
 
-                tf.setText( val );
-                valuePanel.add( tf );
-
-                final String fdeft= String.valueOf(parm.deft);
-                final JTextField ftf= tf;
+                final String fdeft= parm.type=='R' ? "default" : String.valueOf(parm.deft);
+                final JComponent ftf= ctf;
                 JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
                     public void actionPerformed( ActionEvent e ) {
-                        ftf.setText(fdeft);
+                        if ( ftf instanceof DataSetSelector ) {
+                            ((DataSetSelector)ftf).setValue(fdeft);
+                        } else {
+                            ((JTextField)ftf).setText(fdeft);
+                        }
                     }
                 });
-                defaultButton.setToolTipText("Click to reset to default");
+                defaultButton.setToolTipText( ( parm.type == 'R' ) ? String.valueOf(parm.deft) : "Click to reset to default" );
                 valuePanel.add( defaultButton );
                 valuePanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                 
                 paramsPanel.add( valuePanel );
-                tflist.add(tf);
-                    paramsList.add( parm.name );
-                    deftsList.add( String.valueOf( parm.deft ) );
-                    typesList.add( parm.type );
+                tflist.add(ctf);
 
-                    hasVars= true;
+                paramsList.add( parm.name );
+                deftsList.add( String.valueOf( parm.deft ) );
+                typesList.add( parm.type );
+
+                hasVars= true;
             }
                 
             hasVars= parms.size()>0;
@@ -275,15 +333,33 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
 
+    private String[] getScriptURI( URISplit split ) {
+        Map<String,String> params= URISplit.parseParams(split.params);
+
+        String furi;
+        String resourceUri=null;
+        if ( params.containsKey("script") ) {
+            furi= params.get("script");
+            resourceUri= split.resourceUri.toString();
+        } else {
+            furi= split.resourceUri.toString();
+            resourceUri= null;
+        }
+
+        return new String[] { furi, resourceUri };
+            
+    }
+
     public void setURI(String url) {
         try {
             this.suri= url;
             URISplit split= URISplit.parse(suri);
 
-            File f = DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(url) ), new NullProgressMonitor());
+            String[] furir= getScriptURI( split );
+            File f = DataSetURI.getFile( furir[0], new NullProgressMonitor() );
 
             support.loadFile(f);
-            Map<String,String> results= JythonDataSourceFactory.getParameters(url, new NullProgressMonitor() );
+            Map<String,String> results= JythonDataSourceFactory.getParameters( f.toString(), new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
             int i=0;
             int idx= -1;
@@ -307,7 +383,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 variableComboBox.setSelectedIndex(0);
             }
 
-            hasVariables= doVariables(f,params);
+            Map<String,String> ffparams= new HashMap( params );
+
+            if ( furir[1]!=null ) ffparams.put( "resourceURI", furir[1] );
+            hasVariables= doVariables( f,ffparams );
 
             if ( hasVariables ) {
                 tearoffTabbedPane1.setSelectedIndex(1);
@@ -315,7 +394,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             List<String> errs= new ArrayList();
             if ( JythonUtil.pythonLint( f.toURI(), errs) ) {
-                System.err.println(errs);
                 EditorAnnotationsSupport esa= textArea.getEditorAnnotationsSupport();
                 for ( String s: errs ) {
                     String[] ss= s.split(":",2);
@@ -353,7 +431,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         for ( int j=0; j<paramsList.size(); j++ ) {
             String name= paramsList.get(j);
-            String value= tflist.get(j).getText();
+            JComponent jc= tflist.get(j);
+            String value= ( jc instanceof JTextField ) ? ((JTextField)jc).getText() : ((DataSetSelector)jc).getValue();
             String deft= deftsList.get(j);
             char type= typesList.get(j);
 
@@ -364,6 +443,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         value=  "'" + value + "'";
                     }
                     params.put( name, value );
+                } else if ( type=='R' ) {
+                    if ( params.get("script")!=null ) {
+                        try {
+                            split.resourceUri= new URI(value);
+                        } catch ( URISyntaxException ex ) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
                 } else {
                     params.put( name, value );
                 }
@@ -395,7 +482,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
-        DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(uri) ), mon );
+
+        URISplit split= URISplit.parse(uri);
+        String[] furir= getScriptURI( split );
+        DataSetURI.getFile( furir[0], mon );
         return true;
     }
 
