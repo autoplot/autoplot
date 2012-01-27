@@ -96,13 +96,22 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         String label; // the label for the variable used in the script
         Object deft;
         String doc;
-        char type; // A (String) or F (Double)
+        char type; // A (String) or F (Double) or R (URI)
     }
 
     protected static Map<String,Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
         BufferedReader reader= null;
 
-        File src = DataSetURI.getFile(uri, new NullProgressMonitor());
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String furi;
+        if ( params.containsKey("script") ) {
+            furi= params.get("script");
+        } else {
+            furi= split.resourceUri.toString();
+        }
+
+        File src = DataSetURI.getFile(furi, new NullProgressMonitor());
 
         Map<String,Param> result= new LinkedHashMap();
 
@@ -136,9 +145,14 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                     if ( m.group(3)==null ) {
                         System.err.println("error handle");
                     } else {
-                        parm.type= m.group(3).startsWith("'") ? 'A' : 'F';
-                        String sval= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
-                        parm.deft= parm.type=='F' ? Double.parseDouble( sval ) : sval;
+                        if ( parm.name.equals("resourceURI") ) {
+                            parm.type= 'R';
+                            parm.deft= m.group(3).substring(1,m.group(3).length()-1);
+                        } else {
+                            parm.type= m.group(3).startsWith("'") ? 'A' : 'F';
+                            String sval= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
+                            parm.deft= parm.type=='F' ? Double.parseDouble( sval ) : sval;
+                        }
                     }
 
                     result.put( parm.name, parm );
