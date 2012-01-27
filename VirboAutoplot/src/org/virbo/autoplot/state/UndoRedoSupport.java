@@ -297,50 +297,49 @@ public class UndoRedoSupport {
         }
     }
 
-    public synchronized void pushState( PropertyChangeEvent ev, String label ) {
+    public void pushState( PropertyChangeEvent ev, String label ) {
         if (ignoringUpdates) {
             return;
         }
         Application state = applicationModel.createState(false);
-        StateStackElement elephant;
-
-        if (stateStackPos > 0) {
-            elephant = stateStack.get(stateStackPos - 1);
-        } else {
-            elephant = null;
-        }
-
-        if (elephant != null && state.equals(elephant.state)) {
-            return;
-        }
-        String labelStr = "initial";
-        String docString= "initial state of application";
-        StateStackElement element= new StateStackElement( state, labelStr, docString );
-
-        if (elephant != null) {
-            List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
-            element= describeChanges( diffss, element );
-            if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
-                element.deltaDesc= label;
-            }
-        }
-
-        int oldDepth= stateStackPos;
-
-        //long t0= System.currentTimeMillis();
         BufferedImage thumb= applicationModel.getThumbnail(50);
-        //System.err.println( String.format( "time for thumbnail : %d ms", System.currentTimeMillis()- t0 ) );
+        int oldDepth;
+        synchronized (this) {
+            StateStackElement elephant;
 
-        element.thumb= thumb;
-        stateStack.add(stateStackPos, element );
+            if (stateStackPos > 0) {
+                elephant = stateStack.get(stateStackPos - 1);
+            } else {
+                elephant = null;
+            }
 
-        while (stateStack.size() > (1 + stateStackPos)) {
-            stateStack.removeLast();
+            if (elephant != null && state.equals(elephant.state)) {
+                return;
+            }
+            String labelStr = "initial";
+            String docString= "initial state of application";
+            StateStackElement element= new StateStackElement( state, labelStr, docString );
+
+            if (elephant != null) {
+                List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
+                element= describeChanges( diffss, element );
+                if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
+                    element.deltaDesc= label;
+                }
+            }
+
+            oldDepth= stateStackPos;
+
+            element.thumb= thumb;
+            stateStack.add(stateStackPos, element );
+
+            while (stateStack.size() > (1 + stateStackPos)) {
+                stateStack.removeLast();
+            }
+            stateStackPos++;
+
+            removeOldStates();
         }
-        stateStackPos++;
-
-        removeOldStates();
-
         propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, stateStackPos);
 
     }
