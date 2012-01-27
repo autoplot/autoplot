@@ -1173,6 +1173,11 @@ public class AutoplotUtil {
                         if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertableTo(u1) ) {
                             spec= RenderType.eventsBar;
                         }
+                    } else {
+                        Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) ) {
+                            spec= RenderType.eventsBar;
+                        }
                     }
                 }
             } else {
