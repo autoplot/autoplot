@@ -449,14 +449,16 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     }
                     params.put( name, value );
                 } else if ( type=='R' ) {
-                    if ( params.get("script")!=null ) {
-                        URISplit ruriSplit= URISplit.parse(value);
-                        split.resourceUri= ruriSplit.resourceUri;
-                        split.scheme= ruriSplit.scheme;
-                        split.authority= ruriSplit.authority;
-                        split.path= ruriSplit.path;
-                        split.file= ruriSplit.file;
+                    URISplit ruriSplit= URISplit.parse(value);
+                    if ( !params.containsKey("script") ) {
+                        params.put( "script", split.resourceUri.toString() );
                     }
+                    split.resourceUri= ruriSplit.resourceUri;
+                    split.scheme= ruriSplit.scheme;
+                    split.authority= ruriSplit.authority;
+                    split.path= ruriSplit.path;
+                    split.file= ruriSplit.file;
+
                 } else {
                     params.put( name, value );
                 }
