@@ -1516,7 +1516,15 @@ APSplash.checkTime("init 52");
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyImageMenuItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
+        addressBarMenu = new javax.swing.JMenu();
+        dataSetSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
+        timeRangeSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
+        textSizeMenu = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
         resetZoomMenuItem = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
         zoomInMenuItem = new javax.swing.JMenuItem();
         zoomOutMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
@@ -1537,12 +1545,6 @@ APSplash.checkTime("init 52");
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         layoutPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
-        textSizeMenu = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        addressBarMenu = new javax.swing.JMenu();
-        dataSetSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
-        timeRangeSelectorMenuItem = new javax.swing.JRadioButtonMenuItem();
         autoMenu = new javax.swing.JMenu();
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -1562,13 +1564,13 @@ APSplash.checkTime("init 52");
         aggregateMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
-        exceptionReport = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
         gettingStartedMenuItem = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
         autoplotHomepageButton = new javax.swing.JMenuItem();
+        exceptionReport = new javax.swing.JMenuItem();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -1690,8 +1692,60 @@ APSplash.checkTime("init 52");
 
         viewMenu.setText("View");
 
+        addressBarMenu.setText("Address Bar");
+
+        dataSetSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
+        addressBarButtonGroup.add(dataSetSelectorMenuItem);
+        dataSetSelectorMenuItem.setSelected(true);
+        dataSetSelectorMenuItem.setText("Data Set Selector");
+        dataSetSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataSetSelectorMenuItemActionPerformed(evt);
+            }
+        });
+        addressBarMenu.add(dataSetSelectorMenuItem);
+
+        timeRangeSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
+        addressBarButtonGroup.add(timeRangeSelectorMenuItem);
+        timeRangeSelectorMenuItem.setText("Time Range Selector");
+        timeRangeSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeSelectorMenuItemActionPerformed(evt);
+            }
+        });
+        addressBarMenu.add(timeRangeSelectorMenuItem);
+
+        viewMenu.add(addressBarMenu);
+
+        textSizeMenu.setText("Text Size");
+
+        jMenuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        jMenuItem1.setText("Bigger");
+        jMenuItem1.setToolTipText("Make canvas font bigger");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        textSizeMenu.add(jMenuItem1);
+
+        jMenuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
+        jMenuItem2.setText("Smaller");
+        jMenuItem2.setToolTipText("Make canvas font smaller");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        textSizeMenu.add(jMenuItem2);
+
+        viewMenu.add(textSizeMenu);
+        viewMenu.add(jSeparator4);
+
         resetZoomMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         resetZoomMenuItem.setText("Reset Zoom");
+        resetZoomMenuItem.setToolTipText("Revert to the original axis settings");
         resetZoomMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resetZoomMenuItemActionPerformed(evt);
@@ -1699,21 +1753,28 @@ APSplash.checkTime("init 52");
         });
         viewMenu.add(resetZoomMenuItem);
 
+        jMenu1.setText("Zoom");
+        jMenu1.setToolTipText("Note zooming can be done by dragging ranges with the mouse, or use the mouse wheel.");
+
         zoomInMenuItem.setText("Zoom In");
+        zoomInMenuItem.setToolTipText("zoom in on the X axis");
         zoomInMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zoomInMenuItemActionPerformed(evt);
             }
         });
-        viewMenu.add(zoomInMenuItem);
+        jMenu1.add(zoomInMenuItem);
 
         zoomOutMenuItem.setText("Zoom Out");
+        zoomOutMenuItem.setToolTipText("zoom out the X axis");
         zoomOutMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zoomOutMenuItemActionPerformed(evt);
             }
         });
-        viewMenu.add(zoomOutMenuItem);
+        jMenu1.add(zoomOutMenuItem);
+
+        viewMenu.add(jMenu1);
 
         jMenuBar1.add(viewMenu);
 
@@ -1830,56 +1891,6 @@ APSplash.checkTime("init 52");
 
         optionsMenu.add(enableFeatureMenu);
 
-        textSizeMenu.setText("Text Size");
-
-        jMenuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        jMenuItem1.setText("Bigger");
-        jMenuItem1.setToolTipText("Make canvas font bigger");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        textSizeMenu.add(jMenuItem1);
-
-        jMenuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-        );
-        jMenuItem2.setText("Smaller");
-        jMenuItem2.setToolTipText("Make canvas font smaller");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        textSizeMenu.add(jMenuItem2);
-
-        optionsMenu.add(textSizeMenu);
-
-        addressBarMenu.setText("Address Bar");
-
-        dataSetSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
-        addressBarButtonGroup.add(dataSetSelectorMenuItem);
-        dataSetSelectorMenuItem.setSelected(true);
-        dataSetSelectorMenuItem.setText("Data Set Selector");
-        dataSetSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataSetSelectorMenuItemActionPerformed(evt);
-            }
-        });
-        addressBarMenu.add(dataSetSelectorMenuItem);
-
-        timeRangeSelectorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
-        addressBarButtonGroup.add(timeRangeSelectorMenuItem);
-        timeRangeSelectorMenuItem.setText("Time Range Selector");
-        timeRangeSelectorMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeRangeSelectorMenuItemActionPerformed(evt);
-            }
-        });
-        addressBarMenu.add(timeRangeSelectorMenuItem);
-
-        optionsMenu.add(addressBarMenu);
-
         autoMenu.setText("Auto");
 
         autoRangingCheckBoxMenuItem.setSelected(true);
@@ -1991,15 +2002,6 @@ APSplash.checkTime("init 52");
         });
         toolsMenu.add(decodeURLItem);
 
-        exceptionReport.setText("Provide Feedback...");
-        exceptionReport.setToolTipText("Send feedback to application support");
-        exceptionReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exceptionReportActionPerformed(evt);
-            }
-        });
-        toolsMenu.add(exceptionReport);
-
         jMenuBar1.add(toolsMenu);
 
         helpMenu.setText("Help");
@@ -2055,6 +2057,15 @@ APSplash.checkTime("init 52");
             }
         });
         helpMenu.add(autoplotHomepageButton);
+
+        exceptionReport.setText("Provide Feedback...");
+        exceptionReport.setToolTipText("Send feedback to application support");
+        exceptionReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exceptionReportActionPerformed(evt);
+            }
+        });
+        helpMenu.add(exceptionReport);
 
         aboutAutoplotMenuItem.setText("About Autoplot");
         aboutAutoplotMenuItem.setToolTipText("Show information about this release");
@@ -2932,6 +2943,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JMenuItem gettingStartedMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem inspectVapFileMenuItem;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -2942,6 +2954,7 @@ APSplash.checkTime("init -80");
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JCheckBoxMenuItem nnCb;
