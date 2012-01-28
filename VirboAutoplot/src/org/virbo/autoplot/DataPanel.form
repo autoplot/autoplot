@@ -41,7 +41,7 @@
             <TitledBorder title="Data Post Processing [?]&#xa;"/>
           </Border>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="When the operations field starts with the pipe (|) character, it is a list of filters that are to be applied to the data.  Otherwise it is the component of the dataset to plot, such as &quot;Bx&quot;.  GUI controls for slicing are provided as well, and these simply control the string."/>
+        <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
 
       <Layout>
@@ -179,7 +179,7 @@
             <TitledBorder title="Data Source [?]"/>
           </Border>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Additional processes applied to the data after loading.  For example, data source typically identifies fill, but in case this is done improperly, the value can be set here."/>
+        <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
 
       <Layout>

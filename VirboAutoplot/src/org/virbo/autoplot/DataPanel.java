@@ -452,7 +452,7 @@ public class DataPanel extends javax.swing.JPanel {
         uriTextField = new javax.swing.JTextField();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Post Processing [?]\n"));
-        jPanel2.setToolTipText("When the operations field starts with the pipe (|) character, it is a list of filters that are to be applied to the data.  Otherwise it is the component of the dataset to plot, such as \"Bx\".  GUI controls for slicing are provided as well, and these simply control the string.");
+        jPanel2.setToolTipText("");
 
         sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "second", "last" }));
         sliceTypeComboBox.setSelectedIndex(2);
@@ -568,7 +568,7 @@ public class DataPanel extends javax.swing.JPanel {
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Source [?]"));
-        jPanel1.setToolTipText("Additional processes applied to the data after loading.  For example, data source typically identifies fill, but in case this is done improperly, the value can be set here.");
+        jPanel1.setToolTipText("");
 
         validRangeLabel.setText("Valid Range:");
         validRangeLabel.setToolTipText("Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill.\n");
