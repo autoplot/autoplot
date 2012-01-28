@@ -6,9 +6,11 @@
 package org.autoplot.help;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -36,8 +38,11 @@ public class TitledBorderDecorator {
                 int y= e.getY() ;
                 int x= e.getX() ;
 
+                FontMetrics fm= e.getComponent().getGraphics().getFontMetrics();
+                Rectangle2D bounds= fm.getStringBounds( tb.getTitle(),e.getComponent().getGraphics() );
+
                 boolean within;
-                if ( y>0 && y<16 && x>4 && x<jPanel1.getWidth() ) {
+                if ( y>0 && y<16 && x>4 && x<(bounds.getWidth()+12) ) { // 4 and 8 by experiment on Linux.
                     within= true;
                 } else {
                     within= false;
