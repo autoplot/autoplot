@@ -400,6 +400,14 @@ public class AxisPanel extends javax.swing.JPanel {
         jPanel1.setToolTipText("click title for help");
 
         titleTextField.setText("title will go here");
+        titleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                titleMouseAction(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                titleMouseAction(evt);
+            }
+        });
 
         jLabel6.setText("Title:");
         jLabel6.setToolTipText("title for the selected plot. ");
@@ -498,6 +506,12 @@ public class AxisPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_axisMouseAction
 
+    private void titleMouseAction(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleMouseAction
+        if ( evt.isPopupTrigger() ) {
+            showTitleMenu(evt);
+        }
+    }//GEN-LAST:event_titleMouseAction
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbVisibleCB;
     private javax.swing.JCheckBox isotropicCheckBox;
@@ -541,13 +555,25 @@ public class AxisPanel extends javax.swing.JPanel {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{COMPONENT}", "Component property from the plot element" ) );
-        processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset" ) );
+        processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
         processMenu.add( createMenuItem( tf, "%{TIMERANGE}", "Special timerange property from the plot element controller" ) );
         return processMenu;
     }
 
     void showLabelMenu( MouseEvent ev) {
         JPopupMenu processMenu= initLabelMenu( (JTextField)ev.getSource() );
+        processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+    }
+
+    JPopupMenu initTitleMenu( JTextField tf ) {
+        JPopupMenu processMenu;
+        processMenu= new JPopupMenu();
+        processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
+        return processMenu;
+    }
+
+    void showTitleMenu( MouseEvent ev) {
+        JPopupMenu processMenu= initTitleMenu( (JTextField)ev.getSource() );
         processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
     }
 
