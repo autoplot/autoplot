@@ -6,6 +6,7 @@ package org.virbo.binarydatasource;
 
 import java.nio.ByteBuffer;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 
@@ -318,7 +319,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      */
     @Override
     public QDataSet trim( int ist, int ien ) {
-        return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, len3, back, type );
+        BufferDataSet result= makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, len3, back, type );
+        DataSetUtil.putProperties( DataSetUtil.trimProperties( this, ist, ien ), result );
+        return result;
     }
 
     /*public BufferDataSet slice( int i0 ) {
