@@ -41,7 +41,8 @@ public class PromptTextField extends JTextField {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if ( getText().length()==0 && !hasFocus() ) {
+        String txt= getText();
+        if ( ( txt==null || txt.length()==0 ) && !hasFocus() ) {
             Graphics scratch = g.create();
             promptLabel.setBounds( 0, 0, getWidth(), getHeight() );
             scratch.translate( getInsets().left, 0 );
