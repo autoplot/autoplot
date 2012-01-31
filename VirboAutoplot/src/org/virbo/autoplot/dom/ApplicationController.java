@@ -747,9 +747,13 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (r == null) {
                 return;
             }
-            PlotElement p = findPlotElement(r);
-            if (getPlotElement() != p) {
-                setPlotElement(p);
+            try {
+                PlotElement p = findPlotElement(r);
+                if (getPlotElement() != p) {
+                    setPlotElement(p);
+                }
+            } catch ( IllegalArgumentException ex ) {
+                System.err.println("unable to find the plot element, assuming transitional state...");
             }
 
         }
