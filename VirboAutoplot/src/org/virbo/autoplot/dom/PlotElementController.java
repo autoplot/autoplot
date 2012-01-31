@@ -1242,6 +1242,8 @@ public class PlotElementController extends DomNodeController {
         }
         this.renderer = renderer;
         ac.unbindImpl(node);
+        ac.unbindImpl(((PlotElement)node).getStyle());
+
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
