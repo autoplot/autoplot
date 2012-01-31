@@ -34,6 +34,7 @@ public final class EventThreadResponseMonitor {
 
     public void start() {
         new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
+        new Thread( watchEventThreadRunnable(), "watchEventThread" ).start();
     }
 
     public static synchronized String dumpPendingEvents() {
@@ -110,6 +111,28 @@ public final class EventThreadResponseMonitor {
 
                 //pending= dumpPendingEvents();
                 //TODO: this would be the correct time to dumpPendingEvents.
+            }
+        };
+    }
+
+    Runnable watchEventThreadRunnable() {
+        return new Runnable() {
+            public void run() {
+                AWTEvent currentEvent= null;
+                while (true) {
+                    EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
+                    AWTEvent test= instance.peekEvent();
+                    if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
+                        System.err.println("====  long job to process ====");
+                        System.err.println(test);
+                        System.err.println("====  end, long job to process ====");
+                    }
+                    currentEvent=  test;
+                    try {
+                        Thread.sleep(1000);
+                    } catch ( InterruptedException ex ) {
+                    }
+                }
             }
         };
     }
