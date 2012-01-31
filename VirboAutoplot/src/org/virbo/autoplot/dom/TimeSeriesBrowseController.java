@@ -24,6 +24,7 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  *
@@ -247,21 +248,26 @@ public class TimeSeriesBrowseController {
             }
 
             if (tag == null || !tag.contains(testCacheTag)) {
+                TimeSeriesBrowse tsb= dataSourceController.getTsb();
+                if ( tsb==null ) {
+                    System.err.println("tsbc253: tsb was null");
+                    return;
+                }
                 if ( xAxis!=null ) {
                     if (plot.isOverSize() && autorange==false ) {
                         visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3); //TODO: be aware of
                     }
-                    dataSourceController.getTsb().setTimeRange(trange);
-                    dataSourceController.getTsb().setTimeResolution(newResolution);
+                    tsb.setTimeRange(trange);
+                    tsb.setTimeResolution(newResolution);
                     logger.log( Level.FINE, "updateTsb: {0} (@{1})", new Object[]{trange, newResolution});
                 } else {
-                    dataSourceController.getTsb().setTimeRange(trange);
-                    dataSourceController.getTsb().setTimeResolution(null);
+                    tsb.setTimeRange(trange);
+                    tsb.setTimeResolution(null);
                     logger.log( Level.FINE, "updateTsb: {0} (@ intrinsic)", trange);
                 }
 
                 String surl;
-                surl = dataSourceController.tsb.getURI();
+                surl = tsb.getURI();
                 // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
