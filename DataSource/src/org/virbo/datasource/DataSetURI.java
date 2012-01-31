@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -775,26 +776,45 @@ public class DataSetURI {
 
         } else if (action==ACTION_WAIT_EXISTS ) {
             long t0= System.currentTimeMillis();
-            while ( newf.exists() ) {
-                try {
-                    Thread.sleep(300);
-                    if ( System.currentTimeMillis()-t0 > 60000 ) {
-                        System.err.println("waiting for other process to finish loading %s..." + newf );
+            mon.setProgressMessage("waiting for resource");
+            mon.started();
+            try {
+                while ( newf.exists() ) {
+                    try {
+                        Thread.sleep(300);
+                        if ( System.currentTimeMillis()-t0 > 60000 ) {
+                            System.err.println("waiting for other process to finish loading %s..." + newf );
+                        }
+                        if ( mon.isCancelled() ) {
+                            throw new InterruptedIOException("cancel pressed");
+                        }
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } finally {
+                mon.finished();
             }
+
             return result;
 
         } else {
-            InputStream in;
-            System.err.println( "reading URL "+url );
-            URLConnection urlc= url.openConnection();
-            urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
-            in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
-            OutputStream out= new FileOutputStream( newf );
-            DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+            boolean fail= true;
+            try {
+                InputStream in;
+                System.err.println( "reading URL "+url );
+                URLConnection urlc= url.openConnection();
+                urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
+                in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
+                OutputStream out= new FileOutputStream( newf );
+                DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+                fail= false;
+            } finally {
+                if ( fail ) { // clean up if there was an exception
+                    newf.delete();
+                    result.delete();
+                }
+            }
         }
 
         result.deleteOnExit();
