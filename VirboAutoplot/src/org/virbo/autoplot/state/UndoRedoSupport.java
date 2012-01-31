@@ -302,7 +302,7 @@ public class UndoRedoSupport {
             return;
         }
         Application state = applicationModel.createState(false);
-        //BufferedImage thumb= applicationModel.getThumbnail(50);
+        BufferedImage thumb= applicationModel.getThumbnail(50);
         int oldDepth;
         synchronized (this) {
             StateStackElement elephant;
@@ -330,7 +330,7 @@ public class UndoRedoSupport {
 
             oldDepth= stateStackPos;
 
-            //element.thumb= thumb;
+            element.thumb= thumb;
             stateStack.add(stateStackPos, element );
 
             while (stateStack.size() > (1 + stateStackPos)) {
