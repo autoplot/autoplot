@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdesktop.beansbinding.Converter;
@@ -42,6 +43,10 @@ public class BindingSupport {
         Method srcSetter;
         Method dstGetter;
         Method srcGetter;
+        @Override
+        public String toString() {
+            return src+"."+srcProp+"==dst."+dstProp;
+        }
     }
 
     private PropertyChangeListener propListener(final Object p, final Method setter, final Method getter, final Converter c, final boolean forward) {
@@ -203,6 +208,10 @@ public class BindingSupport {
             if (list == null) {
                 return;
             }
+//            for ( Entry<Object,List<BindingImpl>> e: implBindingContexts.entrySet() ) {
+//                System.err.println("=="+e.getKey()+"==");
+//                System.err.println(""+e.getValue().size()+"items: " +e.getValue());
+//            }
             for (BindingImpl bi : list) {
                 try {
                     Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
