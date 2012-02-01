@@ -68,8 +68,12 @@ public class StatePersistence {
     private StatePersistence() {
     }
 
-    public static String currentVersion() {
-        return "1.07";
+    /**
+     * return the current DOM version, describing the scheme of the DOM.  
+     * @return
+     */
+    public static AbstractVapScheme currentScheme() {
+        return new Vap1_07Scheme();
     }
 
     public static void saveState( File f, Object state ) throws IOException {
@@ -136,7 +140,7 @@ public class StatePersistence {
 
         if ( sscheme.length()>0 ) {
             try {
-                doConvert( document, currentVersion(), sscheme );
+                doConvert( document, scheme.getId(), sscheme );
             } catch ( TransformerException ex ) {
                 ex.printStackTrace();
                 // throw new IOException("Unable to export to version "+sscheme,ex); //TODO: JAVA1.6 will set initial cause
@@ -356,7 +360,7 @@ public class StatePersistence {
                 }
                 
                 domVersion= root.getAttribute("domVersion");
-                String currentVersion= currentVersion();
+                String currentVersion= currentScheme().getId();
                 if ( domVersion.startsWith("v") ) {
                     domVersion= domVersion.substring(1).replace('_','.');
                 }
