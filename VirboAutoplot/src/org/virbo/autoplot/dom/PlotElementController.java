@@ -1246,19 +1246,14 @@ public class PlotElementController extends DomNodeController {
 
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
-            bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
         } else if (renderer instanceof SpectrogramRenderer) {
             bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
-            bindToSeriesRenderer(new SeriesRenderer());
         } else if (renderer instanceof ImageVectorDataSetRenderer) {
             bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
         } else if (renderer instanceof EventsRenderer ) {
             bindToEventsRenderer((EventsRenderer)renderer);
         } else if (renderer instanceof DigitalRenderer ) {
             bindToDigitalRenderer((DigitalRenderer)renderer);
-        } else {
-            bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
-            bindToSeriesRenderer(new SeriesRenderer());
         }
         Plot mip= ac.getPlotFor(plotElement);
         if ( mip!=null ) {  // transitional state
