@@ -582,7 +582,7 @@ public class ApplicationModel {
         }
 
         if ( surl.contains("nohistory=true") ) {
-            System.err.println("Not logging URI because it contains nohistory=true");
+            logger.fine("Not logging URI because it contains nohistory=true");
             return;
         } 
 
