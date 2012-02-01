@@ -449,7 +449,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if (!isValueAdjusting()) {
                     PlotElement p = getPlotElement();
                     if (p != null) {
-                        setDataSourceFilter(getDataSourceFilterFor(p));
+                        DataSourceFilter dsf= getDataSourceFilterFor(p);
+                        if ( dsf!=null ) setDataSourceFilter(dsf);
                         setPlot(getPlotFor(p));
                     } else {
                         setDataSourceFilter(null);
