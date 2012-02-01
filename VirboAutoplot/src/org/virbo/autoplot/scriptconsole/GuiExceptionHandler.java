@@ -78,6 +78,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.state.Vap1_07Scheme;
 import org.w3c.dom.Document;
@@ -534,12 +535,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 if ( appModel!=null ) {
                     Application state= (Application)appModel.getDocumentModel();
 
-                    Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, new Vap1_07Scheme() );// TODO: look up version
+                    Element app1 = SerializeUtil.getDomElement( doc, (DomNode)state, StatePersistence.currentScheme() );
 
                     Element vap= doc.createElement("vap");
                     vap.appendChild(app1);
 
-                    vap.setAttribute( "domVersion", "v1_07" ); // TODO: look up version
+                    vap.setAttribute( "domVersion", StatePersistence.currentScheme().getId() );
                     try {
                         vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
                     } catch ( IOException ex ) {
