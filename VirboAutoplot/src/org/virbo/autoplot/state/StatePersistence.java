@@ -68,6 +68,10 @@ public class StatePersistence {
     private StatePersistence() {
     }
 
+    public static String currentVersion() {
+        return "1.07";
+    }
+
     public static void saveState( File f, Object state ) throws IOException {
         saveState( f, state, "" );
     }
@@ -132,7 +136,7 @@ public class StatePersistence {
 
         if ( sscheme.length()>0 ) {
             try {
-                doConvert( document, "1.07", sscheme );
+                doConvert( document, currentVersion(), sscheme );
             } catch ( TransformerException ex ) {
                 ex.printStackTrace();
                 // throw new IOException("Unable to export to version "+sscheme,ex); //TODO: JAVA1.6 will set initial cause
@@ -352,7 +356,7 @@ public class StatePersistence {
                 }
                 
                 domVersion= root.getAttribute("domVersion");
-                String currentVersion= "1.07";
+                String currentVersion= currentVersion();
                 if ( domVersion.startsWith("v") ) {
                     domVersion= domVersion.substring(1).replace('_','.');
                 }
