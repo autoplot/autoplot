@@ -422,9 +422,8 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
    tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.000.d2s'
    f= findfile( getenv('IDL_TMPDIR') + 'autoplot.' + '*' + '.???.d2s', count=c )
    for i=0,c-1 do begin
-      print, f[i], ' ', tmpfile, ' ', f[i] lt tmpfile
       if ( f[i] lt tmpfile ) then begin
-         print, 'deleting ' + f[i]
+         ;print, 'deleting ' + f[i]
          file_delete, f[i]
       endif
    endfor
