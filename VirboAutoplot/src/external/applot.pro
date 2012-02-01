@@ -2,6 +2,7 @@
 ; ascii, boolean, use ascii transfer types
 pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
 
+   print, 'writing das2stream to ' + filename
    on_error, 2
    
    streamHeader= [ '[00]xxxxxx<stream>', '</stream>' ]
@@ -190,11 +191,25 @@ function getStructTag, struct, tag, def
   return, struct.(ry[0])
 end
  
+;+
+; NAME:
+;    APPLOT
+; PURPOSE:
+;    Plot to Autoplot instead of the direct graphics plotting, by creating a temporary file of the data and sending a plot
+;    command to Autoplot with the server turned on.
+; ARGUMENTS:
+;    X,Y,Z as with plot.  If X is an integer, then it is the position in Autoplot, so that multiple plots can be sent to 
+;      one autoplot canvas.
+; CALLING SEQUENCE:
+;    APPLOT, X, Y
+;    APPLOT, X, Y, Z   for a spectrogram
 ;
-; mimic plot command, but with Autoplot.  if x is an int, then
-; it is the position within autoplot.
-;
-pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
+; KEYWORDS:
+;   tmpfile=   explicitly set the file used to move data into Autoplot.  This can also be used with /noplot
+;   /noplot    just make the tmpfile, don't actually try to plot.
+;   xunits=    units as a string, especially like "seconds since 2010-01-01T00:00"
+;-
+pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=noplot, _extra=e, respawn=respawn
 
    x= x_in
    if ( n_elements(y_in) gt 0 ) then y= y_in
@@ -236,8 +251,14 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
       print, 'survived spawn'
    endif
 
-   tmpfile= getenv('IDL_TMPDIR') + 'autoplot.d2s'
-   tmpfile= strjoin( str_sep( tmpfile, '\' ), '/' )
+   if n_elements( tmpfile ) eq 0 then begin
+     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.d2s'
+     tmpfile= strjoin( str_sep( tmpfile, '\' ), '/' )
+   endif else begin
+     if ( strpos( tmpfile, '.d2s' ) ne strlen(tmpfile)-4 ) then begin
+       tmpfile= tmpfile + '.d2s'  ; add the extension
+     endif
+   endelse
 
    np= n_params();
 
@@ -341,6 +362,10 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
    ;endfor
    ;close, unit
    ;free_lun, unit
+
+   if keyword_set( noplot ) then begin
+      return
+   endif
 
    ex= ''
 
