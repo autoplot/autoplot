@@ -252,7 +252,11 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
    endif
 
    if n_elements( tmpfile ) eq 0 then begin
-     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.d2s'
+     caldat, systime(1, /julian), Mon, D, Y, H, Min
+     tag= string( Y, Mon, D, H, Min, format='(I04,I02,I02,"T",I02,I02)' )
+     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.???.d2s'
+     f= findfile( tmpfile, count=c )
+     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.' + string(c,format='(I3.3)') + '.d2s'
      tmpfile= strjoin( str_sep( tmpfile, '\' ), '/' )
    endif else begin
      if ( strpos( tmpfile, '.d2s' ) ne strlen(tmpfile)-4 ) then begin
@@ -377,7 +381,7 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
    catch, err
    if ( err eq 0 ) then begin
        socket, unit, 'localhost', port, /get_lun, write_timeout=1
-       ;cmd= 'plot( ''file:/'+tmpfile+'?depend0=field0&column=field1'' )'
+
        if ( !version.os_family eq 'Windows' ) then tmpfile= '/'+tmpfile
 
        if ( pos gt -1 ) then begin
@@ -412,4 +416,16 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
       retall
    endelse
 
+   ; clean up old tmp files more than 10 minutes old.
+   caldat, systime(1, /julian) - 10/1440., Mon, D, Y, H, Min  ; ten minutes ago
+   tag= string( Y, Mon, D, H, Min, format='(I04,I02,I02,"T",I02,I02)' )
+   tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.000.d2s'
+   f= findfile( getenv('IDL_TMPDIR') + 'autoplot.' + '*' + '.???.d2s', count=c )
+   for i=0,c-1 do begin
+      print, f[i], ' ', tmpfile, ' ', f[i] lt tmpfile
+      if ( f[i] lt tmpfile ) then begin
+         print, 'deleting ' + f[i]
+         file_delete, f[i]
+      endif
+   endfor
 end
