@@ -5,7 +5,7 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
    print, 'writing das2stream to ' + filename
    on_error, 2
    
-   streamHeader= [ '[00]xxxxxx<stream>', '</stream>' ]
+   streamHeader= [ '[00]xxxxxx<stream source=''applot.pro'' localDate='''+systime(0)+'''>', '</stream>' ]
    contentLength= -10 ; don't include the packet tag and content length
    for i=0,n_elements( streamHeader )-1 do begin
       contentLength += strlen( streamHeader[i] ) + 1
