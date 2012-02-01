@@ -590,7 +590,7 @@ public class PlotController extends DomNodeController {
             }
 
             for ( int i=0; i<newPes.length; i++ ) {
-                System.err.println( dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+                System.err.println( "moveToStackBottom: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
             }
             dom.setPlotElements(newPes);
 
@@ -645,7 +645,7 @@ public class PlotController extends DomNodeController {
             }
 
             for ( int i=0; i<newPes.length; i++ ) {
-                System.err.println( dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+                System.err.println( "moveToStackTop: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
             }
             dom.setPlotElements(newPes);
 

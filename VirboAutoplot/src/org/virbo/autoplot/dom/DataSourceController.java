@@ -1641,7 +1641,7 @@ public class DataSourceController extends DomNodeController {
         } else if ( e.getMessage()!=null && e.getMessage().contains("nsupported protocol") ) { //unsupport protocol
             model.showMessage( e.getMessage(), "Unsupported Protocol", JOptionPane.ERROR_MESSAGE );
         } else {
-            System.err.println(model.getExceptionHandler());
+            System.err.println("model.getExceptionHandler: "+ model.getExceptionHandler());
             model.getExceptionHandler().handle(e);
         }
     }

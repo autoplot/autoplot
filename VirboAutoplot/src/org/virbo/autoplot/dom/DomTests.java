@@ -35,6 +35,6 @@ public class DomTests {
         
         p1.getXaxis().range= p1.getXaxis().range.next();
         
-        System.err.println( p1.diffs(p2));
+        System.err.println( "diffsTest: " + p1.diffs(p2));
     }
 }

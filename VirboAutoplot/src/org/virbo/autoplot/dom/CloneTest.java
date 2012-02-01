@@ -20,13 +20,13 @@ public class CloneTest {
 
         PlotElementStyle cln= (PlotElementStyle) style.copy();
 
-        System.err.println( cln.getReference());
+        System.err.println( "CloneTest: " + cln.getReference());
 
         PlotElement myPanel= new PlotElement();
 
         myPanel.getStyle().setColortable( DasColorBar.Type.GRAYSCALE );
 
         PlotElement clonePanel= (PlotElement) myPanel.copy();
-        System.err.println( clonePanel.getStyle().getColortable() );
+        System.err.println( "colortable: " + clonePanel.getStyle().getColortable() );
     }
 }
