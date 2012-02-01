@@ -353,6 +353,9 @@ public class StatePersistence {
                 
                 domVersion= root.getAttribute("domVersion");
                 String currentVersion= "1.07";
+                if ( domVersion.startsWith("v") ) {
+                    domVersion= domVersion.substring(1).replace('_','.');
+                }
 
                 if ( ! domVersion.equals(currentVersion) ) {
 
