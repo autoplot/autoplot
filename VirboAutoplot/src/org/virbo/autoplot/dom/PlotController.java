@@ -589,9 +589,9 @@ public class PlotController extends DomNodeController {
                 newPes[bottom]= p;
             }
 
-            for ( int i=0; i<newPes.length; i++ ) {
-                System.err.println( "moveToStackBottom: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
-            }
+            //for ( int i=0; i<newPes.length; i++ ) {
+            //    System.err.println( "moveToStackBottom: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+            //}
             dom.setPlotElements(newPes);
 
         } finally {
@@ -644,9 +644,9 @@ public class PlotController extends DomNodeController {
                 newPes[top]= p;
             }
 
-            for ( int i=0; i<newPes.length; i++ ) {
-                System.err.println( "moveToStackTop: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
-            }
+            //for ( int i=0; i<newPes.length; i++ ) {
+            //    System.err.println( "moveToStackTop: " + dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+            //}
             dom.setPlotElements(newPes);
 
         } finally {
