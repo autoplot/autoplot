@@ -480,7 +480,7 @@ public class PlotController extends DomNodeController {
             if ( pp.contains(pele) ) {
                 pp.remove(pele);
             } else {
-                System.err.println("Plot "+plot+"doesn't contain the source plotElement "+plotElement +" see bug 2992903" ); //bug 2992903
+                //System.err.println("Plot "+plot+" doesn't contain the source plotElement "+plotElement +" see bug 2992903" ); //bug 2992903
                 return;
             }
             
