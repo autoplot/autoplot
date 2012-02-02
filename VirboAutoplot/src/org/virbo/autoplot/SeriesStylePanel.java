@@ -18,7 +18,6 @@ import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
@@ -86,11 +85,13 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
 
     }
 
+    public void releaseElementBindings() {
+        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+    }
 
     public synchronized void doElementBindings(PlotElement element) {
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
-        Binding b;
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  "symbolSize" ), symSizeSpinner, BeanProperty.create("value")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "plotSymbol" ), psymEditor,BeanProperty.create( "value")));

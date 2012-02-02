@@ -45,6 +45,9 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
 
     }
 
+    public void releaseElementBindings() {
+        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+    }
 
     public synchronized void doElementBindings(PlotElement element) {
         PlotElementStyle style= element.getStyle();

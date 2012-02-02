@@ -60,9 +60,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
     PlotElement currentElement;
 
     Application dom;
+    private StylePanel currentEditorPanel;
 
     interface StylePanel {
         public abstract void doElementBindings(PlotElement element);
+        public abstract void releaseElementBindings();
     }
     
     /** Creates new form PlotStylePanel */
@@ -161,10 +163,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
         PlotElement element= dom.getController().getPlotElement();
         if ( element==null ) return;
 
-        if ( stylePanel.getComponentCount()==1 ) {
-            stylePanel.remove( stylePanel.getComponent(0) );
-        }
-        
         StylePanel editorPanel=null;
         if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
             editorPanel= new SpectrogramStylePanel(applicationModel);
@@ -176,14 +174,25 @@ public class PlotStylePanel extends javax.swing.JPanel {
             editorPanel= new SeriesStylePanel(applicationModel);
         }
 
-        editorPanel.doElementBindings(element);
+        if ( currentEditorPanel==null || ( this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
+            editorPanel.doElementBindings(element);
 
-        stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
+            if ( currentEditorPanel!=null ) {
+                currentEditorPanel.releaseElementBindings();
+            }
+            currentEditorPanel= editorPanel;
+
+            if ( stylePanel.getComponentCount()==1 ) {
+                stylePanel.remove( stylePanel.getComponent(0) );
+            }
+
+            stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
         
+            currentElement= element;
+        }
+
         element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
         element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
-
-        currentElement= element;
         
         repaint();
         validate(); // paint the new GUI

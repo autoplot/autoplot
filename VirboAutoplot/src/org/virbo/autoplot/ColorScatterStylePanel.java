@@ -94,11 +94,13 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
 
     }
 
+    public void releaseElementBindings() {
+        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+    }
 
     public synchronized void doElementBindings(PlotElement element) {
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
-        Binding b;
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "colortable" ), edit, BeanProperty.create("value")));
 
