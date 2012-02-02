@@ -111,11 +111,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static final String UNCAUGHT = "An unexpected error has occurred. " +
         "The system may not be able to recover properly.  You can inspect " +
         "information about the crash with the Show Details button below, and " +
-        "submit an automatic bug entry.\n\n" +
-        "This submission will include information about the program state " +
-        "when the crash occurred, source code version tags, and platform information. " +
-        "If log messages are available, they will be sent as well.\n\n" +
-        "";
+        "submit an error report.\n\n" +
+        "This submission to the Autoplot developers will include information about the program state " +
+        "including data URIs, undos, source code version tags," +
+        "and platform information.\n\n";
 
     private JButton submitButton;
     private static final String USER_ID= "USER_ID";
@@ -163,7 +162,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         dialog.setModal(false);
         dialog.setResizable(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        final JTextArea messageArea = new JTextArea(10, 40);
+        final JTextArea messageArea = new JTextArea(12, 40);
         messageArea.setLineWrap(true);
         messageArea.setWrapStyleWord(true);
         messageArea.setEditable(false);
@@ -786,6 +785,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         for ( int i=0; i<3; i++ ) {
             eh.handle( new RuntimeException("Bad Deal 2!") );
         }
+
+        ExceptionHandler eh2= new GuiExceptionHandler();
+        eh2.handleUncaught( new RuntimeException("Bad Deal!") );
     }
 
 }
