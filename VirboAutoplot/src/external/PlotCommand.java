@@ -139,6 +139,7 @@ public class PlotCommand extends PyObject {
                         Py.None,
                         Py.None,Py.None,
                         Py.None,
+                        Py.None,
         } );
         //Map<String,PyObject> foo= fs.args( args, keywords );
         //TODO: check on this with Ed.
