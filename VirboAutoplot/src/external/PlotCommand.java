@@ -127,6 +127,7 @@ public class PlotCommand extends PyObject {
                 "color",
                 "symsize","linewidth",
                 "symbol",
+                "isotropic",
         },
                 new PyObject[] { Py.None, Py.None,
                         Py.None, Py.None,
@@ -221,7 +222,8 @@ public class PlotCommand extends PyObject {
             List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
 
             Plot plot= dom.getController().getPlotFor(elements.get(0));
-
+            plot.setIsotropic(false);
+            
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
                 String kw= keywords[i-nparm];
                 PyObject val= args[i];
@@ -287,6 +289,8 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("renderType") ) {
                     RenderType rt= RenderType.valueOf(sval);
                     elements.get(0).setRenderType(rt);
+                } else if ( kw.equals("isotropic" ) ) {
+                    plot.setIsotropic(true);
                 }
             }
 
