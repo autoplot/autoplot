@@ -193,7 +193,7 @@ public abstract class Bookmark {
                 try {
                     title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
                 } catch ( IllegalArgumentException ex ) {
-                    throw new IllegalArgumentException( ex.getMessage() + "\nBookmarks file is unversioned, so URLs should be encoded");
+                    throw new IllegalArgumentException( ex.getMessage() + "\nBookmarks file is unversioned, so titles should be encoded");
                 }
             }
         } else {
