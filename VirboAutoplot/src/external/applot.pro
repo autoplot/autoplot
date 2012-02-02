@@ -252,8 +252,8 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
    endif
 
    if n_elements( tmpfile ) eq 0 then begin
-     caldat, systime(1, /julian), Mon, D, Y, H, Min
-     tag= string( Y, Mon, D, H, Min, format='(I04,I02,I02,"T",I02,I02)' )
+     caldat, systime(1, /julian), Mon, Day, Year, Hour, Min
+     tag= string( Year, Mon, Day, Hour, Min, format='(I04,I02,I02,"T",I02,I02)' )
      tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.???.d2s'
      f= findfile( tmpfile, count=c )
      tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.' + string(c,format='(I3.3)') + '.d2s'
