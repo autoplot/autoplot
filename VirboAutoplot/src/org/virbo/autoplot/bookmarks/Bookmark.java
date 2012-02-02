@@ -142,8 +142,8 @@ public abstract class Bookmark {
     /**
      * parse the bookmarks in this node.
      * @param element
-     * @param vers null, empty string <2011, or version number
-     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels)
+     * @param vers null, empty string &lt;2011, or version number
+     * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels)
      * @return Bookmark.  If it's a folder, then bookmark.remoteStatus can be used to determine if it needs to be reloaded.
      * @throws UnsupportedEncodingException
      * @throws IOException
@@ -162,7 +162,11 @@ public abstract class Bookmark {
             if ( vers.equals("") ) {
                 nl = ((Element) element).getElementsByTagName("url");
                 s = ((Text) (nl.item(0).getFirstChild())).getData();
-                uri = URLDecoder.decode(s, "UTF-8") ;
+                try {
+                    uri = URLDecoder.decode(s, "UTF-8") ;
+                } catch ( IllegalArgumentException ex ) {
+                    throw new IllegalArgumentException( ex.getMessage() + "\nBookmarks file is unversioned, so URLs should be encoded");
+                }
             } else {
                 nl = ((Element) element).getElementsByTagName("uri");
                 if ( nl.getLength()==0 ) {
@@ -186,7 +190,11 @@ public abstract class Bookmark {
                 }
             } else {
                 s = ((Text) (nl.item(0).getFirstChild())).getData();
-                title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+                try {
+                    title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
+                } catch ( IllegalArgumentException ex ) {
+                    throw new IllegalArgumentException( ex.getMessage() + "\nBookmarks file is unversioned, so URLs should be encoded");
+                }
             }
         } else {
             title= "(untitled)";
