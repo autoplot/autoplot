@@ -36,6 +36,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonOps;
+import org.virbo.jythonsupport.JythonUtil;
 
 /**
  *
@@ -91,16 +92,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    static class Param {
-        String name;
-        String label; // the label for the variable used in the script
-        Object deft;
-        String doc;
-        char type; // A (String) or F (Double) or R (URI)
-    }
-
-    protected static Map<String,Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
-        BufferedReader reader= null;
+    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
 
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -111,64 +103,16 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             furi= split.resourceUri.toString();
         }
 
-        File src = DataSetURI.getFile(furi, new NullProgressMonitor());
+        File src = DataSetURI.getFile(furi, mon );
 
-        Map<String,Param> result= new LinkedHashMap();
+        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new BufferedReader( new FileReader(src) ) );
 
-        try {
-            reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
+        Map<String,JythonUtil.Param> result= new LinkedHashMap();
 
-            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
-            String sarg= "\\s*\\'([a-zA-Z_][a-zA-Z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
-            String aarg= "\\s*(\\'[^\\']+\\')\\s*"; // any argument
-            String farg= "\\s*([0-9\\.\\+-eE]+)\\s*"; // any float variable name
-
-            Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
-            Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
-
-            String line= reader.readLine();
-            while ( line!=null ) {
-                Matcher m= p.matcher(line);
-                if ( !m.matches() ) {
-                    m= fp.matcher(line);
-                }
-
-                if ( m.matches() ) {
-                    Param parm= new Param();
-
-                    parm.name= m.group(2); // exists in the URI space
-
-                    parm.label= m.group(1);  // exists in the Script space.  Why different.  Shouldn't be allowed, but this is required.
-
-                    parm.doc= m.group(5); // might be null
-
-                    if ( m.group(3)==null ) {
-                        System.err.println("error handle");
-                    } else {
-                        if ( parm.name.equals("resourceURI") ) {
-                            parm.type= 'R';
-                            parm.deft= m.group(3).substring(1,m.group(3).length()-1);
-                        } else {
-                            parm.type= m.group(3).startsWith("'") ? 'A' : 'F';
-                            String sval= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
-                            parm.deft= parm.type=='F' ? Double.parseDouble( sval ) : sval;
-                        }
-                    }
-
-                    result.put( parm.name, parm );
-
-                }
-                line= reader.readLine();
-            }
-            reader.close();
-
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        for ( JythonUtil.Param r : r2 ) {
+            result.put( r.name, r );
         }
+
         return result;
 
     }
@@ -185,9 +129,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 for (String n : po.keySet()) {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
                 }
-                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                Map<String,JythonUtil.Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
                 for ( String n: po2.keySet() ) {
-                    Param parm= po2.get(n);
+                    JythonUtil.Param parm= po2.get(n);
                     if ( parm.doc==null ) parm.doc="";
                     if ( !parm.name.equals(parm.label) ) {
                         parm.doc+= " (named "+parm.label+" in the script)";
@@ -203,8 +147,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             if ( paramName.equals("script") ) {
                 //TODO: filesystem completions.
             } else {
-                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
-                Param pp= po2.get(paramName);
+                Map<String,JythonUtil.Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                JythonUtil.Param pp= po2.get(paramName);
                 if ( pp!=null ) {
                     if ( pp.deft instanceof Number ) {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(pp.deft), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
@@ -257,19 +201,26 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,String> getParameters( String surl, ProgressMonitor mon ) throws IOException {
-        File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
+    /**
+     * Scrape through the Jython script looking for assignments.  Ideally, this would just be a list of plottable
+     * result parameters, but that's impossible without actually running the script.
+     * @param surl
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    protected static Map<String,String> getResultParameters( String surl, ProgressMonitor mon ) throws IOException {
+        File src = DataSetURI.getFile(DataSetURI.getURL(surl),mon);
         BufferedReader reader = new BufferedReader(new FileReader(src));
         String s = reader.readLine();
 
-        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=(.*)(#(.*))?");
         Pattern defPattern= Pattern.compile("def .*");
 
         boolean inDef= false;
 
         Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
 
-        boolean haveResult = false;
         while (s != null) {
 
             if ( inDef==false ) {
@@ -287,10 +238,15 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             if ( !inDef ) {
                 Matcher m= assignPattern.matcher(s);
                 if ( m.matches() ) {
-                    if ( m.group(3)!=null ) {
-                        result.put(m.group(1), m.group(3) );
+                    String rhs= m.group(2);
+                    if ( rhs.contains("getParam(") ) {
+                        // reject
                     } else {
-                        result.put(m.group(1), s );
+                        if ( m.group(4)!=null ) {
+                            result.put(m.group(1), m.group(4) );
+                        } else {
+                            result.put(m.group(1), s );
+                        }
                     }
                 }
             }

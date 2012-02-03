@@ -8,11 +8,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,16 @@ import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyNone;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
+import org.python.core.PyTuple;
 import org.python.util.InteractiveInterpreter;
+import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetURI;
 
 /**
@@ -124,6 +128,80 @@ public class JythonUtil {
         return errs.size()>0;
 
 
+    }
+
+    public static class Param {
+        public String name;
+        public String label; // the label for the variable used in the script
+        public Object deft;
+        public String doc;
+        public List<Object> enums;  // the allowed values
+        /**
+         * A (String) or F (Double) or R (URI)
+         */
+        public char type;
+    }
+
+    public static List<Param> getGetParams( BufferedReader reader ) throws IOException {
+        String s= reader.readLine();
+
+        StringBuilder build= new StringBuilder();
+        Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
+        while (s != null) {
+
+           Matcher m= getParamPattern.matcher(s);
+           if ( m.matches() || s.contains("getParam") ) {
+               build.append(s).append("\n");
+           }
+           s = reader.readLine();
+        }
+
+        reader.close();
+        
+        String params= build.toString();
+
+        String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n";
+
+        String prog= myCheat + params ;
+
+        PythonInterpreter interp= new PythonInterpreter();
+        interp.exec(prog);
+
+        PyObject locals= interp.getLocals();
+
+        PyStringMap mlocals= (PyStringMap)locals;
+        mlocals.__delitem__("getParam");
+
+        List<Param> result= new ArrayList();
+        PyList list= mlocals.items();
+        for ( int i=0; i<list.__len__(); i++ ) {
+            PyTuple o= (PyTuple) list.get(i);
+            Param p= new Param();
+            p.label= o.__getitem__(0).toString();   // should be name in the script
+            if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
+            PyList oo= (PyList) o.__getitem__(1);
+            p.name= oo.__getitem__(0).toString(); // name in the URI
+            p.deft= oo.__getitem__(1);
+            p.doc= oo.__getitem__(2).toString();
+            if ( p.name.equals("resourceUri") ) {
+                p.type= 'R';
+                p.deft= p.deft.toString();
+            } else {
+                if ( p.deft instanceof String ) {
+                    p.type= 'A';
+                    p.deft= p.deft.toString();
+                } else if ( p.deft instanceof PyInteger ) {
+                    p.type= 'F';
+                    p.deft= ((PyInteger)p.deft).__tojava__(int.class);
+                } else if ( p.deft instanceof PyFloat ) {
+                    p.type= 'F';
+                    p.deft= ((PyFloat)p.deft).__tojava__(double.class);
+                }
+            }
+            result.add(p);
+        }
+
+        return result;
     }
 
     /**

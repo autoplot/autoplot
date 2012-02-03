@@ -46,7 +46,6 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.jython.JythonDataSourceFactory.Param;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
@@ -103,7 +102,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
 
-        jLabel1.setText("dataset variable:");
+        jLabel1.setText("Select variable:");
         jLabel1.setToolTipText("The dataset pointed to by the URI");
 
         caretPositionLabel.setText("1,1");
@@ -120,10 +119,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         scriptPanelLayout.setHorizontalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -140,19 +139,17 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         tearoffTabbedPane1.addTab("params", paramsPanel);
 
-        jLabel2.setText("Select from the variables calculated by the script, 'data' is used by default:");
+        jLabel2.setText("Select from the variables calculated by the script, 'data' or 'result' is used by default:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 351, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 440, Short.MAX_VALUE))
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(jLabel2)
                 .addContainerGap())
@@ -165,8 +162,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -191,7 +188,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     private boolean doVariables( File f, Map<String,String> params ) {
 
-        Map<String,JythonDataSourceFactory.Param> parms;
+        Map<String,JythonUtil.Param> parms;
 
         boolean hasVars= false;
         tflist= new ArrayList();
@@ -204,9 +201,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             paramsPanel.add( new JLabel("<html>This script has these input parameters.  Buttons on the right show default values.<br><br></html>") );
 
-            for ( Entry<String,Param> e: parms.entrySet() ) {
+            for ( Entry<String,JythonUtil.Param> e: parms.entrySet() ) {
                 //String s= e.getKey();
-                JythonDataSourceFactory.Param parm= e.getValue();
+                JythonUtil.Param parm= e.getValue();
                 
                 String vname= parm.name;                
                 String label= parm.label;
@@ -215,7 +212,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     label= vname+ ":";
                 } else {
                     String doc= parm.doc;
-                    doc= doc.substring(1,doc.length()-1);// pop off the quotes
+                    if ( doc.startsWith("'") ) doc= doc.substring(1,doc.length()-1);// pop off the quotes
                     if ( !parm.label.equals(parm.name) ) {
                         doc= doc + " ("+parm.label+" internally)";
                     }
@@ -248,7 +245,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     Dimension x= tf.getPreferredSize();
                     x.width= Integer.MAX_VALUE;
                     tf.setMaximumSize(x);
-                    
+                    tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
+
                     Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
                     JButton filesButton= new JButton( fileIcon );
 //                    filesButton.setMaximumSize( new Dimension(16,16) );
@@ -330,6 +328,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
 
             paramsPanel.add( Box.createVerticalGlue() );
+            paramsPanel.revalidate();
 
         } catch (IOException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -342,16 +341,16 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         Map<String,String> params= URISplit.parseParams(split.params);
 
         String furi;
-        String resourceUri=null;
+        String resourceUri1=null;
         if ( params.containsKey("script") ) {
             furi= params.get("script");
-            resourceUri= split.resourceUri.toString();
+            resourceUri1= split.resourceUri.toString();
         } else {
             furi= split.resourceUri.toString();
-            resourceUri= null;
+            resourceUri1= null;
         }
 
-        return new String[] { furi, resourceUri };
+        return new String[] { furi, resourceUri1 };
             
     }
 
@@ -364,7 +363,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             File f = DataSetURI.getFile( furir[0], new NullProgressMonitor() );
 
             support.loadFile(f);
-            Map<String,String> results= JythonDataSourceFactory.getParameters( f.toString(), new NullProgressMonitor() );
+            Map<String,String> results= JythonDataSourceFactory.getResultParameters( f.toString(), new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
             int i=0;
             int idx= -1;
@@ -464,7 +463,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 }
             } else if ( type=='R' && value.equals(deft) && !split.resourceUri.toString().equals(deft) ) {
                 URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
-                params.put( "script", split.resourceUri.toString() );
+                if (params.get("script")==null ) {
+                    params.put( "script", split.resourceUri.toString() );
+                }
                 split.resourceUri= ruriSplit.resourceUri;
                 split.scheme= ruriSplit.scheme;
                 split.authority= ruriSplit.authority;
