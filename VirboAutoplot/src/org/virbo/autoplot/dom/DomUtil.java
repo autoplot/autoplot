@@ -681,27 +681,33 @@ public class DomUtil {
 
 
     /**
-     * plugs values from USER_PROPERTIES into template string.
-     * @param template
-     * @param props
+     * plugs values from USER_PROPERTIES or METADATA into template string.
+     * @param template template, for example the title or label.
+     * @param root USER_PROPERTIES, METADATA, etc.
+     * @param props properties tree.
      * @return
      */
-    public static String resolveUserProperties( String template, Map<String,Object> props ) {
-        int i= template.indexOf("%{USER_PROPERTIES.");
-        while ( i>-1 ) {
-            int i2= template.indexOf("}",i);
-            String propName= template.substring(i+18,i2);
-            int i3= propName.indexOf(".");
-            Map<String,Object> props1= props;
-            while ( i3>-1 ) {
-                String propName1= propName.substring(0,i3);
-                props1= (Map<String, Object>) props.get(propName1);
-                propName= propName1;
-                i3= propName.indexOf(".");
+    public static String resolveProperties( String template, String root, Map<String,Object> props ) {
+        try {
+            int i= template.indexOf("%{"+root+".");
+            int n= root.length()+3;
+            while ( i>-1 ) {
+                int i2= template.indexOf("}",i);
+                String propName= template.substring(i+n,i2);
+                int i3= propName.indexOf(".");
+                Map<String,Object> props1= props;
+                while ( i3>-1 ) {
+                    String propName1= propName.substring(0,i3);
+                    props1= (Map<String, Object>) props.get(propName1);
+                    propName= propName1;
+                    i3= propName.indexOf(".");
+                }
+                String prop= String.valueOf( props1.get(propName) );
+                template= template.substring(0,i) + prop + template.substring(i2+1);
+                i= template.indexOf("%{"+root+".",i);
             }
-            String prop= String.valueOf( props1.get(propName) );
-            template= template.substring(0,i) + prop + template.substring(i2+1);
-            i= template.indexOf("%{USER_PROPERTIES.",i);
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
         }
         return template;
     }
