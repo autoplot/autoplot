@@ -184,6 +184,9 @@ public class JythonUtil {
             p.deft= oo.__getitem__(1);
             p.doc= oo.__getitem__(2).toString();
             if ( p.name.equals("resourceUri") ) {
+                p.name= "resourceURI"; //  I will regret allowing for this sloppiness...
+            }
+            if ( p.name.equals("resourceURI") ) {
                 p.type= 'R';
                 p.deft= p.deft.toString();
             } else {
