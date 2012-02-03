@@ -249,8 +249,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
                     Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
                     JButton filesButton= new JButton( fileIcon );
-//                    filesButton.setMaximumSize( new Dimension(16,16) );
-//                    filesButton.setMinimumSize( new Dimension(16,16) );
                     filesButton.addActionListener( new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             JFileChooser c= new JFileChooser();
