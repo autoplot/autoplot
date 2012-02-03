@@ -539,6 +539,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             pelement.removePropertyChangeListener(domListener);
             pelement.getStyle().removePropertyChangeListener(domListener);
             unbind(pelement);
+            unbind(pelement.getStyle());
+            unbindImpl(pelement); //TODO: I need to remind myself why there are two types of bindings...
+            unbindImpl(pelement.getStyle());
             pelement.controller.unbindDsf();
             pelement.removePropertyChangeListener(plotIdListener);
 
