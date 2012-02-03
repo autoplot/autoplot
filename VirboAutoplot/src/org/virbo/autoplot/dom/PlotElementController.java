@@ -1244,6 +1244,9 @@ public class PlotElementController extends DomNodeController {
         ac.unbindImpl(node);
         ac.unbindImpl(((PlotElement)node).getStyle());
 
+        if ( node!=plotElement ) {
+            System.err.println("node!=plotElement");
+        }
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
         } else if (renderer instanceof SpectrogramRenderer) {
@@ -2202,6 +2205,25 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                 }
+                if ( title.contains("USER_PROPERTIES" ) ) {
+                    if ( plotElement!=null ) {
+                        if ( dataSet!=null ) {
+                            Map<String,Object> props= (Map<String, Object>) dataSet.property(QDataSet.USER_PROPERTIES);
+                            title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
+                        }
+                    }
+                }
+                if ( title.contains("METADATA" ) ) {
+                    if ( plotElement!=null ) {
+                        if ( dataSet!=null ) {
+                            DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, plotElement.getDataSourceFilterId() );
+                            if ( dsf!=null ) { // ought not to be!
+                                Map<String,Object> props= (Map<String, Object>) dsf.getController().getRawProperties(); //TODO: this is a really old name that needs updating...
+                                title= DomUtil.resolveProperties( title, "METADATA", props );
+                            }
+                        }
+                    }
+                }
                 if ( title.contains("TIMERANGE") ) {
                     DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, plotElement );
                     if ( tr==null ) {
@@ -2227,6 +2249,10 @@ public class PlotElementController extends DomNodeController {
                 String title= (String)value;
                 String ptitle=  plotElement.getLegendLabel();
                 if ( containsString( ptitle, "CONTEXT", title) ) {
+                    title= ptitle;
+                } else if ( ptitle.contains( "%{USER_PROPERTIES" ) ) { //kludgy
+                    title= ptitle;
+                } else if ( ptitle.contains( "%{METADATA" ) ) { //kludgy
                     title= ptitle;
                 } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
                     title= ptitle;
