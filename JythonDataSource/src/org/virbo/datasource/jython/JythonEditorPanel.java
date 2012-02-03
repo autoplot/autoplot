@@ -34,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -199,7 +200,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         try {
             parms= JythonDataSourceFactory.getParams( f.toURI(), new NullProgressMonitor() );
 
-            paramsPanel.add( new JLabel("<html>This script has these input parameters.  Buttons on the right show default values.<br><br></html>") );
+            paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
             for ( Entry<String,JythonUtil.Param> e: parms.entrySet() ) {
                 //String s= e.getKey();
@@ -271,12 +272,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     valuePanel.add( filesButton );
 
                 } else {
-                    JTextField tf= new JTextField(50);
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
                     String val;
                     if ( params.get(vname)!=null ) {
                         val= params.get(vname);
@@ -285,9 +280,27 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     } else {
                         val= String.valueOf( parm.deft );
                     }
+                    if ( parm.enums!=null && parm.enums.size()>0 ) {
+                        JComboBox jcb= new JComboBox(parm.enums.toArray());
+                        jcb.setEditable(false);
+                        jcb.setSelectedItem(val);
+                        ctf= jcb;
+                        Dimension x= ctf.getPreferredSize();
+                        x.width= Integer.MAX_VALUE;
+                        ctf.setMaximumSize(x);
+                        ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                        
+                    } else {
+                        JTextField tf= new JTextField(50);
+                        Dimension x= tf.getPreferredSize();
+                        x.width= Integer.MAX_VALUE;
+                        tf.setMaximumSize(x);
+                        tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
 
-                    tf.setText( val );
-                    ctf= tf;
+                        tf.setText( val );
+                        ctf= tf;
+                    }
+                    
                     valuePanel.add( ctf );
                 }
                 
@@ -299,6 +312,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     public void actionPerformed( ActionEvent e ) {
                         if ( ftf instanceof DataSetSelector ) {
                             ((DataSetSelector)ftf).setValue(fvalue);
+                        } else if ( ftf instanceof JComboBox ) {
+                            ((JComboBox)ftf).setSelectedItem(fvalue);
                         } else {
                             ((JTextField)ftf).setText(fvalue);
                         }
@@ -434,7 +449,17 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         for ( int j=0; j<paramsList.size(); j++ ) {
             String name= paramsList.get(j);
             JComponent jc= tflist.get(j);
-            String value= ( jc instanceof JTextField ) ? ((JTextField)jc).getText() : ((DataSetSelector)jc).getValue();
+            String value;
+            if ( jc instanceof JTextField ) {
+                value= ((JTextField)jc).getText();
+            } else if ( jc instanceof DataSetSelector ) {
+                value= ((DataSetSelector)jc).getValue();
+            } else if ( jc instanceof JComboBox ) {
+                value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
+            } else {
+                throw new IllegalArgumentException("the code needs attention: component for "+name+" not supported ");
+            }
+            
             String deft= deftsList.get(j);
             char type= typesList.get(j);
 
