@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -677,4 +678,32 @@ public class DomUtil {
         }
         return false;
     }
+
+
+    /**
+     * plugs values from USER_PROPERTIES into template string.
+     * @param template
+     * @param props
+     * @return
+     */
+    public static String resolveUserProperties( String template, Map<String,Object> props ) {
+        int i= template.indexOf("%{USER_PROPERTIES.");
+        while ( i>-1 ) {
+            int i2= template.indexOf("}",i);
+            String propName= template.substring(i+18,i2);
+            int i3= propName.indexOf(".");
+            Map<String,Object> props1= props;
+            while ( i3>-1 ) {
+                String propName1= propName.substring(0,i3);
+                props1= (Map<String, Object>) props.get(propName1);
+                propName= propName1;
+                i3= propName.indexOf(".");
+            }
+            String prop= String.valueOf( props1.get(propName) );
+            template= template.substring(0,i) + prop + template.substring(i2+1);
+            i= template.indexOf("%{USER_PROPERTIES.",i);
+        }
+        return template;
+    }
+
 }
