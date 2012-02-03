@@ -29,6 +29,7 @@ public class BindingSupport {
 
     protected BindingSupport() {
         implBindingContexts = new HashMap();
+        //sources= new HashMap();
     }
 
     private static class BindingImpl {
@@ -88,6 +89,7 @@ public class BindingSupport {
         };
     }
     final Map<Object, List<BindingImpl>> implBindingContexts; // these are for controllers to use.
+    //final Map<Object, StackTraceElement[] > sources;
 
     public String capitalize(String name) {
         if (name == null || name.length() == 0) {
@@ -133,7 +135,7 @@ public class BindingSupport {
      * @param c bean converter for converting the property.
      * @throws IllegalArgumentException if a property contains a dot.
      */
-        public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter c) {
+    public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter c) {
         if (srcProp.contains(".")) {
             throw new IllegalArgumentException("src property name cannot contain periods: " + srcProp);
         }
@@ -196,6 +198,8 @@ public class BindingSupport {
             if (list == null) {
                 list = new ArrayList();
                 implBindingContexts.put(src, list);
+                //sources.put(src,new Exception().getStackTrace());
+                //System.err.println("implBindingContexts.size="+implBindingContexts.size());
             }
             list.add(bi);
         }
@@ -231,6 +235,7 @@ public class BindingSupport {
             }
             list.clear();
             implBindingContexts.remove(master);
+            //sources.remove(master); // leave in code for future testing to find leaks.
         }
     }
 
@@ -263,8 +268,27 @@ public class BindingSupport {
             }
             if ( list2.isEmpty() ) {
                 implBindingContexts.remove(master);
+                //sources.remove(master);
             } else {
                 implBindingContexts.put( master, list2 );
+//                System.err.println("implBindingContexts.size="+implBindingContexts.size());
+//                if ( implBindingContexts.size()>100 ) {
+//                    int i=0;
+//                    for ( Entry e: implBindingContexts.entrySet() ) {
+//                        i++;
+//                        if ( i>70 && i<80 ) {
+//                            System.err.println("=== "+e );
+//                            StackTraceElement[] ste= sources.get( e.getKey() );
+//                            for ( StackTraceElement ste1: ste ) {
+//                                if ( !ste1.toString().contains("BindingSupport.bind") && !ste1.toString().contains("ApplicationController.bind") ) {
+//                                    System.err.println( ste1 );
+//                                    break;
+//                                }
+//                            }
+//
+//                        }
+//                    }
+//                }
             }
         }
     }
