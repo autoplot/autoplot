@@ -511,19 +511,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 dialog.setExpertMode(isExpertMode());
                             }
 
-        //                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
-        //                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
-        //                            if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
-        //                                ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
-        //                            }
-        //                        }
-        //                        SwingUtilities.invokeLater( new Runnable() {
-        //                            public void run() {
-        //                                ((AggregatingDataSourceEditorPanel)fedit).hintAtCompletion();
-        //                            }
-        //                        });
-        //                    }
-
                             dialog.setVisible(true);
 
                             if (!dialog.isCancelled()) {
