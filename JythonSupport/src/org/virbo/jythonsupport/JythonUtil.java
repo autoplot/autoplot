@@ -183,6 +183,15 @@ public class JythonUtil {
             p.name= oo.__getitem__(0).toString(); // name in the URI
             p.deft= oo.__getitem__(1);
             p.doc= oo.__getitem__(2).toString();
+            if (  oo.__getitem__(3) instanceof PyList ) {
+                PyList pyList= ((PyList)oo.__getitem__(3));
+                List<Object> enums= new ArrayList(pyList.size());
+                for ( int j=0; j<pyList.size(); j++ ) {
+                    enums.add(j,pyList.get(j));
+                }
+                p.enums= enums;
+            }
+
             if ( p.name.equals("resourceUri") ) {
                 p.name= "resourceURI"; //  I will regret allowing for this sloppiness...
             }
