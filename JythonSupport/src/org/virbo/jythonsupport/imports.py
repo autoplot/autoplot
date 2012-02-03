@@ -26,7 +26,9 @@ import operator.isNumberType
 def getParam( x, default, title='' ):
   if ( type(x).__name__=='int' ):
      x= 'arg_%d' % i
-
+  if ( x=='resourceUri' ):
+     print 'resourceURI may be used, but resourceUri cannot.'
+     x= 'resourceURI'
   if params.has_key(x):
      if ( operator.isNumberType(default) ): #TODO: complex
          return float(params[x])
