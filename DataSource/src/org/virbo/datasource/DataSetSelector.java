@@ -489,48 +489,53 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
 
                     fedit.setURI(surl);
+                    final String fsurl= surl;
 
-                    DataSourceEditorDialog dialog;
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            DataSourceEditorDialog dialog;
 
-                    String title = "Editing URI " + surl;
-                    if (window instanceof Frame) {
-                        dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
-                    } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
-                        dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
-                    } else {
-                        throw new RuntimeException("parent windowAncestor type is not supported.");
-                    }
-                    dialog.setTitle(title);
+                            String title = "Editing URI " + fsurl;
+                            if (window instanceof Frame) {
+                                dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
+                            } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
+                                dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
+                            } else {
+                                throw new RuntimeException("parent windowAncestor type is not supported.");
+                            }
+                            dialog.setTitle(title);
 
-                    if ( actionListenerList==null || actionListenerList.isEmpty() ) {
-                        dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
-                    } else {
-                        dialog.setExpertMode(isExpertMode());
-                    }
+                            if ( actionListenerList==null || actionListenerList.isEmpty() ) {
+                                dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
+                            } else {
+                                dialog.setExpertMode(isExpertMode());
+                            }
 
-//                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
-//                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
-//                            if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
-//                                ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
-//                            }
-//                        }
-//                        SwingUtilities.invokeLater( new Runnable() {
-//                            public void run() {
-//                                ((AggregatingDataSourceEditorPanel)fedit).hintAtCompletion();
-//                            }
-//                        });
-//                    }
+        //                    if ( fedit instanceof AggregatingDataSourceEditorPanel ) { //TODO: other TSBs can be supported here
+        //                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits()) ) {
+        //                            if ( ((AggregatingDataSourceEditorPanel)fedit).getTimeRange()==null ) {
+        //                                ((AggregatingDataSourceEditorPanel)fedit).setTimeRange( timeRange );
+        //                            }
+        //                        }
+        //                        SwingUtilities.invokeLater( new Runnable() {
+        //                            public void run() {
+        //                                ((AggregatingDataSourceEditorPanel)fedit).hintAtCompletion();
+        //                            }
+        //                        });
+        //                    }
 
-                    dialog.setVisible(true);
+                            dialog.setVisible(true);
 
-                    if (!dialog.isCancelled()) {
-                        logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
-                        dataSetSelector.setSelectedItem(fedit.getURI());
-                        keyModifiers = dialog.getModifiers();
-                        maybePlot(true);
-                    } else {
-                        setMessage("editor cancelled");
-                    }
+                            if (!dialog.isCancelled()) {
+                                logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
+                                dataSetSelector.setSelectedItem(fedit.getURI());
+                                keyModifiers = dialog.getModifiers();
+                                maybePlot(true);
+                            } else {
+                                setMessage("editor cancelled");
+                            }
+                        } };
+                        SwingUtilities.invokeLater(run);
 
                 }
             };
