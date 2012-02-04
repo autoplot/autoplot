@@ -23,7 +23,7 @@ params= dict()
 
 import operator.isNumberType
 
-def getParam( x, default, title='' ):
+def getParam( x, default, title='', enums='' ):
   if ( type(x).__name__=='int' ):
      x= 'arg_%d' % i
   if ( x=='resourceUri' ):
