@@ -21,6 +21,7 @@ import org.python.util.PythonInterpreter;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -246,6 +247,8 @@ public class InlineDataSource extends AbstractDataSource {
                 } else {
                     MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice1(ds,0));
                     MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice1(ds,ds.length(0)-1));
+                    DataSetUtil.copyDimensionProperties( ds, zz ); // we put these in the wrong place, fix this...
+                    if ( ds.property(QDataSet.RENDER_TYPE)!=null ) zz.putProperty(QDataSet.RENDER_TYPE,ds.property(QDataSet.RENDER_TYPE)); // vap+inline:0,0,100,100,0,0; 0,0,0,100,100,0&RENDER_TYPE=scatter
                     zz.putProperty( QDataSet.DEPEND_0, xx );
                     ds= zz;
                 }
