@@ -1710,21 +1710,6 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            //TODO: This is really sloppy.
-            boolean isSeries;
-            boolean hasRenderType= props.get( QDataSet.RENDER_TYPE ) !=null;
-            isSeries = (depend0 == null || DataSetUtil.isMonotonic(depend0));
-            if ( !hasRenderType ) {
-                if (isSeries) {
-                    peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);
-                } else {
-                    peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
-                    if ( peleCopy.getRenderType()==RenderType.series )
-                        peleCopy.setRenderType( RenderType.scatter );
-                }
-
-            }
-
             peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
             peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
 
