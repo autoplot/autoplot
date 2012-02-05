@@ -313,7 +313,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         if ( ftf instanceof DataSetSelector ) {
                             ((DataSetSelector)ftf).setValue(fvalue);
                         } else if ( ftf instanceof JComboBox ) {
-                            ((JComboBox)ftf).setSelectedItem(fvalue);
+                            JComboBox jcb= ((JComboBox)ftf);
+                            for ( int i=0; i<jcb.getItemCount(); i++ ) {
+                                if ( fvalue.toString().equals( jcb.getItemAt(i).toString() ) ) {
+                                    jcb.setSelectedIndex(i);
+                                }
+                            }
                         } else {
                             ((JTextField)ftf).setText(fvalue);
                         }
@@ -336,8 +341,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             hasVars= parms.size()>0;
 
             if ( !hasVars ) {
-                paramsPanel.add( new JLabel("<html><em>no parameters</em></html>") );
-
+                paramsPanel.add( new JLabel("<html><em>no input parameters</em></html>") );
             }
 
             paramsPanel.add( Box.createVerticalGlue() );
