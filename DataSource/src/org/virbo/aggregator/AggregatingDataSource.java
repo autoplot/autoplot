@@ -92,7 +92,9 @@ public class AggregatingDataSource extends AbstractDataSource {
         if ( super.params.get("timeRange")!=null && stimeRange==null ) {
             stimeRange= super.params.get("timeRange");
         }
-        if ( stimeRange==null ) throw new IllegalArgumentException("timeRange not found");
+        if ( stimeRange==null ) {
+            throw new IllegalArgumentException("timerange not found");
+        }
         stimeRange= stimeRange.replaceAll("\\+"," " );        
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
 
