@@ -15,6 +15,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -551,6 +552,7 @@ public class AutoplotUtil {
             // find min and max of three-point medians
             try {
                 dd = simpleRange(ds);
+                logger.log(Level.FINEST, "simpleRange(ds)= {0} - {1}", new Object[]{dd[0], dd[1]});
                 if ( Units.dimensionless.isFill(dd[0]) ) dd[0]= dd[0] / 100; // kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FEDO
                 if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 100;
             } catch (IllegalArgumentException ex) {
@@ -686,6 +688,7 @@ public class AutoplotUtil {
                     (Units) properties.get(QDataSet.UNITS));
             // see if the typical extent is consistent with extent seen.  If the
             // typical extent won't hide the data's structure, then use it.
+            System.err.println("typical min,max= "+range);
             if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
@@ -727,7 +730,7 @@ public class AutoplotUtil {
                 }
                 if (d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
                         && d2 > 0.   // and the stats max is greater than the typical range min()
-                        && d2 < 1.1  // and the top isn't clipping data badly
+                        && d2 < 1.14  // and the top isn't clipping data badly  //TODO: we really need to be more robust about this.  hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109 was failing because a small number of points was messing this up.
                         && d1 > -0.1 // and the bottom isn't clipping data badly
                         && d1 < 1.   // and the stats min is less then the typical range max().
                         && uu.isConvertableTo( u ) ) {  // and we ARE talking about the same thing
