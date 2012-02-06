@@ -320,11 +320,12 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * returns the metadata provided by the first delegate dataset.
      */
+    @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
             Map<String, Object> retValue;
-            retValue = super.getMetadata(mon);
-            return retValue;
+            getDataSet(mon); // sorry, we have to read the data...
+            return metadata;
         } else {
             return metadata;
         }
