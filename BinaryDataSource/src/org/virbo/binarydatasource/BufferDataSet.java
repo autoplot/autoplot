@@ -54,6 +54,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     public final static Object DOUBLE= "double";
     public final static Object FLOAT= "float";
     public final static Object TRUNCATEDFLOAT= "truncatedfloat"; // 16 bit real that has exponent like a FLOAT but mantissa precision is reduced.
+    public final static Object VAX_FLOAT= "vaxfloat";
     public final static Object LONG= "long";
     public final static Object INT= "int";
     public final static Object UINT= "uint";
@@ -66,6 +67,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if (type.equals(DOUBLE)) {
             return 8;
         } else if (type.equals(FLOAT)) {
+            return 4;
+        } else if ( type.equals(VAX_FLOAT) ) {
             return 4;
         } else if (type.equals(LONG)) {
             return 8;
@@ -109,6 +112,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             result=new Double( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(FLOAT) ) {
             result=new  Float( rank, reclen, recoffs, len0, len1, len2, len3, buf );
+        } else if ( type.equals(VAX_FLOAT) ) {
+            result= new VaxFloat( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(LONG) ) {
             result=new  Long( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(INT) ) {
