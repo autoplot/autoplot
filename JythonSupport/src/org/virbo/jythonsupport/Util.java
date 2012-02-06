@@ -137,6 +137,13 @@ public class Util {
     private static String metadataSurl;
 
     /**
+     * @deprecated use getMetadata
+     */
+    public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
+        return getMetadata( surl, mon );
+    }
+
+    /**
      * load the metadata for the url.  This can be called independently from getDataSet,
      * and data sources should not assume that getDataSet is called before getMetaData.
      * Some may, in which case a bug report should be submitted.
