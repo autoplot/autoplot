@@ -153,7 +153,7 @@ public class Util {
         } else {
             URI url = DataSetURI.getURIValid(surl);
             DataSourceFactory factory = DataSetURI.getDataSourceFactory(url, new NullProgressMonitor());
-            DataSource result = factory.getDataSource(DataSetURI.getResourceURI(url));
+            DataSource result = factory.getDataSource(url);
             if (mon == null) {
                 mon = new NullProgressMonitor();
             }
