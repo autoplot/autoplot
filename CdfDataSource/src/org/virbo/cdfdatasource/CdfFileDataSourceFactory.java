@@ -211,7 +211,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         //    return currentCDF;
         //}
 
-        System.err.println("opening "+cdfFile);
+        logger.log(Level.FINE, "opening {0}", cdfFile);
         currentCDF= CDF.open(cdfFile);
         //currentFile= cdfFile;
         return currentCDF;
