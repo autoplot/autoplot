@@ -145,8 +145,8 @@ public class Util {
      * @return metadata tree created by the data source.
      * @throws java.lang.Exception
      */
-    public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
-        logger.log( Level.FINE, "getMetaData({0})", surl );
+    public static Map<String, Object> getMetadata(String surl, ProgressMonitor mon) throws Exception {
+        logger.log( Level.FINE, "getMetadata({0})", surl );
 
         if (surl.equals(metadataSurl)) {
             return metadata;
@@ -161,6 +161,8 @@ public class Util {
             return result.getMetadata(mon);
         }
     }
+
+
 
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
