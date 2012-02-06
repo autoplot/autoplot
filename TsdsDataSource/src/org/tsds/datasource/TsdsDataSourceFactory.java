@@ -61,7 +61,7 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
     }
 
     public <T> T getCapability(Class<T> clazz) {
-        if ( clazz.isInstance( TimeSeriesBrowse.class ) ) {
+        if ( clazz==TimeSeriesBrowse.class ) {
            return (T) new TsdsTimeSeriesBrowse();
         } else {
             return null;
