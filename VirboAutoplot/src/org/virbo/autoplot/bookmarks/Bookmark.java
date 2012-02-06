@@ -45,6 +45,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.das2.DasApplication;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -193,14 +194,16 @@ public abstract class Bookmark {
 
             Element flist = (Element) nl.item(0);
             if ( flist==null ) {
-                contents= Collections.emptyList(); // The remote folder itself can contain remote folders,
+                List<Bookmark> contents1= Collections.emptyList(); // The remote folder itself can contain remote folders,
                 String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 if ( remoteUrl2.length()>0 ) {
                     remoteRemote= true; // avoid warning
                 }
+                contents.addAll(contents1);
             } else {
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
-                contents = parseBookmarks( flist, vers1, remoteLevel-1 );
+                List<Bookmark> contents1 = parseBookmarks( flist, vers1, remoteLevel-1 );
+                contents.addAll(contents1);
             }
 
         } catch (XPathExpressionException ex) {
