@@ -42,6 +42,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Offset=", "byte offset into each record for dep0") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Type=") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Units=", "support timetags like 'seconds since 2001-001'" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
@@ -103,6 +104,11 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") ); 
+                return result;
+            } else if ( paramName.equals("depend0Units") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "seconds since 2001-001T00:00") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ms since 2001-001T00:00") );
                 return result;
             } else if ( paramName.equals("byteOrder") ) {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
