@@ -8,6 +8,7 @@ package org.virbo.autoplot.bookmarks;
 import java.awt.Component;
 import java.awt.Container;
 import java.net.MalformedURLException;
+import javax.swing.event.MenuEvent;
 import org.virbo.datasource.AutoplotSettings;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -45,6 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MenuListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
@@ -1046,6 +1048,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             } else {
                 Bookmark.Folder folder = (Bookmark.Folder) book;
                 String title= book.getTitle();
+                //final String ftitle= title;
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()==0 ) {
                         title= title + " " + Bookmark.MSG_REMOTE;
@@ -1055,11 +1058,28 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                         title= title + " " + Bookmark.MSG_NO_REMOTE;
                     }
                 }
-                JMenu subMenu = new JMenu(title);
+                final JMenu subMenu = new JMenu(title);
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
                     String ttext=  "<html><em>"+ book.getDescription()+"</em></html>";
                     subMenu.setToolTipText( ttext );
                 }
+//                if ( folder.getRemoteStatus()==-1 ) {
+//                    subMenu.addMenuListener( new MenuListener() {
+//
+//                        public void menuSelected(MenuEvent e) {
+//                            System.err.println("go off and download the rest");
+//                            subMenu.setText( ftitle + " (loading)");
+//                        }
+//
+//                        public void menuDeselected(MenuEvent e) {
+//
+//                        }
+//
+//                        public void menuCanceled(MenuEvent e) {
+//
+//                        }
+//                    });
+//                }
                 addBookmarks(subMenu, folder.getBookmarks(),sel);
                 bookmarksMenu.add(subMenu);
             }
