@@ -27,8 +27,6 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -463,29 +461,28 @@ public class BookmarksManagerModel {
      * @param selectedBookmark location to add the bookmark, can be null.
      * @throws MalformedURLException
      */
-    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedURLException, SAXException, ParserConfigurationException, IOException {
-        try {
-            File ff= DataSetURI.downloadResourceAsTempFile( new URL(surl), new NullProgressMonitor() );
-            Document doc = AutoplotUtil.readDoc( new FileInputStream(ff) );
-            List<Bookmark> newList= new ArrayList(this.list.size());
-            for ( int i=0; i<this.list.size(); i++ ) {
-                newList.add(i,this.list.get(i).copy());
-            }
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
-            List<Bookmark> copy= new ArrayList();
-            for ( int i=0;i<importBook.size(); i++ ) {
-                Bookmark m=  importBook.get(i);
-                if ( m instanceof Bookmark.Folder ) {
-                    ((Bookmark.Folder)m).setRemoteUrl( surl );
-                    ((Bookmark.Folder)m).setTitle( m.getTitle() );
-                    copy.add( m );
-                }
-            }
-            mergeList(copy,newList);
-            setList(newList);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark)  {
+        List<Bookmark> importBook= new ArrayList(100);
+        boolean remote= Bookmark.getRemoteBookmarks(surl,1,true,importBook);
+        if ( remote==true ) {
+            System.err.println("remote bookmarks found...");
         }
+        List<Bookmark> newList= new ArrayList(this.list.size());
+        for ( int i=0; i<this.list.size(); i++ ) {
+            newList.add(i,this.list.get(i).copy());
+        }
+
+        List<Bookmark> copy= new ArrayList();
+        for ( int i=0;i<importBook.size(); i++ ) {
+            Bookmark m=  importBook.get(i);
+            if ( m instanceof Bookmark.Folder ) {
+                ((Bookmark.Folder)m).setRemoteUrl( surl );
+                ((Bookmark.Folder)m).setTitle( m.getTitle() );
+                copy.add( m );
+            }
+        }
+        mergeList(copy,newList);
+        setList(newList);
 
     }
 }

@@ -7,6 +7,7 @@ package org.virbo.autoplot.bookmarks;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.HeadlessException;
 import java.net.MalformedURLException;
 import javax.swing.event.MenuEvent;
 import org.virbo.datasource.AutoplotSettings;
@@ -112,6 +113,32 @@ public class BookmarksManager extends javax.swing.JDialog {
 
     public BookmarksManagerModel getModel() {
         return model;
+    }
+
+
+    /**
+     * present a GUI offering to delete the set of bookmarks.
+     * @param bs
+     * @throws HeadlessException
+     */
+    private void maybeDeleteBookmarks(List<Bookmark> bs) throws HeadlessException {
+        boolean confirm= false;
+        if (bs.size() > 1 && JOptionPane.showConfirmDialog(this, "Delete " + bs.size() + " bookmarks?", "Delete Bookmarks", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            confirm = true;
+        }
+        if (confirm) {
+            model.removeBookmarks(bs);
+        } else {
+            for (Bookmark b : bs) {
+                if (b instanceof Bookmark.Folder) {
+                    if (confirm || JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                        model.removeBookmark(b);
+                    }
+                } else {
+                    model.removeBookmark(b);
+                }
+            }
+        }
     }
 
     /**
@@ -573,23 +600,6 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
             try {
                  // kludge for testing remote bookmarks
                 model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-                showMessage( "Error parsing "+s, "Malformed URL error "+ex.getMessage(), JOptionPane.WARNING_MESSAGE );
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-                showMessage( "Error parsing "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-            } catch (SAXException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                showMessage( "Error parsing "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-            } catch (FileNotFoundException ex ) {
-                showMessage( "File not found: "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-            } catch (HtmlResponseIOException ex ) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                showMessage( "HTML response (not XML) from "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-            } catch (IOException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                showMessage( "I/O Error adding "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IllegalArgumentException ex ) {
                 if ( true ) { //ex.toString().contains("URLDecoder") ) {
                     showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
@@ -611,21 +621,8 @@ private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_addItemMenuItemActionPerformed
 
 private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
-    boolean confirm = false; // the user has confirmed
     List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
-    if (bs.size() > 1 && JOptionPane.showConfirmDialog(this, "Delete "+bs.size()+" bookmarks?", "Delete Bookmarks", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-        confirm = true;
-    }
-
-    for (Bookmark b : bs) {
-        if (b instanceof Bookmark.Folder) {
-            if (confirm || JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                model.removeBookmark(b);
-            }
-        } else {
-            model.removeBookmark(b);
-        }
-    }
+    maybeDeleteBookmarks(bs);
 }//GEN-LAST:event_deleteMenuItemActionPerformed
 
 private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleTextFieldActionPerformed
@@ -797,21 +794,8 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     Action createDeleteAction() {
         return new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent e) {
-                boolean confirm = false; // the user has confirmed
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
-                if (bs.size() > 1 && JOptionPane.showConfirmDialog(BookmarksManager.this, "Delete "+bs.size()+" bookmarks?", "Delete Bookmarks", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    confirm = true;
-                }
-
-                for (Bookmark b : bs) {
-                    if (b instanceof Bookmark.Folder) {
-                        if (confirm || JOptionPane.showConfirmDialog(BookmarksManager.this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                            model.removeBookmark(b);
-                        }
-                    } else {
-                        model.removeBookmark(b);
-                    }
-                }
+                maybeDeleteBookmarks(bs);
             }
         };
     }
@@ -1026,11 +1010,14 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, final DataSetSelector sel ) {
 
+        int MAX_TITLE_LEN=50;
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
 
             if (book instanceof Bookmark.Item) {
-                JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
+                String title= book.getTitle();
+                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
+                JMenuItem mi = new JMenuItem(new AbstractAction(title) {
                     public void actionPerformed(ActionEvent e) {
                         sel.setValue(((Bookmark.Item) book).getUri());
                         sel.maybePlot(e.getModifiers());
@@ -1038,7 +1025,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 });
 
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ book.getDescription()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "\n" + book.getDescription()+"</em></html>";
                     mi.setToolTipText( ttext );
                 } 
                 if (book.getIcon() != null) {
@@ -1048,6 +1035,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             } else {
                 Bookmark.Folder folder = (Bookmark.Folder) book;
                 String title= book.getTitle();
+                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
                 //final String ftitle= title;
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()==0 ) {
@@ -1060,7 +1048,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 }
                 final JMenu subMenu = new JMenu(title);
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ book.getDescription()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "\n" + book.getDescription()+"</em></html>";
                     subMenu.setToolTipText( ttext );
                 }
 //                if ( folder.getRemoteStatus()==-1 ) {

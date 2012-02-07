@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -140,7 +141,15 @@ public abstract class Bookmark {
         }
     }
 
-    private static boolean getRemoteBookmarks( String remoteUrl, int remoteLevel, List<Bookmark> contents ) {
+    /**
+     * read in a remote bookmarks file.
+     * @param remoteUrl the location of the file.
+     * @param remoteLevel limit the depth of remote bookmarks.  For example, remoteLevel=1 indicates this should be read but no remote bookmarks ought to be read.
+     * @param startAtRoot if true, then include the root nodes, otherwise return the contents of the folders.
+     * @param contents list where the bookmarks should be stored.
+     * @return true if there is a remote bookmark within the file.
+     */
+    protected static boolean getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) {
         InputStream in=null;
         boolean remoteRemote= true;
  
@@ -148,8 +157,6 @@ public abstract class Bookmark {
             URL rurl= new URL(remoteUrl);
   
             NodeList nl;
-
-
 
             // Copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
             // See if the URI is file-like, not containing query parameters, in which case we allow caching to occur.
@@ -159,7 +166,16 @@ public abstract class Bookmark {
                 if ( parentUri!=null ) {
                     FileSystem fd= FileSystem.create(parentUri);
                     FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
-                    in= fo.getInputStream();
+                    if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
+                        fo= fd.getFileObject( fo.getNameExt()+".gz" );
+                        in= new GZIPInputStream( fo.getInputStream() );
+                    } else {
+                        if ( remoteUrl.endsWith(".gz" ) ) {
+                            in= new GZIPInputStream( fo.getInputStream() );
+                        } else {
+                            in= fo.getInputStream();
+                        }
+                    }
                 } else {
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
                 }
@@ -189,17 +205,21 @@ public abstract class Bookmark {
             XPathFactory factory= XPathFactory.newInstance();
 
             XPath xpath= (XPath) factory.newXPath();
-            Object o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
+            Object o;
+            if ( startAtRoot ) {
+                o= xpath.evaluate( "/bookmark-list", document, XPathConstants.NODESET );
+            } else {
+                o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
+            }
             nl= (NodeList)o;
 
             Element flist = (Element) nl.item(0);
             if ( flist==null ) {
-                List<Bookmark> contents1= Collections.emptyList(); // The remote folder itself can contain remote folders,
+                // The remote folder itself can contain remote folders,
                 String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 if ( remoteUrl2.length()>0 ) {
                     remoteRemote= true; // avoid warning
                 }
-                contents.addAll(contents1);
             } else {
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
                 List<Bookmark> contents1 = parseBookmarks( flist, vers1, remoteLevel-1 );
@@ -345,7 +365,7 @@ public abstract class Bookmark {
                         InputStream in=null;
                         contents= new ArrayList();
 
-                        remoteRemote= getRemoteBookmarks( remoteUrl, remoteLevel, contents );
+                        remoteRemote= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
 
                         if ( ( contents.size()==0 ) & !remoteRemote ) {
                             System.err.println("unable to parse bookmarks at "+remoteUrl);
