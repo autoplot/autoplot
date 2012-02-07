@@ -302,7 +302,7 @@ public abstract class Bookmark {
                 if ( uri==null ) {
                     title= "(untitled)";
                 } else {
-                    System.err.println("Using URI for title because title is empty: "+uri );
+                    //System.err.println("Using URI for title because title is empty: "+uri );
                     title= uri;
                 }
             } else {
