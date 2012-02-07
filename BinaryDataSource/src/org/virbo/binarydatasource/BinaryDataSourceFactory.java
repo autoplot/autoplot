@@ -82,6 +82,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "uint") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "truncatedFloat") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "vaxFloat") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") ); 
@@ -97,6 +98,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "uint") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "truncatedFloat") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "vaxFloat") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
