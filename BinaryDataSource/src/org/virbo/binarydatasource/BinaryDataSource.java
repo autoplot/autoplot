@@ -270,6 +270,7 @@ public class BinaryDataSource extends AbstractDataSource {
             BufferDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, 1, buf, dep0Type );
             String dep0Units= getParameter("depend0Units", "" );
             if ( dep0Units.length()>0 ) {
+                dep0Units= dep0Units.replaceAll("\\+", " ");
                 Units dep0u= SemanticOps.lookupUnits(dep0Units);
                 dep0ds.putProperty( QDataSet.UNITS, dep0u );
             }
