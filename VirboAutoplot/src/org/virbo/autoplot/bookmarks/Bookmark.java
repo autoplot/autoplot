@@ -265,8 +265,12 @@ public abstract class Bookmark {
                 if ( nl.getLength()==0 ) {
                     nl = ((Element) element).getElementsByTagName("url");
                 }
-                s = ((Text) (nl.item(0).getFirstChild())).getData();
-                uri = s;
+                if ( nl.item(0).getFirstChild()!=null ) {
+                    s = ((Text) (nl.item(0).getFirstChild())).getData();
+                    uri = s;
+                } else {
+                    uri = "???"; // we would have NullPointerException before...
+                }
             }
         } else {
             uri= null;
