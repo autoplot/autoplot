@@ -1025,7 +1025,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 });
 
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "\n" + book.getDescription()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
                     mi.setToolTipText( ttext );
                 } 
                 if (book.getIcon() != null) {
@@ -1048,7 +1048,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 }
                 final JMenu subMenu = new JMenu(title);
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "\n" + book.getDescription()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
                     subMenu.setToolTipText( ttext );
                 }
 //                if ( folder.getRemoteStatus()==-1 ) {
