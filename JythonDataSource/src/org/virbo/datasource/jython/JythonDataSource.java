@@ -499,6 +499,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 tsb1.setTimeRange(tr);
                 reader.close();
                 return tsb1;
+            } else if ( line.contains("timerange") && line.contains("getParam") ) {
+                System.err.println("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
             }
             line= reader.readLine();
         }
