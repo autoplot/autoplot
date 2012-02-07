@@ -11,11 +11,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 
 /**
@@ -256,7 +258,7 @@ public class BinaryDataSource extends AbstractDataSource {
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
             if ( recFormatParse!=null ) {
-                dep0Type= getParameter("dep0Type", String.valueOf(((Object[])recFormatParse[1])[dep0]) );
+                dep0Type= getParameter("depend0Type", String.valueOf(((Object[])recFormatParse[1])[dep0]) );
             }
             if ( dep0Offset==-1 ) {
                 if ( recFormatParse==null ) {
@@ -265,7 +267,12 @@ public class BinaryDataSource extends AbstractDataSource {
                     dep0Offset= ((int[])recFormatParse[0])[dep0];
                 }
             }
-            QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, 1, buf, dep0Type );
+            BufferDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, 1, buf, dep0Type );
+            String dep0Units= getParameter("depend0Units", "" );
+            if ( dep0Units.length()>0 ) {
+                Units dep0u= SemanticOps.lookupUnits(dep0Units);
+                dep0ds.putProperty( QDataSet.UNITS, dep0u );
+            }
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
             boolean reportOffset= !( getParameter( "reportOffset", "no" ).equals("no") );
