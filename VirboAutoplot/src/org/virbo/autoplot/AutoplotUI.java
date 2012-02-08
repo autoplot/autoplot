@@ -2591,25 +2591,32 @@ private void updateFrameTitle() {
                      raiseApplicationWindow(frame);
                 }
 
+                String pos= alm.getValue("position");
+
                 String url = alm.getValue("URL");
-                if (url == null) {
-                    int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
-                    if (action == JOptionPane.YES_OPTION) {
-                        app.support.newApplication();
-                    } else {
-                        raise= true;
-                    }
+                if ( pos!=null ) {
+                    app.applicationModel.setDataSet( Integer.parseInt(pos), null, url );
+                    
                 } else {
-                    String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                            String.format( "<html>Autoplot is already running.<br>Replace URI, replacing data with<br>%s?", url ),
-                            "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
-                            new String[] { "New Window", "Replace" }, "Replace" );
-                    if (action.equals("Replace")) {
-                        app.applicationModel.setDataSourceURL(url);
-                        raise= true;
-                    } else if (action.equals("New Window")) {
-                        ApplicationModel nmodel = app.support.newApplication();
-                        nmodel.setDataSourceURL(url);
+                    if (url == null) {
+                        int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
+                        if (action == JOptionPane.YES_OPTION) {
+                            app.support.newApplication();
+                        } else {
+                            raise= true;
+                        }
+                    } else {
+                        String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
+                                String.format( "<html>Autoplot is already running.<br>Replace URI, replacing data with<br>%s?", url ),
+                                "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
+                                new String[] { "New Window", "Replace" }, "Replace" );
+                        if (action.equals("Replace")) {
+                            app.applicationModel.setDataSourceURL(url);
+                            raise= true;
+                        } else if (action.equals("New Window")) {
+                            ApplicationModel nmodel = app.support.newApplication();
+                            nmodel.setDataSourceURL(url);
+                        }
                     }
                 }
                 if ( raise ) {
@@ -2633,7 +2640,8 @@ private void updateFrameTitle() {
     public static void main( String args[] ) {
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
-        alm.addOptionalPositionArgument(0, "URL", null, "initial URL to load");
+        alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
+        alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
         alm.addOptionalSwitchArgument("bookmarks", null, "bookmarks", null, "bookmarks to load");
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
         alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
@@ -2686,12 +2694,12 @@ private void updateFrameTitle() {
         final String initialURL;
         final String bookmarks;
 
-        if (alm.getValue("URL") != null) {
-            initialURL = alm.getValue("URL");
-            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);
+        if (alm.getValue("URI") != null) {
+            initialURL = alm.getValue("URI");
+            logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open");
-            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);            
+            logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else {
             initialURL = null;
         }
