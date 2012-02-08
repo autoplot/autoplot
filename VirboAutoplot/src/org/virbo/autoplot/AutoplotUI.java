@@ -320,7 +320,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
                 if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
                     DataSetSelector source= (DataSetSelector)ev.getSource();
-                    source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(xml))$" );
+                    source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
                 } else {
                     support.importBookmarks( bookmarksFile );
                     applicationModel.addRecent(dataSetSelector.getValue());
@@ -330,7 +330,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
-                source.showFileSystemCompletions( false, true, "[^\\s]+\\.xml" );
+                source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
             }
         });
         dataSetSelector.registerActionTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
