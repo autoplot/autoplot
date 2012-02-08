@@ -1014,6 +1014,10 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
 
+            if ( bookmarksMenu.isPopupMenuVisible() ) {
+                sel.setMessage("Bookmarks updated");
+            }
+
             if (book instanceof Bookmark.Item) {
                 String title= book.getTitle();
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
