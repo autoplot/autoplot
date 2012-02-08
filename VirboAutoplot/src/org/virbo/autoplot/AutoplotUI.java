@@ -1433,7 +1433,7 @@ APSplash.checkTime("init 52");
         }
 
         bookmarksManager.setPrefNode("bookmarks");
-        
+
         bookmarksMenu.removeAll();
 
         item= bookmarksMenu.add( new AbstractAction("Export Recent...") {
@@ -1448,7 +1448,9 @@ APSplash.checkTime("init 52");
         bookmarksManager.updateBookmarks( bookmarksMenu, this.dataSetSelector );
         bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
+                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                    bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
+                } } );
             }
         });
 //        addBookmarks(bookmarksMenu, bookmarks);
