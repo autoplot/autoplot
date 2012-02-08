@@ -683,7 +683,7 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_0" );
                         if ( att!=null ) {
                             logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
-                            xDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            xDependVariable = cdf.getVariable(String.valueOf(att));
                             xMaxRec = xDependVariable.getNumberOfValues();
                             if ( xMaxRec!=maxRec ) {
                                 if ( maxRec==-1 ) maxRec+=1; //why?
@@ -702,10 +702,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_1" );
                         if ( att!=null && rank>1 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_1 entry for {0}", var.getName());
-                            yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            yDependVariable = cdf.getVariable(String.valueOf(att));
                             yNumRec = yDependVariable.getNumberOfValues();
                             if (yNumRec == 1) {
-                                yNumRec = yDependVariable.getDimensions()[0] - 1;  //TODO: check
+                                yNumRec = yDependVariable.getDimensions()[0];
                             }
                             if ( dims.length>0 && (yNumRec)!=dims[0] ) {
                                 warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
@@ -721,10 +721,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_1" );
                         if ( att!=null && rank>1  ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_1 entry for {0}", var.getName());
-                            yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            yDependVariable = cdf.getVariable(String.valueOf(att));
                             yNumRec = yDependVariable.getNumberOfValues();
                             if (yNumRec == 1) {
-                                yNumRec = yDependVariable.getDimensions()[0] - 1;
+                                yNumRec = yDependVariable.getDimensions()[0];
                             }
                             if ( dims.length>0 && (yNumRec)!=dims[0] ) {
                                 warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
@@ -740,10 +740,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_2" );
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_2 entry for {0}", var.getName());
-                            zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            zDependVariable = cdf.getVariable(String.valueOf(att));
                             zNumRec = zDependVariable.getNumberOfValues();
                             if (zNumRec == 1) {
-                                zNumRec = zDependVariable.getDimensions()[0] - 1; //TODO: check
+                                zNumRec = zDependVariable.getDimensions()[0];
                             }
                         }
                     }
@@ -756,10 +756,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_2" );
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_2 entry for {0}", var.getName());
-                            zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            zDependVariable = cdf.getVariable(String.valueOf(att));
                             zNumRec = zDependVariable.getNumberOfValues();
                             if (zNumRec == 0) {
-                                zNumRec = zDependVariable.getDimensions()[0] - 1;
+                                zNumRec = zDependVariable.getDimensions()[0];
                             }
                         }
                     }
@@ -771,10 +771,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_3" );
                         if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_3 entry for {0}", var.getName());
-                            z1DependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            z1DependVariable = cdf.getVariable(String.valueOf(att));
                             z1NumRec = z1DependVariable.getNumberOfValues();
                             if (z1NumRec == 1) {
-                                z1NumRec = z1DependVariable.getDimensions()[0] - 1; //TODO: check
+                                z1NumRec = z1DependVariable.getDimensions()[0]; //TODO: check
                             }
                         }
                     }
@@ -787,10 +787,10 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_3" );
                         if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_3 entry for {0}", var.getName());
-                            zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            zDependVariable = cdf.getVariable(String.valueOf(att));
                             z1NumRec = zDependVariable.getNumberOfValues();
                             if (z1NumRec == 0) {
-                                z1NumRec = zDependVariable.getDimensions()[0] - 1;
+                                z1NumRec = zDependVariable.getDimensions()[0];
                             }
                         }
                     }
