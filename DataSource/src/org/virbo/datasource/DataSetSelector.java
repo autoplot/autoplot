@@ -68,7 +68,6 @@ import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
@@ -272,23 +271,27 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
-                    if (f.reject(surl1,mon)) {
-                        if ( f instanceof AggregatingDataSourceFactory ) {
+                    if (f.reject(surl1,mon)) { 
+                        TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
+                        if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                 try {
-                                    String delegateUri= AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(surl);
-                                    DataSourceFactory ddsf= AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
-                                    if ( !ddsf.reject( delegateUri, mon) ) {
-                                        surl1= URISplit.putParam( surl, "timerange", timeRange.toString() );
-                                        if ( !f.reject(surl1, mon) ) {
-                                            setMessage("accepted aggregation after setting timerange");
-                                            int modifiers= this.keyModifiers;
-                                            setValue(surl1);
-                                            this.keyModifiers= modifiers;
-                                            firePlotDataSetURL();
-                                            return;
-                                        }
+                                    tsb.setURI(surl1);
+                                    tsb.setTimeRange(timeRange);
+                                    String suri= tsb.getURI();
+                                    if ( !f.reject( suri, mon) ) {
+                                        setMessage("accepted uri after setting timerange");
+                                        int modifiers= this.keyModifiers;
+                                        setValue(suri);
+                                        this.keyModifiers= modifiers;
+                                        firePlotDataSetURL();
+                                        return;    
                                     }
+                                } catch ( ParseException ex ) {
+                                    JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
+                                    setMessage(ex.getMessage());  // $y$J would throw runtime exception.
+                                    ex.printStackTrace();
+                                    return;
                                 } catch ( IllegalArgumentException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
