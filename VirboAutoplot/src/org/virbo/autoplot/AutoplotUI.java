@@ -2593,7 +2593,7 @@ private void updateFrameTitle() {
 
                 String pos= alm.getValue("position");
 
-                String url = alm.getValue("URL");
+                String url = alm.getValue("URI");
                 if ( pos!=null ) {
                     app.applicationModel.setDataSet( Integer.parseInt(pos), null, url );
                     
