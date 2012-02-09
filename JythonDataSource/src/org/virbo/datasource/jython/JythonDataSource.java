@@ -66,6 +66,22 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         addCability(Caching.class, this); //TODO: check for parameter inputs!
         this.listener = factory.listener;
 
+        if ( true ) {
+            try {
+                File jythonScript= getScript();  // this assumes the user can go without progress feedback.
+                TimeSeriesBrowse tsb1= checkForTimeSeriesBrowse( uri.toString(), jythonScript );
+                if ( tsb1!=null ) {
+                    addCability( TimeSeriesBrowse.class, tsb1 );
+                    tsb= tsb1;
+                    notCheckedTsb= false;
+                }
+            } catch (ParseException ex) {
+                System.err.println(ex);
+            } catch ( IOException ex ) {
+                System.err.println(ex);
+                // behave as before...
+            }
+        }
     }
 
     private File getScript() throws IOException {
