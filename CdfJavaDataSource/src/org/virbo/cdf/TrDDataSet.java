@@ -583,9 +583,10 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         double[] newback = new double[noff2-noff1];
         System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
         TrDDataSet result= new TrDDataSet( nrank, end-start, len1, len2, len3, newback );
-        DataSetUtil.putProperties( DataSetUtil.getProperties(this), result );
-        QDataSet dep0= (QDataSet) property(QDataSet.DEPEND_0);
-        if ( dep0!=null ) result.putProperty( QDataSet.DEPEND_0, dep0.trim(start, end) );
+        Map<String,Object> props= DataSetUtil.getProperties(this);
+        Map<String,Object> depProps= DataSetUtil.trimProperties( this, start, end );
+        props.putAll(depProps);
+        DataSetUtil.putProperties( props, result );
         return result;
     }
 
