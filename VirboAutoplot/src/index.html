@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screen shot"  src="screen.png">
-        <p><small>Tabs can now be dropped into undocked panes.</small></p>
+        <p><small>A bug associated with "internal" datasets is fixed, where plotting X,Y,and Z would result in the Z not being trimmed along with X and Y.  The color scatter
+            plot below is updated as the application timerange is adjusted.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +23,19 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>A change in v2011a_7 caused datasets to fail to automatically bind to the application timerange.</li>
+            <li>old code from original Autoplot was ignored render type guess code and set this based on monotonic property.</li>
+            <li>guessCadenceNew would not tally deltas properly, resulting in incorrect cadence=0 for vap+inline:0,0,100,100,0,0;0,0,0,100,100,0</li>
+            <li>link(x,y) shouldn't return a bundle dataset, it should return y(x).</li>
+            <li>fftFilter threw out units.</li>
+            <li>3482782: stress testing revealed some interesting memory leaks.  These are addressed.</li>
+            <li>bugfixes in SeriesRenderer error bars and outline fillStyle when printing pointed out by Jon V.</li>
+            <li>bookmarks update while user is in the menu would cause them to not update properly.  Now this is done on event thread.</li>
+            <li>bugfix in cdf/java checking on variable lengths.  rank 2 data would indicate a length mismatch because of old code.</li>
+            <li>ArrayDataSet trim didn't trim PLANE_0 property.  Now we use DataSetUtil.trimProperties for consistent behavior.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>3479676: improve feedback with misformatted extension files. Applet had been failing to compile and I finally tracked this down.</li>
             <li>3480193: cacheTag added to result of Jython data source script when TimeSeriesBrowse is detected, so that the script is not called for zoom in.</li>
             <li>bugfix on Windows with the ftp filesystem when a file already exists, which prevented the CDAWeb module from working properly on some machines.</li>
@@ -33,48 +47,20 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>3480889: "address bar" menu item moved to underused "view" menu, "provide feedback" moved to "help"</li>
             <li>size of the subpanel help links reduced to just the label, to reduce accidental clicks</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3469219: handle units in append.  For example LANL has files where timetags are always from start of day</li>
-            <li>bugfix: Turns out "ms since 1992-09-13T00:00" in a QStream would not be interpreted as a time.  Now SemanticOps.lookupUnits is used.</li>
-            <li>bugfix: rank3 copyValues IDL/Matlab adapter failed because the length(i0) was used instead of length(i0,i1), leaving result mostly zeroes.</li>
-            <li>bugfix: migrate changes from the CDF Java library to support the same virtual variables</li>
-            <li>3469880: tooltips should go on field labels, not on the label itself. </li>
-            <li>bugfix: getParam( 'timerange', '1997-Jan' ) wouldn't support TimeSeriesBrowse because "Jan" was not [a-z]*</li>
-            <li>updates to auralizeTool so that it works again</li>
-            <li>clean up aggregate GUI, so previews are shown and one code is used to form aggregations</li>
-            <li>bugfix: extra messages "autolayout was set to false" because all prefs were read just to get NN</li>
-            <li>profiling to find problem spots for long batch runs</li>
-            <li>limit undo list to 100 states to support long batch runs</li>
-            <li>3471016: move more GUI operations to event thread to avoid deadlocks</li>
-            <li>ytagsDataSet gave Y[X] -> indgen() instead of Y.</li>
-            <li>bugfix: digital renderer color was not bound to foreground color.</li>
-            <li>bugfix: rank 2 [:,[X,Y,Z]] scheme supported in SeriesRenderer.</li>
-            <li>update contour function to return bundle [:,[X,Y,Z]]</li>
-            <li>bugfix: python supports ds[:,0] as unbundle, before it would drop metadata making it useless for bundles</li>
-            <li>bugfix: in plotx, allow symbol='stars' by loosing up code that looks for values in enumeration</li>
-            <li>bugfix: guard against ordinal units getting into axis setting.</li>
-            <li>bugfix: rank 4 was never coded for TrimStrideWrapper.java, so python ds[:,:,:,4:6] would fail, clean up to today's qdataset</li>
-            <li>bugfix: python supports ds[:,0] as shorthand for unbundle, before it would drop metadata making it useless for bundles</li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>data sources with TimeSeriesBrowse, that have a URI without the timerange, are accepted by binding automatically to the application timerange.</li>
+            <li>getParam in jython scripts can be enumeration: getParam('sc','1','spacecraft',['1','2','3','4'])</li>
+            <li>add FFTFilterType.TenPercentEdgeCosine for use with waves.</li>
+            <li>resourceUri handled specially in JythonDataSource editor.</li>
+            <li>support %{USER_PROPERTIES.x.y} and %{METADATA.x.y} in legend label.</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>3479591: tearoff tabs can be dropped into child container</li>
             <li>removeBackground1 and removeBackground0 provide in-line means of running background removal on data.</li>
             <li>cache result of FFTUtil.getFreqDomainTagsForPower, to save memory since this is repeated for each record.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>guessNameFor(URI) introduced, and Jython script getDataSet completion attempts to suggest better name than "ds"</li>
-            <li>add fftPowerDelta1024 to CDF virtual variable functions</li>
-            <li>improve support for filesystem completions like .../1wire/dot4_data/$Y/$m/$d/10.&lt;COMP&gt;</li>
-            <li>LSpec code updated to work with today's Autoplot, and included in single-jar release</li>
-            <li>NetCDF/HDF5 reader supports constraints like ds[0:10] to allow read of huge files.</li>
-            <li>box zoom detected and described efficiently in undo list</li>
-            <li>add  Ops.flatten function, before we had only flattenRank2</li>
-            <li>introduce SemanticOps.getLooseUnitsConverter, which allows a ratiometric unit to be compared to a dimensionless. (2 kg).gt(1) </li>
-            <li>simplify code and allow ds[r] to be used where ds is rank 2 and r is rank 1</li>
         </ul>
 
 <p>Known issues:</p>
