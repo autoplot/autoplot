@@ -23,14 +23,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
-            <li>A change in v2011a_7 caused datasets to fail to automatically bind to the application timerange.</li>
+            <li>3116643: data sources with TimeSeriesBrowse, that have a URI without the timerange, are accepted by binding automatically to the application timerange.</li>
+            <li>3484946: A change in v2011a_7 caused datasets to fail to automatically bind to the application timerange.</li>
             <li>old code from original Autoplot was ignored render type guess code and set this based on monotonic property.</li>
-            <li>guessCadenceNew would not tally deltas properly, resulting in incorrect cadence=0 for vap+inline:0,0,100,100,0,0;0,0,0,100,100,0</li>
+            <li>3484940: guessCadenceNew would not tally deltas properly, resulting in incorrect cadence=0 for vap+inline:0,0,100,100,0,0;0,0,0,100,100,0</li>
             <li>link(x,y) shouldn't return a bundle dataset, it should return y(x).</li>
             <li>fftFilter threw out units.</li>
             <li>3482782: stress testing revealed some interesting memory leaks.  These are addressed.</li>
             <li>bugfixes in SeriesRenderer error bars and outline fillStyle when printing pointed out by Jon V.</li>
-            <li>bookmarks update while user is in the menu would cause them to not update properly.  Now this is done on event thread.</li>
+            <li>3198392: bookmarks update while user is in the menu would cause them to not update properly.  Now this is done on event thread.</li>
             <li>bugfix in cdf/java checking on variable lengths.  rank 2 data would indicate a length mismatch because of old code.</li>
             <li>ArrayDataSet trim didn't trim PLANE_0 property.  Now we use DataSetUtil.trimProperties for consistent behavior.</li>
         </ul>
@@ -50,7 +51,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
-            <li>data sources with TimeSeriesBrowse, that have a URI without the timerange, are accepted by binding automatically to the application timerange.</li>
             <li>getParam in jython scripts can be enumeration: getParam('sc','1','spacecraft',['1','2','3','4'])</li>
             <li>add FFTFilterType.TenPercentEdgeCosine for use with waves.</li>
             <li>resourceUri handled specially in JythonDataSource editor.</li>
