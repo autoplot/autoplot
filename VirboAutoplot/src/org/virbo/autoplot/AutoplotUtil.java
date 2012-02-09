@@ -541,7 +541,15 @@ public class AutoplotUtil {
                         dd = new double[]{min - dcadence, max + dcadence};
                     }
                 }
+            } else if ( ds.length()==1 ) {
+                dd = simpleRange(ds);
+                if (UnitsUtil.isTimeLocation(u)) {
+                    dd = new double[]{ dd[0], dd[0]+Units.days.createDatum(1).doubleValue(u.getOffsetUnits()) };
+                } else {
+                    dd = new double[]{ dd[0], dd[0]+1};
+                }
             } else {
+                dd = simpleRange(ds);
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
                 } else {
