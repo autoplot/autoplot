@@ -2585,10 +2585,10 @@ private void updateFrameTitle() {
         final SingleInstanceListener sisL = new SingleInstanceListener() {
 
             public void newActivation(String[] argv) {
-                System.err.println( "argv:" );
-                for ( int i=0; i<argv.length; i++ ) {
-                    System.err.printf( "argv[%d]: %s\n", i, argv[i] );
-                }
+//                System.err.println( "argv:" );
+//                for ( int i=0; i<argv.length; i++ ) {
+//                    System.err.printf( "argv[%d]: %s\n", i, argv[i] );
+//                }
 
                 for ( int i=0; i<argv.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
                    if ( argv[i].equals("-print") ) argv[i]="--print";
