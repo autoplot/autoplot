@@ -608,6 +608,8 @@ public class GuiSupport {
         ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
         model.addDasPeersToApp();
+        model.dom.getOptions().setDataVisible( parent.applicationModel.dom.getOptions().isDataVisible() ); // options has funny sync code and these must be set before AutoplotUI is constructed.
+        model.dom.getOptions().setLayoutVisible( parent.applicationModel.dom.getOptions().isLayoutVisible() );
         AutoplotUI view = new AutoplotUI(model);
         view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
         view.setVisible(true);
