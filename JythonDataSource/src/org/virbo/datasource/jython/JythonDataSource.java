@@ -415,6 +415,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     }
 
     public boolean satisfies(String surl) {
+        if ( surl.startsWith("vap+inline:") ) return false;
         try {
             return useCache(new URI(surl));
         } catch (URISyntaxException ex) {
