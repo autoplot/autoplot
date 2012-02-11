@@ -812,6 +812,8 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
+        setMessage("ready in just a few seconds...");
+        
     }
 
     protected void refreshUndoRedoLabel() {

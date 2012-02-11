@@ -610,7 +610,7 @@
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Component id="tabbedPanelContainer" alignment="1" pref="724" max="32767" attributes="0"/>
+              <Component id="tabbedPanelContainer" alignment="1" pref="732" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -628,7 +628,7 @@
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-                  <Component id="tabbedPanelContainer" pref="569" max="32767" attributes="0"/>
+                  <Component id="tabbedPanelContainer" pref="577" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
           </Group>
