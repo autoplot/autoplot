@@ -108,6 +108,7 @@ import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
+import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
@@ -1546,7 +1547,11 @@ APSplash.checkTime("init 52");
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        resetZoomMenu = new javax.swing.JMenu();
         resetZoomMenuItem = new javax.swing.JMenuItem();
+        resetXMenuItem = new javax.swing.JMenuItem();
+        resetYMenuItem = new javax.swing.JMenuItem();
+        resetZMenuItem = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         zoomInMenuItem = new javax.swing.JMenuItem();
         zoomOutMenuItem = new javax.swing.JMenuItem();
@@ -1766,6 +1771,8 @@ APSplash.checkTime("init 52");
         viewMenu.add(textSizeMenu);
         viewMenu.add(jSeparator4);
 
+        resetZoomMenu.setText("Reset Zoom");
+
         resetZoomMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         resetZoomMenuItem.setText("Reset Zoom");
         resetZoomMenuItem.setToolTipText("Revert to the original axis settings");
@@ -1774,7 +1781,34 @@ APSplash.checkTime("init 52");
                 resetZoomMenuItemActionPerformed(evt);
             }
         });
-        viewMenu.add(resetZoomMenuItem);
+        resetZoomMenu.add(resetZoomMenuItem);
+
+        resetXMenuItem.setText("Reset X");
+        resetXMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetXMenuItemActionPerformed(evt);
+            }
+        });
+        resetZoomMenu.add(resetXMenuItem);
+
+        resetYMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        resetYMenuItem.setText("Reset Y");
+        resetYMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetYMenuItemActionPerformed(evt);
+            }
+        });
+        resetZoomMenu.add(resetYMenuItem);
+
+        resetZMenuItem.setText("Reset Z");
+        resetZMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetZMenuItemActionPerformed(evt);
+            }
+        });
+        resetZoomMenu.add(resetZMenuItem);
+
+        viewMenu.add(resetZoomMenu);
 
         jMenu1.setText("Zoom");
         jMenu1.setToolTipText("Note zooming can be done by dragging ranges with the mouse, or use the mouse wheel.");
@@ -2111,28 +2145,28 @@ APSplash.checkTime("init 52");
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE))
+                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 708, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(4, 4, 4)
-                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE)))
+                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)))
                 .addContainerGap())
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 578, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 586, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -2502,6 +2536,24 @@ private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     };
     new Thread(run,"canvas layout").start();
 }//GEN-LAST:event_fixLayoutMenuItemActionPerformed
+
+private void resetXMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetXMenuItemActionPerformed
+    if ( !AutoplotUtil.resetZoomX(dom)) {
+        System.err.println("unable to zoom x");
+    }
+}//GEN-LAST:event_resetXMenuItemActionPerformed
+
+private void resetYMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetYMenuItemActionPerformed
+    if ( !AutoplotUtil.resetZoomY(dom)) {
+        System.err.println("unable to zoom y");
+    }
+}//GEN-LAST:event_resetYMenuItemActionPerformed
+
+private void resetZMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZMenuItemActionPerformed
+    if ( !AutoplotUtil.resetZoomZ(dom)) {
+        System.err.println("unable to zoom z");
+    }
+}//GEN-LAST:event_resetZMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3025,6 +3077,10 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
+    private javax.swing.JMenuItem resetXMenuItem;
+    private javax.swing.JMenuItem resetYMenuItem;
+    private javax.swing.JMenuItem resetZMenuItem;
+    private javax.swing.JMenu resetZoomMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
