@@ -696,7 +696,6 @@ public class AutoplotUtil {
                     (Units) properties.get(QDataSet.UNITS));
             // see if the typical extent is consistent with extent seen.  If the
             // typical extent won't hide the data's structure, then use it.
-            System.err.println("typical min,max= "+range);
             if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
