@@ -65,8 +65,13 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.OptionsPrefsController;
+import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.QDataSet;
@@ -406,6 +411,67 @@ public class AutoplotUtil {
         if (ard.log) result.putProperty( QDataSet.SCALE_TYPE, "log" );
         if ( u!=Units.dimensionless ) result.putProperty(QDataSet.UNITS,u);
         return result;
+    }
+
+    public static boolean resetZoomY( Application dom ) {
+        PlotElementController pec = dom.getController().getPlotElement().getController();
+        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
+        DataSourceFilter dsf = pec.getDataSourceFilter();
+        if (pcopy.getComponent().length() > 0) {
+            System.err.println("cannot reset Y because of component...");
+            return false;
+        }
+        Plot plot= dom.getController().getPlot();
+
+        QDataSet ds= pec.getDataSet();
+        if ( ds==null ) return false;
+        if ( true ) {
+            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+        }
+        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        dom.getController().getPlot().getYaxis().setRange(pcopy.getPlotDefaults().getYaxis().getRange());
+        return true;
+    }
+
+    public static boolean resetZoomX( Application dom ) {
+        PlotElementController pec = dom.getController().getPlotElement().getController();
+        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
+        DataSourceFilter dsf = pec.getDataSourceFilter();
+        if (pcopy.getComponent().length() > 0) {
+            System.err.println("cannot reset X because of component...");
+            return false;
+        }
+        Plot plot= dom.getController().getPlot();
+
+        QDataSet ds= pec.getDataSet();
+        if ( ds==null ) return false;
+        if ( true ) {
+            ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+        }
+        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        dom.getController().getPlot().getXaxis().setRange(pcopy.getPlotDefaults().getXaxis().getRange());
+        return true;
+    }
+
+
+    public static boolean resetZoomZ( Application dom ) {
+        PlotElementController pec = dom.getController().getPlotElement().getController();
+        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
+        DataSourceFilter dsf = pec.getDataSourceFilter();
+        if (pcopy.getComponent().length() > 0) {
+            System.err.println("cannot reset Z because of component...");
+            return false;
+        }
+        Plot plot= dom.getController().getPlot();
+
+        QDataSet ds= pec.getDataSet();
+        if ( ds==null ) return false;
+        if ( true ) {
+            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+        }
+        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        dom.getController().getPlot().getZaxis().setRange(pcopy.getPlotDefaults().getZaxis().getRange());
+        return true;
     }
 
     /**
