@@ -690,26 +690,38 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( -1, true, new Runnable() {
+        invokeLater( 1100, true, new Runnable() {
             public void run() {
-                long t0= System.currentTimeMillis();
+                //long t0= System.currentTimeMillis();
+APSplash.checkTime("init 249");
                 if ( flayoutPane!=null ) {
                     LayoutPanel lui= new LayoutPanel();
                     layoutPanel= lui;
                     flayoutPane.setViewportView(lui);
                     lui.setApplication(dom);
+APSplash.checkTime("init 250");
                 }
-                System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
+            }
+        } );
+        invokeLater( 1150, true, new Runnable() {
+            public void run() {
+                //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
+APSplash.checkTime("init 259");
                 if ( fdataPane!=null ) {
                     final DataPanel dp= new DataPanel(dom);
                     dataPanel= dp;
                     fdataPane.setViewportView(dp);
                     dp.doBindings();
+APSplash.checkTime("init 260");
                 }
-                System.err.println("  invokeLater set, data panel "+(System.currentTimeMillis()-t0));
+            }
+        } );
+        invokeLater( 1200, true, new Runnable() {
+            public void run() {
+APSplash.checkTime("init 269");
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
                 fmetadataPane.setViewportView(mdp);
-                System.err.println("  invokeLater set, metadata panel "+(System.currentTimeMillis()-t0));
+APSplash.checkTime("init 270");
             }
         });
 
@@ -2790,10 +2802,11 @@ APSplash.checkTime("init -80");
                 if ( !headless ) {
                     APSplash.showSplash();
                 }
-APSplash.checkTime("init -80");
+APSplash.checkTime("init -70");
                 final AutoplotUI app;
                 if ( !headless ) {
                     app= new AutoplotUI(model);
+APSplash.checkTime("init 200");
                     boolean addSingleInstanceListener= true;
                     if ( addSingleInstanceListener ) {
                         addSingleInstanceListener( alm, app );
@@ -2803,6 +2816,7 @@ APSplash.checkTime("init -80");
                     app= null;
                 }
 
+APSplash.checkTime("init 210");
                 final boolean server= !alm.getValue("port").equals("-1");
                 if ( server ) {
                     int iport = Integer.parseInt(alm.getValue("port"));
@@ -2828,7 +2842,7 @@ APSplash.checkTime("init -80");
                 if ( alm.getValue("mode").equals("basic") ) {
                     app.setExpertMode(false);
                 }
-
+APSplash.checkTime("init 220");
                 if ( !headless ) {
                     logger.fine("UI.setVisible(true)");
                     SwingUtilities.invokeLater( new Runnable() {
@@ -2844,7 +2858,7 @@ APSplash.checkTime("init -80");
                     //APSplash.getInstance().setVisible(false);
                     APSplash.hideSplash();
                 }
-                
+APSplash.checkTime("init 230");
                 if ( !headless && initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);
                     app.dataSetSelector.maybePlot(false);
@@ -2888,6 +2902,7 @@ APSplash.checkTime("init -80");
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
                     if ( app!=null ) app.setStatus("ready");
+APSplash.checkTime("init 240");
                 }
 
             }
