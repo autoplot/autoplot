@@ -1531,7 +1531,7 @@ public class PlotElementController extends DomNodeController {
      * @param props
      * @param spec
      */
-    private static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
+    public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
 
         RenderType spec = peleCopy.getRenderType();
 
