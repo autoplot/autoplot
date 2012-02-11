@@ -692,20 +692,24 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         invokeLater( -1, true, new Runnable() {
             public void run() {
+                long t0= System.currentTimeMillis();
                 if ( flayoutPane!=null ) {
                     LayoutPanel lui= new LayoutPanel();
                     layoutPanel= lui;
                     flayoutPane.setViewportView(lui);
                     lui.setApplication(dom);
                 }
+                System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
                 if ( fdataPane!=null ) {
                     final DataPanel dp= new DataPanel(dom);
                     dataPanel= dp;
                     fdataPane.setViewportView(dp);
                     dp.doBindings();
                 }
+                System.err.println("  invokeLater set, data panel "+(System.currentTimeMillis()-t0));
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
                 fmetadataPane.setViewportView(mdp);
+                System.err.println("  invokeLater set, metadata panel "+(System.currentTimeMillis()-t0));
             }
         });
 
@@ -763,7 +767,9 @@ public class AutoplotUI extends javax.swing.JFrame {
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        long t0= System.currentTimeMillis();
                         refreshUndoRedoLabel();
+                        System.err.println( "refreshUndoRedoLabel "+( System.currentTimeMillis()-t0) );
                     }
                 });
             }
@@ -812,6 +818,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
+        System.err.println("ready in just a few seconds...");
         setMessage("ready in just a few seconds...");
         
     }
