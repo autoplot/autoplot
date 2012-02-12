@@ -691,7 +691,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 1100, true, new Runnable() {
+        invokeLater( 10100, true, new Runnable() {
             public void run() {
                 //long t0= System.currentTimeMillis();
 APSplash.checkTime("init 249");
@@ -704,7 +704,7 @@ APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 1150, true, new Runnable() {
+        invokeLater( 10150, true, new Runnable() {
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
 APSplash.checkTime("init 259");
@@ -717,7 +717,7 @@ APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 1200, true, new Runnable() {
+        invokeLater( 10200, true, new Runnable() { //TEMPORILY replace for mac.
             public void run() {
 APSplash.checkTime("init 269");
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
@@ -780,9 +780,7 @@ APSplash.checkTime("init 270");
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        long t0= System.currentTimeMillis();
                         refreshUndoRedoLabel();
-                        System.err.println( "refreshUndoRedoLabel "+( System.currentTimeMillis()-t0) );
                     }
                 });
             }
