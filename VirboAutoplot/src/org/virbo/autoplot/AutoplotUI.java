@@ -2688,7 +2688,9 @@ private void updateFrameTitle() {
                 String pos= alm.getValue("position");
 
                 if ( pos!=null ) {
-                    app.applicationModel.setDataSet( Integer.parseInt(pos), null, url );
+                    app.applicationModel.setFocus( Integer.parseInt(pos) );
+                    app.dataSetSelector.setValue(url);
+                    app.dataSetSelector.maybePlot(false); // allow for completions
                     
                 } else {
                     if (url == null) {
