@@ -31,11 +31,13 @@ public final class WriteIDLSav {
     public static final int VARFLAG_ARRAY = 4;
 
     private static ByteBuffer timestamp() {
-        ByteBuffer date= writeString( Calendar.getInstance().toString() );
-        ByteBuffer user= writeString( "USER" );
-        ByteBuffer host= writeString( "HOST" ); //TODO: get these from java props
+        ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
+        ByteBuffer user= writeString( "jbf" );
+        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
         ByteBuffer result= ByteBuffer.allocateDirect( 256*4 + date.limit() + user.limit() + host.limit() );
-        result.position(256*4);
+        for ( int i=0; i<256*4; i++ ) {
+            result.put((byte)0);
+        }
         result.put(date);
         result.put(user);
         result.put(host);
@@ -45,6 +47,7 @@ public final class WriteIDLSav {
 
     private static ByteBuffer version() {
         ByteBuffer format= ByteBuffer.allocateDirect(4);
+        format.order(ByteOrder.BIG_ENDIAN);
         format.putInt(7);
         ByteBuffer arch= writeString( "JAVA_ARCH");
         ByteBuffer os= writeString( "JAVA_OS");
@@ -58,16 +61,17 @@ public final class WriteIDLSav {
         return result;
     }
 
-    static final ByteBuffer getBytesStr( String s ) {
+    static ByteBuffer getBytesStr( String s ) {
         return ByteBuffer.wrap(s.getBytes());
     }
 
-    static final ByteBuffer getBytesByte( byte b ) {
+    static ByteBuffer getBytesByte( byte b ) {
         return ByteBuffer.wrap(new byte[]{b});
     }
 
     private static  ByteBuffer writeString( String s ) {
         ByteBuffer result= ByteBuffer.allocateDirect(s.length()+4);
+        result.order( ByteOrder.BIG_ENDIAN );
         result.putInt(s.length());
         try {
             result.put(s.getBytes("US-ASCII"));
@@ -84,6 +88,7 @@ public final class WriteIDLSav {
         int ndims= 1;
 
         ByteBuffer result= ByteBuffer.allocateDirect( capacity );
+        result.order(ByteOrder.BIG_ENDIAN);
         result.putInt( 8 ); // normal array.  There's a 64-bit array read as well that is not implemented.
         result.putInt( eleLen ); // bytes per element TODO: only 8 byte.
         result.putInt( Array.getLength(data)*eleLen ); //TODO: 1D
@@ -112,6 +117,7 @@ public final class WriteIDLSav {
 
     private static ByteBuffer writeDoubleArray( double[] data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( data.length*8 );
+        buf.order(ByteOrder.BIG_ENDIAN);
         for ( int i=0; i<data.length; i++ ) {
             buf.putDouble(data[i]);
         }
@@ -123,6 +129,7 @@ public final class WriteIDLSav {
 
         ByteBuffer arrayDesc= writeArrayDesc(data);
         ByteBuffer result= ByteBuffer.allocateDirect( 8 + arrayDesc.limit() );
+        result.order(ByteOrder.BIG_ENDIAN);
         result.putInt( DATATYPE_DOUBLE );
         result.putInt( VARFLAG_ARRAY);
         result.put(arrayDesc);
@@ -144,7 +151,7 @@ public final class WriteIDLSav {
         }
 
         ByteBuffer result= ByteBuffer.allocateDirect( nameBuf.limit() + typedesc.limit() + 4 + varData.limit() );
-
+        result.order(ByteOrder.BIG_ENDIAN);
         result.put(nameBuf);
         result.put(typedesc);
         result.putInt(7);
@@ -160,14 +167,21 @@ public final class WriteIDLSav {
 
 
     private static void writeRecord( FileChannel ch, int recType, ByteBuffer buf ) throws IOException {
-        ByteBuffer rec= ByteBuffer.allocateDirect( buf.limit()+16 );
-        rec.order( ByteOrder.LITTLE_ENDIAN );
+
+        int len= (int)( 4 * Math.ceil( ( buf.limit()+12. ) / 4 ) );
+
+        ByteBuffer rec= ByteBuffer.allocateDirect( len );
+        rec.order( ByteOrder.BIG_ENDIAN );
 
         rec.putInt( recType );
-        rec.putLong( buf.limit() );
+        rec.putInt( len );
 
         rec.putInt( 0 ); // skip 4 bytes.
         rec.put(buf);
+
+        for ( int i=rec.position(); i<rec.limit(); i++ ) {
+            rec.put((byte)0);  // pad out to 4 byte boundary
+        }
 
         rec.flip();
 
@@ -177,7 +191,7 @@ public final class WriteIDLSav {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        FileOutputStream fos = new FileOutputStream(new File("/tmp/channel.idlsav"));
+        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.idlsav"));
         FileChannel ch = fos.getChannel();
 
         ch.write(getBytesStr("SR"));
@@ -187,12 +201,12 @@ public final class WriteIDLSav {
 
         writeRecord( ch, RECTYPE_TIMESTAMP, timestamp() );
         writeRecord( ch, RECTYPE_VERSION, version() );
-        writeRecord( ch, RECTYPE_VARIABLE, variable( "xyxyxyxy", new double[] { 45,46,47,48,49 } ) );
+        //writeRecord( ch, RECTYPE_VARIABLE, variable( "xyxyxyxy", new double[] { 45,46,47,48,49 } ) );
         writeRecord( ch, RECTYPE_ENDMARKER, endMarker() );
         ch.close();
 
         // variable
-throw new IllegalArgumentException("This is a work in progress....");
+//throw new IllegalArgumentException("This is a work in progress....");
 
     }
 }
