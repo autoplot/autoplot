@@ -419,6 +419,7 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( "|toRadians()", "convert the data to radians. (No units check) " ) );
         processMenu.add( createMenuItem( "|magnitude()", "calculate the magnitude of the vectors " ) );
         processMenu.add( createMenuItem( "|unbundle('Bx')", "unbundle a component " ) );
+        processMenu.add( createMenuItem( "|dbAboveBackgroundDim1(10)", "show data as decibels above the 10% level" ) );
     }
     void showProcessMenu( MouseEvent ev) {
         initProcessMenu();
