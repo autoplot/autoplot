@@ -2705,17 +2705,21 @@ private void updateFrameTitle() {
                                 String.format( "<html>Autoplot is already running.<br>Replace URI, replacing data with<br>%s?", url ),
                                 "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                                 new String[] { "New Window", "Replace" }, "Replace" );
-                        if (action.equals("Replace")) {
-                            app.dataSetSelector.setValue(url);
-                            app.dataSetSelector.maybePlot(false); // allow for completions
-                            //app.applicationModel.setDataSourceURL(url);
+                        if ( action!=null ) {
+                            if (action.equals("Replace")) {
+                                app.dataSetSelector.setValue(url);
+                                app.dataSetSelector.maybePlot(false); // allow for completions
+                                //app.applicationModel.setDataSourceURL(url);
+                                raise= true;
+                            } else if (action.equals("New Window")) {
+                                ApplicationModel nmodel = app.support.newApplication();
+                                DataSetSelector sel= ((AutoplotUI)nmodel.application.getMainFrame()).dataSetSelector;
+                                sel.setValue(url);
+                                sel.maybePlot(false);
+                                nmodel.setDataSourceURL(url);
+                            }
+                        } else {
                             raise= true;
-                        } else if (action.equals("New Window")) {
-                            ApplicationModel nmodel = app.support.newApplication();
-                            DataSetSelector sel= ((AutoplotUI)nmodel.application.getMainFrame()).dataSetSelector;
-                            sel.setValue(url);
-                            sel.maybePlot(false);
-                            nmodel.setDataSourceURL(url);
                         }
                     }
                 }
