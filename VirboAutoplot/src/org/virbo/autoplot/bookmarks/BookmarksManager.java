@@ -599,7 +599,7 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
         if ( s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:") ) { // kludge for testing remote bookmarks
             try {
                  // kludge for testing remote bookmarks
-                model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+                model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath())); // null getSelectedBook is okay
             } catch (IllegalArgumentException ex ) {
                 if ( true ) { //ex.toString().contains("URLDecoder") ) {
                     showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
@@ -614,8 +614,8 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_newFolderMenuItemActionPerformed
 
 private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
-    String s = JOptionPane.showInputDialog("Bookmark URL:");
-    if (s != null && !s.equals("")) {
+        String s = JOptionPane.showInputDialog("Bookmark URL:");
+        if (s != null && !s.equals("")) {
         model.addBookmark(new Bookmark.Item(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
     }
 }//GEN-LAST:event_addItemMenuItemActionPerformed
@@ -627,6 +627,10 @@ private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
 private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleTextFieldActionPerformed
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    if ( b==null ) {
+        JOptionPane.showMessageDialog(rootPane, "No bookmark is selected","No Bookmark Selected",JOptionPane.OK_OPTION);
+        return;
+    }
     b.setTitle(titleTextField.getText());
     jTree1.repaint();
     model.fireBookmarkChange(b);
