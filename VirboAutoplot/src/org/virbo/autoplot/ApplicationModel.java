@@ -284,6 +284,23 @@ public class ApplicationModel {
         }
     }
 
+    /**
+     * just set the focus to the given dataSourceFilter index.  plotElements and dataSourceFilters
+     * are added until the index exists.  This is introduced to support code where we reenter
+     * autoplot with the position switch, and we can to then call maybePlot so that completions can
+     * happen.
+     * @param chNum the index of the DataSourceFilter to use.
+     */
+    public void setFocus( int chNum ) {
+        while ( dom.getDataSourceFilters().length <= chNum ) {
+            Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
+            dom.getController().setPlot(p);
+            dom.getController().addPlotElement( null, null  );
+        }
+        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+        dom.getController().setDataSourceFilter(dsf);
+    }
+
     public void setDataSource(DataSource dataSource) {
         dom.getController().getDataSourceFilter().getController().resetDataSource(false, dataSource);
     }
