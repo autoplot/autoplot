@@ -54,6 +54,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     /** Creates new form PlotStylePanel */
     public AxisPanel(final ApplicationModel applicationModel) {
+   APSplash.checkTime("in axispanel 10");
         this.applicationModel = applicationModel;
         this.dom = applicationModel.dom;
         this.applicationController= this.dom.getController();
@@ -64,13 +65,17 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
+   APSplash.checkTime("in axispanel 15");
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 doPlotElementBindings();
             }
         });
+            // there's a strange delay here on a mac.  We work around this be delaying construction on gui.
+   APSplash.checkTime("in axispanel 17");
         initComponents();
 
+   APSplash.checkTime("in axispanel 20");
         DasPlot plot = applicationController.getPlot().getController().getDasPlot();
         DasColorBar colorbar = applicationController.getPlot().getController().getDasColorBar();
 
@@ -91,6 +96,7 @@ public class AxisPanel extends javax.swing.JPanel {
         zredit.addFocusListener( createDatumRangeEditorListener(zredit) );
         zredit.setToolTipText("Z axis range");
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
+   APSplash.checkTime("in axispanel 30");
 
         xredit.addPropertyChangeListener( new PropertyChangeListener() {
            public void propertyChange(PropertyChangeEvent ev ) {
@@ -120,8 +126,10 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         };
         SwingUtilities.invokeLater(run);
+   APSplash.checkTime("in axispanel 40");
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
+   APSplash.checkTime("in axispanel 50");
 
     }
 
