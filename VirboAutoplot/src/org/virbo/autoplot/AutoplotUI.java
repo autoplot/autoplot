@@ -598,15 +598,19 @@ public class AutoplotUI extends javax.swing.JFrame {
     private Runnable addAxes() {
         return new Runnable() {
             public void run() {
+  APSplash.checkTime("addAxes in");
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( -1, true, new Runnable() {
+                invokeLater( 15500, true, new Runnable() {
                     public void run() {
+  APSplash.checkTime("addAxes1 in");
                         JComponent c= new AxisPanel(applicationModel);
                          sp.setViewportView(c);
+  APSplash.checkTime("addAxes1 out");
                     }
                 });
+  APSplash.checkTime("addAxes out");
             }
         };
     }
@@ -614,15 +618,19 @@ public class AutoplotUI extends javax.swing.JFrame {
     private Runnable addStyle() {
         return new Runnable() {
             public void run() {
+  APSplash.checkTime("addStyle in");
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( -1, true, new Runnable() {
+                invokeLater( 15500, true, new Runnable() {
                     public void run() {
+  APSplash.checkTime("addStyle1 in");
                         JComponent c= new PlotStylePanel(applicationModel);
                         sp.setViewportView(c);
+  APSplash.checkTime("addStyle1 out");
                     }
                 } );
+  APSplash.checkTime("addStyle out");
             }
         };
     }
