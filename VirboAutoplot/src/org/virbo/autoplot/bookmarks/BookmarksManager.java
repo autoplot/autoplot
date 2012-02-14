@@ -116,6 +116,49 @@ public class BookmarksManager extends javax.swing.JDialog {
         return model;
     }
 
+    /**
+     * return the remoteUrl containing this bookmark, or an empty string.
+     * @param b the target bookmark.
+     * @param treeModel the model containing the bookmark
+     * @param ppath the path to the bookmark.
+     * @return the first remote URL containing the bookmark, or an empty string if it is local.
+     */
+    private String maybeGetRemoteBookmarkUrl(Bookmark b, TreeModel treeModel, TreePath ppath ) {
+        // if it is a child of a remote bookmark, make sure it's not editable.
+        String remoteUrl= "";
+        if ( b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
+        while ( ppath.getPathCount()>1 ) {
+            Bookmark.Folder f= (Folder) model.getSelectedBookmark(treeModel,ppath);
+            if ( f.remoteUrl!=null && !f.remoteUrl.equals("") ) {
+                remoteUrl= f.remoteUrl;
+                break;
+            }
+            ppath= ppath.getParentPath();
+        }
+        return remoteUrl;
+    }
+
+    /**
+     * remove the bookmarks from the list that come from a remote bookmarks file.  For example, these cannot be individually deleted.
+     * The root node of a bookmarks file is left in there, so that it may be used to delete the folder.
+     * @param bs
+     * @param model
+     * @param selectionPaths
+     * @return the remaining remote bookmarks.
+     */
+    private List<Bookmark> removeRemoteBookmarks(List<Bookmark> bs, TreeModel model, TreePath[] selectionPaths) {
+        assert selectionPaths.length==bs.size();
+        List<Bookmark> result= new ArrayList();
+        for ( int i=0; i<bs.size(); i++ ) {
+            Bookmark bs1= bs.get(i);
+            if ( (bs1 instanceof Bookmark.Folder && ((Bookmark.Folder)bs1).getRemoteUrl()!=null )
+                    || "".equals( maybeGetRemoteBookmarkUrl( bs.get(i), model, selectionPaths[i] )) ) {
+                result.add(bs.get(i));
+            }
+        }
+        return result;
+    }
+
 
     /**
      * present a GUI offering to delete the set of bookmarks.
@@ -131,6 +174,7 @@ public class BookmarksManager extends javax.swing.JDialog {
             model.removeBookmarks(bs);
         } else {
             for (Bookmark b : bs) {
+                //TODO: check for remote bookmark
                 if (b instanceof Bookmark.Folder) {
                     if (confirm || JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                         model.removeBookmark(b);
@@ -555,15 +599,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         // if it is a child of a remote bookmark, make sure it's not editable.
         String remoteUrl= "";
         TreePath ppath= jTree1.getSelectionPath();
-        if ( b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
-        while ( ppath.getPathCount()>1 ) {
-            Bookmark.Folder f= (Folder) model.getSelectedBookmark(jTree1.getModel(),ppath);
-            if ( f.remoteUrl!=null && !f.remoteUrl.equals("") ) {
-                remoteUrl= f.remoteUrl;
-                break;
-            }
-            ppath= ppath.getParentPath();
-        }
+        remoteUrl= maybeGetRemoteBookmarkUrl( b, jTree1.getModel(), ppath);
 
         URLTextField.setEditable(remoteUrl.length()==0);
         if ( remoteUrl.length()==0 ) {
@@ -657,7 +693,14 @@ private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 
 private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
     List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
-    maybeDeleteBookmarks(bs);
+    if ( bs.size()>0 ) {
+        bs= removeRemoteBookmarks( bs, jTree1.getModel(), jTree1.getSelectionPaths() );
+        if ( bs.size()==0 ) {
+            JOptionPane.showMessageDialog(rootPane, "Part of remote bookmarks tree cannot be deleted","Remote Bookmark Delete",JOptionPane.OK_OPTION);
+        } else {
+            maybeDeleteBookmarks(bs);
+        }
+    }
 }//GEN-LAST:event_deleteMenuItemActionPerformed
 
 private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleTextFieldActionPerformed
@@ -834,7 +877,14 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
         return new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent e) {
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
-                maybeDeleteBookmarks(bs);
+                if ( bs.size()>0 ) {
+                    bs= removeRemoteBookmarks( bs, jTree1.getModel(), jTree1.getSelectionPaths() );
+                    if ( bs.size()==0 ) {
+                        JOptionPane.showMessageDialog(rootPane, "Part of remote bookmarks tree cannot be deleted","Remote Bookmark Delete",JOptionPane.OK_OPTION);
+                    } else {
+                        maybeDeleteBookmarks(bs);
+                    }
+                }
             }
         };
     }
