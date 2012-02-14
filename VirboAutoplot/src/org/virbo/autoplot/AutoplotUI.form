@@ -209,7 +209,7 @@
                 <MenuItem class="javax.swing.JMenuItem" name="resetYMenuItem">
                   <Properties>
                     <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())" type="code"/>
+                      <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_R,(java.awt.event.InputEvent.SHIFT_MASK | (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())))" type="code"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Reset Y"/>
                   </Properties>

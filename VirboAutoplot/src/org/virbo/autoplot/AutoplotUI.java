@@ -1789,7 +1789,7 @@ APSplash.checkTime("init 52");
         });
         resetZoomMenu.add(resetXMenuItem);
 
-        resetYMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        resetYMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,(java.awt.event.InputEvent.SHIFT_MASK | (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()))));
         resetYMenuItem.setText("Reset Y");
         resetYMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
