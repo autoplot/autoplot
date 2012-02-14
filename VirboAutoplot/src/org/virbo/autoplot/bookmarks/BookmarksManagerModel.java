@@ -362,11 +362,17 @@ public class BookmarksManagerModel {
         for (Bookmark b : bookmarks) {
             String node= b.toString();
             if (b instanceof Bookmark.Folder) {
-                if ( ((Bookmark.Folder)b).remoteUrl!=null ) {
-                    node= node + " (remote)";
+                if ( ((Bookmark.Folder)b).remoteUrl!=null && ((Bookmark.Folder)b).remoteUrl.length()>0 ) {
+                    node= node + String.format( " (remoteUrl=%s)", ((Bookmark.Folder)b).remoteUrl );
                 }
             }
-            MutableTreeNode child = new DefaultMutableTreeNode(b);
+            final String fnode= node;
+            MutableTreeNode child = new DefaultMutableTreeNode(b) {
+                @Override
+                public String toString() {
+                    return fnode;
+                }
+            };
             parent.insert(child, parent.getChildCount());
             if (b instanceof Bookmark.Folder) {
                 List<Bookmark> kids = ((Bookmark.Folder) b).getBookmarks();
