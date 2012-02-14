@@ -10,6 +10,7 @@ import java.awt.Container;
 import java.awt.HeadlessException;
 import java.net.MalformedURLException;
 import javax.swing.event.MenuEvent;
+import org.virbo.autoplot.bookmarks.Bookmark.Folder;
 import org.virbo.datasource.AutoplotSettings;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -213,14 +214,14 @@ public class BookmarksManager extends javax.swing.JDialog {
         importFromWebButton = new javax.swing.JButton();
         ExportButton = new javax.swing.JButton();
         dismissButton = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
+        URILabel = new javax.swing.JLabel();
         URLTextField = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        titleLabel = new javax.swing.JLabel();
         titleTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         descriptionTextField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        editDescriptionButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -271,8 +272,8 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        jLabel3.setText("URI:");
-        jLabel3.setToolTipText("Location of the data (often the URL)");
+        URILabel.setText("URI:");
+        URILabel.setToolTipText("Location of the data (often the URL)");
 
         URLTextField.setToolTipText("Location of the data (often the URL)");
         URLTextField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -286,8 +287,8 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        jLabel2.setText("Title:");
-        jLabel2.setToolTipText("Title for the URI");
+        titleLabel.setText("Title:");
+        titleLabel.setToolTipText("Title for the URI");
 
         titleTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -326,10 +327,10 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        jButton1.setText("...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        editDescriptionButton.setText("Edit");
+        editDescriptionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                editDescriptionButtonActionPerformed(evt);
             }
         });
 
@@ -433,19 +434,19 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 374, Short.MAX_VALUE)
                         .add(dismissButton))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel3)
+                        .add(URILabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel2)
+                        .add(titleLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 534, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton1)))
+                        .add(editDescriptionButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -457,16 +458,16 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
+                    .add(titleLabel)
                     .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(7, 7, 7)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(descriptionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton1))
+                    .add(editDescriptionButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
+                    .add(URILabel)
                     .add(URLTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(16, 16, 16)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -540,18 +541,52 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         URLTextField.setEditable( b instanceof Bookmark.Item );
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUri());
+            URILabel.setText("URI:");
         } else {
             if ( b instanceof Bookmark.Folder && ((Bookmark.Folder)b).getRemoteUrl()!=null ) {
                 String url= ((Bookmark.Folder)b).getRemoteUrl();
                 URLTextField.setText(url);
+                URILabel.setText("URL:");
             } else {
                 URLTextField.setText("");
+                URILabel.setText("URI:");
             }
         }
+        // if it is a child of a remote bookmark, make sure it's not editable.
+        String remoteUrl= "";
+        TreePath ppath= jTree1.getSelectionPath();
+        if ( b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
+        while ( ppath.getPathCount()>1 ) {
+            Bookmark.Folder f= (Folder) model.getSelectedBookmark(jTree1.getModel(),ppath);
+            if ( f.remoteUrl!=null && !f.remoteUrl.equals("") ) {
+                remoteUrl= f.remoteUrl;
+                break;
+            }
+            ppath= ppath.getParentPath();
+        }
+
+        URLTextField.setEditable(remoteUrl.length()==0);
+        if ( remoteUrl.length()==0 ) {
+            titleLabel.setText("Title:");
+            titleLabel.setToolTipText("Title for the URI");
+        } else {
+            titleLabel.setText("Title*:");
+            titleLabel.setToolTipText("<html>Title for the URI.<br>This bookmark is part of a set of remote bookmarks from<br>"
+                    + remoteUrl +
+                    "<br> and cannot be edited.");
+        }
+        descriptionTextField.setEditable(remoteUrl.length()==0);
+        editDescriptionButton.setEnabled(remoteUrl.length()==0);
+        titleTextField.setEditable(remoteUrl.length()==0);
+
     } else {
         titleTextField.setText("");
         descriptionTextField.setText("");
         URLTextField.setText("");
+        titleLabel.setText("Title:");
+        descriptionTextField.setEditable(false);
+        editDescriptionButton.setEnabled(false);
+        titleTextField.setEditable(false);
     }
 }//GEN-LAST:event_jTree1ValueChanged
 
@@ -684,7 +719,7 @@ private void descriptionTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FI
     dirtyBookmark= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
 }//GEN-LAST:event_descriptionTextFieldKeyTyped
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDescriptionButtonActionPerformed
     String txt= descriptionTextField.getText();
     if ( txt.contains("<br>") ) {
         txt=  txt.replaceAll("<br>", "\n");
@@ -707,7 +742,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         jTree1.repaint();
         model.fireBookmarkChange(b);
     }
-}//GEN-LAST:event_jButton1ActionPerformed
+}//GEN-LAST:event_editDescriptionButtonActionPerformed
 
 //    /**
 //    * @param args the command line arguments
@@ -730,22 +765,21 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ExportButton;
+    private javax.swing.JLabel URILabel;
     private javax.swing.JTextField URLTextField;
     private javax.swing.JMenuItem addItemMenuItem;
     private javax.swing.JMenuItem closeMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JTextField descriptionTextField;
     private javax.swing.JButton dismissButton;
+    private javax.swing.JButton editDescriptionButton;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exportMenuItem;
     private javax.swing.JButton importButton;
     private javax.swing.JButton importFromWebButton;
     private javax.swing.JMenuItem importMenuItem;
     private javax.swing.JMenuItem importUrlMenuItem;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
@@ -754,6 +788,7 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JMenuItem mergeInDefaultMenuItem;
     private javax.swing.JMenuItem newFolderMenuItem;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
+    private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
     // End of variables declaration//GEN-END:variables
 
