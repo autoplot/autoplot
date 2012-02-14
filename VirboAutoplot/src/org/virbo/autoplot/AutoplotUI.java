@@ -602,7 +602,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( 15500, true, new Runnable() {
+                invokeLater( 5500, true, new Runnable() {
                     public void run() {
   APSplash.checkTime("addAxes1 in");
                         JComponent c= new AxisPanel(applicationModel);
@@ -622,7 +622,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( 15500, true, new Runnable() {
+                invokeLater( 5500, true, new Runnable() {
                     public void run() {
   APSplash.checkTime("addStyle1 in");
                         JComponent c= new PlotStylePanel(applicationModel);
