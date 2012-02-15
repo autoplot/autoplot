@@ -375,7 +375,7 @@ public class PyQDataSet extends PyJavaInstance {
                     if ( slices.__getitem__(0) instanceof PySlice ) {
                         int index= ((Number)slices.__getitem__(1).__tojava__( Number.class )).intValue();
                         if ( index<0 ) index= rods.length(0) + index;
-                        QDataSet unb1= DataSetOps.unbundle( rods, index );
+                        QDataSet unb1= DataSetOps.unbundle( rods, index, false );
                         PySlice slice = (PySlice) slices.__getitem__(0);
                         if ( slice.start instanceof PyNone && slice.stop instanceof PyNone && slice.step instanceof PyNone ) {
                             return new PyQDataSet( unb1 );
