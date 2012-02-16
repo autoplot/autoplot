@@ -425,13 +425,13 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * calculate the interpretted metadata after the slicing.
+     * calculate the interpreted metadata after the slicing.
      * @param c
      * @param properties
      * @return
      */
     Map<String,Object> processProperties( String c, Map<String,Object> properties ) {
-        if (c.length() > 5 && c.startsWith("|")) {
+        if (c.length() > 5 && c.contains("|")) {
             // slice and collapse specification
             properties = MetadataUtil.sprocess(c, properties );
         }
