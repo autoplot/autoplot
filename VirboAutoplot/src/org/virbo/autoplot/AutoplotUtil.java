@@ -446,7 +446,12 @@ public class AutoplotUtil {
         QDataSet ds= pec.getDataSet();
         if ( ds==null ) return false;
         if ( true ) {
-            ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+            if ( DataSetUtil.isQube(ds) ) {
+                ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+            } else {
+                //System.err.println("unable to resetZoom Y because it is non-qube");
+            }
+            
         }
         PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
         dom.getController().getPlot().getXaxis().setRange(pcopy.getPlotDefaults().getXaxis().getRange());
@@ -467,7 +472,11 @@ public class AutoplotUtil {
         QDataSet ds= pec.getDataSet();
         if ( ds==null ) return false;
         if ( true ) {
-            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+            if ( DataSetUtil.isQube(ds) ) {
+                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+            } else {
+                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+            }
         }
         PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
         dom.getController().getPlot().getZaxis().setRange(pcopy.getPlotDefaults().getZaxis().getRange());
