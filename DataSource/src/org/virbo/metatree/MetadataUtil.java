@@ -155,6 +155,12 @@ public class MetadataUtil {
      * @return
      */
     public static Map<String,Object> sprocess( String c, Map<String,Object> properties ) {
+
+        int i= c.indexOf("|");
+        if ( i>0 ) {
+            c= c.substring(i); // TODO: look at the slice component.
+        }
+        
         Scanner s= new Scanner( c );
         s.useDelimiter("[\\(\\),]");
 
