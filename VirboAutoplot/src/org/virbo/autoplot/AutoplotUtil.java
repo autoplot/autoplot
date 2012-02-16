@@ -475,6 +475,7 @@ public class AutoplotUtil {
             if ( DataSetUtil.isQube(ds) ) {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
             } else {
+                //TODO: we can do this, SemanticOps.trim even has code where it trims each of the data subsets for rank3 but not rank 2.
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
             }
         }
