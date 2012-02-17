@@ -416,11 +416,6 @@ public class AutoplotUtil {
     public static boolean resetZoomY( Application dom ) {
         PlotElementController pec = dom.getController().getPlotElement().getController();
         PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
-        DataSourceFilter dsf = pec.getDataSourceFilter();
-        if (pcopy.getComponent().length() > 0) {
-            System.err.println("cannot reset Y because of component...");
-            return false;
-        }
         Plot plot= dom.getController().getPlot();
 
         QDataSet ds= pec.getDataSet();
@@ -428,7 +423,7 @@ public class AutoplotUtil {
         if ( true ) {
             ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
         }
-        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
         dom.getController().getPlot().getYaxis().setRange(pcopy.getPlotDefaults().getYaxis().getRange());
         return true;
     }
@@ -436,11 +431,6 @@ public class AutoplotUtil {
     public static boolean resetZoomX( Application dom ) {
         PlotElementController pec = dom.getController().getPlotElement().getController();
         PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
-        DataSourceFilter dsf = pec.getDataSourceFilter();
-        if (pcopy.getComponent().length() > 0) {
-            System.err.println("cannot reset X because of component...");
-            return false;
-        }
         Plot plot= dom.getController().getPlot();
 
         QDataSet ds= pec.getDataSet();
@@ -453,7 +443,7 @@ public class AutoplotUtil {
             }
             
         }
-        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
         dom.getController().getPlot().getXaxis().setRange(pcopy.getPlotDefaults().getXaxis().getRange());
         return true;
     }
@@ -462,11 +452,6 @@ public class AutoplotUtil {
     public static boolean resetZoomZ( Application dom ) {
         PlotElementController pec = dom.getController().getPlotElement().getController();
         PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
-        DataSourceFilter dsf = pec.getDataSourceFilter();
-        if (pcopy.getComponent().length() > 0) {
-            System.err.println("cannot reset Z because of component...");
-            return false;
-        }
         Plot plot= dom.getController().getPlot();
 
         QDataSet ds= pec.getDataSet();
@@ -479,7 +464,7 @@ public class AutoplotUtil {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
             }
         }
-        PlotElementController.doAutoranging(pcopy, dsf.getController().getFillProperties(), ds );
+        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
         dom.getController().getPlot().getZaxis().setRange(pcopy.getPlotDefaults().getZaxis().getRange());
         return true;
     }
