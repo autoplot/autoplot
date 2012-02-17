@@ -2903,9 +2903,6 @@ APSplash.checkTime("init 210");
                     }
                 });
 
-                if ( alm.getValue("mode").equals("basic") ) {
-                    app.setExpertMode(false);
-                }
 APSplash.checkTime("init 220");
                 if ( !headless ) {
                     logger.fine("UI.setVisible(true)");
@@ -2921,6 +2918,11 @@ APSplash.checkTime("init 220");
                     logger.fine("UI is visible");
                     //APSplash.getInstance().setVisible(false);
                     APSplash.hideSplash();
+
+                    if ( alm.getValue("mode").equals("basic") ) {
+                        app.setExpertMode(false);
+                    }
+
                 }
 APSplash.checkTime("init 230");
                 if ( !headless && initialURL != null) {
@@ -3305,6 +3307,18 @@ APSplash.checkTime("init 240");
             }
         }
         dataSetSelector.setExpertMode(expert);
+        
+        final boolean fexpert= expert;
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                if ( !fexpert ) {
+                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
+                    dom.getOptions().setUseTimeRangeEditor(true);
+                }
+            }
+        } );
+        
+
     }
 
     public boolean isExpertMode() {

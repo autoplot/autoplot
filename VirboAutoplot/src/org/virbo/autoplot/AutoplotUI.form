@@ -108,9 +108,6 @@
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="viewMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="View"/>
-          </Properties>
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="addressBarMenu">
               <Properties>
