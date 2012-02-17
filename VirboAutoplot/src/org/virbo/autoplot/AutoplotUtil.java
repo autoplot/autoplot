@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.OptionsPrefsController;
@@ -423,8 +425,9 @@ public class AutoplotUtil {
         if ( true ) {
             ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
         }
-        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
-        dom.getController().getPlot().getYaxis().setRange(pcopy.getPlotDefaults().getYaxis().getRange());
+        Axis axis= dom.getController().getPlot().getYaxis();
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        axis.setRange(pcopy.getPlotDefaults().getYaxis().getRange());
         return true;
     }
 
@@ -443,8 +446,9 @@ public class AutoplotUtil {
             }
             
         }
-        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
-        dom.getController().getPlot().getXaxis().setRange(pcopy.getPlotDefaults().getXaxis().getRange());
+        Axis axis= dom.getController().getPlot().getXaxis();
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        axis.setRange(pcopy.getPlotDefaults().getXaxis().getRange());
         return true;
     }
 
@@ -464,8 +468,9 @@ public class AutoplotUtil {
                 ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
             }
         }
-        PlotElementController.doAutoranging(pcopy, new HashMap(), ds );
-        dom.getController().getPlot().getZaxis().setRange(pcopy.getPlotDefaults().getZaxis().getRange());
+        Axis axis= dom.getController().getPlot().getZaxis();
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        axis.setRange(pcopy.getPlotDefaults().getZaxis().getRange());
         return true;
     }
 
