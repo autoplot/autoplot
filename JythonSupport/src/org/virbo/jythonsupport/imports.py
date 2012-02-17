@@ -8,6 +8,7 @@ from org.virbo.dsutil import DataSetBuilder
 from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
 from java.net import URL
 from org.das2.datum import TimeParser
+import org.das2.graph
 
 # security concerns
 #from java.io import File
