@@ -6,9 +6,8 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
-        <img alt="screen shot"  src="screen.png">
-        <p><small>A bug associated with "internal" datasets is fixed, where plotting X,Y,and Z would result in the Z not being trimmed along with X and Y.  The color scatter
-            plot below is updated as the application timerange is adjusted.</small></p>
+        <img alt="screenshot"  src="screen.png">
+        <p><small>Das2's canvas object allows for "decorating" plots with arbitrary code.  Here a <a href="http://autoplot.org/autoplot.jnlp?script:http://autoplot.org/data/script/addDecorators.jy">Jython script</a> adds decorations.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,7 +22,20 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3487247: make sure remote bookmark is not editable, since edits would be lost once the remote are read in again.</li>
+            <li>Jython ds[:,0] implemented with unbundle should have disallowed high-rank unbundle (which allows a rank 3 dataset to be stored in a rank 2 table.)</li>
+            <li>DataSourceEditorDialog is always created on the event thread, avoiding occasional hang in JythonDataSource</li>
+            <li>rte_0076363774_20120128_090924: sloppiness in the trim function of DDataSet </li>
+            <li>In JythonDataSource, try to add the TSB capability immediately, so this behaves like a proper TSB-capable data source.</li>
+            <li>Fixes to single-instance launch</li>
+            <li>delay construction of axes and style tabs to work-around 1 sec delay in GUI on Mac.</li>
+            <li>bugfixes in Bx|fftPower(512).  fftPower result is marked as a qube.</li>
+            <li>weightsDataSet handles bundles.</li>
+            <li>BUNDLE_1 should not be propogated through binaryOp and unaryOp.</li>
             <li>3116643: data sources with TimeSeriesBrowse, that have a URI without the timerange, are accepted by binding automatically to the application timerange.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>3484946: A change in v2011a_7 caused datasets to fail to automatically bind to the application timerange.</li>
             <li>old code from original Autoplot was ignored render type guess code and set this based on monotonic property.</li>
             <li>3484940: guessCadenceNew would not tally deltas properly, resulting in incorrect cadence=0 for vap+inline:0,0,100,100,0,0;0,0,0,100,100,0</li>
@@ -35,32 +47,23 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>bugfix in cdf/java checking on variable lengths.  rank 2 data would indicate a length mismatch because of old code.</li>
             <li>ArrayDataSet trim didn't trim PLANE_0 property.  Now we use DataSetUtil.trimProperties for consistent behavior.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3479676: improve feedback with misformatted extension files. Applet had been failing to compile and I finally tracked this down.</li>
-            <li>3480193: cacheTag added to result of Jython data source script when TimeSeriesBrowse is detected, so that the script is not called for zoom in.</li>
-            <li>bugfix on Windows with the ftp filesystem when a file already exists, which prevented the CDAWeb module from working properly on some machines.</li>
-            <li>3475644: in downloadResourceAsTempFile, where multiple threads would step on each other's work.  </li>
-            <li>3479791: LogConsole/logger.log prevents datasets from garbage collected from memory</li>
-            <li>3479791: Metadata panel used das2 CombinedTreeModel which held references to datasets as well.</li>
-            <li>bugfix: deadlock could occur because of synchronization in UndoRedoSupport where it would create the thumbnail.</li>
-            <li>JythonDataSource script= keyword supported properly in editor.</li>
-            <li>3480889: "address bar" menu item moved to underused "view" menu, "provide feedback" moved to "help"</li>
-            <li>size of the subpanel help links reduced to just the label, to reduce accidental clicks</li>
-        </ul>
         
         <p>Features:</p>
+        <ul>
+            <li>position=&lt;int&gt; command line option added to support web sites that want to build applications using webstart single instance feature.</li>
+            <li>dbAboveBackgroundDim1 and dbAboveBackgroundDim0 operations introduced for Plasma Wave Group.</li>
+            <li>Reset Zoom->Reset Y (Ctrl+Shift+Y) and Reset Zoom->Reset X introduced.</li>
+            <li>minor changes to das2 library to allow top and bottom decorators, and opaque plots.</li>
+            <li>introduce dbAboveBackgroundDim1 filter for RPWS group</li>
+            <li>basic mode automatically switches over to timerange mode.</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>getParam in jython scripts can be enumeration: getParam('sc','1','spacecraft',['1','2','3','4'])</li>
             <li>add FFTFilterType.TenPercentEdgeCosine for use with waves.</li>
             <li>resourceUri handled specially in JythonDataSource editor.</li>
             <li>support %{USER_PROPERTIES.x.y} and %{METADATA.x.y} in legend label.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
             <li>3479591: tearoff tabs can be dropped into child container</li>
-            <li>removeBackground1 and removeBackground0 provide in-line means of running background removal on data.</li>
-            <li>cache result of FFTUtil.getFreqDomainTagsForPower, to save memory since this is repeated for each record.</li>
         </ul>
 
 <p>Known issues:</p>
