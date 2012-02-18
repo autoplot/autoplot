@@ -99,10 +99,9 @@ public class CDAWebDataSource extends AbstractDataSource {
         ArrayDataSet accum = null;
 
         try {
-            mon.setProgressMessage("refreshing database");
-
+            
             try {
-                db.maybeRefresh( new NullProgressMonitor() );
+                db.maybeRefresh( mon );
             } catch ( IOException ex ) {
                 ex.printStackTrace();
                 mon.setProgressMessage("unable to connect via ftp");
