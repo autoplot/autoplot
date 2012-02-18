@@ -26,11 +26,7 @@ public class DataSourceFilter extends DomNode {
             throw new IllegalArgumentException("uri cannot be set to null now, use \"\" instead");
         }
         if ( !uri.equals("") ) {
-            URISplit split= URISplit.parse(uri);
-            uri= URISplit.format(split); // make canonical
-            if ( !uri.startsWith("vap+") && split.ext.length()>1 ) {
-                uri= "vap+"+split.ext.substring(1)+":"+uri;
-            }
+            uri= URISplit.makeCanonical(uri);
         }
         
         String oldUri = this.uri;
