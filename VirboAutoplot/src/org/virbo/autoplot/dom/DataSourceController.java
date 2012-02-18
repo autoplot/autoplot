@@ -1475,6 +1475,7 @@ public class DataSourceController extends DomNodeController {
      * @param mon
      */
     public synchronized void setSuri(String suri, ProgressMonitor mon) {
+        suri= URISplit.makeCanonical(suri);
         dsf.setUri(suri);
         setUriNeedsResolution(true);
     }
@@ -1486,6 +1487,7 @@ public class DataSourceController extends DomNodeController {
      */
     public synchronized void resetSuri(String suri, ProgressMonitor mon) {
         String old = dsf.getUri();
+        suri= URISplit.makeCanonical(suri);
         if (  old.length()>0 && old.equals(suri)) {
             dsf.setUri("");
         }
