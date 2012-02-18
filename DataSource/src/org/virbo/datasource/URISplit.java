@@ -93,6 +93,7 @@ public class URISplit {
 
     /**
      * make the URI colloquial, e.g. removing "vap+cdf:" from "vap+cdf:file:///tmp/x.cdf"
+     * URIs that do not have a resource URI are left alone.
      * @param suri
      * @return
      */
@@ -101,7 +102,7 @@ public class URISplit {
         if ( suri.trim().equals("") ) return "";
         URISplit split= URISplit.parse(suri);
         if ( split.vapScheme!=null ) {
-            if ( split.ext.length()>1 && split.vapScheme.equals("vap+"+split.ext.substring(1) ) ) {
+            if ( split.ext!=null && split.ext.length()>1 && split.vapScheme.equals("vap+"+split.ext.substring(1) ) ) {
                 split.vapScheme= null;
             }
         }
