@@ -106,7 +106,11 @@ public class URISplit {
                 split.vapScheme= null;
             }
         }
-        return URISplit.format(split);
+        String result= URISplit.format(split);
+        if ( result.endsWith("file:///") && suri.endsWith(":") ) { // kludge around "file:/// that is added to "vap+cdaweb:"
+            return suri;
+        }
+        return result;
     }
 
     /**
