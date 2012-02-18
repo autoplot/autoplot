@@ -341,6 +341,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void maybePlot(boolean allowModifiers) {
         logger.log(Level.FINE, "go {0}", getValue());
 
+System.err.println( "go getValue="+getValue() );
+System.err.println( "go getText ="+getEditor().getText());
+
         if (!allowModifiers) {
             keyModifiers = 0;
         }
@@ -1280,6 +1283,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         if (value == null) {
             value="";
         }
+        value= URISplit.makeColloquial( value );
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
