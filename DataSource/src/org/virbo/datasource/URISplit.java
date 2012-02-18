@@ -92,6 +92,23 @@ public class URISplit {
     }
 
     /**
+     * make the URI colloquial, e.g. removing "vap+cdf:" from "vap+cdf:file:///tmp/x.cdf"
+     * @param suri
+     * @return
+     */
+    public static String makeColloquial(String suri) {
+        if ( suri==null ) return null;
+        if ( suri.trim().equals("") ) return "";
+        URISplit split= URISplit.parse(suri);
+        if ( split.vapScheme!=null ) {
+            if ( split.ext.length()>1 && split.vapScheme.equals("vap+"+split.ext.substring(1) ) ) {
+                split.vapScheme= null;
+            }
+        }
+        return URISplit.format(split);
+    }
+
+    /**
      * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
      * then "vap:" is implicit.
      */
