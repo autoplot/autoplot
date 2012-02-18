@@ -28,10 +28,14 @@ public class DataSourceFilter extends DomNode {
         if ( !uri.equals("") ) {
             URISplit split= URISplit.parse(uri);
             uri= URISplit.format(split); // make canonical
+            if ( !uri.startsWith("vap+") && split.ext.length()>1 ) {
+                uri= "vap+"+split.ext.substring(1)+":"+uri;
+            }
         }
         
         String oldUri = this.uri;
         this.uri = uri;
+
         propertyChangeSupport.firePropertyChange(PROP_URI, oldUri, uri);
     }
     
