@@ -416,62 +416,83 @@ public class AutoplotUtil {
     }
 
     public static boolean resetZoomY( Application dom ) {
-        PlotElementController pec = dom.getController().getPlotElement().getController();
-        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
         Plot plot= dom.getController().getPlot();
 
-        QDataSet ds= pec.getDataSet();
-        if ( ds==null ) return false;
-        if ( true ) {
-            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
-        }
+        boolean result= true;
         Axis axis= dom.getController().getPlot().getYaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-        axis.setRange(pcopy.getPlotDefaults().getYaxis().getRange());
-        return true;
+
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+
+        DatumRange range= null;
+        for ( PlotElement pe: pes ) {
+            if ( pe.isActive()==false ) continue;
+            QDataSet ds= pe.getController().getDataSet();
+            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+            PlotElement pcopy1= (PlotElement)pe.copy();
+            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+            if ( range==null ) {
+                range= pcopy1.getPlotDefaults().getYaxis().getRange();
+            } else {
+                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getYaxis().getRange() );
+            }
+        }
+        if ( range!=null ) axis.setRange(range);
+
+        return result;
     }
 
     public static boolean resetZoomX( Application dom ) {
-        PlotElementController pec = dom.getController().getPlotElement().getController();
-        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
         Plot plot= dom.getController().getPlot();
 
-        QDataSet ds= pec.getDataSet();
-        if ( ds==null ) return false;
-        if ( true ) {
-            if ( DataSetUtil.isQube(ds) ) {
-                ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
-            } else {
-                //System.err.println("unable to resetZoom Y because it is non-qube");
-            }
-            
-        }
+        boolean result= true;
         Axis axis= dom.getController().getPlot().getXaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-        axis.setRange(pcopy.getPlotDefaults().getXaxis().getRange());
-        return true;
+
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+
+        DatumRange range= null;
+        for ( PlotElement pe: pes ) {
+            if ( pe.isActive()==false ) continue;
+            QDataSet ds= pe.getController().getDataSet();
+            ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+            PlotElement pcopy1= (PlotElement)pe.copy(); // TODO: something ain't right below...
+            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+            if ( range==null ) {
+                range= pcopy1.getPlotDefaults().getXaxis().getRange();
+            } else {
+                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getXaxis().getRange() );
+            }
+        }
+        if ( range!=null ) axis.setRange(range);
+
+        return result;
     }
 
 
     public static boolean resetZoomZ( Application dom ) {
-        PlotElementController pec = dom.getController().getPlotElement().getController();
-        PlotElement pcopy = (PlotElement) dom.getController().getPlotElement().copy();
         Plot plot= dom.getController().getPlot();
 
-        QDataSet ds= pec.getDataSet();
-        if ( ds==null ) return false;
-        if ( true ) {
-            if ( DataSetUtil.isQube(ds) ) {
-                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+        boolean result= true;
+        Axis axis= dom.getController().getPlot().getZaxis();
+
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+
+        DatumRange range= null;
+        for ( PlotElement pe: pes ) {
+            if ( pe.isActive()==false ) continue;
+            if ( !RenderTypeUtil.needsColorbar(pe.getRenderType()) ) continue;
+            QDataSet ds= pe.getController().getDataSet();
+            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+            PlotElement pcopy1= (PlotElement)pe.copy(); 
+            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+            if ( range==null ) {
+                range= pcopy1.getPlotDefaults().getZaxis().getRange();
             } else {
-                //TODO: we can do this, SemanticOps.trim even has code where it trims each of the data subsets for rank3 but not rank 2.
-                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getZaxis().getRange() );
             }
         }
-        Axis axis= dom.getController().getPlot().getZaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-        axis.setRange(pcopy.getPlotDefaults().getZaxis().getRange());
-        return true;
+        if ( range!=null ) axis.setRange(range);
+
+        return result;
     }
 
     public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
