@@ -92,6 +92,7 @@ public class CDAWebDB {
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
+            mon.setProgressMessage("refreshing database");//TODO: is this working
             mon.started();
             mon.setTaskSize(3);
             mon.setProgressMessage("downloading file "+dbloc );
