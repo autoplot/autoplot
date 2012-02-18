@@ -77,6 +77,21 @@ public class URISplit {
     public static final String PARAM_ID="id";
 
     /**
+     * make the URI canonical, with the vap+&lt;ext&gt;: prefix.
+     * @param suri, such as "/tmp/x.cdf"
+     * @return "vap+cdf:file:///tmp/x.cdf"
+     */
+    public static String makeCanonical(String suri) {
+        if ( suri==null ) return null;
+        URISplit split= URISplit.parse(suri);
+        suri= URISplit.format(split); // make canonical
+        if ( !suri.startsWith("vap+") && split.ext.length()>1 ) {
+            suri= "vap+"+split.ext.substring(1)+":"+suri;
+        }
+        return suri;
+    }
+
+    /**
      * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
      * then "vap:" is implicit.
      */
