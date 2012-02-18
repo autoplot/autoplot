@@ -426,7 +426,7 @@ public class AutoplotUtil {
             ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
         }
         Axis axis= dom.getController().getPlot().getYaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
         axis.setRange(pcopy.getPlotDefaults().getYaxis().getRange());
         return true;
     }
@@ -447,7 +447,7 @@ public class AutoplotUtil {
             
         }
         Axis axis= dom.getController().getPlot().getXaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
         axis.setRange(pcopy.getPlotDefaults().getXaxis().getRange());
         return true;
     }
@@ -469,9 +469,13 @@ public class AutoplotUtil {
             }
         }
         Axis axis= dom.getController().getPlot().getZaxis();
-        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds ); // :) cast to Object!
+        PlotElementController.doAutoranging(pcopy, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
         axis.setRange(pcopy.getPlotDefaults().getZaxis().getRange());
         return true;
+    }
+
+    public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
+        return autoRange( ds, properties, false );
     }
 
     /**
@@ -484,11 +488,12 @@ public class AutoplotUtil {
      * which does an efficient, self-configuring, one-pass histogram of the data
      * that more effectively identifies the data range and outliers.
      *
-     * @param ds
-     * @param properties
+     * @param ds The dataset, a non-bundle, to be autoranged.
+     * @param properties Additional constraints for properties, such as SCALE_TYPE
+     * @param ignoreDsProps Don't check ds for TYPICAL_MIN and SCALE_TYPE.  MONOTONIC is never ignored.
      * @return
      */
-    public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
+    public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
 
         log.fine("enter autoRange "+ds);
 
@@ -530,12 +535,14 @@ public class AutoplotUtil {
         // the autoranging will be in log space only if the data are not time locations.
         boolean isLog= "log".equals(ds.property(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u);
 
-        Number typicalMin= (Number)ds.property(QDataSet.TYPICAL_MIN);
-        Number typicalMax= (Number)ds.property(QDataSet.TYPICAL_MAX);
-        if ( typicalMin!=null ) {
-            typical= new AutoRangeDescriptor();
-            typical.range= new DatumRange( typicalMin.doubleValue(), typicalMax.doubleValue(), u );
-            typical.log= isLog;
+        if ( !ignoreDsProps ) {
+            Number typicalMin= (Number)ds.property(QDataSet.TYPICAL_MIN);
+            Number typicalMax= (Number)ds.property(QDataSet.TYPICAL_MAX);
+            if ( typicalMin!=null ) {
+                typical= new AutoRangeDescriptor();
+                typical.range= new DatumRange( typicalMin.doubleValue(), typicalMax.doubleValue(), u );
+                typical.log= isLog;
+            }
         }
 
         if ( properties!=null && "log".equals(properties.get(QDataSet.SCALE_TYPE) ) ) {
@@ -550,7 +557,7 @@ public class AutoplotUtil {
             Units units=null;
             UnitsConverter uc= UnitsConverter.IDENTITY;
             for ( int i=0; i<ds.length(); i++ ) {
-                AutoRangeDescriptor r1= autoRange( ds.slice(i), properties );
+                AutoRangeDescriptor r1= autoRange( ds.slice(i), properties, false );
                 if ( units==null ) {
                     units= r1.range.getUnits();
                 } else {

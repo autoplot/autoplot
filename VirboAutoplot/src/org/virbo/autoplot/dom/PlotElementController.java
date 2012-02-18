@@ -1334,7 +1334,7 @@ public class PlotElementController extends DomNodeController {
                 //}
 
                 logger.fine("doAutoranging");
-                doAutoranging( peleCopy,props,fillDs );
+                doAutoranging( peleCopy,props,fillDs, false );
 
                 //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
                 //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
@@ -1519,6 +1519,10 @@ public class PlotElementController extends DomNodeController {
 
     }
 
+    public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
+        doAutoranging( peleCopy, props, fillDs, false );
+    }
+
     /**
      * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
      * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
@@ -1531,7 +1535,7 @@ public class PlotElementController extends DomNodeController {
      * @param props
      * @param spec
      */
-    public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
+    public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs, boolean ignoreDsProps ) {
 
         RenderType spec = peleCopy.getRenderType();
 
@@ -1622,16 +1626,16 @@ public class PlotElementController extends DomNodeController {
                 return;
             }
 
-            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
 
-            AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops );
+            AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
 
             //QDataSet hist= getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor desc;
             //if ( false && hist!=null ) {
             //    desc= AutoplotUtil.autoRange( hist, fillDs, props );
             //} else {
-                desc = AutoplotUtil.autoRange( zds, props );
+                desc = AutoplotUtil.autoRange( zds, props, ignoreDsProps );
             //}
 
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
@@ -1692,11 +1696,11 @@ public class PlotElementController extends DomNodeController {
                 if ( SemanticOps.isBundle(fillDs) ) {
                     depend0= SemanticOps.xtagsDataSet(fillDs);
                     if ( spec==RenderType.colorScatter ) {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props ); 
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
                     } else {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props ); // small problem that we don't support colorScatter here
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); //TODO: small problem that we don't support colorScatter here
                         for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
-                           AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props );
+                           AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
                            if ( ydesc1.range.getUnits().isConvertableTo(ydesc.range.getUnits()) ) {
                                ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
                            } else {
@@ -1705,7 +1709,7 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                 } else {
-                    ydesc = AutoplotUtil.autoRange( fillDs, props );
+                    ydesc = AutoplotUtil.autoRange( fillDs, props, ignoreDsProps );
                     depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
                 }
             }
@@ -1719,7 +1723,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+                AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
 
                 peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
                 if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
@@ -1731,12 +1735,12 @@ public class PlotElementController extends DomNodeController {
             if (spec == RenderType.colorScatter) {
                 AutoplotUtil.AutoRangeDescriptor zdesc;
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null);
+                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null, ignoreDsProps);
                 } else {
                     QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
                     if ( plane0!=null ) {
                         zdesc= AutoplotUtil.autoRange(plane0,
-                            (Map) props.get(QDataSet.PLANE_0));
+                            (Map) props.get(QDataSet.PLANE_0), ignoreDsProps);
                         peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                         peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                         peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
