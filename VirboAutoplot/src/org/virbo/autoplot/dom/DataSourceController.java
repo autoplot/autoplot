@@ -111,7 +111,7 @@ public class DataSourceController extends DomNodeController {
             } else {
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
-                    System.err.println("!!! "+whoIsChanging +" !!!"); // we probably need to do something with this.
+                    System.err.println("!!! someone is changing: "+whoIsChanging +" !!!  ignoring event."); // we probably need to do something with this.
                     return;
                 }
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
