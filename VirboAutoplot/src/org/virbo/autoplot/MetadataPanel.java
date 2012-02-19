@@ -19,8 +19,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.system.RequestProcessor;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -84,6 +82,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         updateProperties();
         updateStatistics();
         updateComponentDataSet();
+        bindToPlotElement(dom.getController().getPlotElement());
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "metadataPanel");
     }
