@@ -54,6 +54,7 @@ public interface CDFConstants {
     public static final long CDF_REAL8  = 22;
     public static final long CDF_EPOCH  = 31;    // Standard style
     public static final long CDF_EPOCH16= 32;    // Standard style
+    public static final long CDF_TT2000=  33;
     public static final long CDF_BYTE   = 41;    // Same as CDF_INT1 (signed)
     public static final long CDF_FLOAT  = 44;    // Same as CDF_REAL4
     public static final long CDF_DOUBLE = 45;    // Same as CDF_REAL8
