@@ -167,6 +167,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
 
+        String eventListColumn= getParam( "eventListColumn", null );
+        if ( eventListColumn!=null ) {
+            dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
+            dep0.putProperty( QDataSet.UNITS, Units.us2000 );
+            dep0.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
+            column= eventListColumn;
+        }
+
         String group= getParam( "group", null );
         if ( group!=null ) {
             vds= ArrayDataSet.copy( DataSetOps.unbundle( ds, group ) );
@@ -664,6 +672,15 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 parser.setUnits(icol, u);
                 parser.setFieldParser(icol, parser.UNITS_PARSER);
             }
+        }
+
+        // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
+        o= params.get("eventListColumn");
+        if ( o!=null ) {
+            parser.setUnits(0,Units.us2000);
+            parser.setFieldParser(0, parser.UNITS_PARSER);
+            parser.setUnits(1,Units.us2000);
+            parser.setFieldParser(1, parser.UNITS_PARSER);
         }
 
         // --- done configuration, now read ---
