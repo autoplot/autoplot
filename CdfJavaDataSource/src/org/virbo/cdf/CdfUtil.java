@@ -167,7 +167,7 @@ public class CdfUtil {
         long sizeBytes;
         if ( itype==CDFConstants.CDF_EPOCH16 ) {
             sizeBytes= 16;
-        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH) {
+        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH || itype==CDFConstants.CDF_TT2000 ) {
             sizeBytes= 8;
         } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
             sizeBytes=4; //sizeBytes= 4;
@@ -453,6 +453,9 @@ public class CdfUtil {
             result= ArrayDataSet.wrap( dresult, qube1, false );
             result.putProperty(QDataSet.UNITS, Units.us2000);
 
+        } else if ( varType==CDFConstants.CDF_TT2000 ) {
+            result.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
+
         }
 
 //System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
@@ -513,6 +516,7 @@ public class CdfUtil {
             case 45:return "CDF_DOUBLE";
             case 31:return "CDF_EPOCH";
             case 32 :return "CDF_EPOCH16";
+            case 33: return "CDF_TT2000";
             case 51 :return "CDF_CHAR";
             default: return String.valueOf(type);
         }
