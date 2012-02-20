@@ -10,8 +10,11 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyList;
@@ -68,6 +71,58 @@ public class InlineDataSource extends AbstractDataSource {
         return DataSetOps.makePropertiesMutable(res);
     }
 
+    /**
+     * s formatted ds with only commas delineating datums.  If all elements are parseable as a
+     * double, the result is a dimensionless array.  If parseable as
+     * times, the result is a time array.  Otherwise the result is a
+     * result has enumeration units for the ordinal values.
+     * @param s formatted ds with only commas delineating datums
+     * @return
+     */
+    private MutablePropertyDataSet parseInlineDsSimple( String s ) {
+        Units u= Units.dimensionless;
+        Units tu= Units.us2000;
+        EnumerationUnits eu= EnumerationUnits.create("default");
+        String[] ss2= s.split(",");
+        DDataSet result= DDataSet.createRank1(ss2.length);
+
+        boolean isTime= false;
+        boolean isEnum= false;
+        for ( int j=0; j<ss2.length; j++ ) {
+            try {
+                if ( !isTime && !isEnum ) u.parse(ss2[j]);
+            } catch ( ParseException e ) {
+                isTime= true;
+                if ( !isEnum ) {
+                    try {
+                        tu.parse(ss2[j]);
+                    } catch (ParseException ex) {
+                        isEnum= true;
+                    }
+                }
+            }
+        }
+
+        try {
+            for ( int j=0; j<ss2.length; j++ ) {
+                String ss= ss2[j];
+                if ( isEnum ) {
+                    if ( ss.startsWith("'") && ss.endsWith("'") ) ss= ss.substring(1,ss.length()-1);
+                    result.putValue( j, eu.createDatum(ss).doubleValue(eu) );
+                    if ( j==0 ) result.putProperty( QDataSet.UNITS, eu );
+                } else if ( isTime ) {
+                    result.putValue( j, tu.parse(ss).doubleValue(tu) );
+                    if ( j==0 ) result.putProperty( QDataSet.UNITS, tu );
+                } else {
+                    result.putValue(j, u.parse(ss).value() );
+                }
+            }
+        } catch ( ParseException ex ) {
+            throw new RuntimeException(ex);
+        }
+
+        return result;
+    }
 
     private MutablePropertyDataSet parseInlineDs( String s ) throws Exception {
         if ( s.equals("None") || s.equals("null") || s.equals("") ) return null;
@@ -93,25 +148,16 @@ public class InlineDataSource extends AbstractDataSource {
         }
 
         String[] ss= s.split(";");
-        Units u= Units.dimensionless;
         if ( ss.length>1 ) { // rank 2
             BundleDataSet bds= BundleDataSet.createRank1Bundle();
             for ( int i=0; i<ss.length; i++ ) {
-                String[] ss2= ss[i].split(",");
-                DDataSet result= DDataSet.createRank1(ss2.length);
-                for ( int j=0; j<ss2.length; j++ ) {
-                    result.putValue(j, u.parse(ss2[j]).doubleValue(u) );
-                }
+                MutablePropertyDataSet result= parseInlineDsSimple(ss[i]);
                 bds.bundle(result);
             }
             bds.putProperty( QDataSet.BUNDLE_1, null );
             return bds;
         } else {
-           String[] ss2= ss[0].split(",");
-            DDataSet result= DDataSet.createRank1(ss2.length);
-            for ( int j=0; j<ss2.length; j++ ) {
-                result.putValue(j, u.parse(ss2[j]).doubleValue(u) );
-            }
+            MutablePropertyDataSet result= parseInlineDsSimple(ss[0]);
             return result;
         }
     }
@@ -243,7 +289,14 @@ public class InlineDataSource extends AbstractDataSource {
                     MutablePropertyDataSet xx= (MutablePropertyDataSet)DataSetOps.unbundle(ds,0) ;
                     MutablePropertyDataSet zz= (MutablePropertyDataSet)DataSetOps.unbundle(ds,ds.length(0)-1);
                     zz.putProperty( QDataSet.DEPEND_0, xx );
-                    ds= zz;   
+                    ds= zz;
+                } else if ( ds instanceof BundleDataSet ) { // use unbundle to support TimeLocation and EnumerationUnits types
+                    BundleDataSet bds= (BundleDataSet)ds;
+                    MutablePropertyDataSet xx= (MutablePropertyDataSet) bds.unbundle(0);
+                    MutablePropertyDataSet zz= (MutablePropertyDataSet) bds.unbundle(ds.length(0)-1);
+                    if ( ds.property(QDataSet.RENDER_TYPE)!=null ) zz.putProperty(QDataSet.RENDER_TYPE,ds.property(QDataSet.RENDER_TYPE)); // vap+inline:0,0,100,100,0,0; 0,0,0,100,100,0&RENDER_TYPE=scatter
+                    zz.putProperty( QDataSet.DEPEND_0, xx );
+                    ds= zz;
                 } else {
                     MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice1(ds,0));
                     MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice1(ds,ds.length(0)-1));
