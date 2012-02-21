@@ -209,7 +209,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 mon.setTaskSize(nl.getLength());
                 mon.setProgressMessage( "reading events from votable" );
 
-                String column= getParam("column","");
+                String column= getParam("arg_0","");
                 int icol= -1;
 
                 NodeList nodes = (NodeList) xpath.evaluate("//FIELD/@name", document, XPathConstants.NODESET );
