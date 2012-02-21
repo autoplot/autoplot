@@ -784,7 +784,10 @@ public class AutoplotUtil {
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
 
             if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
-                tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+//                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
+//                if ( tmin.doubleValue()<0 ) {
+                    tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+//                }
             }
 
             Units uu=  (Units) properties.get(QDataSet.UNITS);
@@ -797,14 +800,14 @@ public class AutoplotUtil {
                 double d1, d2;
                 if (result.log) {
                     try {
-                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd1 = result.range.min().le(range.min()) ? result.range.min() : range.min();
                         Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
                     } catch (InconvertibleUnitsException ex) {
                         range = makeDimensionless(range);
                         result.range = makeDimensionless(result.range);
-                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd1 = result.range.min().le(range.min()) ? result.range.min() : range.min();
                         Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
