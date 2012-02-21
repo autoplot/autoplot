@@ -86,6 +86,8 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
                 return false;
             } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
                 return false;
+            } else if ( localName.equals("VOTABLE")) {  // VOTABLE from VxOs and AMDA
+                return false;
             } else {
                 return true;
             }

@@ -31,6 +31,7 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
@@ -50,10 +51,11 @@ import org.xml.sax.SAXException;
  *
  * @author jbf
  */
-public class SpaseRecordDataSource implements DataSource {
+public class SpaseRecordDataSource extends AbstractDataSource {
 
     protected static final Object TYPE_HELM = "HELM";
     protected static final Object TYPE_SPASE = "SPASE";
+    protected static final Object TYPE_VOTABLE = "VOTABLE";
     
     /**
      * the DataSource URL found within Bob's SPASE record.
@@ -75,6 +77,7 @@ public class SpaseRecordDataSource implements DataSource {
 
     /** Creates a new instance of SpaseRecordDataSource */
     public SpaseRecordDataSource( URI uri ) throws IllegalArgumentException, IOException, SAXException, Exception {
+        super(uri);
         try {
             this.url= new URL( uri.getSchemeSpecificPart() );
         } catch (MalformedURLException ex) {
@@ -190,6 +193,73 @@ public class SpaseRecordDataSource implements DataSource {
                 
                 return dd;
 
+            } else if ( type==TYPE_VOTABLE ) {
+
+                NodeList nl= (NodeList) xpath.evaluate( "//VOTABLE/RESOURCE/TABLE/DATA/TABLEDATA/TR", document, XPathConstants.NODESET );
+
+                DataSetBuilder timespans= new DataSetBuilder(2,100,2);
+                DataSetBuilder description= new DataSetBuilder(1,100);
+
+                EnumerationUnits eu= new EnumerationUnits("eventDesc");
+
+                description.putProperty(QDataSet.UNITS,eu );
+                timespans.putProperty(QDataSet.UNITS, Units.us2000 );
+                timespans.putProperty(QDataSet.BINS_1,"min,max");
+
+                mon.setTaskSize(nl.getLength());
+                mon.setProgressMessage( "reading events from votable" );
+
+                String column= getParam("column","");
+                int icol= -1;
+
+                NodeList nodes = (NodeList) xpath.evaluate("//FIELD/@name", document, XPathConstants.NODESET );
+
+                if ( column.equals("") ) {
+                    icol= nodes.getLength()-1;
+                } else {
+                    for ( int i=0; i<nodes.getLength(); i++ ) {
+                        if ( nodes.item(i).getNodeValue().equals(column) ) icol= i;
+                    }
+                }
+
+                for ( int j=0; j<nl.getLength(); j++ ) {
+                    Node item= nl.item(j);
+                    mon.setTaskProgress(j);
+                    if ( mon.isCancelled() ) throw new CancelledOperationException("User pressed cancel");
+
+                    String desc;
+                    nodes = (NodeList) xpath.evaluate("TD", item, XPathConstants.NODESET );
+
+                    Node col= nodes.item(icol);
+                    desc= col.getTextContent().trim();
+                    String startDate= (String) xpath.evaluate( "TD[1]/text()", item, XPathConstants.STRING );
+                    String stopDate= (String) xpath.evaluate( "TD[2]/text()", item, XPathConstants.STRING );
+
+                    if ( startDate.compareTo(stopDate)>0 ) {
+                        //throw new IllegalArgumentException("startDate is after stopDate");
+                        Exception e= new IllegalArgumentException("StartDate is after StopDate: "+startDate );
+                        e.printStackTrace();
+                        timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                        timespans.putValue(j, 1, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                        description.putValue(j,eu.createDatum(e.getMessage()).doubleValue(eu) );
+                        continue;
+                    }
+                    description.putValue(j,eu.createDatum( desc ).doubleValue(eu) );
+                    timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
+                    timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
+                }
+
+                mon.finished();
+
+                DDataSet dd= description.getDataSet();
+                dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
+
+                String title= (String)xpath.evaluate("//VOTABLE/RESOURCE/@name", document, XPathConstants.STRING );
+                dd.putProperty( QDataSet.TITLE,title );
+
+                return dd;
+
+
             } else {
                 throw new IllegalArgumentException( "Unsupported XML type, root node should be Spase or Eventlist"); // see else above
             }
@@ -230,6 +300,8 @@ public class SpaseRecordDataSource implements DataSource {
             type= TYPE_SPASE;
         } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
             type= TYPE_HELM;
+        } else if ( localName.equals("VOTABLE") ) { // Virtual Observatories / AMDA VOTABLE event tables.
+            type= TYPE_VOTABLE;
         } else {
             throw new IllegalArgumentException("Unsupported XML type, root node should be Spase or Eventlist");
         }
