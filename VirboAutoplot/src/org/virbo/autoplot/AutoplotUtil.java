@@ -783,7 +783,7 @@ public class AutoplotUtil {
             Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
 
-            if ( isLog && tmin.doubleValue()<=0 ) {
+            if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
                 tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
             }
 
