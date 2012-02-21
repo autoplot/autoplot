@@ -160,9 +160,6 @@ public class IstpMetadataModel extends MetadataModel {
                 }
             }
         }
-        if ("log".equals(getScaleType(attrs)) && min <= 0) {
-            min = max / 10000;
-        }
         if ( units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
         if ( max<min ) max= Double.MAX_VALUE; //vap+cdaweb:ds=I2_AV_AME&id=ampl&timerange=1978-01-23+7:28:21+to+7:28:22
         if ( UnitsUtil.isTimeLocation(units) ) {
