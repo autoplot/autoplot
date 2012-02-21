@@ -183,7 +183,7 @@ public class IstpMetadataModel extends MetadataModel {
     private static String getScaleType(Map attrs) {
         String type = null;
         if (attrs.containsKey("SCALETYP") && attrs.get("SCALETYP") instanceof String ) { // CAA STAFF
-            type = (String) attrs.get("SCALETYP");
+            type = String.valueOf( attrs.get("SCALETYP") ).toLowerCase();
         }
         return type;
     }
@@ -207,11 +207,11 @@ public class IstpMetadataModel extends MetadataModel {
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
         if (attrs.containsKey("LABLAXIS")) {
-            properties.put(QDataSet.LABEL, attrs.get("LABLAXIS"));
+            properties.put(QDataSet.LABEL, String.valueOf( attrs.get("LABLAXIS") ));
         }
 
         if (attrs.containsKey("CATDESC")) {
-            properties.put(QDataSet.TITLE, attrs.get("CATDESC"));
+            properties.put(QDataSet.TITLE, String.valueOf( attrs.get("CATDESC") ));
         }
 
         if (attrs.containsKey("DISPLAY_TYPE")) {
@@ -235,7 +235,7 @@ public class IstpMetadataModel extends MetadataModel {
 
         Units units = Units.dimensionless;
         if (attrs.containsKey("UNITS")) {
-            String sunits = (String) attrs.get("UNITS");
+            String sunits = String.valueOf( attrs.get("UNITS") );
 
             try {
                 units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
