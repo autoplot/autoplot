@@ -782,12 +782,15 @@ public class AutoplotUtil {
 
             Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
+
+            if ( isLog && tmin.doubleValue()<=0 ) {
+                tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+            }
+
             Units uu=  (Units) properties.get(QDataSet.UNITS);
             if ( uu==null ) uu= Units.dimensionless;
-            DatumRange range = getRange(
-                    (Number) properties.get(QDataSet.TYPICAL_MIN),
-                    (Number) properties.get(QDataSet.TYPICAL_MAX),
-                    (Units) properties.get(QDataSet.UNITS));
+            DatumRange range = getRange( tmin, tmax, uu );
+            
             // see if the typical extent is consistent with extent seen.  If the
             // typical extent won't hide the data's structure, then use it.
             if ((tmin != null || tmax != null)) {
