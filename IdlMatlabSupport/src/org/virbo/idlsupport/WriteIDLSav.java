@@ -31,9 +31,12 @@ public final class WriteIDLSav {
     public static final int VARFLAG_ARRAY = 4;
 
     private static ByteBuffer timestamp() {
-        ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
+        //ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
+        //ByteBuffer user= writeString( "jbf" );
+        //ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+        ByteBuffer date= writeString( "Mon Feb 20 06:49:42 2012" ); //Calendar.getInstance().toString() );
         ByteBuffer user= writeString( "jbf" );
-        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+        ByteBuffer host= writeString( "spot5" ); //TODO: get these from java props
         ByteBuffer result= ByteBuffer.allocateDirect( 257*4 + date.limit() + user.limit() + host.limit() );
         for ( int i=0; i<257*4; i++ ) {
             result.put((byte)0);
@@ -112,27 +115,26 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer writeShortDesc( Object data ) {
-        int nmax= 8; // ?? see python code.
-        int capacity= ( 8 + nmax ) * 4; //TODO: 1D
-        int eleLen= 8; // bytes
-        int ndims= 1;
-
-        ByteBuffer result= ByteBuffer.allocateDirect( capacity );
-        result.order(ByteOrder.BIG_ENDIAN);
-        result.putInt( 8 ); // normal array.  There's a 64-bit array read as well that is not implemented.
-        result.putInt( eleLen ); // bytes per element TODO: only 8 byte.
-        result.putInt( Array.getLength(data)*eleLen ); //TODO: 1D
-        result.putInt( Array.getLength(data) );
-        result.putInt( ndims );
-        result.putInt( 0 );
-        result.putInt( 0 );
-
-        result.putInt( nmax );
-
-        for ( int i=0; i<nmax; i++ ) {
-            result.putInt( i==0 ? Array.getLength(data) : 1 ); //TODO: guess
+    private static int dataTypeCode( Object data ) {
+        if ( data.getClass()==Short.class ) {
+            return 2;
+        } else if ( data.getClass()==Integer.class ) {
+            return 3;
+        } else if ( data.getClass()==Float.class ) {
+            return 4;
+        } else if ( data.getClass()==Double.class ) {
+            return 5;
+        } else {
+            throw new IllegalArgumentException("unsupported type: "+data.getClass() );
         }
+    }
+
+    private static ByteBuffer writeScalarDesc( Object data ) {
+        
+        ByteBuffer result= ByteBuffer.allocateDirect( 8 );
+        result.order(ByteOrder.BIG_ENDIAN);
+        result.putInt( dataTypeCode(data) ); // 2=16bit 3=32bit int 5=float,etc.
+        result.putInt( 0);  // bytes per element TODO: only 8 byte.
 
         result.flip();
         return result;
@@ -141,8 +143,14 @@ public final class WriteIDLSav {
     private static ByteBuffer writeTypeDesc( Object data ) {
         if ( data.getClass().isArray() ) {
             return writeArrayDesc( data );
-        } else if ( data.getClass()==short.class ) {
-            return writeShortDesc( data );
+        } else if ( data.getClass()==Short.class ) {
+            return writeScalarDesc( data );
+        } else if ( data.getClass()==Integer.class ) {
+            return writeScalarDesc( data );
+        } else if ( data.getClass()==Float.class ) {
+            return writeScalarDesc( data );
+        } else if ( data.getClass()==Double.class ) {
+            return writeScalarDesc( data );
         } else {
             throw new RuntimeException("not implemented");
         }
@@ -157,6 +165,15 @@ public final class WriteIDLSav {
         buf.flip();
         return buf;
     }
+
+    private static ByteBuffer writeShort( short data ) {
+        ByteBuffer buf= ByteBuffer.allocateDirect( 4 );
+        buf.order(ByteOrder.BIG_ENDIAN);
+        buf.putShort((short)0);
+        buf.putShort(data);
+        buf.flip();
+        return buf;
+    }    
 
     private static ByteBuffer writeTypeDescArray( Object data ) {
 
@@ -179,6 +196,8 @@ public final class WriteIDLSav {
         ByteBuffer varData;
         if ( data.getClass().isArray() && data.getClass().getComponentType()==double.class ) {
             varData= writeDoubleArray( (double[])data );
+        } else if ( data.getClass()==Short.class ) {
+            varData= writeShort( (Short)data );
         } else {
             throw new RuntimeException("not supported "+data.getClass());
         }
@@ -236,7 +255,7 @@ public final class WriteIDLSav {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.idlsav"));
+        FileOutputStream fos = new FileOutputStream(new File("/home/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
         FileChannel ch = fos.getChannel();
 
         ch.write(getBytesStr("SR"));
@@ -247,8 +266,8 @@ public final class WriteIDLSav {
         int pos= 4;
         pos= writeRecord( ch, RECTYPE_TIMESTAMP, timestamp(), pos );
         pos= writeRecord( ch, RECTYPE_VERSION, version(), pos );
-        //writeRecord( ch, RECTYPE_VARIABLE, variable( "xyxyxyxy", new double[] { 45,46,47,48,49 } ), pos );
-        writeRecord( ch, RECTYPE_VARIABLE, variable( "myvar", (short)99 ), pos );
+        pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "xyxyxyxy", new double[] { 45,46,47,48,49 } ), pos );
+        //pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "myvar", (short)99 ), pos );
         pos= writeRecord( ch, RECTYPE_ENDMARKER, endMarker(), pos );
         ch.close();
 
