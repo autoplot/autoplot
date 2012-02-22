@@ -511,7 +511,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         setUri(uri);
 
-        PrintWriter out = new PrintWriter( new File( getResourceURI() ) ); //TODO: it would be nice to support a preview, this assumes file.
+        File f= new File( getResourceURI() );
+        if ( !f.createNewFile() ) {
+            if ( f.exists() ) {
+                throw new IOException( "Unable to write to existing file: "+f );
+            } else {
+                throw new IOException( "Unable to write file: "+f );
+            }
+        }
+        PrintWriter out = new PrintWriter( f ); //TODO: it would be nice to support a preview, this assumes file.
 
         String head= getParam( "header", "" ); // could be "rich"
         if ( !"rich".equals( head ) ) {
