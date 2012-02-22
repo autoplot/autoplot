@@ -218,7 +218,26 @@ public class DataSourceUtil {
             }
 
             double nc= dr.width().divide(dr1.width()).doubleValue(Units.dimensionless); // number of intervals estimate
-            
+
+            // see if we can make the agg more specific, in particular, handling $Y$m01.dat when $Y$m$d was detected.  Of course we have to guess
+            // here, since we are not going to look inside the files.
+            if ( moveUs.size()>4 && sagg.contains("$d") ) {
+                String sagg1= sagg.replace("$d","01");
+                TimeParser tp1= TimeParser.create(sagg1);
+                boolean fail= false;
+                for ( int i=0; i<moveUs.size(); i++ ) {
+                    try {
+                        tp1.parse(moveUs.get(i));
+                    } catch ( ParseException ex ) {
+                        fail= true;
+                        break;
+                    }
+                }
+                if ( fail==false ) {
+                    sagg= sagg1;
+                }
+            }
+
             // more than one file, and then five files or fairly continuous.
             if ( loose || moveUs.size()>0 && ( moveUs.size()>4 || nc<((1+moveUs.size())*2)  ) ) { // reject small aggregations
                 notAccountedFor.removeAll(moveUs);
