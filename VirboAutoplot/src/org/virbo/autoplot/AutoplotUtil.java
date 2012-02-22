@@ -566,7 +566,7 @@ public class AutoplotUtil {
             }
         }
 
-        if ( properties!=null && "log".equals(properties.get(QDataSet.SCALE_TYPE) ) ) {
+        if ( properties!=null && "log".equals(properties.get(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u) ) {
             isLog= true;
         }
 
