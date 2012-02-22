@@ -41,7 +41,7 @@
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="328" max="32767" attributes="0"/>
+              <EmptySpace pref="210" max="32767" attributes="0"/>
               <Component id="updateButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -81,13 +81,13 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;Submit&quot; to submit stack traces and log files to the server.  Optionally, add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you&apos;d like to be contacted.&lt;/html&gt; "/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;OK&quot; to submit stack traces and log files to the server.  Optionally, add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you&apos;d like to be contacted.&lt;/html&gt; "/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Data that will be submitted:"/>
+        <Property name="text" type="java.lang.String" value="Preview of data that will be submitted:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -144,7 +144,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="updateButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Update"/>
+        <Property name="text" type="java.lang.String" value="Update Preview"/>
+        <Property name="toolTipText" type="java.lang.String" value="Update data preview area below, showing exactly what data is submitted."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateButtonActionPerformed"/>

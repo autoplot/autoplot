@@ -75,10 +75,10 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         submitDOMCB = new javax.swing.JCheckBox();
         updateButton = new javax.swing.JButton();
 
-        jLabel1.setText("<html>Press \"Submit\" to submit stack traces and log files to the server.  Optionally, add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
+        jLabel1.setText("<html>Press \"OK\" to submit stack traces and log files to the server.  Optionally, add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        jLabel2.setText("Data that will be submitted:");
+        jLabel2.setText("Preview of data that will be submitted:");
 
         userTextArea.setColumns(20);
         userTextArea.setRows(5);
@@ -97,7 +97,8 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         submitDOMCB.setSelected(true);
         submitDOMCB.setText("Submit DOM and Undo Info");
 
-        updateButton.setText("Update");
+        updateButton.setText("Update Preview");
+        updateButton.setToolTipText("Update data preview area below, showing exactly what data is submitted.");
         updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateButtonActionPerformed(evt);
@@ -127,7 +128,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 328, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 210, Short.MAX_VALUE)
                 .add(updateButton)
                 .addContainerGap())
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
