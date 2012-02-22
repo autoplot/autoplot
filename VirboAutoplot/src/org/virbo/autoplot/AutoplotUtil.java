@@ -818,6 +818,14 @@ public class AutoplotUtil {
                         d1= d1/2;
                         logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                     }
+                    if ( d1<-4 ) { //often with log we get "1 count" averages that are very small (demo2: po_h0_hyd_$Y$m$d_v01.cdf)
+                        logger.fine("rejecting statistical range because min is too small.");
+                        result.range = range;
+                        result.robustMin= range.min().doubleValue(result.range.getUnits());
+                        result.robustMax= range.max().doubleValue(result.range.getUnits());
+                        d1= 0;
+                        d2= 1;
+                    }
                 } else {
                     try {
                         d1 = DatumRangeUtil.normalize(range, result.range.min());
