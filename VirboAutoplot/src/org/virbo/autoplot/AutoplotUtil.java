@@ -800,14 +800,15 @@ public class AutoplotUtil {
                 double d1, d2;
                 if (result.log) {
                     try {
-                        Datum dd1 = result.range.min().le(range.min()) ? result.range.min() : range.min();
-                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                        Datum limit= range.min();
+                        Datum dd1 = result.range.min().ge(limit) ? result.range.min() : limit; // these represent the range seen, guard against min
+                        Datum dd2 = result.range.max().ge(limit) ? result.range.max() : limit;
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
                     } catch (InconvertibleUnitsException ex) {
                         range = makeDimensionless(range);
                         result.range = makeDimensionless(result.range);
-                        Datum dd1 = result.range.min().le(range.min()) ? result.range.min() : range.min();
+                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
                         Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
