@@ -783,6 +783,11 @@ public class AutoplotUtil {
             Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
 
+            Units uu=  (Units) properties.get(QDataSet.UNITS);
+            if ( uu==null ) uu= Units.dimensionless;
+
+            Datum ftmin=  uu.createDatum( tmin==null ? -1 * Double.MAX_VALUE : tmin );
+
             if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
 //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
 //                if ( tmin.doubleValue()<0 ) {
@@ -790,8 +795,6 @@ public class AutoplotUtil {
 //                }
             }
 
-            Units uu=  (Units) properties.get(QDataSet.UNITS);
-            if ( uu==null ) uu= Units.dimensionless;
             DatumRange range = getRange( tmin, tmax, uu );
             
             // see if the typical extent is consistent with extent seen.  If the
@@ -799,8 +802,9 @@ public class AutoplotUtil {
             if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
+                    if ( ftmin.doubleValue(uu)<=0 ) ftmin= uu.createDatum(1e-38);
+                    Datum limit= ftmin;
                     try {
-                        Datum limit= range.min();
                         Datum dd1 = result.range.min().ge(limit) ? result.range.min() : limit; // these represent the range seen, guard against min
                         Datum dd2 = result.range.max().ge(limit) ? result.range.max() : limit;
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
