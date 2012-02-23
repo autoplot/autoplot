@@ -11,7 +11,18 @@
 
 package org.virbo.autoplot;
 
-import java.awt.Font;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
@@ -42,8 +53,6 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
             this.jLabel5.setText( this.jLabel5.getText()+"  (Unable to create aggregation spec, couldn't find yyyymmdd.)");
             previewDataSetSelector.setValue(s);
         }
-        Font f= previewDataSetSelector.getEditor().getFont().deriveFont(8.f);
-        previewDataSetSelector.getEditor().setFont(f);
 
         Application dom2= (Application)dom.copy();
         DomOps.aggregateAll(dom2);
@@ -55,6 +64,51 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         }
         allUrisTA.setEditable(false);
 
+        addressBarUriButton.setIcon( new ImageIcon( this.getClass().getResource("/org/virbo/datasource/go.png") ) );
+        allUrisButton.setIcon( new ImageIcon( this.getClass().getResource("/org/virbo/datasource/go.png") ) );
+    }
+
+    /**
+     *  show this in a modal dialog, without the Okay button.
+     */
+    public void showDialog() {
+        Window window = SwingUtilities.getWindowAncestor(this.dataSetSelector);
+        final JDialog dialog;
+        if (window instanceof Frame) {
+            dialog = new JDialog((Frame)window, "Aggregate URIs", true);
+        } else {
+            dialog = new JDialog((Dialog)window, "Aggregate URIs", true);
+        }
+        dialog.getContentPane().setLayout( new BorderLayout() );
+        dialog.add(this);
+
+        JPanel buttons= new JPanel();
+        buttons.setLayout( new FlowLayout( FlowLayout.RIGHT ) );
+        JButton cancel= new JButton("Cancel");
+        cancel.setAction( new AbstractAction("Cancel") {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+                dialog.dispose();
+            }
+        } );
+        cancel.setIcon(AutoplotUtil.cancelIcon());
+        
+        JButton help= new JButton("Help");
+        help.setAction( new AbstractAction("Help") {
+            public void actionPerformed(ActionEvent e) {
+                AutoplotUtil.openBrowser( "http://autoplot.org/help#Aggregation" );
+            }
+        } );
+
+        buttons.add( help );
+        buttons.add( cancel );
+        buttons.add( new JLabel("   ") );
+
+        dialog.add( this, BorderLayout.CENTER );
+        dialog.add( buttons, BorderLayout.SOUTH );
+
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
     /** This method is called from within the constructor to
@@ -100,7 +154,6 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         jLabel6.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         allUrisTA.setColumns(20);
-        allUrisTA.setFont(allUrisTA.getFont().deriveFont((float)8));
         allUrisTA.setRows(5);
         allUrisTA.setText("vap+dat:http://autoplot.org/data/autoplot.dat\n");
         jScrollPane1.setViewportView(allUrisTA);
@@ -114,46 +167,51 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(12, 12, 12)
                         .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE))
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(addressBarUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 144, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(allUrisButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
+                        .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 587, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(allUrisButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 143, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(12, 12, 12)
+                        .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(addressBarUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)))
+                        .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 600, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE)
-                    .addContainerGap()))
+                    .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 720, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(22, Short.MAX_VALUE)))
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {addressBarUriButton, allUrisButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {jLabel5, jLabel6}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(98, 98, 98)
+                .add(92, 92, 92)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(addressBarUriButton)
                     .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(allUrisButton)
                     .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .add(jScrollPane1)
+                .addContainerGap())
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
                     .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(236, Short.MAX_VALUE)))
+                    .addContainerGap(259, Short.MAX_VALUE)))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
