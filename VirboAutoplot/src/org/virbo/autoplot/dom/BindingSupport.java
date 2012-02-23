@@ -50,6 +50,18 @@ public class BindingSupport {
         }
     }
 
+    public static Converter toStringConverter= new Converter() {
+        @Override
+        public Object convertForward(Object value) {
+            return value.toString();
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            return value.toString();
+        }
+    };
+
     private PropertyChangeListener propListener(final Object p, final Method setter, final Method getter, final Converter c, final boolean forward) {
         return new PropertyChangeListener() {
 
