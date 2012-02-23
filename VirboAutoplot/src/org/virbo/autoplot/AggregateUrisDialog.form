@@ -41,7 +41,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="allUrisButton" linkSize="1" min="-2" pref="104" max="-2" attributes="1"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jLabel6" linkSize="2" min="-2" pref="587" max="-2" attributes="1"/>
+                          <Component id="jLabel6" linkSize="4" min="-2" pref="584" max="-2" attributes="1"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
@@ -50,7 +50,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="addressBarUriButton" linkSize="1" min="-2" pref="105" max="-2" attributes="1"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jLabel5" linkSize="2" min="-2" pref="600" max="-2" attributes="1"/>
+                          <Component id="jLabel5" linkSize="4" min="-2" pref="580" max="-2" attributes="1"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -72,14 +72,14 @@
                       <Component id="addressBarUriButton" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="previewDataSetSelector" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="allUrisButton" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="jScrollPane1" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
