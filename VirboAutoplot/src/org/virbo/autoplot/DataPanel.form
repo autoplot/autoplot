@@ -49,16 +49,16 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel1" pref="410" max="32767" attributes="0"/>
+                      <Component id="jLabel1" pref="451" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="componentTextField" pref="318" max="32767" attributes="0"/>
+                          <Component id="componentTextField" pref="359" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="doSliceCheckBox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="sliceTypeComboBox" pref="260" max="32767" attributes="0"/>
+                          <Component id="sliceTypeComboBox" pref="301" max="32767" attributes="0"/>
                           <EmptySpace min="18" pref="18" max="18" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -67,10 +67,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="sliceIndexSpinner" min="-2" pref="104" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
+                          <Component id="sliceAutorangesCB" pref="245" max="32767" attributes="0"/>
                       </Group>
                       <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="dataSetLabel" alignment="0" pref="410" max="32767" attributes="0"/>
+                      <Component id="dataSetLabel" alignment="0" pref="451" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -171,7 +171,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="sliceAutorangesCB">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Slice Autoranges"/>
+            <Property name="text" type="java.lang.String" value="Slice Index Change Autoranges"/>
             <Property name="toolTipText" type="java.lang.String" value="Changing the slice index will re-autorange the data"/>
           </Properties>
         </Component>
@@ -220,7 +220,7 @@
                       <Component id="fillValueComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="validRangeComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="177" max="32767" attributes="0"/>
+                  <EmptySpace pref="218" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -303,7 +303,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="uriTextField" pref="410" max="32767" attributes="0"/>
+                  <Component id="uriTextField" pref="451" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
