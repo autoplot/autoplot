@@ -35,14 +35,17 @@ import javax.swing.event.DocumentListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.BindingSupport;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.util.TickleTimer;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -152,6 +155,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     private void doIncrUp( int amount ) {
             String s= componentTextField.getText();
+            String olds= s;
             int cp= componentTextField.getCaretPosition();
             String match= ".*\\|slice\\d\\(\\d*";
             String match2= ".*\\|slices\\((\\d+,)*\\d*";
@@ -168,9 +172,16 @@ public class DataPanel extends javax.swing.JPanel {
             } else {
                 return;
             }
-            componentTextField.setText(s);
-            applicationController.getPlotElement().setComponent( componentTextField.getText() );
-            componentTextField.setCaretPosition(cp);
+            try {
+                componentTextField.setText(s);
+                applicationController.getPlotElement().setComponent( componentTextField.getText() );
+                componentTextField.setCaretPosition(cp);
+            } catch ( ArrayIndexOutOfBoundsException ex ) {
+                ex.printStackTrace();
+                componentTextField.setText(olds);
+                applicationController.getPlotElement().setComponent( componentTextField.getText() );
+                componentTextField.setCaretPosition(cp);
+            }
     }
 
     private long lastIncrUp=0;
@@ -250,7 +261,6 @@ public class DataPanel extends javax.swing.JPanel {
         doSliceCheckBox.setEnabled(canSlice);
         sliceIndexSpinner.setEnabled(canSlice);
         sliceIndexLabel.setEnabled(canSlice);
-        sliceAutorangesCB.setEnabled(canSlice);
         sliceTypeComboBox.setEnabled(canSlice);
         transposeCheckBox.setEnabled(canSlice);
 
@@ -345,15 +355,23 @@ public class DataPanel extends javax.swing.JPanel {
 
         if (newDsf == null) {
             dataSourceFilterBindingGroup = null;
+            dataSetLabel.setText( "(no dataset)" );
             return;
         }
 
         updateSliceTypeComboBox(newDsf,true);
 
+        QDataSet ds= newDsf.getController().getFillDataSet();
+        dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
+
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.uriTextField, BeanProperty.create("text")));
+        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.fillDataSet"),this.dataSetLabel, BeanProperty.create("text"));
+        b.setConverter( BindingSupport.toStringConverter );
+        bc.addBinding(b);
+
         try {
             bc.bind();
         } catch ( RuntimeException e ) {
@@ -444,6 +462,8 @@ public class DataPanel extends javax.swing.JPanel {
         componentTextField = new javax.swing.JTextField();
         doSliceCheckBox = new javax.swing.JCheckBox();
         sliceAutorangesCB = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        dataSetLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         validRangeLabel = new javax.swing.JLabel();
         validRangeComboBox = new javax.swing.JComboBox();
@@ -453,7 +473,6 @@ public class DataPanel extends javax.swing.JPanel {
         uriTextField = new javax.swing.JTextField();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Post Processing [?]\n"));
-        jPanel2.setToolTipText("");
 
         sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "second", "last" }));
         sliceTypeComboBox.setSelectedIndex(2);
@@ -522,6 +541,12 @@ public class DataPanel extends javax.swing.JPanel {
         sliceAutorangesCB.setText("Slice Autoranges");
         sliceAutorangesCB.setToolTipText("Changing the slice index will re-autorange the data");
 
+        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()-2f));
+        jLabel1.setText("Apply additional operations to the dataset");
+
+        dataSetLabel.setFont(dataSetLabel.getFont().deriveFont(dataSetLabel.getFont().getSize()-2f));
+        dataSetLabel.setText("(dataset will go here)");
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -529,6 +554,7 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(operationsLabel)
                         .add(18, 18, 18)
@@ -545,12 +571,17 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(sliceAutorangesCB))
-                    .add(transposeCheckBox))
+                    .add(transposeCheckBox)
+                    .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(dataSetLabel)
+                .add(11, 11, 11)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(operationsLabel)
                     .add(componentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -565,11 +596,10 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(sliceAutorangesCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Source [?]"));
-        jPanel1.setToolTipText("");
 
         validRangeLabel.setText("Valid Range:");
         validRangeLabel.setToolTipText("Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill.\n");
@@ -735,9 +765,11 @@ public class DataPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField componentTextField;
+    private javax.swing.JLabel dataSetLabel;
     private javax.swing.JCheckBox doSliceCheckBox;
     private javax.swing.JComboBox fillValueComboBox;
     private javax.swing.JLabel fillValueLabel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
