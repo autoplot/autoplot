@@ -1130,6 +1130,11 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     // End of variables declaration//GEN-END:variables
 
     private void updateColumns() {
+        int n= jTable1.getColumnCount();
+        int wide= n<5 ? 210 : 170;
+        int norm= n<5 ? 100 : 70;
+        int narrow= n<5 ? 50 : 50;
+
         for (int i = 0; i < jTable1.getColumnCount(); i++) {
             String label;
             if (i < columns.size()) {
@@ -1143,9 +1148,11 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             Object o= jTable1.getValueAt(nrow-1,i);
             String s= String.valueOf(o);
             if ( s.length()>16 ) { // times
-                jTable1.getColumnModel().getColumn(i).setPreferredWidth(150);
+                jTable1.getColumnModel().getColumn(i).setPreferredWidth(wide);
             } else if ( s.length()<5 ) {
-                jTable1.getColumnModel().getColumn(i).setPreferredWidth(50);
+                jTable1.getColumnModel().getColumn(i).setPreferredWidth(narrow); 
+            } else {
+                jTable1.getColumnModel().getColumn(i).setPreferredWidth(norm);
             }
         }
         jTable1.getTableHeader().repaint();
