@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -1482,6 +1483,10 @@ public class AutoplotUtil {
 
     public static Image getAutoplotIcon() {
         return new ImageIcon(AutoplotUtil.class.getResource("logoA16x16.png")).getImage();
+    }
+
+    public static Icon cancelIcon() {
+        return new ImageIcon( AutoplotUtil.class.getResource("/com/cottagesystems/jdiskhog/resources/cancel14.png" ) );
     }
 
     private static int styleFromMessageType(int messageType) {
