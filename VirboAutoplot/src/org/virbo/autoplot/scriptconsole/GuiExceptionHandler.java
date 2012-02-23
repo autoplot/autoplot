@@ -104,6 +104,8 @@ import org.w3c.dom.ls.LSSerializer;
  * @author  jbf
  */
 public final class GuiExceptionHandler implements ExceptionHandler {
+    
+    private static final String CUSTODIAN = "faden@cottagesystems.com";
 
     //private static JDialog dialog;
     //private static JTextArea messageArea;
@@ -657,7 +659,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
         String url =
-         "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
+         "http://papc00o.org:8080/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
         form.setGuiExceptionHandler( this );
@@ -671,7 +673,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             form.getUsernameTextField().setText( (String)map.get(USER_ID) );
             form.getEmailTextField().setText( (String)map.get(EMAIL) );
 
-            String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "OK" };
+            String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Submit" };
             Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
             int option= JOptionPane.showOptionDialog( parent, form, "Submit Exception Report",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[3] )  ;
@@ -737,11 +739,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                         postMethod.releaseConnection();
                     } else {
                         postMethod.releaseConnection();
-                        JOptionPane.showMessageDialog( null, postMethod.getStatusLine() );
+                        JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+postMethod.getStatusLine()+"<br><br>Consider save to file and email to faden@cottagesystems.com" );
                     }
 
                 } catch ( IOException ex ) {
-                    JOptionPane.showMessageDialog( null, ex.toString() );
+                    JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+ex.toString()+"<br><br>Consider save to file and email to "+CUSTODIAN );
                 }
             } else if ( option==0 ) {
                 id= form.getUsernameTextField().getText().replaceAll(" ","_");
