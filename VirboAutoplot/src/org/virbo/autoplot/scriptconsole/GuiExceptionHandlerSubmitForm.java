@@ -76,7 +76,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         updateButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
 
-        jLabel1.setText("<html>Press \"OK\" to submit stack traces and log files to the server.  Optionally, add comments briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
+        jLabel1.setText("<html>Press \"Submit\" to submit stack traces and log files to the server.  Optionally, add comments briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jLabel2.setText("Preview of data that will be submitted:");
@@ -134,9 +134,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 349, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(usernameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 133, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(layout.createSequentialGroup()
-                        .add(submitDOMCB)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 355, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(submitDOMCB))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
