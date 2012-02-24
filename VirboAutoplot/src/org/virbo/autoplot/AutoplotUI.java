@@ -1181,7 +1181,7 @@ APSplash.checkTime("init 52");
     }
 
     private void initServer() {
-        String result = JOptionPane.showInputDialog(this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345);
+        String result = JOptionPane.showInputDialog(this, "Select port for server.  This port will accept Jython commands to control and receive services from the application", 12345);
         if ( result==null ) return;
         int iport = Integer.parseInt(result);
         setupServer(iport, applicationModel);
