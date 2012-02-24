@@ -602,7 +602,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( 5500, true, new Runnable() {
+                invokeLater( 2500, true, new Runnable() {
                     public void run() {
   APSplash.checkTime("addAxes1 in");
                         JComponent c= new AxisPanel(applicationModel);
@@ -622,7 +622,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( 5500, true, new Runnable() {
+                invokeLater( 2500, true, new Runnable() {
                     public void run() {
   APSplash.checkTime("addStyle1 in");
                         JComponent c= new PlotStylePanel(applicationModel);
@@ -699,7 +699,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 10100, true, new Runnable() {
+        invokeLater( 3530, true, new Runnable() {
             public void run() {
                 //long t0= System.currentTimeMillis();
 APSplash.checkTime("init 249");
@@ -712,7 +712,7 @@ APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 10150, true, new Runnable() {
+        invokeLater( 3550, true, new Runnable() {
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
 APSplash.checkTime("init 259");
@@ -725,7 +725,7 @@ APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 10200, true, new Runnable() { //TEMPORILY replace for mac.
+        invokeLater( 3570, true, new Runnable() { //TEMPORILY replace for mac.
             public void run() {
 APSplash.checkTime("init 269");
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
