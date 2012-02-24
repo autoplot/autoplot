@@ -119,7 +119,16 @@ public class EditorContextMenu {
                 }
             };
             item= new JMenuItem( a );
-            item.setToolTipText("<html>get a parameter for the script, for example, from the URI or command line depending on context<br>The first argument is the parameter name,<br>second is the default value,<br>optional third is description</html>");
+            item.setToolTipText("<html>get a parameter for the script, for example, from the URI or command line depending on context<br>The first argument is the parameter name,<br>second is the default value and type,<br>optional third is description</html>");
+            insertCodeMenu.add( item );
+
+            a= new AbstractAction("getParam() with enumeration") {
+                public void actionPerformed(ActionEvent e) {
+                    insertCode( "sc= getParam( 'sc', 'c1', 'spacecraft', ['c1','c2','c3','c4'] )\n");
+                }
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>get a parameter for the script, constraining the list of values to an enumeration.</html>");
             insertCodeMenu.add( item );
 
             JMenu fragmentsMenu= new JMenu("Code Fragments");
