@@ -361,13 +361,10 @@ public class PyQDataSet extends PyJavaInstance {
                 if ( idx<0 ) {
                     idx= rods.length()+idx;
                 }
-                if ( rods.rank()>1 ) {
-                    QDataSet sds= rods.slice(idx);
-                    //TODO: properties and context.
-                    return new PyQDataSet( sds );
-                } else {
-                    return Py.java2py(rods.value(idx));
-                }
+
+                QDataSet sds= rods.slice(idx);
+                //TODO: properties and context.
+                return new PyQDataSet( sds );
                 
             } else if (arg0.isSequenceType()) {
                 PySequence slices = (PySequence) arg0;
