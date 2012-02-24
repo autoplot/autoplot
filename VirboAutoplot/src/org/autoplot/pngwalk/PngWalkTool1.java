@@ -84,7 +84,7 @@ import org.virbo.datasource.URISplit;
 /**
  * GUI for browsing PNGWalks, or sets of PNG images.  These typically contain files named to make a time series, such as
  * product_$Y$m$d.png, but this can browse any set of images using wildcards.  This provides a number of views of the
- * images, such as a grid of thumbnails and the coverflow view which shows an image and the preceeding and succeeding images.
+ * images, such as a grid of thumbnails and the coverflow view which shows an image and the preceding and succeeding images.
  * This also contains a hook to get back into Autoplot, if product.vap (or vap named like the images) is found.
  * 
  * @author jbf

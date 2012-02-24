@@ -83,7 +83,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;Submit&quot; to submit stack traces and log files to the server.  Optionally, add comments briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you&apos;d like to be contacted.&lt;/html&gt; "/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;Submit&quot; to submit stack traces and log files to the server.  Optionally, add comments briefly describing actions preceding the event.  Your usename is automatically detected, and provide an email address if you&apos;d like to be contacted.&lt;/html&gt; "/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>
