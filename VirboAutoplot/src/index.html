@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Das2's canvas object allows for "decorating" plots with arbitrary code.  Here a <a href="http://autoplot.org/autoplot.jnlp?script:http://autoplot.org/data/script/addDecorators.jy">Jython script</a> adds decorations.</small></p>
+        <p><small>Voyager PRA data is easy read in with the BinaryDataSource and the JythonDataSource.  You can look at <a href="http://autoplot.org/data/jyds/voyagerPRA.jyds">the script</a> that creates this plot.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -53,6 +53,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>initial support for CDF TT2000 in CDF/Java reader.  Use vap+cdfj: to try this out</li>
+            <li>toTimeDataSet(yr,mn,day,hour,min,sec,nano) introduced</li>
             <li>position=&lt;int&gt; command line option added to support web sites that want to build applications using webstart single instance feature.</li>
             <li>dbAboveBackgroundDim1 and dbAboveBackgroundDim0 operations introduced for Plasma Wave Group.</li>
             <li>Reset Zoom->Reset Y (Ctrl+Shift+Y) and Reset Zoom->Reset X introduced.</li>
