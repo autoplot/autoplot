@@ -125,11 +125,34 @@ public class Test019 {
         res0= DasDevicePosition.parseFormatStr("0%");
         res0= DasDevicePosition.parseFormatStr(""); // should be same as "0%"
     }
+
+    public static void testFileSystemModel() throws Exception {
+        FileStorageModelNew fsm= FileStorageModelNew.create( FileSystem.create( "file:///home/jbf/ct/hudson/data/dat/span/omni2/" ),
+                "omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf" );
+        System.err.println( fsm );
+
+        File[] files;
+        String tr;
+
+        tr="1984";
+        System.err.println( tr );
+        files= fsm.getFilesFor( DatumRangeUtil.parseTimeRangeValid( tr ) );
+        for ( File f: files ) System.err.println(" -> "+f );
+
+        tr= "1984-03";
+        System.err.println( tr );
+        files= fsm.getFilesFor( DatumRangeUtil.parseTimeRangeValid( tr ) ); // Reiner obversed that this does not identify file.
+        for ( File f: files ) System.err.println(" -> "+f );
+
+    }
+
+    
     public static void main( String[] args ) {
         try {
             testTimeRangeFormatParse();
             testRestrictedFileSystemAccess();
             testLayout();
+            testFileSystemModel();
         } catch (Exception ex) {
             Logger.getLogger( Test019.class.getName()).log( Level.SEVERE, "error in test019", ex );
             ex.printStackTrace();
