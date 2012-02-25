@@ -36,8 +36,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
@@ -232,10 +234,15 @@ public class AutoplotDataServer {
                 System.err.println( String.format( "getDataSet('%s','%s')", suri, dr ) );
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 if ( ds1!=null ) {
-                    QDataSet range= DataSetOps.dependBounds( ds1 );
-                    System.err.println("loaded ds="+ds1 + "  bounds: "+range );
-                    System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
-
+                    if ( ds1.rank()==1 ) {
+                        QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
+                        System.err.println("loaded ds="+ds1 + "  bounds: "+xrange );
+                        System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                    } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
+                        QDataSet range= DataSetOps.dependBounds( ds1 );
+                        System.err.println("loaded ds="+ds1 + "  bounds: "+range );
+                        System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                    }
                     writeData( format, out, ds1 );
                     someValid= true;
                 }
