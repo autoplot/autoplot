@@ -428,13 +428,15 @@ public class AutoplotUtil {
         for ( PlotElement pe: pes ) {
             if ( pe.isActive()==false ) continue;
             QDataSet ds= pe.getController().getDataSet();
-            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
-            PlotElement pcopy1= (PlotElement)pe.copy();
-            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-            if ( range==null ) {
-                range= pcopy1.getPlotDefaults().getYaxis().getRange();
-            } else {
-                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getYaxis().getRange() );
+            if ( ds!=null ) {
+                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), null );
+                PlotElement pcopy1= (PlotElement)pe.copy();
+                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                if ( range==null ) {
+                    range= pcopy1.getPlotDefaults().getYaxis().getRange();
+                } else {
+                    range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getYaxis().getRange() );
+                }
             }
         }
         if ( range!=null ) axis.setRange(range);
@@ -454,13 +456,15 @@ public class AutoplotUtil {
         for ( PlotElement pe: pes ) {
             if ( pe.isActive()==false ) continue;
             QDataSet ds= pe.getController().getDataSet();
-            ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
-            PlotElement pcopy1= (PlotElement)pe.copy(); // TODO: something ain't right below...
-            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-            if ( range==null ) {
-                range= pcopy1.getPlotDefaults().getXaxis().getRange();
-            } else {
-                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getXaxis().getRange() );
+            if ( ds!=null ) {
+                ds= SemanticOps.trim( ds, null, plot.getYaxis().getRange() );
+                PlotElement pcopy1= (PlotElement)pe.copy(); // TODO: something ain't right below...
+                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                if ( range==null ) {
+                    range= pcopy1.getPlotDefaults().getXaxis().getRange();
+                } else {
+                    range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getXaxis().getRange() );
+                }
             }
         }
         if ( range!=null ) axis.setRange(range);
@@ -482,13 +486,15 @@ public class AutoplotUtil {
             if ( pe.isActive()==false ) continue;
             if ( !RenderTypeUtil.needsColorbar(pe.getRenderType()) ) continue;
             QDataSet ds= pe.getController().getDataSet();
-            ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
-            PlotElement pcopy1= (PlotElement)pe.copy(); 
-            PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
-            if ( range==null ) {
-                range= pcopy1.getPlotDefaults().getZaxis().getRange();
-            } else {
-                range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getZaxis().getRange() );
+            if ( ds!=null ) {
+                ds= SemanticOps.trim( ds, plot.getXaxis().getRange(), plot.getYaxis().getRange() );
+                PlotElement pcopy1= (PlotElement)pe.copy();
+                PlotElementController.doAutoranging(pcopy1, Collections.singletonMap( QDataSet.SCALE_TYPE, (Object)( axis.isLog() ? "log" : "linear" ) ), ds, true ); // :) cast to Object!
+                if ( range==null ) {
+                    range= pcopy1.getPlotDefaults().getZaxis().getRange();
+                } else {
+                    range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getZaxis().getRange() );
+                }
             }
         }
         if ( range!=null ) axis.setRange(range);
