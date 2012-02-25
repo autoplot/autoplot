@@ -330,6 +330,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     @Override
     public double value( int i, int j ) {
         int index= j + shape[1] * i;
+        if ( index>=data.length) {
+            throw new IllegalArgumentException("how");
+        }
         return data[ index ];
     }
     
