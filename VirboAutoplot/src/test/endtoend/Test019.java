@@ -130,7 +130,7 @@ public class Test019 {
         long t0;
         String test;
         TimeParser tp;
-        int nt= 100000; // number of invocations
+        int nt= 500000; // number of invocations
 
         test= "2012-017 00:00:00";
         t0= System.currentTimeMillis();
@@ -140,13 +140,21 @@ public class Test019 {
         }
         System.err.printf( "%d parses of %s: %d(ms)\n", nt, test, System.currentTimeMillis()-t0 );
 
+        test= "2012-01-17 00:00:00.000";
+        t0= System.currentTimeMillis();
+        tp= TimeParser.create("$Y-$m-$d $H:$M:$S.$(milli)");
+        for ( int i=0;i<nt; i++ ) {
+            tp.parse(test).getTimeRange();
+        }
+        System.err.printf( "%d parses of %s: %d ms\n", nt, test, System.currentTimeMillis()-t0 );
+
         test= "omni2_h0_mrg1hr_19840701_v01.cdf";
         t0= System.currentTimeMillis();
         tp= TimeParser.create("omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf");
         for ( int i=0;i<nt; i++ ) {
             tp.parse(test).getTimeRange();
         }
-        System.err.printf( "%d parses of %s: %d(ms)\n", nt, test, System.currentTimeMillis()-t0 );
+        System.err.printf( "%d parses of %s: %d ms\n", nt, test, System.currentTimeMillis()-t0 );
     }
     
     public static void main( String[] args ) {
