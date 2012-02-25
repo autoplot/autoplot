@@ -659,7 +659,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
         String url =
-         "http://papc00o.org:8080/RTEReceiver/LargeUpload.jsp";
+         "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
         form.setGuiExceptionHandler( this );
