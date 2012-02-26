@@ -572,7 +572,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_das2ServerComboBoxActionPerformed
 
     private void discoveryCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_discoveryCbActionPerformed
-        getDataSetsRunnable().run();
+        RequestProcessor.invokeLater( getDataSetsRunnable() );
     }//GEN-LAST:event_discoveryCbActionPerformed
 
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
@@ -617,7 +617,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public void setServerURL(String serverURL) {
         String oldServerURL = this.serverURL;
         this.serverURL = serverURL;
-        new Thread( getDataSetsRunnable() ).start();
+        RequestProcessor.invokeLater( getDataSetsRunnable() );
         firePropertyChange(PROP_SERVERURL, oldServerURL, serverURL);
     }
 
@@ -726,7 +726,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.das2ServerComboBox.setModel( new DefaultComboBoxModel(servers.toArray()) );
         this.das2ServerComboBox.setSelectedItem(split.resourceUri);
 
-        new Thread( getDataSetsRunnable() ).start();
+        RequestProcessor.invokeLater( getDataSetsRunnable() );
 
     }
 
@@ -736,13 +736,18 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 String ss= das2ServerComboBox.getSelectedItem().toString();
                 try {
                     DasServer server= DasServer.create( new URL( ss ) );
-                    TreeModel model;
+                    final TreeModel model;
                     if ( discoveryCb.isSelected() ) {
                         model= server.getDataSetListWithDiscovery();
                     } else {
                         model= server.getDataSetList();
                     }
-                    jTree1.setModel(model);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            jTree1.setModel(model);
+                        }
+                    });
+                    
                     if ( dataSetId!=null ) selectDataSetId();
                 } catch (DasException ex) {
 
