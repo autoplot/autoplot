@@ -11,9 +11,12 @@
 
 package org.das2.datasource;
 
+import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -25,7 +28,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,10 +61,13 @@ import org.das2.DasException;
 import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -77,6 +85,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
         initComponents();
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                updateDas2ServersImmediately();
+            }
+        });
     }
 
     /** This method is called from within the constructor to
@@ -363,56 +376,98 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_jTree1ValueChanged
 
-    private void viewDsdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDsdfButtonActionPerformed
-        TreePath p= jTree1.getSelectionPath();
-        TreeModel m= jTree1.getModel();
-        if ( m.isLeaf( p.getLastPathComponent() ) ) {
-            {
-                InputStream in = null;
-                try {
-                    Object[] oo = p.getPath();
-                    String ds = String.valueOf(oo[1]);
-                    for (int i = 2; i < oo.length; i++) {
-                        ds = ds + "/" + oo[i];
-                    }
-                    String surl = oo[0] + "?server=dsdf&dataset=" + ds;
-                    URL url = new URL(surl);
-                    
-                    in = url.openStream();
+    private void updateDas2ServersImmediately() {
+        List<String> d2ss= listDas2Servers();
+        Object sel= das2ServerComboBox.getSelectedItem();
+        das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
+        das2ServerComboBox.setSelectedItem(sel);
+    }
 
-                    StringBuilder sb= new StringBuilder();
+    /**
+     * add the default known servers, plus the ones we know about.
+     */
+    private List<String> listDas2Servers() {
+        List<String> d2ss= new ArrayList( );
+        d2ss.add( "http://www-pw.physics.uiowa.edu/das/das2Server" );
+        d2ss.add( "http://cassini.physics.uiowa.edu/das/das2Server" );
+        File home = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
+        File book = new File(home, "bookmarks");
+        File hist = new File(book, "history.txt");
 
-                    int by= in.read();
-                    while ( by!=-1 ) {
-                        sb.append( (char)by );
-                        by= in.read();
-                    }
-                    in.close();
+        //long t0= System.currentTimeMillis();
+        System.err.println("reading recent datasources from " + hist.toString() );
+        if ( !hist.exists() ) return d2ss;
+        try {
+            String seek="vap+das2server:";
+            int ttaglen= 25;
+            BufferedReader r = new BufferedReader(new FileReader(hist));
+            String s = r.readLine();
+            LinkedHashSet dss = new LinkedHashSet();
+            while (s != null) {
+                if ( s.length()>ttaglen && s.substring(ttaglen).startsWith(seek)) {
+                    int i= s.indexOf("?");
+                    if ( i==-1 ) i= s.length();
+                    dss.add( s.substring(ttaglen+seek.length(),i) );
+                }
+                s = r.readLine();
+            }
+            d2ss.removeAll(dss);  // remove whatever we have already
+            List<String> d2ssDiscoveryList= new ArrayList(dss);
+            Collections.reverse( d2ssDiscoveryList );
+            d2ssDiscoveryList.addAll(d2ss);
+            d2ss= d2ssDiscoveryList; // put the most recently used ones at the front of the list
+            //System.err.printf("read extra das2servers in %d millis\n",(System.currentTimeMillis()-t0) );
 
-                    String s= sb.toString();
-                    int contentLength= Integer.parseInt( s.substring(4,10) );
-                    String sxml= s.substring(10,10+contentLength);
+        } catch ( IOException ex ) {
+            JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
+        }
 
-                    Reader xin = new BufferedReader(new StringReader(sxml));
+        return d2ss;
 
-                    DocumentBuilder builder;
-                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    InputSource source = new InputSource(xin);
-                    Document document = builder.parse(source);
+    }
 
-                    XPathFactory factory= XPathFactory.newInstance();
+    private void showDsdf( URL url ) {
+      InputStream in= null ;
+        try {
+            in = url.openStream();
 
-                    XPath xpath= (XPath) factory.newXPath();
-                    NodeList o= (NodeList)xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
+            StringBuilder sb= new StringBuilder();
 
-                    String result= "";
-                    for ( int ii=0; ii<o.getLength(); ii++ ) {
-                        result+= "\n" + o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue();
-                    }
-                    in.close();
+            int by= in.read();
+            while ( by!=-1 ) {
+                sb.append( (char)by );
+                by= in.read();
+            }
+            in.close();
 
+            String s= sb.toString();
+            int contentLength= Integer.parseInt( s.substring(4,10) );
+            String sxml= s.substring(10,10+contentLength);
+
+            Reader xin = new BufferedReader(new StringReader(sxml));
+
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource source = new InputSource(xin);
+            Document document = builder.parse(source);
+
+            XPathFactory factory= XPathFactory.newInstance();
+
+            XPath xpath= (XPath) factory.newXPath();
+            NodeList o= (NodeList)xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
+
+            String result= "";
+            for ( int ii=0; ii<o.getLength(); ii++ ) {
+                result+= "\n" + o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue();
+            }
+            in.close();
+
+            final String fresult= result;
+
+            Runnable run= new Runnable() {
+                public void run() {
                     JTextArea area= new JTextArea();
-                    area.setText(result);
+                    area.setText(fresult);
                     area.setEditable(false);
                     final JPopupMenu copyMenu= new JPopupMenu();
                     copyMenu.add( new DefaultEditorKit.CopyAction() ).setText("Copy");
@@ -428,23 +483,55 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     });
                     JScrollPane sp= new JScrollPane( area,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
                     sp.setPreferredSize(new java.awt.Dimension( 480,480));
-                    JOptionPane.showMessageDialog( this, sp );
-                    
+                    JOptionPane.showMessageDialog( Das2ServerDataSourceEditorPanel.this, sp );
 
-                } catch (XPathExpressionException ex) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SAXException ex) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParserConfigurationException ex) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            };
+            SwingUtilities.invokeLater(run);
+
+
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+    private void viewDsdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDsdfButtonActionPerformed
+        TreePath p= jTree1.getSelectionPath();
+        TreeModel m= jTree1.getModel();
+        if ( m.isLeaf( p.getLastPathComponent() ) ) {
+            {
+                try {
+                    Object[] oo = p.getPath();
+                    String ds = String.valueOf(oo[1]);
+                    for (int i = 2; i < oo.length; i++) {
+                        ds = ds + "/" + oo[i];
                     }
+                    String surl = oo[0] + "?server=dsdf&dataset=" + ds;
+
+                    final URL url = new URL(surl);
+
+                    RequestProcessor.invokeLater( new Runnable() {
+                        public void run() {
+                            showDsdf(url);
+                        }
+                    } );
+                    
+                } catch ( MalformedURLException ex ) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showConfirmDialog( this, "Internal Error: "+ex.toString() ); // give a message
                 }
             }
         }
