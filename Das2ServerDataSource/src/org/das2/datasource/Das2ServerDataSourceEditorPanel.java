@@ -11,7 +11,6 @@
 
 package org.das2.datasource;
 
-import java.awt.HeadlessException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -67,7 +66,6 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -713,12 +711,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( item!=null ) {
             tcaItem.setText(item);
         }
-        StringBuffer paramsStr= new StringBuffer();
+        StringBuilder paramsStr= new StringBuilder();
         for ( Entry<String,String> e: params.entrySet() ) {
             if ( e.getKey().startsWith("arg_") ) {
-                paramsStr.append(e.getValue()+"\n");
+                paramsStr.append(e.getValue()).append("\n");
             } else {
-                paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
+                paramsStr.append(e.getKey()).append("=").append(e.getValue()).append("\n");
             }
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
