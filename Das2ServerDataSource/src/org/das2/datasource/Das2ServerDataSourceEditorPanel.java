@@ -88,7 +88,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox();
+        das2ServerComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
@@ -109,11 +109,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel7 = new javax.swing.JLabel();
         descriptionLabel = new javax.swing.JLabel();
 
-        jComboBox1.setEditable(true);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        das2ServerComboBox.setEditable(true);
+        das2ServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
+        das2ServerComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                das2ServerComboBoxActionPerformed(evt);
             }
         });
 
@@ -189,16 +189,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
-                            .add(jComboBox1, 0, 412, Short.MAX_VALUE)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+                            .add(das2ServerComboBox, 0, 416, Short.MAX_VALUE)
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 177, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 179, Short.MAX_VALUE)
                                 .add(discoveryCb))))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
@@ -214,14 +214,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel4))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(33, 33, 33)
-                        .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+                        .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(examplesComboBox, 0, 145, Short.MAX_VALUE))
+                        .add(examplesComboBox, 0, 147, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(jLabel7)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
+                        .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(jLabel3)
@@ -237,7 +237,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(das2ServerComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(5, 5, 5)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
@@ -450,9 +450,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        setServerURL( String.valueOf( jComboBox1.getSelectedItem() ) );
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    private void das2ServerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_das2ServerComboBoxActionPerformed
+        setServerURL( String.valueOf( das2ServerComboBox.getSelectedItem() ) );
+    }//GEN-LAST:event_das2ServerComboBoxActionPerformed
 
     private void discoveryCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_discoveryCbActionPerformed
         getDataSetsRunnable().run();
@@ -468,10 +468,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextArea ReaderParamsTextArea;
+    public javax.swing.JComboBox das2ServerComboBox;
     public javax.swing.JLabel descriptionLabel;
     public javax.swing.JCheckBox discoveryCb;
     public javax.swing.JComboBox examplesComboBox;
-    public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
@@ -606,8 +606,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
 
-        this.jComboBox1.setModel( new DefaultComboBoxModel(servers.toArray()) );
-        this.jComboBox1.setSelectedItem(split.resourceUri);
+        this.das2ServerComboBox.setModel( new DefaultComboBoxModel(servers.toArray()) );
+        this.das2ServerComboBox.setSelectedItem(split.resourceUri);
 
         new Thread( getDataSetsRunnable() ).start();
 
@@ -616,7 +616,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     Runnable getDataSetsRunnable() {
         Runnable run= new Runnable() {
             public void run() {
-                String ss= jComboBox1.getSelectedItem().toString();
+                String ss= das2ServerComboBox.getSelectedItem().toString();
                 try {
                     DasServer server= DasServer.create( new URL( ss ) );
                     TreeModel model;
