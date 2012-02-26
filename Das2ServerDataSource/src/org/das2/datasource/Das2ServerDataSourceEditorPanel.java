@@ -300,8 +300,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
             in.close();
             String s = sb.toString();
-            int contentLength = Integer.parseInt(s.substring(4, 10));
-            String sxml = s.substring(10, 10 + contentLength);
+            final int packetTagLength=10;
+
+            int contentLength = Integer.parseInt(s.substring(4, packetTagLength )); // "[00]000192<stream > <properties validRange="1999-228 to 2010-359" server="http://planet.physics.uiowa.edu/das-test/das2Server" das2Stream="0" qstream="1" exampleRange="2010-001 to 2010-002" /> </stream>"
+            String sxml = s.substring( packetTagLength, packetTagLength + contentLength);
             Reader xin = new BufferedReader(new StringReader(sxml));
             DocumentBuilder builder;
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
