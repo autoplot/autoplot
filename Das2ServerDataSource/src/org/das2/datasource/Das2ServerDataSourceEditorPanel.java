@@ -148,6 +148,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel3.setText("Time Range:");
 
         jLabel4.setText("Reader Parameters:");
+        jLabel4.setToolTipText("Special parameters for the reader that implements the data source.  ");
 
         ReaderParamsTextArea.setColumns(20);
         ReaderParamsTextArea.setRows(5);
@@ -182,7 +183,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Examples", " " }));
+        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Example Time Ranges", "" }));
         examplesComboBox.setToolTipText("Example times specified in the data set descriptor file");
         examplesComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -191,6 +192,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         });
 
         jLabel7.setText("Description:");
+        jLabel7.setToolTipText("Description provided by the server (in its dsdf file)");
 
         descriptionLabel.setText(" ");
 
