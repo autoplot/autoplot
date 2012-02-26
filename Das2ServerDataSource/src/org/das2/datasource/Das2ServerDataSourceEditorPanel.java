@@ -389,7 +389,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
             String surl = oo[0] + "?server=dsdf&dataset=" + ds;
             try {
-                InputStream in = null;
                 final URL url = new URL(surl);
                 RequestProcessor.invokeLater( new Runnable() {
                     public void run() {
