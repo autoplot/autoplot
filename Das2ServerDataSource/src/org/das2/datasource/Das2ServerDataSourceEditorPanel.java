@@ -79,6 +79,10 @@ import org.xml.sax.SAXException;
  */
 public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    //DANGER: NB gui code doesn't use this...
+    private static final String EXAMPLE_TIME_RANGES = "Example Time Ranges";
+
+
     private String DEFAULT_TIMERANGE="2001-01-01";
 
     /** Creates new form Das2ServerDataSourceEditorPanel */
@@ -579,7 +583,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
         String item= (String) examplesComboBox.getSelectedItem();
-        if ( !item.equals("Examples") ) {
+        if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
             timeRangeTextField.setText(item);
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
