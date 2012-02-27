@@ -45,6 +45,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -407,7 +408,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         List<String> d2ss= listDas2Servers();
         Object sel= das2ServerComboBox.getSelectedItem();
         das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
-        das2ServerComboBox.setSelectedItem(sel);
+        das2ServerComboBox.setSelectedItem(serverURL);
     }
 
     /**
@@ -565,10 +566,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
     private void das2ServerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_das2ServerComboBoxActionPerformed
-        setServerURL( String.valueOf( das2ServerComboBox.getSelectedItem() ) );
+        Object o= das2ServerComboBox.getSelectedItem();
+        if ( o!=null ) {
+            setServerURL( String.valueOf( o ) );
+        }
     }//GEN-LAST:event_das2ServerComboBoxActionPerformed
 
     private void discoveryCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_discoveryCbActionPerformed
+        jTree1.setModel( waitTreeModel() );
         RequestProcessor.invokeLater( getDataSetsRunnable() );
     }//GEN-LAST:event_discoveryCbActionPerformed
 
@@ -614,7 +619,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public void setServerURL(String serverURL) {
         String oldServerURL = this.serverURL;
         this.serverURL = serverURL;
-        RequestProcessor.invokeLater( getDataSetsRunnable() );
+        if ( !this.serverURL.equals(oldServerURL) ) {
+            timeRangeTextField.setText("");
+            descriptionLabel.setText("");
+            jTree1.setModel( waitTreeModel() );
+            RequestProcessor.invokeLater( getDataSetsRunnable() );
+        }
         firePropertyChange(PROP_SERVERURL, oldServerURL, serverURL);
     }
 
@@ -723,14 +733,22 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.das2ServerComboBox.setModel( new DefaultComboBoxModel(servers.toArray()) );
         this.das2ServerComboBox.setSelectedItem(split.resourceUri);
 
+        jTree1.setModel( waitTreeModel() );
         RequestProcessor.invokeLater( getDataSetsRunnable() );
 
+    }
+
+    TreeModel waitTreeModel() {
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("updating, please wait..." );
+        return new javax.swing.tree.DefaultTreeModel(treeNode1);
     }
 
     Runnable getDataSetsRunnable() {
         Runnable run= new Runnable() {
             public void run() {
-                String ss= das2ServerComboBox.getSelectedItem().toString();
+
+                String ss= serverURL;
+
                 try {
                     DasServer server= DasServer.create( new URL( ss ) );
                     final TreeModel model;
@@ -791,16 +809,26 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     public String getURI() {
+
+        TreePath tp=  jTree1.getSelectionPath();
+        if ( tp==null ) {
+            return "vap+das2server:"+serverURL + "?" ;
+        }
+
+        Object[] tp0= tp.getPath();
+
         DatumRange timeRange=null;
         try {
             timeRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        TreePath tp=  jTree1.getSelectionPath();
-        Object[] tp0= tp.getPath();
-        String dataSetId= (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject();
-        for ( int i=2; i<tp0.length; i++ ) dataSetId += "/"+ (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject();
+        
+        String dataSetId="";
+        if ( tp0.length>1 ) {
+            dataSetId= (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject();
+            for ( int i=2; i<tp0.length; i++ ) dataSetId += "/"+ (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject();
+        }
 
         LinkedHashMap<String,String> map= new LinkedHashMap();
         String readerParams= ReaderParamsTextArea.getText();
