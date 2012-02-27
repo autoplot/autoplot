@@ -142,7 +142,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel2.setText("Data Set Id:");
 
-        timeRangeTextField.setText("2000-01-01");
+        timeRangeTextField.setText(DEFAULT_TIMERANGE);
 
         jLabel3.setText("Time Range:");
 
@@ -165,6 +165,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         tcaItem.setToolTipText("The optional item number for TCAs.");
 
         viewDsdfButton.setText("View DSDF");
+        viewDsdfButton.setToolTipText("View the DSDF configuration file on the server");
         viewDsdfButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 viewDsdfButtonActionPerformed(evt);
@@ -175,7 +176,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
 
         discoveryCb.setText("require example time");
-        discoveryCb.setToolTipText("Show only datasets that have identified example times.");
+        discoveryCb.setToolTipText("Show only datasets that have identified example times.  These should be a higher quality, and can be tested by a machine.");
         discoveryCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 discoveryCbActionPerformed(evt);
@@ -212,7 +213,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 179, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 181, Short.MAX_VALUE)
                                 .add(discoveryCb))))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
@@ -240,7 +241,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .addContainerGap()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(viewDsdfButton)))
                 .addContainerGap())
@@ -406,7 +407,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void updateDas2ServersImmediately() {
         List<String> d2ss= listDas2Servers();
-        Object sel= das2ServerComboBox.getSelectedItem();
         das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
         das2ServerComboBox.setSelectedItem(serverURL);
     }
@@ -620,7 +620,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String oldServerURL = this.serverURL;
         this.serverURL = serverURL;
         if ( !this.serverURL.equals(oldServerURL) ) {
-            timeRangeTextField.setText("");
+            timeRangeTextField.setText( DEFAULT_TIMERANGE );
             descriptionLabel.setText("");
             jTree1.setModel( waitTreeModel() );
             RequestProcessor.invokeLater( getDataSetsRunnable() );
