@@ -100,8 +100,9 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
     public boolean reject(String surl, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
-        Map params= URISplit.parseParams(split.params);
-        return !( params.containsKey("start_time") && params.containsKey("end_time") && params.containsKey("dataset") );
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String ds= params.get("dataset");
+        return !( params.containsKey("start_time") && params.containsKey("end_time") && ds!=null && ds.length()>0 );
     }
 
     public <T> T getCapability(Class<T> clazz) {
