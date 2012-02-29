@@ -141,7 +141,11 @@ public class CefDataSource extends AbstractDataSource {
 
         double ceffill;
         if (!param.entries.get("VALUE_TYPE").equals("ISO_TIME")) {
-            ceffill = (sceffill != null) ? Double.parseDouble(sceffill) : fill;
+            try { // C1_CP_WHI_ACTIVE had "?" for fill.
+                ceffill = (sceffill != null) ? Double.parseDouble(sceffill) : fill;
+            } catch ( NumberFormatException ex ) {
+                ceffill= fill;
+            }
         } else {
             ceffill = fill;
         }
