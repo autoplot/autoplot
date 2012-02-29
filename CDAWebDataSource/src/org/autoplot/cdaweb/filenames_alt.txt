@@ -124,7 +124,6 @@ VOYAGER2_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/voyager/v
 #FILE NOT FOUND: 2011-01-26
 UY_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/coho1hr_magplasma %Y/uy_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 FILE NOT FOUND: 2009-09-30
-#UY_1MIN_VHM ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/vhm_1min %Y/uy_1min_vhm_%Y%m%d_?%v.cdf  # these are 10-day files...
 #FILE NOT FOUND: 2009-06-30
 WI_H1_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_h1 %Y/wi_h1_swe_%Y%m01_?%v.cdf  # sort of
 #FILE NOT FOUND: 2004-11-15
@@ -132,4 +131,5 @@ WI_H1_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_h1 %Y/wi_h1_swe_%Y%m01_?%
 #FILE NOT FOUND: 2001-07-10
 #ok WI_M2_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_m2 %Y/wi_m2_swe_%Y%m%d_?%v.cdf
 #FILE NOT FOUND: 2001-07-10
-
+CRRES_H0_MEA ftp://cdaweb.gsfc.nasa.gov/pub/istp/crres/mea %Y/crres_h0_mea_%Y%m%(d,span=10)_?%v.cdf
+UY_1MIN_VHM ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/vhm_1min %Y/uy_1min_vhm_%Y%m%(d,span=10)_?%v.cdf  # these are 10-day files...
