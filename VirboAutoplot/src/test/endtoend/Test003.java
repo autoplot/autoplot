@@ -54,6 +54,15 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap" );
             ScriptContext.writeToPng( "test003_006.png" );
 
+            //ScriptContext.reset();
+
+            //ScriptContext.load( "http://sarahandjeremy.net/~jbf/autoplot/data/gz/test_rank1.qds" ); // the .gz version of this file exists.  Autoplot should find and use it.
+            //ScriptContext.writeToPng( "test003_007.png" );
+            
+            ScriptContext.reset();
+            ScriptContext.load( "http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/mea/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15" );
+            ScriptContext.writeToPng( "test003_008.png" );
+
             if ( headless ) System.exit(0);
             
         } catch ( Exception ex ) {
