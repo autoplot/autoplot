@@ -49,7 +49,7 @@ done
 
 # use hacked version of cdf library
 rm -rf gsfc/
-jar xf ../../APLibs/lib/cdfjava-hack.jar
+jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
    echo jar xf $i
