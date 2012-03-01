@@ -27,6 +27,11 @@ if [ "" = "$STOREPASS" ]; then
     STOREPASS=dolphin
 fi
 
+if [ "" = "$ALIAS" ]; then
+    echo "ALIAS NEEDED!"
+    KEYPASS=virbo
+fi
+
 if [ "" = "$CODEBASE" ]; then
     CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
 fi
