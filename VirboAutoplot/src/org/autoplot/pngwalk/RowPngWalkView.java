@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JComponent;
@@ -27,8 +26,6 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 
 /**
  *
@@ -49,7 +46,8 @@ public class RowPngWalkView extends PngWalkView {
         setLayout(new java.awt.BorderLayout());
         canvas = new Canvas();
         scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
+        scrollPane.addMouseWheelListener( getMouseWheelListener() );
+        
         canvas.addMouseListener(new MouseAdapter() {
 
             @Override

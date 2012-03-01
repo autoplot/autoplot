@@ -13,8 +13,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +31,7 @@ public class ContextFlowView extends PngWalkView {
     public ContextFlowView( WalkImageSequence s ) {
         super(s);
         sequenceChanged();
-        addMouseWheelListener(new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
-            }
-        });
+        addMouseWheelListener( getMouseWheelListener() );
 
         addMouseListener(new MouseAdapter() {
 
@@ -55,7 +49,7 @@ public class ContextFlowView extends PngWalkView {
     }
 
     @Override
-    protected void sequenceChanged() {
+    protected final void sequenceChanged() {
         if ( seq==null ) {
             imageBounds= null;
         } else {

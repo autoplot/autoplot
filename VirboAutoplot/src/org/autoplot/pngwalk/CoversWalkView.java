@@ -46,9 +46,10 @@ public class CoversWalkView extends PngWalkView  {
         super(sequence);
         setLayout(new java.awt.BorderLayout());
         canvas= new Canvas();
-        
-        scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
+        scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.addMouseWheelListener( getMouseWheelListener() );
+        
         canvas.addMouseListener(new MouseAdapter() {
 
             @Override

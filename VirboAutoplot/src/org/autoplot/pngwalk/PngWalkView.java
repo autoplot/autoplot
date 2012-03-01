@@ -5,6 +5,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -133,6 +135,18 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
      */
     public JComponent getMouseTarget() {
         return this;
+    }
+
+   /**
+     * return the mouse wheel listener, which should be added to each panel so the sequence position is easily adjusted.
+     * @return
+     */
+    public MouseWheelListener getMouseWheelListener() {
+        return new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
+            }
+        };
     }
 
     // Error message painting (e.g. "No matching images")

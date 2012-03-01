@@ -53,6 +53,7 @@ public class GridPngWalkView extends PngWalkView {
         setLayout(new java.awt.BorderLayout());
         canvas = new GridViewCanvas();
         scrollPane = new JScrollPane(canvas);
+        scrollPane.addMouseWheelListener( getMouseWheelListener() );
         canvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
