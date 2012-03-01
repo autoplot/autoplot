@@ -43,15 +43,14 @@
         <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20111115.jar" /> -->
         <jar href="AutoplotStable.jar" />
         
-        <!-- cdf -->
-        <jar href="http://autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" > -->
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.0.jnlp" > -->
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" > -->
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1.jnlp" > -->
-           <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.2.jnlp" >
+        <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.2.jnlp" > -->
+           <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.3.2/cdf-3.3.2.jnlp" >
         </extension>
         
     </resources> 
