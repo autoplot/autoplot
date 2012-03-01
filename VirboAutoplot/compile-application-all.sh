@@ -43,9 +43,10 @@ for i in ../../APLibs/lib/*.jar; do
    jar xf $i
 done
 
-# use hacked version of cdf library
+# use beta version of cdf library that supports tt2000.
+echo "using tt2000 support"
 rm -rf gsfc/
-jar xf ../../APLibs/lib/cdfjava-hack.jar
+jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
    echo jar xf $i
