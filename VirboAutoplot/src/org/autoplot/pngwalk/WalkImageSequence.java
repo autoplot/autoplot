@@ -96,23 +96,29 @@ public class WalkImageSequence implements PropertyChangeListener  {
             }
         }
 
-        int splitIndex= WalkUtil.splitIndex( template );
+        if ( template.equals("file:///") ) {
+            haveThumbs400= false;
 
-        URI fsRoot;
-        fsRoot = DataSetURI.getResourceURI( template.substring(0,splitIndex) );
+        } else {
 
-        try {
-            FileSystem fs= FileSystem.create( fsRoot );
-            if ( fs.getFileObject("/thumbs400/").exists() ) {
-                String[] result= fs.listDirectory("/thumbs400/");
-                if ( result.length<2 ) {
-                    haveThumbs400= false; //TODO: kludge, I expected IOException when dir doesn't exist.
+            int splitIndex= WalkUtil.splitIndex( template );
+
+            URI fsRoot;
+            fsRoot = DataSetURI.getResourceURI( template.substring(0,splitIndex) );
+
+            try {
+                FileSystem fs= FileSystem.create( fsRoot );
+                if ( fs.getFileObject("/thumbs400/").exists() ) {
+                    String[] result= fs.listDirectory("/thumbs400/");
+                    if ( result.length<2 ) {
+                        haveThumbs400= false; //TODO: kludge, I expected IOException when dir doesn't exist.
+                    }
+                } else {
+                    haveThumbs400= false;
                 }
-            } else {
+            } catch ( IOException ex ) {
                 haveThumbs400= false;
             }
-        } catch ( IOException ex ) {
-            haveThumbs400= false;
         }
 
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
