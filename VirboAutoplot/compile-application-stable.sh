@@ -17,6 +17,24 @@ if [ "" = "$JAVA6_HOME" ]; then
     JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
 fi
 
+if [ "" = "$KEYPASS" ]; then
+    echo "KEYPASS NEEDED!"
+    KEYPASS=virbo1
+fi
+
+if [ "" = "$STOREPASS" ]; then
+    echo "STOREPASS NEEDED!"
+    STOREPASS=dolphin
+fi
+
+if [ "" = "$CODEBASE" ]; then
+    CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
+fi
+
+if [ "" = "$HUDSON_URL" ]; then
+    HUDSON_URL="http://papco.org:8080/hudson"
+fi
+
 rm -r -f temp-src/
 mkdir temp-src/
 rm -r -f temp-classes/
@@ -90,11 +108,11 @@ echo "done make jumbo jar file..."
 echo "normalize jar file for signing..."
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 echo "sign the jar files..."
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar $ALIAS
+$JAVA5_HOME/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
 echo "repeat normalize/sign (workaround for known bug with large files...)"
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
-if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar $ALIAS; then
+if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources!"
    exit 1
 fi
