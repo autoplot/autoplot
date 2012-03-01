@@ -449,6 +449,10 @@ public class CdfUtil {
         } else if (varType == Variable.CDF_EPOCH16) {
             throw new UnsupportedOperationException("single Epoch16 not supported, send us the file");
 
+        } else if (varType == Variable.CDF_TIME_TT2000 ) {
+            result= LDataSet.wrap( new long[] { (Long) o } );
+            result.putProperty(QDataSet.UNITS, Units.cdfTT2000 );
+
         } else if (o instanceof Number) {
             result = DDataSet.wrap(new double[]{((Number) o).doubleValue()});
         } else if (varType == Variable.CDF_CHAR || varType==Variable.CDF_UCHAR) {
@@ -641,6 +645,11 @@ public class CdfUtil {
             result = DDataSet.wrap(dresult, qube);
             result.putProperty(QDataSet.UNITS, Units.us2000);
 
+        } else if (varType == Variable.CDF_TIME_TT2000 ) {
+            long[] data = (long[]) odata;
+            result = LDataSet.wrap( data, qube);
+            result.putProperty(QDataSet.UNITS, Units.cdfTT2000 );
+
         } else {
 
             throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
@@ -779,6 +788,10 @@ public class CdfUtil {
                 }
                 result = DDataSet.wrap(dresult);
                 result.putProperty(QDataSet.UNITS, Units.us2000);
+
+            } else if (varType == CDFConstants.CDF_TIME_TT2000 ) {
+                result = LDataSet.wrap((long[]) odata);
+                result.putProperty(QDataSet.UNITS, Units.cdfTT2000 );
 
             } else {
 
