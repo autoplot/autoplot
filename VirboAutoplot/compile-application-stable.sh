@@ -29,7 +29,7 @@ fi
 
 if [ "" = "$ALIAS" ]; then
     echo "ALIAS NEEDED!"
-    KEYPASS=virbo
+    ALIAS=virbo
 fi
 
 if [ "" = "$CODEBASE" ]; then
