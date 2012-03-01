@@ -74,6 +74,8 @@ public class Test002 {
             "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
             "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
             "021 file:///home/jbf/ct/hudson/vap/auto4.vap",
+            "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
+
         };
 
 
