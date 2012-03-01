@@ -638,6 +638,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             if (ENABLE_QUALITY_CONTROL) seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
         }
 
+        if ( template.length()==0 ) {
+            setStatus("Enter the location of a pngwalk file by providing a template for the files, such as /tmp/$Y$m$d.png");
+            return;
+        }
+        
         Runnable run= new Runnable() {
             public void run() {
                 try {

@@ -15,6 +15,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -46,6 +47,10 @@ public class RowPngWalkView extends PngWalkView {
         setLayout(new java.awt.BorderLayout());
         canvas = new Canvas();
         scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        MouseWheelListener[] ll= scrollPane.getMouseWheelListeners();
+        for ( MouseWheelListener l : ll ) scrollPane.removeMouseWheelListener( l );
+
         scrollPane.addMouseWheelListener( getMouseWheelListener() );
         
         canvas.addMouseListener(new MouseAdapter() {

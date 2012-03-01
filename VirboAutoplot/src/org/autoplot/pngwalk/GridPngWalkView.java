@@ -16,6 +16,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -53,6 +54,10 @@ public class GridPngWalkView extends PngWalkView {
         setLayout(new java.awt.BorderLayout());
         canvas = new GridViewCanvas();
         scrollPane = new JScrollPane(canvas);
+
+        MouseWheelListener[] ll= scrollPane.getMouseWheelListeners();
+        for ( MouseWheelListener l : ll ) scrollPane.removeMouseWheelListener( l );
+
         scrollPane.addMouseWheelListener( getMouseWheelListener() );
         canvas.addMouseListener(new MouseAdapter() {
             @Override
