@@ -26,44 +26,11 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- *
+ * Create a CDAWebDataSource.  The source contains knowledge of the CDAWeb database, knowing
+ * how the files are stored, aggregation templates, and metadata describing the dataset.
  * @author jbf
  */
 public class CDAWebDataSourceFactory implements DataSourceFactory {
-
-//    static {
-//        loadCdfLibraries();
-//    }
-//
-//    /** copied from CdfFileDataSourceFactory **/
-//
-//    private static void loadCdfLibraries() {
-//        String cdfLib1 = System.getProperty("cdfLib1");
-//        String cdfLib2 = System.getProperty("cdfLib2");
-//
-//        if ( cdfLib1==null && cdfLib2==null ) {
-//            System.err.println("System properties for cdfLib not set, setting up for debugging");
-//            String os= System.getProperty("os.name");
-//            if ( os.startsWith("Windows") ) {
-//                cdfLib1= "dllcdf";
-//                cdfLib2= "cdfNativeLibrary";
-//            } else {
-//                System.err.println("no values set identifying cdf libraries, hope you're on a mac or linux!");
-//                System.err.println( System.getProperty("java.library.path" ));
-//                cdfLib2= "cdfNativeLibrary";
-//            }
-//        }
-//
-//        try {
-//            // TODO: on Linux systems, may not be able to execute from plug-in media.
-//            if (cdfLib1 != null) System.loadLibrary(cdfLib1);
-//            if (cdfLib2 != null) System.loadLibrary(cdfLib2);
-//        } catch ( UnsatisfiedLinkError ex ) {
-//            ex.printStackTrace();
-//            System.err.println( System.getProperty("java.library.path" ));
-//            throw ex;
-//        }
-//    }
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new CDAWebDataSource(uri);
