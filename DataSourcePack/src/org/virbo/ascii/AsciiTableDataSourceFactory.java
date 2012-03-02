@@ -79,6 +79,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "parse records by splitting on delimiter."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "tail=",
                     "read the last n records."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "eventListColumn=",
+                    "read in the file as an event list, where the first two columns are UT times"));
 
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
@@ -99,6 +101,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "all columns"));
                 return result;
             } else if (paramName.equals("bundle")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
@@ -145,6 +148,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
             } else if (paramName.equals("tail")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
+            } else if (paramName.equals("eventListColumn")) {
+                List<CompletionContext> result = getFieldNames(cc, mon);
+                if ( result.size()>2 ) result.subList( 2, result.size() );
+                return result;
             } else {
                 return Collections.emptyList();
             }
