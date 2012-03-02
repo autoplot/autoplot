@@ -835,6 +835,14 @@ public class CdfUtil {
                     desc += ")";
                 }
 
+                Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
+                if ( att!=null ) {
+                    if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
+                        desc += " (Virtual)";
+                    }
+                }
+
+
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
