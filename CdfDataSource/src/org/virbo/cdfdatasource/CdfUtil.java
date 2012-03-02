@@ -1174,6 +1174,12 @@ public class CdfUtil {
                     }
                     desc += ")";
                 }
+                if ( hasEntry( virtual, var ) ) {
+                    if ( "true".equalsIgnoreCase( String.valueOf( virtual.getEntry(var).getData() ) ) ) {
+                        desc += " (Virtual)";
+                    }
+                }
+
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
