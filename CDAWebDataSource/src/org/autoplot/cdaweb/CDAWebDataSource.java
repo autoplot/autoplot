@@ -93,13 +93,19 @@ public class CDAWebDataSource extends AbstractDataSource {
 
         CDAWebDB db= CDAWebDB.getInstance();
 
+        {
+            // get a file via http so we get a filesystem offline if we are at a hotel.
+            // Note the file is small, and if the file is already downloaded, this will only result in a head request.
+            DataSetURI.getFile( "http://cdaweb.gsfc.nasa.gov/istp_public/data/OLD_MASTERS/a1_k0_mpa_00000000_v01.cdf", false, new NullProgressMonitor() );
+        }
+
         mon.started();
 
         MutablePropertyDataSet result= null;
         ArrayDataSet accum = null;
 
         try {
-            
+
             try {
                 db.maybeRefresh( mon );
             } catch ( IOException ex ) {
@@ -126,7 +132,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
-            mon.setTaskSize(files.length*10);
+            mon.setTaskSize(files.length*10+10);
             mon.started();
 
             //we need to look in the file to see if it is virtual
