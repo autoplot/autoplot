@@ -817,6 +817,7 @@ public class CdfUtil {
     }
 
     public static boolean hasEntry( Attribute bAttr, Variable var ) {
+        if ( bAttr==null ) return false;
         try {
             bAttr.getEntry(var);
             return true;
