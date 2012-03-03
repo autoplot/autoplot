@@ -1,0 +1,46 @@
+# demo custom renderer.  This takes a ds[n,4] and plots dots
+# with each record: [x,y,rad,color]
+
+from org.virbo.dataset import SemanticOps
+from java.lang import IllegalArgumentException
+
+cb= dom.plots[0].zaxis.controller.getDasAxis()
+
+class MyPCL( java.beans.PropertyChangeListener ):
+   def propertyChange(self,e):
+      dom.plots[0].controller.dasPlot.repaint()
+
+cb.addPropertyChangeListener( MyPCL() )  #TODO: there's a jython way to do this
+
+class MyRend( org.das2.graph.Renderer ):
+  def render( self, g, xAxis, yAxis, mon ):
+     ds= self.getDataSet()
+     if ( ds.rank()!=2 or ds.length(0)!=4 ):
+        self.getParent().postException( self, IllegalArgumentException( "dataset is not ds[n,4]" ) )
+        return
+     xds= ds[:,0]
+     yds= ds[:,1]
+     rds= ds[:,2]/2
+     cds= ds[:,3]
+
+     xu= SemanticOps.getUnits( xds )
+     yu= SemanticOps.getUnits( yds )
+     cu= SemanticOps.getUnits( cds )
+     ru= SemanticOps.getUnits( rds )
+
+     for i in xrange( yds.length() ):
+        x= xAxis.transform( xds.value(i), xu )
+        y= yAxis.transform( yds.value(i), yu )        
+        g.setColor( Color( cb.rgbTransform( cds.value(i), cu ) ) )
+        x2= xAxis.transform( xds.value(i)+rds.value(i), xu ) - x
+        g.fillOval( int(x-x2/2),int(y-x2/2),int(x2/2),int(x2/2) )
+
+dom.plots[0].controller.dasPlot.removeRenderers()
+
+ds= randn( 1000,4 )
+
+r= MyRend()
+r.setDataSet(ds)
+
+dom.plots[0].controller.dasPlot.addRenderer( r )
+
