@@ -37,6 +37,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.ArrayDataSet;
@@ -170,7 +171,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         String eventListColumn= getParam( "eventListColumn", null );
         if ( eventListColumn!=null ) {
             dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
-            dep0.putProperty( QDataSet.UNITS, Units.us2000 );
+            if ( parser.getUnits(0)!=parser.getUnits(1) ) {
+                throw new IllegalArgumentException("first two columns should have the same units");
+            }
+            dep0.putProperty( QDataSet.UNITS, parser.getUnits(0) );
             dep0.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
             column= eventListColumn;
         }
@@ -328,6 +332,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             if (dep0 != null) {
                 vds.putProperty(QDataSet.DEPEND_0, dep0);
+            }
+            if ( eventListColumn!=null ) {
+                vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
             return vds;
         }
@@ -660,6 +667,18 @@ public class AsciiTableDataSource extends AbstractDataSource {
                         }
                     }
                 }
+                // check to see if first two columns look like times, and go ahead and handle these automatically
+                for ( int icol= 0; icol<fields.length && icol<2; icol++ ) {
+                    String field = fields[icol];
+                    try {
+                        if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
+                            TimeUtil.parseTime(field);
+                            parser.setUnits(icol, Units.us2000);
+                            parser.setFieldParser(icol, parser.UNITS_PARSER);
+                        }
+                    } catch (ParseException ex) {
+                    }
+                }
             }
         }
 
@@ -677,10 +696,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
         // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
         o= params.get("eventListColumn");
         if ( o!=null ) {
-            parser.setUnits(0,Units.us2000);
             parser.setFieldParser(0, parser.UNITS_PARSER);
-            parser.setUnits(1,Units.us2000);
             parser.setFieldParser(1, parser.UNITS_PARSER);
+            int icol = parser.getFieldIndex(o);
+            EnumerationUnits eu= EnumerationUnits.create("events");
+            parser.setUnits(icol,eu);
+            parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
         }
 
         // --- done configuration, now read ---
