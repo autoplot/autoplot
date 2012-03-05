@@ -270,7 +270,7 @@ public class AutoplotDataServer {
 
         if ( !someValid ) {
              if ( format.equals("d2s") ) {
-                 System.out.printf("[00]%6.6i<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
+                 System.out.printf("[00]%06d<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
              }
         }
 
