@@ -8,6 +8,7 @@ package ftpfs.ftp;
 import java.io.InterruptedIOException;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Proxy;
 import java.net.Socket;
 
 // The SocketOpener class opens sockets with timeout.  JDK 1.1 does not
@@ -63,6 +64,18 @@ public class SocketOpener
     };
   }
 
+
+  // Constructor.  This SocketOpener will use Socket (String, int) to create
+  // the socket.
+
+  public SocketOpener (final Proxy proxy )
+  {
+    socketFactory = new SocketFactory()
+    {
+      public Socket makeSocket() throws IOException
+        {return new Socket (proxy);}
+    };
+  }
 
   // Constructor.  This SocketOpener will use Socket (InetAddress, int, int)
   // to create the socket.

@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.SocketException;
@@ -315,19 +317,42 @@ public class FtpBean
         setUserName(user);
     	setAcctInfo(acct);
 
+        Proxy proxy= Proxy.NO_PROXY;
+        String proxyHost= System.getProperty("ftp.proxyHost");
+        if ( proxyHost!=null ) {
+            String proxyPort= System.getProperty("ftp.proxyPort","21");
+            String nonProxyHosts= System.getProperty("ftp.nonProxyHosts","" );
+            if ( !nonProxyHosts.equals("") ) {
+                throw new IllegalArgumentException("ftp.nonProxyHosts is not supported, please submit this error");
+            }
+
+            proxy= new Proxy( Proxy.Type.valueOf("ftp"), new InetSocketAddress(proxyHost,Integer.parseInt(proxyPort)) );
+        }
+
         // Create socket, get input & output stream
         try
         {
             if (timeout == 0)
 	    {
-                socket = new Socket(server, port);
+                if ( proxy==Proxy.NO_PROXY ) {
+                    socket = new Socket(server, port);
+                } else {
+                    //untested
+                    socket = new Socket(proxy);
+                }
             } else
 	    {
                 /* If a timeout has been set before opening the socket,
                  * use the SocketOpener. Note that if the thread times out,
                  * it is forcibly terminated.
                  */
-                 socket = new SocketOpener (server, port).makeSocket(timeout);
+                if ( proxy==Proxy.NO_PROXY ) {
+                    socket = new SocketOpener (server, port).makeSocket(timeout);
+                } else {
+                    //untested
+                    socket = new SocketOpener ( proxy ).makeSocket(timeout);
+                }
+                 
             }
 
             in = new BufferedReader(
