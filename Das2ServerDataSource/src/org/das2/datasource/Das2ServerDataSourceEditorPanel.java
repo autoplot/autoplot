@@ -543,6 +543,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void viewDsdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDsdfButtonActionPerformed
         TreePath p= jTree1.getSelectionPath();
         TreeModel m= jTree1.getModel();
+        if ( p==null ) {
+            JOptionPane.showConfirmDialog( this, "No dataset selected" );
+            return;
+        }
         if ( m.isLeaf( p.getLastPathComponent() ) ) {
             {
                 try {
