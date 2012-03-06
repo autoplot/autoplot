@@ -127,11 +127,11 @@ public class ScriptPanelSupport {
     protected void loadInputStream( InputStream in ) throws IOException {
         BufferedReader r = null;
         try {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
             while (s != null) {
-                buf.append(s + "\n");
+                buf.append(s).append("\n");
                 s = r.readLine();
             }
             Document d = editor.getDocument();
