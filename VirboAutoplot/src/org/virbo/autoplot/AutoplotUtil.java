@@ -84,6 +84,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;
@@ -178,6 +179,47 @@ public class AutoplotUtil {
             }
         }
         return urls;
+    }
+
+    /**
+     * Replace filename references within the DOM, and reset xrange.  This was the often-used ReplaceFile script
+     * @param dom
+     */
+    public static void replaceFile( Component parent, Application dom ) {
+
+        if ( dom.getDataSourceFilters(0).getUri()==null ) {
+           JOptionPane.showMessageDialog( parent, "Nothing plotted" );
+        } else {
+
+            DataSourceFilter dsf= dom.getDataSourceFilters(0);
+           URISplit split= URISplit.parse( dsf.getUri() );
+
+           String oldf= split.file;
+
+           String newf= JOptionPane.showInputDialog( parent,
+            "<html>Current file is<br>"+oldf+"<br><br>Enter New Filename: ",
+             oldf );
+
+           if ( newf!=null ) {
+
+                dom.getOptions().setAutoranging(false);
+
+                for ( DataSourceFilter i: dom.getDataSourceFilters() ) {
+                    String oldf1= i.getUri();
+                    String newf1= oldf1.replace( oldf, newf );
+                    i.setUri( newf1 );
+                    
+               }
+                dom.getController().waitUntilIdle();
+                dom.getOptions().setAutoranging(true);
+                dom.getController().waitUntilIdle();
+
+                dom.getController().setDataSourceFilter(dsf);
+                
+                resetZoomX(dom); // assumes focus is set
+
+            }
+        }
     }
 
     public static class AutoRangeDescriptor {
