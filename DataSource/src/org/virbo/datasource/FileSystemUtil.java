@@ -12,6 +12,7 @@ package org.virbo.datasource;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import org.das2.util.filesystem.FileSystem;
@@ -31,6 +32,24 @@ public class FileSystemUtil {
         if ( resource.startsWith(s) ) return resource.substring(s.length()); else return resource;
     }
 
+    /**
+     * return true if the possibleParent is a valid folder tree root, and maybeChild exists within tree.
+     * @param possibleParent
+     * @param maybeChild a file or folder which may exist within possibleParent.
+     * @return true if possibleParent is a folder containing
+     */
+    public static boolean isChildOf( File possibleParent, File maybeChild ) {
+        possibleParent= possibleParent.getAbsoluteFile();
+        if ( !possibleParent.exists() || !possibleParent.isDirectory() ) {
+            // this cannot possibly be the parent
+            return false;
+        }
+        maybeChild= maybeChild.getAbsoluteFile();
+        URI parentURI = possibleParent.toURI(),
+        childURI = maybeChild.toURI();
+        return !parentURI.relativize(childURI).isAbsolute();
+    }
+    
     /**
      * checks to see if the context uri appears to represent an existing
      * data source.  false indicates that the resource is known to not exist.
