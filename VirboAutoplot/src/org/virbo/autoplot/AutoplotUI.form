@@ -514,6 +514,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="replaceFileMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Replace File..."/>
+                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Replace the file with a new one.  This assumes that any parameters used to load the file&lt;br&gt;should be preserved, and axis settings should be preserved.  We re-range on the x-axis, since often we are switching to a new interval in time.&lt;/html&gt;&#xa;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="replaceFileMenuItemActionPerformed"/>

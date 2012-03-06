@@ -2057,6 +2057,7 @@ APSplash.checkTime("init 52");
         toolsMenu.add(aggregateMenuItem);
 
         replaceFileMenuItem.setText("Replace File...");
+        replaceFileMenuItem.setToolTipText("<html>Replace the file with a new one.  This assumes that any parameters used to load the file<br>should be preserved, and axis settings should be preserved.  We re-range on the x-axis, since often we are switching to a new interval in time.</html>\n");
         replaceFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 replaceFileMenuItemActionPerformed(evt);
