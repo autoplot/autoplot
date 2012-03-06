@@ -28,10 +28,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import org.das2.util.DasExceptionHandler;
-import org.das2.util.filesystem.WebFileSystem;
+import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PySyntaxError;
+import org.virbo.datasource.FileSystemUtil;
 
 /**
  *
@@ -101,7 +102,7 @@ public class ScriptPanelSupport {
     }
 
     protected void save( File file ) throws FileNotFoundException, IOException {
-        if ( file==null ) {
+        if ( file==null || FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             saveAs();
             return;
         }
@@ -181,7 +182,7 @@ public class ScriptPanelSupport {
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
-        if (file != null && !file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
+        if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
         }
         int r = chooser.showSaveDialog(editor);
