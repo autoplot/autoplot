@@ -708,6 +708,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         serverURL= DataSetURI.fromUri( split.resourceUri );
         Map<String,String> params= URISplit.parseParams(split.params);
         dataSetId= params.remove("dataset");
+        if ( dataSetId!=null && dataSetId.startsWith("/") ) {
+            dataSetId= dataSetId.substring(1);
+        }
         String startTime= params.remove("start_time");
         String endTime= params.remove("end_time");
         if ( startTime!=null ) {
@@ -751,6 +754,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return new javax.swing.tree.DefaultTreeModel(treeNode1);
     }
 
+    private void updateTree( TreeModel model ) {
+        jTree1.setModel(model);
+        if ( dataSetId!=null ) selectDataSetId();
+    }
+
     Runnable getDataSetsRunnable() {
         Runnable run= new Runnable() {
             public void run() {
@@ -767,11 +775,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            jTree1.setModel(model);
+                            updateTree(model);
                         }
                     });
                     
-                    if ( dataSetId!=null ) selectDataSetId();
                 } catch (DasException ex) {
 
                     Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
