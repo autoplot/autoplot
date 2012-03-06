@@ -101,6 +101,15 @@ public class ZipFileObject extends FileObject {
 
         // We're blindly unpacking and not checking age of possibly existing cache file
         FileSystemUtil.maybeMkdirs(tmpDir);
+        if ( tmpFile.exists() ) {
+            if ( tmpFile.lastModified()< new File(zfs.getZipFile().getName()).lastModified() ) {
+                if ( !tmpFile.delete() ) {
+                    throw new IOException("unable to delete old unzipped file: "+tmpFile );
+                }
+            } else {
+                return tmpFile; //TODO: we need to more thoroughly check timestamps dates, etc.
+            }
+        }
         if ( ! tmpFile.createNewFile() ) {
             throw new IllegalArgumentException("unable to create file "+tmpFile );
         }
