@@ -11,11 +11,17 @@ import java.util.List;
 import java.util.Map;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
+import org.virbo.dsops.Ops;
+import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
@@ -76,7 +82,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
         String typeSuggest= getParam( "type", "double" );
 
-        NetcdfFileWriteable ncfile= NetcdfFileWriteable.createNew( getResourceURI().toURL().toString() );
+        NetcdfFileWriteable ncfile= NetcdfFileWriteable.createNew( getResourceURI().toURL().getFile().toString(), true );
 
         String varName= nameFor(data);
 
@@ -92,7 +98,9 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             if ( depi!=null ) {
                 namei= nameFor(depi);
             }
-            dims.add( new Dimension( namei, qube[i] ) );
+            Dimension d= ncfile.addDimension( namei, qube[i] );
+            dims.add( d );
+            
         }
 
         Variable var= ncfile.addVariable( varName, typeFor(data,typeSuggest), dims );
@@ -105,10 +113,29 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             var.addAttribute( new Attribute("VALIDMAX", (Double) getProperty( data, QDataSet.VALID_MAX, 1e38 ) ) );
             var.addAttribute( new Attribute("FILLVAL",  (Double) getProperty( data, QDataSet.FILL_VALUE, -1e31 ) ) );
         }
+
+        ncfile.create();
+
+        ArrayDataSet ads= ArrayDataSet.copy(data);
+
+        Array ddata= Array.factory( typeFor(data,typeSuggest), qube );
+        DataSetIterator it= new QubeDataSetIterator(ads);
+        int i=0;
+        while ( it.hasNext() ) {
+            it.next();
+            ddata.setDouble( i, it.getValue(ads) );
+            i++;
+        }
+        ncfile.write( varName, ddata );
+
         ncfile.finish();
 
         ncfile.close();
         
     }
 
+//    public static void main( String[] args ) throws Exception {
+//        QDataSet out= Ops.rand(100);
+//        new HDF5DataSourceFormat().formatData("file:///home/jbf/foo.nc", out, new NullProgressMonitor() );
+//    }
 }
