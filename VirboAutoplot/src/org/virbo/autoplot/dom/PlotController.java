@@ -722,6 +722,19 @@ public class PlotController extends DomNodeController {
 
         controller.setPlot(that);
         AutoplotUtil.resetZoomY(dom);
+
+        double nmin,nmax;
+        if ( domPlot.getYaxis().isLog() ) {
+            nmin= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
+            nmax= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
+        } else {
+            nmin= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
+            nmax= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
+        }
+        if ( nmax-nmin > 0.9 ) {
+            that.getYaxis().setRange( domPlot.getYaxis().getRange() );
+        }
+        
         AutoplotUtil.resetZoomX(dom);
 
         //that.getController().resetZoom(true, true, false);
