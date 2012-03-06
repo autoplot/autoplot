@@ -47,6 +47,7 @@ import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 
@@ -132,7 +133,7 @@ public class ScriptPanelSupport {
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
-        if (file != null && !file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
+        if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
         }
         if ( file==null ) {
@@ -273,7 +274,7 @@ public class ScriptPanelSupport {
                 }
 
                 boolean updateSurl = false;
-                if (file == null || file.getCanonicalPath().startsWith( FileSystem.settings().getLocalCacheDir().toString())) {
+                if (file == null || FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
                     if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
                         updateSurl = true;
                     } else {
