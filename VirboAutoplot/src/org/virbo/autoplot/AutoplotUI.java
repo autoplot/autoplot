@@ -1596,6 +1596,7 @@ APSplash.checkTime("init 52");
         fixLayoutMenuItem = new javax.swing.JMenuItem();
         createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
+        replaceFileMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
@@ -2054,6 +2055,14 @@ APSplash.checkTime("init 52");
             }
         });
         toolsMenu.add(aggregateMenuItem);
+
+        replaceFileMenuItem.setText("Replace File...");
+        replaceFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                replaceFileMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(replaceFileMenuItem);
         toolsMenu.add(aggSeparator);
 
         decodeURLItem.setText("Decode URL");
@@ -2561,6 +2570,16 @@ private void resetZMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         System.err.println("unable to zoom z");
     }
 }//GEN-LAST:event_resetZMenuItemActionPerformed
+
+private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceFileMenuItemActionPerformed
+    final Component source= (Component)evt.getSource();
+    Runnable run= new Runnable() {
+        public void run() {
+            AutoplotUtil.replaceFile( source,dom );
+        }
+    };
+    RequestProcessor.invokeLater(run);
+}//GEN-LAST:event_replaceFileMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3095,6 +3114,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
+    private javax.swing.JMenuItem replaceFileMenuItem;
     private javax.swing.JMenuItem resetXMenuItem;
     private javax.swing.JMenuItem resetYMenuItem;
     private javax.swing.JMenuItem resetZMenuItem;
