@@ -33,6 +33,7 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
@@ -713,11 +714,17 @@ public class PlotController extends DomNodeController {
         ApplicationController controller= dom.getController();
         Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
         that.setTitle( "" );
+        controller.bind(domPlot.getYaxis(), Axis.PROP_LOG, that.getYaxis(), Axis.PROP_LOG);
         controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
         controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
         controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
         controller.addConnector(domPlot, that);
-        that.getController().resetZoom(true, true, false);
+
+        controller.setPlot(that);
+        AutoplotUtil.resetZoomY(dom);
+        AutoplotUtil.resetZoomX(dom);
+
+        //that.getController().resetZoom(true, true, false);
         lock.unlock();
         return that;
     }
