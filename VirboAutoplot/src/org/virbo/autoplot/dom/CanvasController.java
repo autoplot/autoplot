@@ -660,15 +660,19 @@ public class CanvasController extends DomNodeController {
         final List<Rectangle> clip= new ArrayList<Rectangle>();
 
         synchronized (this) {
-            if ( currentSelectionItems!=null ) return; //TODO: we really should clear it if it's different
+            if ( currentSelectionItems!=null ) {
+                if ( selectedItems.size()>0 && currentSelectionItems.size()>0 && selectedItems.get(0)==currentSelectionItems.get(0) ) {
+                    return;
+                }
+            } 
             currentSelectionItems= selectedItems;
         }
 
         for ( Object o: selectedItems ) {
             if ( o instanceof Plot ) {
-                DasPlot p= ((Plot)o).getController().getDasPlot();
-                sel.add( SelectionUtil.getSelectionArea( p ) );
-                clip.add( p.getBounds() );
+                //DasPlot p= ((Plot)o).getController().getDasPlot();
+                //sel.add( SelectionUtil.getSelectionArea( p ) );
+                //clip.add( p.getBounds() );
             } else if ( o instanceof PlotElement ) {
                 Renderer rend= ((PlotElement)o).getController().getRenderer();
                 if ( rend==null ) return;// transitional case
