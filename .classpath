@@ -51,7 +51,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/poi-contrib-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-scratchpad-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/swing-layout-1.0.3.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/cdfjava-hack.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jh.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/commons/commons-vfs-1.0.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/netCDF/netcdf-4.1.jar"/>
@@ -59,5 +58,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/javacsv.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/javaws.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/opendap-2.1.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
