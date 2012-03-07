@@ -29,6 +29,13 @@ public class DiskUsageModel {
     @SuppressWarnings("unchecked")
     public void search(File f, int depth, ProgressMonitor mon) {
 
+        try {
+            File nf= f.getCanonicalFile();
+            f= nf;
+        } catch ( IOException ex ) {
+            // this is the old behavoir.
+        }
+
         File[] kids = f.listFiles();
         
         if (kids == null) {
@@ -52,6 +59,10 @@ public class DiskUsageModel {
             }
             if (kids[i].isDirectory() && notLink(kids[i])) {
                 search(kids[i], depth + 1, mon);
+            } else {
+                if ( kids[i].isDirectory() && ! notLink(kids[i]) ) {
+                    System.err.println("appears to be a link: "+kids[i]);
+                }
             }
         }
 
@@ -88,6 +99,12 @@ public class DiskUsageModel {
     }
 
     public Long usage(File f) {
+        try {
+            File nf= f.getCanonicalFile();
+            f= nf;
+        } catch ( IOException ex ) {
+
+        }
         return dirUsage.get(f);
     }
     private boolean ready = false;
