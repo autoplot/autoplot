@@ -670,9 +670,9 @@ public class CanvasController extends DomNodeController {
 
         for ( Object o: selectedItems ) {
             if ( o instanceof Plot ) {
-                //DasPlot p= ((Plot)o).getController().getDasPlot();
-                //sel.add( SelectionUtil.getSelectionArea( p ) );
-                //clip.add( p.getBounds() );
+                DasPlot p= ((Plot)o).getController().getDasPlot();
+                sel.add( SelectionUtil.getSelectionArea( p ) );
+                clip.add( p.getBounds() );
             } else if ( o instanceof PlotElement ) {
                 Renderer rend= ((PlotElement)o).getController().getRenderer();
                 if ( rend==null ) return;// transitional case
