@@ -322,7 +322,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 setPlotElement(p);
                 setStatus("" + domPlot + ", " + p + " selected");
                 if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
-                    canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
+                    canvas.controller.indicateSelection( Collections.singletonList((DomNode)p) ); // don't flash plot node, just the plot element.
                 }
             } else {
                 setStatus("" + domPlot + " selected");
