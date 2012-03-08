@@ -45,6 +45,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.AsciiHeadersParser;
 
 /**
  *
@@ -186,7 +187,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
         } else if (column != null) {
             if ( bundleDescriptor!=null ) {
                 //vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
-                vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,column));
+                try {
+                    vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,column));
+                } catch ( IllegalArgumentException ex ) {
+                    QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
+                    if ( _vds==null ) {
+                        throw new IllegalArgumentException("No such dataset: " +column );
+                    } else {
+                        vds= ArrayDataSet.maybeCopy(_vds);
+                    }
+                }
+
             } else {
                 int icol = parser.getFieldIndex(column);
                 if (icol == -1) {
