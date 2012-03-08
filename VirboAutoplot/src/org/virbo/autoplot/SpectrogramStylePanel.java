@@ -90,7 +90,6 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Spectrogram [?]"));
 
-        colortableTypePanel.setToolTipText("colortable for spectrograms\n");
         colortableTypePanel.setLayout(new java.awt.BorderLayout());
 
         jLabel4.setText("Colortable:");
@@ -99,7 +98,7 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         jLabel5.setText("Rebin:");
         jLabel5.setToolTipText("method for binning to pixel resolution");
 
-        rebinPanel.setToolTipText("algorythm for binning to pixel resolution");
+        rebinPanel.setToolTipText("");
         rebinPanel.setLayout(new java.awt.BorderLayout());
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);

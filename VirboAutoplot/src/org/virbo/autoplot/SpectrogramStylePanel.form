@@ -73,9 +73,6 @@
       </Layout>
       <SubComponents>
         <Container class="javax.swing.JPanel" name="colortableTypePanel">
-          <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="colortable for spectrograms&#xa;"/>
-          </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
         </Container>
@@ -93,7 +90,7 @@
         </Component>
         <Container class="javax.swing.JPanel" name="rebinPanel">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="algorythm for binning to pixel resolution"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
