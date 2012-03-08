@@ -36,7 +36,7 @@ public class Test030 {
         QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
 
         QDataSet x= DataSetOps.unbundle(ds,0);
-        QDataSet y= DataSetOps.unbundle(ds,bds.length()-1);
+        QDataSet y= DataSetOps.unbundle(ds,bds.length()-1,true);
         plot( x, y );
         setTitle( uri );
 
