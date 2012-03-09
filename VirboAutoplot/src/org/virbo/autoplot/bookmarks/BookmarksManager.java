@@ -1120,6 +1120,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
                     String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
                     mi.setToolTipText( ttext );
+                    //TODO: delay tooltip
                 } 
                 if (book.getIcon() != null) {
                     mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
@@ -1143,6 +1144,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
                     String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
                     subMenu.setToolTipText( ttext );
+                    //TODO: delay tooltip
                 }
 //                if ( folder.getRemoteStatus()==-1 ) {
 //                    subMenu.addMenuListener( new MenuListener() {
