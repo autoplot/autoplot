@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
@@ -55,7 +58,14 @@ public final class WriteIDLSav {
 
         ByteBuffer date= writeString( new java.util.Date().toString() ); //Calendar.getInstance().toString() );
         ByteBuffer user= writeString( System.getProperty("user.name") );
-        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+
+        String shost;
+        try {
+            shost=  InetAddress.getLocalHost().getHostName();
+        } catch ( UnknownHostException ex ) {
+            shost= "localhost"; // this shouldn't happen
+        }
+        ByteBuffer host= writeString( shost );
 
         ByteBuffer result= ByteBuffer.allocateDirect( 257*4 + date.limit() + user.limit() + host.limit() );
         for ( int i=0; i<257*4; i++ ) {
@@ -73,9 +83,10 @@ public final class WriteIDLSav {
         format.order(ByteOrder.BIG_ENDIAN);
         format.putInt(9);
         format.flip();
-        ByteBuffer arch= writeString( "x86_64");
-        ByteBuffer os= writeString( "darwin");
-        ByteBuffer release= writeString("8.1");
+        ByteBuffer arch= writeString( System.getProperty("os.arch") );
+        ByteBuffer os= writeString( System.getProperty("os.name"));
+        ByteBuffer release= writeString("(Autoplot)");
+        
         ByteBuffer result= ByteBuffer.allocateDirect( 4 + 4 + arch.limit() + os.limit() + release.limit() );
         result.putInt( 0 );
         result.put( format );
@@ -328,14 +339,14 @@ public final class WriteIDLSav {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
-        //FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.novar.idlsav"));
-
+        FileOutputStream fos = new FileOutputStream(new File("/tmp/test.autoplot.idlsav"));
+        
         WriteIDLSav widls= new WriteIDLSav();
         widls.addVariable( "myvar", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
         widls.addVariable( "second", new double[] { -1,-1,-2,-3,-3,4,5,6,7,7,8,9,9,10 } );
-        widls.addVariable( "oneval", 19.95 );
+        //widls.addVariable( "oneval", 19.95 );
         widls.write(fos);
 
+        fos.close();
     }
 }
