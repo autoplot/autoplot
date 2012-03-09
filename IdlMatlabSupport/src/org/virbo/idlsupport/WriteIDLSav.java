@@ -208,7 +208,16 @@ public final class WriteIDLSav {
         return result;
     }
 
+    /**
+     * format the data
+     * @param name an IDL identifier.
+     * @param data a supported type.
+     * @param pos
+     * @return the encoding of variable into a reset ByteBuffer.
+     */
     private ByteBuffer variable( String name, Object data, long pos ) {
+
+        checkVariableType(name, data);
 
         ByteBuffer nameBuf= writeString( name.toUpperCase() );
         ByteBuffer typedesc= writeTypeDesc( data );
@@ -283,7 +292,15 @@ public final class WriteIDLSav {
 
     private LinkedHashMap<String,Object> variables= new LinkedHashMap();
 
+    public void checkVariableType( String name, Object data ) {
+        Class c= data.getClass();
+        if ( !( c.isArray() && c.getComponentType()==double.class ) && c!=Short.class ) {
+            throw new IllegalArgumentException("\"" + name + "\" is unsupported data type: "+data.getClass() );
+        }
+    }
+
     public void addVariable( String name, Object data ) {
+        checkVariableType( name, data );
         variables.put(name, data);
     }
 
