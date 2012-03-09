@@ -30,13 +30,27 @@ public final class WriteIDLSav {
     public static final int RECTYPE_VERSION = 14;
     public static final int VARFLAG_ARRAY = 4;
 
+    private static String nameFor( int type ) {
+        if ( type==RECTYPE_VARIABLE ) {
+                return "VARIABLE";
+        } else if ( type==RECTYPE_TIMESTAMP ) {
+          return "TIMESTAMP";
+        } else if ( type==RECTYPE_VERSION) {
+          return "VERSION";
+        } else if ( type==RECTYPE_ENDMARKER ) {
+          return "ENDMARKER";
+        } else {
+            return ""+type;
+        }
+    }
+    
     private static ByteBuffer timestamp() {
-        //ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
-        //ByteBuffer user= writeString( "jbf" );
-        //ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
-        ByteBuffer date= writeString( "Mon Feb 20 06:49:42 2012" ); //Calendar.getInstance().toString() );
+        ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
         ByteBuffer user= writeString( "jbf" );
-        ByteBuffer host= writeString( "spot5" ); //TODO: get these from java props
+        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+        //ByteBuffer date= writeString( "Mon Feb 20 06:49:42 2012" ); //Calendar.getInstance().toString() );
+        //ByteBuffer user= writeString( "jbf" );
+        //ByteBuffer host= writeString( "spot5" ); //TODO: get these from java props
         ByteBuffer result= ByteBuffer.allocateDirect( 257*4 + date.limit() + user.limit() + host.limit() );
         for ( int i=0; i<257*4; i++ ) {
             result.put((byte)0);
@@ -102,8 +116,8 @@ public final class WriteIDLSav {
         result.putInt( Array.getLength(data)*eleLen ); //TODO: 1D
         result.putInt( Array.getLength(data) );
         result.putInt( ndims );
-        result.putInt( 0 );
-        result.putInt( 0 );
+        result.putInt( 0 );  // should be 1*256+83
+        result.putInt( 0 );  // should be 1*256+83
 
         result.putInt( nmax );
 
@@ -188,7 +202,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer variable( String name, Object data ) {
+    private static ByteBuffer variable( String name, Object data, long pos ) {
 
         ByteBuffer nameBuf= writeString( name.toUpperCase() );
         ByteBuffer typedesc= writeTypeDesc( data );
@@ -202,9 +216,13 @@ public final class WriteIDLSav {
             throw new RuntimeException("not supported "+data.getClass());
         }
 
-        ByteBuffer result= ByteBuffer.allocateDirect( nameBuf.limit() + typedesc.limit() + 4 + varData.limit() );
+        ByteBuffer result= ByteBuffer.allocateDirect( 4 + nameBuf.limit() + 8 + typedesc.limit() + 4 + varData.limit() );
         result.order(ByteOrder.BIG_ENDIAN);
+        result.put(ByteBuffer.allocateDirect( 4 ) );
         result.put(nameBuf);
+        //result.put(ByteBuffer.allocateDirect( 8 ) );
+        result.putInt(5);   // why?
+        result.putInt(20);  // why?
         result.put(typedesc);
         result.putInt(7);
         result.put(varData);
@@ -246,7 +264,11 @@ public final class WriteIDLSav {
 
         rec.flip();
 
-        System.err.println( "writing "+recType + " to buffer bytes "+ pos + " to " + ( pos + rec.limit() ) + " " + padBytes );
+        String stype= nameFor( recType ) ;
+
+
+        //System.err.println( "writing "+stype + " to buffer bytes "+ pos + " to " + ( pos + rec.limit() ) + " " + padBytes );
+        System.err.printf( "%d %d %s\n", pos, pos +rec.limit(), stype );
         ch.write(rec);
 
         pos+= rec.limit();
@@ -255,7 +277,9 @@ public final class WriteIDLSav {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        FileOutputStream fos = new FileOutputStream(new File("/home/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
+        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
+        //FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.novar.idlsav"));
+
         FileChannel ch = fos.getChannel();
 
         ch.write(getBytesStr("SR"));
@@ -266,7 +290,7 @@ public final class WriteIDLSav {
         int pos= 4;
         pos= writeRecord( ch, RECTYPE_TIMESTAMP, timestamp(), pos );
         pos= writeRecord( ch, RECTYPE_VERSION, version(), pos );
-        pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "xyxyxyxy", new double[] { 45,46,47,48,49 } ), pos );
+        pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "abcdefgh", new double[] { 45,46,47,48,49 }, pos ), pos );
         //pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "myvar", (short)99 ), pos );
         pos= writeRecord( ch, RECTYPE_ENDMARKER, endMarker(), pos );
         ch.close();
