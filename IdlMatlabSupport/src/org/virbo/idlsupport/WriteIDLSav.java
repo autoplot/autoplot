@@ -8,14 +8,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.Channel;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.util.Calendar;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  * write data to IDL Save File
@@ -30,7 +31,7 @@ public final class WriteIDLSav {
     public static final int RECTYPE_VERSION = 14;
     public static final int VARFLAG_ARRAY = 4;
 
-    private static String nameFor( int type ) {
+    private String nameFor( int type ) {
         if ( type==RECTYPE_VARIABLE ) {
                 return "VARIABLE";
         } else if ( type==RECTYPE_TIMESTAMP ) {
@@ -44,13 +45,18 @@ public final class WriteIDLSav {
         }
     }
     
-    private static ByteBuffer timestamp() {
-        ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
-        ByteBuffer user= writeString( "jbf" );
-        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+    private ByteBuffer timestamp() {
+        //ByteBuffer date= writeString( "Sat Feb 11 08:43:55 2012" ); //Calendar.getInstance().toString() );
+        //ByteBuffer user= writeString( "jbf" );
+        //ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
         //ByteBuffer date= writeString( "Mon Feb 20 06:49:42 2012" ); //Calendar.getInstance().toString() );
         //ByteBuffer user= writeString( "jbf" );
         //ByteBuffer host= writeString( "spot5" ); //TODO: get these from java props
+
+        ByteBuffer date= writeString( new java.util.Date().toString() ); //Calendar.getInstance().toString() );
+        ByteBuffer user= writeString( System.getProperty("user.name") );
+        ByteBuffer host= writeString( "Jeremy-Fadens-MacBook-Air.local" ); //TODO: get these from java props
+
         ByteBuffer result= ByteBuffer.allocateDirect( 257*4 + date.limit() + user.limit() + host.limit() );
         for ( int i=0; i<257*4; i++ ) {
             result.put((byte)0);
@@ -62,7 +68,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer version() {
+    private ByteBuffer version() {
         ByteBuffer format= ByteBuffer.allocateDirect(4);
         format.order(ByteOrder.BIG_ENDIAN);
         format.putInt(9);
@@ -88,7 +94,7 @@ public final class WriteIDLSav {
         return ByteBuffer.wrap(new byte[]{b});
     }
 
-    private static  ByteBuffer writeString( String s ) {
+    private ByteBuffer writeString( String s ) {
         int len= 4 * (int)Math.ceil( ( s.length()+4 ) / 4. );
         ByteBuffer result= ByteBuffer.allocateDirect(len);
         result.order( ByteOrder.BIG_ENDIAN );
@@ -103,7 +109,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer writeArrayDesc( Object data ) {
+    private ByteBuffer writeArrayDesc( Object data ) {
         int nmax= 8; // ?? see python code.
         int capacity= ( 8 + nmax ) * 4; //TODO: 1D
         int eleLen= 8; // bytes
@@ -129,7 +135,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static int dataTypeCode( Object data ) {
+    private int dataTypeCode( Object data ) {
         if ( data.getClass()==Short.class ) {
             return 2;
         } else if ( data.getClass()==Integer.class ) {
@@ -143,7 +149,7 @@ public final class WriteIDLSav {
         }
     }
 
-    private static ByteBuffer writeScalarDesc( Object data ) {
+    private ByteBuffer writeScalarDesc( Object data ) {
         
         ByteBuffer result= ByteBuffer.allocateDirect( 8 );
         result.order(ByteOrder.BIG_ENDIAN);
@@ -154,7 +160,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer writeTypeDesc( Object data ) {
+    private ByteBuffer writeTypeDesc( Object data ) {
         if ( data.getClass().isArray() ) {
             return writeArrayDesc( data );
         } else if ( data.getClass()==Short.class ) {
@@ -170,7 +176,7 @@ public final class WriteIDLSav {
         }
     }
 
-    private static ByteBuffer writeDoubleArray( double[] data ) {
+    private ByteBuffer writeDoubleArray( double[] data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( data.length*8 );
         buf.order(ByteOrder.BIG_ENDIAN);
         for ( int i=0; i<data.length; i++ ) {
@@ -180,7 +186,7 @@ public final class WriteIDLSav {
         return buf;
     }
 
-    private static ByteBuffer writeShort( short data ) {
+    private ByteBuffer writeShort( short data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( 4 );
         buf.order(ByteOrder.BIG_ENDIAN);
         buf.putShort((short)0);
@@ -189,7 +195,7 @@ public final class WriteIDLSav {
         return buf;
     }    
 
-    private static ByteBuffer writeTypeDescArray( Object data ) {
+    private ByteBuffer writeTypeDescArray( Object data ) {
 
         ByteBuffer arrayDesc= writeArrayDesc(data);
         ByteBuffer result= ByteBuffer.allocateDirect( 8 + arrayDesc.limit() );
@@ -202,7 +208,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer variable( String name, Object data, long pos ) {
+    private ByteBuffer variable( String name, Object data, long pos ) {
 
         ByteBuffer nameBuf= writeString( name.toUpperCase() );
         ByteBuffer typedesc= writeTypeDesc( data );
@@ -231,7 +237,7 @@ public final class WriteIDLSav {
         return result;
     }
 
-    private static ByteBuffer endMarker() {
+    private ByteBuffer endMarker() {
         ByteBuffer result= ByteBuffer.allocate(4);
         for ( int i=0; i<4; i++ ) result.put((byte)0);
         result.flip();
@@ -239,7 +245,7 @@ public final class WriteIDLSav {
     }
 
 
-     private static int writeRecord( FileChannel ch, int recType, ByteBuffer buf, int pos ) throws IOException {
+     private int writeRecord( WritableByteChannel ch, int recType, ByteBuffer buf, int pos ) throws IOException {
 
         int len= (int)( 4 * Math.ceil( ( buf.limit()+12. ) / 4 ) );
 
@@ -275,12 +281,15 @@ public final class WriteIDLSav {
         return pos;
     }
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    private LinkedHashMap<String,Object> variables= new LinkedHashMap();
 
-        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
-        //FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.novar.idlsav"));
+    public void addVariable( String name, Object data ) {
+        variables.put(name, data);
+    }
 
-        FileChannel ch = fos.getChannel();
+    public void write( OutputStream out ) throws IOException {
+
+        WritableByteChannel ch= Channels.newChannel(out);
 
         ch.write(getBytesStr("SR"));
 
@@ -290,13 +299,26 @@ public final class WriteIDLSav {
         int pos= 4;
         pos= writeRecord( ch, RECTYPE_TIMESTAMP, timestamp(), pos );
         pos= writeRecord( ch, RECTYPE_VERSION, version(), pos );
-        pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "abcdefgh", new double[] { 45,46,47,48,49 }, pos ), pos );
-        //pos= writeRecord( ch, RECTYPE_VARIABLE, variable( "myvar", (short)99 ), pos );
+
+        for ( Entry<String,Object> var: variables.entrySet() ) {
+            pos= writeRecord( ch, RECTYPE_VARIABLE, variable( var.getKey(), var.getValue(), pos ), pos );
+        }
+
         pos= writeRecord( ch, RECTYPE_ENDMARKER, endMarker(), pos );
         ch.close();
 
-        // variable
-//throw new IllegalArgumentException("This is a work in progress....");
+    }
+
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+
+        FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.onevar.idlsav"));
+        //FileOutputStream fos = new FileOutputStream(new File("/Users/jbf/ct/autoplot/idlsave/channel.novar.idlsav"));
+
+        WriteIDLSav widls= new WriteIDLSav();
+        widls.addVariable( "myvar", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
+        widls.addVariable( "second", new double[] { -1,-1,-2,-3,-3,4,5,6,7,7,8,9,9,10 } );
+        widls.addVariable( "oneval", 19.95 );
+        widls.write(fos);
 
     }
 }
