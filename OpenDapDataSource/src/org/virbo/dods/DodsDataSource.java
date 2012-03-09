@@ -171,6 +171,9 @@ public class DodsDataSource extends AbstractDataSource {
         mon.setTaskSize(-1);
         mon.started();
 
+        String label= adapter.getSource().toString();
+        mon.setProgressMessage( "parse " + label+".dds" );
+
         MyDDSParser parser = new MyDDSParser();
         parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
 
