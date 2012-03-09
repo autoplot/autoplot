@@ -191,10 +191,20 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     try {
                         item.size = Long.parseLong(aline.substring(sizePos, sizePos + 11).trim());
                     } catch ( NumberFormatException ex ) {
-                        item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
+                        try {
+                            item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
+                        } catch ( NumberFormatException ex2 ) {
+                            ex.printStackTrace();
+                            item.size = 1; // don't RTE
+                        }
                     }
                     item.type = type == 'd' ? 'd' : 'f';
-                    item.modified = parseTime1970(aline.substring(modifiedPos, modifiedPos+12), Calendar.getInstance());
+                    if ( aline.length()>=modifiedPos+12 ) {
+                        item.modified = parseTime1970(aline.substring(modifiedPos, modifiedPos+12), Calendar.getInstance());
+                    } else {
+                        item.modified = 0;
+                    }
+                    
 
                     result.add(item);
 
