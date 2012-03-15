@@ -531,12 +531,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="decodeURLItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="updateAllMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="reloadAllMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Update All"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/org/virbo/autoplot/resources/reload.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Reload All Data"/>
+                <Property name="toolTipText" type="java.lang.String" value="Reload all data, updating to get any changes.  Axis settings and labels should remain the same."/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateAllMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="reloadAllMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

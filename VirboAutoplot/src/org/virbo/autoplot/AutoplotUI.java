@@ -1599,7 +1599,7 @@ APSplash.checkTime("init 52");
         replaceFileMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
-        updateAllMenuItem = new javax.swing.JMenuItem();
+        reloadAllMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
         gettingStartedMenuItem = new javax.swing.JMenuItem();
@@ -2076,13 +2076,15 @@ APSplash.checkTime("init 52");
         });
         toolsMenu.add(decodeURLItem);
 
-        updateAllMenuItem.setText("Update All");
-        updateAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        reloadAllMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/reload.png"))); // NOI18N
+        reloadAllMenuItem.setText("Reload All Data");
+        reloadAllMenuItem.setToolTipText("Reload all data, updating to get any changes.  Axis settings and labels should remain the same.");
+        reloadAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateAllMenuItemActionPerformed(evt);
+                reloadAllMenuItemActionPerformed(evt);
             }
         });
-        toolsMenu.add(updateAllMenuItem);
+        toolsMenu.add(reloadAllMenuItem);
 
         jMenuBar1.add(toolsMenu);
 
@@ -2591,7 +2593,7 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     RequestProcessor.invokeLater(run);
 }//GEN-LAST:event_replaceFileMenuItemActionPerformed
 
-private void updateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateAllMenuItemActionPerformed
+private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
    // Reload All Data
     for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
         if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
@@ -2600,7 +2602,7 @@ private void updateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
             System.err.println( "not updating: " + dsf.getUri() );
         }
     }
-}//GEN-LAST:event_updateAllMenuItemActionPerformed
+}//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3134,6 +3136,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
+    private javax.swing.JMenuItem reloadAllMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem replaceFileMenuItem;
     private javax.swing.JMenuItem resetXMenuItem;
@@ -3154,7 +3157,6 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
-    private javax.swing.JMenuItem updateAllMenuItem;
     private javax.swing.JMenu viewMenu;
     private javax.swing.JMenuItem zoomInMenuItem;
     private javax.swing.JMenuItem zoomOutMenuItem;
