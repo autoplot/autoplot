@@ -647,9 +647,13 @@ public class DataSetURI {
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {
-                throw new IOException(ex.getMessage(),ex);
+                IOException ex2= new IOException(ex.getMessage());
+                ex2.initCause(ex);
+                throw ex2;
             } else {
-                throw new IOException("Unsupported protocol: "+suri,ex); //TODO: we should probably never hide the original message.
+                IOException ex2= new IOException("Unsupported protocol: "+suri);
+                ex2.initCause(ex);
+                throw ex2;//TODO: we should probably never hide the original message.
             }
         }
     }
