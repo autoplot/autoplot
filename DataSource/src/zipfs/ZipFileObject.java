@@ -66,7 +66,7 @@ public class ZipFileObject extends FileObject {
     @Override
     public boolean canRead() {
         // At this point we can read the zip file, so we know we can read its contents
-        return true;
+        return exists();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ZipFileObject extends FileObject {
     /* For the ZipFileSystem, getFile unpacks the requested file to a temporary
      * location and returns that file. */
     @Override
-    public File getFile(ProgressMonitor monitor) throws FileNotFoundException, IOException {
+    public synchronized File getFile(ProgressMonitor monitor) throws FileNotFoundException, IOException {
         // ignoring the monitor for now; possibly we'll need to use it this proves slow
         if ( !exists() ) throw new FileNotFoundException(
                 String.format( "file %s does not exist in %s", this.name, this.zfs.toString() ) );
