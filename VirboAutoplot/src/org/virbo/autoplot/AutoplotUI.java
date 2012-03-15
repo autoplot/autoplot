@@ -1599,6 +1599,7 @@ APSplash.checkTime("init 52");
         replaceFileMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
+        updateAllMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
         gettingStartedMenuItem = new javax.swing.JMenuItem();
@@ -2074,6 +2075,14 @@ APSplash.checkTime("init 52");
             }
         });
         toolsMenu.add(decodeURLItem);
+
+        updateAllMenuItem.setText("Update All");
+        updateAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateAllMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(updateAllMenuItem);
 
         jMenuBar1.add(toolsMenu);
 
@@ -2581,6 +2590,17 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     };
     RequestProcessor.invokeLater(run);
 }//GEN-LAST:event_replaceFileMenuItemActionPerformed
+
+private void updateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateAllMenuItemActionPerformed
+   // Reload All Data
+    for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
+        if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
+            dsf.getController().update();
+        } else {
+            System.err.println( "not updating: " + dsf.getUri() );
+        }
+    }
+}//GEN-LAST:event_updateAllMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3134,6 +3154,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
+    private javax.swing.JMenuItem updateAllMenuItem;
     private javax.swing.JMenu viewMenu;
     private javax.swing.JMenuItem zoomInMenuItem;
     private javax.swing.JMenuItem zoomOutMenuItem;
