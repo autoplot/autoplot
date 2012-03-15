@@ -634,7 +634,7 @@ public class DataSetURI {
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
         try {
-            FileSystem fs = FileSystem.create(toUri(split.path));
+            FileSystem fs = FileSystem.create(toUri(split.path),mon); // mon because of ZipFileSystem
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
             File tfile = fo.getFile(mon);
