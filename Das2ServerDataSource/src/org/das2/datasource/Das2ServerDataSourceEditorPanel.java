@@ -362,12 +362,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             SwingUtilities.invokeLater(run);
 
         } catch (SAXException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MalformedURLException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -523,12 +527,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
 
         } catch (XPathExpressionException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
             Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
