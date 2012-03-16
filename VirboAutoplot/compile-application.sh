@@ -62,6 +62,10 @@ if [ "" = "$RSYNC" ]; then
     RSYNC=rsync
 fi
 
+if [ "" = "$AWK" ]; then
+    AWK=awk
+fi
+
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
@@ -80,8 +84,7 @@ fi
 
 echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
 #echo 'ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
-which awk
-plugins=`ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
+plugins=`ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | $AWK  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
 echo $plugins
 
 echo "copy sources..."
