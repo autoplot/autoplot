@@ -200,7 +200,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     } else {
                         isCoordinateVariable= true;
                     }
-                }
+                } 
             }
         }
         
@@ -270,7 +270,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
 
 
-        if ( attributes.containsKey("VAR_TYPE") ) { // LANL want to create HDF5 files with ISTP metadata
+        if ( attributes.containsKey("VAR_TYPE") || attributes.containsKey("DEPEND_0") ) { // LANL want to create HDF5 files with ISTP metadata
             properties.put( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
             Map<String,Object> istpProps= new IstpMetadataModel().properties(attributes);
             if ( properties.get( QDataSet.UNITS )==Units.us2000 ) {
