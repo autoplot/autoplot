@@ -51,7 +51,7 @@ if [ "" = "$CODEBASE" ]; then
 fi
 
 if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="http://papco.org:8080/hudson"
+    HUDSON_URL="http://apps-pw.physics.uiowa.edu:8080/hudson"
 fi
 
 if [ "" = "$WGET" ]; then
