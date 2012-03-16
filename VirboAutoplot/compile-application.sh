@@ -78,6 +78,10 @@ if [ $? -ne 0 ]; then
    exit -1
 fi
 
+echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
+plugins=`ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
+echo $plugins
+
 echo "copy sources..."
 for i in \
   dasCore dasCoreUtil dasCoreDatum \
@@ -85,13 +89,7 @@ for i in \
   JythonSupport \
   AutoplotHelp \
   IdlMatlabSupport \
-  AudioSystemDataSource \
-  BinaryDataSource DataSourcePack JythonDataSource \
-  Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CefDataSource \
-  WavDataSource ImageDataSource ExcelDataSource \
-  FitsDataSource OpenDapDataSource \
-  CdfDataSource CdfJavaDataSource CDAWebDataSource \
+  $plugins \
   VirboAutoplot; do
     echo ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
     ${RSYNC} -a --exclude .svn ../${i}/src/ temp-volatile-src/
@@ -157,12 +155,7 @@ for i in \
   AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
-  BinaryDataSource DataSourcePack JythonDataSource \
-  Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CdfDataSource CefDataSource \
-  WavDataSource ImageDataSource ExcelDataSource \
-  FitsDataSource OpenDapDataSource \
-  CdfJavaDataSource \
+  $plugins \
   VirboAutoplot; do
     if [ -d ../${i}/javahelp/ ]; then
         echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
