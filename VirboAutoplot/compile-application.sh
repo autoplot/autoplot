@@ -80,6 +80,7 @@ fi
 
 echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
 #echo 'ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
+which awk
 plugins=`ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  'BEGIN { FS = "/" } ; { print $2 }' | sort | uniq | xargs`
 echo $plugins
 
