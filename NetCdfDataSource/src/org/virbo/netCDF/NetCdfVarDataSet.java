@@ -241,8 +241,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             if ( cdata==null ) {
                 throw new RuntimeException("Either data or cdata should be defined at this point");
             }
-            //20110101T00:00 is 14 chars long.  2011-Jan-01T00:00:00.000000000 is 30 chars long.
-            if ( shape.length==2 && shape[1]>=14 && shape[1]<=30 ) { // NASA/Goddard translation service formats Times as strings, check for this.
+            //20110101T00:00 is 14 chars long.  "2011-Jan-01T00:00:00.000000000     " is 35 chars long. (LANL has padding after the times to make it 35 characters long.)
+            if ( shape.length==2 && shape[1]>=14 && shape[1]<=35 ) { // NASA/Goddard translation service formats Times as strings, check for this.
                 logger.fine("parsing times formatted in char arrays");
                 data= new double[shape[0]];
                 String ss= new String(cdata);
