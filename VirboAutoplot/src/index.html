@@ -22,6 +22,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>ISO8601 char arrays in NetCDF/HDF5 can now be up to 35 characters long.  Any variable with DEPEND_0 is considered to have ISTP conventions.</li>
+            <li>New filesystem stuff wouldn't clean up locks when create failed. (Thanks Hudson!)</li>
             <li>Major fix to filesystem stuff, where a hung filesystem create doesn't prevent further use of any filesystems (and Autoplot)</li>
             <li>fixes to rich ascii, including unbundle preserves bundle with proper labels, and support for enums</li>
             <li>check for cache area when saving Jython files was broken.</li>
