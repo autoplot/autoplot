@@ -8,10 +8,20 @@ package org.virbo.autoplot;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import javax.swing.SwingUtilities;
+import org.virbo.datasource.AutoplotSettings;
 
 /**
  * This utility regularly posts events on the event thread, and measures processing time.
@@ -27,6 +37,10 @@ public final class EventThreadResponseMonitor {
 
     int testFrequency = 300;
     int warnLevel= 500; // acceptable millisecond delay in processing
+    int errorLevel= 10000; // unacceptable delay in processing, and an error is submitted.
+    String reportedEventId= ""; // toString showing the last reported error.
+
+    long currentRequestStartTime; // roughly the start time of the current request, when it looks like it is slow
 
     public EventThreadResponseMonitor() {
         
@@ -104,7 +118,7 @@ public final class EventThreadResponseMonitor {
                         System.err.printf( "events pending:\n");
                         System.err.printf( pending );
                     }
-                    
+
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
@@ -126,6 +140,67 @@ public final class EventThreadResponseMonitor {
                         System.err.println("====  long job to process ====");
                         System.err.println(test);
                         System.err.println("====  end, long job to process ====");
+
+                        String eventId= test.toString();
+                        boolean hungProcess= System.currentTimeMillis()-currentRequestStartTime > errorLevel;
+                        if ( hungProcess && ! eventId.equals(reportedEventId) ) {
+
+                            System.err.printf( "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT...\n" );
+
+                            Date now= new Date();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                            String timeStamp= sdf.format( now );
+
+                            String id= "anon";
+                            try {
+                                id= System.getProperty("user.name");
+                            } catch ( SecurityException ex ) {
+                            }
+
+                            String fname= "hang_"+ id.replaceAll(" ","_") + "_"+ timeStamp + ".txt";
+
+                            File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
+                            if ( !logdir.exists() ) {
+                                if ( !logdir.mkdirs() ) {
+                                    throw new IllegalStateException("Unable to mkdir "+logdir);
+                                }
+                            }
+
+                            File f= new File( logdir, fname );
+                            Map<Thread,StackTraceElement[]> ttt= Thread.getAllStackTraces();
+
+                            try {
+                                PrintWriter out= new PrintWriter( new FileOutputStream(f) );
+
+                                for ( Entry<Thread,StackTraceElement[]> tt : ttt.entrySet() ) {
+                                    Thread t= tt.getKey();
+                                    StackTraceElement[] stes= tt.getValue();
+                                    out.println( t.getName() );
+                                    for ( int i=0; i<stes.length; i++ ) {
+                                        out.println("\tat " + stes[i]);
+                                    }
+                                    out.println( "\n" );
+                                }
+
+                                out.close();
+                                
+                            } catch ( IOException ex ) {
+                                ex.printStackTrace();
+                                
+                            }
+
+                            reportedEventId= eventId;
+                            
+                            currentEvent= null;
+                            
+                        }
+                    } else {
+                        currentRequestStartTime= System.currentTimeMillis();
+
+                    }
+
+                    if ( test!=currentEvent ) {
+
                     }
                     currentEvent=  test;
                     try {
