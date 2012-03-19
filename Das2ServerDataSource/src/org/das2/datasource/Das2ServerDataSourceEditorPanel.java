@@ -59,8 +59,10 @@ import javax.xml.xpath.XPathFactory;
 import org.das2.DasApplication;
 import org.das2.DasException;
 import org.das2.client.DasServer;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
@@ -721,13 +723,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         String startTime= params.remove("start_time");
         String endTime= params.remove("end_time");
-        if ( startTime!=null ) {
-            try {
-                DatumRange dr = DatumRangeUtil.parseTimeRange(startTime + " to " + endTime);
-                timeRangeTextField.setText(dr.toString());
-            } catch (ParseException ex) {
-                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        if ( startTime!=null && endTime!=null ) {
+            Datum t1= TimeUtil.createValid( startTime );
+            Datum t2= TimeUtil.createValid( endTime );
+            DatumRange dr = new DatumRange( t1, t2 );
+            timeRangeTextField.setText(dr.toString());
         } else {
             timeRangeTextField.setText( DEFAULT_TIMERANGE );
         }

@@ -36,6 +36,7 @@ import org.das2.dataset.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.das2.datum.TimeUtil;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -51,14 +52,16 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 class Das2ServerDataSource extends AbstractDataSource {
 
-    public Das2ServerDataSource(URI uri) {
+    public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
         if ( !"no".equals( params.get("tsb") ) ) {
             addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
         }
-        HashMap params2 = new HashMap(params);
+        HashMap<String,String> params2 = new HashMap(params);
         params2.put("server", "dataset");
-        timeRange= DatumRangeUtil.parseTimeRangeValid( params2.get("start_time") + " to "+ params2.get("end_time" ) );
+
+        timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
+
         resolution= null;
     }
 
@@ -277,7 +280,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
 
 
-        if ( timeRange==null ) timeRange= DatumRangeUtil.parseTimeRange( params2.get("start_time") + " to "+ params2.get("end_time" ) );
+        if ( timeRange==null ) timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
 
         logger.fine("  done. ");
 
