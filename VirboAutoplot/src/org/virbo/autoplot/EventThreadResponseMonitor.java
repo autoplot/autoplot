@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import javax.swing.SwingUtilities;
+import org.das2.DasApplication;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -151,11 +152,12 @@ public final class EventThreadResponseMonitor {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
                             String timeStamp= sdf.format( now );
 
-                            String id= "anon";
-                            try {
-                                id= System.getProperty("user.name");
-                            } catch ( SecurityException ex ) {
+                            if ( !DasApplication.hasAllPermission() ) {
+                                return;
                             }
+
+                            String id= "anon";
+                            id= System.getProperty("user.name");
 
                             String fname= "hang_"+ id.replaceAll(" ","_") + "_"+ timeStamp + ".txt";
 
