@@ -41,7 +41,7 @@
         
         <jar href="AutoplotVolatile.jar" />
         <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20111115.jar" /> -->
-        <jar href="AutoplotStable.jar" />
+        <jar href="../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" > -->
