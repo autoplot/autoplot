@@ -615,7 +615,16 @@ public class CdfUtil {
 
         } else if (varType == Variable.CDF_CHAR || varType == Variable.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(variable.getName());
-            String[] sdata = (String[]) odata;
+            String[] sdata;
+            if ( odata instanceof byte[] && qube.length==1 ) { //http://cdaweb.gsfc.nasa.gov/istp_public/data/image/euv/2005/im_k0_euv_20050129_v01.cdf?IMAGE[0]
+                int nn= Array.getLength(odata)/qube[0];
+                sdata= new String[qube[0]];
+                for ( int ii=0; ii<qube[0]; ii++ ) {
+                    sdata[ii]= new String( (byte[])odata, ii*nn, nn );
+                }
+            } else {
+                sdata = (String[]) odata;
+            }
             double[] back = new double[sdata.length];
             for (int i = 0; i < sdata.length; i++) {
                 back[i] = units.createDatum(sdata[i]).doubleValue(units);
