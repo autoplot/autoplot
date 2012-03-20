@@ -934,6 +934,7 @@ public class GuiSupport {
                 ProgressMonitor mon = DasProgressPanel.createFramed("importing bookmarks");
                 if ( gui.getRemote().isSelected() ) {
                     parent.getBookmarksManager().getModel().addRemoteBookmarks(bookmarksFile);
+                    parent.getBookmarksManager().reload();
                 } else {
                     in = DataSetURI.getInputStream(DataSetURI.getURIValid(bookmarksFile), mon);
                     ByteArrayOutputStream boas=new ByteArrayOutputStream();
