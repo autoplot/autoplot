@@ -627,7 +627,10 @@ public class DataSetURI {
     }
 
     /**
-     * return a file reference for the url.  This is initially to fix the problem
+     * return a file reference for the url.  The file must have a nice name
+     * on the server, and cannot be the result of a server query with parameters. (Use 
+     * downloadResourceAsTempFile for this).
+     * This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
      * @param allowHtml skip html test that tests for html content.
      */
@@ -681,7 +684,8 @@ public class DataSetURI {
      * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
      * it's needed.
      *
-     * This will always always download, no caching is done.  We allow subsequent calls within 10 seconds to use the same file.
+     * This will almost always download, very little caching is done.  We allow subsequent
+     * calls within 10 seconds to use the same file.
      * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
@@ -719,12 +723,10 @@ public class DataSetURI {
             }
         }
 
-        String filename = new File( localCache, split.file.substring(split.path.length()) ).toString();
+        String filename = split.file.substring( split.path.length());
 
         if ( split.params!=null && split.params.length()>0 ) {
             String safe= split.params;
-            //safe= safe.replaceAll("\\:","%3A"); // mimic wget on Windows
-            //safe= safe.replaceAll("\\&","__");  // except our filenames can't contain ampersands.
 
             safe= safe.replaceAll("\\+","_"); // 2011 safeName uses "plus" for this
             safe= safe.replaceAll("-","."); // 2011 safeName uses "_" for this, but it should be different than "+"
@@ -734,7 +736,16 @@ public class DataSetURI {
             filename= filename.replaceAll("@","_")+"@";
         }
 
-        //filename= filename + "@" + String.format("%16d", System.currentTimeMillis() );
+        if ( filename.length() > 50 ) { // Bob pointed out this often results in very long names that cause a problem.  Hash these.
+            String[] ss= filename.split("@");
+            String base= ss[0];
+            if ( base.length()>50 ) base= base.substring(0,50);
+            String args= ss[1];
+            if ( args.length()>0 ) args= String.format( "%09d", Math.abs(args.hashCode()) );
+            filename= base + String.format( "%09d", Math.abs(ss[0].hashCode()) ) + "@" + args;
+        }
+
+        filename = new File( localCache, filename ).toString();
 
         Object action="";
         File result= new File( filename );  // final name
@@ -770,7 +781,7 @@ public class DataSetURI {
                 System.err.println("this thread will downloading temp resource " + newf );
                 action= ACTION_DOWNLOAD;
                 OutputStream out= new FileOutputStream(result);  // touch the file
-                out.write( "DataSetURI.downloadResourceAsTempFile: This should not be used.\n".getBytes() ); // I bet we see this message again!
+                out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
                 out.close();
                 OutputStream outf= new FileOutputStream(newf);
                 outf.close();
