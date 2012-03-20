@@ -32,16 +32,14 @@ import org.virbo.datasource.AutoplotSettings;
  */
 public final class EventThreadResponseMonitor {
 
-    long lastPost;
-    long response;
-    String pending;
+    private long lastPost;
+    private long response;
+    private String pending;
 
-    int testFrequency = 300;
-    int warnLevel= 500; // acceptable millisecond delay in processing
-    int errorLevel= 10000; // unacceptable delay in processing, and an error is submitted.
-    String reportedEventId= ""; // toString showing the last reported error.
-
-    long currentRequestStartTime; // roughly the start time of the current request, when it looks like it is slow
+    private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 300;
+    private static final int WARN_LEVEL_MILLIS= 500; // acceptable millisecond delay in processing
+    private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
+    private static final int WATCH_INTERVAL_MILLIS = 1000;
 
     public EventThreadResponseMonitor() {
         
@@ -85,7 +83,7 @@ public final class EventThreadResponseMonitor {
             public void run() {
                 while ( true ) {
                     try {
-                        long nextPost= lastPost+testFrequency;
+                        long nextPost= lastPost+TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS;
                         long sleep= nextPost - System.currentTimeMillis();
                         while ( sleep > 0 ) {
                             Thread.sleep( sleep );
@@ -107,13 +105,17 @@ public final class EventThreadResponseMonitor {
         };
     }
 
+    /**
+     * the response runnable simply measures how long it takes for an event to be processed by the event thread.
+     * @return
+     */
     Runnable responseRunnable() {
         return new Runnable() {
             public void run() {
                 response= System.currentTimeMillis();
                 long levelms= response-lastPost;
 
-                if ( levelms>warnLevel ) {
+                if ( levelms>WARN_LEVEL_MILLIS ) {
                     System.err.printf( "CURRENT EVENT QUEUE CLEAR TIME: %5.3f sec\n", levelms/1000. );
                     if ( pending!=null ) {
                         System.err.printf( "events pending:\n");
@@ -130,10 +132,20 @@ public final class EventThreadResponseMonitor {
         };
     }
 
+    /**
+     * the watchEventThreadRunnable watches the current event on the event thread, and if it doesn't change within a given
+     * interval (WATCH_INTERVAL_MILLIS) start printing errors and eventually (ERROR_LEVEL_MILLIS) log an error because the thread appears to
+     * be hung.
+     * @return
+     */
+
     Runnable watchEventThreadRunnable() {
         return new Runnable() {
             public void run() {
                 AWTEvent currentEvent= null;
+                String reportedEventId= "";      // toString showing the last reported error.
+                long currentRequestStartTime= 0; // roughly the start time of the current request, when it looks like it is slow
+
                 while (true) {
                     EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
                     AWTEvent test= instance.peekEvent();
@@ -143,7 +155,7 @@ public final class EventThreadResponseMonitor {
                         System.err.println("====  end, long job to process ====");
 
                         String eventId= test.toString();
-                        boolean hungProcess= System.currentTimeMillis()-currentRequestStartTime > errorLevel;
+                        boolean hungProcess= System.currentTimeMillis()-currentRequestStartTime > ERROR_LEVEL_MILLIS;
                         if ( hungProcess && ! eventId.equals(reportedEventId) ) {
 
                             System.err.printf( "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT...\n" );
@@ -178,8 +190,8 @@ public final class EventThreadResponseMonitor {
                                     Thread t= tt.getKey();
                                     StackTraceElement[] stes= tt.getValue();
                                     out.println( t.getName() );
-                                    for ( int i=0; i<stes.length; i++ ) {
-                                        out.println("\tat " + stes[i]);
+                                    for ( StackTraceElement ste : stes) {
+                                        out.println("\tat " + ste);
                                     }
                                     out.println( "\n" );
                                 }
@@ -206,7 +218,7 @@ public final class EventThreadResponseMonitor {
                     }
                     currentEvent=  test;
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(WATCH_INTERVAL_MILLIS);
                     } catch ( InterruptedException ex ) {
                     }
                 }
