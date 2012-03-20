@@ -954,6 +954,13 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     }
 
     /**
+     * reload the bookmarks from disk.  Remote bookmarks will be reloaded slightly later.
+     */
+    public void reload() {
+        setPrefNode( prefNode );
+    }
+
+    /**
      * setting this makes the manager the authority on bookmarks.
      * @param nodeName
      */
