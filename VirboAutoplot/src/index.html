@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>orbit:rbspa-pp:12 is used to select the 12th predicted orbit of RBSP.</small></p>
+        <p><small>das2server URIs are more flexible about times, allowing end time with missing hh:mm:ss.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>hung event thread detector writes to autoplot_data/log/ when event thread appears to be hung.</li>
+            <li>das2server is more flexible about handing times.</li>
+            <li>downloadResourceAsTempFile long filename bug fixed by using hash for long filenames</li>
             <li>ISO8601 char arrays in NetCDF/HDF5 can now be up to 35 characters long.  Any variable with DEPEND_0 is considered to have ISTP conventions.</li>
             <li>New filesystem stuff wouldn't clean up locks when create failed. (Thanks Hudson!)</li>
             <li>Major fix to filesystem stuff, where a hung filesystem create doesn't prevent further use of any filesystems (and Autoplot)</li>
