@@ -275,7 +275,10 @@ public class DodsAdapter {
                     HashMap tprops = new HashMap();
                     tprops.put(QDataSet.UNITS, dimUnits[idim]);
                     if (dimProperties[idim] != null) {
-                        tprops.putAll(dimProperties[idim]);
+                        String[] ss= DataSetUtil.dimensionProperties();
+                        for ( String s: ss ) {
+                            if ( dimProperties[idim].containsKey(s) ) tprops.put( s, dimProperties[idim].get(s) );
+                        }
                     }
                     DodsVarDataSet tds = DodsVarDataSet.newDataSet(t, tprops);
                     zds.putProperty("DEPEND_" + idim, tds);
@@ -293,7 +296,10 @@ public class DodsAdapter {
                         DArray t = (DArray) dds.getVariable(dependName[idim]);
                         HashMap tprops = new HashMap();
                         tprops.put(QDataSet.UNITS, dimUnits[idim]);
-                        if (dimProperties[idim] != null) tprops.putAll(dimProperties[idim]);
+                        String[] ss= DataSetUtil.dimensionProperties();
+                        for ( String s: ss ) {
+                            if ( dimProperties[idim].containsKey(s) ) tprops.put( s, dimProperties[idim].get(s) );
+                        }
                         DodsVarDataSet tds = DodsVarDataSet.newDataSet(t, tprops);
                         if (DataSetUtil.isMonotonic(tds)) {
                             tds.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
