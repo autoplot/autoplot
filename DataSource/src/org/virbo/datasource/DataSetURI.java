@@ -736,7 +736,7 @@ public class DataSetURI {
             filename= filename.replaceAll("@","_")+"@";
         }
 
-        if ( filename.length() > 50 ) { // Bob pointed out this often results in very long names that cause a problem.  Hash these.
+        if ( filename.length() > 50 ) { // https://sourceforge.net/support/tracker.php?aid=3509357
             String[] ss= filename.split("@");
             String base= ss[0];
             if ( base.length()>50 ) base= base.substring(0,50);
