@@ -780,7 +780,7 @@ public abstract class Bookmark {
          * a remote bookmark is one that is a copy of a folder at the remote
          * location.  If it's a remote folder, then we use it to maintain the
          * bookmarks.  We'll keep a local copy, but this may be updated.
-         * null indicates that this this a note a remote bookmark.
+         * null indicates that this this a not a remote bookmark.
          */
         String remoteUrl= null;
 
@@ -902,6 +902,11 @@ public abstract class Bookmark {
             }
         }
 
+        /**
+         * copy the bookmark.  Its title, description and URI is copied.  Note the parent is not copied, since it's use
+         * depends on the context where it is being used.
+         * @return
+         */
         public Bookmark copy() {
             Bookmark.Item result = new Bookmark.Item(getUri());
             result.setTitle(getTitle());
