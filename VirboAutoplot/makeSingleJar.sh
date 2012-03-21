@@ -15,7 +15,7 @@ unzip -o ../AutoplotVolatile.jar
 zip -r ../autoplot.jar.1 *
 
 cd ..
-cat ../../bin/starterScript.sh > autoplot.jar
+cat ../starterScript.sh > autoplot.jar
 cat autoplot.jar.1 >> autoplot.jar
 rm autoplot.jar.1
 rm -r tjar
