@@ -671,6 +671,8 @@ private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
             try {
                  // kludge for testing remote bookmarks
                 model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath())); // null getSelectedBook is okay
+                reload();
+                
             } catch (IllegalArgumentException ex ) {
                 if ( true ) { //ex.toString().contains("URLDecoder") ) {
                     showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
