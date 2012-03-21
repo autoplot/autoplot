@@ -246,8 +246,10 @@ public class BookmarksManagerModel {
 
     /**
      * merge in the bookmarks.  Items with the same title are repeated, and
-     * folders with the same name are merged.
-     * @param list
+     * folders with the same name are merged.  When merging in a remote folder,
+     * the entire folder is replaced.
+     * @param src the items to merge in
+     * @param dest the list to update.
      */
      public void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
         if ( src.size()==0 ) return;
@@ -257,8 +259,24 @@ public class BookmarksManagerModel {
             if ( item instanceof Bookmark.Folder ) {
                 String folderName= item.getTitle();
                 Bookmark.Folder old= (Bookmark.Folder)findItem( dest, folderName, true );
+                Bookmark.Folder itemBook= (Bookmark.Folder)item;
                 if ( old!=null ) {
-                    mergeList( ((Bookmark.Folder)item).getBookmarks(), old.getBookmarks() );
+                    if ( itemBook.remoteUrl==null ) {
+                        mergeList( ((Bookmark.Folder)item).getBookmarks(), old.getBookmarks() );
+                    } else {
+                        System.err.println("replacing folder "+old + " with remote bookmark folder "+item + " " + itemBook.remoteUrl );
+                        Bookmark.Folder parent= old.getParent();
+                        if ( parent==null ) {
+                            int indx= dest.indexOf(old);
+                            dest.remove(indx);
+                            dest.add(indx,itemBook);
+                        } else {
+                            List<Bookmark> list= parent.getBookmarks();
+                            int indx= list.indexOf(old);
+                            list.remove(indx);
+                            list.add(indx,itemBook);
+                        }
+                    }
                 } else {
                     dest.add(item);
                 }
@@ -482,8 +500,6 @@ public class BookmarksManagerModel {
         for ( int i=0;i<importBook.size(); i++ ) {
             Bookmark m=  importBook.get(i);
             if ( m instanceof Bookmark.Folder ) {
-                ((Bookmark.Folder)m).setRemoteUrl( surl );
-                ((Bookmark.Folder)m).setTitle( m.getTitle() );
                 copy.add( m );
             }
         }
