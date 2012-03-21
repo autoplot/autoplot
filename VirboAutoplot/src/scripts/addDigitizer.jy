@@ -1,0 +1,27 @@
+## the events recorder #####
+from org.das2.components import DataPointRecorder
+dpr= DataPointRecorder()
+
+addTab( 'digitizer', dpr )
+
+## add the box selector #########################
+dom= getDocumentModel()
+plot= dom.plots[0].controller.dasPlot
+
+from org.das2.event import BoxSelectorMouseModule
+
+mm= BoxSelectorMouseModule.create( plot, 'events tool' )
+
+from java.lang import Runtime
+
+def boxSelected(event):
+    x= event.getXRange().min()
+    y= event.getYRange().max()
+    map= java.util.HashMap()
+    map.put( "dx", event.getXRange().width() )
+    map.put( "dy", event.getYRange().width() )
+    dpr.addDataPoint( x, y, map )
+    
+mm.BoxSelected=boxSelected
+
+plot.dasMouseInputAdapter.primaryModule= mm
