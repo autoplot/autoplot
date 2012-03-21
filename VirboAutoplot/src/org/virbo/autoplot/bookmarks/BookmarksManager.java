@@ -1109,6 +1109,9 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
     private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, final DataSetSelector sel ) {
 
+        //TODO: tooltips are sometimes underneath submenus.
+        //ToolTipManager.sharedInstance().getReshowDelay();
+
         int MAX_TITLE_LEN=50;
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
@@ -1130,7 +1133,6 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
                     String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+ "<br>" + ((Bookmark.Item)book).getUri() +"</em></html>";
                     mi.setToolTipText( ttext );
-                    //TODO: delay tooltip
                 } else {
                     String ttext=  "<html><em>"+ title + "<br>" + ((Bookmark.Item)book).getUri()+"</em></html>";
                     mi.setToolTipText( ttext );
