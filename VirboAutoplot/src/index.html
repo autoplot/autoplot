@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>das2server URIs are more flexible about times, allowing end time with missing hh:mm:ss.</small></p>
+        <p><small>A bug is fixed with ISTP CDFs sent over OpenDap, allowing rank 2 data to be plotted.  The top panel is accessing the data directly in a CDF file, the bottom is via OpenDAP.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +22,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
-            <li>hung event thread detector writes to autoplot_data/log/ when event thread appears to be hung.</li>
+            <li>bookmarks with remote URLs load properly when "bookmarks:..." is used to bring in new bookmarks</li>
+            <li>bugfixes to allow rank 2 CDF data (stereo/swaves) to be read over openDAP.</li>
+            <li>hung event thread detector writes to autoplot_data/log when event thread appears to be hung.</li>
             <li>das2server is more flexible about handing times.</li>
             <li>downloadResourceAsTempFile long filename bug fixed by using hash for long filenames</li>
             <li>ISO8601 char arrays in NetCDF/HDF5 can now be up to 35 characters long.  Any variable with DEPEND_0 is considered to have ISTP conventions.</li>
