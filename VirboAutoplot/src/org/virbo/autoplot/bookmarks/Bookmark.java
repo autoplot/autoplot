@@ -744,6 +744,9 @@ public abstract class Bookmark {
     }
 
 
+    /**
+     * icons associated with the bookmark.  This was wishful thinking, and wasn't fully developed.
+     */
     protected ImageIcon icon = null;
     public static final String PROP_ICON = "icon";
 
