@@ -14,7 +14,10 @@ package org.virbo.datasource;
  * @author jbf
  */
 public class Version {
-    
+
+    /**
+     * Version of the DataSource library is {@value}.
+     */
     public static final String version= "20070530.1" ;
     
     /** Creates a new instance of Version */
