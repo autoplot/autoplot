@@ -133,8 +133,6 @@ rm -f temp-volatile-classes/META-INF/*.SF
 
 export TIMESTAMP=`date +%Y%m%d_%H%M%S`
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
-cat temp-volatile-classes/META-INF/build.txt
-echo "** Why doesn't apps-pw have build.tag? **"
 
 cat temp-volatile-classes/META-INF/build.txt | sed "s/build.timestamp\:/build.timestamp\: $TIMESTAMP/" > temp-volatile-classes/META-INF/build.txt.1
 mv  temp-volatile-classes/META-INF/build.txt.1  temp-volatile-classes/META-INF/build.txt
