@@ -48,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.event.MenuListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -1127,10 +1128,13 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 });
 
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+ "<br>" + ((Bookmark.Item)book).getUri() +"</em></html>";
                     mi.setToolTipText( ttext );
                     //TODO: delay tooltip
-                } 
+                } else {
+                    String ttext=  "<html><em>"+ title + "<br>" + ((Bookmark.Item)book).getUri()+"</em></html>";
+                    mi.setToolTipText( ttext );
+                }
                 if (book.getIcon() != null) {
                     mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
                 }
