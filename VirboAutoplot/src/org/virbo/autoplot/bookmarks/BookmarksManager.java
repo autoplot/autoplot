@@ -1146,38 +1146,33 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 String title= book.getTitle();
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
                 //final String ftitle= title;
+                final JMenu subMenu = new JMenu(title);
+                String tooltip;
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()==0 ) {
                         title= title + " " + Bookmark.MSG_REMOTE;
+                        tooltip= Bookmark.TOOLTIP_REMOTE;
                     } else if ( folder.getRemoteStatus()==-1 ) {
                         title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
+                        tooltip= Bookmark.TOOLTIP_NOT_LOADED;
                     } else {
                         title= title + " " + Bookmark.MSG_NO_REMOTE;
+                        tooltip= Bookmark.TOOLTIP_NO_REMOTE;
                     }
+                } else {
+                    tooltip= "";
                 }
-                final JMenu subMenu = new JMenu(title);
+
+                if ( tooltip.contains("%{URL}") ) {
+                    tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
+                }
+                
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em></html>";
-                    subMenu.setToolTipText( ttext );
-                    //TODO: delay tooltip
+                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
+                    subMenu.setToolTipText( ttext + "<br>" + tooltip );
+                } else {
+                    if ( tooltip.length()>0 ) subMenu.setToolTipText( tooltip );
                 }
-//                if ( folder.getRemoteStatus()==-1 ) {
-//                    subMenu.addMenuListener( new MenuListener() {
-//
-//                        public void menuSelected(MenuEvent e) {
-//                            System.err.println("go off and download the rest");
-//                            subMenu.setText( ftitle + " (loading)");
-//                        }
-//
-//                        public void menuDeselected(MenuEvent e) {
-//
-//                        }
-//
-//                        public void menuCanceled(MenuEvent e) {
-//
-//                        }
-//                    });
-//                }
                 addBookmarks(subMenu, folder.getBookmarks(),sel);
                 bookmarksMenu.add(subMenu);
             }
