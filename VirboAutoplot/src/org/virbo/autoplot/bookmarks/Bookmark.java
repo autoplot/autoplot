@@ -71,9 +71,13 @@ import org.xml.sax.SAXException;
  */
 public abstract class Bookmark {
 
-    public static final String MSG_NO_REMOTE= "(remote not available)";
-    public static final String MSG_REMOTE= "(remote)";
-    public static final String MSG_NOT_LOADED= "(remote not loaded)";
+    public static final String MSG_NO_REMOTE= "[remote*]";
+    public static final String TOOLTIP_NO_REMOTE = "<html>Remote folder based on contents of remote URI <br>%{URL}<br> not available. Using cached version.</html>";
+    public static final String MSG_REMOTE= "";
+    public static final String TOOLTIP_REMOTE = "<html>Bookmark folder based on contents of remote URI <br>%{URL}</html>";
+    public static final String MSG_NOT_LOADED= "[remote...]";
+    public static final String TOOLTIP_NOT_LOADED = "<html>Checking to see if remote bookmark list has changed.<br>%{URL}</html>";
+
     private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
@@ -217,10 +221,15 @@ public abstract class Bookmark {
             if ( flist==null ) {
                 // The remote folder itself can contain remote folders,
                 String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
+                //TODOString remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 if ( remoteUrl2.length()>0 ) {
                     remoteRemote= true; // avoid warning
                 }
             } else {
+                //TODOString remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING ); //TODO: verify that we can have remote in lower position.
+                //TODOif ( remoteUrl2.length()>0 ) {
+                //TODO    remoteRemote= true; // avoid warning
+                //TODO}
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
                 List<Bookmark> contents1 = parseBookmarks( flist, vers1, remoteLevel-1 );
                 contents.addAll(contents1);
