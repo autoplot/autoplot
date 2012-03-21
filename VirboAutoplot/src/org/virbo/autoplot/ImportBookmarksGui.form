@@ -58,6 +58,7 @@
     <Component class="javax.swing.JCheckBox" name="remote">
       <Properties>
         <Property name="text" type="java.lang.String" value="remote bookmarks folder"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;If checked, this bookmark folder will be synchronized with &lt;br&gt;the remote bookmarks file when Autoplot is started.  &lt;br&gt;If unchecked, the bookmarks in this remote bookmarks &lt;br&gt;file will not be updated if the remote file changes."/>
       </Properties>
     </Component>
   </SubComponents>

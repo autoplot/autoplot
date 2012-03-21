@@ -51,6 +51,7 @@ public class ImportBookmarksGui extends javax.swing.JPanel {
         bookmarksFilename.setText("insert name of bookmarks file here");
 
         remote.setText("remote bookmarks folder");
+        remote.setToolTipText("<html>If checked, this bookmark folder will be synchronized with <br>the remote bookmarks file when Autoplot is started.  <br>If unchecked, the bookmarks in this remote bookmarks <br>file will not be updated if the remote file changes.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
