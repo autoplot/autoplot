@@ -1175,7 +1175,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                     String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
                     subMenu.setToolTipText( ttext + "<br>" + tooltip );
                 } else {
-                    if ( tooltip.length()>0 ) subMenu.setToolTipText( tooltip );
+                    if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
                 }
                 addBookmarks(subMenu, folder.getBookmarks(),sel);
                 bookmarksMenu.add(subMenu);
