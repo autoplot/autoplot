@@ -1149,8 +1149,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 Bookmark.Folder folder = (Bookmark.Folder) book;
                 String title= book.getTitle();
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
-                //final String ftitle= title;
-                final JMenu subMenu = new JMenu(title);
+
                 String tooltip;
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()==0 ) {
@@ -1166,6 +1165,8 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 } else {
                     tooltip= "";
                 }
+
+                final JMenu subMenu = new JMenu(title);
 
                 if ( tooltip.contains("%{URL}") ) {
                     tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
