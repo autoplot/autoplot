@@ -71,6 +71,10 @@ public class ScriptContext extends PyJavaInstance {
             model.addDasPeersToApp();
             dom= model.getDocumentModel();
         }
+        if ( view!=null ) {
+            view.setVisible(true);
+        }
+
     }
 
     protected static void setApplicationModel(ApplicationModel m) {
