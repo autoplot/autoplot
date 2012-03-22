@@ -153,7 +153,7 @@ public final class EventThreadResponseMonitor {
 
                 while (true) {
                     EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
-                    AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for evert getSystemEventQueue.
+                    AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
                     if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
                         System.err.println("====  long job to process ====");
                         System.err.println(test);
