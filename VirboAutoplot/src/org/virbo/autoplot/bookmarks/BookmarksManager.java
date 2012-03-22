@@ -923,7 +923,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
         for ( Bookmark b: book ) {
             if ( b instanceof Bookmark.Folder ) {
                 Bookmark.Folder bf= (Bookmark.Folder)b;
-                if ( bf.remoteStatus==-1 ) {
+                if ( bf.remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) {
                     unresolved= true;
                 }
             }
@@ -936,7 +936,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
             public void run() {
                 try {
                     try {
-                        Thread.sleep(10000); // sleep 10 seconds before making second pass
+                        Thread.sleep(5000); // sleep 5 seconds before making second pass
                     } catch (InterruptedException ex) {
                         Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -1152,10 +1152,10 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
                 String tooltip;
                 if ( folder.getRemoteUrl()!=null ) {
-                    if ( folder.getRemoteStatus()==0 ) {
+                    if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL ) {
                         title= title + " " + Bookmark.MSG_REMOTE;
                         tooltip= Bookmark.TOOLTIP_REMOTE;
-                    } else if ( folder.getRemoteStatus()==-1 ) {
+                    } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED  ) {
                         title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
                         tooltip= Bookmark.TOOLTIP_NOT_LOADED;
                     } else {
