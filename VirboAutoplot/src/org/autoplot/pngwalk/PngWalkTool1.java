@@ -314,7 +314,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         return tool;
     }
 
-    private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame f ) {
+    private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame frame ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
 
@@ -324,18 +324,18 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     if ( JOptionPane.OK_OPTION==
                             JOptionPane.showConfirmDialog( tool,
                             "Quit application?", "Quit PNG Walk", JOptionPane.OK_CANCEL_OPTION ) ) {
-                        f.dispose();
+                        frame.dispose();
                         AppManager.getInstance().closeApplication(tool);
                     }
                 } else {
-                    f.dispose();
+                    frame.dispose();
                     AppManager.getInstance().closeApplication(tool);
                 }
             }
         } );
         fileMenu.add( new AbstractAction( "Quit" ) {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
+                frame.dispose();
                 AppManager.getInstance().quit();
             }
         } );
@@ -420,7 +420,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         result.add( optionsMenu );
 
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
-        final BookmarksManager man= new BookmarksManager(f,true);
+        final BookmarksManager man= new BookmarksManager(frame,true);
 
         man.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
