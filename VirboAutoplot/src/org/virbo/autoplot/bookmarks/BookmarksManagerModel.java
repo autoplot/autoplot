@@ -482,7 +482,10 @@ public class BookmarksManagerModel {
     }
 
     /**
-     * add the remote bookmarks.
+     * add the remote bookmarks.  An ordinary bookmarks file downloaded from
+     * a website can be tacked on to a user's existing bookmarks, and updates
+     * to the file will be visible on the client's bookmark list.
+     * 
      * @param surl
      * @param selectedBookmark location to add the bookmark, can be null.
      * @throws MalformedURLException
@@ -502,6 +505,10 @@ public class BookmarksManagerModel {
         for ( int i=0;i<importBook.size(); i++ ) {
             Bookmark m=  importBook.get(i);
             if ( m instanceof Bookmark.Folder ) {
+                Bookmark.Folder bf= (Bookmark.Folder)m;
+                if ( bf.getRemoteUrl()==null ) {
+                    bf.setRemoteUrl( surl );
+                }
                 copy.add( m );
             }
         }
