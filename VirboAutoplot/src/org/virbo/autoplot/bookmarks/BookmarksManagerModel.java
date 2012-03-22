@@ -383,7 +383,7 @@ public class BookmarksManagerModel {
             String node= b.toString();
             if (b instanceof Bookmark.Folder) {
                 if ( ((Bookmark.Folder)b).remoteUrl!=null && ((Bookmark.Folder)b).remoteUrl.length()>0 ) {
-                    node= node + String.format( " (remoteUrl=%s)", ((Bookmark.Folder)b).remoteUrl );
+                    node= node + String.format( " [remoteUrl=%s]", ((Bookmark.Folder)b).remoteUrl );
                 }
             }
             final String fnode= node;
