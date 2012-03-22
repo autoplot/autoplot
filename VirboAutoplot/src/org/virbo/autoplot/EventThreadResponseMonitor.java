@@ -28,6 +28,11 @@ import org.virbo.datasource.AutoplotSettings;
  * This utility regularly posts events on the event thread, and measures processing time.
  * This should never be more than 500ms (warnLevel below).
  * See org.das2.util.awt.LoggingEventQueue, which was a similar experiment from 2005.
+ * This now monitors the event thread for hung events.
+ *
+ * Bugs found:
+ *   https://sourceforge.net/tracker/index.php?func=detail&aid=3510248&group_id=199733&atid=970682
+ *
  * @author jbf
  */
 public final class EventThreadResponseMonitor {
@@ -148,7 +153,7 @@ public final class EventThreadResponseMonitor {
 
                 while (true) {
                     EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
-                    AWTEvent test= instance.peekEvent();
+                    AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for evert getSystemEventQueue.
                     if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
                         System.err.println("====  long job to process ====");
                         System.err.println(test);
