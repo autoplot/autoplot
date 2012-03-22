@@ -261,20 +261,22 @@ public class BookmarksManagerModel {
                 Bookmark.Folder old= (Bookmark.Folder)findItem( dest, folderName, true );
                 Bookmark.Folder itemBook= (Bookmark.Folder)item;
                 if ( old!=null ) {
+                    int indx;
+                    boolean replace;
+                    indx= dest.indexOf(old);
+                    replace= old.remoteUrl!=null;
                     if ( itemBook.remoteUrl==null ) {
                         mergeList( ((Bookmark.Folder)item).getBookmarks(), old.getBookmarks() );
                     } else {
-                        System.err.println("replacing folder "+old + " with remote bookmark folder "+item + " " + itemBook.remoteUrl );
                         Bookmark.Folder parent= old.getParent();
                         if ( parent==null ) {
-                            int indx= dest.indexOf(old);
-                            dest.remove(indx);
-                            dest.add(indx,itemBook);
+                            dest.add(indx+1,itemBook);
+                            if ( replace ) dest.remove(indx);
                         } else {
                             List<Bookmark> list= parent.getBookmarks();
-                            int indx= list.indexOf(old);
-                            list.remove(indx);
-                            list.add(indx,itemBook);
+                            indx= list.indexOf(old);
+                            list.add(indx+1,itemBook);
+                            if ( replace ) list.remove(indx);
                         }
                     }
                 } else {
