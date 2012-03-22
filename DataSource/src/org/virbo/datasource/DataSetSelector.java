@@ -1285,8 +1285,6 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
         this.editor.setText(value);
-        Window p= SwingUtilities.getWindowAncestor(this); // pngwalk: starts with this invisible.
-        if ( !p.isVisible() ) p.setVisible(true);
         //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
     //doItemStateChange = true;
     }
