@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -589,14 +590,29 @@ public class GuiSupport {
      * @return
      */
     ApplicationModel newApplication() {
-        ApplicationModel model = new ApplicationModel();
+        final ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
         model.addDasPeersToApp();
-        AutoplotUI view = new AutoplotUI(model);
-        view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-        view.setVisible(true);
-        OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
-        opc.loadPreferencesWithEvents();
+        Runnable run= new Runnable() {
+            public void run() {
+                AutoplotUI view = new AutoplotUI(model);
+                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                view.setVisible(true);
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                opc.loadPreferencesWithEvents();
+            }
+        };
+        try {
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeAndWait(run);
+            }
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
+        } catch ( InvocationTargetException ex ) {
+            throw new RuntimeException(ex);
+        }
         return model;
     }
 
