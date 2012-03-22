@@ -2952,7 +2952,9 @@ APSplash.checkTime("init 220");
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             app.applicationModel.canvas.repaint();
-                            app.setVisible(true);
+                            if ( !initialURL.startsWith("pngwalk:") ) {
+                                app.setVisible(true);
+                            }
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
                     } );
