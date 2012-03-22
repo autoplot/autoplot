@@ -1130,11 +1130,15 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                     }
                 });
 
+                String uri=  ((Bookmark.Item)book).getUri();
+                if ( uri.length()>MAX_TITLE_LEN ) {
+                    uri= uri.substring(0,MAX_TITLE_LEN)+"...";
+                }
                 if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+ "<br>" + ((Bookmark.Item)book).getUri() +"</em></html>";
+                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+ "<br>" + uri +"</em></html>";
                     mi.setToolTipText( ttext );
                 } else {
-                    String ttext=  "<html><em>"+ title + "<br>" + ((Bookmark.Item)book).getUri()+"</em></html>";
+                    String ttext=  "<html><em>"+ title + "<br>" + uri+"</em></html>";
                     mi.setToolTipText( ttext );
                 }
                 if (book.getIcon() != null) {
