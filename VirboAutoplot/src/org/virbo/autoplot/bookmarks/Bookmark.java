@@ -155,7 +155,7 @@ public abstract class Bookmark {
      */
     protected static boolean getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) {
         InputStream in=null;
-        boolean remoteRemote= true;
+        boolean remoteRemote= false;
  
         try {
             URL rurl= new URL(remoteUrl);
@@ -220,35 +220,34 @@ public abstract class Bookmark {
             Element flist = (Element) nl.item(0);
             if ( flist==null ) {
                 // The remote folder itself can contain remote folders,
-                String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
-                //TODOString remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
+                //String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
+                String remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 if ( remoteUrl2.length()>0 ) {
+                    System.err.println("another remote folder: "+remoteUrl2 );
                     remoteRemote= true; // avoid warning
                 }
             } else {
-                //TODOString remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING ); //TODO: verify that we can have remote in lower position.
-                //TODOif ( remoteUrl2.length()>0 ) {
-                //TODO    remoteRemote= true; // avoid warning
-                //TODO}
+                String remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING ); //TODO: verify that we can have remote in lower position.
+                if ( remoteUrl2.length()>0 ) {
+                    System.err.println("another remote folder: "+remoteUrl2 );
+                    remoteRemote= true; // avoid warning
+                }
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
                 List<Bookmark> contents1 = parseBookmarks( flist, vers1, remoteLevel-1 );
                 contents.addAll(contents1);
             }
 
-        } catch (XPathExpressionException ex) {
-            Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-        } catch ( IllegalArgumentException ex ) {
-            ex.printStackTrace();
-        } catch ( FileNotFoundException ex ) {
-            ex.printStackTrace();
-        } catch ( IOException ex ) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            Bookmark.Item err= new Bookmark.Item("");
+            err.description= ex.toString();
+            err.setTitle("Error Occurred");
+            try {
+                err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/error-icon.png" ) ) ) );
+            } catch (IOException ex2) {
+                ex.printStackTrace();
+            }
+            contents.add( err );
+
         } finally {
             if ( in!=null ) {
                 try {
@@ -356,8 +355,12 @@ public abstract class Bookmark {
 
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
-            int remoteStatus=-1;
+            int remoteStatus=Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
             boolean remoteRemote= false;  // remote folder contains references to remote folder
+
+            if ( String.valueOf(remoteUrlNode).contains("temperatures.xml") && remoteLevel>1 ) {
+                System.err.println("remote contains remote");
+            }
 
             if ( remoteUrlNode!=null ) { // 2984078
 
@@ -371,30 +374,36 @@ public abstract class Bookmark {
                     } else {
                         System.err.println( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
 
-                        InputStream in=null;
                         contents= new ArrayList();
 
+                        if ( remoteUrl.toString().contains("temperatures2012")) {
+                            System.err.println("here 2012");
+                        }
                         remoteRemote= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
 
                         if ( ( contents.size()==0 ) & !remoteRemote ) {
                             System.err.println("unable to parse bookmarks at "+remoteUrl);
                             System.err.println("Maybe using local copy");
-                            remoteStatus= 1;
+                            remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
                         } else {
-                            remoteStatus= 0;
+                            remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+                        }
+
+                        if ( remoteRemote ) {
+                            remoteStatus= Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
                         }
                     }
                 }
                 
             } else {
-                if ( remoteUrlNode==null ) remoteStatus= 0;
+                if ( remoteUrlNode==null ) remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
                 
             }
             
-            if ( ( remoteUrl==null || remoteStatus==-1 ) && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty, but local folders must not.
+            if ( ( remoteUrl==null || remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty, but local folders must not.
                 nl = ((Element) element).getElementsByTagName("bookmark-list");
                 if ( nl.getLength()==0 ) {
-                    if ( remoteStatus==-1 ) { // only if a remote folder is not resolved is this okay
+                    if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) { // only if a remote folder is not resolved is this okay
                         contents= Collections.emptyList();
                     } else {
                         throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
@@ -804,13 +813,17 @@ public abstract class Bookmark {
             return this.remoteUrl;
         }
 
+        public static int REMOTE_STATUS_NOT_LOADED= -1;
+        public static int REMOTE_STATUS_SUCCESSFUL= 0;
+        public static int REMOTE_STATUS_UNSUCCESSFUL= 1;
+
         /**
          * remote status indicator.
          * -1 not loaded
          * 0 successful
          * 1 unsuccessful.
          */
-        int remoteStatus= -1;
+        int remoteStatus= REMOTE_STATUS_NOT_LOADED;
 
         public void setRemoteStatus( int status ) {
             this.remoteStatus= status;
