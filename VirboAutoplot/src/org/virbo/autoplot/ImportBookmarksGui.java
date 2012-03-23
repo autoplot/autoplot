@@ -15,7 +15,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
 /**
- *
+ * Ask the user if they would like to import the a bookmarks file.  They can
+ * leave it as a remote file as well, so we will keep checking for updates.
  * @author jbf
  */
 public class ImportBookmarksGui extends javax.swing.JPanel {
