@@ -510,6 +510,8 @@ public class BookmarksManagerModel {
                     bf.setRemoteUrl( surl );
                 }
                 copy.add( m );
+            } else if ( m.getTitle().equals(Bookmark.TITLE_ERROR_OCCURRED) ) {
+                copy.add( m );
             }
         }
         mergeList(copy,newList);
