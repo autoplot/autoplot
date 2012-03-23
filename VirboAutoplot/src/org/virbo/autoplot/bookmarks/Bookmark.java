@@ -146,6 +146,23 @@ public abstract class Bookmark {
     }
 
     /**
+     * check to see if there are remote nodes that still need to be resolved
+     * @param contents
+     * @return
+     */
+    private static boolean checkForUnresolved( List<Bookmark> contents ) {
+        for ( Bookmark book: contents ) {
+            if ( book instanceof Bookmark.Folder ) {
+                Bookmark.Folder bf= (Bookmark.Folder) book;
+                if ( bf.remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) return true;
+                if ( checkForUnresolved( bf.getBookmarks() ) ) { //TODO: no check for cycles
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
      * read in a remote bookmarks file.
      * @param remoteUrl the location of the file.
      * @param remoteLevel limit the depth of remote bookmarks.  For example, remoteLevel=1 indicates this should be read but no remote bookmarks ought to be read.
@@ -217,7 +234,14 @@ public abstract class Bookmark {
             }
             nl= (NodeList)o;
 
-            Element flist = (Element) nl.item(0);
+            //TODO: the roots can contain a remoteUrl node, which we must ignore.  Clear it before looking for remoteUrl deeper in the tree.
+            NodeList bfs= (NodeList)xpath.evaluate( "/bookmark-list/bookmark-folder", document, XPathConstants.NODESET );
+            for ( int i= 0; i<bfs.getLength(); i++ ) {
+                Element bf= (Element)bfs.item(i);
+                bf.removeAttribute( "remoteUrl" );
+            }
+
+            Element flist = (Element) nl.item(0); // the bookmark list.
             if ( flist==null ) {
                 // The remote folder itself can contain remote folders,
                 //String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
@@ -234,6 +258,7 @@ public abstract class Bookmark {
                 }
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
                 List<Bookmark> contents1 = parseBookmarks( flist, vers1, remoteLevel-1 );
+                remoteRemote= checkForUnresolved(contents1);
                 contents.addAll(contents1);
             }
 
@@ -358,10 +383,6 @@ public abstract class Bookmark {
             int remoteStatus=Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
             boolean remoteRemote= false;  // remote folder contains references to remote folder
 
-            if ( String.valueOf(remoteUrlNode).contains("temperatures.xml") && remoteLevel>1 ) {
-                System.err.println("remote contains remote");
-            }
-
             if ( remoteUrlNode!=null ) { // 2984078
 
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
@@ -376,9 +397,6 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
-                        if ( remoteUrl.toString().contains("temperatures2012")) {
-                            System.err.println("here 2012");
-                        }
                         remoteRemote= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
 
                         if ( ( contents.size()==0 ) & !remoteRemote ) {
@@ -878,6 +896,11 @@ public abstract class Bookmark {
             result.remoteStatus= remoteStatus;
             result.bookmarks = new ArrayList<Bookmark>(this.bookmarks);
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return getTitle() + ( remoteStatus!=0 ? "*" : "" );
         }
     }
 
