@@ -946,6 +946,10 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                         Runnable run= loadBooksRunnable( start, depthf+1 );
                         RequestProcessor.invokeLater(run);
                     }
+                    //System.err.println("\n\n=====");
+                    //for ( Bookmark b: book ) {
+                    //    System.err.println(b);
+                    //}
                 } catch (SAXException ex) {
                     Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -1223,4 +1227,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
         return item;
     }
 
+    public static void main( String[] args ) {
+        new BookmarksManager(null, false).setPrefNode("bookmarks");
+    }
 }
