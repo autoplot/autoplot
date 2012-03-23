@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Careless code in the block that supports single-instance code is fixed.  Occasionally this would cause Autoplot to hang.</small></p>
+        <p><small>The x-axis title %{RANGE} shows both Y-m-d and day-of-year.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>replace file messages up log z axis.  This is now corrected to check for autoranging.</li>
             <li>3510248: single instance code could result in hung application</li>
             <li>vertical slice works with data with non-monotonic tags</li>
             <li>remote bookmarks file with remoteURL buried deep in the tree is handled properly.</li>
@@ -36,6 +37,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>Major fix to filesystem stuff, where a hung filesystem create doesn't prevent further use of any filesystems (and Autoplot)</li>
             <li>fixes to rich ascii, including unbundle preserves bundle with proper labels, and support for enums</li>
             <li>check for cache area when saving Jython files was broken.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>ZipFileSystem had a bug that prevented its use in some situations.</li>
             <li>Initial HEAD request in HTTPFileSystem changed to GET request to support LANL.</li>
             <li>bugfix in AutoHistogram when log check would produce a different length histogram</li>
@@ -46,44 +50,20 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>c:/documents and settings/ is a hidden link on Windows 7, which when used resulted in null pointer exception</li>
             <li>various cleanup in das2server plugin</li>
             <li>omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf with $d instead of 01 works fine.</li>
-            <li>null pointer exception in resetZoom[XYZ] when dataset had not been plotted</li>
-            <li>Improvements to make aggregation GUI requested by Reiner.</li>
-            <li>Improvements to the Feedback GUI to support use in firewalled environment that doesn't allow post.</li>
-            <li>Minor corrections to data tab/slice area, including slice indexes is always enabled.  And focus dataset toString is displayed for reference.</li>
-            <li>3487247: make sure remote bookmark is not editable, since edits would be lost once the remote are read in again.</li>
-            <li>Jython ds[:,0] implemented with unbundle should have disallowed high-rank unbundle (which allows a rank 3 dataset to be stored in a rank 2 table.)</li>
-            <li>DataSourceEditorDialog is always created on the event thread, avoiding occasional hang in JythonDataSource</li>
-            <li>rte_0076363774_20120128_090924: sloppiness in the trim function of DDataSet </li>
-            <li>In JythonDataSource, try to add the TSB capability immediately, so this behaves like a proper TSB-capable data source.</li>
-            <li>Fixes to single-instance launch</li>
-            <li>delay construction of axes and style tabs to work-around 1 sec delay in GUI on Mac.</li>
-            <li>bugfixes in Bx|fftPower(512).  fftPower result is marked as a qube.</li>
-            <li>weightsDataSet handles bundles.</li>
-            <li>BUNDLE_1 should not be propogated through binaryOp and unaryOp.</li>
-            <li>3116643: data sources with TimeSeriesBrowse, that have a URI without the timerange, are accepted by binding automatically to the application timerange.</li>
-        </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3484946: A change in v2011a_7 caused datasets to fail to automatically bind to the application timerange.</li>
-            <li>old code from original Autoplot was ignored render type guess code and set this based on monotonic property.</li>
-            <li>3484940: guessCadenceNew would not tally deltas properly, resulting in incorrect cadence=0 for vap+inline:0,0,100,100,0,0;0,0,0,100,100,0</li>
-            <li>link(x,y) shouldn't return a bundle dataset, it should return y(x).</li>
-            <li>fftFilter threw out units.</li>
-            <li>3482782: stress testing revealed some interesting memory leaks.  These are addressed.</li>
-            <li>bugfixes in SeriesRenderer error bars and outline fillStyle when printing pointed out by Jon V.</li>
-            <li>3198392: bookmarks update while user is in the menu would cause them to not update properly.  Now this is done on event thread.</li>
-            <li>bugfix in cdf/java checking on variable lengths.  rank 2 data would indicate a length mismatch because of old code.</li>
-            <li>ArrayDataSet trim didn't trim PLANE_0 property.  Now we use DataSetUtil.trimProperties for consistent behavior.</li>
         </ul>
         
         <p>Features:</p>
         <ul>
+            <li>xaxis title = %{RANGE} will have both Y-m-d and doy.</li>
             <li>"Reload All Data" added to the tools, replacing the script some people might have had installed</li>
             <li>first export to idlsav support for rank 1 data (no timetags)</li>
             <li>introduce filters in QStream support, and a first that reduces data streams</li>
             <li>Ops.unbundle(ds,int) is slice by default, before it would unbundle high-rank data as well.  This is cleaner.</li>
             <li>Rich ascii automatically adds timetags when the first column is times.</li>
             <li>"Replace File" script incorporated into Autoplot, see Tools->Replace File next to Aggregation.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>Initial support for export to HDF5 (no timetags)</li>
             <li>Initial proxy support in Ftp filesystem</li>
             <li>initial support for timeranges like "orbit:crres:591"</li>
@@ -99,14 +79,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>minor changes to das2 library to allow top and bottom decorators, and opaque plots.</li>
             <li>introduce dbAboveBackgroundDim1 filter for RPWS group</li>
             <li>basic mode automatically switches over to timerange mode.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>getParam in jython scripts can be enumeration: getParam('sc','1','spacecraft',['1','2','3','4'])</li>
-            <li>add FFTFilterType.TenPercentEdgeCosine for use with waves.</li>
-            <li>resourceUri handled specially in JythonDataSource editor.</li>
-            <li>support %{USER_PROPERTIES.x.y} and %{METADATA.x.y} in legend label.</li>
-            <li>3479591: tearoff tabs can be dropped into child container</li>
         </ul>
 
 <p>Known issues:</p>
