@@ -193,6 +193,7 @@ if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../Autoplot
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
+if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
