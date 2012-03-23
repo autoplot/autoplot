@@ -72,9 +72,9 @@ import org.xml.sax.SAXException;
 public abstract class Bookmark {
 
     public static final String MSG_NO_REMOTE= "[remote*]";
-    public static final String TOOLTIP_NO_REMOTE = "Remote folder based on contents of remote URI <br>%{URL}<br> not available. Using cached version.";
+    public static final String TOOLTIP_NO_REMOTE = "Remote folder based on contents of remote URL <br>%{URL}<br> not available. Using cached version.";
     public static final String MSG_REMOTE= "[remote]";
-    public static final String TOOLTIP_REMOTE = "Bookmark folder based on contents of remote URI <br>%{URL}";
+    public static final String TOOLTIP_REMOTE = "Bookmark folder based on contents of remote URL <br>%{URL}";
     public static final String MSG_NOT_LOADED= "[remote...]";
     public static final String TOOLTIP_NOT_LOADED = "Checking to see if remote bookmark list has changed.<br>%{URL}";
 
