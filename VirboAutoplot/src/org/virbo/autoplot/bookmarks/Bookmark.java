@@ -72,6 +72,7 @@ import org.xml.sax.SAXException;
 public abstract class Bookmark {
 
     public static final String MSG_NO_REMOTE= "[remote*]";
+    public static final String TITLE_ERROR_OCCURRED = "Error Occurred";
     public static final String TOOLTIP_NO_REMOTE = "Remote folder based on contents of remote URL <br>%{URL}<br> not available. Using cached version.";
     public static final String MSG_REMOTE= "[remote]";
     public static final String TOOLTIP_REMOTE = "Bookmark folder based on contents of remote URL <br>%{URL}";
@@ -238,7 +239,13 @@ public abstract class Bookmark {
             NodeList bfs= (NodeList)xpath.evaluate( "/bookmark-list/bookmark-folder", document, XPathConstants.NODESET );
             for ( int i= 0; i<bfs.getLength(); i++ ) {
                 Element bf= (Element)bfs.item(i);
-                bf.removeAttribute( "remoteUrl" );
+                String url= bf.getAttribute("remoteUrl");
+                if ( url.contains("%3A%2F%2F") ) {
+                    url= URLDecoder.decode(url,"US-ASCII");
+                }
+                if ( url.equals(remoteUrl) ) {
+                    bf.removeAttribute( "remoteUrl" );
+                }
             }
 
             Element flist = (Element) nl.item(0); // the bookmark list.
@@ -265,7 +272,7 @@ public abstract class Bookmark {
         } catch (Exception ex) {
             Bookmark.Item err= new Bookmark.Item("");
             err.description= ex.toString();
-            err.setTitle("Error Occurred");
+            err.setTitle(TITLE_ERROR_OCCURRED);
             try {
                 err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/error-icon.png" ) ) ) ); 
             } catch (IOException ex2) {
