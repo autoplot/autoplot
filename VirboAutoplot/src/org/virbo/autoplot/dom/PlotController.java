@@ -803,7 +803,7 @@ public class PlotController extends DomNodeController {
             //System.err.println("should this happen?  see bug 2992903");
         }
 
-        if ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) {
+        if ( ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) && dom.getOptions().isAutoranging() ) {
             resetZoom( plot.getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
         }
     }
