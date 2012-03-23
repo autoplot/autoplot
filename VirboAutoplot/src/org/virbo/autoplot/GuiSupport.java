@@ -938,6 +938,10 @@ public class GuiSupport {
         }
     }
 
+    /**
+     * Maybe import the bookmarks in response to the "bookmarks:..." URI.
+     * @param bookmarksFile URL which refers to a local, HTTP, HTTPS, or FTP resource.
+     */
     public void importBookmarks( String bookmarksFile )  {
 
         ImportBookmarksGui gui= new ImportBookmarksGui();
