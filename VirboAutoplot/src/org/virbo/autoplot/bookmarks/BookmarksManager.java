@@ -239,6 +239,17 @@ public class BookmarksManager extends javax.swing.JDialog {
         } );
     }
     
+    /**
+     * set if the play button was used to excuse the GUI.  I was thinking it would be useful to allow the manager to be used to select
+     * data sources, since it shows the descriptions, but I need to focus on getting this cleaned up first.  I'm leaving this as
+     * a reminder.  TODO:doPlay
+     */
+    private boolean doPlay= false;
+
+    public boolean isPlay() {
+        return doPlay;
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -465,14 +476,14 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
-                    .add(layout.createSequentialGroup()
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(importButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(importFromWebButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 374, Short.MAX_VALUE)
-                        .add(dismissButton))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 361, Short.MAX_VALUE)
+                        .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(URILabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -484,9 +495,9 @@ public class BookmarksManager extends javax.swing.JDialog {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 534, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editDescriptionButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)))
+                        .add(editDescriptionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 53, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
