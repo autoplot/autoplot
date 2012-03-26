@@ -57,7 +57,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Object for managing the user's bookmarks.  This object sits quietly beside the Autoplot
+ * UI, becoming visible when the user asks to manage bookmarks.  This also populates the Bookmarks
+ * submenu.
  * @author  jbf
  */
 public class BookmarksManager extends javax.swing.JDialog {
