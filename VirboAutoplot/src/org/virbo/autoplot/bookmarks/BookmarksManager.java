@@ -242,7 +242,7 @@ public class BookmarksManager extends javax.swing.JDialog {
     /**
      * set if the play button was used to excuse the GUI.  I was thinking it would be useful to allow the manager to be used to select
      * data sources, since it shows the descriptions, but I need to focus on getting this cleaned up first.  I'm leaving this as
-     * a reminder.  TODO:doPlay
+     * a reminder.  
      */
     private boolean doPlay= false;
 
@@ -547,6 +547,7 @@ private void ExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_ExportButtonActionPerformed
 
 private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
+    doPlay= false;
     this.dispose();
 }//GEN-LAST:event_dismissButtonActionPerformed
 
@@ -849,6 +850,17 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                if ( e.getClickCount()==2 ) {
+                    Bookmark sel= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
+                    if ( sel instanceof Bookmark.Item ) {
+                        if ( getParent() instanceof AutoplotUI ) {
+                            AutoplotUI p= (AutoplotUI)getParent();
+                            Bookmark.Item bisel= (Bookmark.Item) sel;
+                            p.plotUri(bisel.getUri());
+                        }
+                        dispose();
+                    }
+                }
                 if ( e.isPopupTrigger() ) {
                     contextMenu.show( jTree1, e.getX(), e.getY() );
                 }
