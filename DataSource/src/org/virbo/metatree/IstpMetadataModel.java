@@ -207,9 +207,29 @@ public class IstpMetadataModel extends MetadataModel {
             properties.put(QDataSet.LABEL, String.valueOf( attrs.get("LABLAXIS") ));
         }
 
-        if (attrs.containsKey("CATDESC")) {
-            properties.put(QDataSet.TITLE, String.valueOf( attrs.get("CATDESC") ));
+        String title= " ";
+        String s;
+        s= (String)attrs.get("Source_name");
+        if (  s!=null ) {
+            int i= s.indexOf(">");
+            if ( i>-1 ) {
+                title= title + s.substring(0,i).trim() + " ";
+            }
         }
+        s= (String)attrs.get("Descriptor");
+        if (  s!=null ) {
+            int i= s.indexOf(">");
+            if ( i>-1 ) {
+                title= title + s.substring(0,i).trim() + " ";
+            }
+        }
+        if ( title.trim().length()>0 ) title= title+" "; // add space to delimit S/C name and instrument from description
+        s= (String)attrs.get("CATDESC");
+        if ( s!=null ) {
+            title= title + s.trim();
+        }
+
+        if ( title.trim().length()>0 ) properties.put( QDataSet.TITLE, title.trim() );
 
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
