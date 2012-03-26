@@ -213,16 +213,19 @@ public class IstpMetadataModel extends MetadataModel {
         if (  s!=null ) {
             int i= s.indexOf(">");
             if ( i>-1 ) {
-                title= title + s.substring(0,i).trim() + " ";
+                title= title + s.substring(0,i).trim();
             }
         }
+        
         s= (String)attrs.get("Descriptor");
         if (  s!=null ) {
             int i= s.indexOf(">");
             if ( i>-1 ) {
+                if ( title.length()>0 ) title= title+"/";
                 title= title + s.substring(0,i).trim() + " ";
             }
         }
+
         if ( title.trim().length()>0 ) title= title+" "; // add space to delimit S/C name and instrument from description
         s= (String)attrs.get("CATDESC");
         if ( s!=null ) {
