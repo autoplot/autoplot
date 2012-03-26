@@ -247,6 +247,7 @@ public abstract class CDFImpl implements java.io.Serializable {
      * returns value of the named global attribute
      */
     public Object getAttribute(String atr) {
+        if ( attributeTable==null ) return null;
         CDFAttribute a = (CDFAttribute)attributeTable.get(atr);
         if (a == null) return null;
         if (!a.isGlobal()) return null;
@@ -267,6 +268,7 @@ public abstract class CDFImpl implements java.io.Serializable {
      * returns value of the named attribute for the named variable
      */
     public Object getAttribute(String var, String atr) {
+        if ( attributeTable==null ) return null;
         CDFVariable c = (CDFVariable)variableTable.get(var);
         if (c == null) return null;
         Vector attrs = c.attributes;
