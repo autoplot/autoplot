@@ -326,6 +326,18 @@ public class CdfJavaDataSource extends AbstractDataSource {
             throw ex;
         }
 
+        // do two global attr for S/C identification
+        Object gattr;
+        gattr= cdf.getAttribute("Source_name");
+        if ( gattr!=null && gattr.getClass().isArray() && Array.getLength(gattr)>0 ) {
+            props.put( "Source_name", String.valueOf( Array.get(gattr,0) ) );
+        }
+
+        gattr= cdf.getAttribute("Descriptor");
+        if ( gattr!=null && gattr.getClass().isArray() && Array.getLength(gattr)>0 ) {
+            props.put( "Descriptor", String.valueOf( Array.get(gattr,0) ) );
+        }
+
         for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
             for (int i = 0; i < vv.length; i++) {
                 Object attrv = cdf.getAttribute( var.getName(), vv[i]);
