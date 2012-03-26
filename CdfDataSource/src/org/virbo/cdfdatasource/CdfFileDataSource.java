@@ -19,6 +19,7 @@ import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -439,6 +440,30 @@ public class CdfFileDataSource extends AbstractDataSource {
     private HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
         Pattern p = Pattern.compile("DEPEND_[0-9]");
+
+        // do two global attr for S/C identification
+        Attribute gattr;
+        Vector entries;
+        try {
+            gattr= cdf.getAttribute("Source_name");
+            if ( gattr!=null ) {
+                entries= gattr.getEntries();
+                if ( gattr!=null && entries.size()>0 ) {
+                   String s= String.valueOf(( (Entry)gattr.getEntries().get(0)).getData() );
+                   props.put( "Source_name", s );
+                }
+            }
+            gattr= cdf.getAttribute("Descriptor");
+            if ( gattr!=null ) {
+                entries= gattr.getEntries();
+                if ( entries.size()>0 ) {
+                    String s= String.valueOf(( (Entry)gattr.getEntries().get(0)).getData() );
+                    props.put( "Descriptor", s );
+                }
+            }
+        } catch ( CDFException ex ) {
+            ex.printStackTrace();
+        }
 
         Vector v = cdf.getAttributes();
         for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
