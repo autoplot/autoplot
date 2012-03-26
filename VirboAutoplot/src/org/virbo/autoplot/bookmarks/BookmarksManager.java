@@ -273,6 +273,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         descriptionTextField = new javax.swing.JTextField();
         editDescriptionButton = new javax.swing.JButton();
+        plotButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -385,6 +386,15 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
+        plotButton.setText("Plot");
+        plotButton.setToolTipText("Plot the URI in the current focus position");
+        plotButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotButtonActionPerformed(evt);
+            }
+        });
+
         jMenu1.setText("File");
 
         importMenuItem.setText("Import...");
@@ -482,7 +492,9 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .add(importFromWebButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 361, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 299, Short.MAX_VALUE)
+                        .add(plotButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(URILabel)
@@ -525,7 +537,8 @@ public class BookmarksManager extends javax.swing.JDialog {
                     .add(dismissButton)
                     .add(importButton)
                     .add(importFromWebButton)
-                    .add(ExportButton))
+                    .add(ExportButton)
+                    .add(plotButton))
                 .addContainerGap())
         );
 
@@ -607,9 +620,12 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         // if it is a child of a remote bookmark, make sure it's not editable.
         String remoteUrl= "";
         TreePath ppath= jTree1.getSelectionPath();
-        remoteUrl= maybeGetRemoteBookmarkUrl( b, jTree1.getModel(), ppath);
-
-        URLTextField.setEditable(remoteUrl.length()==0);
+        if ( ppath!=null ) {
+            remoteUrl= maybeGetRemoteBookmarkUrl( b, jTree1.getModel(), ppath);
+            URLTextField.setEditable(remoteUrl.length()==0);
+        } else {
+            URLTextField.setEditable(false);
+        }
         if ( remoteUrl.length()==0 ) {
             titleLabel.setText("Title:");
             titleLabel.setToolTipText("Title for the URI");
@@ -797,6 +813,24 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     }
 }//GEN-LAST:event_editDescriptionButtonActionPerformed
 
+    private boolean maybePlot() {
+        Bookmark sel= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
+        if ( sel instanceof Bookmark.Item ) {
+            if ( getParent() instanceof AutoplotUI ) {
+                AutoplotUI p= (AutoplotUI)getParent();
+                Bookmark.Item bisel= (Bookmark.Item) sel;
+                p.plotUri(bisel.getUri());
+            }
+            dispose();
+            return true;
+        }
+        return false;
+    }
+
+private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
+    maybePlot();
+}//GEN-LAST:event_plotButtonActionPerformed
+
 //    /**
 //    * @param args the command line arguments
 //    */
@@ -840,6 +874,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     private javax.swing.JTree jTree1;
     private javax.swing.JMenuItem mergeInDefaultMenuItem;
     private javax.swing.JMenuItem newFolderMenuItem;
+    private javax.swing.JButton plotButton;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
@@ -851,15 +886,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
             @Override
             public void mouseClicked(MouseEvent e) {
                 if ( e.getClickCount()==2 ) {
-                    Bookmark sel= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
-                    if ( sel instanceof Bookmark.Item ) {
-                        if ( getParent() instanceof AutoplotUI ) {
-                            AutoplotUI p= (AutoplotUI)getParent();
-                            Bookmark.Item bisel= (Bookmark.Item) sel;
-                            p.plotUri(bisel.getUri());
-                        }
-                        dispose();
-                    }
+                    maybePlot();
                 }
                 if ( e.isPopupTrigger() ) {
                     contextMenu.show( jTree1, e.getX(), e.getY() );
