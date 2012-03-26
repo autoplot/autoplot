@@ -16,6 +16,7 @@ import org.virbo.autoplot.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
@@ -113,6 +114,11 @@ public class BookmarksManager extends javax.swing.JDialog {
     public BookmarksManagerModel getModel() {
         return model;
     }
+
+    /**
+     * DataSetSelector to send URIs to.
+     */
+    DataSetSelector sel;
 
     /**
      * return the remoteUrl containing this bookmark, or an empty string.
@@ -815,12 +821,16 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     }
 }//GEN-LAST:event_editDescriptionButtonActionPerformed
 
-    private boolean maybePlot() {
-        Bookmark sel= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
-        if ( sel instanceof Bookmark.Item ) {
+    private boolean maybePlot( int modifiers ) {
+        Bookmark book= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
+        if ( book instanceof Bookmark.Item ) {
             if ( getParent() instanceof AutoplotUI ) {
                 AutoplotUI p= (AutoplotUI)getParent();
-                Bookmark.Item bisel= (Bookmark.Item) sel;
+                Bookmark.Item bisel= (Bookmark.Item) book;
+                
+                sel.setValue(((Bookmark.Item) book).getUri());
+                sel.maybePlot(modifiers);
+
                 p.plotUri(bisel.getUri());
             }
             dispose();
@@ -830,7 +840,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     }
 
 private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-    maybePlot();
+    maybePlot(evt.getModifiers());
 }//GEN-LAST:event_plotButtonActionPerformed
 
 //    /**
@@ -888,7 +898,7 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             @Override
             public void mouseClicked(MouseEvent e) {
                 if ( e.getClickCount()==2 ) {
-                    maybePlot();
+                    maybePlot(e.getModifiers());
                 }
                 if ( e.isPopupTrigger() ) {
                     contextMenu.show( jTree1, e.getX(), e.getY() );
@@ -1130,23 +1140,29 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
         bookmarksMenu.removeAll();
 
-        bookmarksMenu.add(new AbstractAction("Add Bookmark...") {
+        JMenuItem mi;
+
+        mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
 
             public void actionPerformed(ActionEvent e) {
                 Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
                 setAddBookmark(bookmark);
                 setVisible(true);
             }
-        });
+        } );
+        mi.setToolTipText("Add the current URI to the bookmarks");
+        bookmarksMenu.add(mi);
 
-        bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
-
+        mi= new JMenuItem( new AbstractAction("Manage Bookmarks") {
             public void actionPerformed(ActionEvent e) {
                 Container parent= BookmarksManager.this.getParent();
                 BookmarksManager.this.setLocationRelativeTo( parent );
                 setVisible(true);
             }
-        });
+        } );
+        mi.setToolTipText("Manage bookmarks, or select bookmark to plot");
+        bookmarksMenu.add(mi);
+
 
         bookmarksMenu.add(new JSeparator());
 
@@ -1158,10 +1174,9 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     }
 
-    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, final DataSetSelector sel ) {
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, final DataSetSelector select ) {
 
-        //TODO: tooltips are sometimes underneath submenus.
-        //ToolTipManager.sharedInstance().getReshowDelay();
+        this.sel= select;
 
         int MAX_TITLE_LEN=50;
         for (int i = 0; i < bookmarks.size(); i++) {
