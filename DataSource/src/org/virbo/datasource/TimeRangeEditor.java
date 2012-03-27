@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -339,6 +340,16 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         getPopupMenu().show( this, e.getX(), e.getY() );
     }
 
+    private JMenuItem exampleTime( final String s, final String toolTip ) {
+        JMenuItem mi= new JMenuItem( new AbstractAction(s) {
+            public void actionPerformed( ActionEvent e ) {
+                timeRangeTextField.setText(s);
+            }
+        });
+        mi.setToolTipText(toolTip);
+        return mi;
+    }
+
     private JPopupMenu getPopupMenu() {
         JPopupMenu result= new JPopupMenu();
         JMenuItem cutItem = result.add(new DefaultEditorKit.CutAction());
@@ -348,6 +359,16 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         JMenuItem pasteItem = result.add(new DefaultEditorKit.PasteAction());
         pasteItem.setText("Paste");
 
+        JMenu examplesMenu= new JMenu("Examples");
+        examplesMenu.add( exampleTime( "2010 Jan", "Month of January" ) );
+        examplesMenu.add( exampleTime( "2010-01-01", "January 1, 2010" ) );
+        examplesMenu.add( exampleTime( "2010-01-01/2010-01-04", "ISO8601 range" ) );
+        examplesMenu.add( exampleTime( "P5D", "Last 5 Days to now" ) );
+        examplesMenu.add( exampleTime( "orbit:rbspa-pp:30", "Orbit 30 from rbspa-pp orbits file" ) );
+        examplesMenu.add( exampleTime( "orbit:http://das2.org/wiki/index.php/Orbits/rbspa-pp:30", "Orbit 30 from any orbits file" ) );
+
+        result.add( examplesMenu );
+        
         if ( this.alternatePeerCard!=null ) {
             result.add( new JSeparator() );
             result.add( new AbstractAction( alternatePeer ) {
