@@ -14,10 +14,10 @@
     <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
     <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
 	 
-	<taskdef name="deploy"  classname="org.apache.catalina.ant.DeployTask"/>
-	<taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
+	<!-- <taskdef name="deploy"  classname="org.apache.catalina.ant.DeployTask"/> -->
+	<!-- <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/> -->
 	
-	<target name="release" depends="" >
+<!--	<target name="release" depends="" >
 		<tstamp/>
 		<sshexec host="ec2-174-129-62-39.compute-1.amazonaws.com"
 			username="ubuntu"
@@ -30,7 +30,6 @@
 
 	  	<tstamp/>
 
-		<!-- Could remove need for this warning buy using trycatch external Ant tool and inserting a try undeploy here. -->
 		<echo>Warning: You must run undeploy if more than one deploy is to be executed on the same date.</echo> 
 	  	<echo>Warning: You should undeploy older versions of VxOware to prevent OutOfMemory problems.</echo>	       
 	    <deploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager/html"
@@ -53,7 +52,7 @@
 				            path="/AutoplotServlet"/>
 
 	</target>
-
+-->
     <!--
 
     There exist several targets which are by default empty and which can be 
