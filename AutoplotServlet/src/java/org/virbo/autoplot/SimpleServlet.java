@@ -6,6 +6,7 @@ package org.virbo.autoplot;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.util.logging.Logger;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
@@ -29,6 +30,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasCanvas;
+import org.das2.graph.Painter;
 import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
 import org.das2.util.TimerConsoleFormatter;
@@ -352,6 +354,13 @@ public class SimpleServlet extends HttpServlet {
 
                 logit("done with script", t0, uniq, debug);
             }
+
+            dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
+                public void paint(Graphics2D g) {
+                    g.setFont( Font.decode("sans-30") );
+                    g.drawString( "testSimpleServlet", 300, 300 );
+                }
+            });
 
             dom.getController().waitUntilIdle();
 
