@@ -675,9 +675,19 @@ public class DataSetURI {
         return getFile(suri,false,mon);
     }
 
+    /**
+     * @see DataSetURI.downloadResourceAsTempFile
+     * @param url the address to download.
+     * @param mon a progress monitor.
+     * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
+     * @throws IOException
+     */
+    public static File downloadResourceAsTempFile( URL url, ProgressMonitor mon ) throws IOException {
+        return downloadResourceAsTempFile( url, -1, mon );
+    }
 
     /**
-     * introduced when we needed access to a URL with arguments.  This allows us
+     * This was introduced when we needed access to a URL with arguments.  This allows us
      * to download the file in a script and then read the file.  It will put the
      * file in the directory, and the parameters are encoded in the name.
      * Note this cannot be used to download HTML content, because checkNonHtml is
@@ -685,18 +695,23 @@ public class DataSetURI {
      * it's needed.
      *
      * This will almost always download, very little caching is done.  We allow subsequent
-     * calls within 10 seconds to use the same file.
+     * calls within 10 seconds to use the same file (by default).  The timeoutSeconds parameter
+     * can be used to set this to any limit.
      * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
      * TODO: what about Tomcat and other long java processes?
      * 
      * @param url the address to download.
+     * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.
      * @param mon a progress monitor.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
      */
-    public static File downloadResourceAsTempFile( URL url, ProgressMonitor mon ) throws IOException {
+    public static File downloadResourceAsTempFile( URL url, int timeoutSeconds, ProgressMonitor mon ) throws IOException {
+
+        if ( timeoutSeconds==-1 ) timeoutSeconds= 10;
+
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
         if ( split.file.startsWith("file:/") ) {
@@ -753,8 +768,8 @@ public class DataSetURI {
 
         synchronized (DataSetURI.class) {
             //TODO: check expires tag and delete after this time.
-            if ( result.exists() && System.currentTimeMillis()-result.lastModified() < 10000 && !newf.exists() ) {
-                System.err.println("using <10sec old temp file "+result);
+            if ( result.exists() && ( System.currentTimeMillis()-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
+                System.err.println("using young temp file "+result);
                 action= ACTION_USE_CACHE;
             } else if ( newf.exists() ) {
                 System.err.println("waiting for other thread to load temp resource " + newf );
