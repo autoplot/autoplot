@@ -999,9 +999,14 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
-                    if ( checkUnresolved(book) && depthf<2 ) {
+                    int depthLimit= 2;
+                    if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthf+1 );
                         RequestProcessor.invokeLater(run);
+                    } else {
+                        if ( depthf>=depthLimit ) {
+                            System.err.println("remote bookmarks depth limit met");
+                        }
                     }
                     //System.err.println("\n\n=====");
                     //for ( Bookmark b: book ) {
@@ -1189,29 +1194,25 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             if (book instanceof Bookmark.Item) {
                 String title= book.getTitle();
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
-                JMenuItem mi = new JMenuItem(new AbstractAction(title) {
-                    public void actionPerformed(ActionEvent e) {
-                        sel.setValue(((Bookmark.Item) book).getUri());
-                        sel.maybePlot(e.getModifiers());
-                    }
-                });
 
-                String uri=  ((Bookmark.Item)book).getUri();
-                if ( uri.length()>MAX_TITLE_LEN ) {
-                    uri= uri.substring(0,MAX_TITLE_LEN)+"...";
-                }
-                if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+ "<br>" + uri +"</em></html>";
-                    mi.setToolTipText( ttext );
+                if ( book.isHidden() ) {
+
                 } else {
-                    String ttext=  "<html><em>"+ title + "<br>" + uri+"</em></html>";
-                    mi.setToolTipText( ttext );
+                    JMenuItem mi = new JMenuItem(new AbstractAction(title) {
+                        public void actionPerformed(ActionEvent e) {
+                            sel.setValue(((Bookmark.Item) book).getUri());
+                            sel.maybePlot(e.getModifiers());
+                        }
+                    });
+
+                    if (book.getIcon() != null) {
+                        mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
+                    }
+                    bookmarksMenu.add(mi);
                 }
-                if (book.getIcon() != null) {
-                    mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
-                }
-                bookmarksMenu.add(mi);
+
             } else {
+
                 Bookmark.Folder folder = (Bookmark.Folder) book;
                 String title= book.getTitle();
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
@@ -1232,20 +1233,25 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     tooltip= "";
                 }
 
-                final JMenu subMenu = new JMenu(title);
-
-                if ( tooltip.contains("%{URL}") ) {
-                    tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
-                }
-                
-                if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                    String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
-                    subMenu.setToolTipText( ttext + "<br>" + tooltip );
+                if ( folder.isHidden() ) {
+                    
                 } else {
-                    if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
+                    final JMenu subMenu = new JMenu(title);
+
+                    if ( tooltip.contains("%{URL}") ) {
+                        tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
+                    }
+
+                    if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
+                        String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
+                        subMenu.setToolTipText( ttext + "<br>" + tooltip );
+                    } else {
+                        if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
+                    }
+                    addBookmarks(subMenu, folder.getBookmarks(),sel);
+                    bookmarksMenu.add(subMenu);
+
                 }
-                addBookmarks(subMenu, folder.getBookmarks(),sel);
-                bookmarksMenu.add(subMenu);
             }
         }
     }
