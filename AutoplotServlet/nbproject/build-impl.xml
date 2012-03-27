@@ -515,6 +515,9 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -560,6 +563,9 @@ exists or setup the property manually. For example like this:
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar">
@@ -735,6 +741,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${reference.WavDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.TsdsDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.JythonDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.FitsDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.CdfJavaDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCore.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
@@ -745,7 +752,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.batik-util.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.itext-1.2.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jython.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.cdfjava.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.cdfjava.3.3.2.tt2000.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jfits-0.93.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.beansbinding-1.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
@@ -762,6 +769,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${reference.WavDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.TsdsDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.JythonDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.FitsDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.CdfJavaDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
@@ -772,7 +780,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.batik-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.itext-1.2.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.cdfjava.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.cdfjava.3.3.2.tt2000.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jfits-0.93.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.beansbinding-1.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
@@ -1086,6 +1094,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QStream}/build.xml" inheritall="false" target="clean"/>
