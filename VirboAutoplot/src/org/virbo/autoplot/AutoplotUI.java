@@ -323,8 +323,17 @@ public class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
                 } else {
-                    support.importBookmarks( bookmarksFile );
-                    applicationModel.addRecent(dataSetSelector.getValue());
+                    while ( getBookmarksManager()==null ) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
+                        support.importBookmarks( bookmarksFile );
+                        applicationModel.addRecent(dataSetSelector.getValue());
+                    }
                 }
             }
         });
