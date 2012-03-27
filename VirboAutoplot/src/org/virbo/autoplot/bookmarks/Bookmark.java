@@ -199,10 +199,10 @@ public abstract class Bookmark {
                         }
                     }
                 } else {
-                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
+                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
                 }
             } catch ( URISyntaxException ex ) {
-                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, new NullProgressMonitor()) );
+                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
             }
 
             ByteArrayOutputStream boas=new ByteArrayOutputStream();
