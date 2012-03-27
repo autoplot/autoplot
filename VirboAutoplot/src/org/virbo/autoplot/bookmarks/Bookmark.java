@@ -308,6 +308,7 @@ public abstract class Bookmark {
         String title = null;
         ImageIcon icon = null;
         String description= null;
+        boolean hidden= false;
 
         NodeList nl;
 
@@ -374,11 +375,25 @@ public abstract class Bookmark {
             }
         }
         
+        nl = ((Element) element).getElementsByTagName("hidden");
+        if (nl.getLength() > 0) {
+            Node child= (nl.item(0).getFirstChild());
+            if ( child==null ) {
+                hidden= false;
+            } else {
+                s = ((Text)child).getData();
+                hidden= s.equals("true");
+            }
+        } else {
+            hidden= false;
+        }
+
         if (element.getNodeName().equals("bookmark")) {
             Bookmark book = new Bookmark.Item(uri);
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
             if ( description!=null ) book.setDescription(description);
+            book.setHidden(hidden);
             return book;
 
         } else if (element.getNodeName().equals("bookmark-folder")) {
@@ -443,6 +458,7 @@ public abstract class Bookmark {
             if ( icon!=null ) book.setIcon(icon);
             if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
             if ( description!=null ) book.setDescription(description);
+            book.setHidden(hidden);
             book.remoteStatus= remoteStatus;
             
             book.getBookmarks().addAll(contents);
@@ -684,6 +700,9 @@ public abstract class Bookmark {
                 if (b.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) b.icon.getImage())).append("</icon>\n");
                 if (b.description != null) buf.append("     <description>").append( URLEncoder.encode(b.getDescription(), "UTF-8")).append("</description>\n");
                 buf.append("     <url>").append(URLEncoder.encode(b.getUri(), "UTF-8")).append("</url>\n");
+                if ( bookmark.isHidden() ) {
+                    buf.append("     <hidden>true</hidden>\n");
+                }
                 buf.append("  </bookmark>\n");
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
@@ -695,6 +714,9 @@ public abstract class Bookmark {
                 }
                 buf.append("    <title>").append(URLEncoder.encode(title, "UTF-8")).append("</title>\n");
                 if (f.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) f.icon.getImage())).append("</icon>\n");
+                if ( bookmark.isHidden() ) {
+                    buf.append("     <hidden>true</hidden>\n");
+                }
                 if (f.description != null) buf.append("     <description>").append( URLEncoder.encode(f.getDescription(), "UTF-8")).append("</description>\n");
                 buf.append(formatBooksOld(f.getBookmarks()));
                 buf.append("  </bookmark-folder>\n");
@@ -788,7 +810,8 @@ public abstract class Bookmark {
 
 
     /**
-     * icons associated with the bookmark.  This was wishful thinking, and wasn't fully developed.
+     * icons associated with the bookmark.  This was wishful thinking, and wasn't fully developed.  Note we have since
+     * decided that Autoplot.org should compute icons if they are desired.
      */
     protected ImageIcon icon = null;
     public static final String PROP_ICON = "icon";
@@ -803,6 +826,20 @@ public abstract class Bookmark {
         propertyChangeSupport.firePropertyChange(PROP_ICON, oldIcon, icon);
     }
 
+
+    /**
+     * 
+     */
+    private boolean hidden= false;
+
+    public void setHidden( boolean hidden ) {
+        this.hidden= hidden;
+    }
+
+    public boolean isHidden() {
+        return this.hidden;
+    }
+    
     public static final String PROP_PARENT= "parent";
     private Bookmark.Folder parent= null;
 
