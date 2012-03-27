@@ -999,7 +999,7 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
-                    int depthLimit= 2;
+                    int depthLimit= 3;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthf+1 );
                         RequestProcessor.invokeLater(run);
@@ -1297,5 +1297,24 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     public static void main( String[] args ) {
         new BookmarksManager(null, false).setPrefNode("bookmarks");
+    }
+
+    /**
+     * return true if we are already using the remote bookmark, marked as a remote bookmark,
+     * at the root level.
+     * @param bookmarksFile
+     * @return true if we already have the bookmark.
+     */
+    public boolean haveRemoteBookmark(String bookmarksFile) {
+        List<Bookmark> list= model.getList();
+        for ( Bookmark book: list ) {
+            if ( book instanceof Bookmark.Folder ) {
+                String rurl= ((Bookmark.Folder)book).getRemoteUrl();
+                if ( rurl!=null && rurl.equals(bookmarksFile) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
