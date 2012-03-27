@@ -80,6 +80,8 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.err.println("v20120327.1655");
+
         //register java cdf as .cdf handler
         if ( DataSourceRegistry.getInstance().getSource("cdf")==null ) {
             DataSourceRegistry.getInstance().registerExtension( "org.virbo.cdf.CdfJavaDataSourceFactory", "cdf", "cdf files read by the Java CDF reader" );
