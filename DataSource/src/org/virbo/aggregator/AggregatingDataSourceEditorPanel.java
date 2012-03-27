@@ -100,7 +100,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10));
+        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
+        outerRangeTextField.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/aggregator/spinner_16.gif"))); // NOI18N
         outerRangeTextField.setText("listing to get available time ranges...");
 
         yearsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
@@ -140,7 +141,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
         });
 
-        delegateFileLabel.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
+        delegateFileLabel.setFont(new java.awt.Font("SansSerif", 0, 10));
         delegateFileLabel.setText("example file used for editing goes here");
         delegateFileLabel.setToolTipText("Aggregation works by automatically generating a set of \"delegate uris\" that are read and combined into one dataset.  This editor works by picking a delegate and providing an editor for the delegate as well.\n");
 
@@ -152,7 +153,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 208, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 212, Short.MAX_VALUE)
                 .add(jButton3))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(7, 7, 7)
@@ -163,7 +164,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(318, Short.MAX_VALUE))
+                .addContainerGap(322, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
@@ -204,7 +205,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -299,6 +300,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             return;
         }
         outerRangeTextField.setText("found files for " + dr.toString());
+        outerRangeTextField.setIcon(null);
     }
 
     private void updateDropLists(boolean updateYear, boolean updateMonth) {
