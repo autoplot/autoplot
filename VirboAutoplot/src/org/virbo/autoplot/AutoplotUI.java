@@ -323,7 +323,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
                 } else {
-                    while ( getBookmarksManager()==null ) {
+                    while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
