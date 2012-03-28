@@ -32,7 +32,7 @@ import org.virbo.autoplot.state.StatePersistence;
  */
 public class TestApplet001 {
 
-    private static void doTest( final Map<String, String> params, boolean headless, String ... args ) {
+    private static void doTest( final String testId, final Map<String, String> params, boolean headless, String ... args ) {
         AppletStub stub = new AppletStub() {
 
             public boolean isActive() {
@@ -136,13 +136,13 @@ public class TestApplet001 {
         applet.getDom().getController().waitUntilIdle();
 
         try {
-            StatePersistence.saveState(new File("test-applet.vap"), applet.getDom());
+            StatePersistence.saveState(new File("applet_"+testId+".vap"), applet.getDom());
         } catch (IOException ex) {
             Logger.getLogger(TestApplet001.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         try {
-            applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("test-applet.png");
+            applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("applet_"+testId+".png");
         } catch (IOException ex) {
             Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -196,7 +196,7 @@ public class TestApplet001 {
         FileSystemSettings.setRestrictPermission(true);
 
         try {
-            doTest( params, headless, "height", "200", "width", "600" );
+            doTest( test, params, headless, "height", "200", "width", "600" );
         } catch ( Exception ex ) {
             ex.printStackTrace();
             if ( headless ) System.exit(1);
