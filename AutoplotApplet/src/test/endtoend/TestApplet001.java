@@ -151,7 +151,7 @@ public class TestApplet001 {
 
     public static void main(String[] args) {
 
-        boolean headless= false; // true for Hudson (though it's not really headless), false for debugging
+        boolean headless= true; // true for Hudson (though it's not really headless), false for debugging
 
         String test="test001";
         if ( args.length>0 ) test= args[0];
