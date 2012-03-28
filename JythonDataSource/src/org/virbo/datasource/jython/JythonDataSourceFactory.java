@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -173,10 +174,15 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         } else {
             try {
                 URISplit split= URISplit.parse(surl);
-                if ( split.scheme.equals("inline") ) {
+                if ( split.scheme!=null && split.scheme.equals("inline") ) {
                     return false;
                 }
-                File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
+                URL url= DataSetURI.getURL(surl);
+                if ( url==null ) {
+                    return true;
+                }
+
+                File src = DataSetURI.getFile( url, new NullProgressMonitor() );
                 BufferedReader reader = new BufferedReader(new FileReader(src));
                 String s = reader.readLine();
                 boolean haveResult = false;
