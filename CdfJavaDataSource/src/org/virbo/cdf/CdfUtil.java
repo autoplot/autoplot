@@ -186,14 +186,20 @@ public class CdfUtil {
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
 
         {
-            String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            String cdfFile;
+            synchronized ( CdfJavaDataSource.lock ) {
+                cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            }
+            
             if ( false && cdfFile!=null ) {
                 String uri= cdfFile + "?" + variable.getName();
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
                 }
-                MutablePropertyDataSet result= CdfJavaDataSource.dsCache.get( uri );
-                if ( result!=null ) return result;
+                synchronized ( CdfJavaDataSource.dslock ) {
+                    MutablePropertyDataSet result= CdfJavaDataSource.dsCache.get( uri );
+                    if ( result!=null ) return result;
+                }
             }
         }
         if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
@@ -460,14 +466,19 @@ public class CdfUtil {
 
 //System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
         if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
-            String cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            String cdfFile;
+            synchronized ( CdfJavaDataSource.lock ) {
+                cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
+            }
             if ( cdfFile!=null ) {
                 String uri= cdfFile + "?" + variable.getName();
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
                 }
-                CdfJavaDataSource.dsCache.put( uri, result );
-                CdfJavaDataSource.dsCacheFresh.put( uri, System.currentTimeMillis() );
+                synchronized ( CdfJavaDataSource.dslock ) {
+                    CdfJavaDataSource.dsCache.put( uri, result );
+                    CdfJavaDataSource.dsCacheFresh.put( uri, System.currentTimeMillis() );
+                }
             }
         }
         return result;

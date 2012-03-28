@@ -66,24 +66,30 @@ public class CdfJavaDataSource extends AbstractDataSource {
     protected static final LinkedHashMap<String,CDF> openFiles= new LinkedHashMap();
     protected static final Map<CDF,String> openFilesRev= new HashMap();
     protected static final Map<String,Long> openFilesFresh= new HashMap();
+    protected static final Object lock= new Object();
 
     protected static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
     protected static final HashMap<String,Long> dsCacheFresh= new HashMap();
+    protected static final Object dslock= new Object();
 
-    private static synchronized void cdfCacheUnload( String fileName, boolean unloadDs ) {
-        CDF cdf= openFiles.remove(fileName);
-        openFilesRev.remove(cdf);
-        openFilesFresh.remove(fileName);
-        if ( unloadDs ) {
-            List<String> unload= new ArrayList();
-            for ( String ds: dsCache.keySet() ) {
-                if ( ds.startsWith(fileName) ) {
-                    unload.add(ds);
+    private static void cdfCacheUnload( String fileName, boolean unloadDs ) {
+        synchronized (lock) {
+            CDF cdf= openFiles.remove(fileName);
+            openFilesRev.remove(cdf);
+            openFilesFresh.remove(fileName);
+            if ( unloadDs ) {
+                synchronized (dslock) {
+                    List<String> unload= new ArrayList();
+                    for ( String ds: dsCache.keySet() ) {
+                        if ( ds.startsWith(fileName) ) {
+                            unload.add(ds);
+                        }
+                    }
+                    for ( String ds: unload ) {
+                        dsCache.remove(ds);
+                        dsCacheFresh.remove(ds);
+                    }
                 }
-            }
-            for ( String ds: unload ) {
-                dsCache.remove(ds);
-                dsCacheFresh.remove(ds);
             }
         }
     }
@@ -91,9 +97,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
     public CDF getCdfFile( String fileName ) {
         CDF cdf;
         try {
-            cdf= openFiles.get(fileName);
+            synchronized ( lock ) {
+                cdf= openFiles.get(fileName);
+            }
             if ( cdf==null ) {
-                synchronized (this) {
+                synchronized (lock) {
                     File cdfFile= new File(fileName);
                     if ( !cdfFile.exists() ) throw new IllegalArgumentException("CDF file does not exist: "+fileName);
                     if ( cdfFile.length()==0 ) throw new IllegalArgumentException("CDF file length is zero: "+fileName);
@@ -107,7 +115,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     }
                 }
             } else {
-                synchronized (this) { // freshen reference.
+                synchronized (lock) { // freshen reference.
                     long date= openFilesFresh.get(fileName);
                     if ( new File(fileName).lastModified() > date ) {
                         cdf = CDFFactory.getCDF(fileName);
@@ -192,9 +200,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon, Map<String,Object> attr1 ) throws Exception {
 
         String lsurl= uri.toString();
-        MutablePropertyDataSet cached= dsCache.get(lsurl);
-        if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
-            synchronized (this) {
+        MutablePropertyDataSet cached=null;
+        synchronized ( dslock ) {
+            cached= dsCache.get(lsurl);
+            if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
                 dsCache.remove(lsurl);
                 dsCache.put( lsurl, cached );
                 dsCacheFresh.put( lsurl, System.currentTimeMillis() );
