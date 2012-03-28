@@ -355,12 +355,14 @@ public class SimpleServlet extends HttpServlet {
                 logit("done with script", t0, uniq, debug);
             }
 
-            dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
-                public void paint(Graphics2D g) {
-                    g.setFont( Font.decode("sans-30") );
-                    g.drawString( "testSimpleServlet", 300, 300 );
-                }
-            });
+            if ( false ) { // force a change in the output, useful for testing.
+                dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
+                    public void paint(Graphics2D g) {
+                        g.setFont( Font.decode("sans-30") );
+                        g.drawString( "testSimpleServlet", 300, 300 );
+                    }
+                });
+            }
 
             dom.getController().waitUntilIdle();
 
