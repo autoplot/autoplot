@@ -262,11 +262,13 @@ public class DataSetURI {
      * and getResourceURI().toURL() should be used to handle all cases.
      * 
      * @param surl
-     * @return
+     * @return the URL, or null if it is not found.
      */
     public static URL getWebURL(URI url) {
         try {
-            URL rurl = getResourceURI(url).toURL();
+            URI uri= getResourceURI(url);
+            if ( uri==null ) return null;
+            URL rurl = uri.toURL();
             String surl = rurl.toString();
             return new URL(surl);
 
@@ -956,6 +958,7 @@ public class DataSetURI {
     /**
      * canonical method for getting the URL.  These will always be web-downloadable 
      * URLs.
+     * @return null or the URL if available.
      */
     public static URL getURL(String surl) throws MalformedURLException {
         try {
