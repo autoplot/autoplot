@@ -151,24 +151,47 @@ public class TestApplet001 {
 
     public static void main(String[] args) {
 
-        boolean headless= true; // true for Hudson (though it's not really headless), false for debugging
+        boolean headless= false; // true for Hudson (though it's not really headless), false for debugging
+
+        String test="test001";
+        if ( args.length>0 ) test= args[0];
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("dataSetURL", "vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
-        params.put("column", "5em,100%-10em");
-        params.put("font", "sans-italic-10");
-        params.put("row", "3em,100%-3em");
-        params.put("renderType", "fillToZero");
-        params.put("color", "#0000ff");
-        params.put("fillColor", "#aaaaff");
-        params.put("foregroundColor", "#ffffff");
-        params.put("backgroundColor", "#000000");
-        params.put("clickCallback", "onClick,label=Show Coordinates");
-        //params.put("contextOverview", "on");
-        //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
-        params.put("codebase_lookup", "false");
-        params.put("java_arguments", "-Djnlp.packEnabled=true");
 
+        if ( test.equals("test001") ) {
+
+            params.put("dataSetURL", "vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
+            params.put("column", "5em,100%-10em");
+            params.put("font", "sans-italic-10");
+            params.put("row", "3em,100%-3em");
+            params.put("renderType", "fillToZero");
+            params.put("color", "#0000ff");
+            params.put("fillColor", "#aaaaff");
+            params.put("foregroundColor", "#ffffff");
+            params.put("backgroundColor", "#000000");
+            params.put("clickCallback", "onClick,label=Show Coordinates");
+            //params.put("contextOverview", "on");
+            //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
+            params.put("codebase_lookup", "false");
+            params.put("java_arguments", "-Djnlp.packEnabled=true");
+
+        } else if ( test.equals("test003") ) {
+            params.put("dataSetURL", "http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14");
+            params.put("column", "5em,100%-10em");
+            params.put("font", "sans-italic-10");
+            params.put("row", "3em,100%-3em");
+            params.put("renderType", "fillToZero");
+            params.put("color", "#0000ff");
+            params.put("fillColor", "#aaaaff");
+            params.put("foregroundColor", "#ffffff");
+            params.put("backgroundColor", "#000000");
+            params.put("clickCallback", "onClick,label=Show Coordinates");
+            //params.put("contextOverview", "on");
+            //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
+            params.put("codebase_lookup", "false");
+            params.put("java_arguments", "-Djnlp.packEnabled=true");
+
+        }
         DasApplication.setRestrictPermission(true);
         FileSystemSettings.setRestrictPermission(true);
 
