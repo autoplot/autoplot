@@ -1397,7 +1397,7 @@ public class DataSourceController extends DomNodeController {
 
             if ( dsf.getController().getTsb()==null ) {
                 String title= "no data in interval";
-                model.showMessage( "warning: "+ e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+                model.showMessage( ""+ e.getMessage(), title, JOptionPane.INFORMATION_MESSAGE );
             } else {
                 // do nothing.
             }
