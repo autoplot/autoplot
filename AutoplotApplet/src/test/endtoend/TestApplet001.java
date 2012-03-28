@@ -158,6 +158,8 @@ public class TestApplet001 {
 
         Map<String, String> params = new HashMap<String, String>();
 
+        int height= 200;
+
         if ( test.equals("test001") ) {
 
             params.put("dataSetURL", "vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
@@ -174,7 +176,15 @@ public class TestApplet001 {
             //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
             params.put("codebase_lookup", "false");
             params.put("java_arguments", "-Djnlp.packEnabled=true");
-
+        } else if ( test.equals("test002" ) ) {
+            params.put("vap", "http://autoplot.org/data/autoplot-applet.vap");
+            params.put("clickCallback", "onClick,label=Show Coordinates");
+            //params.put("contextOverview", "on");
+            //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
+            params.put("codebase_lookup", "false");
+            params.put("java_arguments", "-Djnlp.packEnabled=true");
+            height=400;
+            
         } else if ( test.equals("test003") ) {
             params.put("dataSetURL", "http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14");
             params.put("column", "5em,100%-10em");
@@ -196,7 +206,7 @@ public class TestApplet001 {
         FileSystemSettings.setRestrictPermission(true);
 
         try {
-            doTest( test, params, headless, "height", "200", "width", "600" );
+            doTest( test, params, headless, "height", String.valueOf(height), "width", "600" );
         } catch ( Exception ex ) {
             ex.printStackTrace();
             if ( headless ) System.exit(1);
