@@ -399,7 +399,7 @@ public class AutoplotApplet extends JApplet {
         appmodel.getCanvas().setPrintingTag("");
 
         dom.getOptions().setAutolayout("true".equals(getParameter("autolayout")));
-        if (!dom.getOptions().isAutolayout()) {
+        if (!dom.getOptions().isAutolayout() && vap==null ) {
             if (!row.equals("")) {
                 dom.getController().getCanvas().getController().setRow(row);
             }
