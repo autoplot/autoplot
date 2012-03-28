@@ -361,7 +361,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         String resourceUri1=null;
         if ( params.containsKey("script") ) {
             furi= params.get("script");
-            resourceUri1= split.resourceUri.toString();
+            resourceUri1= split.resourceUri==null ? null : split.resourceUri.toString();
         } else {
             furi= split.resourceUri.toString();
             resourceUri1= null;
@@ -519,7 +519,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     public boolean reject(String uri) throws Exception {
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.length()==0 || split.file.equals("file:///") ) {
-            return true;
+            Map<String,String> params= URISplit.parseParams(split.params);
+            if ( params.containsKey("script") ) {
+                return false;
+            } else {
+                return true;
+            }
         } else {
             return false;
         }
