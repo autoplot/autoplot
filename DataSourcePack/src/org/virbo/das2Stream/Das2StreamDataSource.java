@@ -69,6 +69,8 @@ public class Das2StreamDataSource extends AbstractDataSource {
                     }
                 } else if ( se.getMessage().equals("NoDataInInterval") ) {
                     throw new NoDataInIntervalException(se.getMessage());
+                } else if ( se.getCause()!=null && se.getCause() instanceof NoDataInIntervalException ) {
+                    throw (NoDataInIntervalException)se.getCause();
                 }
                 throw se;
             }
