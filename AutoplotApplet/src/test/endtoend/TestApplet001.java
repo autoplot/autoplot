@@ -136,13 +136,13 @@ public class TestApplet001 {
         applet.getDom().getController().waitUntilIdle();
 
         try {
-            StatePersistence.saveState(new File("applet_"+testId+".vap"), applet.getDom());
+            StatePersistence.saveState(new File("test.applet."+testId+".vap"), applet.getDom());
         } catch (IOException ex) {
             Logger.getLogger(TestApplet001.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         try {
-            applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("applet_"+testId+".png");
+            applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("test.applet."+testId+".png");
         } catch (IOException ex) {
             Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
         }
