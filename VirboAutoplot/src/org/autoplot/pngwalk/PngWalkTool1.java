@@ -613,6 +613,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         if ( template.contains("$") && !template.contains("%") ) {
             template= template.replaceAll("\\$","%");
+            if ( template.contains("(") && !template.contains("{") ) {
+                template= template.replaceAll("\\(","{");
+                template= template.replaceAll("\\)","}");
+            }
         }
         
         dataSetSelector1.setValue(template);
@@ -700,6 +704,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                         }
                     }
                 } catch (java.io.IOException e) {
+                    e.printStackTrace();
                     // This probably means the template was invalid. Don't set new sequence.
                     if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
                 }
