@@ -226,6 +226,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 String template = tool.getTemplate();
                 int i0 = template.indexOf("_$Y");
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
+                if ( i0==-1 ) i0= template.indexOf("_%o"); 
+                if ( i0==-1 ) i0= template.indexOf("_%{o,");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 || i0==-1 ) return false;
                 //String timeRange = s.substring(i0 + 1, i1);
@@ -259,6 +261,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     }
                     int i0 = template.indexOf("_$Y");
                     if ( i0==-1 ) i0= template.indexOf("_%Y");
+                    if ( i0==-1 ) i0= template.indexOf("_%o");
+                    if ( i0==-1 ) i0= template.indexOf("_%(o,");
+
                     //int i1 = template.indexOf(".png");
                     //if ( i1==-1 ) return;
                     //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
