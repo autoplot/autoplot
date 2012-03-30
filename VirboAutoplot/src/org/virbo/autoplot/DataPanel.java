@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
@@ -47,6 +48,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.FilterChainPanel;
 
 /**
  * PlotElement for controlling how data is handled.
@@ -464,6 +466,7 @@ public class DataPanel extends javax.swing.JPanel {
         sliceAutorangesCB = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         dataSetLabel = new javax.swing.JLabel();
+        editComponentPanel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         validRangeLabel = new javax.swing.JLabel();
         validRangeComboBox = new javax.swing.JComboBox();
@@ -547,6 +550,13 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetLabel.setFont(dataSetLabel.getFont().deriveFont(dataSetLabel.getFont().getSize()-2f));
         dataSetLabel.setText("(dataset will go here)");
 
+        editComponentPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/reload.png"))); // NOI18N
+        editComponentPanel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editComponentPanelActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -554,26 +564,29 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(operationsLabel)
-                        .add(18, 18, 18)
-                        .add(componentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE))
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(doSliceCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceTypeComboBox, 0, 301, Short.MAX_VALUE)
-                        .add(18, 18, 18))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(sliceIndexLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE))
+                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE))
                     .add(transposeCheckBox)
-                    .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
-                .addContainerGap())
+                    .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2Layout.createSequentialGroup()
+                                .add(operationsLabel)
+                                .add(18, 18, 18)
+                                .add(componentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE))
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(doSliceCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(sliceTypeComboBox, 0, 321, Short.MAX_VALUE)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(editComponentPanel))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -584,7 +597,8 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(11, 11, 11)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(operationsLabel)
-                    .add(componentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(componentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(editComponentPanel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(doSliceCheckBox)
@@ -636,7 +650,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(fillValueComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(validRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(218, Short.MAX_VALUE))
+                .addContainerGap(236, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -665,7 +679,7 @@ public class DataPanel extends javax.swing.JPanel {
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(uriTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                .add(uriTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -680,8 +694,8 @@ public class DataPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -690,7 +704,8 @@ public class DataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -762,11 +777,22 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_componentTextFieldMouseReleased
 
+    private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
+        FilterChainPanel p= new FilterChainPanel();
+        p.setFilters(componentTextField.getText());
+        int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
+        if ( ret==JOptionPane.OK_OPTION ) {
+            componentTextField.setText( p.getFilters() );
+            applicationController.getPlotElement().setComponentAutomatically( componentTextField.getText() );
+            componentChanged();
+        }
+    }//GEN-LAST:event_editComponentPanelActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField componentTextField;
     private javax.swing.JLabel dataSetLabel;
     private javax.swing.JCheckBox doSliceCheckBox;
+    private javax.swing.JButton editComponentPanel;
     private javax.swing.JComboBox fillValueComboBox;
     private javax.swing.JLabel fillValueLabel;
     private javax.swing.JLabel jLabel1;
