@@ -2656,10 +2656,12 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }
                 int idx= tabs.indexOfTab("style");
                 if ( idx==-1 ) idx=  tabs.getTabCount();
-                tabs.insertTab("layout", null, layoutPanel, 
+                JScrollPane jsp = new JScrollPane();
+                jsp.setViewportView(layoutPanel);
+                tabs.insertTab("layout", null, jsp,
                         String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
             } else {
-                if ( layoutPanel!=null ) tabs.remove(layoutPanel);
+                if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
             }
         } else if ( ev.getPropertyName().equals(Options.PROP_DATAVISIBLE ) ) {
             if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
@@ -2668,10 +2670,12 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }
                 int idx= tabs.indexOfTab("metadata");
                 if ( idx==-1 ) idx=  tabs.getTabCount();
-                tabs.insertTab("data", null, dataPanel,
+                JScrollPane jsp = new JScrollPane();
+                jsp.setViewportView(dataPanel);
+                tabs.insertTab("data", null, jsp,
                         String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
             } else {
-                if ( dataPanel!=null ) tabs.remove(dataPanel);
+                if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
             }
         } else if ( ev.getPropertyName().equals(Options.PROP_USE_TIME_RANGE_EDITOR ) ) {
             if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
