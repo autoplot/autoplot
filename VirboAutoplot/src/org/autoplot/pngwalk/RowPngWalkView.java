@@ -294,7 +294,11 @@ public class RowPngWalkView extends PngWalkView {
                     g2.setColor(Color.BLACK);
                     Shape oldClip = g2.getClip();
                     g2.clip(new Rectangle(cx, 0, (cellSize+thumb.getWidth())/2, getHeight()));
-                    g2.drawString(wimage.getCaption(), cx, cy);
+                    String s= wimage.getCaption();
+                    if ( s.startsWith("orbit:") ) {
+                        s= s.substring(6);
+                    }
+                    g2.drawString( s, cx, cy);
                     g2.setClip(oldClip);
                 }
             }

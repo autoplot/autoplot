@@ -331,7 +331,11 @@ public class GridPngWalkView extends PngWalkView {
                         g2.setColor(Color.BLACK);
                         Shape oldClip = g2.getClip();
                         g2.clip(new Rectangle(cx, row*thumbSize, (thumbSize+thumb.getWidth())/2, thumbSize));
-                        g2.drawString(wimage.getCaption(), cx, cy);
+                        String s= wimage.getCaption();
+                        if ( s.startsWith("orbit:") ) {
+                            s= s.substring(6);
+                        }
+                        g2.drawString( s, cx, cy);
                         g2.setClip(oldClip);
                     }
 
