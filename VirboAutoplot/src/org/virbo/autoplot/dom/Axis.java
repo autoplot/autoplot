@@ -61,7 +61,7 @@ public class Axis extends DomNode {
     }
     protected String label = "";
     /**
-     * consise label for the axis.
+     * concise label for the axis.
      */
     public static final String PROP_LABEL = "label";
 
