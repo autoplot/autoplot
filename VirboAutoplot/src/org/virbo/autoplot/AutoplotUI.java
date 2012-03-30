@@ -6,6 +6,7 @@
 package org.virbo.autoplot;
 
 import java.awt.HeadlessException;
+import java.awt.event.MouseEvent;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
@@ -36,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -44,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
@@ -73,10 +76,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultEditorKit;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool1;
@@ -2320,10 +2326,37 @@ APSplash.checkTime("init 52");
             buffy.append("</html>");
 
 
-            JLabel label= new JLabel(buffy.toString());
-            JScrollPane pane= new JScrollPane(label,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+            JTextPane jtp= new JTextPane();
+            jtp.setContentType("text/html");
+            jtp.read(new StringReader(buffy.toString()), null);
+            jtp.setEditable(false);
+
+            final JPopupMenu menu= new JPopupMenu();
+            JMenuItem copyItem = menu.add(new DefaultEditorKit.CopyAction());
+            copyItem.setText("Copy");
+            jtp.addMouseListener( new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        if (menu != null) {
+                            menu.show(e.getComponent(), e.getX(), e.getY());
+                        }
+                    }
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        if (menu != null) {
+                            menu.show(e.getComponent(), e.getX(), e.getY());
+                        }
+                    }
+                }
+            });
+
+            //JLabel label= new JLabel(buffy.toString());
+            JScrollPane pane= new JScrollPane(jtp,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
             pane.getVerticalScrollBar().setUnitIncrement( 12 );
-            pane.setPreferredSize(new java.awt.Dimension(label.getPreferredSize().width + 50,480));
+            pane.setPreferredSize(new java.awt.Dimension(jtp.getPreferredSize().width + 50,480));
 
             JOptionPane.showMessageDialog(this, pane);
 
