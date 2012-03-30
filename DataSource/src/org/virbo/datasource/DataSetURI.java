@@ -225,7 +225,7 @@ public class DataSetURI {
     }
 
     /**
-     * returns the URI to be interpretted by the DataSource.  This identifies
+     * returns the URI to be interpreted by the DataSource.  This identifies
      * a file (or database) resource that can be passed to VFS.
      * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
      * @return the URI for the datasource resource, or null if it is not valid.
@@ -236,7 +236,7 @@ public class DataSetURI {
     }
 
     /**
-     * returns the URI to be interpretted by the DataSource.  For file-based
+     * returns the URI to be interpreted by the DataSource.  For file-based
      * data sources, this will probably be the filename plus server-side
      * parameters, and can be converted to a URL.
      *
@@ -257,17 +257,17 @@ public class DataSetURI {
     }
 
     /**
-     * returns a downloadable URL from the surl, perhaps popping off the 
+     * returns a downloadable URL from the Autoplot URI, perhaps popping off the
      * data source specifier.  This assumes that the resource is a URL,
      * and getResourceURI().toURL() should be used to handle all cases.
      * 
-     * @param surl
-     * @return the URL, or null if it is not found.
+     * @param uri An Autoplot URI.
+     * @return a URL that can be downloaded, or null if it is not found.
      */
-    public static URL getWebURL(URI url) {
+    public static URL getWebURL(URI uri) {
         try {
-            URI uri= getResourceURI(url);
-            if ( uri==null ) return null;
+            URI uri1= getResourceURI(uri);
+            if ( uri1==null ) return null;
             URL rurl = uri.toURL();
             String surl = rurl.toString();
             return new URL(surl);
