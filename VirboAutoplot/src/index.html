@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The x-axis title %{RANGE} shows both Y-m-d and day-of-year.</small></p>
+        <p><small>Simply adding a plot button to the bookmarks GUI allows the user to look at titles and descriptions easily when looking for a product.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>NAME used for label of DEPEND_0, even when RichAscii headers had already assigned a label</li>
+            <li>fftPower function knows what to do with TT2000-based timetags</li>
+            <li>dbAboveBackground and other filters do not drop axis labels</li>
+            <li>data tab has scrollpane when initially enabled so that canvas doesn't resize because of long dataset labels.</li>
             <li>3513630: empty field at the end of an ascii record doesn't prevent file from being parsed</li>
             <li>replace file messages up log z axis.  This is now corrected to check for autoranging.</li>
             <li>3510248: single instance code could result in hung application</li>
@@ -55,6 +59,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>bookmarks manager has a plot button now, which allows the user to see title and description before plotting</li>
+            <li>"about Autoplot" dialog supports cut-n-paste</li>
+            <li>beginnings of filters dialog</li>
+            <li>CDF shows S/C and project in title, from ISTP global attributes</li>
+            <li>Pngwalk tool supports orbits as tiemranges $(o:rbspa-pp)</li>
+            <li>timerange GUI contains examples in the right-click context menu.</li>
+            <li>ap+jyds:script=file:/home/jbf/project/autoplot/data/jyds/setXUnitsScott.jyds rejects properly so that the GUI is entered</li>
             <li>xaxis title = %{RANGE} will have both Y-m-d and doy.</li>
             <li>"Reload All Data" added to the tools, replacing the script some people might have had installed</li>
             <li>first export to idlsav support for rank 1 data (no timetags)</li>
