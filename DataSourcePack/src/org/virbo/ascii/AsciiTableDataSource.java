@@ -180,6 +180,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
             column= eventListColumn;
         }
 
+        if ( ds.length()==0 ) {
+            System.err.println("===========================================");
+            System.err.println("no records found when parsing ascii file!!!");
+            System.err.println("===========================================");
+            // this may raise an exception in a future version.
+        }
+
         String group= getParam( "group", null );
         if ( group!=null ) {
             vds= ArrayDataSet.copy( DataSetOps.unbundle( ds, group ) );
