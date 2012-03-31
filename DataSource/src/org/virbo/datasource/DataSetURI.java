@@ -268,7 +268,7 @@ public class DataSetURI {
         try {
             URI uri1= getResourceURI(uri);
             if ( uri1==null ) return null;
-            URL rurl = uri.toURL();
+            URL rurl = uri1.toURL();
             String surl = rurl.toString();
             return new URL(surl);
 
