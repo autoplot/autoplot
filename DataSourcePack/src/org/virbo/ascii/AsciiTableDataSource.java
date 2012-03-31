@@ -251,8 +251,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             if ( depend0.length()>1 ) dep0.putProperty( QDataSet.NAME, depend0 );
             Units xunits= (Units) dep0.property(QDataSet.UNITS);
-            if ( xunits==null || !UnitsUtil.isTimeLocation( xunits ) )
-                dep0.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
+            if ( xunits==null || !UnitsUtil.isTimeLocation( xunits ) ) {
+                if ( dep0.property(QDataSet.LABEL)==null ) {
+                    dep0.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
+                }
+            }
         }
 
         if ( bundle!=null ) {
