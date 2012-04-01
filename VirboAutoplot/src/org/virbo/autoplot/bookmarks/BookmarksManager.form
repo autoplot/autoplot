@@ -126,7 +126,11 @@
                       <Component id="importFromWebButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="ExportButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="299" max="32767" attributes="0"/>
+                      <EmptySpace pref="144" max="32767" attributes="0"/>
+                      <Component id="overplotButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="plotBelowButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="plotButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="dismissButton" min="-2" pref="43" max="-2" attributes="0"/>
@@ -183,6 +187,8 @@
                   <Component id="importFromWebButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="ExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="plotButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="plotBelowButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="overplotButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -302,6 +308,22 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="plotBelowButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Plot Below"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotBelowButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="overplotButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Overplot"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="overplotButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

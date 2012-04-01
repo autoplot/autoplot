@@ -17,6 +17,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
@@ -282,6 +283,8 @@ public class BookmarksManager extends javax.swing.JDialog {
         descriptionTextField = new javax.swing.JTextField();
         editDescriptionButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
+        plotBelowButton = new javax.swing.JButton();
+        overplotButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -403,6 +406,20 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
+        plotBelowButton.setText("Plot Below");
+        plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotBelowButtonActionPerformed(evt);
+            }
+        });
+
+        overplotButton.setText("Overplot");
+        overplotButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                overplotButtonActionPerformed(evt);
+            }
+        });
+
         jMenu1.setText("File");
 
         importMenuItem.setText("Import...");
@@ -500,7 +517,11 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .add(importFromWebButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 299, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 144, Short.MAX_VALUE)
+                        .add(overplotButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(plotBelowButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -546,7 +567,9 @@ public class BookmarksManager extends javax.swing.JDialog {
                     .add(importButton)
                     .add(importFromWebButton)
                     .add(ExportButton)
-                    .add(plotButton))
+                    .add(plotButton)
+                    .add(plotBelowButton)
+                    .add(overplotButton))
                 .addContainerGap())
         );
 
@@ -825,9 +848,6 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
         Bookmark book= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
         if ( book instanceof Bookmark.Item ) {
             if ( getParent() instanceof AutoplotUI ) {
-                AutoplotUI p= (AutoplotUI)getParent();
-                Bookmark.Item bisel= (Bookmark.Item) book;
-                
                 sel.setValue(((Bookmark.Item) book).getUri());
                 sel.maybePlot(modifiers);
 
@@ -841,6 +861,14 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
     maybePlot(evt.getModifiers());
 }//GEN-LAST:event_plotButtonActionPerformed
+
+private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
+    maybePlot(KeyEvent.CTRL_MASK);
+}//GEN-LAST:event_plotBelowButtonActionPerformed
+
+private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overplotButtonActionPerformed
+    maybePlot(KeyEvent.SHIFT_MASK);
+}//GEN-LAST:event_overplotButtonActionPerformed
 
 //    /**
 //    * @param args the command line arguments
@@ -885,6 +913,8 @@ private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JTree jTree1;
     private javax.swing.JMenuItem mergeInDefaultMenuItem;
     private javax.swing.JMenuItem newFolderMenuItem;
+    private javax.swing.JButton overplotButton;
+    private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
     private javax.swing.JLabel titleLabel;
