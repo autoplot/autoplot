@@ -831,7 +831,6 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
                 sel.setValue(((Bookmark.Item) book).getUri());
                 sel.maybePlot(modifiers);
 
-                p.plotUri(bisel.getUri());
             }
             dispose();
             return true;
