@@ -11,7 +11,9 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 /**
- *
+ * Dialog that contains DataSourceEditorPanels, and actions like:
+ * Cancel, Overplot, Plot Below, and Plot.
+ * 
  * @author  jbf
  */
 public class DataSourceEditorDialog extends javax.swing.JDialog {
@@ -84,7 +86,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         okayButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
-        okayButton.setText("Ok");
+        okayButton.setText("Plot");
         okayButton.setToolTipText("Plot, replacing any previous plot.");
         okayButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -144,9 +146,9 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(525, Short.MAX_VALUE)
+                .addContainerGap(537, Short.MAX_VALUE)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 838, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -198,8 +200,10 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     void setPlayButton(boolean b) {
         if ( b ) {
             okayButton.setIcon(  new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png") ) );
+            okayButton.setText("Plot");
         } else {
             okayButton.setIcon(null);
+            okayButton.setText("Ok");
         }
         plotBelowButton.setVisible(b);
         overplotButton.setVisible(b);
