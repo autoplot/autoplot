@@ -1130,6 +1130,16 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         JMenuItem mi;
 
+        mi= new JMenuItem( new AbstractAction("Manage and Browse") {
+            public void actionPerformed(ActionEvent e) {
+                Container parent= BookmarksManager.this.getParent();
+                BookmarksManager.this.setLocationRelativeTo( parent );
+                setVisible(true);
+            }
+        } );
+        mi.setToolTipText("Manage bookmarks, or select bookmark to plot");
+        bookmarksMenu.add(mi);
+
         mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
 
             public void actionPerformed(ActionEvent e) {
@@ -1140,17 +1150,6 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         } );
         mi.setToolTipText("Add the current URI to the bookmarks");
         bookmarksMenu.add(mi);
-
-        mi= new JMenuItem( new AbstractAction("Manage Bookmarks") {
-            public void actionPerformed(ActionEvent e) {
-                Container parent= BookmarksManager.this.getParent();
-                BookmarksManager.this.setLocationRelativeTo( parent );
-                setVisible(true);
-            }
-        } );
-        mi.setToolTipText("Manage bookmarks, or select bookmark to plot");
-        bookmarksMenu.add(mi);
-
 
         bookmarksMenu.add(new JSeparator());
 
@@ -1226,10 +1225,10 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     }
 
                     if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                        String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
-                        subMenu.setToolTipText( ttext + "<br>" + tooltip );
+                        //String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
+                        //subMenu.setToolTipText( ttext + "<br>" + tooltip );
                     } else {
-                        if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
+                        //if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
                     }
                     addBookmarks(subMenu, folder.getBookmarks(),sel);
                     bookmarksMenu.add(subMenu);
