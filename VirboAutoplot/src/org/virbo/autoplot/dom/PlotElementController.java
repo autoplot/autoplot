@@ -806,8 +806,14 @@ public class PlotElementController extends DomNodeController {
             qube.add(a[i]);
         }
 
+        String newResult="|slices(";
+        boolean transpose= false;
         String result="";
         int nslice= fillDs.rank()-2;
+
+        int idim=0;
+        int ndim= fillDs.rank();
+
         for ( int islice=0; islice<nslice; islice++ ) {
             int sliceIndex = 0;
             int bestSlice = 0;
@@ -843,21 +849,46 @@ public class PlotElementController extends DomNodeController {
 
             // pick a slice index near the middle, which is less likely to be all fill.
             int n= qube.get(sliceIndex)/2;
+
+            if ( sliceIndex>0 ) {
+                for ( int i=0; i<sliceIndex; i++ ) {
+                    newResult+= "':',";
+                    idim++;
+                }
+            }
+            newResult+= n;
+            idim++;
+
+            if ( idim<(ndim-1) ) newResult+= ",";
             
             result+= "|slice"+sliceIndex+"("+n+")";
             if (lat > -1 && lon > -1 && lat < lon) {
                 result+="|transpose()";
+                transpose= true;
             }
 
             slicePref.remove(sliceIndex);
             qube.remove(sliceIndex);
 
-            //if ( fillDs.rank()>3 ) {
-            //    result="|slice0(0)"+result;
-            //}
         }
 
-        return result;
+        for ( int i=idim; i<ndim; i++ ) {
+            newResult+= "':'";
+            if ( i<ndim-1 ) newResult+=",";
+        }
+
+        newResult+= ")";
+        if ( transpose ) {
+            newResult+="|transpose()";
+        }
+
+        if ( nslice<2 ) {
+            return result;
+        } else {
+            return newResult;
+        }
+        
+        //return result;
 
     }
 
