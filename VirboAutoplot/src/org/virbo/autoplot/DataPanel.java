@@ -156,7 +156,7 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     /**
-     * increment the field at the carot position in the slice or slices function.
+     * increment the field at the caret position in the slice or slices function.
      * @param amount positive or negative number of steps.
      */
     private void doIncrUp( int amount ) {
