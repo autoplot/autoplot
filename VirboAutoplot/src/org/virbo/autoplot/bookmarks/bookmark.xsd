@@ -1,0 +1,40 @@
+<xsd:schema
+	      xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	      targetNamespace="http://autoplot.org/schema/bookmarks"
+	      xmlns="http://autoplot.org/schema/bookmarks"
+	      elementFormDefault="qualified">
+
+   <xsd:element name="autoplot-bookmark-list" type="autoplot-bookmark-list" />
+   <xsd:complexType name="autoplot-bookmark-list">
+      <xsd:sequence>
+         <xsd:element ref="bookmark-folder" minOccurs="1" maxOccurs="unbounded" /> 
+      </xsd:sequence>
+   </xsd:complexType>
+
+   <xsd:element name="bookmark-folder" type="bookmark-folder"/>
+   <xsd:complexType name="bookmark-folder">
+      <xsd:sequence>
+         <xsd:element name="title" minOccurs="1" maxOccurs="1" />
+         <xsd:element name="description" minOccurs="0" maxOccurs="1" />
+         <xsd:element ref="bookmark-list" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+      <xsd:attribute name="remoteUrl" type="xsd:string" />
+   </xsd:complexType>
+  
+   <xsd:element name="bookmark-list" type="bookmark-list"/>
+   <xsd:complexType name="bookmark-list">
+      <xsd:sequence>
+         <xsd:element ref="bookmark" minOccurs="1" maxOccurs="unbounded" /> 
+      </xsd:sequence>
+   </xsd:complexType>
+
+   <xsd:element name="bookmark" type="bookmark"/>
+   <xsd:complexType name="bookmark">
+      <xsd:sequence>
+         <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1" />
+         <xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1" />
+         <xsd:element name="url" type="xsd:string" minOccurs="1" maxOccurs="1" />
+      </xsd:sequence>
+   </xsd:complexType>
+
+</xsd:schema>
