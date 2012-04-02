@@ -976,7 +976,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             public void run() {
                 try {
                     try {
-                        Thread.sleep(5000); // sleep 5 seconds before making second pass
+                        Thread.sleep(300); // sleep 300 milliseconds before making second pass
                     } catch (InterruptedException ex) {
                         Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
