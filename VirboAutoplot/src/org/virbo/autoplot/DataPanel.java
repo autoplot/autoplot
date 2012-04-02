@@ -155,12 +155,16 @@ public class DataPanel extends javax.swing.JPanel {
         operationsLabel.setVisible(expert);
     }
 
+    /**
+     * increment the field at the carot position in the slice or slices function.
+     * @param amount positive or negative number of steps.
+     */
     private void doIncrUp( int amount ) {
             String s= componentTextField.getText();
             String olds= s;
             int cp= componentTextField.getCaretPosition();
             String match= ".*\\|slice\\d\\(\\d*";
-            String match2= ".*\\|slices\\((\\d+,)*\\d*";
+            String match2= ".*\\|slices\\(([\\:\\'\\d]+,)*\\d*";
             if ( cp<s.length() ) {
                 Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
                 if ( m.matches() ) {
