@@ -270,9 +270,6 @@ public class BookmarksManager extends javax.swing.JDialog {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        importButton = new javax.swing.JButton();
-        importFromWebButton = new javax.swing.JButton();
-        ExportButton = new javax.swing.JButton();
         dismissButton = new javax.swing.JButton();
         URILabel = new javax.swing.JLabel();
         URLTextField = new javax.swing.JTextField();
@@ -306,27 +303,6 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
         jScrollPane1.setViewportView(jTree1);
-
-        importButton.setText("Import...");
-        importButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importButtonActionPerformed(evt);
-            }
-        });
-
-        importFromWebButton.setText("Import From Web...");
-        importFromWebButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importFromWebButtonActionPerformed(evt);
-            }
-        });
-
-        ExportButton.setText("Export...");
-        ExportButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ExportButtonActionPerformed(evt);
-            }
-        });
 
         dismissButton.setText("OK");
         dismissButton.addActionListener(new java.awt.event.ActionListener() {
@@ -474,7 +450,7 @@ public class BookmarksManager extends javax.swing.JDialog {
 
         editMenu.setText("Edit");
 
-        newFolderMenuItem.setText("New Folder");
+        newFolderMenuItem.setText("New Folder...");
         newFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newFolderMenuItemActionPerformed(evt);
@@ -482,7 +458,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
         editMenu.add(newFolderMenuItem);
 
-        addItemMenuItem.setText("New Bookmark");
+        addItemMenuItem.setText("New Bookmark...");
         addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addItemMenuItemActionPerformed(evt);
@@ -511,13 +487,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(importButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(importFromWebButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 144, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
                         .add(overplotButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotBelowButton)
@@ -564,9 +534,6 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(16, 16, 16)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(dismissButton)
-                    .add(importButton)
-                    .add(importFromWebButton)
-                    .add(ExportButton)
                     .add(plotButton)
                     .add(plotBelowButton)
                     .add(overplotButton))
@@ -577,18 +544,6 @@ public class BookmarksManager extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-    model.doImport(this);
-}//GEN-LAST:event_importButtonActionPerformed
-
-private void importFromWebButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importFromWebButtonActionPerformed
-    model.doImportUrl(this);
-}//GEN-LAST:event_importFromWebButtonActionPerformed
-
-private void ExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportButtonActionPerformed
-    model.doExport(this);
-}//GEN-LAST:event_ExportButtonActionPerformed
 
 private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
     doPlay= false;
@@ -667,7 +622,8 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
                     "<br> and cannot be edited.");
         }
         descriptionTextField.setEditable(remoteUrl.length()==0);
-        editDescriptionButton.setEnabled(remoteUrl.length()==0);
+        editDescriptionButton.setEnabled( true );
+        editDescriptionButton.setText( remoteUrl.length()==0 ? "Edit" : "View" );
         titleTextField.setEditable(remoteUrl.length()==0);
 
     } else {
@@ -675,7 +631,6 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         descriptionTextField.setText("");
         URLTextField.setText("");
         titleLabel.setText("Title:");
-        descriptionTextField.setEditable(false);
         editDescriptionButton.setEnabled(false);
         titleTextField.setEditable(false);
     }
@@ -829,8 +784,10 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     edit.setColumns(80);
     JScrollPane jScrollPane2= new JScrollPane(edit);
 
-    int ok= JOptionPane.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), JOptionPane.OK_CANCEL_OPTION );
-    if ( ok==JOptionPane.OK_OPTION ) {
+    edit.setEditable(descriptionTextField.isEditable());
+    
+    int ok= JOptionPane.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), edit.isEditable() ? JOptionPane.OK_CANCEL_OPTION : JOptionPane.OK_CANCEL_OPTION );
+    if ( edit.isEditable() && ok==JOptionPane.OK_OPTION ) {
         txt= edit.getText();
         txt= txt.replaceAll("\n", "<br>");
         descriptionTextField.setText(txt);
@@ -890,7 +847,6 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ExportButton;
     private javax.swing.JLabel URILabel;
     private javax.swing.JTextField URLTextField;
     private javax.swing.JMenuItem addItemMenuItem;
@@ -901,8 +857,6 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JButton editDescriptionButton;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exportMenuItem;
-    private javax.swing.JButton importButton;
-    private javax.swing.JButton importFromWebButton;
     private javax.swing.JMenuItem importMenuItem;
     private javax.swing.JMenuItem importUrlMenuItem;
     private javax.swing.JLabel jLabel1;

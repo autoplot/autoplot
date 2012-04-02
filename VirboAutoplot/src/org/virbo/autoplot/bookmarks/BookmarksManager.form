@@ -66,7 +66,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="newFolderMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="New Folder"/>
+                <Property name="text" type="java.lang.String" value="New Folder..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newFolderMenuItemActionPerformed"/>
@@ -74,7 +74,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="addItemMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="New Bookmark"/>
+                <Property name="text" type="java.lang.String" value="New Bookmark..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addItemMenuItemActionPerformed"/>
@@ -120,13 +120,7 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="jScrollPane1" alignment="0" pref="681" max="32767" attributes="0"/>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="importButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="importFromWebButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="ExportButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="144" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
                       <Component id="overplotButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="plotBelowButton" min="-2" max="-2" attributes="0"/>
@@ -183,9 +177,6 @@
               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="dismissButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="importFromWebButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ExportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="plotButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="plotBelowButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="overplotButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -210,30 +201,6 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="importButton">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Import..."/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importButtonActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="importFromWebButton">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Import From Web..."/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importFromWebButtonActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="ExportButton">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Export..."/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ExportButtonActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JButton" name="dismissButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="OK"/>
