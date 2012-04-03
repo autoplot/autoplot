@@ -851,7 +851,7 @@ public class PlotElementController extends DomNodeController {
             int n= qube.get(sliceIndex)/2;
 
             if ( sliceIndex>0 ) {
-                for ( int i=0; i<sliceIndex; i++ ) {
+                for ( int i=0; i<(sliceIndex-islice); i++ ) {
                     newResult+= "':',";
                     idim++;
                 }
@@ -859,7 +859,7 @@ public class PlotElementController extends DomNodeController {
             newResult+= n;
             idim++;
 
-            if ( idim<(ndim-1) ) newResult+= ",";
+            if ( (idim-islice)<(ndim-1) ) newResult+= ",";
             
             result+= "|slice"+sliceIndex+"("+n+")";
             if (lat > -1 && lon > -1 && lat < lon) {
