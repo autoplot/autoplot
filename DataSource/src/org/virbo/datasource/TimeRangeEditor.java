@@ -90,7 +90,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         } catch ( ParseException e ) {
             timeRangeTextField.setText( range.toString() );
             if ( UnitsUtil.isTimeLocation(value.getUnits()) ) { // go ahead and handle non-times.
-                showErrorUsage( text, "unable to parse time range" );
+                showErrorUsage( text, "<html>" +e.getMessage() );
             } else {
                 //showErrorUsage( text, "unable to parse range" );
             }
