@@ -1261,11 +1261,11 @@ public class ApplicationModel {
     boolean moveCache( File n ) {
         File local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
 
-        ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(getCanvas()), "Moving Cache..." );        
-        mon.started();
+        ProgressMonitor mon1= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(getCanvas()), "Moving Cache..." );
+        mon1.started();
         
         boolean y= Util.copyFileTree( local, n );
-        mon.finished();
+        mon1.finished();
         if ( y ) {
             //y= Util.deleteFileTree(local);
             JOptionPane.showMessageDialog( this.getCanvas(), "<html>File cache moved to<br>"+n+".<br>The old cache ("+local+") still contains data<br>and should manually be deleted.</html>", "Files moved", JOptionPane.PLAIN_MESSAGE );
