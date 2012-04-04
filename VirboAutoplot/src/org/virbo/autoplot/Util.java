@@ -174,6 +174,12 @@ public class Util {
         return true;
     }
     
+    /**
+     * copy a branch of files and folders.
+     * @param root
+     * @param dst
+     * @return true if successful.
+     */
     public static boolean copyFileTree( File root, File dst ) {
         try {
             String roots= root.getCanonicalPath()+"/";
@@ -194,7 +200,7 @@ public class Util {
         File[] children = root.listFiles();
         boolean success = true;
 
-        if ( !dst.mkdirs() ) {
+        if ( !dst.exists() && !dst.mkdirs() ) {
             throw new IllegalArgumentException( "unable to make directory "+dst );
         }
         for (int i = 0; i < children.length; i++) {
