@@ -37,7 +37,7 @@ public class Util {
 
         File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
         if ( !f2.exists() ) {
-            boolean ok= f2.mkdirs();
+            boolean ok= f2.exists() || f2.mkdirs();
             if ( !ok ) {
                 throw new RuntimeException("unable to create folder "+ f2 );
             }
