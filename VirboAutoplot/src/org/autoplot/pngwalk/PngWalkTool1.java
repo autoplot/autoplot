@@ -617,7 +617,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     public void setTemplate( String template ) {
 
         if ( template.contains("%") && !template.contains("$") ) {
-            template= template.replaceAll("%","$");
+            template= template.replaceAll("\\%","\\$");
             if ( template.contains("{") && !template.contains("(") ) {
                 template= template.replaceAll("\\{","(");
                 template= template.replaceAll("\\}",")");
