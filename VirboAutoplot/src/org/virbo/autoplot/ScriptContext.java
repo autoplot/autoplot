@@ -621,7 +621,17 @@ public class ScriptContext extends PyJavaInstance {
         TimeParser tp= TimeParser.create(spec);
         DatumRange range= DatumRangeUtil.parseTimeRange(srange);
 
-        String sstart= tp.format( range.min(), null );
+        String sstart;
+        try {
+            sstart= tp.format( range.min(), null );
+        } catch ( Exception ex ) { // orbit files have limited range
+            DatumRange dr= tp.getValidRange();
+            DatumRange dd= DatumRangeUtil.sloppyIntersection(range, dr);
+            if ( dd.width().value()==0 ) {
+                return new String[0]; // no intersection
+            }
+            sstart= tp.format( dd.min(), null );
+        }
 
         tp.parse(sstart);
         DatumRange curr= tp.getTimeRange();
@@ -629,7 +639,11 @@ public class ScriptContext extends PyJavaInstance {
         while ( range.intersects(curr) ) {
             String scurr= tp.format( curr.min(), curr.max() );
             result.add( scurr );
+            DatumRange oldCurr= curr;
             curr= curr.next();
+            if ( oldCurr.equals(curr) ) { // orbits return next() that is this at the ends.
+                break;
+            }
         }
         return result.toArray( new String[result.size()] );
 
