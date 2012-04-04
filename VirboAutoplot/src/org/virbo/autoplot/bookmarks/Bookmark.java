@@ -51,6 +51,7 @@ import org.das2.util.Base64;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemUtil;
+import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -171,10 +172,12 @@ public abstract class Bookmark {
      * @param contents list where the bookmarks should be stored.
      * @return true if there is a remote bookmark within the file.
      */
-    protected static boolean getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) {
+    protected static RemoteStatus getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) {
         InputStream in=null;
         boolean remoteRemote= false;
- 
+
+        boolean offline= false;
+
         try {
             URL rurl= new URL(remoteUrl);
   
@@ -187,6 +190,9 @@ public abstract class Bookmark {
                 URI parentUri= FileSystemUtil.isCacheable( ruri );
                 if ( parentUri!=null ) {
                     FileSystem fd= FileSystem.create(parentUri);
+                    if ( fd instanceof WebFileSystem ) {
+                        offline= ((WebFileSystem)fd).isOffline();
+                    }
                     FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
                     if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
                         fo= fd.getFileObject( fo.getNameExt()+".gz" );
@@ -289,7 +295,14 @@ public abstract class Bookmark {
                 }
             }
         }
-        return remoteRemote;
+
+        RemoteStatus result= new RemoteStatus();
+        result.remoteURL= remoteUrl;
+        result.depth= remoteLevel;
+        result.remoteRemote= remoteRemote;
+        result.status= offline ? Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL : Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+
+        return result;
     }
 
     /**
@@ -403,7 +416,7 @@ public abstract class Bookmark {
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
             int remoteStatus=Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
-            boolean remoteRemote= false;  // remote folder contains references to remote folder
+            RemoteStatus rs;
 
             if ( remoteUrlNode!=null ) { // 2984078
 
@@ -419,19 +432,19 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
-                        remoteRemote= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
+                        rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
 
-                        if ( ( contents.size()==0 ) & !remoteRemote ) {
+                        if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
                             System.err.println("unable to parse bookmarks at "+remoteUrl);
                             System.err.println("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
                         } else {
-                            remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+                            remoteStatus= rs.status;
                         }
 
-                        if ( remoteRemote ) {
+                        if ( rs.remoteRemote ) {
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
-                        }
+                       }
                     }
                 }
                 

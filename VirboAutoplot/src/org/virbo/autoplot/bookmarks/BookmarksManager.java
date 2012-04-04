@@ -590,12 +590,16 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         }*/
         descriptionTextField.setText( b.getDescription() );
         URLTextField.setEditable( b instanceof Bookmark.Item );
+        int status=0;
+        String err="";
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUri());
             URILabel.setText("URI:");
         } else {
             if ( b instanceof Bookmark.Folder && ((Bookmark.Folder)b).getRemoteUrl()!=null ) {
                 String url= ((Bookmark.Folder)b).getRemoteUrl();
+                status= ((Bookmark.Folder)b).getRemoteStatus();
+                if ( status==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) err= "<br>** Unable to connect to remote URL **";
                 URLTextField.setText(url);
                 URILabel.setText("URL:");
             } else {
@@ -609,9 +613,15 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         if ( ppath!=null ) {
             remoteUrl= maybeGetRemoteBookmarkUrl( b, jTree1.getModel(), ppath);
             URLTextField.setEditable(remoteUrl.length()==0);
+            if ( remoteUrl.length()==0 ) {
+                URLTextField.setToolTipText("Location of the remote folder"+err);
+            } else {
+                URLTextField.setToolTipText("Location of the data (often the URL)");
+            }
         } else {
             URLTextField.setEditable(false);
         }
+
         if ( remoteUrl.length()==0 ) {
             titleLabel.setText("Title:");
             titleLabel.setToolTipText("Title for the URI");
@@ -619,7 +629,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
             titleLabel.setText("Title*:");
             titleLabel.setToolTipText("<html>Title for the URI.<br>This bookmark is part of a set of remote bookmarks from<br>"
                     + remoteUrl +
-                    "<br> and cannot be edited.");
+                    "<br> and cannot be edited." + err );
         }
         descriptionTextField.setEditable(remoteUrl.length()==0);
         editDescriptionButton.setEnabled( true );
