@@ -22,6 +22,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>I forgot to escape %Y's when converting to $Y's in PngwalkTool.</li>
+            <li>export to IDLSAV fixed when a dataset doesn't have a name.</li>
+            <li>move cache works again after a failed refactoring</li>
+            <li>remote bookmarks offline status is properly indicated</li>
             <li>NAME used for label of DEPEND_0, even when RichAscii headers had already assigned a label</li>
             <li>fftPower function knows what to do with TT2000-based timetags</li>
             <li>dbAboveBackground and other filters do not drop axis labels</li>
@@ -59,6 +63,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>export to IDLSAV saves the x tags as well.</li>
             <li>bookmarks manager has a plot button now, which allows the user to see title and description before plotting</li>
             <li>"about Autoplot" dialog supports cut-n-paste</li>
             <li>beginnings of filters dialog</li>
