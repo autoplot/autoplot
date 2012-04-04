@@ -55,6 +55,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.beans.BeansUtil;
+import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
@@ -1255,15 +1256,22 @@ public class ApplicationModel {
     /**
      * move the cache.
      * @param n
-     * @return
+     * @return true if successful.
      */
     boolean moveCache( File n ) {
         File local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
+
+        ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(getCanvas()), "Moving Cache..." );        
+        mon.started();
+        
         boolean y= Util.copyFileTree( local, n );
+        mon.finished();
         if ( y ) {
             //y= Util.deleteFileTree(local);
             JOptionPane.showMessageDialog( this.getCanvas(), "<html>File cache moved to<br>"+n+".<br>The old cache ("+local+") still contains data<br>and should manually be deleted.</html>", "Files moved", JOptionPane.PLAIN_MESSAGE );
             AutoplotSettings.settings().setFscache(n.toString());
+        } else {
+            JOptionPane.showMessageDialog( this.getCanvas(), "<html>Some problem occured, so the cache remains at the old location.</html>", "move files failed", JOptionPane.WARNING_MESSAGE );
         }
         return y;
     }
