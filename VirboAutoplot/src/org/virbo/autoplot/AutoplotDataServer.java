@@ -129,7 +129,7 @@ public class AutoplotDataServer {
         String cache = alm.getValue("cache");
         if (!cache.equals("")) {
             File fcache = new File(cache);
-            if (!fcache.mkdirs()) {
+            if ( !fcache.exists() && !fcache.mkdirs()) {
                 System.err.println("unable to make dirs for cache=" + fcache);
             }
             if (!fcache.canWrite()) {
