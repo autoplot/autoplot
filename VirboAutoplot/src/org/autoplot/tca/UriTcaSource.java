@@ -90,6 +90,9 @@ public class UriTcaSource extends AbstractQFunction {
                 String label= (String) ds.property(QDataSet.LABEL);
                 bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
                 bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
+                if ( ds.property(QDataSet.VALID_MIN)!=null ) bds1.putProperty( QDataSet.VALID_MIN, 0, ds.property(QDataSet.VALID_MIN) );
+                if ( ds.property(QDataSet.VALID_MAX)!=null ) bds1.putProperty( QDataSet.VALID_MAX, 0, ds.property(QDataSet.VALID_MAX) );
+                if ( ds.property(QDataSet.FILL_VALUE)!=null ) bds1.putProperty( QDataSet.FILL_VALUE, 0, ds.property(QDataSet.FILL_VALUE) );
                 bundleDs= bds1;
             } else {
                 DDataSet bds1= DDataSet.createRank2(ds.length(0),0);
@@ -169,7 +172,30 @@ public class UriTcaSource extends AbstractQFunction {
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
                 result= ds.slice(ii);
-                
+                if ( DataSetUtil.weightsDataSet(result).value()==0 ) { // pick a relavant near neighbor
+                    findex= Ops.findex( dep0, Ops.subtract( d0, deltaMinus ) );
+                    int imin= (int)( findex.value() + 0.5 );
+                    if ( imin<0 ) imin=0;
+                    findex= Ops.findex( dep0, Ops.add( d0, deltaPlus ) );
+                    int imax= (int)( findex.value() + 0.5 );
+                    if ( imax>=dep0.length() ) imax= dep0.length()-1;
+                    int irad= Math.max( ii-imin, imax-ii );
+                    for ( int iiii= 1; iiii<irad; iiii++ ) {
+                        if ( ii-iiii >= imin ) {
+                            result= ds.slice(ii-iiii);
+                            if ( DataSetUtil.weightsDataSet(result).value()>0 ) {
+                                break;
+                            }
+                        }
+                        if ( ii+iiii <= imax ) {
+                            result= ds.slice(ii+iiii);
+                            if ( DataSetUtil.weightsDataSet(result).value()>0 ) {
+                                break;
+                            }
+                        }
+                    }
+                }
+
             } else {
 
                 if ( findex.value()>dep0.length()-1 && ( Ops.ge( Ops.add( dep0.slice(dep0.length()-1), deltaMinus ), d0 ).value()==1 ) ) {
