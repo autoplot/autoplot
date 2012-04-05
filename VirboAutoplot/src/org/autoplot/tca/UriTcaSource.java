@@ -231,11 +231,18 @@ public class UriTcaSource extends AbstractQFunction {
                     doRead();
                 }
                 QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                if ( dep0==null ) {
+                    throw new RuntimeException("Unable to locate independent variable, expecting to find DEPEND_0");
+                }
                 t0= DataSetUtil.asDatum( dep0.slice(0) );
                 tu= t0.getUnits();
                 label= "???";
             } catch ( Exception ex ) {
-                throw new RuntimeException(ex);
+                if ( ex instanceof RuntimeException ) {
+                    throw (RuntimeException)ex;
+                } else {
+                    throw new RuntimeException(ex);
+                }
             }
 
         }
