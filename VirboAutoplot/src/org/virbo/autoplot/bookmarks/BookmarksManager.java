@@ -1140,7 +1140,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         JMenuItem mi;
 
-        mi= new JMenuItem( new AbstractAction("Manage and Browse") {
+        mi= new JMenuItem( new AbstractAction("Manage and Browse...") {
             public void actionPerformed(ActionEvent e) {
                 Container parent= BookmarksManager.this.getParent();
                 BookmarksManager.this.setLocationRelativeTo( parent );
