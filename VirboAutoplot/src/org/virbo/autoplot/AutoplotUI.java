@@ -474,6 +474,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         stateSupport = getPersistentStateSupport(this, applicationModel);
 
         fillFileMenu();
+        fillInitialBookmarksMenu();
         APSplash.checkTime("init 53");
 
         AppManager.getInstance().addApplication(this);
@@ -1016,6 +1017,28 @@ APSplash.checkTime("init 270");
             }
         };
         SwingUtilities.invokeLater(run);
+    }
+
+    private void fillInitialBookmarksMenu() {
+
+        JMenuItem mi;
+        mi= new JMenuItem( "Manage and Browse..." );
+        mi.setEnabled(false);
+        bookmarksMenu.add( mi ); // take up some space in case it is reset while it's open.
+
+        mi= new JMenuItem( "Add bookmark..." );
+        mi.setEnabled(false);
+        bookmarksMenu.add( mi );
+
+        bookmarksMenu.add( new JSeparator() );
+        
+        mi= new JMenuItem("Loading..." );
+        mi.setToolTipText("Loading initial bookmarks file...");
+        bookmarksMenu.add(mi);
+
+        mi= new JMenuItem(" ");
+        bookmarksMenu.add(mi);
+
     }
 
     private void fillFileMenu() {
