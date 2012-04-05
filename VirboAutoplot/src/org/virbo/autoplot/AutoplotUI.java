@@ -1502,15 +1502,6 @@ APSplash.checkTime("init 52");
 
         bookmarksMenu.removeAll();
 
-        item= bookmarksMenu.add( new AbstractAction("Export Recent...") {
-            public void actionPerformed(ActionEvent e) {
-                support.exportRecent(AutoplotUI.this);
-            }
-        } );
-        item.setToolTipText("Export recent URIs to a bookmarks file.  (There is no method for importing recent URIs.)");
-//TODO: export recent is never added to the menu.
-        bookmarksMenu.add(new JSeparator());
-
         bookmarksManager.updateBookmarks( bookmarksMenu, this.dataSetSelector );
         bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
