@@ -20,15 +20,16 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.AbstractButton;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -68,6 +69,20 @@ public class FilterChainPanel extends JPanel {
         init();
     }
 
+    /**
+     * get the index of the component in the list.
+     * @param sub
+     * @return
+     */
+    private int getIndex( Component sub ) {
+        Component[] ccs= sub.getParent().getComponents();
+        int ifi=-1;
+        for ( int i=0; i<ccs.length; i++ ) {
+            if ( ccs[i]==sub ) ifi= i;
+        }
+        return ifi;
+    }
+
     private void deleteFilter( int in ) {
         filters.remove(in);
     }
@@ -104,7 +119,7 @@ public class FilterChainPanel extends JPanel {
         "dbAboveBackgroundDim1(10) show data as decibels above the 10% level", };
 
         for ( int i=0; i<opts.length; i++ ) {
-            JCheckBox cb= new JCheckBox(opts[i]);
+            JRadioButton cb= new JRadioButton(opts[i]);
             group.add(cb);
             optionsPanel.add(cb);
         }
@@ -137,6 +152,7 @@ public class FilterChainPanel extends JPanel {
                    content.add(ccs[i]);
                }
                content.add( add );
+               content.add(Box.createVerticalGlue());
                
                content.revalidate();
            }
@@ -145,7 +161,7 @@ public class FilterChainPanel extends JPanel {
        return null;
     }
 
-    private JPanel onePanel( final int fi ) {
+    private JPanel onePanel( int fi ) {
         final JPanel sub= new JPanel( new BorderLayout() );
 
         JButton subAdd= new JButton("");
@@ -154,8 +170,8 @@ public class FilterChainPanel extends JPanel {
         if ( fi>=0 ) {
             subAdd.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String s= addFilter(fi);
-
+                    int ifi= getIndex( sub );
+                    String s= addFilter(ifi);
                 }
             } );
         } else {
@@ -173,7 +189,8 @@ public class FilterChainPanel extends JPanel {
             subDelete.setIcon( new ImageIcon( FilterChainPanel.class.getResource("/org/virbo/datasource/subtract.png") ) );
             subDelete.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    deleteFilter(fi);
+                    int ifi= getIndex( sub );
+                    deleteFilter(ifi);
                     Container parent= sub.getParent();
                     parent.remove(sub);
                     parent.validate();
@@ -187,13 +204,15 @@ public class FilterChainPanel extends JPanel {
             tf.setText(filters.get(fi));
             tf.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    filters.set( fi, tf.getText() );
+                    int ifi= getIndex( sub );
+                    filters.set( ifi, tf.getText() );
                 }
             });
             tf.addFocusListener( new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
-                    filters.set( fi, tf.getText() );
+                    int ifi= getIndex( sub );
+                    filters.set( ifi, tf.getText() );
                 }
             });
             sub.add( tf, BorderLayout.CENTER );
@@ -204,6 +223,10 @@ public class FilterChainPanel extends JPanel {
             sub.add( tf, BorderLayout.CENTER );
 
         }
+
+        Dimension maximumSize = sub.getPreferredSize();
+        maximumSize.width = Integer.MAX_VALUE;
+        sub.setMaximumSize(maximumSize);
 
         return sub;
     }
@@ -226,6 +249,8 @@ public class FilterChainPanel extends JPanel {
         add= onePanel(-1);
         content.add( add );
 
+        content.add(Box.createVerticalGlue());
+        
         this.setLayout( new BorderLayout() );
         this.add( pane );
 
