@@ -69,7 +69,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -100,6 +99,8 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.pushingpixels.tracing.TracingEventQueue;
+import org.pushingpixels.tracing.TracingEventQueueJMX;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -689,8 +690,6 @@ public class AutoplotUI extends javax.swing.JFrame {
     }
 
     private void addFeatures( ApplicationModel model ) {
-        final LayoutPanel flui;
-        final DataPanel fdp;
 
         final JScrollPane flayoutPane;
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
@@ -751,14 +750,25 @@ APSplash.checkTime("init 270");
         });
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
-            scriptPanel= new JythonScriptPanel(applicationModel, this.dataSetSelector);
+            final DataSetSelector fdataSetSelector= this.dataSetSelector; // org.pushngpixels.tracing.TracingEventQueueJMX showed this was a problem.
+            invokeLater( 4000, true, new Runnable() {
+                public void run() {
+            scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
             tabs.addTab( TAB_SCRIPT, null, scriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             scriptPanelMenuItem.setSelected(true);
+                }
+            } );
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
+            invokeLater( 4100, true, new Runnable() {
+                public void run() {
             initLogConsole();
+                }
+            } );
         }
+
+
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -2853,6 +2863,8 @@ private void updateFrameTitle() {
      * @param args the command line arguments
      */
     public static void main( String args[] ) {
+
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TracingEventQueueJMX());
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
