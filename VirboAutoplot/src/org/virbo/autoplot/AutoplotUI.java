@@ -751,21 +751,19 @@ APSplash.checkTime("init 270");
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             final DataSetSelector fdataSetSelector= this.dataSetSelector; // org.pushngpixels.tracing.TracingEventQueueJMX showed this was a problem.
+            final JScrollPane fjython= new JScrollPane();
+            tabs.addTab( TAB_SCRIPT, null, fjython,
+                  String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             invokeLater( 4000, true, new Runnable() {
                 public void run() {
             scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
-            tabs.addTab( TAB_SCRIPT, null, scriptPanel,
-                  String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
+            fjython.setViewportView(scriptPanel);
             scriptPanelMenuItem.setSelected(true);
                 }
             } );
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
-            invokeLater( 4100, true, new Runnable() {
-                public void run() {
             initLogConsole();
-                }
-            } );
         }
 
 
@@ -2864,7 +2862,7 @@ private void updateFrameTitle() {
      */
     public static void main( String args[] ) {
 
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TracingEventQueueJMX());
+        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TracingEventQueueJMX());
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
