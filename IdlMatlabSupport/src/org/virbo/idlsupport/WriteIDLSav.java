@@ -197,6 +197,16 @@ public final class WriteIDLSav {
         return buf;
     }
 
+    private ByteBuffer writeLongArray( long[] data ) {
+        ByteBuffer buf= ByteBuffer.allocateDirect( data.length*8 );
+        buf.order(ByteOrder.BIG_ENDIAN);
+        for ( int i=0; i<data.length; i++ ) {
+            buf.putLong(data[i]);
+        }
+        buf.flip();
+        return buf;
+    }
+    
     private ByteBuffer writeShort( short data ) {
         ByteBuffer buf= ByteBuffer.allocateDirect( 4 );
         buf.order(ByteOrder.BIG_ENDIAN);
@@ -236,6 +246,8 @@ public final class WriteIDLSav {
         ByteBuffer varData;
         if ( data.getClass().isArray() && data.getClass().getComponentType()==double.class ) {
             varData= writeDoubleArray( (double[])data );
+        } else if (data.getClass().isArray() && data.getClass().getComponentType() == long.class) {
+            varData= writeLongArray( (long[])data );
         } else if ( data.getClass()==Short.class ) {
             varData= writeShort( (Short)data );
         } else {
@@ -305,7 +317,7 @@ public final class WriteIDLSav {
 
     public void checkVariableType( String name, Object data ) {
         Class c= data.getClass();
-        if ( !( c.isArray() && c.getComponentType()==double.class ) && c!=Short.class ) {
+        if ( !( c.isArray() && ( c.getComponentType()==double.class || c.getComponentType()==long.class ) ) && c!=Short.class ) {
             throw new IllegalArgumentException("\"" + name + "\" is unsupported data type: "+data.getClass() );
         }
     }
@@ -344,6 +356,8 @@ public final class WriteIDLSav {
         WriteIDLSav widls= new WriteIDLSav();
         widls.addVariable( "myvar", new double[] { 120,100,120,45,46,47,48,49,120,100,120 } );
         widls.addVariable( "second", new double[] { -1,-1,-2,-3,-3,4,5,6,7,7,8,9,9,10 } );
+        widls.addVariable( "mylong", new long[] { -1, 100000, 100000000000L } );
+
         //widls.addVariable( "oneval", 19.95 );
         widls.write(fos);
 
