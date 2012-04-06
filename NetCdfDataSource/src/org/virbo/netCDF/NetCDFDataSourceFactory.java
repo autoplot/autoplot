@@ -9,6 +9,7 @@
 
 package org.virbo.netCDF;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,9 +50,9 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            String file= DataSetURI.fromUri( cc.resourceURI );
+            File file= DataSetURI.getFile( cc.resourceURI, mon );
             
-            NetcdfDataset dataset= getDataSet( file );
+            NetcdfDataset dataset= getDataSet( file.toString() );
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
             for ( int j=0; j<vars.size();j++ ) {
@@ -92,9 +93,9 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             URISplit split = URISplit.parse( surl );
             Map params= URISplit.parseParams( split.params );
 
-            DataSetURI.getFile( surl, mon ); // check for non-ncml.  We always download now because ncml can be slow.
+            File file= DataSetURI.getFile( surl, mon ); // check for non-ncml.  We always download now because ncml can be slow.
 
-            NetcdfDataset dataset= getDataSet( split.file );
+            NetcdfDataset dataset= getDataSet( file.toString() );
 
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
             List<Variable> vars= (List<Variable>)dataset.getVariables();
