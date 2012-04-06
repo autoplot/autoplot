@@ -6,6 +6,9 @@
 package org.virbo.datasource;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -22,6 +25,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -64,7 +68,11 @@ public class FilterChainPanel extends JPanel {
         init();
     }
 
-    private String addFilter() {
+    private void deleteFilter( int in ) {
+        filters.remove(in);
+    }
+
+    private String addFilter( int idx ) {
         JPanel optionsPanel= new JPanel();
         optionsPanel.setLayout( new BoxLayout(optionsPanel,BoxLayout.Y_AXIS) );
 
@@ -114,11 +122,20 @@ public class FilterChainPanel extends JPanel {
                }
            }
            if ( ss!=null ) {
-               filters.add( ss );
-               JPanel one= onePanel(filters.size()-1);
+               filters.add( idx, ss );
 
-               content.remove(add);
+               JPanel one= onePanel(idx);
+
+               Component[] ccs= content.getComponents();
+               content.removeAll();
+
+               for ( int i=0; i<idx; i++ ) {
+                   content.add(ccs[i]);
+               }
                content.add( one );
+               for ( int i=idx; i<ccs.length-1; i++ ) {
+                   content.add(ccs[i]);
+               }
                content.add( add );
                
                content.revalidate();
@@ -129,7 +146,7 @@ public class FilterChainPanel extends JPanel {
     }
 
     private JPanel onePanel( final int fi ) {
-        JPanel sub= new JPanel( new BorderLayout() );
+        final JPanel sub= new JPanel( new BorderLayout() );
 
         JButton subAdd= new JButton("");
         subAdd.setIcon( new ImageIcon( FilterChainPanel.class.getResource("/org/virbo/datasource/add.png") ) );
@@ -137,19 +154,33 @@ public class FilterChainPanel extends JPanel {
         if ( fi>=0 ) {
             subAdd.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    String s= addFilter(fi);
 
                 }
             } );
         } else {
            subAdd.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String s= addFilter();
+                    String s= addFilter(filters.size());
                 }
             } );
         }
 
         sub.add( subAdd, BorderLayout.WEST );
 
+        if ( fi>=0 ) {
+            JButton subDelete= new JButton("");
+            subDelete.setIcon( new ImageIcon( FilterChainPanel.class.getResource("/org/virbo/datasource/subtract.png") ) );
+            subDelete.addActionListener( new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    deleteFilter(fi);
+                    Container parent= sub.getParent();
+                    parent.remove(sub);
+                    parent.validate();
+                }
+            } );
+            sub.add( subDelete, BorderLayout.EAST );
+        }
 
         if ( fi>=0 ) {
             final JTextField tf= new JTextField();
@@ -179,12 +210,13 @@ public class FilterChainPanel extends JPanel {
 
     void init() {
         content= new JPanel();
+        this.setPreferredSize( new Dimension( 300, 300 ) );
 
         BoxLayout lo= new BoxLayout( content, BoxLayout.Y_AXIS );
         content.setLayout( lo );
 
         JScrollPane pane= new JScrollPane( content );
-
+        pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
         for ( int i=0; i<filters.size(); i++ ) {
 
             content.add( onePanel(i) );
