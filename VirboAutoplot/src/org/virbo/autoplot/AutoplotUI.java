@@ -2862,6 +2862,7 @@ private void updateFrameTitle() {
      */
     public static void main( String args[] ) {
 
+        //http://today.java.net/pub/a/today/2007/08/30/debugging-swing.html
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TracingEventQueueJMX());
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
