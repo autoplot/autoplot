@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Simply adding a plot button to the bookmarks GUI allows the user to look at titles and descriptions easily when looking for a product.</small></p>
+        <p><small>Labels are fixed in this rich ascii file.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,11 +22,17 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>HDF5 via FTP works now, there was old code that still used NetCDF's access via HTTP which hid the bug.</li>
             <li>xtick tick labels look for close relevant tick when closest is fill, use **** to indicate fill.</li>
+            <li>bookmarks have initial menu, indicating that bookmarks are being loaded</li>
             <li>I forgot to escape %Y's when converting to $Y's in PngwalkTool.</li>
             <li>export to IDLSAV fixed when a dataset doesn't have a name.</li>
             <li>move cache works again after a failed refactoring</li>
             <li>remote bookmarks offline status is properly indicated</li>
+            <li>Ascii parser check for empty field at the end of a record, as in "1991-01-01 00:03,1490.0,I,"</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>NAME used for label of DEPEND_0, even when RichAscii headers had already assigned a label</li>
             <li>fftPower function knows what to do with TT2000-based timetags</li>
             <li>dbAboveBackground and other filters do not drop axis labels</li>
@@ -48,24 +54,17 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>fixes to rich ascii, including unbundle preserves bundle with proper labels, and support for enums</li>
             <li>check for cache area when saving Jython files was broken.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>ZipFileSystem had a bug that prevented its use in some situations.</li>
-            <li>Initial HEAD request in HTTPFileSystem changed to GET request to support LANL.</li>
-            <li>bugfix in AutoHistogram when log check would produce a different length histogram</li>
-            <li>pngwalk views all accept mouse wheel events properly</li>
-            <li>"pngwalk:" initial URI works now</li>
-            <li>in CDAWEB, CRRES_H0_MEA and UY_1MIN_VHM have 10-day spans now.</li>
-            <li>bugfix: negative cadence handled in http://www.rssd.esa.int/saweb/swics/data/1999/19990107.cdf?MATRIX_RATE_1</li>
-            <li>c:/documents and settings/ is a hidden link on Windows 7, which when used resulted in null pointer exception</li>
-            <li>various cleanup in das2server plugin</li>
-            <li>omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf with $d instead of 01 works fine.</li>
-        </ul>
         
         <p>Features:</p>
         <ul>
-            <li>export to IDLSAV saves the x tags as well.</li>
+            <li>slight speedup on startup time when script panel is visible.</li>
+            <li>export to IDLSAV saves the x tags as well, with times as t1970 (seconds since 1970-01-01)</li>
+            <li>"slices(0,0,:,:)" function used as initial filter for double slicing, to replace confusing "|slice0(0)|slice0(0)"</li>
             <li>bookmarks manager has a plot button now, which allows the user to see title and description before plotting</li>
+            <li>remote bookmarks are loaded almost immediately, since the cost of loading them is small</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>"about Autoplot" dialog supports cut-n-paste</li>
             <li>introduce filters dialog that will provide GUI for adding filters</li>
             <li>CDF shows S/C and project in title, from ISTP global attributes</li>
@@ -79,24 +78,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>Ops.unbundle(ds,int) is slice by default, before it would unbundle high-rank data as well.  This is cleaner.</li>
             <li>Rich ascii automatically adds timetags when the first column is times.</li>
             <li>"Replace File" script incorporated into Autoplot, see Tools->Replace File next to Aggregation.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Initial support for export to HDF5 (no timetags)</li>
-            <li>Initial proxy support in Ftp filesystem</li>
-            <li>initial support for timeranges like "orbit:crres:591"</li>
-            <li>timerange "P1D" will show the last day to the current time</li>
-            <li>initial support for CDF TT2000 in CDF/C reader (the default).</li>
-            <li>include jsamp jar file so support for Cluster Final Archive can be explored.</li>
-            <li>initial support for CDF TT2000 in CDF/Java reader.  Use vap+cdfj: to try this out</li>
-            <li>das2server plugin looks at history to identify other das2servers.</li>
-            <li>toTimeDataSet(yr,mn,day,hour,min,sec,nano) introduced</li>
-            <li>position=&lt;int&gt; command line option added to support web sites that want to build applications using webstart single instance feature.</li>
-            <li>dbAboveBackgroundDim1 and dbAboveBackgroundDim0 operations introduced for Plasma Wave Group.</li>
-            <li>Reset Zoom->Reset Y (Ctrl+Shift+Y) and Reset Zoom->Reset X introduced.</li>
-            <li>minor changes to das2 library to allow top and bottom decorators, and opaque plots.</li>
-            <li>introduce dbAboveBackgroundDim1 filter for RPWS group</li>
-            <li>basic mode automatically switches over to timerange mode.</li>
         </ul>
 
 <p>Known issues:</p>
