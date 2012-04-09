@@ -27,6 +27,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,7 +57,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
@@ -1472,5 +1476,44 @@ public class GuiSupport {
         } else {
             return null;
         }
+    }
+
+    public static MouseAdapter createExamplesPopup( final JTextField tf, final String [] labels, final String[] tooltips ) {
+        return new MouseAdapter() {
+            private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
+                JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+                    public void actionPerformed(ActionEvent e) {
+                        String v= componentTextField.getText();
+                        int i= componentTextField.getCaretPosition();
+                        componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );
+                    }
+                });
+                if ( doc!=null ) result.setToolTipText(doc);
+                return result;
+            }
+            void showPopup( MouseEvent ev ) {
+                JPopupMenu processMenu;
+                processMenu= new JPopupMenu();
+                for ( int i=0; i<labels.length; i++ ) {
+                    processMenu.add( createMenuItem( tf, labels[i], tooltips==null ? null : tooltips[i] ) );
+                }
+                processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent evt) {
+                if ( evt.isPopupTrigger() ) {
+                    showPopup(evt);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent evt) {
+                if ( evt.isPopupTrigger() ) {
+                    showPopup(evt);
+                }
+            }
+
+        };
     }
 }
