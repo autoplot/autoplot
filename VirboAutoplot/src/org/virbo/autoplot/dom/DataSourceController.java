@@ -559,8 +559,8 @@ public class DataSourceController extends DomNodeController {
             } else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 if ( parentSources==null ) {
-                    System.err.println("strange case where parent sources is not resolved.");
-                    return;
+                    System.err.println("strange case where parent sources is not resolved."); //TODO: looks like we can get here by adding scatter plot of two tsbs, then replace with demo 1.
+                    return; //https://sourceforge.net/tracker/?func=detail&aid=3516161&group_id=199733&atid=970682
                 }
                 parentSources[i] = null;
             }
