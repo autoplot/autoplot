@@ -110,7 +110,7 @@ public class WalkUtil {
             ss= fs.listDirectory( "/", spec );
         }
 
-        Arrays.sort(ss);
+        //Arrays.sort(ss);
         
         List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
