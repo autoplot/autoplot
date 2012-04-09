@@ -11,6 +11,8 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +20,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import org.virbo.autoplot.GuiSupport;
 
 /**
  *
@@ -32,6 +36,13 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         String home= java.lang.System.getProperty( "user.home" ) + java.lang.System.getProperty( "file.separator" );
         home= home.replaceAll("\\\\","/");
         outputFolderTf.setText( home + "pngwalk/" );
+
+        timeFormatTf.addMouseListener( GuiSupport.createExamplesPopup(
+                timeFormatTf,
+                new String[] { "$Y$m$d", "$(o,id=crres)", "$(o,id=rbspa-pp)", "$Y$m" },
+                new String[] { "daily files", "CRRES orbits", "RBSP-A PP orbits", "Monthly files" }
+                ) );
+
         setDefaults();
         checkExists();
     }
