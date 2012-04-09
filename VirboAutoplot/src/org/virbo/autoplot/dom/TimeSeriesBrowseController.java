@@ -19,6 +19,7 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -117,8 +118,15 @@ public class TimeSeriesBrowseController {
             PropertyDescriptor pd = new PropertyDescriptor(property, c);
             Method getter = pd.getReadMethod();
 
-            setTimeRange( (DatumRange) getter.invoke( node ));
-            dsf.getController().getTsb().setTimeRange( getTimeRange() );
+            DatumRange defaultTimeRange= dsf.getController().getTsb().getTimeRange();
+            DatumRange appTimeRange=  (DatumRange) getter.invoke( node );
+            if ( !appTimeRange.equals( Application.DEFAULT_TIME_RANGE ) && UnitsUtil.isTimeLocation( appTimeRange.getUnits() ) ) { //TODO: clean up.  This really should be based on if there is another guy controlling the timerange.
+                setTimeRange( appTimeRange );
+                dsf.getController().getTsb().setTimeRange( appTimeRange );
+            } else {
+                setTimeRange( defaultTimeRange );
+                pd.getWriteMethod().invoke( node, defaultTimeRange );
+            }
 
             //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
             node.addPropertyChangeListener( property, timeSeriesBrowseListener );
