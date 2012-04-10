@@ -550,7 +550,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static BufferedImage writeToBufferedImage( Application applicationIn ) {
         ApplicationModel appmodel= new ApplicationModel();
-        appmodel.addDasPeersToApp();
+        appmodel.addDasPeersToAppAndWait();
         appmodel.getDocumentModel().syncTo(applicationIn);
 
         int height= applicationIn.getCanvases(0).getHeight();
