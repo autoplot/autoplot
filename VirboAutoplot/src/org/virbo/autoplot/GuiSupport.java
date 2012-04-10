@@ -41,15 +41,21 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -672,102 +678,36 @@ public class GuiSupport {
     public static JMenu createEZAccessMenu(final Plot plot) {
 
         JMenu result = new JMenu("Plot Style");
-        result.add(new JMenuItem(new AbstractAction("Scatter") {
+        JMenuItem mi;
 
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.scatter);
-            }
-        }));
+        Map<String,RenderType> tt= new LinkedHashMap();
+        tt.put( "Scatter", RenderType.scatter );
+        tt.put( "Color Scatter", RenderType.colorScatter );
+        tt.put( "Series", RenderType.series );
+        tt.put( "Stair Steps", RenderType.stairSteps );
+        tt.put( "Fill To Zero", RenderType.fillToZero );
+        tt.put( "Huge Scatter", RenderType.hugeScatter );
+        tt.put( "Spectrogram", RenderType.spectrogram );
+        tt.put( "Nearest Neighbor Spectrogram", RenderType.nnSpectrogram);
+        tt.put( "Digital", RenderType.digital);
+        tt.put( "Events Bar", RenderType.eventsBar);
+        tt.put( "Image", RenderType.image);
+        tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
 
-        result.add(new JMenuItem(new AbstractAction("Color Scatter") {
+        ButtonGroup group= new ButtonGroup();
 
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.colorScatter);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Series") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.series);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Stair Steps") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.stairSteps);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Fill To Zero") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.fillToZero);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Huge Scatter") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.hugeScatter);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Spectrogram") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.spectrogram);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Nearest Neighbor Spectrogram") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.nnSpectrogram);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Digital") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.digital);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Events Bar") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.eventsBar);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Image") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.image);
-            }
-        }));
-
-        result.add(new JMenuItem(new AbstractAction("Pitch Angle Distribution") {
-
-            public void actionPerformed(ActionEvent e) {
-                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
-                pe.setRenderType(RenderType.pitchAngleDistribution);
-            }
-        }));
-
+        for ( Entry<String,RenderType> ee: tt.entrySet() ) {
+            final Entry<String,RenderType> fee= ee;
+            mi= new JMenuItem(new AbstractAction(fee.getKey()) {
+                public void actionPerformed(ActionEvent e) {
+                    PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                    pe.setRenderType(fee.getValue());
+                }
+            });
+            result.add(mi);
+            //group.add(mi);
+        }
+  
         return result;
     }
 
