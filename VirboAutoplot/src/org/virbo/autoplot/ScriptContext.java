@@ -68,7 +68,7 @@ public class ScriptContext extends PyJavaInstance {
         if (model == null) {
             model = new ApplicationModel();
             model.setExceptionHandler( new ExitExceptionHandler() );
-            model.addDasPeersToApp();
+            model.addDasPeersToAppAndWait();
             dom= model.getDocumentModel();
         }
         if ( view!=null ) {
