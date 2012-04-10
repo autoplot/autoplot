@@ -842,7 +842,21 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         assignId( domPlot );
 
-        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,domColumn );
+        final Column fcol= domColumn;
+        final Row frow= domRow;
+
+        Runnable run= new Runnable() { public void run() {
+            new PlotController(application, domPlot).createDasPeer(canvas, frow ,fcol );
+        } };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch ( Exception ex ) {
+                ex.printStackTrace();
+            }
+        }
 
         domPlot.getXaxis().setAutoRange(true);
         domPlot.getYaxis().setAutoRange(true);
