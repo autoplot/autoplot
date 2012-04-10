@@ -1200,7 +1200,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     if (book.getIcon() != null) {
                         mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
                     }
-                    bookmarksMenu.add(mi);
+                    bookmarksMenu.add(mi); //TODO: this should not happen off the event thread.  Instead we should keep a separate model that is used to populate the GUI.
                 }
 
             } else {
