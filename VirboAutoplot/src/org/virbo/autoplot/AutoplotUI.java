@@ -229,7 +229,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-                refreshUndoRedoLabel();
+                SwingUtilities.invokeLater( new Runnable() { public void run() { refreshUndoRedoLabel(); } } );
             }
         });
 
@@ -440,7 +440,9 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                dataSetSelector.setValue( appController.getFocusUri() );
+                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                    dataSetSelector.setValue( appController.getFocusUri() );
+                } } );
             }
         } );
         dataSetSelector.setValue( dom.getController().getFocusUri() );
