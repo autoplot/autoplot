@@ -186,6 +186,29 @@ public class ApplicationModel {
     }
 
     /**
+     * addDasPeers should be called from the event thread.  This is intended to support old code that
+     * was loose about this with minimal impact on code.  
+     */
+    public void addDasPeersToAppAndWait() {
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            addDasPeersToApp();
+        } else {
+            Runnable run= new Runnable() {
+                public void run() {
+                    addDasPeersToApp();
+                }
+            };
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            } catch (InvocationTargetException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    /**
      * This needs to be called after the application model is initialized and
      * preferably from the event thread.
      */
