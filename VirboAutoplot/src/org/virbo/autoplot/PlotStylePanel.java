@@ -160,43 +160,46 @@ public class PlotStylePanel extends javax.swing.JPanel {
             currentElement.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
         }
 
-        PlotElement element= dom.getController().getPlotElement();
+        final PlotElement element= dom.getController().getPlotElement();
         if ( element==null ) return;
 
-        StylePanel editorPanel=null;
-        if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
-            editorPanel= new SpectrogramStylePanel(applicationModel);
-        } else if ( element.getRenderType()==RenderType.hugeScatter ) {
-            editorPanel= new HugeScatterStylePanel(applicationModel);
-        } else if ( element.getRenderType()==RenderType.colorScatter ) {
-            editorPanel= new ColorScatterStylePanel(applicationModel);
-        } else {
-            editorPanel= new SeriesStylePanel(applicationModel);
-        }
-
-        if ( currentEditorPanel==null || ( this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
-            editorPanel.doElementBindings(element);
-
-            if ( currentEditorPanel!=null ) {
-                currentEditorPanel.releaseElementBindings();
-            }
-            currentEditorPanel= editorPanel;
-
-            if ( stylePanel.getComponentCount()==1 ) {
-                stylePanel.remove( stylePanel.getComponent(0) );
+        Runnable run = new Runnable() { public void run() {
+            StylePanel editorPanel=null;
+            if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
+                editorPanel= new SpectrogramStylePanel(applicationModel);
+            } else if ( element.getRenderType()==RenderType.hugeScatter ) {
+                editorPanel= new HugeScatterStylePanel(applicationModel);
+            } else if ( element.getRenderType()==RenderType.colorScatter ) {
+                editorPanel= new ColorScatterStylePanel(applicationModel);
+            } else {
+                editorPanel= new SeriesStylePanel(applicationModel);
             }
 
-            stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
-        
-            currentElement= element;
-        }
+            if ( currentEditorPanel==null || ( PlotStylePanel.this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
+                editorPanel.doElementBindings(element);
 
-        element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
-        element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
-        
-        repaint();
-        validate(); // paint the new GUI
-        
+                if ( currentEditorPanel!=null ) {
+                    currentEditorPanel.releaseElementBindings();
+                }
+                currentEditorPanel= editorPanel;
+
+                if ( stylePanel.getComponentCount()==1 ) {
+                    stylePanel.remove( stylePanel.getComponent(0) );
+                }
+
+                stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
+
+                currentElement= element;
+            }
+
+            element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+            element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
+
+            repaint();
+            validate(); // paint the new GUI
+        } };
+        SwingUtilities.invokeLater(run);
+
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
 
     }
