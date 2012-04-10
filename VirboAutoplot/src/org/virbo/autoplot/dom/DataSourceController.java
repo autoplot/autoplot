@@ -1502,6 +1502,7 @@ public class DataSourceController extends DomNodeController {
      * Postconditions: 
      *   A dataSource object is created 
      *   dsf._getDataSource returns the data source.
+     *   any parents the dataSource had (vap+internal:data_0,data_1) are deleted.
      *   A thread has been started that will load the dataset.
      * Side Effects:
      *   update is called to start the download, unless 
