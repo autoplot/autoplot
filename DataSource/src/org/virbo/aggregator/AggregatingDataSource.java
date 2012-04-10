@@ -207,11 +207,13 @@ public class AggregatingDataSource extends AbstractDataSource {
                 mon1.setTaskProgress(0); // cause it to paint
             } else if ( ss.length==1 ) {
                 mon1 = mon;
+                if ( mon1.isCancelled() ) break;
                 mon1.setLabel("loading " + ss[0] );
                 mon1.started();
                 mon1.setTaskProgress(0);
             } else {
                 mon1= mon;
+                if ( mon1.isCancelled() ) break;
             }
 
             try {
