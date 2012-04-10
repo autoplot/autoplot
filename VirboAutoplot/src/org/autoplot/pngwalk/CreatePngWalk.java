@@ -12,12 +12,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
@@ -105,8 +107,8 @@ public class CreatePngWalk {
         mon.setProgressMessage("initializing child application");
 
         ApplicationModel appmodel = new ApplicationModel();
-        appmodel.addDasPeersToApp();
-
+        appmodel.addDasPeersToAppAndWait();
+        
         Application dom2 = appmodel.getDocumentModel();
 
         mon.setProgressMessage("synchronize to this application");
