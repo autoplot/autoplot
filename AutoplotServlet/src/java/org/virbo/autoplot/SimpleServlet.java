@@ -173,7 +173,7 @@ public class SimpleServlet extends HttpServlet {
             System.setProperty("java.awt.headless", "true");
 
             ApplicationModel appmodel = new ApplicationModel();
-            appmodel.addDasPeersToApp();
+            appmodel.addDasPeersToAppAndWait();
 
             logit("create application model", t0, uniq, debug);
 

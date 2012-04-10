@@ -31,7 +31,7 @@ public class ScriptServlet extends HttpServlet {
         try {
 
             ApplicationModel appmodel = new ApplicationModel();
-            appmodel.addDasPeersToApp();
+            appmodel.addDasPeersToAppAndWait();
 
             String script= request.getParameter("script");
             
