@@ -1521,13 +1521,15 @@ public class DataSourceController extends DomNodeController {
         }
         String surl = dsf.getUri();
         if ( surl.length()==0 ) {
-            getApplication().getController().deleteParentsOfDataSourceFilter(dsf);
+            getApplication().getController().deleteAnyParentsOfDataSourceFilter(dsf);
             clearParentSources();
             resetDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
             setDataSetNeedsLoading(false);
 
         } else {
+            getApplication().getController().deleteAnyParentsOfDataSourceFilter(dsf);
+            
             URISplit split = URISplit.parse(surl);
             surl = URISplit.format(split);
 
