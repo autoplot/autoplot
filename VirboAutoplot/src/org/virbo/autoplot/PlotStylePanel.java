@@ -103,6 +103,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         };
         SwingUtilities.invokeLater(run);
         AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
+        AutoplotHelpSystem.getHelpSystem().registerHelpID( this, "stylePanel" );
 
     }
 
@@ -199,8 +200,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
             validate(); // paint the new GUI
         } };
         SwingUtilities.invokeLater(run);
-
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
 
     }
 
