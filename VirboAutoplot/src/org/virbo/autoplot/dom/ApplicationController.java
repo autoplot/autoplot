@@ -779,6 +779,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public synchronized Plot addPlot( final Plot focus, Object direction ) {
+
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            System.err.println("SF Bug 3516412: addPlot is called off the event thread!!!");
+        }
+
         logger.fine("enter addPlot");
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Add Plot");
