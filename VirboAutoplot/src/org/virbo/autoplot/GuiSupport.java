@@ -596,9 +596,9 @@ public class GuiSupport {
     ApplicationModel newApplication() {
         final ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
-        model.addDasPeersToApp();
         Runnable run= new Runnable() {
             public void run() {
+                model.addDasPeersToApp();
                 AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 view.setVisible(true);
@@ -625,17 +625,32 @@ public class GuiSupport {
      * @return
      */
     ApplicationModel cloneApplication() {
-        ApplicationModel model = new ApplicationModel();
+        final ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
-        model.addDasPeersToApp();
-        model.dom.getOptions().setDataVisible( parent.applicationModel.dom.getOptions().isDataVisible() ); // options has funny sync code and these must be set before AutoplotUI is constructed.
-        model.dom.getOptions().setLayoutVisible( parent.applicationModel.dom.getOptions().isLayoutVisible() );
-        AutoplotUI view = new AutoplotUI(model);
-        view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-        view.setVisible(true);
+        Runnable run= new Runnable() {
+            public void run() {
+                model.addDasPeersToApp();
+                model.dom.getOptions().setDataVisible( parent.applicationModel.dom.getOptions().isDataVisible() ); // options has funny sync code and these must be set before AutoplotUI is constructed.
+                model.dom.getOptions().setLayoutVisible( parent.applicationModel.dom.getOptions().isLayoutVisible() );
+                AutoplotUI view = new AutoplotUI(model);
+                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                view.setVisible(true);
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                opc.loadPreferencesWithEvents();
+            }
+        };
+        try {
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeAndWait(run);
+            }
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
+        } catch ( InvocationTargetException ex ) {
+            throw new RuntimeException(ex);
+        }
         model.dom.syncTo( parent.applicationModel.dom );
-        OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
-        opc.loadPreferencesWithEvents();
         return model;
     }
     
