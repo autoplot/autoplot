@@ -1198,11 +1198,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * delete the parents of this DSF node, if they are no longer used.
+     * Delete the parents of this DSF node, if any exist, and if they are no longer used.
      * Do not delete the node itself.  Do not fix focus.
      * @param dsf
      */
-    protected synchronized void deleteParentsOfDataSourceFilter(DataSourceFilter dsf) {
+    protected synchronized void deleteAnyParentsOfDataSourceFilter(DataSourceFilter dsf) {
         DataSourceFilter[] parents = dsf.controller.getParentSources();
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
@@ -1252,6 +1252,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         unbind(dsf);
         dsf.controller.unbind();
 
+        //TODO: this is a repeat of code in deleteAnyParentsOfDataSourceFilter.  Why can't it be used?
         DataSourceFilter[] parents = dsf.controller.getParentSources();
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
