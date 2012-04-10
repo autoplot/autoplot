@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.awt.PdfGraphicsOutput;
@@ -72,9 +73,16 @@ public class ScriptContext extends PyJavaInstance {
             dom= model.getDocumentModel();
         }
         if ( view!=null ) {
-            view.setVisible(true);
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                view.setVisible(true);
+            } else {
+                SwingUtilities.invokeLater( new Runnable() {
+                    public void run() {
+                        view.setVisible(true);
+                    }
+                } );
+            }
         }
-
     }
 
     protected static void setApplicationModel(ApplicationModel m) {
