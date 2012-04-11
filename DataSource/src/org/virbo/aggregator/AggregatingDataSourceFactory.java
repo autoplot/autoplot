@@ -238,7 +238,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             }
             String timeRange = ((String) map.get("timerange"));
             timeRange= timeRange.replaceAll("\\+"," ");
-            if (timeRange.length() < 4) {
+            if (timeRange.length() < 3) { // P2D is a valid timerange
                 return true;
             }
             try {
