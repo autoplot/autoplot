@@ -83,7 +83,21 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             isNumber[timeFormats.length-1]= true;
         } else {
             lastDigitFormat=null; // we can't use this feature
-            timeFormat.append( " ").append( timeFormats[timeFormats.length-1] ); // to have indeterminate length for first field, we need terminator.
+            String lastTimeFormat= timeFormats[timeFormats.length-1];
+            String[] lastTimeFormats= lastTimeFormat.split("%");
+            StringBuilder sb= new StringBuilder();
+            for ( int i=1; i<lastTimeFormats.length; i++ ) {
+                if ( lastTimeFormats[i].startsWith("{") ) {
+                    sb.append("%").append(lastTimeFormats[i]); // don't try to do anything with this for now.  TODO: do this...
+                } else {
+                    if ( lastTimeFormats[i].length()>1 ) { // if there is a delimiter there, then we can have variable length fields.
+                        sb.append("%").append("-1").append(lastTimeFormats[i]);
+                    } else {
+                        sb.append("%").append(lastTimeFormats[i]);
+                    }
+                }
+            }
+            timeFormat.append(" ").append( sb.toString() ); // to have indeterminate length for first field, we need terminator.
             isNumber[timeFormats.length-1]= false;
         }
 
