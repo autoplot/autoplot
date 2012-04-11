@@ -159,9 +159,15 @@ class TsdsDataSource extends AbstractDataSource {
     private void setTSBParameters() {
         Map<String, String> params2 = new LinkedHashMap<String, String>(params);
 
-        DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
-        DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(params2.get("EndDate"));
-        timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
+        String str= params.get("timerange");
+
+        if ( str==null ) {
+            DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
+            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(params2.get("EndDate"));
+            timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
+        } else {
+            timeRange = quantizeTimeRange( DatumRangeUtil.parseTimeRangeValid(str) );
+        }
 
         int ppd;
         String sppd = params2.get("ppd");
@@ -212,6 +218,7 @@ class TsdsDataSource extends AbstractDataSource {
             timeRange = quantizeTimeRange(timeRange);
             params2.put("StartDate", "" + df.format(timeRange.min()));
             params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
+            params2.remove("timerange");
         } else {
             setTSBParameters();
         }
