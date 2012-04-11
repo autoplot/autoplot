@@ -138,6 +138,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                         jTree1.setSelectionPath(tp);
                         if ( jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) tp= tp.getParentPath();
                         jTree1.expandPath(tp);
+                        jTree1.scrollPathToVisible(tp);
                     }
                 }
             }
@@ -604,6 +605,9 @@ public class BookmarksManager extends javax.swing.JDialog {
 private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
     doPlay= false;
     this.dispose();
+    if ( menuIsDirty ) {
+        updateBookmarks( dirtyMenu, dirtySelector );
+    }
 }//GEN-LAST:event_dismissButtonActionPerformed
 
 private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
@@ -738,6 +742,9 @@ private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
 private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
     this.dispose();
+    if ( menuIsDirty ) {
+        updateBookmarks( dirtyMenu, dirtySelector );
+    }
 }//GEN-LAST:event_closeMenuItemActionPerformed
 
 private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newFolderMenuItemActionPerformed
@@ -876,6 +883,9 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
             }
             dispose();
+            if ( menuIsDirty ) {
+               updateBookmarks( dirtyMenu, dirtySelector );
+            }
             return true;
         }
         return false;
