@@ -113,12 +113,12 @@ public class AggregatingDataSource extends AbstractDataSource {
 
         public void setTimeRange(DatumRange dr) {
             viewRange = quantize(dr);
-            Logger.getLogger("virbo.datasource.agg").fine("set timerange=" + viewRange);
+            Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "set timerange={0}", viewRange);
         }
 
         public void setTimeResolution(Datum d) {
             resolution= d;
-            Logger.getLogger("virbo.datasource.agg").fine("set resolution=" + d );
+            Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "set resolution={0}", d);
         }
 
         public String getURI() {
@@ -161,7 +161,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         
         String[] ss = getFsm().getBestNamesFor( viewRange, new NullProgressMonitor() );
 
-        Logger.getLogger("virbo.datasource.agg").fine("aggregating " + ss.length + " files for " + viewRange);
+        Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, viewRange});
 
         ArrayDataSet result = null;
         JoinDataSet altResult= null; // used when JoinDataSets are found
