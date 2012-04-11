@@ -49,6 +49,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.system.RequestProcessor;
@@ -65,6 +66,45 @@ import org.xml.sax.SAXException;
  * @author  jbf
  */
 public class BookmarksManager extends javax.swing.JDialog {
+
+    /**
+     * return the index of the node in the tree, by comparing at toString of each node.
+     * @param tree
+     * @param root
+     * @param find
+     * @return
+     */
+    private int indexOfChild( TreeModel tree, Object root, Object find ) {
+        for ( int i=0; i<tree.getChildCount(root); i++ ) {
+            Object tt= tree.getChild(root, i);
+            if ( tt.toString().equals(find.toString()) ) return i;
+        }
+        return -1;
+    }
+
+    /**
+     * returns the TreePath in the new tree, or null if it cannot be identified.
+     * @param mod
+     * @param foriegn
+     * @return
+     */
+    private TreePath moveTreePath( TreeModel mod, TreePath foriegn ) {
+        Object parent= mod.getRoot();
+        Object[] path= new Object[foriegn.getPathCount()];
+        path[0]= parent;
+        for ( int i=1; i<foriegn.getPathCount(); i++ ) {
+            int j= indexOfChild( mod, parent, foriegn.getPathComponent(i) );
+            if ( j>-1 ) {
+                parent= mod.getChild(parent, j);
+                path[i]= parent;
+            } else {
+                Object[] parentPath= new Object[i];
+                System.arraycopy(path, 0, parentPath, 0, i);
+                return new TreePath(parentPath);
+            }
+        }
+        return new TreePath(path);
+    }
 
     /** Creates new form BookmarksManager */
     public BookmarksManager(java.awt.Frame parent, boolean modal) {
@@ -90,7 +130,16 @@ public class BookmarksManager extends javax.swing.JDialog {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 TreeModel mod = model.getTreeModel();
+                TreePath tp= jTree1.getSelectionPath();
                 jTree1.setModel(mod);
+                if ( tp!=null ) {
+                    tp= moveTreePath( mod, tp );
+                    if ( tp!=null ) {
+                        jTree1.setSelectionPath(tp);
+                        if ( jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) tp= tp.getParentPath();
+                        jTree1.expandPath(tp);
+                    }
+                }
             }
         });
 
@@ -111,6 +160,13 @@ public class BookmarksManager extends javax.swing.JDialog {
     Bookmark dirtyBookmark;
 
     JPopupMenu contextMenu= createContextMenu();
+
+    /**
+     * true indicates the menu managed by the bookmarks manager is dirty and needs to be updated.
+     */
+    private boolean menuIsDirty= false;
+    private JMenu dirtyMenu=null;
+    private DataSetSelector dirtySelector=null;
 
     public BookmarksManagerModel getModel() {
         return model;
@@ -1134,6 +1190,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
 
+        if ( this.isVisible() ) {
+            menuIsDirty= true;
+            dirtyMenu= bookmarksMenu;
+            dirtySelector= dataSetSelector;
+            return;
+        }
+
         List<Bookmark> bookmarks= model.getList();
 
         bookmarksMenu.removeAll();
@@ -1169,13 +1232,19 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         addBookmarks( bookmarksMenu, bookmarks, 0, dataSetSelector );
 
+        menuIsDirty= false;
     }
 
     private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int depth, final DataSetSelector select ) {
 
         this.sel= select;
 
-        int MAX_TITLE_LEN=50;
+        final int MAX_TITLE_LEN = 50; // bookmark item description length
+        final int MAX_LABEL_LEN = 30; // folder item description length
+        final int TRIM_TAIL_LEN = 10;
+
+        System.err.println("addBookmarks(...,depth="+depth+")");
+
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
 
@@ -1229,8 +1298,8 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     
                 } else {
                     String label= title.trim();
-                    if ( label.length()>30 && depth>0 ) {
-                        label= label.substring( 0,17 ) + "..."+ label.substring( label.length()-10,label.length() );
+                    if ( label.length()>MAX_LABEL_LEN && depth>0 ) {
+                        label= label.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ label.substring( label.length()-TRIM_TAIL_LEN,label.length() );
                     }
                     final JMenu subMenu = new JMenu(label);
 
