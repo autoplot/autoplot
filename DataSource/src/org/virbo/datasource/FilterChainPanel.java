@@ -254,6 +254,8 @@ public class FilterChainPanel extends JPanel {
         this.setLayout( new BorderLayout() );
         this.add( pane );
 
+        this.add( new JLabel("<html>Add filters for operations like<br>smoothing and slicing data.<br>"), BorderLayout.NORTH );
+
     }
 
     public JPanel getPanel() {
