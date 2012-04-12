@@ -598,6 +598,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
 
         run= new Runnable() {
+            public String toString() { return "addInitializePython"; }
             public void run() {
                 try {
                     //initialize the python interpretter
@@ -618,6 +619,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
                 invokeLater( 2500, true, new Runnable() {
+                    public String toString() { return "addAxesRunnable"; }
                     public void run() {
   APSplash.checkTime("addAxes1 in");
                         JComponent c= new AxisPanel(applicationModel);
@@ -638,6 +640,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
                 invokeLater( 2500, true, new Runnable() {
+                    public String toString() { return "addStyle"; }
                     public void run() {
   APSplash.checkTime("addStyle1 in");
                         JComponent c= new PlotStylePanel(applicationModel);
@@ -713,6 +716,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
         invokeLater( 3530, true, new Runnable() {
+            public String toString() { return "addMetadata"; }
             public void run() {
                 //long t0= System.currentTimeMillis();
 APSplash.checkTime("init 249");
@@ -726,6 +730,7 @@ APSplash.checkTime("init 250");
             }
         } );
         invokeLater( 3550, true, new Runnable() {
+            public String toString() { return "addDataPanel"; }
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
 APSplash.checkTime("init 259");
@@ -739,6 +744,7 @@ APSplash.checkTime("init 260");
             }
         } );
         invokeLater( 3570, true, new Runnable() { //TEMPORILY replace for mac.
+            public String toString() { return "addMetadataPanel"; }
             public void run() {
 APSplash.checkTime("init 269");
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
@@ -753,6 +759,7 @@ APSplash.checkTime("init 270");
             tabs.addTab( TAB_SCRIPT, null, fjython,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             invokeLater( 4000, true, new Runnable() {
+                public String toString() { return "addScriptPanel"; }
                 public void run() {
             scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
             fjython.setViewportView(scriptPanel);
@@ -765,6 +772,7 @@ APSplash.checkTime("init 270");
             tabs.addTab("console", null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
             invokeLater( 4020, true, new Runnable() {
+                public String toString() { return "addLogConsole"; }
                 public void run() {
             initLogConsole();
                 }  }  );
@@ -913,6 +921,7 @@ APSplash.checkTime("init 270");
     private void addBindings() {
 
         Runnable run= new Runnable() {
+            public String toString() { return "bindings"; }
             public void run() {
                 BindingGroup bc = new BindingGroup();
                 bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
@@ -3033,6 +3042,10 @@ APSplash.checkTime("init 220");
                 if ( !headless ) {
                     logger.fine("UI.setVisible(true)");
                     SwingUtilities.invokeLater( new Runnable() {
+                        @Override
+                        public String toString() {
+                            return "repaintRunnable";
+                        }
                         public void run() {
                             app.applicationModel.canvas.repaint();
                             if ( initialURL==null || !initialURL.startsWith("pngwalk:") ) {
@@ -3060,6 +3073,7 @@ APSplash.checkTime("init 230");
                 
                 if (bookmarks != null) {
                     Runnable run = new Runnable() {
+                        public String toString() { return "initialLoadBookmarksRunnable"; }
                         public void run() {
                             try {
                                 final URL url = new URL(bookmarks);
@@ -3080,6 +3094,7 @@ APSplash.checkTime("init 230");
                 if ( !script.equals("") ) {
                     if ( app!=null ) app.setStatus("running script "+script);
                     Runnable run= new Runnable() {
+                        public String toString() { return "runScriptRunnable"; }
                         public void run() {
                             try {
                                 ScriptContext.setApplicationModel(model); // initialize

@@ -120,6 +120,7 @@ public class AxisPanel extends javax.swing.JPanel {
            }
         });
         Runnable run= new Runnable() {
+            public String toString() { return "axisPanelBindings"; }
             public void run() {
                 doPlotBindings();
                 doPlotElementBindings();

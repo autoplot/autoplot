@@ -83,6 +83,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         validate();
 
         Runnable run= new Runnable() {
+            public String toString() { return "initPlotStyleBindings"; }
             public void run() {
                 doOptionsBindings();
                 doElementBindings();
@@ -164,7 +165,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
         final PlotElement element= dom.getController().getPlotElement();
         if ( element==null ) return;
 
-        Runnable run = new Runnable() { public void run() {
+        Runnable run = new Runnable() { 
+            public String toString() { return "doElementBindingsRunnable";  }
+            public void run() {
             StylePanel editorPanel=null;
             if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
                 editorPanel= new SpectrogramStylePanel(applicationModel);
