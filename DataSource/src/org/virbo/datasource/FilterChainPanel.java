@@ -39,14 +39,17 @@ import javax.swing.JTextField;
  */
 public class FilterChainPanel extends JPanel {
 
+    String component;
     List<String> filters;
     JPanel content= new JPanel();
     JPanel add;
 
     public String getFilters() {
-        StringBuffer result= new StringBuffer();
+        StringBuilder result= new StringBuilder();
+        if ( !component.equals("") ) result.append(component);
+
         for ( int i=0; i<filters.size(); i++ ) {
-            result.append( "|"+filters.get(i) );
+            result.append("|").append( filters.get(i));
         }
         return result.toString();
     }
@@ -56,14 +59,27 @@ public class FilterChainPanel extends JPanel {
             filters= new LinkedList();
         } else {
             if ( filterStr.charAt(0)=='|') {
+                component= "";
                 filterStr= filterStr.substring(1);
+            } else {
+                int i= filterStr.indexOf("|");
+                if ( i==-1 ) {
+                    component= filterStr;
+                    filterStr="";
+                } else {
+                    component= filterStr.substring(0,i);
+                    filterStr= filterStr.substring(i+1);
+                }
             }
-            List<String> f= new ArrayList<String>();
-            String[] ss= filterStr.split("\\|");
+            if ( filterStr.trim().length()==0 ) {
+                filters= new LinkedList();
+            } else {
+                String[] ss= filterStr.split("\\|");
 
-            LinkedList<String> ff= new LinkedList( Arrays.asList(ss) );
+                LinkedList<String> ff= new LinkedList( Arrays.asList(ss) );
 
-            filters= ff;
+                filters= ff;
+            }
         }
         
         init();
@@ -254,7 +270,11 @@ public class FilterChainPanel extends JPanel {
         this.setLayout( new BorderLayout() );
         this.add( pane );
 
-        this.add( new JLabel("<html>Add filters for operations like<br>smoothing and slicing data.<br>"), BorderLayout.NORTH );
+        String msg= "<html>Add filters for operations like<br>smoothing and slicing data.<br>";
+        if ( this.component.length()>0 ) {
+            msg+= "component="+component+"<br>";
+        }
+        this.add( new JLabel(msg), BorderLayout.NORTH );
 
     }
 
