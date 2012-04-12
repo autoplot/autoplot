@@ -1275,92 +1275,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         menuIsDirty= false;
     }
 
-    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector select ) {
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector sel ) {
 
-        this.sel= select;
-
-        final int MAX_TITLE_LEN = 50; // bookmark item description length
-        final int MAX_LABEL_LEN = 30; // folder item description length
-        final int TRIM_TAIL_LEN = 10;
-
-        for (int i = 0; i < bookmarks.size(); i++) {
-            final Bookmark book = bookmarks.get(i);
-
-            if ( bookmarksMenu.isPopupMenuVisible() ) {
-                sel.setMessage("Bookmarks updated");
-            }
-
-            if (book instanceof Bookmark.Item) {
-                String title= book.getTitle();
-                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
-
-                if ( book.isHidden() ) {
-
-                } else {
-                    JMenuItem mi = new JMenuItem(new AbstractAction(title) {
-                        public void actionPerformed(ActionEvent e) {
-                            sel.setValue(((Bookmark.Item) book).getUri());
-                            sel.maybePlot(e.getModifiers());
-                        }
-                    });
-
-                    if (book.getIcon() != null) {
-                        mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
-                    }
-                    bookmarksMenu.add(mi); //TODO: this should not happen off the event thread.  Instead we should keep a separate model that is used to populate the GUI.
-                }
-
-            } else {
-
-                Bookmark.Folder folder = (Bookmark.Folder) book;
-                String title= book.getTitle();
-                if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
-
-                String tooltip;
-                if ( folder.getRemoteUrl()!=null ) {
-                    if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL ) {
-                        title= title + " " + Bookmark.MSG_REMOTE;
-                        tooltip= Bookmark.TOOLTIP_REMOTE;
-                    } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED  ) {
-                        title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
-                        tooltip= Bookmark.TOOLTIP_NOT_LOADED;
-                    } else {
-                        title= title + " " + Bookmark.MSG_NO_REMOTE;
-                        tooltip= Bookmark.TOOLTIP_NO_REMOTE;
-                    }
-                } else {
-                    tooltip= "";
-                }
-
-                if ( folder.isHidden() ) {
-                    
-                } else {
-                    String label= title.trim();
-                    if ( label.length()>MAX_LABEL_LEN && treeDepth>0 ) {
-                        label= label.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ label.substring( label.length()-TRIM_TAIL_LEN,label.length() );
-                    }
-
-                    // note repeated code in DelayMenu
-                    final JMenu subMenu= new DelayMenu( label, folder.getBookmarks(), treeDepth+1, sel );
-
-                    if ( tooltip.contains("%{URL}") ) {
-                        tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
-                    }
-
-                    if ( treeDepth==0 && folder.getRemoteUrl()!=null ) {
-                        if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                            String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
-                            subMenu.setToolTipText( ttext + "<br>" + tooltip );
-                        } else {
-                            if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
-                        }
-                    }
-                    
-                    bookmarksMenu.add(subMenu);
-
-                }
-            }
+        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, sel );
+        if ( bookmarksMenu.isPopupMenuVisible() ) {
+            sel.setMessage("Bookmarks updated");
         }
+
     }
 
     public Bookmark addBookmark(final String surl) {
