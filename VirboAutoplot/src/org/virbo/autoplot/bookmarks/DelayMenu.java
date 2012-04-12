@@ -112,7 +112,7 @@ public class DelayMenu extends JMenu {
         addMenuListener( new MenuListener() {
 
             public void menuSelected(MenuEvent e) {
-                System.err.println("resolving menu "+label+"...");
+                //System.err.println("resolving menu "+label+"...");
                 DelayMenu.this.removeAll();
                 calculateMenu( DelayMenu.this, bookmarks, treeDepth, sel );
             }
