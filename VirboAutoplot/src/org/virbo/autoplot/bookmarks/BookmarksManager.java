@@ -1052,13 +1052,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             public void run() {
                 try {
                     try {
-                        Thread.sleep(1000); // sleep 300 milliseconds before making second pass
+                        Thread.sleep(1000); // sleep 1000 milliseconds before making second pass
                     } catch (InterruptedException ex) {
                         Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
-                    int depthLimit= 3;
+                    int depthLimit= 5;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthf+1 );
                         RequestProcessor.invokeLater(run);
