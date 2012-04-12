@@ -771,10 +771,10 @@ public class DataSetURI {
         synchronized (DataSetURI.class) {
             //TODO: check expires tag and delete after this time.
             if ( result.exists() && ( System.currentTimeMillis()-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
-                System.err.println("using young temp file "+result);
+                logger.log(Level.FINE, "using young temp file {0}", result);
                 action= ACTION_USE_CACHE;
             } else if ( newf.exists() ) {
-                System.err.println("waiting for other thread to load temp resource " + newf );
+                logger.log(Level.FINE, "waiting for other thread to load temp resource {0}", newf);
                 action= ACTION_WAIT_EXISTS;
             } else {
                 File newName= result;
@@ -795,7 +795,7 @@ public class DataSetURI {
                         newf= new File( filename + ".temp" );
                     }
                 }
-                System.err.println("this thread will downloading temp resource " + newf );
+                logger.log(Level.FINE, "this thread will downloading temp resource {0}", newf);
                 action= ACTION_DOWNLOAD;
                 OutputStream out= new FileOutputStream(result);  // touch the file
                 out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
@@ -817,7 +817,7 @@ public class DataSetURI {
                     try {
                         Thread.sleep(300);
                         if ( System.currentTimeMillis()-t0 > 60000 ) {
-                            System.err.println("waiting for other process to finish loading %s..." + newf );
+                            logger.log(Level.FINE, "waiting for other process to finish loading %s...{0}", newf);
                         }
                         if ( mon.isCancelled() ) {
                             throw new InterruptedIOException("cancel pressed");
@@ -836,7 +836,7 @@ public class DataSetURI {
             boolean fail= true;
             try {
                 InputStream in;
-                System.err.println( "reading URL "+url );
+                logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
                 urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
                 in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
