@@ -969,12 +969,7 @@ public class PlotElementController extends DomNodeController {
             }
                     
             boolean shouldHaveChildren= fillDs.rank() == 2
-                    &&  ( renderType != RenderType.spectrogram 
-                    && renderType != RenderType.nnSpectrogram
-                    && renderType != RenderType.digital
-                    && renderType != RenderType.eventsBar
-                    && renderType != RenderType.image
-                    && renderType != RenderType.pitchAngleDistribution )
+                    &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps )
                     &&  fillDs.length(0) <= QDataSet.MAX_UNIT_BUNDLE_COUNT;
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
@@ -1708,6 +1703,14 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
+        } else if ( spec==RenderType.vectorPlot ) { //TODO: this should be discoverable
+            QDataSet qube= EventsRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
         } else if ( spec==RenderType.image ) {
             QDataSet qube= RGBImageRenderer.doAutorange( fillDs );
             if ( qube==null ) {
@@ -1896,6 +1899,9 @@ public class PlotElementController extends DomNodeController {
             return true;
 
         } else if ( spec==RenderType.eventsBar ) {
+            return true;
+
+        } else if ( spec==RenderType.vectorPlot ) {
             return true;
 
         } else if ( spec==RenderType.digital ) {
