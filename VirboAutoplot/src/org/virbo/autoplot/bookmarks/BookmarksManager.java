@@ -221,6 +221,27 @@ public class BookmarksManager extends javax.swing.JDialog {
         return result;
     }
 
+//
+//    /**
+//     * see also maybeGetRemoteBookmarkUrl( b, null, null)
+//     * @param b
+//     * @return
+//     */
+//    private boolean isBookmarkRemote( Bookmark b ) {
+//        while ( b!=null ) {
+//            if ( b instanceof Bookmark.Folder ) {
+//                Bookmark.Folder bf= (Bookmark.Folder)b;
+//                if ( bf.remoteUrl!=null && bf.remoteUrl.length()>0 ) {
+//                    return true;
+//                } else {
+//                    b= b.getParent();
+//                }
+//            } else {
+//                b= b.getParent();
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * present a GUI offering to delete the set of bookmarks.
@@ -236,7 +257,10 @@ public class BookmarksManager extends javax.swing.JDialog {
             model.removeBookmarks(bs);
         } else {
             for (Bookmark b : bs) {
-                //TODO: check for remote bookmark
+//                if ( isBookmarkRemote(b) ) {
+//                    int i= JOptionPane.showConfirmDialog(this, "Bookmark is part of a remote bookmark folder", "Delete Bookmarks Folder", JOptionPane.OK_OPTION );
+//                    return;
+//                }
                 if (b instanceof Bookmark.Folder) {
                     if (confirm || JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                         model.removeBookmark(b);
