@@ -260,13 +260,13 @@ public abstract class Bookmark {
                 //String remoteUrl2= (String)xpath.evaluate( "/bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 String remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING );
                 if ( remoteUrl2.length()>0 ) {
-                    System.err.println("another remote folder: "+remoteUrl2 );
+                    logger.log(Level.FINE, "another remote folder: {0} at {1}", new Object[]{remoteUrl2, remoteLevel});
                     remoteRemote= true; // avoid warning
                 }
             } else {
                 String remoteUrl2= (String)xpath.evaluate( "//bookmark-list/bookmark-folder/@remoteUrl", document, XPathConstants.STRING ); //TODO: verify that we can have remote in lower position.
                 if ( remoteUrl2.length()>0 ) {
-                    System.err.println("another remote folder: "+remoteUrl2 );
+                    logger.log(Level.FINE, "another remote folder: {0} at {1}", new Object[]{remoteUrl2, remoteLevel});
                     remoteRemote= true; // avoid warning
                 }
                 String vers1= (String) xpath.evaluate("/bookmark-list/@version", document, XPathConstants.STRING );
@@ -428,7 +428,7 @@ public abstract class Bookmark {
                     if ( waitAction ) {
 
                     } else {
-                        System.err.println( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
+                        logger.finer( String.format( "Reading in remote bookmarks folder \"%s\" from %s", title, remoteUrl ) );
 
                         contents= new ArrayList();
 
