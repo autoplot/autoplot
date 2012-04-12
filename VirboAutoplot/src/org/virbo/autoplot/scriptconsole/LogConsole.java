@@ -118,7 +118,6 @@ public class LogConsole extends javax.swing.JPanel {
 
 
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
-
             public PythonInterpreter createInterpreter() throws java.io.IOException {
                 maybeInitializeInterpreter();
                 return interp;
@@ -126,7 +125,6 @@ public class LogConsole extends javax.swing.JPanel {
         });
 
         timer2 = new Timer(100, new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 update();
             }
