@@ -2968,7 +2968,7 @@ private void updateFrameTitle() {
             }
 
             public void run() {
-                long t0= System.currentTimeMillis();
+                //long t0= System.currentTimeMillis();
 
                 logger.fine("enter invokeLater");
 
@@ -3102,7 +3102,7 @@ APSplash.checkTime("init 240");
                     }
                 }
 
-                System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
+                //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
             }
         });
     }
