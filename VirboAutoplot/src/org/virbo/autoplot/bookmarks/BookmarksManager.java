@@ -1052,7 +1052,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             public void run() {
                 try {
                     try {
-                        Thread.sleep(300); // sleep 300 milliseconds before making second pass
+                        Thread.sleep(1000); // sleep 300 milliseconds before making second pass
                     } catch (InterruptedException ex) {
                         Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -1245,15 +1245,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         menuIsDirty= false;
     }
 
-    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int depth, final DataSetSelector select ) {
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector select ) {
 
         this.sel= select;
 
         final int MAX_TITLE_LEN = 50; // bookmark item description length
         final int MAX_LABEL_LEN = 30; // folder item description length
         final int TRIM_TAIL_LEN = 10;
-
-        System.err.println("addBookmarks(...,depth="+depth+")");
 
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
@@ -1308,7 +1306,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     
                 } else {
                     String label= title.trim();
-                    if ( label.length()>MAX_LABEL_LEN && depth>0 ) {
+                    if ( label.length()>MAX_LABEL_LEN && treeDepth>0 ) {
                         label= label.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ label.substring( label.length()-TRIM_TAIL_LEN,label.length() );
                     }
                     final JMenu subMenu = new JMenu(label);
@@ -1317,7 +1315,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                         tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
                     }
 
-                    if ( depth==0 && folder.getRemoteUrl()!=null ) {
+                    if ( treeDepth==0 && folder.getRemoteUrl()!=null ) {
                         if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
                             String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
                             subMenu.setToolTipText( ttext + "<br>" + tooltip );
@@ -1325,7 +1323,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                             if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
                         }
                     }
-                    addBookmarks(subMenu, folder.getBookmarks(), depth+1, sel);
+                    addBookmarks(subMenu, folder.getBookmarks(), treeDepth+1, sel);
                     bookmarksMenu.add(subMenu);
 
                 }
