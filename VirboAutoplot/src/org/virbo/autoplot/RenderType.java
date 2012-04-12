@@ -13,4 +13,5 @@ public enum RenderType {
     image,
     pitchAngleDistribution,
     eventsBar,
+    vectorPlot,
 }
