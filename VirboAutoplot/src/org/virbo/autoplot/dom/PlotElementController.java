@@ -38,7 +38,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.graph.VectorPlot;
+import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
@@ -1705,7 +1705,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
         } else if ( spec==RenderType.vectorPlot ) { //TODO: this should be discoverable
-            QDataSet qube= VectorPlot.doAutorange( fillDs );
+            QDataSet qube= VectorPlotRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
