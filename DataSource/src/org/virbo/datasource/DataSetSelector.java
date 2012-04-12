@@ -85,7 +85,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
-        initComponents();
+        initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
         dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
 
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
