@@ -67,6 +67,8 @@ import org.xml.sax.SAXException;
  */
 public class BookmarksManager extends javax.swing.JDialog {
 
+    private final static Logger logger= Logger.getLogger("autoplot.bookmarks");
+    
     /**
      * return the index of the node in the tree, by comparing at toString of each node.
      * @param tree
@@ -151,7 +153,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         try {
             dropTarget.addDropTargetListener(trans.createDropTargetListener());
         } catch (TooManyListenersException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         jTree1.setDropTarget(dropTarget);
         dragSource.createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY_OR_MOVE, trans.createDragGestureListener());
@@ -749,13 +751,13 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             model.setList(book);
             formatToFile( bookmarksFile );
         } catch (SAXException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             new GuiExceptionHandler().handle(ex);
         } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 }//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
@@ -850,11 +852,11 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             formatToFile( bookmarksFile );
 
         } catch (SAXException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 }//GEN-LAST:event_mergeInDefaultMenuItemActionPerformed
 
@@ -1078,7 +1080,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     try {
                         Thread.sleep(1000); // sleep 1000 milliseconds before making second pass
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
@@ -1096,9 +1098,11 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     //    System.err.println(b);
                     //}
                 } catch (SAXException ex) {
-                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
+                    showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 } catch (IOException ex) {
-                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
+                    showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 }
             }
         };
@@ -1165,16 +1169,16 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
             } );
             
         } catch (SAXException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
         } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
         } finally {
             try {
                 if ( read!=null ) read.close();
             } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1204,14 +1208,14 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
 
     private void formatToFile( File f ) {
-        System.err.println("formatting "+f);
+        logger.log(Level.FINE, "formatting {0}", f);
         OutputStream out = null;
         try {
             out= new FileOutputStream(f);
             Bookmark.formatBooks(out,model.getList());
             out.close();
         } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
                 if ( out!=null ) out.close();
