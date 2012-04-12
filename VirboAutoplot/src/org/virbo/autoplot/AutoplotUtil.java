@@ -66,6 +66,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.VectorPlot;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
@@ -1458,6 +1459,14 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new EventsRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+        } else if ( renderType==RenderType.vectorPlot ) {
+            if (recyclable != null && recyclable instanceof VectorPlot ) {
+                return recyclable;
+            } else {
+                Renderer result = new VectorPlot();
                 result.setDataSetLoader(null);
                 return result;
             }
