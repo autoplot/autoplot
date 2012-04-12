@@ -306,19 +306,19 @@ public class BookmarksManager extends javax.swing.JDialog {
     }
 
 
-    /*private void addIcon() {
-        Runnable run = new Runnable() {
-
-            public void run() {
-                Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-                ImageIcon icon = AutoplotUtil.createIcon(null, ((Bookmark.Item) b).getUri());
-                b.setIcon(icon);
-                //iconButton.setIcon(icon);
-                model.fireBookmarkChange(b);
-            }
-        };
-        new Thread(run).start();
-    }*/
+//    /*private void addIcon() {
+//        Runnable run = new Runnable() {
+//
+//            public void run() {
+//                Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+//                ImageIcon icon = AutoplotUtil.createIcon(null, ((Bookmark.Item) b).getUri());
+//                b.setIcon(icon);
+//                //iconButton.setIcon(icon);
+//                model.fireBookmarkChange(b);
+//            }
+//        };
+//        new Thread(run).start();
+//    }*/
 
     public void setAddBookmark( Bookmark b ) {
         TreePath tp= model.getPathFor( b, jTree1.getModel(), new TreePath(jTree1.getModel().getRoot()) );
@@ -1087,6 +1087,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     int depthLimit= 5;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthf+1 );
+                        System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
                         RequestProcessor.invokeLater(run);
                     } else {
                         if ( depthf>=depthLimit ) {
@@ -1157,6 +1158,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 if ( unresolved ) {
                     final String start= buff.toString();
                     Runnable run= loadBooksRunnable( start, depth+1 );
+                    System.err.printf( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 );
                     RequestProcessor.invokeLater(run);
                 }
 
@@ -1337,7 +1339,9 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     if ( label.length()>MAX_LABEL_LEN && treeDepth>0 ) {
                         label= label.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ label.substring( label.length()-TRIM_TAIL_LEN,label.length() );
                     }
-                    final JMenu subMenu = new JMenu(label);
+
+                    // note repeated code in DelayMenu
+                    final JMenu subMenu= new DelayMenu( label, folder.getBookmarks(), treeDepth+1, sel );
 
                     if ( tooltip.contains("%{URL}") ) {
                         tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
@@ -1351,7 +1355,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                             if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );
                         }
                     }
-                    addBookmarks(subMenu, folder.getBookmarks(), treeDepth+1, sel);
+                    
                     bookmarksMenu.add(subMenu);
 
                 }
