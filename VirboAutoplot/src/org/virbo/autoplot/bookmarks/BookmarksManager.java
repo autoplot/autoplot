@@ -1087,7 +1087,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     int depthLimit= 5;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthf+1 );
-                        System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
+                        //System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
                         RequestProcessor.invokeLater(run);
                     } else {
                         if ( depthf>=depthLimit ) {
@@ -1158,7 +1158,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 if ( unresolved ) {
                     final String start= buff.toString();
                     Runnable run= loadBooksRunnable( start, depth+1 );
-                    System.err.printf( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 );
+                    //System.err.printf( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 );
                     RequestProcessor.invokeLater(run);
                 }
 
