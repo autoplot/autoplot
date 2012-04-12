@@ -2962,8 +2962,13 @@ private void updateFrameTitle() {
         logger.fine("invokeLater()");
 
         java.awt.EventQueue.invokeLater(new Runnable() {
+            public String toString() {
+                return "initAutoplotRunnable";
+            }
 
             public void run() {
+                long t0= System.currentTimeMillis();
+
                 logger.fine("enter invokeLater");
 
                 if ( ! headless ) {
@@ -3096,6 +3101,7 @@ APSplash.checkTime("init 240");
                     }
                 }
 
+                System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
             }
         });
     }
