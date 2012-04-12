@@ -288,7 +288,7 @@ class TsdsDataSource extends AbstractDataSource {
 
     }
 
-    public TimeSeriesBrowse getTimeSeriesBrowse() {
+    final public TimeSeriesBrowse getTimeSeriesBrowse() {
         return new TimeSeriesBrowse() {
 
             public void setTimeRange(DatumRange dr) {
