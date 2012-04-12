@@ -2962,6 +2962,7 @@ private void updateFrameTitle() {
         logger.fine("invokeLater()");
 
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public String toString() {
                 return "initAutoplotRunnable";
             }
