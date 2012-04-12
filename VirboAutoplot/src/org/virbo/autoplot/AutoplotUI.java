@@ -174,6 +174,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     private LayoutPanel layoutPanel;
     private JScrollPane layoutPanel1;
     private LogConsole logConsole;
+    private JScrollPane logConsolePanel;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
@@ -760,7 +761,13 @@ APSplash.checkTime("init 270");
             } );
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
+            logConsolePanel= new JScrollPane();
+            tabs.addTab("console", null, logConsolePanel,
+                String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
+            invokeLater( 4020, true, new Runnable() {
+                public void run() {
             initLogConsole();
+                }  }  );
         }
 
 
@@ -1213,8 +1220,9 @@ APSplash.checkTime("init 52");
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
-        tabs.addTab("console", null, logConsole,
-                String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
+        logConsolePanel.setViewportView( logConsole );
+       // tabs.addTab("console", null, logConsole,
+       //         String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
 
         if ( applicationModel.getExceptionHandler() instanceof GuiExceptionHandler ) {
@@ -2861,7 +2869,7 @@ private void updateFrameTitle() {
 
         //http://today.java.net/pub/a/today/2007/08/30/debugging-swing.html
         //http://today.java.net/today/2007/08/30/tracing.zip
-        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TracingEventQueueJMX());
+        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueueJMX());
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
