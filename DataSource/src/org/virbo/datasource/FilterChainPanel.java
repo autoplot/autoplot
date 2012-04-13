@@ -39,7 +39,7 @@ import javax.swing.JTextField;
  */
 public class FilterChainPanel extends JPanel {
 
-    String component;
+    String component="";
     List<String> filters;
     JPanel content= new JPanel();
     JPanel add;
