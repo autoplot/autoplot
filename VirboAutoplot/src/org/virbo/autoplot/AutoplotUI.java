@@ -2897,6 +2897,7 @@ private void updateFrameTitle() {
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
 
+        alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with the Cluster Final Archive");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
            if ( args[i].equals("-open") ) args[i]="--open";
@@ -2966,6 +2967,10 @@ private void updateFrameTitle() {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        if ( alm.getBooleanValue("samp") ) {
+            JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/addCfaListener.jy") );
         }
 
         logger.fine("invokeLater()");
