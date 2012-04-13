@@ -1,0 +1,30 @@
+from org.astrogrid.samp import Metadata
+from org.astrogrid.samp.xmlrpc import StandardClientProfile
+from org.astrogrid.samp.gui import GuiHubConnector
+from org.astrogrid.samp.client import AbstractMessageHandler
+
+profile = StandardClientProfile.getInstance();
+hubConnector = GuiHubConnector(profile);
+hubConnector.setAutoconnect(3);
+
+meta = Metadata()
+meta.setName("Autoplot");
+meta.setDescriptionText("Autoplot");
+meta.setIconUrl("http://autoplot.org:8080/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo16x16.png");
+meta.setDocumentationUrl("http://autoplot.org");
+
+hubConnector.declareMetadata(meta);
+
+class ConcreteMessageReceiver( AbstractMessageHandler ):
+   def __init__( self, mType ):
+      AbstractMessageHandler.__init__(self,mType)
+
+   def processCall( self, connection, senderId, message ):
+      plot( message.getParam("url") )
+      return None
+
+messageHandler= ConcreteMessageReceiver('image.load.fits')
+
+hubConnector.addMessageHandler(messageHandler);
+hubConnector.declareSubscriptions(hubConnector.computeSubscriptions());
+
