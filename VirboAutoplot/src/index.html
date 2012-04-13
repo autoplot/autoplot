@@ -7,14 +7,14 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Labels are fixed in this rich ascii file.</small></p>
+        <p><small>This CDF file contains TT2000 timetags.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This is the Autoplot2011 branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2012 branch.  This is an update to the production version containing bugfixes and minor new features.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
@@ -22,6 +22,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Clean up of GUI activity performed off the event thread</li>
+            <li>bugfix 3516161: procedure would leave orphan data source filters in the DOM and would fail.</li>
+            <li>improve feedback from misformatted rich headers</li>
+            <li>NetCDF works file files via FTP now.</li>
             <li>HDF5 via FTP works now, there was old code that still used NetCDF's access via HTTP which hid the bug.</li>
             <li>xtick tick labels look for close relevant tick when closest is fill, use **** to indicate fill.</li>
             <li>bookmarks have initial menu, indicating that bookmarks are being loaded</li>
@@ -57,6 +61,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>VectorPlotRenderer added, but it's not presented in the interface yet</li>
+            <li>Cluster Final Archive support continues with --samp switch added.</li>
+            <li>more work towards speeding up startup time</li>
+            <li>Operations gui will contain graphical controls for filters</li>
             <li>slight speedup on startup time when script panel is visible.</li>
             <li>export to IDLSAV saves the x tags as well, with times as t1970 (seconds since 1970-01-01)</li>
             <li>"slices(0,0,:,:)" function used as initial filter for double slicing, to replace confusing "|slice0(0)|slice0(0)"</li>
