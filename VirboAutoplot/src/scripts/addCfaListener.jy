@@ -3,6 +3,8 @@ from org.astrogrid.samp.xmlrpc import StandardClientProfile
 from org.astrogrid.samp.gui import GuiHubConnector
 from org.astrogrid.samp.client import AbstractMessageHandler
 
+print 'starting up SAMP listener for Cluster Final Archive'
+
 profile = StandardClientProfile.getInstance();
 hubConnector = GuiHubConnector(profile);
 hubConnector.setAutoconnect(3);
