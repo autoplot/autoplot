@@ -22,7 +22,9 @@ class ConcreteMessageReceiver( AbstractMessageHandler ):
       AbstractMessageHandler.__init__(self,mType)
 
    def processCall( self, connection, senderId, message ):
-      plot( message.getParam("url") )
+      s= message.getParam("url")
+      if ( s.startswith( 'file://localhost' ) ) s= s[16:]
+      plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
       return None
 
 messageHandler= ConcreteMessageReceiver('image.load.fits')
