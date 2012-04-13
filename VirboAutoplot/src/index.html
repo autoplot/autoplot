@@ -22,7 +22,11 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
-            <li>Clean up of GUI activity performed off the event thread</li>
+            <li>histogram didn't draw the last half bin</li>
+            <li>thread clean up and slightly speed up startup performance</li>
+            <li>ascii parser can parse times with the format "%Y %m %d %H%M".  This tweaked an under-implementation.</li>
+            <li>TSDS supports timerange=P10D in URI, by using timerange if specified instead of StartTime</li>
+            <li>general clean up of GUI actions performed off the event thread</li>
             <li>bugfix 3516161: procedure would leave orphan data source filters in the DOM and would fail.</li>
             <li>improve feedback from misformatted rich headers</li>
             <li>NetCDF works file files via FTP now.</li>
