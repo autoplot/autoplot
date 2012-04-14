@@ -23,7 +23,7 @@ class ConcreteMessageReceiver( AbstractMessageHandler ):
 
    def processCall( self, connection, senderId, message ):
       s= message.getParam("url")
-      if ( s.startswith( 'file://localhost' ) ) s= s[16:]
+      if ( s.startswith( 'file://localhost' ) ): s= s[16:]
       plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
       return None
 
