@@ -1275,11 +1275,13 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         menuIsDirty= false;
     }
 
-    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector sel ) {
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector select ) {
 
-        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, sel );
+        this.sel= select;
+
+        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, select );
         if ( bookmarksMenu.isPopupMenuVisible() ) {
-            sel.setMessage("Bookmarks updated");
+            select.setMessage("Bookmarks updated");
         }
 
     }
