@@ -18,17 +18,28 @@ meta.setDocumentationUrl("http://autoplot.org");
 hubConnector.declareMetadata(meta);
 
 class ConcreteMessageReceiver( AbstractMessageHandler ):
+      
    def __init__( self, mType ):
       AbstractMessageHandler.__init__(self,mType)
+      self.mType= mType
 
    def processCall( self, connection, senderId, message ):
+      print 'got message: %s' % message.toString()
       s= message.getParam("url")
-      if ( s.startswith( 'file://localhost' ) ): s= s[16:]
-      plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
+
+      if ( s.startswith( 'file://localhost' ) ): 
+         s= s[16:]
+      if ( s.startswith( 'file://' ) ): s= s[7:]
+      if ( mType.equals('image.load.fits') ):
+         plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
+      elif ( mType.equals('table.load.cdf') ):
+         plot( 'vap+cdf:file://' + java.net.URLDecoder.decode(s) )
       return None
 
 messageHandler= ConcreteMessageReceiver('image.load.fits')
+messageHandler2= ConcreteMessageReceiver('table.load.cdf')
 
 hubConnector.addMessageHandler(messageHandler);
+hubConnector.addMessageHandler(messageHandler2);
 hubConnector.declareSubscriptions(hubConnector.computeSubscriptions());
 
