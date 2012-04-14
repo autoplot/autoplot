@@ -422,7 +422,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         String doc= ss[1];
                         doc= doc.replaceAll("<", "&lt;");
                         doc= doc.replaceAll(">", "&gt;");
-                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "variable is defined before execution: " + doc);
+                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
                     } catch (BadLocationException ex) {
                         Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
