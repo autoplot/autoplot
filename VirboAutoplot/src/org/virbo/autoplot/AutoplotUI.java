@@ -2969,10 +2969,6 @@ private void updateFrameTitle() {
             }
         }
 
-        if ( alm.getBooleanValue("samp") ) {
-            JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/addCfaListener.jy") );
-        }
-
         logger.fine("invokeLater()");
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -3014,6 +3010,10 @@ APSplash.checkTime("init 200");
                     boolean addSingleInstanceListener= true;
                     if ( addSingleInstanceListener ) {
                         addSingleInstanceListener( alm, app );
+                    }
+                    if ( alm.getBooleanValue("samp") ) {
+                        //JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/addCfaListener.jy") );
+                        org.autoplot.external.AddCfaSampListener.addCdfSampListener( app.dataSetSelector );
                     }
 
                 } else {
