@@ -1,0 +1,5 @@
+file= 'help'
+
+print file
+
+result= rand(100)
