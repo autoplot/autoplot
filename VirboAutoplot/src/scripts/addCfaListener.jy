@@ -32,14 +32,17 @@ class ConcreteMessageReceiver( AbstractMessageHandler ):
       if ( s.startswith( 'file://' ) ): s= s[7:]
       if ( mType.equals('image.load.fits') ):
          plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
+      elif ( mType.equals('table.load.fits') ):
+         plot( 'vap+fits:file://' + java.net.URLDecoder.decode(s) )
       elif ( mType.equals('table.load.cdf') ):
          plot( 'vap+cdf:file://' + java.net.URLDecoder.decode(s) )
       return None
 
 messageHandler= ConcreteMessageReceiver('image.load.fits')
-messageHandler2= ConcreteMessageReceiver('table.load.cdf')
-
 hubConnector.addMessageHandler(messageHandler);
-hubConnector.addMessageHandler(messageHandler2);
+messageHandler= ConcreteMessageReceiver('table.load.fits')
+hubConnector.addMessageHandler(messageHandler);
+messageHandler= ConcreteMessageReceiver('table.load.cdf')
+hubConnector.addMessageHandler(messageHandler);
 hubConnector.declareSubscriptions(hubConnector.computeSubscriptions());
 
