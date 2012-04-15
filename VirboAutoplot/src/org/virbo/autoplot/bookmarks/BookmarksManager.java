@@ -365,10 +365,12 @@ public class BookmarksManager extends javax.swing.JDialog {
         plotButton = new javax.swing.JButton();
         plotBelowButton = new javax.swing.JButton();
         overplotButton = new javax.swing.JButton();
+        viewDetailsButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
         importUrlMenuItem = new javax.swing.JMenuItem();
+        reloadMenuItem = new javax.swing.JMenuItem();
         resetToDefaultMenuItem = new javax.swing.JMenuItem();
         mergeInDefaultMenuItem = new javax.swing.JMenuItem();
         exportMenuItem = new javax.swing.JMenuItem();
@@ -479,6 +481,13 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
+        viewDetailsButton.setText("Details");
+        viewDetailsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewDetailsButtonActionPerformed(evt);
+            }
+        });
+
         jMenu1.setText("File");
 
         importMenuItem.setText("Import...");
@@ -496,6 +505,14 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
         jMenu1.add(importUrlMenuItem);
+
+        reloadMenuItem.setText("Reload Bookmarks");
+        reloadMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reloadMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(reloadMenuItem);
 
         resetToDefaultMenuItem.setText("Reset to Default");
         resetToDefaultMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -582,16 +599,20 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .add(URILabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(titleLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                .add(titleLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel4)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel4)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(descriptionTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editDescriptionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(editDescriptionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(viewDetailsButton))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -600,11 +621,12 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(titleLabel)
-                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(viewDetailsButton))
                 .add(7, 7, 7)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
@@ -675,6 +697,13 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
             iconButton.setText("(no icon)");
         }*/
         descriptionTextField.setText( b.getDescription() );
+        viewDetailsButton.setEnabled( b.getDescriptionUrl()!=null );
+        if ( b.getDescriptionUrl()==null ) {
+            viewDetailsButton.setToolTipText("");
+        } else {
+            viewDetailsButton.setToolTipText("View "+b.getDescriptionUrl());
+        }
+
         URLTextField.setEditable( b instanceof Bookmark.Item );
         int status=0;
         String err="";
@@ -728,6 +757,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         URLTextField.setText("");
         titleLabel.setText("Title:");
         editDescriptionButton.setEnabled(false);
+        viewDetailsButton.setEnabled(false);
         titleTextField.setEditable(false);
     }
 }//GEN-LAST:event_jTree1ValueChanged
@@ -929,6 +959,17 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     maybePlot(KeyEvent.SHIFT_MASK);
 }//GEN-LAST:event_overplotButtonActionPerformed
 
+private void viewDetailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDetailsButtonActionPerformed
+    Bookmark book= model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath()  );
+    if ( book.getDescriptionUrl()!=null ) {
+        AutoplotUtil.openBrowser(book.getDescriptionUrl().toString());
+    }
+}//GEN-LAST:event_viewDetailsButtonActionPerformed
+
+private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadMenuItemActionPerformed
+    reload();
+}//GEN-LAST:event_reloadMenuItemActionPerformed
+
 //    /**
 //    * @param args the command line arguments
 //    */
@@ -972,9 +1013,11 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
+    private javax.swing.JMenuItem reloadMenuItem;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
+    private javax.swing.JButton viewDetailsButton;
     // End of variables declaration//GEN-END:variables
 
     private MouseListener createContextMenuMouseListener() {

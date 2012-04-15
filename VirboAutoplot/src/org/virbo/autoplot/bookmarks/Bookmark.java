@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -321,6 +322,7 @@ public abstract class Bookmark {
         String title = null;
         ImageIcon icon = null;
         String description= null;
+        URL descriptionUrl= null;
         boolean hidden= false;
 
         NodeList nl;
@@ -375,6 +377,8 @@ public abstract class Bookmark {
         if (nl.getLength() > 0) {
             s = ((Text) (nl.item(0).getFirstChild())).getData();
             icon = new ImageIcon(decodeImage(s));
+        } else {
+            icon= null;
         }
 
         nl = ((Element) element).getElementsByTagName("description");
@@ -386,6 +390,25 @@ public abstract class Bookmark {
                 s = ((Text)child).getData();
                 description = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
             }
+        } else {
+            description= "";
+        }
+
+        nl = ((Element) element).getElementsByTagName("description-url");
+        if (nl.getLength() > 0) {
+            Node child= (nl.item(0).getFirstChild());
+            if ( child==null ) {
+                descriptionUrl= null;
+            } else {
+                s = ((Text)child).getData();
+                try {
+                    descriptionUrl = new URL( vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s );
+                } catch ( MalformedURLException ex ) {
+                    descriptionUrl= null;
+                }
+            }
+        } else {
+            descriptionUrl= null;
         }
         
         nl = ((Element) element).getElementsByTagName("hidden");
@@ -406,6 +429,7 @@ public abstract class Bookmark {
             book.setTitle(title);
             if ( icon!=null ) book.setIcon(icon);
             if ( description!=null ) book.setDescription(description);
+            if ( descriptionUrl!=null ) book.setDescriptionUrl( descriptionUrl );
             book.setHidden(hidden);
             return book;
 
@@ -471,6 +495,7 @@ public abstract class Bookmark {
             if ( icon!=null ) book.setIcon(icon);
             if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
             if ( description!=null ) book.setDescription(description);
+            if ( descriptionUrl!=null ) book.setDescriptionUrl( descriptionUrl );
             book.setHidden(hidden);
             book.remoteStatus= remoteStatus;
             
@@ -658,6 +683,16 @@ public abstract class Bookmark {
                 desc.appendChild( doc.createTextNode( b.getDescription() ) );
                 book.appendChild(desc);
             }
+            if ( b.descriptionUrl!=null ) {
+                Element desc= doc.createElement("description-url");
+                desc.appendChild( doc.createTextNode( b.getDescriptionUrl().toString() ) );
+                book.appendChild(desc);
+            }
+            if ( b.isHidden() ) {
+                Element desc= doc.createElement("hidden");
+                desc.appendChild( doc.createTextNode( "true" ) );
+                book.appendChild(desc);
+            }
             parent.appendChild(book);
 
         } else if (bookmark instanceof Bookmark.Folder) {
@@ -682,7 +717,16 @@ public abstract class Bookmark {
                 desc.appendChild( doc.createTextNode( f.getDescription() ) );
                 folder.appendChild(desc);
             }
-
+            if ( f.descriptionUrl!=null ) {
+                Element desc= doc.createElement("description-url");
+                desc.appendChild( doc.createTextNode( f.getDescriptionUrl().toString() ) );
+                folder.appendChild(desc);
+            }
+            if ( f.isHidden() ) {
+                Element desc= doc.createElement("hidden");
+                desc.appendChild( doc.createTextNode( "true" ) );
+                folder.appendChild(desc);
+            }
             Element list= doc.createElement("bookmark-list");
             for ( Bookmark book: f.getBookmarks() ) {
                 formatBookmark( doc, list, book );
@@ -712,6 +756,7 @@ public abstract class Bookmark {
                 buf.append("     <title>").append(URLEncoder.encode(b.getTitle(), "UTF-8")).append("</title>\n");
                 if (b.icon != null) buf.append("     <icon>").append(encodeImage((BufferedImage) b.icon.getImage())).append("</icon>\n");
                 if (b.description != null) buf.append("     <description>").append( URLEncoder.encode(b.getDescription(), "UTF-8")).append("</description>\n");
+                if (b.descriptionUrl !=null ) buf.append("      <description-url>").append( b.getDescriptionUrl() ).append("</description-url>\n");
                 buf.append("     <url>").append(URLEncoder.encode(b.getUri(), "UTF-8")).append("</url>\n");
                 if ( bookmark.isHidden() ) {
                     buf.append("     <hidden>true</hidden>\n");
@@ -731,6 +776,7 @@ public abstract class Bookmark {
                     buf.append("     <hidden>true</hidden>\n");
                 }
                 if (f.description != null) buf.append("     <description>").append( URLEncoder.encode(f.getDescription(), "UTF-8")).append("</description>\n");
+                if (f.descriptionUrl !=null ) buf.append("      <description-url>").append( f.getDescriptionUrl() ).append("</description-url>\n");
                 buf.append(formatBooksOld(f.getBookmarks()));
                 buf.append("  </bookmark-folder>\n");
             }
@@ -821,6 +867,17 @@ public abstract class Bookmark {
         propertyChangeSupport.firePropertyChange( "description", oldValue, description );
     }
 
+    protected URL descriptionUrl=null;
+
+    public URL getDescriptionUrl() {
+        return descriptionUrl;
+    }
+
+    public void setDescriptionUrl(URL descriptionUrl) {
+        URL oldValue= this.descriptionUrl;
+        this.descriptionUrl = descriptionUrl;
+        propertyChangeSupport.firePropertyChange( "descriptionUrl", oldValue, description );
+    }
 
     /**
      * icons associated with the bookmark.  This was wishful thinking, and wasn't fully developed.  Note we have since
