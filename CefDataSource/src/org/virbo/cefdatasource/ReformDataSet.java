@@ -4,6 +4,7 @@
  */
 package org.virbo.cefdatasource;
 
+import java.util.Arrays;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.RankNDataSet;
@@ -51,7 +52,9 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
         this.sizes = sizes;
 
         if (rank > 4) {
-            throw new IllegalArgumentException("sizes imply dataset with rank " + rank + ", too high");
+            StringBuilder ssizes= new StringBuilder( 10 ).append(sizes[0]);
+            for ( int i=1; i<rank; i++ ) ssizes.append(",").append(sizes[i]);
+            throw new IllegalArgumentException( String.format( "sizes=[%s] imply dataset with rank %d, which is not currently supported.", ssizes.toString(), rank ) );
         }
 
         n0 = sizes[0];
