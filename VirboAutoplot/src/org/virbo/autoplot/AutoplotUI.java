@@ -3013,7 +3013,7 @@ APSplash.checkTime("init 200");
                     }
                     if ( alm.getBooleanValue("samp") ) {
                         //JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/addCfaListener.jy") );
-                        org.autoplot.external.AddCfaSampListener.addCdfSampListener( app.dataSetSelector );
+                        org.autoplot.external.AddCfaSampListener.addCfaSampListener( app.dataSetSelector );
                     }
 
                 } else {

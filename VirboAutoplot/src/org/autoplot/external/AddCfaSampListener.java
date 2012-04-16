@@ -12,12 +12,12 @@ import org.astrogrid.samp.xmlrpc.StandardClientProfile;
 import org.astrogrid.samp.gui.GuiHubConnector;
 import org.astrogrid.samp.client.AbstractMessageHandler;
 import org.astrogrid.samp.client.HubConnection;
-import org.virbo.autoplot.ScriptContext;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
 
 /**
- *
+ * Listener for the Cluster Final Archive SAMP protocol.  Other clients
+ * include the SOHO archive viewer, and Ulysses, will include the
+ * Cluster Final Archive viewer.
  * @author jbf
  */
 public class AddCfaSampListener {
@@ -27,7 +27,7 @@ public class AddCfaSampListener {
         sel.maybePlot(true);
     }
 
-    public static void addCdfSampListener( final DataSetSelector sel ) {
+    public static void addCfaSampListener( final DataSetSelector sel ) {
         
         System.err.println( "starting up SAMP listener for Cluster Final Archive" );
 
