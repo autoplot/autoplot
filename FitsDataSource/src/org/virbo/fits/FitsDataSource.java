@@ -47,11 +47,6 @@ public class FitsDataSource extends AbstractDataSource {
         String name = (String) getParams().get("arg_0");
         if (name != null) {
             ihdu = plottable.get(name);
-        } else {
-            Iterator<Entry<String,Integer>> a=  plottable.entrySet().iterator();
-            while ( a.hasNext() ) {
-                ihdu= a.next().getValue(); // pick the last one
-            }
         }
 
         FitsFile file = new FitsFile(getFile(mon));
