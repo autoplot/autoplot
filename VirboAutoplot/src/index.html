@@ -22,6 +22,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>minor cleanup of CEF support</li>
+            <li>excessive use of event thread blocked GUI responsiveness in first 5 seconds</li>
             <li>histogram didn't draw the last half bin</li>
             <li>thread clean up and slightly speed up startup performance</li>
             <li>ascii parser can parse times with the format "%Y %m %d %H%M".  This tweaked an under-implementation.</li>
@@ -65,6 +67,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>descriptionUrl added to bookmarks files, to support remote bookmark lists.</li>
             <li>VectorPlotRenderer added, but it's not presented in the interface yet</li>
             <li>Cluster Final Archive support continues with --samp switch added.</li>
             <li>more work towards speeding up startup time</li>
