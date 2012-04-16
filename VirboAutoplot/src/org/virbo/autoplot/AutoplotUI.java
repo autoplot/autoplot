@@ -132,6 +132,7 @@ import org.w3c.dom.Element;
  */
 public class AutoplotUI extends javax.swing.JFrame {
     private static final String TAB_SCRIPT = "script";
+    private static final String TAB_CONSOLE = "console";
 
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
     final String TAB_TOOLTIP_AXES = "<html>Adjust selected plot axes.<br>%s<html>";
@@ -608,7 +609,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 }
             }
         };
-        invokeLater( 1000, false, run );
+        invokeLater( 10000, false, run );
     }
 
     private Runnable addAxes() {
@@ -618,12 +619,14 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( 2500, true, new Runnable() {
+                invokeLater( 2500, false, new Runnable() {
                     public String toString() { return "addAxesRunnable"; }
                     public void run() {
   APSplash.checkTime("addAxes1 in");
-                        JComponent c= new AxisPanel(applicationModel);
-                         sp.setViewportView(c);
+                        final JComponent c= new AxisPanel(applicationModel);
+                        SwingUtilities.invokeLater( new Runnable() {
+                            public void run( ) { sp.setViewportView(c); }
+                        } );
   APSplash.checkTime("addAxes1 out");
                     }
                 });
@@ -639,12 +642,14 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( 2500, true, new Runnable() {
+                invokeLater( 2500, false, new Runnable() {
                     public String toString() { return "addStyle"; }
                     public void run() {
   APSplash.checkTime("addStyle1 in");
-                        JComponent c= new PlotStylePanel(applicationModel);
-                        sp.setViewportView(c);
+                        final JComponent c= new PlotStylePanel(applicationModel);
+                        SwingUtilities.invokeLater( new Runnable() {
+                            public void run( ) { sp.setViewportView(c); }
+                        } );
   APSplash.checkTime("addStyle1 out");
                     }
                 } );
@@ -715,21 +720,23 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 3530, true, new Runnable() {
-            public String toString() { return "addMetadata"; }
+        invokeLater( 3530, false, new Runnable() {
+            public String toString() { return "addLayout"; }
             public void run() {
                 //long t0= System.currentTimeMillis();
 APSplash.checkTime("init 249");
                 if ( flayoutPane!=null ) {
-                    LayoutPanel lui= new LayoutPanel();
+                    final LayoutPanel lui= new LayoutPanel();
                     layoutPanel= lui;
-                    flayoutPane.setViewportView(lui);
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        flayoutPane.setViewportView(lui);
+                    } } );
                     lui.setApplication(dom);
 APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 3550, true, new Runnable() {
+        invokeLater( 3550, false, new Runnable() {
             public String toString() { return "addDataPanel"; }
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
@@ -737,18 +744,22 @@ APSplash.checkTime("init 259");
                 if ( fdataPane!=null ) {
                     final DataPanel dp= new DataPanel(dom);
                     dataPanel= dp;
-                    fdataPane.setViewportView(dp);
                     dp.doBindings();
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        fdataPane.setViewportView(dp);
+                    } } );
 APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 3570, true, new Runnable() { //TEMPORILY replace for mac.
+        invokeLater( 3570, false, new Runnable() { 
             public String toString() { return "addMetadataPanel"; }
             public void run() {
 APSplash.checkTime("init 269");
-                MetadataPanel mdp = new MetadataPanel(applicationModel);
-                fmetadataPane.setViewportView(mdp);
+                final MetadataPanel mdp = new MetadataPanel(applicationModel);
+                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                    fmetadataPane.setViewportView(mdp);
+                } } );
 APSplash.checkTime("init 270");
             }
         });
@@ -758,24 +769,30 @@ APSplash.checkTime("init 270");
             final JScrollPane fjython= new JScrollPane();
             tabs.addTab( TAB_SCRIPT, null, fjython,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
-            invokeLater( 4000, true, new Runnable() {
+            invokeLater( 4000, false, new Runnable() {
                 public String toString() { return "addScriptPanel"; }
                 public void run() {
-            scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
-            fjython.setViewportView(scriptPanel);
-            scriptPanelMenuItem.setSelected(true);
+                    scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                       fjython.setViewportView(scriptPanel);
+                       scriptPanelMenuItem.setSelected(true);
+                    } } );
                 }
             } );
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
             logConsolePanel= new JScrollPane();
-            tabs.addTab("console", null, logConsolePanel,
+            tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-            invokeLater( 4020, true, new Runnable() {
+            invokeLater( 4020, false, new Runnable() {
                 public String toString() { return "addLogConsole"; }
                 public void run() {
-            initLogConsole();
-                }  }  );
+                    initLogConsole();
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        logConsolePanel.setViewportView( logConsole );
+                    } } );
+                }
+            }  );
         }
 
 
@@ -1212,7 +1229,7 @@ APSplash.checkTime("init 52");
     }
 
 
-    private void initLogConsole() throws SecurityException {
+    private JPanel initLogConsole() throws SecurityException {
         logConsole = new LogConsole();
         logConsole.setScriptContext( Collections.singletonMap( "dom", (Object)applicationModel.dom ) ); // must cast or javac complains
         logConsole.turnOffConsoleHandlers();
@@ -1229,7 +1246,6 @@ APSplash.checkTime("init 52");
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
-        logConsolePanel.setViewportView( logConsole );
        // tabs.addTab("console", null, logConsole,
        //         String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
@@ -1238,6 +1254,7 @@ APSplash.checkTime("init 52");
             ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setLogConsole(logConsole);
         }
         logConsoleMenuItem.setSelected(true);
+        return logConsole;
     }
 
     private void initServer() {
@@ -2428,7 +2445,11 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
     applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(logConsoleMenuItem.isSelected());
     if (applicationModel.getDocumentModel().getOptions().isLogConsoleVisible() && logConsole == null) {
+        logConsolePanel= new JScrollPane();
+        tabs.addTab(TAB_CONSOLE, null, logConsolePanel,
+            String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         initLogConsole();
+        logConsolePanel.setViewportView( logConsole );
     } else {
         if ( logConsole!=null ) {
             logConsole.undoLogConsoleMessages();

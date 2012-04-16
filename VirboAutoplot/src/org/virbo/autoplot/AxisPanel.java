@@ -119,14 +119,9 @@ public class AxisPanel extends javax.swing.JPanel {
                if ( !zLog.isEnabled() ) zLog.setSelected(false);
            }
         });
-        Runnable run= new Runnable() {
-            public String toString() { return "axisPanelBindings"; }
-            public void run() {
-                doPlotBindings();
-                doPlotElementBindings();
-            }
-        };
-        SwingUtilities.invokeLater(run);
+        doPlotBindings();
+        doPlotElementBindings();
+
    APSplash.checkTime("in axispanel 40");
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
