@@ -72,7 +72,7 @@ public class CefDataSource extends AbstractDataSource {
 
         MutablePropertyDataSet ds = null;
 
-        QDataSet dsvar = createDataSet(var, ds, cmon);
+        QDataSet dsvar = createDataSet(var, ds, true, cmon);
 
         cmon.close();
 
@@ -126,7 +126,7 @@ public class CefDataSource extends AbstractDataSource {
      * @throws java.lang.NumberFormatException
      * @throws java.text.ParseException
      */
-    private MutablePropertyDataSet createDataSet(String var, MutablePropertyDataSet tds, DasProgressMonitorReadableByteChannel cmon) throws IOException, NumberFormatException, ParseException {
+    private MutablePropertyDataSet createDataSet(String var, MutablePropertyDataSet tds, boolean doDeps, DasProgressMonitorReadableByteChannel cmon) throws IOException, NumberFormatException, ParseException {
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);
 
         if ( param==null ) {
@@ -157,14 +157,12 @@ public class CefDataSource extends AbstractDataSource {
             for (int i = 0; i < data.length; i++) {
                 try {
                     ddata[i] = Double.parseDouble(data[i]);
-                    if (ddata[i] == ceffill) {
-                        ddata[i] = fill;
-                    }
                 } catch (NumberFormatException ex) {
                     throw new NumberFormatException("format error in data of param.name=" + param.name + ": " + data[i]);
                 }
             }
             ds = DDataSet.wrap(ddata);
+            ds.putProperty(QDataSet.FILL_VALUE, ceffill );
             setDsName( var, ds );
             rank0 = ds.rank();
 
@@ -189,13 +187,7 @@ public class CefDataSource extends AbstractDataSource {
 
                 ArrayDataSet dds = ArrayDataSet.copy(ds);
                 dds.putProperty(QDataSet.UNITS, u);
-                for (int i = 0; i < dds.length(); i++) {
-                    for (int j = 0; j < dds.length(i); j++) {
-                        if (dds.value(i, j) == ceffill) {
-                            dds.putValue(i, j, fill); //TODO: QDataSet has QDataSet.FILL now.
-                        }
-                    }
-                }
+                dds.putProperty(QDataSet.FILL_VALUE, ceffill );
                 ds = dds;
 
 
@@ -246,7 +238,6 @@ public class CefDataSource extends AbstractDataSource {
 
         int[] qube = DataSetUtil.qubeDims(ds);
 
-        boolean doDeps = true;
         if (doDeps) {
             String s;
             for (int i = 0; i < rank0; i++) {
@@ -259,7 +250,7 @@ public class CefDataSource extends AbstractDataSource {
                     } else {
                         continue;
                     }
-                    MutablePropertyDataSet dep0ds = createDataSet(s, tds, cmon);
+                    MutablePropertyDataSet dep0ds = createDataSet(s, tds, false, cmon);
                     if (dep0ds.rank() > 1) {
                         QDataSet dp01 = (QDataSet) dep0ds.property(QDataSet.DEPEND_0);
                         QDataSet dp02 = (QDataSet) ds.property(QDataSet.DEPEND_0);
@@ -269,12 +260,6 @@ public class CefDataSource extends AbstractDataSource {
                             if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
                                 dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
                             }
-                            //if (!org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds)) {
-                            //    QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
-                            //    dep0ds = new SortDataSet(dep0ds, sort);
-                            //    dsid = makeMonotonic(dsid, newDim, sort);
-                            //    //System.err.println(org.virbo.dataset.DataSetUtil.statsString(dsid));
-                            //}
 
                         }
                     }
