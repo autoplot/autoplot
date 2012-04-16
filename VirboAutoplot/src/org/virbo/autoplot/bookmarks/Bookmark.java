@@ -678,7 +678,7 @@ public abstract class Bookmark {
                 icon.appendChild( doc.createTextNode( encodeImage((BufferedImage) b.icon.getImage()) ) );
                 book.appendChild(icon);
             }
-            if ( b.description!=null ) {
+            if ( b.description!=null && b.description.length()>0 ) {
                 Element desc= doc.createElement("description");
                 desc.appendChild( doc.createTextNode( b.getDescription() ) );
                 book.appendChild(desc);
@@ -712,7 +712,7 @@ public abstract class Bookmark {
                 icon.appendChild( doc.createTextNode( encodeImage( (BufferedImage)f.getIcon().getImage() ) ) );
                 folder.appendChild(icon);
             }
-            if (f.description != null) {
+            if (f.description != null && f.description.length()>0) {
                 Element desc= doc.createElement("description");
                 desc.appendChild( doc.createTextNode( f.getDescription() ) );
                 folder.appendChild(desc);
