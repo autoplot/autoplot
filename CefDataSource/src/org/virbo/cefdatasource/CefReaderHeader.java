@@ -71,7 +71,11 @@ public class CefReaderHeader {
             //*** read next record ***
             while (true) {
                 b1.rewind();
-                c.read(b1);
+                if ( c.read(b1)==-1 ) {
+                    eofReached= true;
+                    break;
+                }
+                //c.read(b1);
                 sbuf.append((char) buf[0]);
                 if (buf[0] == eol) {
                     break;
@@ -178,6 +182,11 @@ public class CefReaderHeader {
                 break;
             }
             recordNumber++;
+
+            if ( record.data.length()>2 && ( record.data.startsWith("19") || record.data.startsWith("20") ) ) { //CFA has a bug that they don't output the "DATA_UNTIL" delimiter.
+                // C1_CP_WHI_ACTIVE__20020221_000000_20020221_050000_V120201.cef doesn't have delimiter, so trigger on a date.
+                break;
+            }
 
             //*** Get the keyword/value(s) for this record            
             if (cefSplitRec(record.data, kv)) {
