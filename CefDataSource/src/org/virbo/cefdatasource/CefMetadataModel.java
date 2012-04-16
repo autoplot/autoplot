@@ -8,14 +8,11 @@
 package org.virbo.cefdatasource;
 
 import org.das2.datum.DatumRange;
-import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.MetadataModel;
 
 /**
@@ -119,6 +116,11 @@ public class CefMetadataModel extends MetadataModel {
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
             properties.put(QDataSet.RENDER_TYPE, type);
+        }
+
+        if ( attrs.containsKey("FILLVAL") ) { 
+            String sfill= (String) attrs.get("FILLVAL");
+            properties.put(QDataSet.FILL_VALUE,Double.parseDouble(sfill) );
         }
 
         Units units= Units.dimensionless;
