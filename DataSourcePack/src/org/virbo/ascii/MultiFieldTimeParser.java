@@ -59,7 +59,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         isNumber= new boolean[timeFormats.length];
         
         isNumber[0]= isNumber( timeFormats[0] );
-        if ( timeFormats[0].length()>1 && timeFormats[0].charAt(1)!='(' ) {
+        if ( timeFormats[0].length()>1 && ( timeFormats[0].charAt(1)!='(' && timeFormats[0].charAt(1)!='{' )  ) { //Grrr.  TODO: use parens internally
             if ( multiFieldAdjacent(timeFormats[0]) ) {
                 timeFormat= new StringBuilder(timeFormats[0]); // to have indeterminate length for first field, we need terminator.
             } else {
@@ -87,7 +87,9 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             String[] lastTimeFormats= lastTimeFormat.split("%");
             StringBuilder sb= new StringBuilder();
             for ( int i=1; i<lastTimeFormats.length; i++ ) {
-                if ( lastTimeFormats[i].startsWith("{") ) {
+                if ( lastTimeFormats[i].startsWith("{") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith("}") ) ) {
+                    sb.append("%").append("-1").append(lastTimeFormats[i]); // don't try to do anything with this for now.  TODO: do this...
+                } else if ( lastTimeFormats[i].startsWith("{") ) {
                     sb.append("%").append(lastTimeFormats[i]); // don't try to do anything with this for now.  TODO: do this...
                 } else {
                     if ( lastTimeFormats[i].length()>1 ) { // if there is a delimiter there, then we can have variable length fields.
