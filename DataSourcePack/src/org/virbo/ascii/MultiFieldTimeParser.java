@@ -87,7 +87,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             String[] lastTimeFormats= lastTimeFormat.split("%");
             StringBuilder sb= new StringBuilder();
             for ( int i=1; i<lastTimeFormats.length; i++ ) {
-                if ( lastTimeFormats[i].startsWith("{") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith("}") ) ) {
+                if ( lastTimeFormats[i].startsWith("{") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith("}") ) ) { // if there is a delimiter
                     sb.append("%").append("-1").append(lastTimeFormats[i]);
                 } else if ( lastTimeFormats[i].startsWith("{") ) {
                     sb.append("%").append(lastTimeFormats[i]); 
