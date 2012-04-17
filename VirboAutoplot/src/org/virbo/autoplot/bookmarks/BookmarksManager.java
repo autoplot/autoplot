@@ -484,7 +484,7 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
-        viewDetailsButton.setText("<html><u>Detailed Description</u>");
+        viewDetailsButton.setText("Detailed Description");
         viewDetailsButton.setToolTipText("View description URL in browser");
         viewDetailsButton.setEnabled(false);
         viewDetailsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -624,7 +624,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(titleLabel)
                     .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(viewDetailsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(viewDetailsButton))
                 .add(7, 7, 7)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)

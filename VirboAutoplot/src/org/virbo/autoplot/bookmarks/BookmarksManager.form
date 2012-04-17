@@ -309,7 +309,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="viewDetailsButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;u&gt;Detailed Description&lt;/u&gt;"/>
+        <Property name="text" type="java.lang.String" value="Detailed Description"/>
         <Property name="toolTipText" type="java.lang.String" value="View description URL in browser"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
