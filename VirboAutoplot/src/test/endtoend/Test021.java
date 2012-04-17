@@ -18,7 +18,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
- * giant list of Ascii URIs for testing.
+ * giant list of ASCII URIs for testing.
  * @author jbf
  */
 public class Test021 {
@@ -82,6 +82,9 @@ public class Test021 {
         //[edit] 14 VAPs in the wild
 
         "050 file:///home/jbf/ct/hudson/data.backup/dat/vho.nasa.gov/mission/helios2/H276_021.dat?timeFormat=$Y+$j+$H&column=bn&time=year",
+
+        // I broke this URI after v2011a_11.  The $(milli) field needed to be variable length.  I'm not sure how it was parsing okay with v2011a_11.
+        "051 file:///home/jbf/ct/hudson/data.backup/dat/ccmc/sw1_31485.txt?time=field0&timeFormat=$Y+$m+$d+$H+$M+$S+$(milli)&bundle=field7-field9"
 
     };
 
