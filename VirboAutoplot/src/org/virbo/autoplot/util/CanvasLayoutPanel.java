@@ -22,12 +22,16 @@ import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Timer;
+import org.das2.graph.DasPlot;
 import org.das2.util.ClassMap;
 
 /**
@@ -175,6 +179,11 @@ public class CanvasLayoutPanel extends JLabel {
 
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
+//            if ( c instanceof DasPlot ) {
+//                BufferedImage img= new BufferedImage( c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB );
+//                ((DasPlot)c).paint(img.getGraphics());
+//                g.drawImage( img, new RescaleOp( (float)scale, 0, new RenderingHints( null ) ), (int)( c.getX()*scale ) , (int)( c.getY()*scale ) );
+//            }
             Color color = types.get(c.getClass());
             if (color != null) {
                 java.awt.Rectangle bounds = ((JComponent) c).getBounds();
