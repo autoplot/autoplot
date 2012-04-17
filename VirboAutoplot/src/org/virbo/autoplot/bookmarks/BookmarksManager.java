@@ -68,7 +68,7 @@ import org.xml.sax.SAXException;
 public class BookmarksManager extends javax.swing.JDialog {
 
     private final static Logger logger= Logger.getLogger("autoplot.bookmarks");
-    
+
     /**
      * return the index of the node in the tree, by comparing at toString of each node.
      * @param tree
@@ -182,15 +182,15 @@ public class BookmarksManager extends javax.swing.JDialog {
 
     /**
      * return the remoteUrl containing this bookmark, or an empty string.
-     * @param b the target bookmark.
+     * @param b the target bookmark.  This can be null.
      * @param treeModel the model containing the bookmark
      * @param ppath the path to the bookmark.
      * @return the first remote URL containing the bookmark, or an empty string if it is local.
      */
-    private String maybeGetRemoteBookmarkUrl(Bookmark b, TreeModel treeModel, TreePath ppath ) {
+    protected static String maybeGetRemoteBookmarkUrl(Bookmark b, BookmarksManagerModel model, TreeModel treeModel, TreePath ppath ) {
         // if it is a child of a remote bookmark, make sure it's not editable.
         String remoteUrl= "";
-        if ( b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
+        if ( b!=null && b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
         while ( ppath.getPathCount()>1 ) {
             Bookmark.Folder f= (Folder) model.getSelectedBookmark(treeModel,ppath);
             if ( f.remoteUrl!=null && !f.remoteUrl.equals("") ) {
@@ -206,17 +206,17 @@ public class BookmarksManager extends javax.swing.JDialog {
      * remove the bookmarks from the list that come from a remote bookmarks file.  For example, these cannot be individually deleted.
      * The root node of a bookmarks file is left in there, so that it may be used to delete the folder.
      * @param bs
-     * @param model
+     * @param tmodel
      * @param selectionPaths
      * @return the remaining remote bookmarks.
      */
-    private List<Bookmark> removeRemoteBookmarks(List<Bookmark> bs, TreeModel model, TreePath[] selectionPaths) {
+    private List<Bookmark> removeRemoteBookmarks(List<Bookmark> bs, TreeModel tmodel, TreePath[] selectionPaths) {
         assert selectionPaths.length==bs.size();
         List<Bookmark> result= new ArrayList();
         for ( int i=0; i<bs.size(); i++ ) {
             Bookmark bs1= bs.get(i);
             if ( (bs1 instanceof Bookmark.Folder && ((Bookmark.Folder)bs1).getRemoteUrl()!=null )
-                    || "".equals( maybeGetRemoteBookmarkUrl( bs.get(i), model, selectionPaths[i] )) ) {
+                    || "".equals( maybeGetRemoteBookmarkUrl( bs.get(i), model, tmodel, selectionPaths[i] )) ) {
                 result.add(bs.get(i));
             }
         }
@@ -452,6 +452,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
 
         editDescriptionButton.setText("Edit");
+        editDescriptionButton.setEnabled(false);
         editDescriptionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editDescriptionButtonActionPerformed(evt);
@@ -482,6 +483,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
 
         viewDetailsButton.setText("Details");
+        viewDetailsButton.setEnabled(false);
         viewDetailsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 viewDetailsButtonActionPerformed(evt);
@@ -550,20 +552,12 @@ public class BookmarksManager extends javax.swing.JDialog {
 
         editMenu.setText("Edit");
 
+        newFolderMenuItem.setAction(newFolderAction());
         newFolderMenuItem.setText("New Folder...");
-        newFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newFolderMenuItemActionPerformed(evt);
-            }
-        });
         editMenu.add(newFolderMenuItem);
 
+        addItemMenuItem.setAction(addItemAction());
         addItemMenuItem.setText("New Bookmark...");
-        addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addItemMenuItemActionPerformed(evt);
-            }
-        });
         editMenu.add(addItemMenuItem);
 
         deleteMenuItem.setText("Delete Bookmark");
@@ -726,7 +720,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         String remoteUrl= "";
         TreePath ppath= jTree1.getSelectionPath();
         if ( ppath!=null ) {
-            remoteUrl= maybeGetRemoteBookmarkUrl( b, jTree1.getModel(), ppath);
+            remoteUrl= maybeGetRemoteBookmarkUrl( b, model, jTree1.getModel(), ppath);
             URLTextField.setEditable(remoteUrl.length()==0);
             if ( remoteUrl.length()==0 ) {
                 URLTextField.setToolTipText("Location of the remote folder"+err);
@@ -802,35 +796,6 @@ private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         updateBookmarks( dirtyMenu, dirtySelector );
     }
 }//GEN-LAST:event_closeMenuItemActionPerformed
-
-private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newFolderMenuItemActionPerformed
-    String s = JOptionPane.showInputDialog(this,"New Folder Name:");
-    if (s != null && !s.equals("")) {
-        if ( s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:") ) { // kludge for testing remote bookmarks
-            try {
-                 // kludge for testing remote bookmarks
-                model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath())); // null getSelectedBook is okay
-                reload();
-                
-            } catch (IllegalArgumentException ex ) {
-                if ( true ) { //ex.toString().contains("URLDecoder") ) {
-                    showMessage( "Error in format of "+s+"\n"+ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-                } //else {
-                //    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-                //}
-            }
-        } else {
-            model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
-        }
-    }
-}//GEN-LAST:event_newFolderMenuItemActionPerformed
-
-private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
-        String s = JOptionPane.showInputDialog("Bookmark URL:");
-        if (s != null && !s.equals("")) {
-        model.addBookmark(new Bookmark.Item(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
-    }
-}//GEN-LAST:event_addItemMenuItemActionPerformed
 
 private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
     List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
@@ -1056,10 +1021,65 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     private JPopupMenu createContextMenu() {
         JPopupMenu menu= new JPopupMenu();
+        menu.add( newFolderAction() );
+        menu.add( addItemAction() );
         menu.add( createExportFolderAction() );
         menu.add( createDeleteAction() );
         return menu;
     }
+
+    private Action addItemAction() throws HeadlessException {
+        return new AbstractAction( "New Bookmark..." ) {
+            public void actionPerformed( ActionEvent e ) {
+                String s = JOptionPane.showInputDialog( BookmarksManager.this, "Bookmark URL:");
+                if (s != null && !s.equals("")) {
+                    String x= maybeGetRemoteBookmarkUrl( null, model, jTree1.getModel(), jTree1.getSelectionPath() );
+                    if ( x.length()==0 ) {
+                        model.addBookmark(new Bookmark.Item(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+                    } else {
+                        JOptionPane.showMessageDialog( rootPane, "Cannot add item to remote bookmarks\n"+x, "Remote Bookmark Add Item",JOptionPane.OK_OPTION );
+                    }
+                }
+            }
+        };
+    }
+
+
+    private Action newFolderAction() throws HeadlessException {
+        return new AbstractAction( "New Folder..." ) {
+            public void actionPerformed( ActionEvent e ) {
+                Bookmark context= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+                String x= maybeGetRemoteBookmarkUrl( context, model, jTree1.getModel(), jTree1.getSelectionPath() );
+                if ( x.length()>0 ) {
+                    JOptionPane.showMessageDialog( rootPane, "Cannot add folder to remote bookmarks\n"+x, "Remote Bookmark Add Folder",JOptionPane.OK_OPTION );
+                    return;
+                }
+                String s = JOptionPane.showInputDialog( BookmarksManager.this, "New Folder Name:");
+                if (s != null && !s.equals("")) {
+                    if (s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:")) {
+                        // kludge for testing remote bookmarks
+                        try {
+                            // kludge for testing remote bookmarks
+                            model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath())); // null getSelectedBook is okay
+                            reload();
+                        } catch (IllegalArgumentException ex) {
+                            if (true) {
+                                //ex.toString().contains("URLDecoder") ) {
+                                showMessage("Error in format of " + s + "\n" + ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE);
+                            } //else {
+                            //    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                            //}
+                        }
+                    } else {
+                        model.addBookmark(new Bookmark.Folder(s), context );
+                    }
+                }
+
+            }
+        };
+    }
+
+
 
     Action createDeleteAction() {
         return new AbstractAction("Delete") {

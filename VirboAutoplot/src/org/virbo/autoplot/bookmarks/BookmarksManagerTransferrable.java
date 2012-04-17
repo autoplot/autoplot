@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.xml.sax.SAXException;
@@ -69,7 +71,6 @@ public class BookmarksManagerTransferrable {
                     } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                         String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
                         if (data.length() > 19 && data.startsWith("<bookmark-list")) {
-
                             items = Bookmark.parseBookmarks(data);
                         } else if (data.length() > 14 && data.startsWith("<bookmark")) {
                             item = Bookmark.parseBookmark(data);
@@ -82,6 +83,12 @@ public class BookmarksManagerTransferrable {
                     TreePath tp = jTree1.getPathForLocation((int) dtde.getLocation().getX(), (int) dtde.getLocation().getY());
                     Bookmark context = model.getSelectedBookmark(jTree1.getModel(), tp);
 
+                    String remoteUrl= BookmarksManager.maybeGetRemoteBookmarkUrl( item, model, jTree1.getModel(), tp );
+                    if ( remoteUrl.length()>0 ) {
+                        JOptionPane.showMessageDialog( jTree1, "Drop target is within remote bookmarks\n"+remoteUrl, "Remote Bookmark Move Item",JOptionPane.OK_OPTION );
+                        return;
+                    }
+                    //TODO: check that source is not remote bookmarks, and do not remote when it is.
                     if (item != null) {
                         if (item == context) return;
                         model.removeBookmark(item);

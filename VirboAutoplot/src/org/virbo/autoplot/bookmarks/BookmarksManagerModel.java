@@ -349,6 +349,11 @@ public class BookmarksManagerModel {
         return result;
     }
 
+    /**
+     * remove the listed bookmarks.
+     * TODO: there is still a problem, where we do not check that the bookmark is part of a remoteBookmarks.
+     * @param bookmarks
+     */
     void removeBookmarks(List<Bookmark> bookmarks) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {

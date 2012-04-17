@@ -812,8 +812,11 @@ public abstract class Bookmark {
         }
     }
 
+    private static int seq= 0;
+
     private Bookmark(String title) {
         this.title = title;
+        this.id= String.valueOf(++seq);
     }
 
     public String toString() {
@@ -842,6 +845,19 @@ public abstract class Bookmark {
      */
     public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
         propertyChangeSupport.removePropertyChangeListener(l);
+    }
+
+    /**
+     * id property for performing copies and moves in manager.  Before we were doing it by title, etc.
+     */
+    String id= "";
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId( String id ) {
+        this.id= id;
     }
 
     public String getTitle() {
