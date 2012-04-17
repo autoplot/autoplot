@@ -31,6 +31,8 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Timer;
+import org.autoplot.pngwalk.ImageResize;
+import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.util.ClassMap;
 
@@ -177,13 +179,17 @@ public class CanvasLayoutPanel extends JLabel {
         Stroke selectedStroke= new BasicStroke( 3.f );
         Stroke normalStroke= new BasicStroke( 1.f );
 
+        BufferedImage img= new BufferedImage( target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_ARGB );
+        ((DasCanvas)target).writeToImageImmediately(img);
+        img= ImageResize.getScaledInstance( img,
+                                            (int)( target.getWidth() * scale ),
+                                            (int)( target.getHeight() * scale ),
+                                            RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
+
+        g.drawImage( img, 0,0, this );
+
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
-//            if ( c instanceof DasPlot ) {
-//                BufferedImage img= new BufferedImage( c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB );
-//                ((DasPlot)c).paint(img.getGraphics());
-//                g.drawImage( img, new RescaleOp( (float)scale, 0, new RenderingHints( null ) ), (int)( c.getX()*scale ) , (int)( c.getY()*scale ) );
-//            }
             Color color = types.get(c.getClass());
             if (color != null) {
                 java.awt.Rectangle bounds = ((JComponent) c).getBounds();
