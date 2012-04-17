@@ -124,16 +124,16 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="jScrollPane1" alignment="0" pref="681" max="32767" attributes="0"/>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="overplotButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="overplotButton" linkSize="3" min="-2" pref="83" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="plotBelowButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="plotBelowButton" linkSize="3" min="-2" pref="88" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="plotButton" min="-2" pref="65" max="-2" attributes="0"/>
+                      <Component id="plotButton" linkSize="3" min="-2" pref="75" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="dismissButton" min="-2" pref="56" max="-2" attributes="0"/>
                   </Group>
@@ -143,26 +143,21 @@
                       <Component id="URLTextField" pref="644" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="titleLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="titleTextField" pref="574" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="descriptionTextField" pref="528" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="editDescriptionButton" min="-2" pref="59" max="-2" attributes="0"/>
-                          <Component id="viewDetailsButton" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="descriptionTextField" pref="516" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="editDescriptionButton" min="-2" pref="71" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="titleLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="titleTextField" min="-2" pref="475" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="viewDetailsButton" pref="158" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -172,7 +167,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="248" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="295" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="titleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -190,7 +185,7 @@
                   <Component id="URILabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="URLTextField" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="dismissButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="plotButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -228,12 +223,12 @@
     <Component class="javax.swing.JLabel" name="URILabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="URI:"/>
-        <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL)"/>
+        <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL), or remote folder location"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="URLTextField">
       <Properties>
-        <Property name="toolTipText" type="java.lang.String" value="Location of the data (often the URL)"/>
+        <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
       <Events>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="URLTextFieldFocusLost"/>
@@ -262,6 +257,7 @@
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
         <Property name="text" type="java.lang.String" value="Description:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Up to a short paragraph describing the data"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="descriptionTextField">
@@ -276,6 +272,7 @@
     <Component class="javax.swing.JButton" name="editDescriptionButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Edit"/>
+        <Property name="toolTipText" type="java.lang.String" value="Edit/View description"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -312,7 +309,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="viewDetailsButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Details"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;u&gt;Detailed Description&lt;/u&gt;"/>
+        <Property name="toolTipText" type="java.lang.String" value="View description URL in browser"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
