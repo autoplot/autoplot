@@ -130,6 +130,8 @@ class TsdsDataSource extends AbstractDataSource {
     boolean haveInitialTsml = false;
     Exception exceptionFromConstruct = null;
 
+    private boolean hasEndDate= false;
+
     private void logit(String string, long t0) {
         //System.err.println( "  ### "+string + ": "+ (System.currentTimeMillis()-t0) );
     }
@@ -163,7 +165,15 @@ class TsdsDataSource extends AbstractDataSource {
 
         if ( str==null ) {
             DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
-            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(params2.get("EndDate"));
+            String sEndDate= params2.get("EndDate");
+            DatumRange dr1; 
+            if ( sEndDate==null ) {
+                dr1= dr0;
+                hasEndDate= false;
+            } else {
+                dr1= DatumRangeUtil.parseTimeRangeValid(sEndDate);
+                hasEndDate= true;
+            } // EndDate is no longer required to support near-realtime
             timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
         } else {
             timeRange = quantizeTimeRange( DatumRangeUtil.parseTimeRangeValid(str) );
@@ -217,7 +227,9 @@ class TsdsDataSource extends AbstractDataSource {
         if (timeRange != null) {
             timeRange = quantizeTimeRange(timeRange);
             params2.put("StartDate", "" + df.format(timeRange.min()));
-            params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
+            if ( hasEndDate ) {
+                params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
+            }
             params2.remove("timerange");
         } else {
             setTSBParameters();
