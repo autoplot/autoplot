@@ -94,6 +94,10 @@ class TsdsDataSource extends AbstractDataSource {
             logger.log(Level.FINE, "opening {0}", url3);
             initialTsml(url3.openStream());
 
+            if ( hasEndDate==false ) {
+                params.put( "EndDate", TimeParser.create("$Y$m$d").format( TimeUtil.prevMidnight( timeRange.max().subtract( Units.days.createDatum(1)) ), null ) );
+            }
+
             logit("read initial tsml", t0);
             haveInitialTsml = true;
 
@@ -489,6 +493,9 @@ class TsdsDataSource extends AbstractDataSource {
             DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(sStartTime);
             DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(sEndTime);
 
+            if ( hasEndDate==false ) {
+                timeRange= new DatumRange( dr0.min(), dr1.max() );
+            }
             parameterRange = new DatumRange(dr0.min(), dr1.max());
 
         } catch (XPathExpressionException ex) {
