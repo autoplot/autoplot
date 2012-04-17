@@ -132,6 +132,12 @@ public class Test018 {
     }
 
 
+    /**
+     * check for bindings.  Currently this will bind to the timerange, and after 2012-04-17 it does not reset the timerange.  Soon
+     * this should leave it unbound, or the gui will present the user the choice.
+     * @param testId
+     * @throws Exception
+     */
     public static void test6( String testId ) throws Exception {
         reset();
         plot( "http://autoplot.org/vap/swpc.vap?timeRange=2012-04-07+through+2012-04-17" );
