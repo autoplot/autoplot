@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>This CDF file contains TT2000 timetags.</small></p>
+        <p><small>The cadence-guessing code is loosened up so that low-energy energy channels are connected.  Also, an experimental change to the
+                layout tab is shown..</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +23,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix: cadence-guessing code would be too restrictive for y tags in many cases.</li>
             <li>minor cleanup of CEF support</li>
             <li>excessive use of event thread blocked GUI responsiveness in first 5 seconds</li>
             <li>histogram didn't draw the last half bin</li>
