@@ -227,9 +227,7 @@ class TsdsDataSource extends AbstractDataSource {
         if (timeRange != null) {
             timeRange = quantizeTimeRange(timeRange);
             params2.put("StartDate", "" + df.format(timeRange.min()));
-            if ( hasEndDate ) {
-                params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
-            }
+            params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
             params2.remove("timerange");
         } else {
             setTSBParameters();
@@ -540,7 +538,11 @@ class TsdsDataSource extends AbstractDataSource {
             DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(sStartTime);
             DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(sEndTime);
 
-            timeRange = new DatumRange(dr0.min(), dr1.max());
+            try {
+                timeRange = new DatumRange(dr0.min(), dr1.max());
+            } catch ( IllegalArgumentException ex ) {
+                timeRange = new DatumRange(dr0.min(), dr1.max());
+            }
             int points = (int) Math.ceil(timeRange.width().doubleValue(Units.days)) * ppd;
             int size = points * SIZE_DOUBLE;
 
