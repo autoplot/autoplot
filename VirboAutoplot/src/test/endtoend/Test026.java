@@ -55,6 +55,7 @@ public class Test026 {
         testTimeRange( "2001-01-01 05:00 to 2001-01-01 07:00", "2001 Jan 01 05:00 span 2 hr" );
         testTimeRange( "2010-09-01 00:00 to 2010-09-02 00:00", "2010-244" );  // day of year is three digits (001-366)
         testTimeRange( "2010-03-01 00:00 to 2010-03-02 00:00", "2010-060" );
+        //testTimeRange( "2012-04-07 0:00 to 2012-04-18", "2012-04-07 to 2012-04-18"); // this fails
         //testTimeRange( "2000 01 span 5 d", "2000-jan-01 to 2000-jan-06" );
 
     }
