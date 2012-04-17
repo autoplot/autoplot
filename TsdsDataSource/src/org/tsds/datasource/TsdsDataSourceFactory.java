@@ -56,7 +56,7 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
         if ( split.params.equals("") ) {
             return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
         } else {
-            return !( params.containsKey("StartDate") && params.containsKey("EndDate") && params.containsKey("param1") );
+            return !( params.containsKey("StartDate") && params.containsKey("param1") );
         }
     }
 
