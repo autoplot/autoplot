@@ -131,6 +131,15 @@ public class Test018 {
         writeToPng(testId + "_005.png");
     }
 
+
+    public static void test6( String testId ) throws Exception {
+        reset();
+        plot( "http://autoplot.org/vap/swpc.vap?timeRange=2012-04-07+through+2012-04-17" );
+        waitUntilIdle();
+        plot( 0, "vap+tsds:http://tsds.net/cgi-bin/get.cgi?StartDate=19910101&EndDate=20041231&ext=bin&out=tsml&ppd=24&filter=mean&param1=Augsburg_ULF-1-v1" );
+        writeToPng(testId + "_006.png");
+    }
+
     public static void main(String[] args) {
 
         boolean exit= true;
@@ -153,6 +162,8 @@ public class Test018 {
             //no test3, to straighten out the numbering
             test4( testId );
             test5( testId );
+            test6( testId ); // test out binding
+
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
