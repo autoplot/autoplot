@@ -131,17 +131,26 @@ public class BookmarksManager extends javax.swing.JDialog {
         model.addPropertyChangeListener(BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                TreeModel mod = model.getTreeModel();
-                TreePath tp= jTree1.getSelectionPath();
-                jTree1.setModel(mod);
-                if ( tp!=null ) {
-                    tp= moveTreePath( mod, tp );
-                    if ( tp!=null ) {
-                        jTree1.setSelectionPath(tp);
-                        if ( jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) tp= tp.getParentPath();
-                        jTree1.expandPath(tp);
-                        jTree1.scrollPathToVisible(tp);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        TreeModel mod = model.getTreeModel();
+                        TreePath tp= jTree1.getSelectionPath();
+                        jTree1.setModel(mod);
+                        if ( tp!=null ) {
+                            tp= moveTreePath( mod, tp );
+                            if ( tp!=null ) {
+                                jTree1.setSelectionPath(tp);
+                                if ( jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) tp= tp.getParentPath();
+                                jTree1.expandPath(tp);
+                                jTree1.scrollPathToVisible(tp);
+                            }
+                        }
                     }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
                 }
             }
         });
