@@ -131,6 +131,15 @@ public class EditorContextMenu {
             item.setToolTipText("<html>get a parameter for the script, constraining the list of values to an enumeration.</html>");
             insertCodeMenu.add( item );
 
+            a= new AbstractAction("getParam() for timerange to support time series browse") {
+                public void actionPerformed(ActionEvent e) {
+                    insertCode( "tr= getParam( 'timerange', '2012-04-18', 'timerange to load' )\n");
+                }
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>When getParam timerange is read, then the script will the time axis to be set to any time.</html>");
+            insertCodeMenu.add( item );
+
             JMenu fragmentsMenu= new JMenu("Code Fragments");
             fragmentsMenu.add( createInsertMenuItem( "procedure", "def myproc(x,y):\n  z=x+y\n  return z\n" ) );
 
