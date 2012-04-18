@@ -42,6 +42,9 @@ public class WalkImage  {
     private BufferedImage im;
     private BufferedImage thumb;
     private BufferedImage squishedThumb; // like thumbnail, but squished horizontally to support coverflox.
+    private BufferedImage sizeThumb; // like thumbnail, but based on the current size.
+    private int sizeThumbWidth=-1;
+
     private String caption;
     private Status status;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -149,6 +152,30 @@ public class WalkImage  {
         return getThumbnail(true);
     }
 
+    /**
+     * returns the thumbnail if available, or if waitOk is true then it computes it.  Otherwise PngWalkView.loadingImage
+     * is returned.
+     * @param w
+     * @param h
+     * @param waitOk
+     * @return image or  PngWalkView.loadingImage
+     */
+    public synchronized BufferedImage getThumbnail( int w, int h, boolean waitOk ) {
+        if ( sizeThumbWidth==w ) {
+            return this.sizeThumb;
+        } else {
+            if ( waitOk ) {
+                BufferedImage theThumb= getThumbnail(true);
+                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                sizeThumb = resizeOp.filter(theThumb, null);
+                sizeThumbWidth= w;
+                return sizeThumb;
+            } else {
+                return PngWalkView.loadingImage;
+            }
+        }
+    }
+    
     /**
      * return a file, that is never type=0.  This was a bug on Windows.
      * @param f
@@ -331,6 +358,11 @@ public class WalkImage  {
                 throw new RuntimeException( "unable to read: "+localFile );
             }
 
+            synchronized (freshness ) {
+                freshness.remove(this); // move to freshest position
+                freshness.addFirst(this);
+            }
+            
             synchronized ( freshness ) {
                 while ( freshness.size() > LOADED_IMAGE_COUNT_LIMIT ) {
                     WalkImage old= freshness.getLast();
