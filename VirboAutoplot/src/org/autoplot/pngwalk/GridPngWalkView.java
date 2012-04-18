@@ -236,7 +236,7 @@ public class GridPngWalkView extends PngWalkView {
         @Override
         public void paintComponent(Graphics g1) {
 
-            //long t0= System.currentTimeMillis();
+            long t0= System.currentTimeMillis();
 
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
@@ -260,6 +260,7 @@ public class GridPngWalkView extends PngWalkView {
 
             List<DatumRange> drs= seq.getActiveSubrange();
 
+            boolean outOfTime= false;
             int npaint= (rowMax-rowMin)*(colMax-colMin);
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
@@ -281,11 +282,10 @@ public class GridPngWalkView extends PngWalkView {
                         if (s < 1.0) {
                             int w = (int) (s * thumb.getWidth());
                             int h = (int) (s * thumb.getHeight());
-                            if ( npaint<10 ) {
-                                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                                thumb = resizeOp.filter(thumb, null);
-                            } else {
-                                thumb= WalkUtil.resizeImage( thumb, w, h );
+                            outOfTime= outOfTime || System.currentTimeMillis()-t0 > 100;
+                            thumb= wimage.getThumbnail(w,h,!outOfTime);
+                            if ( thumb==loadingImage ) {
+                                this.repaintSoon();
                             }
                         }
                     } else {
