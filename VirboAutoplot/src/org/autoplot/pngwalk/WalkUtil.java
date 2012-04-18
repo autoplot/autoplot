@@ -108,9 +108,8 @@ public class WalkUtil {
         } else {
             if ( spec.length()>0 && spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
             ss= fs.listDirectory( "/", spec );
+            Arrays.sort(ss);
         }
-
-        //Arrays.sort(ss);
         
         List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
