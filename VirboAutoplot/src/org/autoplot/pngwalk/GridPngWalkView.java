@@ -235,6 +235,9 @@ public class GridPngWalkView extends PngWalkView {
 
         @Override
         public void paintComponent(Graphics g1) {
+
+            //long t0= System.currentTimeMillis();
+
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
@@ -341,6 +344,8 @@ public class GridPngWalkView extends PngWalkView {
 
                 }
             }
+
+            //System.err.printf("repaint gridPngWalkView (ms): %d\n", System.currentTimeMillis()-t0 ); // on 20120418, this was okay.
         }
 
         public Dimension getPreferredScrollableViewportSize() {
