@@ -30,10 +30,15 @@ def getParam( x, default, title='', enums='' ):
   if ( x=='resourceUri' ):
      print 'resourceURI may be used, but resourceUri cannot.'
      x= 'resourceURI'
-  if params.has_key(x):
-     if ( operator.isNumberType(default) ): #TODO: complex
-         return float(params[x])
+  if type(params) is dict:
+     if params.has_key(x):
+         if ( operator.isNumberType(default) ): #TODO: complex
+             return float(params[x])
+         else:
+             return str(params[x])
      else:
-         return str(params[x])
+         return default
   else:
+     print 'in jython script, variable params was overriden.'
      return default
+
