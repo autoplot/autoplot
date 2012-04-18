@@ -578,7 +578,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 updateBookmarks();
             }
         };
-        invokeLater( -1, false, run );
+        invokeLater( 1000, true, run );
         APSplash.checkTime("init 90");
 
         addTools();
