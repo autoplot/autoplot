@@ -2900,6 +2900,7 @@ private void updateFrameTitle() {
         //http://today.java.net/pub/a/today/2007/08/30/debugging-swing.html
         //http://today.java.net/today/2007/08/30/tracing.zip
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueueJMX());
+        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueue());
 
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
