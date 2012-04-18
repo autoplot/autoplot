@@ -1,0 +1,84 @@
+# demo of how to query page and get result from next page.
+# See http://ccmc.gsfc.nasa.gov/requests/GetInput/get_ace_K.php
+
+from org.das2.datum import TimeParser
+
+str= getParam( 'timerange', '2012-04-17T00:00:00//2012-04-17T21:57:00', 'timerange to load' )
+tr= DatumRangeUtil.parseTimeRange(str)
+
+tf= TimeParser.create('$Y/$m/$d $H:$M:$S')
+
+str_start= tf.format( tr.min(), None )
+str_stop=  tf.format( tr.max(), None )
+
+import string
+
+projected='T'
+addshift= 0
+
+import httplib, urllib
+
+parms= { 
+          'str_start': str_start, 
+          'str_stop': str_stop, 
+          'projected':'T',
+          'fb':33,
+          'addshift':0,
+          'latest_year':2012,
+          'latest_month':4,
+          'latest_day':17,
+          'earliest_year':2005,
+          'earliest_month':3,
+          'earliest_day':18,
+          'latest_hour':21,
+          'latest_min':57
+           }
+
+parms = urllib.urlencode(parms)
+
+headers = {"Content-type": "application/x-www-form-urlencoded", "Accept":"text/html", 'User-Agent':'Autoplot/2012' }
+
+baseurl= 'ccmc.gsfc.nasa.gov'
+conn = httplib.HTTPConnection(baseurl)
+
+url = "/cgi-bin/requests/GetInput/get_ace_K.cgi"
+
+conn.request("POST", url, parms, headers)
+
+response = conn.getresponse()
+sdata = response.read()  # "data" variable name causes problems
+
+i1= string.find( sdata, '<a href=\"' )
+i2= string.find( sdata, '"', i1+9 )
+
+print '==== response from server ===='
+print sdata
+print '==== end, response from server ===='
+
+conn.close()
+
+if ( i1<0 ):
+   i2= string.find( sdata, '<br>' )
+   msg= sdata
+   if ( i2>-1 ): msg= sdata[0:i2]
+   raise Exception(msg)
+
+print '----------'
+print i1+10, i2
+print '----------'
+#print sdata[0:100]
+#<H1>ACE K Data Formatted for Runs on Request</H1>
+#<p> Click <a href="/idl_images/sw1_16043.txt" TARG
+#print '----------'
+ur= sdata[i1+9:i2]
+
+print 'downloading http://'+baseurl+ur 
+fil= downloadResourceAsTempFile( URL('http://'+baseurl+ur), monitor )
+
+data= getDataSet( 'vap+dat:%s?time=field0&timeFormat=$Y+$m+$d+$H+$M+$S+$(milli)&bundle=field7-field9' % fil )
+#print data
+ll= labels( ['Bx[nT]','By[nT]','Bz[nT]'] ) 
+data.putProperty( QDataSet.DEPEND_1, ll )
+data.putProperty( QDataSet.LABEL, 'CCMC Ace K Data Runs on Request' )
+
+
