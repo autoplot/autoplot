@@ -17,6 +17,7 @@ public abstract class TrArrayDataSet extends AbstractDataSet {
     
     float fill= Float.NaN;
     double dfill= Double.NaN;
+    long lfill= Long.MAX_VALUE;
 
     /**
      * return the array as ArrayDataSet  The array must be a 1-D array and the
@@ -40,10 +41,10 @@ public abstract class TrArrayDataSet extends AbstractDataSet {
         }
         if ( c==double.class ) return TrDDataSet.wrap( (double[])array, qube );
         if ( c==float.class ) return TrFDataSet.wrap( (float[])array, qube );
-        //if ( c==long.class ) return LDataSet.wrap( (long[])array, qube );
-        //if ( c==int.class ) return IDataSet.wrap( (int[])array, qube );
-        //if ( c==short.class ) return SDataSet.wrap( (short[])array, qube );
-        //if ( c==byte.class ) return BDataSet.wrap( (byte[])array, qube );
+        if ( c==long.class ) return TrLDataSet.wrap( (long[])array, qube );
+        //if ( c==int.class ) return TrIDataSet.wrap( (int[])array, qube );
+        //if ( c==short.class ) return TrSDataSet.wrap( (short[])array, qube );
+        //if ( c==byte.class ) return TrBDataSet.wrap( (byte[])array, qube );
 
         throw new IllegalArgumentException("component type not supported: "+c );
 
