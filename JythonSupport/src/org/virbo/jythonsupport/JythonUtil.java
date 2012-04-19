@@ -62,8 +62,10 @@ public class JythonUtil {
             String jarFile= jarUrl.toString();
 
             if ( jarFile.startsWith("jar:") && jarFile.contains("!") ) {
+                System.err.println("import jarFile: "+jarFile );
                 int i= jarFile.indexOf("!");
                 String jar= jarFile.substring(9,i);
+                System.err.println("import jarFile: pySys.path.insert(0, new PyString("+jar+"));" );
                 pySys.path.insert(0, new PyString(jar));
             }
             
