@@ -66,7 +66,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        selectVariableLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterList = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
@@ -81,7 +81,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel1.setText("Select CDF Variable:");
+        selectVariableLabel.setText("Select CDF Variable:");
 
         parameterList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -164,18 +164,18 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(6, 6, 6)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(selectVariableLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 367, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(jLabel1)
+                .add(selectVariableLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -232,7 +232,6 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel interpretMetadataLabel;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -242,6 +241,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
     private javax.swing.JList parameterList;
+    private javax.swing.JLabel selectVariableLabel;
     private javax.swing.JCheckBox showAllVarTypeCB;
     private javax.swing.JComboBox subsetComboBox;
     // End of variables declaration//GEN-END:variables
@@ -321,10 +321,24 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
             logger.finest("inspect cdf for plottable parameters");
             parameterDescriptions= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false );
-            parameterInfo= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, true );
             if ( parameterDescriptions.isEmpty() ) {
                 throw new IllegalArgumentException("no plottable parameters in cdf file!");
             }
+            Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true );
+            Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true );
+            String label;
+            if ( this.showAllVarTypeCB.isSelected() ) {
+                parameterInfo= allParameterInfo;
+                label= "Select CDF Variable (%d data, %d support):";
+            } else {
+                parameterInfo= dataParameterInfo;
+                label= "Select CDF Variable (%d data, %d support not shown):";
+            }
+            int numData= dataParameterInfo.size();
+            int numSupport= allParameterInfo.size() - numData;
+
+            this.selectVariableLabel.setText( String.format( label, numData, numSupport ) );
+            this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
 
             logger.finest("close cdf");
             CdfFileDataSourceFactory.closeCDF(cdf);
