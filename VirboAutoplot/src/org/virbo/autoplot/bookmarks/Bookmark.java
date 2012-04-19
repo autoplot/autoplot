@@ -353,7 +353,7 @@ public abstract class Bookmark {
         }
 
         nl = ((Element) element).getElementsByTagName("title");
-        if (nl.getLength()>0 ) {
+        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
             if ( !nl.item(0).hasChildNodes() ) {
                 if ( uri==null ) {
                     title= "(untitled)";
@@ -374,7 +374,7 @@ public abstract class Bookmark {
         }
 
         nl = ((Element) element).getElementsByTagName("icon");
-        if (nl.getLength() > 0) {
+        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
             s = ((Text) (nl.item(0).getFirstChild())).getData();
             icon = new ImageIcon(decodeImage(s));
         } else {
@@ -382,7 +382,7 @@ public abstract class Bookmark {
         }
 
         nl = ((Element) element).getElementsByTagName("description");
-        if (nl.getLength() > 0) {
+        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
             Node child= (nl.item(0).getFirstChild());
             if ( child==null ) {
                 description= "";
@@ -395,7 +395,7 @@ public abstract class Bookmark {
         }
 
         nl = ((Element) element).getElementsByTagName("description-url");
-        if (nl.getLength() > 0) {
+        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
             Node child= (nl.item(0).getFirstChild());
             if ( child==null ) {
                 descriptionUrl= null;
@@ -412,7 +412,7 @@ public abstract class Bookmark {
         }
         
         nl = ((Element) element).getElementsByTagName("hidden");
-        if (nl.getLength() > 0) {
+        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
             Node child= (nl.item(0).getFirstChild());
             if ( child==null ) {
                 hidden= false;
