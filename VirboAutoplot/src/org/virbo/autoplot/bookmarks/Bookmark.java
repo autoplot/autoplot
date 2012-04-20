@@ -307,6 +307,22 @@ public abstract class Bookmark {
     }
 
     /**
+     * xml utility for getting the first child node with the given name.
+     * @param element
+     * @param name
+     * @return null or the first child name with the given name.
+     */
+    private static Node getChildElement( Node element, String name ) {
+        NodeList nl= element.getChildNodes();
+        for ( int i=0; i<nl.getLength(); i++ ) {
+            if ( nl.item(i).getNodeName().equals(name) ) {
+                return nl.item(i);
+            }
+        }
+        return null;
+    }
+
+    /**
      * parse the bookmarks in this node.
      * @param element
      * @param vers null, empty string &lt;2011, or version number
@@ -325,24 +341,24 @@ public abstract class Bookmark {
         URL descriptionUrl= null;
         boolean hidden= false;
 
-        NodeList nl;
+        Node n;
 
         if ( element.getNodeName().equals("bookmark") ) {
             if ( vers.equals("") ) {
-                nl = ((Element) element).getElementsByTagName("url");
-                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                n = getChildElement( element,"url" );
+                s = ((Text) (n.getFirstChild())).getData();
                 try {
                     uri = URLDecoder.decode(s, "UTF-8") ;
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException( ex.getMessage() + "\nBookmarks file is unversioned, so URLs should be encoded");
                 }
             } else {
-                nl = ((Element) element).getElementsByTagName("uri");
-                if ( nl.getLength()==0 ) {
-                    nl = ((Element) element).getElementsByTagName("url");
+                n = getChildElement( element,"uri" );
+                if ( n==null ) {
+                    n = getChildElement( element,"url");
                 }
-                if ( nl.item(0).getFirstChild()!=null ) {
-                    s = ((Text) (nl.item(0).getFirstChild())).getData();
+                if ( n.getFirstChild()!=null ) {
+                    s = ((Text) (n.getFirstChild())).getData();
                     uri = s;
                 } else {
                     uri = "???"; // we would have NullPointerException before...
@@ -352,9 +368,9 @@ public abstract class Bookmark {
             uri= null;
         }
 
-        nl = ((Element) element).getElementsByTagName("title");
-        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
-            if ( !nl.item(0).hasChildNodes() ) {
+        n= getChildElement( element, "title" );
+        if ( n!=null ) {
+            if ( !n.hasChildNodes() ) {
                 if ( uri==null ) {
                     title= "(untitled)";
                 } else {
@@ -362,7 +378,7 @@ public abstract class Bookmark {
                     title= uri;
                 }
             } else {
-                s = ((Text) (nl.item(0).getFirstChild())).getData();
+                s = ((Text) (n.getFirstChild())).getData();
                 try {
                     title = vers.equals("") ? URLDecoder.decode(s, "UTF-8") : s;
                 } catch ( IllegalArgumentException ex ) {
@@ -373,17 +389,17 @@ public abstract class Bookmark {
             title= "(untitled)";
         }
 
-        nl = ((Element) element).getElementsByTagName("icon");
-        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
-            s = ((Text) (nl.item(0).getFirstChild())).getData();
+        n = getChildElement( element,"icon");
+        if ( n!=null ) {
+            s = ((Text)n.getFirstChild()).getData();
             icon = new ImageIcon(decodeImage(s));
         } else {
             icon= null;
         }
 
-        nl = ((Element) element).getElementsByTagName("description");
-        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
-            Node child= (nl.item(0).getFirstChild());
+        n = getChildElement( element,"description");
+        if ( n!=null ) {
+            Node child= n.getFirstChild();
             if ( child==null ) {
                 description= "";
             } else {
@@ -394,9 +410,9 @@ public abstract class Bookmark {
             description= "";
         }
 
-        nl = ((Element) element).getElementsByTagName("description-url");
-        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
-            Node child= (nl.item(0).getFirstChild());
+        n = getChildElement( element, "description-url" );
+        if ( n!=null ) {
+            Node child= n.getFirstChild();
             if ( child==null ) {
                 descriptionUrl= null;
             } else {
@@ -411,9 +427,9 @@ public abstract class Bookmark {
             descriptionUrl= null;
         }
         
-        nl = ((Element) element).getElementsByTagName("hidden");
-        if ( nl.getLength()>0 && nl.item(0).getParentNode()==element ) {
-            Node child= (nl.item(0).getFirstChild());
+        n = getChildElement( element, "hidden" );
+        if ( n!=null ) {
+            Node child= n.getFirstChild();
             if ( child==null ) {
                 hidden= false;
             } else {
@@ -478,15 +494,15 @@ public abstract class Bookmark {
             }
             
             if ( ( remoteUrl==null || remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty, but local folders must not.
-                nl = ((Element) element).getElementsByTagName("bookmark-list");
-                if ( nl.getLength()==0 ) {
+                n= getChildElement( element,"bookmark-list");
+                if ( n==null ) {
                     if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) { // only if a remote folder is not resolved is this okay
                         contents= Collections.emptyList();
                     } else {
                         throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
                     }
                 } else {
-                    Element flist = (Element) nl.item(0); // and they may only contain one folder
+                    Element flist = (Element)n; // and they may only contain one folder
                     contents = parseBookmarks( flist, vers, remoteLevel );
                 }
             }
