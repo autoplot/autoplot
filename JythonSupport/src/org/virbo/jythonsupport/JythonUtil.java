@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
@@ -68,17 +69,12 @@ public class JythonUtil {
                 if ( ff.exists() ) {
                     pySys.path.insert(0, new PyString(jar));
                 } else {
-                    System.err.println("doesn't seem like we have the right file, downloading...");
-                    File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
-                    System.err.println("   ...done");
-                    pySys.path.insert(0, new PyString( f.toString() ));
-
+                    String f= getLocalJythonLib();
+                    pySys.path.insert(0, new PyString( f ));
                 }
             } else {
-                System.err.println("unable to use built-in jar file, downloading lib file...");
-                File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
-                System.err.println("   ...done");
-                pySys.path.insert(0, new PyString( f.toString() ));
+                String f= getLocalJythonLib();
+                pySys.path.insert(0, new PyString( f ));
             }
             
         } else {
@@ -95,6 +91,18 @@ public class JythonUtil {
         interp.execfile(imports.openStream(), "imports.py");
         return interp;
 
+    }
+
+    private static String getLocalJythonLib() throws IOException {
+        File ff2= FileSystem.settings().getLocalCacheDir();
+        File ff= new File( ff2.toString() + "http/autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" );
+        if ( ! ff.exists() ) {
+            System.err.println("doesn't seem like we have the right file, downloading...");
+            File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+            ff= f;
+        }
+        System.err.println("   ...done");
+        return ff.toString();
     }
 
     /**
