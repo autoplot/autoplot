@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -53,7 +54,7 @@ public class JythonUtil {
         if ( PySystemState.cachedir==null ) {
             System.setProperty( "python.cachedir", System.getProperty("user.home")+"/autoplot_data/pycache" );
         }
-        
+
         //r.
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
@@ -61,12 +62,26 @@ public class JythonUtil {
         if ( jarUrl!=null ) {
             String jarFile= jarUrl.toString();
 
-            if ( jarFile.startsWith("jar:") && jarFile.contains("!") ) {
+            if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
                 System.err.println("import jarFile: "+jarFile );
                 int i= jarFile.indexOf("!");
                 String jar= jarFile.substring(9,i);
-                System.err.println("import jarFile: pySys.path.insert(0, new PyString("+jar+"));" );
-                pySys.path.insert(0, new PyString(jar));
+                File ff= new File(jar);
+                if ( ff.exists() ) {
+                    System.err.println("import jarFile: pySys.path.insert(0, new PyString("+jar+"));" );
+                    pySys.path.insert(0, new PyString(jar));
+                } else {
+                    System.err.println("doesn't seem like we have the right file, downloading");
+
+                    File f= DataSetURI.getFile( new URL("https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/APLibs/lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                    pySys.path.insert(0, new PyString( f.toString() ));
+
+                }
+            } else {
+                System.err.println("unable to use built-in jar file, downloading lib file");
+
+                File f= DataSetURI.getFile( new URL("https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/APLibs/lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                pySys.path.insert(0, new PyString( f.toString() ));
             }
             
         } else {
