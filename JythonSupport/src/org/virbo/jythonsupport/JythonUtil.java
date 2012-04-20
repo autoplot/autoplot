@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -71,16 +70,16 @@ public class JythonUtil {
                     System.err.println("import jarFile: pySys.path.insert(0, new PyString("+jar+"));" );
                     pySys.path.insert(0, new PyString(jar));
                 } else {
-                    System.err.println("doesn't seem like we have the right file, downloading");
-
-                    File f= DataSetURI.getFile( new URL("https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/APLibs/lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                    System.err.println("doesn't seem like we have the right file, downloading...");
+                    File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                    System.err.println("   ...done");
                     pySys.path.insert(0, new PyString( f.toString() ));
 
                 }
             } else {
-                System.err.println("unable to use built-in jar file, downloading lib file");
-
-                File f= DataSetURI.getFile( new URL("https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/APLibs/lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                System.err.println("unable to use built-in jar file, downloading lib file...");
+                File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
+                System.err.println("   ...done");
                 pySys.path.insert(0, new PyString( f.toString() ));
             }
             
