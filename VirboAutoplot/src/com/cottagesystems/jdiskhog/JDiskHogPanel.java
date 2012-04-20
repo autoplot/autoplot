@@ -178,6 +178,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         DiskUsageModel dumodel = new DiskUsageModel();
         dumodel.search(root, 0, new NullProgressMonitor());
         FSTreeModel model = new FSTreeModel(dumodel, root);
+        model.setHideListingFile(true);
         jTree1.setModel(model);
     }
 
