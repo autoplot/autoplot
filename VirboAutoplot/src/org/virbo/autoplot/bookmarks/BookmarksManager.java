@@ -748,7 +748,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
             titleLabel.setText("Title:");
             titleLabel.setToolTipText("Title for the URI");
         } else {
-            titleLabel.setText("Title*:");
+            titleLabel.setText("[Title]:");
             titleLabel.setToolTipText("<html>Title for the URI.<br>This bookmark is part of a set of remote bookmarks from<br>"
                     + remoteUrl +
                     "<br> and cannot be edited." + err );
