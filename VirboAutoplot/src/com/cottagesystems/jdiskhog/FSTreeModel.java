@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -86,6 +87,16 @@ public class FSTreeModel implements TreeModel {
         this.root = root;
     }
 
+    public boolean hideListingFile = false;
+
+    public boolean isHideListingFile() {
+        return hideListingFile;
+    }
+
+    public void setHideListingFile(boolean hideListingFile) {
+        this.hideListingFile = hideListingFile;
+    }
+
     public Object getRoot() {
         return new TreeNode(root, null, true);
     }
@@ -116,6 +127,12 @@ public class FSTreeModel implements TreeModel {
         File[] ff = listings.get(f);
         if (ff == null) {
             ff = f.listFiles();
+            if ( hideListingFile ) {
+                List<File> lff= new ArrayList( Arrays.asList(ff) );
+                lff.remove( new File( f, ".listing" ) );
+                ff= lff.toArray( new File[ lff.size() ] );
+            }
+
             Arrays.sort(ff, new Comparator() {
 
                 public int compare(Object o1, Object o2) {
