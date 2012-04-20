@@ -67,7 +67,6 @@ public class JythonUtil {
                 String jar= jarFile.substring(9,i);
                 File ff= new File(jar);
                 if ( ff.exists() ) {
-                    System.err.println("import jarFile: pySys.path.insert(0, new PyString("+jar+"));" );
                     pySys.path.insert(0, new PyString(jar));
                 } else {
                     System.err.println("doesn't seem like we have the right file, downloading...");
