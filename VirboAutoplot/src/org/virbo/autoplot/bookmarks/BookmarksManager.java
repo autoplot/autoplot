@@ -895,17 +895,20 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
     
     int ok= JOptionPane.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), edit.isEditable() ? JOptionPane.OK_CANCEL_OPTION : JOptionPane.OK_CANCEL_OPTION );
     if ( edit.isEditable() && ok==JOptionPane.OK_OPTION ) {
-        txt= edit.getText();
-        txt= txt.replaceAll("\n", "<br>");
-        descriptionTextField.setText(txt);
+        String ntxt= edit.getText();
+        if ( ! ntxt.equals(txt) ) {
+            ntxt= ntxt.replaceAll("\n", "<br>");
+            descriptionTextField.setText(ntxt);
+            Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+            if ( b!=null ) {
+                b.setDescription(descriptionTextField.getText());
+                jTree1.repaint();
+                model.fireBookmarkChange(b);
+            }
+        }
+
     }
 
-    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    if ( b!=null ) {
-        b.setDescription(descriptionTextField.getText());
-        jTree1.repaint();
-        model.fireBookmarkChange(b);
-    }
 }//GEN-LAST:event_editDescriptionButtonActionPerformed
 
     private boolean maybePlot( int modifiers ) {
