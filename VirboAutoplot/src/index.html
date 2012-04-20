@@ -23,7 +23,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
-            <li>bugfix: cadence-guessing code would be too restrictive for y tags in many cases.</li>
+            <li>bookmark descriptions would appear in parent nodes.</li>
+            <li>Pngwalk didn't properly unload full-size images when precalculated thumbs weren't available, running out of memory</li>
+            <li>jython library is loaded explicitly to support Java Webstart.</li>
+            <li>add TrLDataSet to support column-major CDF files with TT2000 timetags.</li>
+            <li>cadence-guessing code would be too restrictive for y tags in many cases.</li>
+            <li>Jython scripts warn when params are overwritten, also code detecting time series browse needed to be loosened</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>minor cleanup of CEF support</li>
             <li>excessive use of event thread blocked GUI responsiveness in first 5 seconds</li>
             <li>histogram didn't draw the last half bin</li>
@@ -43,59 +51,25 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>remote bookmarks offline status is properly indicated</li>
             <li>Ascii parser check for empty field at the end of a record, as in "1991-01-01 00:03,1490.0,I,"</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>NAME used for label of DEPEND_0, even when RichAscii headers had already assigned a label</li>
-            <li>fftPower function knows what to do with TT2000-based timetags</li>
-            <li>dbAboveBackground and other filters do not drop axis labels</li>
-            <li>data tab has scrollpane when initially enabled so that canvas doesn't resize because of long dataset labels.</li>
-            <li>3513630: empty field at the end of an ascii record doesn't prevent file from being parsed</li>
-            <li>replace file messages up log z axis.  This is now corrected to check for autoranging.</li>
-            <li>3510248: single instance code could result in hung application</li>
-            <li>vertical slice works with data with non-monotonic tags</li>
-            <li>remote bookmarks file with remoteURL buried deep in the tree is handled properly.</li>
-            <li>don't show the main GUI when "pngwalk:" is used.</li>
-            <li>bookmarks with remote URLs load properly when "bookmarks:..." is used to bring in new bookmarks</li>
-            <li>bugfixes to allow rank 2 CDF data (stereo/swaves) to be read over openDAP.</li>
-            <li>hung event thread detector writes to autoplot_data/log when event thread appears to be hung.</li>
-            <li>das2server is more flexible about handing times.</li>
-            <li>downloadResourceAsTempFile long filename bug fixed by using hash for long filenames</li>
-            <li>ISO8601 char arrays in NetCDF/HDF5 can now be up to 35 characters long.  Any variable with DEPEND_0 is considered to have ISTP conventions.</li>
-            <li>New filesystem stuff wouldn't clean up locks when create failed. (Thanks Hudson!)</li>
-            <li>Major fix to filesystem stuff, where a hung filesystem create doesn't prevent further use of any filesystems (and Autoplot)</li>
-            <li>fixes to rich ascii, including unbundle preserves bundle with proper labels, and support for enums</li>
-            <li>check for cache area when saving Jython files was broken.</li>
-        </ul>
         
         <p>Features:</p>
         <ul>
+            <li>Ops.divide supports 1/x when x has units have inversion registered.</li>
+            <li>Improved support for FITS tables</li>
+            <li>switch --samp turns on connection to SAMP protocol and the Cluster Final Archive.</li>
+            <li>more start time improvements by calculating secondary tabs off the event thread</li>
             <li>finally draw the canvas onto the layout GUI.</li>
             <li>descriptionUrl added to bookmarks files, to support remote bookmark lists.</li>
             <li>VectorPlotRenderer added, but it's not presented in the interface yet</li>
-            <li>Cluster Final Archive support continues with --samp switch added.</li>
-            <li>more work towards speeding up startup time</li>
             <li>Operations gui will contain graphical controls for filters</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>slight speedup on startup time when script panel is visible.</li>
             <li>export to IDLSAV saves the x tags as well, with times as t1970 (seconds since 1970-01-01)</li>
             <li>"slices(0,0,:,:)" function used as initial filter for double slicing, to replace confusing "|slice0(0)|slice0(0)"</li>
             <li>bookmarks manager has a plot button now, which allows the user to see title and description before plotting</li>
             <li>remote bookmarks are loaded almost immediately, since the cost of loading them is small</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>"about Autoplot" dialog supports cut-n-paste</li>
-            <li>introduce filters dialog that will provide GUI for adding filters</li>
-            <li>CDF shows S/C and project in title, from ISTP global attributes</li>
-            <li>Pngwalk tool supports orbits as tiemranges $(o:rbspa-pp)</li>
-            <li>timerange GUI contains examples in the right-click context menu.</li>
-            <li>ap+jyds:script=file:/home/jbf/project/autoplot/data/jyds/setXUnitsScott.jyds rejects properly so that the GUI is entered</li>
-            <li>xaxis title = %{RANGE} will have both Y-m-d and doy.</li>
-            <li>"Reload All Data" added to the tools, replacing the script some people might have had installed</li>
-            <li>first export to idlsav support for rank 1 data (no timetags)</li>
-            <li>introduce filters in QStream support, and a first that reduces data streams</li>
-            <li>Ops.unbundle(ds,int) is slice by default, before it would unbundle high-rank data as well.  This is cleaner.</li>
-            <li>Rich ascii automatically adds timetags when the first column is times.</li>
-            <li>"Replace File" script incorporated into Autoplot, see Tools->Replace File next to Aggregation.</li>
         </ul>
 
 <p>Known issues:</p>
