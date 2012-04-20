@@ -337,6 +337,8 @@ public class AutoplotUI extends javax.swing.JFrame {
                     if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
                         support.importBookmarks( bookmarksFile );
                         applicationModel.addRecent(dataSetSelector.getValue());
+                    } else {
+                        setStatus( "remote bookmarks file is already imported"  );
                     }
                 }
             }
