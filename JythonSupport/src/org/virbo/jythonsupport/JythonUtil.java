@@ -62,7 +62,6 @@ public class JythonUtil {
             String jarFile= jarUrl.toString();
 
             if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
-                System.err.println("import jarFile: "+jarFile );
                 int i= jarFile.indexOf("!");
                 String jar= jarFile.substring(9,i);
                 File ff= new File(jar);
