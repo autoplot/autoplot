@@ -187,6 +187,9 @@ public class CanvasLayoutPanel extends JLabel {
                                             RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
 
         g.drawImage( img, 0,0, this );
+        Color back= target.getBackground();
+        g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
+        g.fillRect(0,0,img.getWidth(),img.getHeight());
 
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
