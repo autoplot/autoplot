@@ -97,6 +97,7 @@ public class JythonUtil {
         File ff2= FileSystem.settings().getLocalCacheDir();
         File ff= new File( ff2.toString() + "http/autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" );
         if ( ! ff.exists() ) {
+            System.err.println("looking for "+ff+", but didn't find it.");
             System.err.println("doesn't seem like we have the right file, downloading...");
             File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
             ff= f;
