@@ -6,9 +6,10 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.util.List;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
+import org.das2.datum.EnumerationUnits;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
@@ -16,7 +17,10 @@ import org.virbo.autoplot.dom.Plot;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.layout.LayoutConstants;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 
 /**
@@ -146,13 +150,36 @@ public class Test018 {
         writeToPng(testId + "_006.png");
     }
 
+    private static Plot docKludge( int position, String mes ) throws InterruptedException {
+        EnumerationUnits eu= new EnumerationUnits("default");
+        Datum d= eu.createDatum(mes);
+        QDataSet ds= DataSetUtil.asDataSet(d);
+        plot( position, ds );
+        waitUntilIdle();
+        ApplicationController ac= getDocumentModel().getController();
+        Plot p= ac.getFirstPlotFor( getDocumentModel().getDataSourceFilters(position) );
+        //p.getXaxis().setVisible(false);
+        //p.getYaxis().setVisible(false);
+        return p;
+    }
+
+    private static String bindStr( Application dom ) {
+        StringBuilder b= new StringBuilder();
+        for ( BindingModel bm: dom.getBindings() ) {
+            b.append(bm.toString()).append("!c");
+        }
+        return b.toString();
+    }
+
     public static void test7_bindings( String testId ) throws Exception {
         Application dom= getDocumentModel();
+
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
         dom.setTimeRange( dom.getTimeRange().next() );
+        docKludge( 2, "These should be bound!c"+bindStr(dom) );
         writeToPng(testId + "_007_1.png");
 
         reset();
@@ -160,15 +187,26 @@ public class Test018 {
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-02" );
+        docKludge( 2, "These should be bound!c"+bindStr(dom) );
         writeToPng(testId + "_007_2.png");
 
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1999-04-05" );
+        docKludge( 2, "These should not be bound!c"+bindStr(dom) );
         writeToPng(testId + "_007_3.png"); // this should disengage from timerange
 
+        reset();
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
+        waitUntilIdle();
+        plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-04-05" );
+        docKludge( 2, "These should be bound!c"+bindStr(dom));
+        writeToPng(testId + "_007_4.png");
+
     }
+
 
     public static void main(String[] args) {
 
