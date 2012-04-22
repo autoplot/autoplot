@@ -146,6 +146,30 @@ public class Test018 {
         writeToPng(testId + "_006.png");
     }
 
+    public static void test7_bindings( String testId ) throws Exception {
+        Application dom= getDocumentModel();
+        reset();
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
+        waitUntilIdle();
+        plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
+        dom.setTimeRange( dom.getTimeRange().next() );
+        writeToPng(testId + "_007_1.png");
+
+        reset();
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
+        waitUntilIdle();
+        plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-02" );
+        writeToPng(testId + "_007_2.png");
+
+        reset();
+        plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
+        waitUntilIdle();
+        plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1999-04-05" );
+        writeToPng(testId + "_007_3.png"); // this should disengage from timerange
+
+    }
+
     public static void main(String[] args) {
 
         boolean exit= true;
@@ -157,6 +181,7 @@ public class Test018 {
             }
 
             String testId= "test018";
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             setCanvasSize(600, 600);
             getDocumentModel().getOptions().setAutolayout(false);
@@ -170,6 +195,7 @@ public class Test018 {
             test5( testId );
             test6( testId ); // test out binding
 
+            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
