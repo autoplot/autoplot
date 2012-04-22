@@ -40,7 +40,7 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20111115.jar" /> -->
+        <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120310.jar" /> -->
         <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
