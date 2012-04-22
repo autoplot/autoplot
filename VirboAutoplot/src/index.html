@@ -23,6 +23,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3434934: http create method was still synchronized, so http://autoplot.org being down would prevent any other http sites from being created.</li>
             <li>bookmark descriptions would appear in parent nodes.</li>
             <li>Pngwalk didn't properly unload full-size images when precalculated thumbs weren't available, running out of memory</li>
             <li>jython library is loaded explicitly to support Java Webstart.</li>
