@@ -175,37 +175,45 @@ public class Test018 {
     public static void test7_bindings( String testId ) throws Exception {
         Application dom= getDocumentModel();
 
+        System.err.println("=== 007_1 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
         dom.setTimeRange( dom.getTimeRange().next() );
         docKludge( 2, "These should be bound!c"+bindStr(dom) );
+        System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_1.png");
 
+        System.err.println("=== 007_2 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-02" );
         docKludge( 2, "These should be bound!c"+bindStr(dom) );
+        System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_2.png");
 
+        System.err.println("=== 007_3 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1999-04-05" );
         docKludge( 2, "These should not be bound!c"+bindStr(dom) );
+        System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_3.png"); // this should disengage from timerange
 
+        System.err.println("=== 007_4 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
         plot( 1, "vap+cdaweb:ds=AC_H2_SWE&id=Vp&timerange=1998-03-01" );
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-04-05" );
         docKludge( 2, "These should be bound!c"+bindStr(dom));
+        System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_4.png");
-
+        System.err.println("==============================");
     }
 
 
