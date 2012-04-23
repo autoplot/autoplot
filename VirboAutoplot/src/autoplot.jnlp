@@ -50,7 +50,7 @@
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1.jnlp" > -->
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.2.jnlp" > -->
-           <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.3.2/cdf-3.3.2.jnlp" >
+           <extension name="cdf" href="../../../../../autoplot-cdf/workspace/cdf-3.4.0.jnlp" >
         </extension>
         
     </resources> 
