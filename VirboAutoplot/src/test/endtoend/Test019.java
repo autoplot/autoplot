@@ -122,6 +122,7 @@ public class Test019 {
      * @throws Exception
      */
     public static void testTimeParser() throws Exception {
+        testTimeParser1( "$-1Y $-1m $-1d $H$M", "2012 03 30 1620", "2012-03-30T16:20 to 2012-03-30T16:21" );
         testTimeParser1( "$Y",            "2012",     "2012-01-01T00:00 to 2013-01-01T00:00");
         testTimeParser1( "$Y-$j",         "2012-017", "2012-01-17T00:00 to 2012-01-18T00:00");
         testTimeParser1( "$(j,Y=2012)",   "017",      "2012-01-17T00:00 to 2012-01-18T00:00");
