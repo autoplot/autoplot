@@ -267,7 +267,6 @@ public class PlotController extends DomNodeController {
 
         bindTo(dasPlot1);
         
-        logger.log(Level.FINE, "add focus listener to {0}", dasPlot1);
         dasPlot1.addFocusListener(ac.focusAdapter);
         dasPlot1.getXAxis().addFocusListener(ac.focusAdapter);
         dasPlot1.getYAxis().addFocusListener(ac.focusAdapter);
@@ -886,6 +885,7 @@ public class PlotController extends DomNodeController {
 
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
             if ( bms.size()==0 && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
+                logger.finer("binding axis to timeRange because no one is using it");
                 dom.setTimeRange( newSettings.getXaxis().getRange() );
                 shouldBindX= true;
                 shouldSetAxisRange= true;
@@ -908,9 +908,9 @@ public class PlotController extends DomNodeController {
                     try {
                         double overlap= droverlap.width().divide(dom.timeRange.width()).doubleValue(Units.dimensionless);
                         if ( overlap > 1.0 ) overlap= 1/overlap;
-                        if ( overlap > reqOverlap ) {
+                        if ( !shouldBindX && overlap > reqOverlap ) {
                             shouldBindX= true;
-                            logger.finer("binding axis because there is significant overlap");
+                            logger.log( Level.FINER, "binding axis because there is significant overlap dom.timerange={0}", dom.timeRange.toString());
                             dom.getController().setStatus("binding axis because there is significant overlap");
                         }
                     } catch ( InconvertibleUnitsException ex ) {
@@ -931,7 +931,7 @@ public class PlotController extends DomNodeController {
         }
         
         if ( bm==null && shouldBindX ) {
-            logger.log(Level.FINER, "add binding because ranges overlap: {0}", plot.getXaxis());
+            logger.log(Level.FINER, "add binding: {0}", plot.getXaxis());
             plot.getXaxis().setLog(false);
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
