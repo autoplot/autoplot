@@ -51,7 +51,7 @@ public class TimeSeriesBrowseController {
     private DomNode listenNode=null;
     private String listenProp=null;
 
-    TimeSeriesBrowseController( DataSourceController dataSourceController, PlotElement p ) {
+    TimeSeriesBrowseController( DataSourceController dataSourceController, final PlotElement p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
@@ -61,9 +61,15 @@ public class TimeSeriesBrowseController {
                     updateTsbTimer.tickle();
                     return;
                 } else {
-                    updateTsb(false);
-                    changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
-                    changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set. 
+                    if ( p!=null && p.getController().getDataSourceFilter().getController().getTsb() == null ) {
+                        // leftover event doesn't need any special handling since TSB has been removed.
+                        // System.err.println("entering that strange branch that probably isn't needed ");
+                        return;
+                    } else {
+                        updateTsb(false);
+                        changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
+                        changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set.
+                    }
                 }
             }
         });
@@ -196,11 +202,6 @@ public class TimeSeriesBrowseController {
     }
 
     public void updateTsb(boolean autorange) {
-
-        if ( p!=null && p.getController().getDataSourceFilter().getController().getTsb() == null) {
-            System.err.println("entering that strange branch that probably isn't needed ");
-            return;
-        }
 
         DatumRange trange= this.getTimeRange();
 
