@@ -43,7 +43,7 @@ public class Test018 {
      * @throws InterruptedException
      */
     private static void test2(String testId) throws IOException, InterruptedException {
-        
+        reset();
         Application dom = getDocumentModel();
         dom.getController().reset(); 
         
@@ -77,6 +77,7 @@ public class Test018 {
     }
 
     private static void test1(String testId) throws IOException, InterruptedException {
+        reset();
         Application dom = getDocumentModel();
 
         dom.getDataSourceFilters(0).setUri("vap:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc");
@@ -222,6 +223,7 @@ public class Test018 {
             test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             setCanvasSize(600, 600);
+
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getOptions().setCanvasFont("sans-8");
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
