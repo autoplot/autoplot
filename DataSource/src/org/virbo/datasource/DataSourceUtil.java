@@ -227,7 +227,11 @@ public class DataSourceUtil {
                 boolean fail= false;
                 for ( int i=0; i<moveUs.size(); i++ ) {
                     try {
-                        tp1.parse(moveUs.get(i));
+                        DatumRange drtest= tp1.parse(moveUs.get(i)).getTimeRange();
+                        if ( ! tp1.format(drtest).equals(moveUs.get(i)) ) {
+                            fail= true;
+                            break;
+                        }
                     } catch ( ParseException ex ) {
                         fail= true;
                         break;
