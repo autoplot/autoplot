@@ -29,7 +29,8 @@ public class CsvDataSourceFormat implements DataSourceFormat {
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         URISplit split = URISplit.parse( uri );
         File f= new File( split.resourceUri );
-        CsvWriter writer= new CsvWriter( new FileWriter(f), ',' );
+        FileWriter fw= new FileWriter(f);
+        CsvWriter writer= new CsvWriter( fw, ',' );
         writer.setForceQualifier(true);
         writer.setUseTextQualifier(true);  // force quotes on header
 
@@ -125,5 +126,6 @@ public class CsvDataSourceFormat implements DataSourceFormat {
             writer.writeRecord(values);
         }
         writer.close();
+        fw.close();
     }
 }

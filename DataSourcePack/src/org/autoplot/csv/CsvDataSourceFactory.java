@@ -74,7 +74,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         //Map<String,String> params = URISplit.parseParams(cc.params);
         File f = DataSetURI.getFile(cc.resourceURI, mon);
 
-        CsvReader reader= new CsvReader( new FileReader(f) );
+        FileReader fr= new FileReader(f);
+        CsvReader reader= new CsvReader( fr );
 
         String[] columns;
         if ( reader.readHeaders() ) {
@@ -100,6 +101,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         }
 
         reader.close();
+        fr.close();
+        
         return result;
 
     }
