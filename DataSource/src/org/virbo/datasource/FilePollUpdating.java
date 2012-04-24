@@ -40,6 +40,7 @@ public class FilePollUpdating implements Updating {
         pollFile= file;
         Runnable run= new Runnable() {
             public void run() {
+                //System.err.println("start polling "+pollFile);
                 while ( pollFile!=null ) {
                     File lpollFile= pollFile; // make a local copy instead of synchronized block
                     if ( lpollFile==null ) continue;
@@ -62,6 +63,7 @@ public class FilePollUpdating implements Updating {
     }
 
     public void stopPolling() {
+        //System.err.println("stop polling "+pollFile);
         pollFile= null;
     }
 
