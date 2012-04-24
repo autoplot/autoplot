@@ -77,6 +77,13 @@ public class URISplit {
     public static final String PARAM_ID="id";
 
     /**
+     * some datasources support periodic checks to see if data sources have updated, such as:
+     *   AggregatingDataSource
+     *   AbstractDataSources (most of those based on files)
+     */
+    public static final String PARAM_FILE_POLL_UPDATES= "filePollUpdates";
+
+    /**
      * make the URI canonical, with the vap+&lt;ext&gt;: prefix.
      * @param suri, such as "/tmp/x.cdf"
      * @return "vap+cdf:file:///tmp/x.cdf"
