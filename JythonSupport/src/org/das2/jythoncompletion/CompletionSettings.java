@@ -19,7 +19,7 @@ public class CompletionSettings {
 
     Preferences prefs= Preferences.userNodeForPackage( CompletionSettings.class );
 
-    protected String docHome = "http://autoplot.org/javadoc/javadoc/";
+    protected String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/";
     public static final String PROP_DOCHOME = "docHome";
 
     public String getDocHome() {
@@ -71,7 +71,7 @@ public class CompletionSettings {
     }
 
     public void loadPreferences() {
-        docHome= prefs.get( PROP_DOCHOME, "http://autoplot.org/javadoc/javadoc/" ) ;
+        docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/" ) ;
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
     }
 

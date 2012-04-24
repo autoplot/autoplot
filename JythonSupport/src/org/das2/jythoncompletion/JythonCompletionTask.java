@@ -261,8 +261,8 @@ public class JythonCompletionTask implements CompletionTask {
                 if ( signature != null) {
                     if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
                         link= "http://download.oracle.com/javase/1.5.0/docs/api/" + signature.replaceAll(",", ", ");
-                    } else if ( signature.startsWith("org/das2/")) {
-                        link= "http://www-pw.physics.uiowa.edu/das2/javadoc/" + signature;
+                    } else if ( signature.startsWith("org/")) {
+                        link= JythonCompletionProvider.getInstance().settings.getDocHome() + signature;
                     } else {
                         //String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
                         //docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
