@@ -41,13 +41,14 @@ import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.datasource.capability.Updating;
 
 /**
  *
  * http://www.papco.org:8080/opendap/cdf/polar/hyd_h0/%Y/po_h0_hyd_%Y%m%d_v...cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
  * @author jbf
  */
-public class AggregatingDataSource extends AbstractDataSource {
+public final class AggregatingDataSource extends AbstractDataSource {
 
     private FileStorageModelNew fsm;
     DataSourceFactory delegateDataSourceFactory;
@@ -88,7 +89,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
-        String stimeRange= super.params.get("timerange");
+        String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
         if ( super.params.get("timeRange")!=null && stimeRange==null ) {
             stimeRange= super.params.get("timeRange");
         }
@@ -98,9 +99,15 @@ public class AggregatingDataSource extends AbstractDataSource {
         stimeRange= stimeRange.replaceAll("\\+"," " );        
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
 
-        //FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
-        //upd= new AggregationPollUpdating(fsm, viewRange);
-        //addCability( Updating.class, upd );
+
+        String filePollUpdates= getParam(  URISplit.PARAM_FILE_POLL_UPDATES,"" );
+        if ( filePollUpdates.length()>0 ) {
+            String surl = DataSetURI.fromUri( uri );
+            FileStorageModelNew fsm1 = AggregatingDataSourceFactory.getFileStorageModel(surl);
+            double ffilePollUpdates= Math.ceil( Double.parseDouble( filePollUpdates ) );
+            upd= new AggregationPollUpdating(fsm1, viewRange, (long)(ffilePollUpdates) );
+            addCability( Updating.class, upd );
+        }
 
     }
 
