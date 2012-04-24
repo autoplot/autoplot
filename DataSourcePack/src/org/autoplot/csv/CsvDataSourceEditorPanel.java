@@ -63,7 +63,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         split = URISplit.parse(uri);
         params = URISplit.parseParams(split.params);
 
-        File f = DataSetURI.getFile(new URL(split.file), mon );
+        DataSetURI.getFile(new URL(split.file), mon );
         return true;
     }
 
@@ -323,16 +323,6 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
     }// </editor-fold>//GEN-END:initComponents
 
 
-    private void resetFile() {
-        if (file == null) {
-            return;
-        }
-
-        String uri= getURI();
-        URISplit split= URISplit.parse(uri);
-
-    }
-
     private void resetTable( ) {
         if (file == null) {
             return;
@@ -399,7 +389,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             String depend0column= params.get(PROP_DEP0);
             if ( depend0column!=null ) this.dep0Columns.setSelectedItem(params.get(PROP_DEP0));
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             columnsComboBox.setModel( new DefaultComboBoxModel( new String[] { "(no records found)" } ) );
             DefaultTableModel dtm= new DefaultTableModel(1,1);
             dtm.setValueAt( "no records found", 0, 0 );
@@ -501,7 +491,6 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             if ( params.get(PROP_BUNDLE)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_BUNDLE) );
             if ( params.get(PROP_DEP0)!=null ) dep0Columns.setSelectedItem( params.get(PROP_DEP0) );
 
-            resetFile();
             resetTable();
             
         } catch (IOException ex) {
