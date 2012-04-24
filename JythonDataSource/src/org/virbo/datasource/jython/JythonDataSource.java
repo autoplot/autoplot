@@ -89,6 +89,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
 
         if ( params.get( PARAM_SCRIPT )!=null ) {
+            // getFile( resourceURI ) //TODO: since we don't getFile(resourceURI), we can't use filePollUpdating.  Also, why do we have local variable?
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
         } else {
             resourceURI= null;
