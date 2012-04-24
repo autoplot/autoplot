@@ -96,6 +96,7 @@ public class AggregationPollUpdating implements Updating {
             return;
         }
         dirHash= dirHash( this.dr );
+        //System.err.println("start polling "+this.fsm+ " in " + this.dr);
         Runnable run= new Runnable() {
             public void run() {
                 while ( dirHash!=0 ) {
@@ -106,7 +107,6 @@ public class AggregationPollUpdating implements Updating {
                     }
                     try {
                         long dirHash1= dirHash(dr);
-                        System.err.printf("old: %d   new: %d   %s \n",dirHash,dirHash1, Thread.currentThread().getName()  );
                         if ( dirHash!=0 && dirHash1!=dirHash ) {
                             dirty= true;
                             dirHash= dirHash1;
@@ -128,8 +128,9 @@ public class AggregationPollUpdating implements Updating {
     }
 
     public void stopPolling() {
-        //System.err.println("stop polling");
+        //System.err.println("stop polling "+this.fsm+ " in " + this.dr);
         dirHash=0;
+        polling= false;
     }
 
     public boolean isPolling() {
