@@ -371,7 +371,9 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             for ( int i=0; i<ncol; i++ ) {
                 columns.put( i, headers.get(i) );
             }
-            
+
+            reader.close();
+
             this.jTable1.setModel( tmodel );
 
             String[] hh= new String[headers.size()+1];

@@ -238,6 +238,8 @@ public class CsvDataSource extends AbstractDataSource {
             line++;
         }
 
+        reader.close();
+        
         mon.finished();
 
         DDataSet ds= builder.getDataSet();

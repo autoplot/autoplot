@@ -71,14 +71,14 @@ public class CsvDataSourceFactory implements DataSourceFactory {
 
     private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
 
-        Map<String,String> params = URISplit.parseParams(cc.params);
+        //Map<String,String> params = URISplit.parseParams(cc.params);
         File f = DataSetURI.getFile(cc.resourceURI, mon);
 
         CsvReader reader= new CsvReader( new FileReader(f) );
 
         String[] columns;
         if ( reader.readHeaders() ) {
-            int ncol= reader.getHeaderCount();
+            //int ncol= reader.getHeaderCount();
             columns= reader.getHeaders();
         } else {
             columns= new String[reader.getColumnCount()];
@@ -98,6 +98,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                     s,
                     label, null ) ) ;
         }
+
+        reader.close();
         return result;
 
     }
