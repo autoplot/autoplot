@@ -754,12 +754,12 @@ public class DataSetURI {
         }
 
         if ( filename.length() > 50 ) { // https://sourceforge.net/support/tracker.php?aid=3509357
-            String[] ss= filename.split("@");
+            String[] ss= filename.split("@",-2);
             String base= ss[0];
             if ( base.length()>50 ) base= base.substring(0,50);
             String args= ss[1];
-            if ( args.length()>0 ) args= String.format( "%09d", Math.abs(args.hashCode()) );
-            filename= base + String.format( "%09d", Math.abs(ss[0].hashCode()) ) + "@" + args;
+            if ( args.length()>0 ) args= String.format( "%09x", args.hashCode() );
+            filename= base + String.format( "%09x", ss[0].hashCode() ) + "@" + args;
         }
 
         filename = new File( localCache, filename ).toString();
@@ -1538,14 +1538,16 @@ public class DataSetURI {
     public static void init() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException, IOException {
 //        File f = new File("c:\\documents and settings\\");
 //        System.err.println(f.exists());
 //        System.err.println(f.toURI().toString());
         
         System.err.println(  getResourceURI("file:C:\\documents and settings\\jbf\\pngwalk") );
 
-
+        URL url= new URL("http://apps-pw/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo64x64.png");
+        File x= downloadResourceAsTempFile( url, new NullProgressMonitor() );
+        System.err.println( x );
 
     }
 }
