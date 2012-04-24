@@ -110,7 +110,8 @@ public class AggregationPollUpdating implements Updating {
                         if ( dirHash!=0 && dirHash1!=dirHash ) {
                             dirty= true;
                             dirHash= dirHash1;
-                        } else if ( dirty && dirHash==dirHash1 ) {
+                        }
+                        if ( dirty && dirHash==dirHash1 ) {
                             pcs.firePropertyChange( Updating.PROP_DATASET, null, null );
                             dirty= false;
                         }
