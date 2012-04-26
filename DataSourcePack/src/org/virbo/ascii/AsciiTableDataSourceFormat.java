@@ -247,6 +247,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         l1= "field"+i;
                     }
                 }
+                if ( uu[i]!=null && uu[i]!=Units.dimensionless ) {
+                    if ( uu[i] instanceof EnumerationUnits ) {
+                        
+                    } else {
+                        l1+="("+uu[i]+")";
+                    }
+                }
                 int nelements= 1;
                 for ( int k=0; k<bundleDesc.length(i); k++ ) {
                     nelements*= bundleDesc.value(i,k);
