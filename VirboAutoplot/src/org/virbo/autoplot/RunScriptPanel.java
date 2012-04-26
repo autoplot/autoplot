@@ -36,6 +36,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
     /** Creates new form RunScriptPanel */
     public RunScriptPanel() {
         initComponents();
+        this.jScrollPane1.getVerticalScrollBar().setUnitIncrement(12);
         textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         scriptPanel.add( textArea );
         textArea.setEditable(false);
