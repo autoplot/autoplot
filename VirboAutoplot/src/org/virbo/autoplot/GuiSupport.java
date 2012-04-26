@@ -822,7 +822,7 @@ public class GuiSupport {
 
     private static File currentFile;
 
-    public static Action getPrintAction( final Application app,final String ext) {
+    public static Action getPrintAction( final Application app, final Component parent,final String ext) {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
             public void actionPerformed(ActionEvent e) {
                 final DasCanvas canvas= DasCanvas.getFocusCanvas();
@@ -836,7 +836,7 @@ public class GuiSupport {
                     fileChooser.setCurrentDirectory(new File(savedir));
                 if (currentFile != null)
                     fileChooser.setSelectedFile(currentFile);
-                int choice = fileChooser.showSaveDialog(canvas);
+                int choice = fileChooser.showSaveDialog(parent);
                 if (choice == JFileChooser.APPROVE_OPTION) {
 
                     String fname = fileChooser.getSelectedFile().toString();
