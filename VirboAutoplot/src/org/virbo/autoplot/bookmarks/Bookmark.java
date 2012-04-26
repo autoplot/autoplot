@@ -281,7 +281,7 @@ public abstract class Bookmark {
             err.description= ex.toString();
             err.setTitle(TITLE_ERROR_OCCURRED);
             try {
-                err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/error-icon.png" ) ) ) ); 
+                err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/warning-icon.png" ) ) ) );
             } catch (IOException ex2) {
                 ex.printStackTrace();
             }

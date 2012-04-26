@@ -8,10 +8,12 @@ package org.virbo.autoplot.bookmarks;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
 
@@ -60,19 +62,24 @@ public class DelayMenu extends JMenu {
                 if ( title.length()>MAX_TITLE_LEN ) title= title.substring(0,MAX_TITLE_LEN)+"...";
 
                 String tooltip;
+                Icon icon;
                 if ( folder.getRemoteUrl()!=null ) {
                     if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL ) {
-                        title= title + " " + Bookmark.MSG_REMOTE;
+                        //title= title + " " + Bookmark.MSG_REMOTE;
                         tooltip= Bookmark.TOOLTIP_REMOTE;
+                        icon=null;
                     } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED  ) {
-                        title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
+                        //title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
                         tooltip= Bookmark.TOOLTIP_NOT_LOADED;
+                        icon= AutoplotUI.BUSY_OPAQUE_ICON;
                     } else {
-                        title= title + " " + Bookmark.MSG_NO_REMOTE;
+                        //title= title + " " + Bookmark.MSG_NO_REMOTE;
                         tooltip= Bookmark.TOOLTIP_NO_REMOTE;
+                        icon= AutoplotUI.WARNING_ICON;
                     }
                 } else {
                     tooltip= "";
+                    icon=null;
                 }
 
                 if ( folder.isHidden() ) {
@@ -83,6 +90,7 @@ public class DelayMenu extends JMenu {
                         titl= titl.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ titl.substring( titl.length()-TRIM_TAIL_LEN,titl.length() );
                     }
                     final JMenu subMenu = new DelayMenu( titl, folder.getBookmarks(), treeDepth+1, sel );
+                    subMenu.setIcon(icon);
 
                     if ( tooltip.contains("%{URL}") ) {
                         tooltip= tooltip.replace("%{URL}",folder.getRemoteUrl());
