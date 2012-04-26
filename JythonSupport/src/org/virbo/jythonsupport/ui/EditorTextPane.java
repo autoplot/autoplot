@@ -29,9 +29,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
-import org.das2.components.DasProgressPanel;
 import org.python.core.PyObject;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
 
@@ -144,11 +142,11 @@ public class EditorTextPane extends JTextPane {
     public void loadFile( File f ) throws FileNotFoundException, IOException {
         BufferedReader r = null;
         try {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             r = new BufferedReader( new InputStreamReader( new FileInputStream(f) ));
             String s = r.readLine();
             while (s != null) {
-                buf.append(s + "\n");
+                buf.append(s).append("\n");
                 s = r.readLine();
             }
             Document d = this.getDocument();
