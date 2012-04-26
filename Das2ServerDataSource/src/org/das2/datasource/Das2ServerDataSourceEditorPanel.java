@@ -480,7 +480,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 s = r.readLine();
             }
 
-            dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+            if ( serverURL==null ) {
+                dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+            } else {
+                dss.addAll( listPeers(serverURL) );
+            }
 
             d2ss.removeAll(dss);  // remove whatever we have already
             List<String> d2ssDiscoveryList= new ArrayList(dss);
