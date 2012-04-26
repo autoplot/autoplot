@@ -75,7 +75,7 @@ public abstract class Bookmark {
 
     public static final String TITLE_ERROR_OCCURRED = "Error Occurred";
     public static final String MSG_NO_REMOTE= "[remote*]";
-    public static final String TOOLTIP_NO_REMOTE = "Remote folder based on contents of remote URL <br>%{URL}<br> not available. Using cached version.";
+    public static final String TOOLTIP_NO_REMOTE = "Using cached version because <br>remote folder based on contents of remote URL <br>%{URL}<br>which is not available. ";
     public static final String MSG_REMOTE= "";
     public static final String TOOLTIP_REMOTE = "Bookmark folder based on contents of remote URL <br>%{URL}";
     public static final String MSG_NOT_LOADED= "[loading...]";
@@ -179,6 +179,8 @@ public abstract class Bookmark {
 
         boolean offline= false;
 
+        RemoteStatus result= new RemoteStatus();
+        
         try {
             URL rurl= new URL(remoteUrl);
   
@@ -279,13 +281,15 @@ public abstract class Bookmark {
         } catch (Exception ex) {
             Bookmark.Item err= new Bookmark.Item("");
             err.description= ex.toString();
-            err.setTitle(TITLE_ERROR_OCCURRED);
+            err.setTitle(TITLE_ERROR_OCCURRED); // note TITLE_ERROR_OCCURRED is used to detect this bookmark.
             try {
                 err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/warning-icon.png" ) ) ) );
             } catch (IOException ex2) {
                 ex.printStackTrace();
             }
+            result.statusMsg= ex.toString();
             contents.add( err );
+            offline= true;
 
         } finally {
             if ( in!=null ) {
@@ -297,12 +301,10 @@ public abstract class Bookmark {
             }
         }
 
-        RemoteStatus result= new RemoteStatus();
         result.remoteURL= remoteUrl;
         result.depth= remoteLevel;
         result.remoteRemote= remoteRemote;
         result.status= offline ? Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL : Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
-
         return result;
     }
 
@@ -456,6 +458,7 @@ public abstract class Bookmark {
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
             int remoteStatus=Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
+            String remoteStatusMsg= "";
             RemoteStatus rs;
 
             if ( remoteUrlNode!=null ) { // 2984078
@@ -478,8 +481,10 @@ public abstract class Bookmark {
                             System.err.println("unable to parse bookmarks at "+remoteUrl);
                             System.err.println("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
+                            remoteStatusMsg= contents.get(0).getDescription();
                         } else {
                             remoteStatus= rs.status;
+                            remoteStatusMsg= rs.statusMsg;
                         }
 
                         if ( rs.remoteRemote ) {
@@ -493,10 +498,12 @@ public abstract class Bookmark {
                 
             }
             
-            if ( ( remoteUrl==null || remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) && ( contents==null || contents.size()==0 ) ) { // remote folders may have local copy be empty, but local folders must not.
+            if ( ( remoteUrl==null ||
+                    ( remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) )
+                    && ( contents==null || contents.size()==0 || ( contents.size()==1 && contents.get(0).getTitle()==TITLE_ERROR_OCCURRED )) ) { // remote folders may have local copy be empty, but local folders must not.
                 n= getChildElement( element,"bookmark-list");
                 if ( n==null ) {
-                    if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED ) { // only if a remote folder is not resolved is this okay
+                    if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) { // only if a remote folder is not resolved is this okay
                         contents= Collections.emptyList();
                     } else {
                         throw new IllegalArgumentException("bookmark-folder should contain one bookmark-list");
@@ -514,6 +521,7 @@ public abstract class Bookmark {
             if ( descriptionUrl!=null ) book.setDescriptionUrl( descriptionUrl );
             book.setHidden(hidden);
             book.remoteStatus= remoteStatus;
+            book.setRemoteStatusMsg( remoteStatusMsg );
             
             book.getBookmarks().addAll(contents);
             for ( int i=0; i<contents.size(); i++ ) {
@@ -995,6 +1003,16 @@ public abstract class Bookmark {
 
         public int getRemoteStatus( ) {
             return this.remoteStatus;
+        }
+
+        String remoteStatusMsg= "";
+
+        public String getRemoteStatusMsg() {
+            return this.remoteStatusMsg;
+        }
+
+        public void setRemoteStatusMsg( String msg ) {
+            this.remoteStatusMsg= msg;
         }
 
         public Folder(String title) {

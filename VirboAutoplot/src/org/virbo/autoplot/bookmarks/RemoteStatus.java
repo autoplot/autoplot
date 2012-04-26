@@ -13,5 +13,6 @@ public class RemoteStatus {
     String remoteURL; // location we tried to read
     int depth;
     int status;  // Bookmark.Folder.REMOTE_STATUS_*
+    String statusMsg="";
     boolean remoteRemote; // true indicates there are more remote bookmarks to load in.
 }

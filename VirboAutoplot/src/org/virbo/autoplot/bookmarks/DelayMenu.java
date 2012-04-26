@@ -72,10 +72,12 @@ public class DelayMenu extends JMenu {
                         //title= title + " " + Bookmark.MSG_NOT_LOADED; // we use this now that we add bookmarks in stages
                         tooltip= Bookmark.TOOLTIP_NOT_LOADED;
                         icon= AutoplotUI.BUSY_OPAQUE_ICON;
-                    } else {
+                    } else if ( folder.getRemoteStatus()== Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL  ) {
                         //title= title + " " + Bookmark.MSG_NO_REMOTE;
-                        tooltip= Bookmark.TOOLTIP_NO_REMOTE;
+                        tooltip= Bookmark.TOOLTIP_NO_REMOTE + "<br>" + folder.getRemoteStatusMsg();
                         icon= AutoplotUI.WARNING_ICON;
+                    } else {
+                        throw new IllegalArgumentException("internal error...");
                     }
                 } else {
                     tooltip= "";
