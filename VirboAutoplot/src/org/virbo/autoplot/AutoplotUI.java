@@ -1157,15 +1157,16 @@ APSplash.checkTime("init 52");
         printToMenu.setToolTipText("Print to file");
         fileMenu.add(printToMenu);
 
-        JMenuItem item = new JMenuItem( GuiSupport.getPrintAction(dom, "pdf" ) );
+        Component focus= AutoplotUI.this;
+        JMenuItem item = new JMenuItem( GuiSupport.getPrintAction(dom, focus, "pdf" ) );
         item.setText("PDF...");
         printToMenu.add(item);
 
-        item = new JMenuItem( GuiSupport.getPrintAction(dom, "svg" ) );
+        item = new JMenuItem( GuiSupport.getPrintAction(dom, focus, "svg" ) );
         item.setText("SVG...");
         printToMenu.add(item);
 
-        item = new JMenuItem( GuiSupport.getPrintAction(dom, "png" ) );
+        item = new JMenuItem( GuiSupport.getPrintAction(dom, focus, "png" ) );
         item.setText("PNG...");
         printToMenu.add(item);
 
