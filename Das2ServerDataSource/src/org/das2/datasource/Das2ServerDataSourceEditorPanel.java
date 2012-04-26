@@ -90,12 +90,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
         initComponents();
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                updateDas2ServersImmediately();
-            }
-        });
     }
+
+    /**
+     * list of servers we know about
+     */
+    List<String> d2ss;
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -416,9 +416,39 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
 
     private void updateDas2ServersImmediately() {
-        List<String> d2ss= listDas2Servers();
+        d2ss= listDas2Servers();
         das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
         das2ServerComboBox.setSelectedItem(serverURL);
+    }
+
+    private List<String> listPeers( String suri ) {
+
+        String uri= suri+"?server=peers";
+
+        List<String> result= new ArrayList();
+
+        try {
+            InputStream in = new URL(uri).openStream();
+
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource source = new InputSource(in);
+            Document initialDocument = builder.parse(source);
+            in.close();
+
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+
+            NodeList urls = (NodeList) xpath.evaluate("//das2server/peers/server/url/text()", initialDocument, XPathConstants.NODESET );
+
+            for ( int i=0; i<urls.getLength(); i++ ) {
+                result.add(urls.item(i).getNodeValue());
+            }
+            return result;
+                
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            return new ArrayList();
+        }
     }
 
     /**
@@ -449,6 +479,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
                 s = r.readLine();
             }
+
+            dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+
             d2ss.removeAll(dss);  // remove whatever we have already
             List<String> d2ssDiscoveryList= new ArrayList(dss);
             Collections.reverse( d2ssDiscoveryList );
@@ -749,7 +782,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
 
-        this.das2ServerComboBox.setModel( new DefaultComboBoxModel(servers.toArray()) );
+        updateDas2ServersImmediately();
         this.das2ServerComboBox.setSelectedItem(split.resourceUri);
 
         jTree1.setModel( waitTreeModel() );
