@@ -1,6 +1,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -56,6 +57,8 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
+        setMinimumSize( new Dimension(640,480) );
+        setPreferredSize( new Dimension(640,480) );
     }
 
     public final void setSequence(WalkImageSequence sequence) {
