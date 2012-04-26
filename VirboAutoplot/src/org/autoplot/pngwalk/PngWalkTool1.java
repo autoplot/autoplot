@@ -469,36 +469,39 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         views[5]= new SinglePngWalkView( null );
         views[6]= new ContextFlowView(null);
 
-        final int SCROLLBAR_HEIGHT = 20;
+        final int SCROLLBAR_HEIGHT = (int) Math.round( new JScrollPane().getHorizontalScrollBar().getPreferredSize().getHeight() );
 
-        views[1].setMinimumSize( new Dimension(100,100) );
-        views[4].setMinimumSize( new Dimension(100,100) );
-        views[3].setPreferredSize( new Dimension(640,480) );
-        final JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
+        final JSplitPane filmStripSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
+
         //p.setEnabled(false);  //prevents user manipulation
-        p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
+        filmStripSplitPane.setDividerLocation(getThumbnailSize()+ (int)(1.2 *SCROLLBAR_HEIGHT));
         views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                p.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT );
+                filmStripSplitPane.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT );
+            }
+        });
+
+        filmStripSplitPane.setMinimumSize( new Dimension(640,480) );
+        filmStripSplitPane.setPreferredSize( new Dimension(640,480) );
+        
+        final JSplitPane coversSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
+        coversSplitPane.setDividerLocation(getThumbnailSize()+ (int)(1.2 *SCROLLBAR_HEIGHT));
+        views[4].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                coversSplitPane.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT  );
             }
         });
         
-        final JSplitPane p2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
-        p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
-        views[4].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                p2.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT  );
-            }
-        });
-
+        coversSplitPane.setMinimumSize( new Dimension(640,480) );
+        coversSplitPane.setPreferredSize( new Dimension(640,480) );
 
         tabs= new TearoffTabbedPane();
 
         tabs.addTab( "Single", new JScrollPane( views[3] ) );
         tabs.addTab( "ContextFlow", views[6] );
         tabs.addTab( "Grid", views[0] );
-        tabs.addTab( "Film Strip", p );
-        tabs.addTab( "Covers", p2 );
+        tabs.addTab( "Film Strip", filmStripSplitPane );
+        tabs.addTab( "Covers", coversSplitPane );
 
         tabs.setSelectedIndex(3);
         

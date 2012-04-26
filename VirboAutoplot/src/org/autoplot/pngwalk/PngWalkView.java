@@ -57,8 +57,6 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
-        setMinimumSize( new Dimension(640,480) );
-        setPreferredSize( new Dimension(640,480) );
     }
 
     public final void setSequence(WalkImageSequence sequence) {
