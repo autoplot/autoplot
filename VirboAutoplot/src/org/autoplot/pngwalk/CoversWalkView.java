@@ -145,7 +145,7 @@ public class CoversWalkView extends PngWalkView  {
         if (seq != null) {
             canvas.setPreferredSize(new Dimension(cellWidth * seq.size(), cellSize));
         } else {
-            canvas.setPreferredSize(new Dimension(0, 0));
+            canvas.setPreferredSize(new Dimension(640,480));
         }
         scrollPane.revalidate(); //force scrollpane to re-do layout
         canvas.revalidate();
