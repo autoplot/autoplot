@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.ArrayDataSet;
@@ -172,8 +173,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
         String eventListColumn= getParam( "eventListColumn", null );
         if ( eventListColumn!=null ) {
             dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
-            if ( parser.getUnits(0)!=parser.getUnits(1) ) {
-                throw new IllegalArgumentException("first two columns should have the same units");
+            Units u0= parser.getUnits(0);
+            Units u1= parser.getUnits(1);
+            if ( u0!=u1 ) {
+                if ( !u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
+                    throw new IllegalArgumentException("first two columns should have the same units");
+                }
             }
             dep0.putProperty( QDataSet.UNITS, parser.getUnits(0) );
             dep0.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
@@ -355,6 +360,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 vds.putProperty(QDataSet.DEPEND_0, dep0);
             }
             if ( eventListColumn!=null ) {
+                Units u0= parser.getUnits(0);
+                Units u1= parser.getUnits(1);
+                if ( u0!=u1 ) {
+                    if ( u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
+                        UnitsConverter uc= u1.getConverter(u0.getOffsetUnits());
+                        for ( int i=0;i<dep0.length(); i++ ) {
+                            dep0.putValue(i,1,dep0.value(i,0)+uc.convert(dep0.value(i,1)) );
+                        }
+                    }
+                }
                 vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
             return vds;
