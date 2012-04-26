@@ -17,10 +17,22 @@ import org.das2.util.monitor.ProgressMonitor;
 public interface DataSourceEditorPanel {
 
     /**
-     * return the GUI to edit the URI.
-     * @return
+     * reject the URI, perhaps because we aren't close enough to identify a resource.
+     * For example, a CDF URI contains the name of the file but not the variable to plot,
+     * so we need to enter the editor panel to complete the URI.
+     * Leaving the editor should never result in a URI that would reject.
+     * @param uri
+     * @return true if the URI is not usable.
      */
-    public JPanel getPanel();
+    public boolean reject( String uri ) throws Exception;
+
+    /**
+     * load any needed resources.  Return false if cancel, true to proceed into the gui.
+     * Throw a FileNotFoundException if needed resources is not found.
+     * @param uri partially-completed URI
+     * @return true to proceed, false if to cancel.
+     */
+    public boolean prepare( String uri, java.awt.Window parent, ProgressMonitor mon) throws Exception;
 
     /**
      * initialize the editor to edit this URI.  This may be incomplete, and the editor
@@ -32,6 +44,12 @@ public interface DataSourceEditorPanel {
     public void setURI( String uri );
 
     /**
+     * return the GUI to edit the URI.
+     * @return
+     */
+    public JPanel getPanel();
+
+    /**
      * return the URI configured by the editor.  This should be the fully-qualified
      * URI, with the "vap+<ext>:" scheme.
      *
@@ -39,21 +57,4 @@ public interface DataSourceEditorPanel {
      */
     public String getURI();
 
-    /**
-     * load any needed resources.  Return false if cancel, true to proceed into the gui.
-     * Throw a FileNotFoundException if needed resources is not found.
-     * @param uri partially-completed URI
-     * @return true to proceed, false if to cancel.
-     */
-    public boolean prepare( String uri, java.awt.Window parent, ProgressMonitor mon) throws Exception;
-
-    /**
-     * reject the URI, perhaps because we aren't close enough to identify a resource.
-     * For example, a CDF URI contains the name of the file but not the variable to plot,
-     * so we need to enter the editor panel to complete the URI.
-     * Leaving the editor should never result in a URI that would reject.
-     * @param uri
-     * @return true if the URI is not usable.
-     */
-    public boolean reject( String uri ) throws Exception;
 }
