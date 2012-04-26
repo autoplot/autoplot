@@ -177,6 +177,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
         double yfactor = (double) ( getHeight()-captionHeight ) / (double) imageHeight;
         double s = Math.min(xfactor, yfactor);
+        if ( s<=0 ) return;
         s = Math.min(1.0, s);
         int xpos = (int) (this.getWidth() - i.getWidth(null) * s) / 2;
         int ypos = (int) ((this.getHeight()-captionHeight) - imageHeight * s) / 2;

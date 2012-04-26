@@ -30,7 +30,7 @@ public class SinglePngWalkView extends PngWalkView {
         if (seq == null || seq.size()==0) return;
 
         BufferedImage i = seq.currentImage().getImage();
-
+        
         if (i!=null && i.getWidth(this) >0 && i.getHeight(this) > 0) {
             paintImageCentered(i, g2, seq.currentImage().getCaption());
             cacheImage = i;
