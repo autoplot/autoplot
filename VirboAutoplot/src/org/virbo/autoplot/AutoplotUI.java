@@ -185,6 +185,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
     public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
+    public static final Icon BUSY_OPAQUE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner_16.gif") );
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
     private TimeRangeEditor timeRangeEditor;
