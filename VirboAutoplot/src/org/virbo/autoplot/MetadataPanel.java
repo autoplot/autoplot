@@ -335,7 +335,13 @@ public class MetadataPanel extends javax.swing.JPanel {
                         componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
                     }
                 } else {
-                    unmount = null;
+                    unmount = componentDataSetTree;
+                    if ( ds!=this.dsTreeDs ) {
+                        componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
+                        this.componentDs = ds;
+                    } else {
+                        componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
+                    }
                 }
             }
         }
