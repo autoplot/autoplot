@@ -1440,6 +1440,7 @@ public class GuiSupport {
     /**
      * raise the application window
      * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+     * This is not working for me on Ubuntu 10.04.
      */
     public static void raiseApplicationWindow( java.awt.Frame frame ) {
         // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
