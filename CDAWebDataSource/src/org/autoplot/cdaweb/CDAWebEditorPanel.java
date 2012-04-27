@@ -240,7 +240,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         
         try {
-            if ( ds == null ? currentDs != null : !ds.equals(currentDs) ) {
+            if ( ds == null ? currentDs != null : true ) {
                 doRefreshDataSet(ds,args);
             }
         } catch ( Exception ex ) {
