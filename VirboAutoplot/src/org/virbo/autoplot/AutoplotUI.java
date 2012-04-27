@@ -593,11 +593,11 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         APSplash.checkTime("init 100");
 
-        if ( AutoplotUtil.getProperty("os.name","").startsWith("Mac OS") ) {
-            applicationModel.getCanvas().resizeAllComponents();
-            applicationModel.getCanvas().repaint();
-            applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
-        }
+//        if ( AutoplotUtil.getProperty("os.name","").startsWith("Mac OS") ) {
+//            applicationModel.getCanvas().resizeAllComponents();
+//            applicationModel.getCanvas().repaint();
+//            applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
+//        }
         APSplash.checkTime("init 110");
 
 
