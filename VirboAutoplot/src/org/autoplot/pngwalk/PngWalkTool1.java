@@ -73,6 +73,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.AppManager;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
@@ -188,6 +189,18 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         return template;
 
     }
+
+    private static void raiseApWindowSoon( final Window apWindow ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                GuiSupport.raiseApplicationWindow((JFrame)apWindow);
+                apWindow.toFront();
+                apWindow.repaint();
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+    
     public static PngWalkTool1 start( String template, final Window parent ) {
 
         final PngWalkTool1 tool = new PngWalkTool1();
@@ -284,13 +297,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     public void run() {
                         try {
                             ScriptContext.createGui();
-                            if ( suri!=null ) ScriptContext.plot(suri);
                             Window apWindow= ScriptContext.getViewWindow();
+                            if ( suri!=null ) ScriptContext.plot(suri);
                             if ( parent==null ) {
                                 apWindow.setVisible(true);
                             }
-                            apWindow.toFront();
-                            apWindow.repaint();
+                            raiseApWindowSoon(apWindow);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                         }
