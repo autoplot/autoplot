@@ -92,7 +92,7 @@ public class URISplit {
         if ( suri==null ) return null;
         URISplit split= URISplit.parse(suri);
         suri= URISplit.format(split); // make canonical
-        if ( !suri.startsWith("vap+") && split.ext.length()>1 ) {
+        if ( !suri.startsWith("vap+") && split.ext!=null && split.ext.length()>1 ) {
             suri= "vap+"+split.ext.substring(1)+":"+suri;
         }
         return suri;
