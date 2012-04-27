@@ -386,7 +386,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         Plot plot1 = null;
         for (Plot p : application.getPlots()) {
             DasPlot p1 = p.controller.getDasPlot();
-            if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
+            if ( p1!=null && ( p1 == c || p1.getXAxis() == c || p1.getYAxis() == c ) ) {
                 plot1 = p;
                 break;
             }
