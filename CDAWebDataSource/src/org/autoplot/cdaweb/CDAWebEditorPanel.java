@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.logging.Level;
@@ -275,7 +276,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 }
                 s= r.readLine();
             }
-            dsidComboBox.setModel( new DefaultComboBoxModel( dss.toArray() ) );
+            Object[] items= dss.toArray();
+            Arrays.sort(items);
+            dsidComboBox.setModel( new DefaultComboBoxModel( items ) );
             dsidComboBox.setSelectedItem(val);
             t0= System.currentTimeMillis() - t0 ;
             System.err.printf("done in %d millis\n", t0 );
