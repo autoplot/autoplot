@@ -1437,6 +1437,23 @@ public class GuiSupport {
         }
     }
 
+    /**
+     * raise the application window
+     * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+     */
+    public static void raiseApplicationWindow( java.awt.Frame frame ) {
+
+        // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+        frame.setVisible(true);
+        int state = frame.getExtendedState();
+        state &= ~JFrame.ICONIFIED;
+        frame.setExtendedState(state);
+        frame.setAlwaysOnTop(true); // security exception
+        frame.toFront();
+        frame.requestFocus();
+        frame.setAlwaysOnTop(false); // security exception
+        System.err.println("done bring to front");
+    }
     public static MouseAdapter createExamplesPopup( final JTextField tf, final String [] labels, final String[] tooltips ) {
         return new MouseAdapter() {
             private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
