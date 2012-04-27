@@ -248,7 +248,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     URI uri= DataSetURI.getURI(surl);
                     if ( uri==null ) {
-                        setMessage("URI cannot be formed from \""+surl+"\"");
+                        setMessage("error: URI cannot be formed from \""+surl+"\"");
                         return;
                     }
                     DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor());
