@@ -969,26 +969,30 @@ public class GuiSupport {
         } else {
             pelement = dom.getController().getPlotElement();
         }
-        if (dia.getDepCount() == 0) {
-            String val= dia.getPrimaryDataSetSelector().getValue();
-            if ( val.endsWith(".vap") ) {
-                mergeVap(dom,plot, pelement, val);
-            } else {
-                dom.getController().doplot(plot, pelement, val );
+        try {
+            if (dia.getDepCount() == 0) {
+                String val= dia.getPrimaryDataSetSelector().getValue();
+                if ( val.endsWith(".vap") ) {
+                    mergeVap(dom,plot, pelement, val);
+                } else {
+                    dom.getController().doplot(plot, pelement, val );
+                }
+            } else if (dia.getDepCount() == 1) {
+                applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+                applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+                dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+            } else if (dia.getDepCount() == 2) {
+                applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+                applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+                applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
+                dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+            } else if (dia.getDepCount() == -1) {
+                if (pelement == null) {
+                    pelement = dom.getController().addPlotElement(plot, null);
+                }
             }
-        } else if (dia.getDepCount() == 1) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-            dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
-        } else if (dia.getDepCount() == 2) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
-            dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
-        } else if (dia.getDepCount() == -1) {
-            if (pelement == null) {
-                pelement = dom.getController().addPlotElement(plot, null);
-            }
+        } catch ( Exception ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
+            applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
         }
     }
 
