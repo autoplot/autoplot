@@ -109,31 +109,33 @@ public class FilterChainPanel extends JPanel {
 
         ButtonGroup group= new ButtonGroup();
         String[] opts= new String[] {
+        "accum() running sum of the rank 1 data. (opposite of diff).",
+        "collapse0() average over the zeroth dimension to reduce the dimensionality.",
+        "collapse1() average over the first dimension to reduce the dimensionality.",
+        "cos() cos of the data in radians. (No units check)",
+        "dbAboveBackgroundDim1(10) show data as decibels above the 10% level",
+        "diff() finite differences between adjacent elements in the rank 1 data.",
+        "exp10() plot pow(10,ds)",
+        "fftPower(128) plot power spectrum by breaking waveform data in windows of length size.",
+        "flatten() flatten a rank 2 dataset. The result is a n,3 dataset of [x,y,z]. (opposite of grid)",
+        "grid() grid the rank2 buckshot but gridded data into a rank 2 table.",
+        "hanning(128) run a hanning window before taking fft.",
         "histogram() perform an \"auto\" histogram of the data that automatically sets bins. ",
         "logHistogram() perform the auto histogram in the log space.",
         "log10() take the base-10 log of the data." ,
-        "exp10() plot pow(10,ds)",
+        "magnitude() calculate the magnitude of the vectors ",
+        "negate() flip the sign on the data.",
+        "sin() sin of the data in radians. (No units check)",
         "slice0(0) slice the data on the zeroth dimension (often time) at the given index.",
         "slice1(0) slice the data on the first dimension at the given index.",
         "slices(':',2,3)) slice the data on the first and second dimensions, leaving the zeroth alone.",
-        "collapse0() average over the zeroth dimension to reduce the dimensionality.",
-        "collapse1() average over the first dimension to reduce the dimensionality.",
-        "transpose() transpose the rank 2 dataset.",
-        "hanning(128) run a hanning window before taking fft.",
-        "fftPower(128) plot power spectrum by breaking waveform data in windows of length size.",
         "smooth(5) boxcar average over the rank 1 data",
-        "diff() finite differences between adjacent elements in the rank 1 data.",
-        "accum() running sum of the rank 1 data. (opposite of diff).",
-        "grid() grid the rank2 buckshot but gridded data into a rank 2 table.",
-        "flatten() flatten a rank 2 dataset. The result is a n,3 dataset of [x,y,z]. (opposite of grid)",
-        "negate() flip the sign on the data.",
-        "cos() cos of the data in radians. (No units check)",
-        "sin() sin of the data in radians. (No units check)",
         "toDegrees() convert the data to degrees. (No units check)",
         "toRadians() convert the data to radians. (No units check) ",
-        "magnitude() calculate the magnitude of the vectors ",
+        "transpose() transpose the rank 2 dataset.",
         "unbundle('Bx') unbundle a component ",
-        "dbAboveBackgroundDim1(10) show data as decibels above the 10% level", };
+        "valid() replace data with 1 where valid, 0 where invalid",
+        };
 
         for ( int i=0; i<opts.length; i++ ) {
             JRadioButton cb= new JRadioButton(opts[i]);
@@ -141,7 +143,7 @@ public class FilterChainPanel extends JPanel {
             optionsPanel.add(cb);
         }
 
-       int r= JOptionPane.showConfirmDialog(this,optionsPanel,"Add Filter",JOptionPane.OK_CANCEL_OPTION);
+       int r= JOptionPane.showConfirmDialog(this, new JScrollPane(optionsPanel),"Add Filter",JOptionPane.OK_CANCEL_OPTION);
        if ( r==JOptionPane.OK_OPTION ) {
            String ss=null;
            Enumeration<AbstractButton> ee= group.getElements();
