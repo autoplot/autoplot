@@ -23,6 +23,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3522211: FTP file locking error with FtpFileSystem on Windows.  Feedback of the error is corrected reported to the user.</li>
+            <li>minor cleanup of CDAWeb GUI, such as sorting recent datasources.  And failure to update when a source is selected twice.</li>
+            <li>Datum to Rank0DataSet converter handles fill</li>
+            <li>minimum sizes set properly in PNGWalk tool so that tearing off and shrinking won't result in errors</li>
+            <li>timeparser.parse( 20010209 ) with $Y$m01 would not throw parse exception, so $Y$m01 was offered as agg suggestion when it is not valid</li>
+            <li>small round of findbugs cleanup, download resource as temp file uses hex for hashcode</li>
+            <li>rte_0764238028: the print to dialog parent was the canvas, causing confusion when canvas was torn off</li>
             <li>3520074: need wiki page describing timerange binding:  Behaviour is restored and test018 now tests this.</li>
             <li>3434934: http create method was still synchronized, so http://autoplot.org being down would prevent any other http sites from being created.</li>
             <li>bookmark descriptions would appear in parent nodes.</li>
@@ -56,7 +63,16 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
+            <li>remote bookmarks loading is indicated via icons instead of [loading...]</li>
+            <li>|valid() added to filters.</li>
+            <li>|dbAboveBackgroundDim1 supports rows that are all fill.</li>
+            <li>das2 server uses "server=peers" to add other das2servers to droplist</li>
+            <li>minor performance enhancements, such as making length methods final</li>
+            <li>export to ascii table includes units in headers</li>
             <li>facebook group added: http://www.facebook.com/autoplot.org</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>Ops.divide supports 1/x when x has units have inversion registered.</li>
             <li>Improved support for FITS tables</li>
             <li>switch --samp turns on connection to SAMP protocol and the Cluster Final Archive.</li>
@@ -65,14 +81,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>descriptionUrl added to bookmarks files, to support remote bookmark lists.</li>
             <li>VectorPlotRenderer added, but it's not presented in the interface yet</li>
             <li>Operations gui will contain graphical controls for filters</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>slight speedup on startup time when script panel is visible.</li>
-            <li>export to IDLSAV saves the x tags as well, with times as t1970 (seconds since 1970-01-01)</li>
-            <li>"slices(0,0,:,:)" function used as initial filter for double slicing, to replace confusing "|slice0(0)|slice0(0)"</li>
-            <li>bookmarks manager has a plot button now, which allows the user to see title and description before plotting</li>
-            <li>remote bookmarks are loaded almost immediately, since the cost of loading them is small</li>
         </ul>
 
 <p>Known issues:</p>
