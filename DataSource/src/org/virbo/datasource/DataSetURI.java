@@ -655,6 +655,10 @@ public class DataSetURI {
                 IOException ex2= new IOException(ex.getMessage());
                 ex2.initCause(ex);
                 throw ex2;
+            } else if ( ex.getMessage().contains("unable to delete") ) {
+                IOException ex2= new IOException(ex.getMessage());
+                ex2.initCause(ex);
+                throw ex2;
             } else {
                 IOException ex2= new IOException("Unsupported protocol: "+suri);
                 ex2.initCause(ex);
