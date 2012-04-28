@@ -13,9 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +23,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -34,7 +31,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 /**
- *
+ * Dialog to create a chain of filters.  Ideally, this will eventually show the data before and
+ * after each filter, provide documentation for each filter, and provide a place for a filter to
+ * provide a filter (e.g. FFT window size and window types).
  * @author jbf
  */
 public class FilterChainPanel extends JPanel {
