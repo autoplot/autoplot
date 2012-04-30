@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.EnumerationUnits;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -213,6 +214,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
         DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
 
+        if ( params.containsKey("eventListColumn") ) {
+            parser.setUnits( parser.getFieldIndex(params.get("eventListColumn")), new EnumerationUnits("events") );;
+        }
         String line= parser.readFirstParseableRecord(file.toString());
         if ( line==null ) {
             //dp= parser.guessSkipAndDelimParser(file.toString());
