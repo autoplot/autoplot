@@ -1024,7 +1024,7 @@ APSplash.checkTime("init 270");
         for ( String ext: exts ) {
             if ( ext.startsWith(".") ) ext= ext.substring(1);
             final String fext= ext;
-            Action a= new AbstractAction( ext ) {
+            Action a= new AbstractAction( ext+"..." ) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         String uri = "vap+" + fext + ":";
