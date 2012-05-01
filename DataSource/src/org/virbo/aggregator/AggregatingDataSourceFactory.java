@@ -57,9 +57,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         URISplit split = URISplit.parse(surl);
         Map parms = URISplit.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
-        stimeRange= stimeRange.replaceAll("\\+", " " );
-        ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
-        parms.remove("timerange");
+        if ( stimeRange!=null ) {
+            stimeRange= stimeRange.replaceAll("\\+", " " );
+            ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
+            parms.remove("timerange");
+        }
         if (parms.size() > 0) {
             ads.setParams(URISplit.formatParams(parms));
         }

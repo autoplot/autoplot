@@ -90,15 +90,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
         this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
-        if ( super.params.get("timeRange")!=null && stimeRange==null ) {
-            stimeRange= super.params.get("timeRange");
+        if ( stimeRange!=null ) {
+            if ( super.params.get("timeRange")!=null && stimeRange==null ) {
+                stimeRange= super.params.get("timeRange");
+            }
+            if ( stimeRange==null ) {
+                throw new IllegalArgumentException("timerange not found");
+            }
+            stimeRange= stimeRange.replaceAll("\\+"," " );
+            viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
         }
-        if ( stimeRange==null ) {
-            throw new IllegalArgumentException("timerange not found");
-        }
-        stimeRange= stimeRange.replaceAll("\\+"," " );        
-        viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
-
 
         String filePollUpdates= getParam(  URISplit.PARAM_FILE_POLL_UPDATES,"" );
         if ( filePollUpdates.length()>0 ) {
