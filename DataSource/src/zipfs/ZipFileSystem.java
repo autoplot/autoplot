@@ -134,8 +134,12 @@ public class ZipFileSystem extends FileSystem {
     public File getLocalRoot() {
         // For /home/user/file.zip create zip/home/user/file/ in the cache dir
         File localCacheDir =  settings().getLocalCacheDir();
-        String zipCacheName = localCacheDir.getAbsolutePath() + "/zip" +
-                zipFile.getName().substring(0, zipFile.getName().length()-4) + "/";
+        char sep= File.separatorChar;
+        String zname= zipFile.getName().substring(0, zipFile.getName().length()-4) + sep;
+        if ( !zname.startsWith("/") && zname.charAt(1)==':' ) {
+            zname= String.valueOf( sep ) + String.valueOf(zname.charAt(0)).toLowerCase() + zname.substring(2); // windows
+        }
+        String zipCacheName = localCacheDir.getAbsolutePath() + sep + "zip" + zname;
 
         File zipCache = new File(zipCacheName);
         /*if (!zipCache.exists() && !zipCache.mkdirs()) {
