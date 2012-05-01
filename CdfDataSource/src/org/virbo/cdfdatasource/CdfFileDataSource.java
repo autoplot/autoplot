@@ -453,6 +453,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                    props.put( "Source_name", s );
                 }
             }
+        } catch ( CDFException ex ) {
+            // no big deal if we don't have it.
+        }
+        try {
             gattr= cdf.getAttribute("Descriptor");
             if ( gattr!=null ) {
                 entries= gattr.getEntries();
@@ -462,7 +466,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
         } catch ( CDFException ex ) {
-            ex.printStackTrace();
+            // no big deal if we don't have it.
         }
 
         Vector v = cdf.getAttributes();
