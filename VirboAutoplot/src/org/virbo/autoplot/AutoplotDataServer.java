@@ -119,7 +119,7 @@ public class AutoplotDataServer {
 
         String timeRange = alm.getValue("timeRange");
 
-        String step = "3600 s";
+        String step = "86400 s";
 
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
