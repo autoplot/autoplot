@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -24,7 +25,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ import javax.swing.Timer;
 import org.autoplot.pngwalk.ImageResize;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
+import org.das2.graph.Renderer;
 import org.das2.util.ClassMap;
 
 /**
@@ -143,7 +144,7 @@ public class CanvasLayoutPanel extends JLabel {
     }
 
     public void setSelectedComponents(List<Object> selectedComponents) {
-        if ( adjusting ) return;
+        //if ( adjusting ) return;
         List<Object> oldSelectedComponents = this.selectedComponents;
         this.selectedComponents = new ArrayList( selectedComponents );
         propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
@@ -187,9 +188,31 @@ public class CanvasLayoutPanel extends JLabel {
                                             RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
 
         g.drawImage( img, 0,0, this );
+
+        Graphics2D gs= (Graphics2D)g.create();
+        AffineTransform at= g.getTransform();
+        at.scale(scale, scale);
+        gs.setTransform(at);
+        gs.setColor( Color.YELLOW );
+        for (int i = 0; i < target.getComponentCount(); i++) {
+            Component c = target.getComponent(i);
+            if ( c instanceof DasPlot ) {
+                DasPlot plot= (DasPlot)c;
+                for ( Renderer r: plot.getRenderers() ) {
+                    if ( selectedComponents.contains(r) ) {
+                        Shape s = org.das2.graph.SelectionUtil.getSelectionArea(r);
+                        gs.fill(s);
+                    }
+                }
+            }
+        }
+        
+        // mute colors and lines
         Color back= target.getBackground();
         g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
         g.fillRect(0,0,img.getWidth(),img.getHeight());
+
+
 
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);

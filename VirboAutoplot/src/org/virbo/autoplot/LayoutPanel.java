@@ -291,18 +291,30 @@ public class LayoutPanel extends javax.swing.JPanel {
             int[] iindices= new int[indices.size()];
             for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
             panelListComponent.setSelectedIndices(iindices);
-            DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
-            canvasLayoutPanel1.setSelectedComponents( Collections.singletonList((Object)dasPlot) );
-            canvasLayoutPanel1.setComponent(dasPlot);
+
+            updateSelected();
         }
     };
-    transient private PropertyChangeListener panelListener = new PropertyChangeListener() {
+    transient private PropertyChangeListener plotElementListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            PlotElement p = app.getController().getPlotElement();
-            List<PlotElement> allElements = Arrays.asList(app.getPlotElements());
-            panelListComponent.setSelectedIndex(allElements.indexOf(p));
+            updateSelected();
         }
     };
+
+    void updateSelected() {
+        
+        List<Object> selected= new ArrayList();
+        DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
+        selected.add(dasPlot);
+
+        int[] iindices= panelListComponent.getSelectedIndices();
+        for ( int i=0; i<iindices.length; i++ ) {
+            selected.add( app.getPlotElements(iindices[i]).getController().getRenderer() );
+        }
+
+        canvasLayoutPanel1.setSelectedComponents( selected );
+        canvasLayoutPanel1.setComponent(dasPlot);
+    }
 
     public void setApplication(Application app) {
         this.app = app;
@@ -314,7 +326,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         app.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, plotElementsListener);
         app.addPropertyChangeListener(Application.PROP_BINDINGS, bindingsListener);
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT, plotListener);
-        app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, panelListener);
+        app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
     }
 
     private void updatePlotElementList() {
@@ -507,6 +519,11 @@ public class LayoutPanel extends javax.swing.JPanel {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
+        });
+        panelListComponent.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                panelListComponentValueChanged(evt);
+            }
         });
         jScrollPane1.setViewportView(panelListComponent);
 
@@ -707,6 +724,10 @@ public class LayoutPanel extends javax.swing.JPanel {
             app.getController().deleteBinding(b);
         }
     }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
+
+    private void panelListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_panelListComponentValueChanged
+        updateSelected();
+    }//GEN-LAST:event_panelListComponentValueChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
