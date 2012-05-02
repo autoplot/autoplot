@@ -226,16 +226,21 @@ public class DataSetSelector extends javax.swing.JPanel {
             firePlotDataSetURL();
             return;
         }
-        
+
+        URISplit split= URISplit.parse(surl);
+
+        String file= split.file;
+        if ( file==null || file.equals("file:///") ) file="";  //TODO: kludge around bug in URISplit.
+
         try {
 
-            if (surl.endsWith("/") || surl.contains("/?") || ( surl.endsWith(".zip") || surl.contains(".zip?") || surl.endsWith(".ZIP") || surl.contains(".ZIP?") ) ) { //TODO:vap+jyds:file:/media/mini/nbprojects/autoplot2010/JythonDataSource/src/hudson.jyds?dir=/home/jbf/Linux/autoplot_data/fscache/zip/home/jbf/Linux/autoplot_data/fscache/http/sarahandjeremy.net/~jbf/foo/
+            if (file.endsWith("/") || file.contains("/?") || ( file.endsWith(".zip") || file.contains(".zip?") || file.endsWith(".ZIP") || surl.contains(".ZIP?") ) ) { 
                 //TODO: vap+cdaweb:file:///?ds=APOLLO12_SWS_1HR&id=NSpectra_1  should not reject if empty file?
                 int carotpos = editor.getCaretPosition();
                 setMessage("busy: getting filesystem completions.");
                 showCompletions(surl, carotpos);
 
-            } else if (surl.endsWith("/..")) { // pop up one directory
+            } else if (file.endsWith("/..")) { // pop up one directory
                 int carotpos = surl.lastIndexOf("/..");
                 carotpos = surl.lastIndexOf("/", carotpos - 1);
                 if (carotpos != -1) {
