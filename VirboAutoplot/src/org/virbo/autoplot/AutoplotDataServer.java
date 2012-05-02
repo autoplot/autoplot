@@ -110,6 +110,7 @@ public class AutoplotDataServer {
         alm.addOptionalSwitchArgument("format", "f", "format", "d2s", "output format qds, d2s (dflt=d2s)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
         alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources");
+        alm.addOptionalSwitchArgument("timeStep", "s", "timeStep", "86400s", "atom step size for loading and sending, default is 86400s");
         alm.addOptionalSwitchArgument("cache", "c", "cache", "", "location where files are downloaded, default is $HOME/autoplot_data/cache");
 
         alm.requireOneOf(new String[]{"uri"});
@@ -119,7 +120,7 @@ public class AutoplotDataServer {
 
         String timeRange = alm.getValue("timeRange");
 
-        String step = "86400 s"; //TODO: make this set via param.
+        String step = alm.getValue("timeStep");
 
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
