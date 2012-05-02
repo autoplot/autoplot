@@ -189,15 +189,21 @@ public class CanvasLayoutPanel extends JLabel {
 
         g.drawImage( img, 0,0, this );
 
+        // mute colors and lines
+        Color back= target.getBackground();
+        g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
+        g.fillRect(0,0,img.getWidth(),img.getHeight());
+
         Graphics2D gs= (Graphics2D)g.create();
         AffineTransform at= g.getTransform();
         at.scale(scale, scale);
         gs.setTransform(at);
-        gs.setColor( Color.YELLOW );
+        gs.setColor(  new Color( 255, 255, 0, 180 ) );
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
             if ( c instanceof DasPlot ) {
                 DasPlot plot= (DasPlot)c;
+                gs.setClip( plot.getBounds() );
                 for ( Renderer r: plot.getRenderers() ) {
                     if ( selectedComponents.contains(r) ) {
                         Shape s = org.das2.graph.SelectionUtil.getSelectionArea(r);
@@ -206,13 +212,6 @@ public class CanvasLayoutPanel extends JLabel {
                 }
             }
         }
-        
-        // mute colors and lines
-        Color back= target.getBackground();
-        g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
-        g.fillRect(0,0,img.getWidth(),img.getHeight());
-
-
 
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
