@@ -297,19 +297,21 @@ public class LayoutPanel extends javax.swing.JPanel {
     };
     transient private PropertyChangeListener plotElementListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            updateSelected();
+            //updateSelected();
         }
     };
 
     void updateSelected() {
         
+        int[] iindices= panelListComponent.getSelectedIndices();
+        PlotElement[] peles=  app.getPlotElements();
+
         List<Object> selected= new ArrayList();
         DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
         selected.add(dasPlot);
 
-        int[] iindices= panelListComponent.getSelectedIndices();
         for ( int i=0; i<iindices.length; i++ ) {
-            selected.add( app.getPlotElements(iindices[i]).getController().getRenderer() );
+            selected.add( peles[iindices[i]].getController().getRenderer() );
         }
 
         canvasLayoutPanel1.setSelectedComponents( selected );
