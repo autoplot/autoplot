@@ -499,8 +499,7 @@ public abstract class Bookmark {
             }
             
             if ( ( remoteUrl==null ||
-                    ( remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) )
-                    && ( contents==null || contents.size()==0 || ( contents.size()==1 && contents.get(0).getTitle()==TITLE_ERROR_OCCURRED )) ) { // remote folders may have local copy be empty, but local folders must not.
+                    ( remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) ) ) { // remote folders may have local copy be empty, but local folders must not.
                 n= getChildElement( element,"bookmark-list");
                 if ( n==null ) {
                     if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) { // only if a remote folder is not resolved is this okay
