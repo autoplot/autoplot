@@ -128,6 +128,7 @@ public class BookmarksManagerModel {
         //    new Exception("set list to null").printStackTrace();
         //}
         //List<Bookmark> oldList = this.list;
+        //BookmarksManager.printBooks( list, "" );
         this.list = list;
         propertyChangeSupport.firePropertyChange(PROP_LIST, null, list);  //always fire event, since the objects within are mutable.
     }
