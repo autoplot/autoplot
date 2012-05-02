@@ -1152,6 +1152,23 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return unresolved;
     }
 
+    public static void printBooks( List<Bookmark> book, String indent ) {
+        for ( Bookmark b: book ) {
+            printBooks(b,indent);
+        }
+    }
+    
+    public static void printBooks( Bookmark book, String indent ) {
+        System.err.println( indent + book.getTitle() );
+        if ( book instanceof Bookmark.Folder ) {
+            Bookmark.Folder bf= (Bookmark.Folder)book;
+            for ( Bookmark b: bf.getBookmarks() ) {
+                printBooks( b, indent+"  " );
+            }
+        }
+
+    }
+
     private Runnable loadBooksRunnable( final String start, final int depthf ) {
         Runnable run= new Runnable() {
             public void run() {
@@ -1165,7 +1182,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     model.setList(book);
                     int depthLimit= 5;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
-                        Runnable run= loadBooksRunnable( start, depthf+1 );
+                        Runnable run= loadBooksRunnable( start, depthLimit );
                         //System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
                         RequestProcessor.invokeLater(run);
                     } else {
