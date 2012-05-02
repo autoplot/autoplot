@@ -23,6 +23,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>remote zip files on Windows would not work because of c:\</li>
+            <li>any URI ending in slash would trigger filesystem completions.  Now we break it apart first.</li>
+            <li>aggregation source does not fail if timerange is not set, since the TSB might be used to set it.</li>
             <li>3522211: FTP file locking error with FtpFileSystem on Windows.  Feedback of the error is corrected reported to the user.</li>
             <li>minor cleanup of CDAWeb GUI, such as sorting recent datasources.  And failure to update when a source is selected twice.</li>
             <li>Datum to Rank0DataSet converter handles fill</li>
