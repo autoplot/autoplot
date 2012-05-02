@@ -297,7 +297,9 @@ public class LayoutPanel extends javax.swing.JPanel {
     };
     transient private PropertyChangeListener plotElementListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            //updateSelected();
+            PlotElement p = app.getController().getPlotElement();
+            List<PlotElement> allElements = Arrays.asList(app.getPlotElements());
+            panelListComponent.setSelectedIndex(allElements.indexOf(p));
         }
     };
 
