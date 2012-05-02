@@ -65,6 +65,7 @@ time.putProperty( QDataSet.UNITS, Units.us2000 )
 data= ds[:,1] / 1e3
 data.putProperty( QDataSet.UNITS, Units.seconds )
 data.putProperty( QDataSet.TITLE, 'Time to calculate '+ dir )
+data.putProperty( QDataSet.SCALE_TYPE, 'linear' )
 
 result= link( time, data )
 
