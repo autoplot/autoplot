@@ -498,7 +498,7 @@ public class BookmarksManagerModel {
      */
     public void addRemoteBookmarks(String surl, Bookmark selectedBookmark)  {
         List<Bookmark> importBook= new ArrayList(100);
-        RemoteStatus remote= Bookmark.getRemoteBookmarks(surl,1,true,importBook);
+        RemoteStatus remote= Bookmark.getRemoteBookmarks(surl,Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT,true,importBook);
         if ( importBook.size()!=1 ) {
             throw new IllegalArgumentException( "Remote bookmarks file contains more than one root folder: "+surl );
         }
