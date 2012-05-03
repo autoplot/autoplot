@@ -211,6 +211,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                     ex.printStackTrace();
                     //TODO CancelledOperationException
                     throw (java.io.InterruptedIOException)ex.getCause();
+                } else if ( ex.getCause()!=null && ( ex.getCause() instanceof org.das2.dataset.NoDataInIntervalException )) {
+                    throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
+
                 } else {
                     ex.printStackTrace();
                     throw ex;
