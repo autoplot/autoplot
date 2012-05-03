@@ -69,8 +69,9 @@ public class Util {
                     fout.close();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 } finally {
-                    fout.close();
+                    if ( fout!=null ) fout.close();
                 }
 
             }
