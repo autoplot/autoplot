@@ -1505,7 +1505,6 @@ APSplash.checkTime("init 52");
             b.bind();
 
             bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
-
                 public void propertyChange(PropertyChangeEvent evt) {
                     updateBookmarks();
                 }
@@ -1519,9 +1518,16 @@ APSplash.checkTime("init 52");
     
     private void updateBookmarks() {
 
-        JMenuItem item;
-        
-        maybeCreateBookmarksManager();
+        if ( bookmarksManager==null ) {
+            maybeCreateBookmarksManager();
+            bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
+                    } } );
+                }
+            });
+        }
 
         if ( !bookmarksManager.hasPrefNode("bookmarks") ) {
             if ( bookmarksManager.hasPrefNode("autoplot") ) {
@@ -1541,18 +1547,11 @@ APSplash.checkTime("init 52");
             }
         }
 
-        bookmarksManager.setPrefNode("bookmarks");
+        Runnable run= new Runnable() { public void run() {
+            bookmarksManager.setPrefNode("bookmarks"); 
+        } };
+        invokeLater( -1, false, run );
 
-        bookmarksMenu.removeAll();
-
-        bookmarksManager.updateBookmarks( bookmarksMenu, this.dataSetSelector );
-        bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
-                } } );
-            }
-        });
 //        addBookmarks(bookmarksMenu, bookmarks);
     }
 
