@@ -149,6 +149,7 @@ public class PlotElementController extends DomNodeController {
         dsf.removePropertyChangeListener(DataSourceFilter.PROP_FILTERS, dsfListener);
         dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_EXCEPTION, exceptionListener);
     }
     
     PropertyChangeListener dsfListener = new PropertyChangeListener() {
@@ -586,6 +587,38 @@ public class PlotElementController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
 
+    PropertyChangeListener exceptionListener = new PropertyChangeListener() {
+
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
+
+            changesSupport.performingChange( this, PENDING_SET_DATASET );
+            try {
+                Exception ex = dsf.controller.getException();
+                logger.log(Level.FINE, "{0} got exception: {1}  ", new Object[]{plotElement, ex });
+                if ( resetComponent ) {
+                    //if ( !plotElement.component.equals("") )  {
+                    //    plotElement.setComponent("");
+                    //} else {
+                    plotElement.setComponent("");
+                    //    plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
+                        plotElement.autoComponent=true;
+                    //}
+                    setResetComponent(false);
+                }
+                renderer.setException(ex);
+                renderer.setDataSet(null);
+                
+            } finally {
+                changesSupport.changePerformed( this, PENDING_SET_DATASET );
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "" + PlotElementController.this;
+        }
+
+    };
 
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
@@ -1147,6 +1180,7 @@ public class PlotElementController extends DomNodeController {
     private void setDataSourceFilterController(final DataSourceController dsc) {
         dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+        dsc.addPropertyChangeListener(DataSourceController.PROP_EXCEPTION, exceptionListener);
     }
     /**
      * true indicates the controller should autorange next time the fillDataSet is changed.
