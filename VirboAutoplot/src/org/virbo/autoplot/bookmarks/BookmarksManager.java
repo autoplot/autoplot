@@ -223,8 +223,11 @@ public class BookmarksManager extends javax.swing.JDialog {
         List<Bookmark> result= new ArrayList();
         for ( int i=0; i<bs.size(); i++ ) {
             Bookmark bs1= bs.get(i);
-            if ( (bs1 instanceof Bookmark.Folder && ((Bookmark.Folder)bs1).getRemoteUrl()!=null )
-                    || "".equals( maybeGetRemoteBookmarkUrl( bs.get(i), model, tmodel, selectionPaths[i] )) ) {
+            Bookmark parent= bs1.getParent();
+            TreePath parentPath= selectionPaths[i].getParentPath();
+            boolean isaRemoteBookmark= (bs1 instanceof Bookmark.Folder && ((Bookmark.Folder)bs1).getRemoteUrl()!=null );
+            boolean isNotPartOfRemoteBookmark= "".equals( maybeGetRemoteBookmarkUrl( parent, model, tmodel, parentPath ) );
+            if ( isaRemoteBookmark && isNotPartOfRemoteBookmark ) {
                 result.add(bs.get(i));
             }
         }
