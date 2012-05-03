@@ -81,6 +81,11 @@ public abstract class Bookmark {
     public static final String MSG_NOT_LOADED= "[loading...]";
     public static final String TOOLTIP_NOT_LOADED = "Checking to see if remote bookmark list has changed.<br>%{URL}";
 
+    /**
+     * limit on the number of remote containing remote containing remote...
+     */
+    public static final int REMOTE_BOOKMARK_DEPTH_LIMIT = 5;
+
     private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
@@ -328,7 +333,7 @@ public abstract class Bookmark {
      * parse the bookmarks in this node.
      * @param element
      * @param vers null, empty string &lt;2011, or version number
-     * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels)
+     * @param remoteLevel If &gt;0, then allow remote to be retrieved (this many levels). If &lt;0 then assume remote bookmarks have been resolved.
      * @return Bookmark.  If it's a folder, then bookmark.remoteStatus can be used to determine if it needs to be reloaded.
      * @throws UnsupportedEncodingException
      * @throws IOException
@@ -491,15 +496,19 @@ public abstract class Bookmark {
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_NOT_LOADED;
                        }
                     }
+                } else if ( remoteLevel<0 ) {
+                    remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+                    
                 }
-                
+            
             } else {
                 if ( remoteUrlNode==null ) remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
                 
             }
             
             if ( ( remoteUrl==null ||
-                    ( remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) ) ) { // remote folders may have local copy be empty, but local folders must not.
+                 ( remoteStatus==Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) ||
+                 remoteLevel<0 ) ) { // remote folders may have local copy be empty, but local folders must not.
                 n= getChildElement( element,"bookmark-list");
                 if ( n==null ) {
                     if ( remoteStatus== Bookmark.Folder.REMOTE_STATUS_NOT_LOADED || remoteStatus==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) { // only if a remote folder is not resolved is this okay
@@ -543,7 +552,7 @@ public abstract class Bookmark {
     /**
      * parse the bookmarks, checking to see what version scheme should be used.
      * @param root the root node, from which the version scheme should be read
-     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels)
+     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
      * @return
      */
     public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) {
@@ -557,6 +566,7 @@ public abstract class Bookmark {
      * The root element should be a bookmark-list containing <bookmark-folder> and <bookmark>
      * @param root
      * @param vers null or the version string.  If null, then check for a version attribute.
+     * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
      * @return
      */
     public static List<Bookmark> parseBookmarks( Element root, String vers, int remoteLevel ) {

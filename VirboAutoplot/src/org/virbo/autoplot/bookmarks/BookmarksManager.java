@@ -199,6 +199,7 @@ public class BookmarksManager extends javax.swing.JDialog {
     protected static String maybeGetRemoteBookmarkUrl(Bookmark b, BookmarksManagerModel model, TreeModel treeModel, TreePath ppath ) {
         // if it is a child of a remote bookmark, make sure it's not editable.
         String remoteUrl= "";
+        if ( ppath==null ) return remoteUrl;
         if ( b!=null && b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
         while ( ppath.getPathCount()>1 ) {
             Bookmark.Folder f= (Folder) model.getSelectedBookmark(treeModel,ppath);
@@ -659,6 +660,15 @@ public class BookmarksManager extends javax.swing.JDialog {
 
 private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
     doPlay= false;
+    if ( dirtyBookmark!=null ) {
+        dirtyBookmark.setTitle(titleTextField.getText());
+        if ( dirtyBookmark instanceof Bookmark.Item ) {
+            ((Bookmark.Item)dirtyBookmark).setUri(URLTextField.getText());
+        }
+        dirtyBookmark.setDescription( descriptionTextField.getText() );
+        model.fireBookmarkChange(dirtyBookmark);
+        dirtyBookmark=null;
+    }
     this.dispose();
     if ( menuIsDirty ) {
         updateBookmarks( dirtyMenu, dirtySelector );
@@ -666,21 +676,11 @@ private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 }//GEN-LAST:event_dismissButtonActionPerformed
 
 private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
-    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    if ( b!=null && b instanceof Bookmark.Item) {
-        ((Bookmark.Item) b).setUri(URLTextField.getText());
-        jTree1.repaint();
-        model.fireBookmarkChange(b);
-    }
+    // it's been marked as dirty, so we don't need to do anything
 }//GEN-LAST:event_URLTextFieldFocusLost
 
 private void titleTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_titleTextFieldFocusLost
-    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    if ( b!=null ) {
-        b.setTitle(titleTextField.getText());
-        jTree1.repaint();
-        model.fireBookmarkChange(b);
-    }
+    // it's been marked as dirty, so we don't need to do anything
 }//GEN-LAST:event_titleTextFieldFocusLost
 
 private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -704,11 +704,12 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
             iconButton.setText("(no icon)");
         }*/
         descriptionTextField.setText( b.getDescription() );
-        viewDetailsButton.setEnabled( b.getDescriptionUrl()!=null );
-        if ( b.getDescriptionUrl()==null ) {
+        URL descriptionUrl= getDescriptionUrl(b);
+        viewDetailsButton.setEnabled( descriptionUrl!=null );
+        if ( descriptionUrl==null ) {
             viewDetailsButton.setToolTipText("");
         } else {
-            viewDetailsButton.setToolTipText("View "+b.getDescriptionUrl());
+            viewDetailsButton.setToolTipText("View "+descriptionUrl);
         }
 
         URLTextField.setEditable( b instanceof Bookmark.Item );
@@ -869,11 +870,12 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
 }//GEN-LAST:event_mergeInDefaultMenuItemActionPerformed
 
 private void descriptionTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_descriptionTextFieldFocusLost
+    // we have to do more here because of the View/Edit button
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     if ( b!=null ) {
-        b.setDescription(descriptionTextField.getText());
-        jTree1.repaint();
-        model.fireBookmarkChange(b);
+        if ( b.getDescription().equals(descriptionTextField.getText() ) ) {
+            dirtyBookmark= b;
+        }
     }
 }//GEN-LAST:event_descriptionTextFieldFocusLost
 
@@ -901,9 +903,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
             descriptionTextField.setText(ntxt);
             Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
             if ( b!=null ) {
-                b.setDescription(descriptionTextField.getText());
-                jTree1.repaint();
-                model.fireBookmarkChange(b);
+                dirtyBookmark= b;
             }
         }
 
@@ -942,8 +942,9 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
 private void viewDetailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDetailsButtonActionPerformed
     Bookmark book= model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath()  );
-    if ( book.getDescriptionUrl()!=null ) {
-        AutoplotUtil.openBrowser(book.getDescriptionUrl().toString());
+    URL url= getDescriptionUrl( book );
+    if ( url!=null ) {
+        AutoplotUtil.openBrowser(url.toString());
     }
 }//GEN-LAST:event_viewDetailsButtonActionPerformed
 
@@ -1139,6 +1140,17 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      */
     File bookmarksFile= null;
 
+    
+    /**
+     * true if we have resolved the bookmarks recently.  This is used to suppress reading remote bookmarks files.
+     */
+    boolean haveReadRemote= false;
+
+    /**
+     * check to see if there are remote bookmarks that need loading.
+     * @param book
+     * @return true if there are unresolved bookmarks.
+     */
     private boolean checkUnresolved( List<Bookmark> book ) {
         boolean unresolved= false;
         for ( Bookmark b: book ) {
@@ -1180,16 +1192,20 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
-                    int depthLimit= 5;
+                    int depthLimit= Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthLimit );
                         //System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
                         RequestProcessor.invokeLater(run);
                     } else {
-                        if ( depthf>=depthLimit ) {
+                        if ( checkUnresolved(book) && depthf>=depthLimit ) {
                             System.err.println("remote bookmarks depth limit met");
                         }
                     }
+                    if ( checkUnresolved(book)==false ) {
+                        haveReadRemote= true;
+                    }
+                    
                     //System.err.println("\n\n=====");
                     //for ( Bookmark b: book ) {
                     //    System.err.println(b);
@@ -1245,7 +1261,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     s= read.readLine();
                 } while ( s!=null );
 
-                int depth=0;
+                int depth= 0;
+                if ( haveReadRemote ) {
+                    depth= -1;
+                }
+                
                 List<Bookmark> book= Bookmark.parseBookmarks(buff.toString(),depth);
                 model.setList(book);
 
@@ -1253,7 +1273,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 unresolved= checkUnresolved(book);
                 if ( unresolved ) {
                     final String start= buff.toString();
-                    Runnable run= loadBooksRunnable( start, depth+1 );
+                    Runnable run= loadBooksRunnable( start, Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT );
                     //System.err.printf( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 );
                     RequestProcessor.invokeLater(run);
                 }
@@ -1442,5 +1462,24 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             }
         }
         return false;
+    }
+
+    /** allow bookmarks to inherit description from parents.
+     * @param book
+     * @return URL describing bookmark.
+     */
+    private URL getDescriptionUrl(Bookmark book) {
+        URL result= book.getDescriptionUrl();
+        if ( result==null ) {
+            Bookmark p= book.getParent();
+            if ( p==null ) {
+                return null;
+            } else {
+                return getDescriptionUrl( p );
+            }
+        } else {
+            return result;
+        }
+        
     }
 }
