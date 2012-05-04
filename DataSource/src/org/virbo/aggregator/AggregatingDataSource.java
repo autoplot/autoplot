@@ -62,7 +62,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     private DatumRange quantize(DatumRange timeRange) {
         try {
-            String[] ss = fsm.getNamesFor(timeRange);
+            String[] ss = fsm.getNamesFor(timeRange); // 3523483 there's a bug here when reading from a zip file, because we need to download it first.
             if (ss.length == 0) {
                 //TODO: Juno uses wildcard in the name.
                 return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
