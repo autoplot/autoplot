@@ -363,7 +363,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 for (int i = 0; i < des.length; i++) {
                     result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
                 }
-
+              
                 return result;
                 
             } catch (FtpException e) {
@@ -374,6 +374,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     }
                     KeyChain.getDefault().clearUserPassword(url);
                     // loop for them to try again.
+                } else if ( e.getMessage().startsWith("550") ) {
+                    throw new IOException( e.getMessage()+": "+directory);
                 } else {
                     throw new IOException(e.getMessage()); //JAVA5
                 }
