@@ -467,6 +467,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
                                 tsb.setURI(surl);
                                 //DatumRange r= tsb.getTimeRange();
+                                //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
                                 tsb.setTimeRange(timeRange);
                                 surl= tsb.getURI();
                             }
