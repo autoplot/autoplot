@@ -63,6 +63,8 @@ import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.DomainDivider;
+import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
@@ -416,6 +418,22 @@ public class DataSetSelector extends javax.swing.JPanel {
         return false;
     }
 
+    DatumRange quantizeTimeRange( DatumRange tr ) {
+        DomainDivider dd= DomainDividerUtil.getDomainDivider(tr.min(),tr.max());
+        while ( dd.boundaryCount(tr.min(),tr.max() )<2 ) {
+            dd= dd.finerDivider(false);
+        }
+        while ( dd.boundaryCount(tr.min(),tr.max() )>12 ) {
+            dd= dd.coarserDivider(false);
+        }
+        DatumRange maxR= dd.rangeContaining(tr.max());
+        if ( maxR.min().equals(tr.max()) ) {
+            return DatumRangeUtil.union( dd.rangeContaining(tr.min()), maxR.min() );
+        } else {
+            return DatumRangeUtil.union( dd.rangeContaining(tr.min()), maxR.max() );
+        }
+    }
+
     /**
      * show the initial parameters completions for the type, or the
      * editor, if that's available.
@@ -468,7 +486,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 tsb.setURI(surl);
                                 //DatumRange r= tsb.getTimeRange();
                                 //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
-                                tsb.setTimeRange(timeRange);
+                                DatumRange tr2=  quantizeTimeRange( timeRange );
+                                tsb.setTimeRange(tr2);
                                 surl= tsb.getURI();
                             }
                         } catch (ParseException ex ){
