@@ -31,7 +31,8 @@ public class ZipFileSystem extends FileSystem {
         if ( !("file".equals(root.getScheme()) ) ) {
             throw new IllegalArgumentException("Cannot access non-local zip file: "+root);
         }
-        if ( !( root.toString().endsWith(".zip") || root.toString().endsWith(".ZIP") ) ) {
+        if ( !( root.toString().endsWith(".zip") || root.toString().endsWith(".ZIP") 
+                || root.toString().endsWith(".zip/") || root.toString().endsWith(".ZIP/") ) ) {
             throw new IllegalArgumentException("expected zip file to end with zip: "+root.toString() );
         }
 
