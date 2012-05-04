@@ -1,4 +1,7 @@
-# demo events bar
+# demo events bar, and the richest of the datasets describing events.
+# This creates a dataset that will be drawn with
+# an events bar, with the dataset specifying the color and location:
+# BUNDLE_1=Time,Duration,Color,Event
 
 from org.virbo.dsutil import DataSetBuilder
 from org.das2.datum import EnumerationUnits
