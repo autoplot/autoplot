@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The cadence-guessing code is loosened up so that low-energy energy channels are connected.  Also, an experimental change to the
-                layout tab is shown..</small></p>
+        <p><small>Pig vocalizations studied in Autoplot.  Wav files are read in and fftPower is used to create spectrograms.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,13 +22,24 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>allow spaces in timerange argument params like "$(o, id=crres)"</li>
+            <li>limit the number of parent files listed when resolving ftp://virbo.org/POES/n15/$Y/poes_n15_$Y$m$d.cdf.zip/poes_n15_$Y$m$d.cdf?P1_90&timerange=1998-07-01</li>
             <li>remote zip files on Windows would not work because of c:\</li>
+            <li>exceptions from data source are indicated in a more obvious way.</li>
+            <li>more cleanup of bookmarks, limit the remote loading to once per session.</li>
+            <li>remote bookmarks are all read at once, instead of in deeper and deeper depths</li>
+            <li>remote-remote bookmarks show properly when off-line.</li>
+            <li>remote folder in remote folder could be deleted.</li>
+            <li>do a little rounding when automatically setting the timerange to avoid excessive resolution.</li>
             <li>any URI ending in slash would trigger filesystem completions.  Now we break it apart first.</li>
             <li>aggregation source does not fail if timerange is not set, since the TSB might be used to set it.</li>
             <li>3522211: FTP file locking error with FtpFileSystem on Windows.  Feedback of the error is corrected reported to the user.</li>
             <li>minor cleanup of CDAWeb GUI, such as sorting recent datasources.  And failure to update when a source is selected twice.</li>
             <li>Datum to Rank0DataSet converter handles fill</li>
             <li>minimum sizes set properly in PNGWalk tool so that tearing off and shrinking won't result in errors</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>timeparser.parse( 20010209 ) with $Y$m01 would not throw parse exception, so $Y$m01 was offered as agg suggestion when it is not valid</li>
             <li>small round of findbugs cleanup, download resource as temp file uses hex for hashcode</li>
             <li>rte_0764238028: the print to dialog parent was the canvas, causing confusion when canvas was torn off</li>
@@ -43,47 +53,21 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>Jython scripts warn when params are overwritten, also code detecting time series browse needed to be loosened</li>
             <li>minor cleanup of CEF support</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>excessive use of event thread blocked GUI responsiveness in first 5 seconds</li>
-            <li>histogram didn't draw the last half bin</li>
-            <li>thread clean up and slightly speed up startup performance</li>
-            <li>ascii parser can parse times with the format "%Y %m %d %H%M".  This tweaked an under-implementation.</li>
-            <li>TSDS supports timerange=P10D in URI, by using timerange if specified instead of StartTime</li>
-            <li>general clean up of GUI actions performed off the event thread</li>
-            <li>bugfix 3516161: procedure would leave orphan data source filters in the DOM and would fail.</li>
-            <li>improve feedback from misformatted rich headers</li>
-            <li>NetCDF works file files via FTP now.</li>
-            <li>HDF5 via FTP works now, there was old code that still used NetCDF's access via HTTP which hid the bug.</li>
-            <li>xtick tick labels look for close relevant tick when closest is fill, use **** to indicate fill.</li>
-            <li>bookmarks have initial menu, indicating that bookmarks are being loaded</li>
-            <li>I forgot to escape %Y's when converting to $Y's in PngwalkTool.</li>
-            <li>export to IDLSAV fixed when a dataset doesn't have a name.</li>
-            <li>move cache works again after a failed refactoring</li>
-            <li>remote bookmarks offline status is properly indicated</li>
-            <li>Ascii parser check for empty field at the end of a record, as in "1991-01-01 00:03,1490.0,I,"</li>
-        </ul>
         
         <p>Features:</p>
         <ul>
+            <li>three and four argument bundle added to scripting to improve legibility</li>
             <li>remote bookmarks loading is indicated via icons instead of [loading...]</li>
+            <li>plotElement selection is indicated in thumbnail on layout tab.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>|valid() added to filters.</li>
             <li>|dbAboveBackgroundDim1 supports rows that are all fill.</li>
             <li>das2 server uses "server=peers" to add other das2servers to droplist</li>
             <li>minor performance enhancements, such as making length methods final</li>
             <li>export to ascii table includes units in headers</li>
             <li>facebook group added: http://www.facebook.com/autoplot.org</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Ops.divide supports 1/x when x has units have inversion registered.</li>
-            <li>Improved support for FITS tables</li>
-            <li>switch --samp turns on connection to SAMP protocol and the Cluster Final Archive.</li>
-            <li>more start time improvements by calculating secondary tabs off the event thread</li>
-            <li>finally draw the canvas onto the layout GUI.</li>
-            <li>descriptionUrl added to bookmarks files, to support remote bookmark lists.</li>
-            <li>VectorPlotRenderer added, but it's not presented in the interface yet</li>
-            <li>Operations gui will contain graphical controls for filters</li>
         </ul>
 
 <p>Known issues:</p>
