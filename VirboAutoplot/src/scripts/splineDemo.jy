@@ -12,7 +12,7 @@ psf= si.interpolate( x, y )
 xx= findgen(100)/50 + 2.
 yy= fltarr(100) 
 for i in range(100):
-   yy[i]= psf.value(xx[i])
+   yy[i]= psf.value(xx[i].value())
 
 plot( 0, xx, yy )
 plot( 1, x, y )
