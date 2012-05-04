@@ -1,3 +1,6 @@
+# Sarah had a file where she has lots of data files, and wanted to be able to
+# look at any of them using a standard plot.  One way to do this is with a script.
+
 from javax.swing import JOptionPane
 
 file= JOptionPane.showInputDialog("Enter filename: ")
