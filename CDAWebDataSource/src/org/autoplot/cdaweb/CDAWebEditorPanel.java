@@ -124,7 +124,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             String str= timeRangeTextField.getText().trim();
             if ( !str.equals("") ) {
                 DatumRange tr1= DatumRangeUtil.parseTimeRange( str );
-                if ( DatumRangeUtil.rescale(dr,-1,2).intersects(tr1) ) { // fuzz up, because I found ACE/SWE data outside the valid range
+                DatumRange accept= DatumRangeUtil.union(dr,tr);
+                if ( DatumRangeUtil.rescale(accept,-0.1,1.1).intersects(tr1) ) { // fuzz up, because I found ACE/SWE data outside the valid range
                     tr= tr1;
                 }
             }
