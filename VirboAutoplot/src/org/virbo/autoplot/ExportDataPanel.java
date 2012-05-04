@@ -243,7 +243,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
         chooser.setFileFilter(deflt);
         String deft= filenameTF.getText();
         try {
-            URL url = new URL( URISplit.parse(deft).file );
+            URL url = new URL( URISplit.parse(deft).file );  
             chooser.setSelectedFile( new File( url.getFile() ) );
         } catch ( Exception e ) {
             
