@@ -37,7 +37,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="processedWithinXRangeB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="351" max="32767" attributes="0"/>
+              <EmptySpace pref="355" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>

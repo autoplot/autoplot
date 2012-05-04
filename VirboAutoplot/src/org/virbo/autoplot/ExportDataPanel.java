@@ -11,6 +11,7 @@
 package org.virbo.autoplot;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -41,8 +42,11 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         if (dsc.getFillDataSet() != null) {
             String name = (String) dsc.getFillDataSet().property(QDataSet.NAME);
+            if ( name==null ) name= "data";
             if (name != null) {
-                filenameTF.setText(name.toLowerCase());
+                String f= new File(".").getAbsoluteFile().getParent();
+                f= f+"/"+name.toLowerCase();
+                filenameTF.setText(f);
             }
             originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), dsc.getFillDataSet() ) );
         }
@@ -237,6 +241,13 @@ public class ExportDataPanel extends javax.swing.JPanel {
         }
 
         chooser.setFileFilter(deflt);
+        String deft= filenameTF.getText();
+        try {
+            URL url = new URL( URISplit.parse(deft).file );
+            chooser.setSelectedFile( new File( url.getFile() ) );
+        } catch ( Exception e ) {
+            
+        }
 
         int r = chooser.showSaveDialog(this);
         if (r == JFileChooser.APPROVE_OPTION) {
