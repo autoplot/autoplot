@@ -75,6 +75,7 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
@@ -224,6 +225,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         try {
             deft = Bookmark.parseBookmarks(sdeft);
 
+        } catch (BookmarksException ex) {
+            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
             Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -241,6 +244,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
                 if ( i0==-1 ) i0= template.indexOf("_%o"); 
                 if ( i0==-1 ) i0= template.indexOf("_%{o,");
+                if ( i0==-1 ) i0= template.indexOf("_$o");
+                if ( i0==-1 ) i0= template.indexOf("_$(o,");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 || i0==-1 ) return false;
                 //String timeRange = s.substring(i0 + 1, i1);
