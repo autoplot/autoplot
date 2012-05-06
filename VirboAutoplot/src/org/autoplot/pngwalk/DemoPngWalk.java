@@ -25,6 +25,7 @@ import org.das2.datum.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
@@ -82,6 +83,8 @@ public class DemoPngWalk {
                 try {
                     List<Bookmark> books = Bookmark.parseBookmarks(srecent);
                     tool.setTemplate( ((Bookmark.Item)books.get(0)).getUri() );
+                } catch (BookmarksException ex) {
+                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SAXException ex) {
                     Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
