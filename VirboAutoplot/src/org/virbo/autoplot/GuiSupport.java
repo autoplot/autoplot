@@ -82,6 +82,7 @@ import org.das2.system.RequestProcessor;
 import org.das2.util.Entities;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
@@ -925,12 +926,12 @@ public class GuiSupport {
                     parent.getBookmarksManager().getModel().importList( books );
                 }
                 parent.setMessage( "imported bookmarks file "+bookmarksFile );
-            } catch (ParserConfigurationException ex) {
+            } catch (BookmarksException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile + "\n"+ex.getMessage() , "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                parent.applicationModel.showMessage( "Semantic Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                parent.applicationModel.showMessage( "XML Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
                 Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex ) {
