@@ -88,11 +88,11 @@ public abstract class Bookmark {
 
     private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
 
-    public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
+    public static List<Bookmark> parseBookmarks(String data) throws IOException, SAXException, BookmarksException  {
         return parseBookmarks(data,0);
     }
 
-    public static List<Bookmark> parseBookmarks(String data,int depth) throws SAXException, IOException {
+    public static List<Bookmark> parseBookmarks(String data,int depth) throws IOException, SAXException, BookmarksException {
         try {
 
             Reader in = new BufferedReader(new StringReader(data));
@@ -117,7 +117,7 @@ public abstract class Bookmark {
      * @throws SAXException
      * @throws IOException
      */
-    public static List<Bookmark> parseBookmarks( URL url ) throws SAXException, IOException {
+    public static List<Bookmark> parseBookmarks( URL url ) throws  IOException, SAXException, BookmarksException {
         try {
 
             File file= DataSetURI.downloadResourceAsTempFile( url, new NullProgressMonitor() );
@@ -135,7 +135,7 @@ public abstract class Bookmark {
         }
     }
 
-    public static Bookmark parseBookmark(String data) throws SAXException, IOException {
+    public static Bookmark parseBookmark(String data) throws IOException, SAXException, BookmarksException {
         try {
 
             Reader in = new BufferedReader(new StringReader(data));
@@ -177,8 +177,9 @@ public abstract class Bookmark {
      * @param startAtRoot if true, then include the root nodes, otherwise return the contents of the folders.
      * @param contents list where the bookmarks should be stored.
      * @return true if there is a remote bookmark within the file.
+     * @throws MalformedRemoteBookmarksException if the remote file contains more that one remote bookmark folder.
      */
-    protected static RemoteStatus getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) {
+    protected static RemoteStatus getRemoteBookmarks( String remoteUrl, int remoteLevel, boolean startAtRoot, List<Bookmark> contents ) throws MalformedRemoteBookmarksException {
         InputStream in=null;
         boolean remoteRemote= false;
 
@@ -262,6 +263,9 @@ public abstract class Bookmark {
                 }
             }
 
+            if ( nl.getLength()>1 ) {
+                throw new MalformedRemoteBookmarksException("remote bookmarks file can only contain one root bookmark folder");
+            }
             Element flist = (Element) nl.item(0); // the bookmark list.
             if ( flist==null ) {
                 // The remote folder itself can contain remote folders,
@@ -282,6 +286,8 @@ public abstract class Bookmark {
                 remoteRemote= checkForUnresolved(contents1);
                 contents.addAll(contents1);
             }
+        } catch ( MalformedRemoteBookmarksException ex ) {
+            throw ex;
 
         } catch (Exception ex) {
             Bookmark.Item err= new Bookmark.Item("");
@@ -338,7 +344,7 @@ public abstract class Bookmark {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static Bookmark parseBookmark( Node element, String vers, int remoteLevel ) throws UnsupportedEncodingException, IOException {
+    public static Bookmark parseBookmark( Node element, String vers, int remoteLevel ) throws IOException, BookmarksException {
 
         String uri = null; // read this first in case it's useful as the title
         String s = null;
@@ -544,7 +550,7 @@ public abstract class Bookmark {
 
     }
 
-    public static List<Bookmark> parseBookmarks(Element root ) {
+    public static List<Bookmark> parseBookmarks(Element root ) throws BookmarksException {
         String vers= root.getAttribute("version");
         return parseBookmarks( root, vers, 1 );
     }
@@ -555,7 +561,7 @@ public abstract class Bookmark {
      * @param remoteLevel if >0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
      * @return
      */
-    public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) {
+    public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) throws BookmarksException {
         logger.log(Level.FINE, "parseBookmarks {0}", remoteLevel);
         String vers= root.getAttribute("version");
         return parseBookmarks( root, vers, remoteLevel );
@@ -569,7 +575,7 @@ public abstract class Bookmark {
      * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
      * @return
      */
-    public static List<Bookmark> parseBookmarks( Element root, String vers, int remoteLevel ) {
+    public static List<Bookmark> parseBookmarks( Element root, String vers, int remoteLevel ) throws BookmarksException {
         if ( vers==null ) {
             vers= root.getAttribute("version");
         }
@@ -597,7 +603,8 @@ public abstract class Bookmark {
                 System.err.println("## bookmark number=" + i);
                 ex.printStackTrace();
                 System.err.println("last bookmark parsed:"+lastBook);
-                continue;
+                //continue;
+                throw new BookmarksException(ex);
             }
 
         }
