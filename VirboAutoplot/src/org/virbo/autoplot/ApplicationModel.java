@@ -89,6 +89,7 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.datasource.HtmlResponseIOException;
 /**
@@ -459,11 +460,17 @@ public class ApplicationModel {
         if ( f.exists() ) {
             try {
                 recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
+            } catch (BookmarksException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+                return new ArrayList<Bookmark>();
             } catch (SAXException ex) {
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (IOException ex) {
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
@@ -487,11 +494,17 @@ public class ApplicationModel {
                         } catch (BackingStoreException ex) {
                             ex.printStackTrace();
                         }
+                    } catch (BookmarksException e) {
+                        e.printStackTrace();
+                        return new ArrayList<Bookmark>();
                     } catch (MalformedURLException e) {
+                        e.printStackTrace();
                         return new ArrayList<Bookmark>();
                     } catch (IOException e) {
+                        e.printStackTrace();
                         return new ArrayList<Bookmark>();
                     } catch (SAXException e) {
+                        e.printStackTrace();
                         return new ArrayList<Bookmark>();
                     } catch (ParserConfigurationException e) {
                         return new ArrayList<Bookmark>();
@@ -502,13 +515,20 @@ public class ApplicationModel {
             } else {
                 try {
                     recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
+                } catch (BookmarksException e) {
+                    e.printStackTrace();
+                    return new ArrayList<Bookmark>();
+
                 } catch (SAXException e) {
+                    e.printStackTrace();
                     return new ArrayList<Bookmark>();
 
                 } catch (IOException e) {
+                    e.printStackTrace();
                     return new ArrayList<Bookmark>();
 
                 } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
                     return new ArrayList<Bookmark>();
 
                 }
