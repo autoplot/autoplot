@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -61,11 +63,20 @@ public class BookmarksManagerModel {
                 }
                 mergeList(importBook,newList);
                 setList(newList);
+
             } catch (SAXException ex) {
+                JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+
             } catch (ParserConfigurationException ex) {
+                JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+
+            } catch (BookmarksException ex) {
+                JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+
+            } catch (IOException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -438,41 +449,6 @@ public class BookmarksManagerModel {
         return result;
     }
 
-    void doImportUrl(Component c) {
-        String ansr = null;  // possibly invalid entry.
-        URL url = null;
-        boolean okay = false;
-        while (okay == false) {
-            String s;
-            if (ansr == null) {
-                s = JOptionPane.showInputDialog(c, "Enter the URL of a bookmarks file:", "");
-            } else {
-                s = JOptionPane.showInputDialog(c, "Whoops, Enter the URL of a bookmarks file:", ansr);
-            }
-
-            if (s == null) {
-                return;
-            } else {
-                try {
-                    ansr= s; // it's likely they will mistype, preserve their work.
-                    url = new URL(s);
-                    okay = true;
-                } catch (MalformedURLException ex) {
-                }
-            }
-        }
-        try {
-            Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
-            importList(importBook);
-        } catch (SAXException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     public void importList(List<Bookmark> books) {
         List<Bookmark> newList= new ArrayList(this.list.size());
@@ -483,7 +459,7 @@ public class BookmarksManagerModel {
         setList(newList);
     }
 
-    public void addRemoteBookmarks(String surl ) throws MalformedURLException, SAXException, ParserConfigurationException, IOException {
+    public void addRemoteBookmarks(String surl ) throws MalformedRemoteBookmarksException {
         addRemoteBookmarks(surl,null);
     }
 
@@ -496,11 +472,11 @@ public class BookmarksManagerModel {
      * @param selectedBookmark location to add the bookmark, can be null.
      * @throws MalformedURLException
      */
-    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark)  {
+    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedRemoteBookmarksException {
         List<Bookmark> importBook= new ArrayList(100);
         RemoteStatus remote= Bookmark.getRemoteBookmarks(surl,Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT,true,importBook);
         if ( importBook.size()!=1 ) {
-            throw new IllegalArgumentException( "Remote bookmarks file contains more than one root folder: "+surl );
+            throw new MalformedRemoteBookmarksException( "Remote bookmarks file contains more than one root folder: "+surl );
         }
 
         if ( remote.remoteRemote==true ) {
