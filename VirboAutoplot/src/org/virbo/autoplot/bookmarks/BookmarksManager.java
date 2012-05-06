@@ -1227,6 +1227,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      * reload the bookmarks from disk.  Remote bookmarks will be reloaded slightly later.
      */
     public void reload() {
+        haveReadRemote= false;
         setPrefNode( prefNode );
     }
 
