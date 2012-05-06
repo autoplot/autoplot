@@ -13,4 +13,10 @@ public class BookmarksException extends Exception {
     public BookmarksException( String s ) {
         super( s );
     }
+    public BookmarksException( Exception cause ) {
+        super( cause );
+    }
+    public BookmarksException( String s, Exception cause ) {
+        super( s, cause );
+    }
 }
