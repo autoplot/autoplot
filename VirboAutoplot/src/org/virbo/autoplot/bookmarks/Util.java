@@ -50,11 +50,17 @@ public class Util {
             try {
                 recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
                 setRecent(sel,recent);
+            } catch (BookmarksException ex) {
+                ex.printStackTrace();
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
+                ex.printStackTrace();
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
+                ex.printStackTrace();
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ParserConfigurationException ex) {
+                ex.printStackTrace();
                 Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
             }
 
