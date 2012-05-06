@@ -88,7 +88,7 @@ public class BookmarksManagerTransferrable {
                         JOptionPane.showMessageDialog( jTree1, "Drop target is within remote bookmarks\n"+remoteUrl, "Remote Bookmark Move Item",JOptionPane.OK_OPTION );
                         return;
                     }
-                    //TODO: check that source is not remote bookmarks, and do not remote when it is.
+                    //TODO: check that source is not remote bookmarks, and do not remove when it is.
                     if (item != null) {
                         if (item == context) return;
                         model.removeBookmark(item);
@@ -100,10 +100,16 @@ public class BookmarksManagerTransferrable {
 
                 } catch (UnsupportedFlavorException ex) {
                     Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
+                } catch (BookmarksException ex ) {
+                    ex.printStackTrace();
+
                 } catch (IOException ex) {
                     Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 } catch (SAXException ex) {
                     Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
 
             }
