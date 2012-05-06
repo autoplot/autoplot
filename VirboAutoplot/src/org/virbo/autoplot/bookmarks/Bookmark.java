@@ -264,7 +264,7 @@ public abstract class Bookmark {
             }
 
             if ( nl.getLength()>1 ) {
-                throw new MalformedRemoteBookmarksException("remote bookmarks file can only contain one root bookmark folder");
+                throw new MalformedRemoteBookmarksException("remote bookmarks file can only contain one root bookmark folder: "+remoteUrl);
             }
             Element flist = (Element) nl.item(0); // the bookmark list.
             if ( flist==null ) {
