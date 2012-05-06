@@ -9,7 +9,7 @@ package org.virbo.autoplot.bookmarks;
  * marker class for MalformedRemoteBookmarksException
  * @author jbf
  */
-public class MalformedRemoteBookmarksException extends Exception {
+public class MalformedRemoteBookmarksException extends BookmarksException {
     public MalformedRemoteBookmarksException( String msg ) {
         super(msg);
     }
