@@ -22,13 +22,20 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,9 +57,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.components.DasProgressPanel;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -515,6 +526,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         jMenu1.add(importMenuItem);
 
         importUrlMenuItem.setText("Import From Web...");
+        importUrlMenuItem.setToolTipText("");
         importUrlMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importUrlMenuItemActionPerformed(evt);
@@ -776,8 +788,116 @@ private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 }//GEN-LAST:event_importMenuItemActionPerformed
 
 private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importUrlMenuItemActionPerformed
-    model.doImportUrl(this);
+    String ansr = null;  // possibly invalid entry.
+    String url = null;
+    boolean okay = false;
+    while (okay == false) {
+        String s;
+        if (ansr == null) {
+            s = JOptionPane.showInputDialog(this, "Enter the URL of a bookmarks file:", "");
+        } else {
+            s = JOptionPane.showInputDialog(this, "Whoops. Enter the URL of a bookmarks file:", ansr);
+        }
+
+        if (s == null) {
+            return;
+        } else {
+            ansr= s; // it's likely they will mistype, preserve their work.
+            url = s;
+            okay = true;
+        }
+    }
+
+    doImportUrl(url);
 }//GEN-LAST:event_importUrlMenuItemActionPerformed
+
+    /**
+     * remove remote references in the bookmarks to make a static local copy.
+     * @param books
+     */
+    void makeLocal( List<Bookmark> books ) throws MalformedRemoteBookmarksException {
+        for ( Bookmark b: books ) {
+            if ( b instanceof Bookmark.Folder ) {
+                Bookmark.Folder bf= (Bookmark.Folder) b;
+                if ( bf.remoteUrl!=null && bf.remoteStatus!=0 ) {
+                    List<Bookmark> importBook= new ArrayList<Bookmark>();
+                    RemoteStatus remote= Bookmark.getRemoteBookmarks( bf.remoteUrl,Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT,true,importBook);
+                    if ( remote.status==0 ) {
+                        bf.bookmarks= importBook;
+                        bf.remoteUrl= null;
+                        bf.remoteStatus= 0;
+                    } else {
+                        throw new IllegalArgumentException("couldn't resolve "+bf.remoteUrl);
+                    }
+                }
+                makeLocal(bf.getBookmarks());
+            }
+        }
+    }
+
+    /**
+     * import a URL, possibly making it a remote folder.  Note this contains a copy of code
+     * @param url import this bookmarks file
+     */
+    void doImportUrl( String url ) {
+
+        String bookmarksFile= url.toString();
+
+        ImportBookmarksGui gui= new ImportBookmarksGui();
+        gui.getBookmarksFilename().setText(bookmarksFile+" ?");
+        gui.getRemote().setSelected(true);
+        int r = JOptionPane.showConfirmDialog( this, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
+        if (r == JOptionPane.OK_OPTION) {
+            InputStream in = null;
+            try {
+                ProgressMonitor mon = DasProgressPanel.createFramed("importing bookmarks");
+                if ( gui.getRemote().isSelected() ) {
+                    try {
+                        this.getModel().addRemoteBookmarks(bookmarksFile);
+                    } catch ( MalformedRemoteBookmarksException ex ) {
+                        JOptionPane.showMessageDialog( this, "Malformed "+bookmarksFile+ "\n"+ex.getMessage(), "Error in remote bookmarks", JOptionPane.WARNING_MESSAGE );
+                        return;
+                    }
+                    this.reload();
+                } else {
+                    in = DataSetURI.getInputStream(DataSetURI.getURIValid(bookmarksFile), mon);
+                    ByteArrayOutputStream boas=new ByteArrayOutputStream();
+                    WritableByteChannel dest = Channels.newChannel(boas);
+                    ReadableByteChannel src = Channels.newChannel(in);
+                    DataSourceUtil.transfer(src, dest);
+                    String sin= new String( boas.toByteArray() );
+                    List<Bookmark> books= Bookmark.parseBookmarks(sin);
+                    makeLocal(books);
+                    this.getModel().importList( books );
+                }
+                JOptionPane.showMessageDialog( this, "imported bookmarks file "+bookmarksFile );
+            } catch (BookmarksException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (SAXException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( this, "XML error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (FileNotFoundException ex ) {
+                JOptionPane.showMessageDialog( this, "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (IOException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog( this, "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } finally {
+                try {
+                    if ( in!=null ) in.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+    }
 
 private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
     String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
@@ -789,14 +909,18 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement() );
             model.setList(book);
             formatToFile( bookmarksFile );
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        } catch (SAXException ex ) {
+            throw new RuntimeException( "Default bookmarks are mis-formatted!  Please let the Autoplot developers know!", ex );
+
+        } catch (BookmarksException ex) {
+            new GuiExceptionHandler().handle(ex);
+
         } catch (FileNotFoundException ex) {
             new GuiExceptionHandler().handle(ex);
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(rootPane, "<html>Unable to read in default bookmarks:<br>"+ex.getMessage());
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
     }
 }//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
@@ -860,13 +984,17 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             model.mergeList(importBook, newList);
             model.setList(newList);
             formatToFile( bookmarksFile );
+        } catch (SAXException ex ) {
+            throw new RuntimeException( "Default bookmarks are mis-formatted!  Please let the Autoplot developers know!", ex );
 
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        } catch (BookmarksException ex) {
+            new GuiExceptionHandler().handle(ex);
+
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(rootPane, "<html>Unable to read in default bookmarks:<br>"+ex.getMessage());
+
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
 }//GEN-LAST:event_mergeInDefaultMenuItemActionPerformed
 
@@ -1080,14 +1208,9 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                             // kludge for testing remote bookmarks
                             model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath())); // null getSelectedBook is okay
                             reload();
-                        } catch (IllegalArgumentException ex) {
-                            if (true) {
-                                //ex.toString().contains("URLDecoder") ) {
-                                showMessage("Error in format of " + s + "\n" + ex.toString(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE);
-                            } //else {
-                            //    showMessage( "Expected XML at "+s, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
-                            //}
-                        }
+                        } catch ( MalformedRemoteBookmarksException ex ) {
+                            showMessage("Error in format of remote " + s + "\n" + ex.toString(), "Error in remote bookmarks", JOptionPane.WARNING_MESSAGE);
+                        } 
                     } else {
                         model.addBookmark(new Bookmark.Folder(s), context );
                     }
@@ -1211,12 +1334,15 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     //for ( Bookmark b: book ) {
                     //    System.err.println(b);
                     //}
+                } catch (BookmarksException ex ) {
+                    logger.log(Level.SEVERE, null, ex);
+                    showMessage( "Semantic error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 } catch (SAXException ex) {
                     logger.log(Level.SEVERE, null, ex);
                     showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+                    showMessage( "IO error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 }
             }
         };
@@ -1288,6 +1414,9 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 }
             } );
             
+        } catch (BookmarksException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            showMessage( "Semantic error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
             showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );

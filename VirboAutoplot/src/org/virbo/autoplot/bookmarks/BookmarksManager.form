@@ -20,6 +20,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="importUrlMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Import From Web..."/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importUrlMenuItemActionPerformed"/>
