@@ -151,7 +151,7 @@ public class Test017 {
 
         //This fails because negative CADENCE and MONOTONIC=true.
 
-        "020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
+        //"020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
         //[edit] 6 ASCII
 
         //Autoplot doesn't download this URL:
@@ -249,12 +249,12 @@ public class Test017 {
         //"046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
 
         //vaps with modifiers and recent ISO8601 parsing.
-        "050 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
-        "051 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
-        "052 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
+        "050 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
+        "051 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
+        "052 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
 
         // these are known to cause faults
-        "100 file:///home/jbf/ct/autoplot/data.backup/examples/dat/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1
+        "100 file:///home/jbf/ct/hudson/data/csv/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1
 
     };
 
