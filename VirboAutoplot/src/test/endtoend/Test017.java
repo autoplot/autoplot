@@ -33,7 +33,7 @@ public class Test017 {
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {
-        System.err.println("-- timer -- " + id + " --: " + (System.currentTimeMillis() - t0));
+        System.err.println("-- timer " + (System.currentTimeMillis() - t0) + " --- finished: " + id  );
         t0 = System.currentTimeMillis();
     }
 
@@ -290,7 +290,7 @@ public class Test017 {
             }
         };
 
-        int timeoutSeconds= 30;
+        int timeoutSeconds= 180;
 
         Future f=null;
         while (true) {
