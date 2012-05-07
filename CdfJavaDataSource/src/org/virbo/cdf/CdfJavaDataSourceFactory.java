@@ -89,6 +89,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
                 
                 File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                DataSetURI.checkLength(cdfFile);
                 String fileName= cdfFile.toString();
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
