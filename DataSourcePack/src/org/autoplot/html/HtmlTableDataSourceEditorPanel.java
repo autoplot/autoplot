@@ -64,7 +64,8 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         split = URISplit.parse(uri);
         params = URISplit.parseParams(split.params);
 
-        DataSetURI.getFile(new URL(split.file), mon );
+        File f= DataSetURI.getFile( split.file, true, mon );
+        DataSetURI.checkLength(f);
         return true;
     }
 
@@ -389,6 +390,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
                 tableComboBox.setSelectedItem(table);
             } else {
                 tableComboBox.setSelectedIndex(0);
+                params.put( "table", String.valueOf( tableComboBox.getSelectedItem() ) );
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
@@ -508,7 +510,8 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             split = URISplit.parse(url);
             params = URISplit.parseParams(split.params);
 
-            File f = DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
+            File f = DataSetURI.getFile( split.file, true, new NullProgressMonitor());
+            DataSetURI.checkLength(f);
             setFile(f);
 
             if ( params.get(PROP_TABLE)!=null ) {
