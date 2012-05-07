@@ -601,6 +601,28 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * check that the file has length&gt;0 and throw EmptyFileException if it does.  This
+     * code is the standard way this should be done.
+     * @param file
+     * @throws EmptyFileException
+     */
+    public static void checkLength( File file ) throws EmptyFileException {
+        if ( file.length()==0 ) {
+            throw new EmptyFileException(file);
+        }
+    }
+
+    /**
+     * Check that the file does not contain html content that was intended for human consumption.  This hopes to solve
+     * the problem where an html login screen is presented in hotels, etc.  This is looking for "html" or "doc" at the
+     * beginning of the file, see DataSourceUtil.isHtmlStream.
+     * 
+     * @param tfile the local copy of the file.
+     * @param source the source of the file.
+     * @throws HtmlResponseIOException
+     * @throws FileNotFoundException
+     */
     private static void checkNonHtml( File tfile, URL source ) throws HtmlResponseIOException, FileNotFoundException {
         FileInputStream fi= null;
         HtmlResponseIOException ex2=null;
