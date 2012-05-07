@@ -68,7 +68,7 @@ public class Test017 {
                         out.println(l);
                     }
                     out.close();
-                } else if (s.contains("file:///") && !s.contains("file:///home/jbf/ct/hudson")) {
+                } else if (s.contains("file:/") && !s.contains("/home/jbf/ct/hudson") ) {
                     // we'll just skip these odd local file references for now.
                     System.err.println("skipping local " + s);
                 } else {
