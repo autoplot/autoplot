@@ -302,6 +302,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         split= URISplit.parse(url);
 
         cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
+        DataSetURI.checkLength(cdfFile);
 
         return true;
     }
@@ -313,6 +314,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         try {
 
             cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), new NullProgressMonitor() );
+            DataSetURI.checkLength(cdfFile);
             
             String fileName= cdfFile.toString();
 

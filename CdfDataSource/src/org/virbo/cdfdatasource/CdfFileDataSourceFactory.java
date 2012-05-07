@@ -27,6 +27,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.EmptyFileException;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -127,6 +128,8 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
                 
                 File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                DataSetURI.checkLength(cdfFile);
+
                 String fileName= cdfFile.toString();
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
@@ -212,6 +215,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         //}
 
         logger.log(Level.FINE, "opening {0}", cdfFile);
+        if ( new File(cdfFile).length()==0 ) {
+
+        }
         currentCDF= CDF.open(cdfFile);
         //currentFile= cdfFile;
         return currentCDF;
