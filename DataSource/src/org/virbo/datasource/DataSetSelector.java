@@ -6,6 +6,7 @@
 package org.virbo.datasource;
 
 import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -48,11 +50,14 @@ import javax.swing.ActionMap;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -414,10 +419,36 @@ public class DataSetSelector extends javax.swing.JPanel {
             JOptionPane.showMessageDialog( DataSetSelector.this, msg, "No Such File", JOptionPane.WARNING_MESSAGE );
             setMessage("" + ex.getMessage());
             return true;
+        } else if ( ex instanceof HtmlResponseIOException ) {
+            JPanel r= new javax.swing.JPanel( new BorderLayout() );
+            final String link = ((HtmlResponseIOException)ex).getURL().toString();
+            r.add( new JLabel( " " ), BorderLayout.NORTH );
+            r.add( new JLabel( msg ) );
+            JPanel se= new JPanel( new BorderLayout() );
+            se.add( new JButton( new AbstractAction("View Page") {
+                public void actionPerformed(ActionEvent e) {
+                    DataSourceUtil.openBrowser(link);
+                }
+            }), BorderLayout.EAST );
+            r.add( se, BorderLayout.SOUTH );
+            JOptionPane.showMessageDialog( DataSetSelector.this, r, "Content is HTML", JOptionPane.WARNING_MESSAGE );
+            setMessage("" + ex.getMessage());
+            return true;
+
+        } else if ( ex instanceof EmptyFileException ) {
+            JOptionPane.showMessageDialog( DataSetSelector.this, msg, "Empty File", JOptionPane.WARNING_MESSAGE );
+            setMessage("" + ex.getMessage());
+            return true;
         }
         return false;
     }
 
+    /**
+     * round the timerange slightly to give a more human-friendly timerange that is equivalent.  DomainDividers are used
+     * to find a nice time that could be divided into roughly 10 segments.
+     * @param tr
+     * @return
+     */
     DatumRange quantizeTimeRange( DatumRange tr ) {
         DomainDivider dd= DomainDividerUtil.getDomainDivider(tr.min(),tr.max());
         while ( dd.boundaryCount(tr.min(),tr.max() )<2 ) {
