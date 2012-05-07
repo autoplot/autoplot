@@ -554,6 +554,7 @@ public class DataSetURI {
      * return a file reference for the url.  This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
      *
+     * TODO: why is there both getFile(url,mon) and getFile( suri, allowHtml, mon )???
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
 
@@ -576,10 +577,12 @@ public class DataSetURI {
             File tfile;
             if ( fo.exists() ) {
                 tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
+                checkNonHtml( tfile, url );
             } else {
                 FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
                 if ( foz.exists() ) {
                     File fz= foz.getFile(mon);
+                    checkNonHtml( fz, url );
                     File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
                     tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
                     org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
