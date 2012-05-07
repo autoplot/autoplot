@@ -73,7 +73,7 @@ public class Test013 {
             System.err.println("attempt to parse "+file);
             StreamTool.readStream(Channels.newChannel(in), handler);
             QDataSet qds = handler.getDataSet();
-            System.err.println(qds);
+            System.err.println( "" + qds + " "+ ( Ops.equivalent( ds, qds)  ) );
         } finally {
             if ( in!=null ) in.close();
         }
@@ -393,6 +393,8 @@ public class Test013 {
         try {
 
             MutablePropertyDataSet ds;
+            testBundle();
+            xxx("testBundle");
 
             test8();
 
