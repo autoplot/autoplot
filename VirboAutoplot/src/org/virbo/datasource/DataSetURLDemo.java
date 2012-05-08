@@ -277,7 +277,7 @@ public class DataSetURLDemo {
         testAll();
         URI uri = DataSetURI.toUri("file:///home/jbf/foo_%25Y.txt");
         System.err.println(uri.toURL());
-        URL url = DataSetURI.toURL("file:///home/jbf/foo_%Y.txt"); // java doesn't complain about percents like this, but they are not allowed.
+        URL url = DataSetURI.toUri("file:///home/jbf/foo_%Y.txt").toURL(); // java doesn't complain about percents like this, but they are not allowed.
         System.err.println(url);
         //System.err.println(url.toURI());
         demoGetCompletions();
