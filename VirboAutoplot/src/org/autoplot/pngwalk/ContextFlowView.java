@@ -6,6 +6,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -30,6 +31,9 @@ public class ContextFlowView extends PngWalkView {
 
     public ContextFlowView( WalkImageSequence s ) {
         super(s);
+
+        this.setPreferredSize( new Dimension(640,500) );
+
         sequenceChanged();
         addMouseWheelListener( getMouseWheelListener() );
 
