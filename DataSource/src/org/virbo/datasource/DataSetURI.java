@@ -415,24 +415,6 @@ public class DataSetURI {
         return factory;
     }
 
-    /**
-     *
-     * split the parameters into name,value pairs.
-     *
-     * items without equals (=) are inserted as "arg_N"=name.
-     * @deprecated use URISplit.parseParams
-     */
-    public static LinkedHashMap<String, String> parseParams(String params) {
-        return URISplit.parseParams(params);
-    }
-
-    /**
-     * @deprecated use URISplit.parseParams
-     */
-    public static String formatParams(Map parms) {
-        return URISplit.formatParams(parms);
-    }
-
     public static InputStream getInputStream(URL url, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse(url.toString());
 
@@ -465,18 +447,6 @@ public class DataSetURI {
 
     }
 
-    /**
-     * canonical method for converting string from the wild into a URI-safe string.
-     * The string should already have a scheme part, such as "http" or "file".
-     * @param surl
-     * @deprecated use toURI().toURL() instead.
-     * @return
-     * @throws java.net.MalformedURLException
-     */
-    public static URL toURL( String surl ) throws MalformedURLException {
-        surl= surl.replaceAll(" ", "%20");
-        return new URL(surl);
-    }
 
     /**
      * canonical method for converting string from the wild into a URI-safe string.
