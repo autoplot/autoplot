@@ -519,6 +519,54 @@ public class DataSetURI {
         return ssheet.replaceAll("\\+"," ");
     }
 
+    /**
+     * check that the file has length&gt;0 and throw EmptyFileException if it does.  This
+     * code is the standard way this should be done.
+     * @param file
+     * @throws EmptyFileException
+     */
+    public static void checkLength( File file ) throws EmptyFileException {
+        if ( file.length()==0 ) {
+            throw new EmptyFileException(file);
+        }
+    }
+
+    /**
+     * Check that the file does not contain html content that was intended for human consumption.  This hopes to solve
+     * the problem where an html login screen is presented in hotels, etc.  This is looking for "html" or "doc" at the
+     * beginning of the file, see DataSourceUtil.isHtmlStream.
+     *
+     * @param tfile the local copy of the file.
+     * @param source the source of the file.
+     * @throws HtmlResponseIOException
+     * @throws FileNotFoundException
+     */
+    private static void checkNonHtml( File tfile, URL source ) throws HtmlResponseIOException, FileNotFoundException {
+        FileInputStream fi= null;
+        HtmlResponseIOException ex2=null;
+        try {
+            fi = new FileInputStream(tfile);
+            byte[] magic = new byte[5];
+            int bytes = fi.read(magic);
+            if ( bytes==5 ) {
+                String ss= new String(magic);
+                if ( DataSourceUtil.isHtmlStream(ss) ) {
+                    ex2= new HtmlResponseIOException( "file appears to be html: "+tfile, source );
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if ( fi!=null ) fi.close();
+            } catch (IOException ex) {
+                Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if ( ex2!=null ) throw ex2;
+        return;
+
+    }
 
     /**
      * return a file reference for the url.  This is initially to fix the problem
@@ -572,55 +620,6 @@ public class DataSetURI {
         } catch (URISyntaxException ex) {
             throw new IOException("URI Syntax Exception: " + ex.getMessage());
         }
-    }
-
-    /**
-     * check that the file has length&gt;0 and throw EmptyFileException if it does.  This
-     * code is the standard way this should be done.
-     * @param file
-     * @throws EmptyFileException
-     */
-    public static void checkLength( File file ) throws EmptyFileException {
-        if ( file.length()==0 ) {
-            throw new EmptyFileException(file);
-        }
-    }
-
-    /**
-     * Check that the file does not contain html content that was intended for human consumption.  This hopes to solve
-     * the problem where an html login screen is presented in hotels, etc.  This is looking for "html" or "doc" at the
-     * beginning of the file, see DataSourceUtil.isHtmlStream.
-     * 
-     * @param tfile the local copy of the file.
-     * @param source the source of the file.
-     * @throws HtmlResponseIOException
-     * @throws FileNotFoundException
-     */
-    private static void checkNonHtml( File tfile, URL source ) throws HtmlResponseIOException, FileNotFoundException {
-        FileInputStream fi= null;
-        HtmlResponseIOException ex2=null;
-        try {
-            fi = new FileInputStream(tfile);
-            byte[] magic = new byte[5];
-            int bytes = fi.read(magic);
-            if ( bytes==5 ) {
-                String ss= new String(magic);
-                if ( DataSourceUtil.isHtmlStream(ss) ) {
-                    ex2= new HtmlResponseIOException( "file appears to be html: "+tfile, source );
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if ( fi!=null ) fi.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        if ( ex2!=null ) throw ex2;
-        return;
-
     }
 
     /**
