@@ -227,55 +227,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
         return (DirectoryEntry[]) result.toArray(new DirectoryEntry[result.size()]);
     }
 
-    protected void resetListCache( String directory ) {
-        directory = toCanonicalFolderName(directory);
-
-        File f= new File(localRoot, directory + ".listing");
-        if ( f.exists() && ! f.delete() ) {
-            throw new IllegalArgumentException("unable to delete .listing file: "+f);
-        }
-        
-    }
-
-    public static final int LISTING_TIMEOUT_MS = 20000;
-
-    public void resetListingCache() {
-        if ( !FileUtil.deleteWithinFileTree(localRoot,".listing") ) {
-            throw new IllegalArgumentException("unable to delete all .listing files");
-        }
-    }
-
-    /**
-     * returns true if the .listing file exists in the local cache and has a recent (LISTING_TIMEOUT_MS=20000) timestamp
-     * @param directory
-     * @return
-     */
-    public boolean isListingCached( String directory ) {
-        File listing = listingFile( directory );
-        if ( listing.exists() && ( System.currentTimeMillis() - listing.lastModified() ) < LISTING_TIMEOUT_MS ) {
-            logger.fine(String.format( "listing date is %f5.2 seconds old", (( System.currentTimeMillis() - listing.lastModified() ) /1000.) ));
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * return the File for the cached listing, even if it does not exist.
-     * @param directory
-     * @return
-     */
-    private File listingFile( String directory ) {
-        File f= new File(localRoot, directory);
-        try {
-            FileSystemUtil.maybeMkdirs(f);;
-        } catch ( IOException ex ) {
-            throw new IllegalArgumentException("unable to mkdir "+f);
-        }
-        File listing = new File(localRoot, directory + ".listing");
-        return listing;
-    }
-
     public synchronized final String[] listDirectory(String directory) throws IOException {
         directory = toCanonicalFolderName(directory);
 
@@ -290,6 +241,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             for (int i = 0; i < des.length; i++) {
                 result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
             }
+
+            cacheListing(directory, result );
+
             return result;
         }
 
@@ -363,7 +317,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 for (int i = 0; i < des.length; i++) {
                     result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
                 }
-              
+
+                cacheListing(directory, result );
+
                 return result;
                 
             } catch (FtpException e) {
