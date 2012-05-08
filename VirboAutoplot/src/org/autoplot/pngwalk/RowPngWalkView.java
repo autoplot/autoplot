@@ -253,8 +253,13 @@ public class RowPngWalkView extends PngWalkView {
                     if (s < 1.0) {
                         int w = (int) (s * thumb.getWidth());
                         int h = (int) (s * thumb.getHeight());
-                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                        thumb = resizeOp.filter(thumb, null);
+                        //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                        //thumb= ImageResize.getScaledInstance( thumb, w, h, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR, true );
+                        thumb= wimage.getThumbnail(w,h,true);
+                        if ( thumb==loadingImage ) {
+                            this.repaintSoon();
+                        }
+                        //thumb = resizeOp.filter(thumb, null);
                     }
                 } else {
                     thumb = loadingImage;
