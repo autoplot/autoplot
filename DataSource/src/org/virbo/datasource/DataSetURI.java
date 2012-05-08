@@ -632,12 +632,35 @@ public class DataSetURI {
      */
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
+        URL url= split.resourceUri.toURL();
         try {
             FileSystem fs = FileSystem.create(toUri(split.path),mon); // mon because of ZipFileSystem
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
-            File tfile = fo.getFile(mon);
-            if ( !allowHtml && tfile.exists() ) checkNonHtml(tfile, new URL(split.file) );
+            File tfile;
+            if ( fo.exists() ) {
+                tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
+                if ( !allowHtml && tfile.exists() ) checkNonHtml( tfile, url );
+            } else {
+                FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
+                if ( foz.exists() ) {
+                    File fz= foz.getFile(mon);
+                    if ( !allowHtml && fz.exists() ) checkNonHtml( fz, url );
+                    File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
+                    tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
+                    org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
+                    if ( tfile.exists() ) {
+                        if ( ! tfile.delete() ) {
+                            throw new IllegalArgumentException("unable to delete "+tfile );
+                        }
+                    } // it shouldn't, but to be safe...
+                    if ( ! tfile1.renameTo(tfile) ) {
+                        throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
+                    }
+                } else {
+                    throw new FileNotFoundException("File not found: "+url );
+                }
+            }
             return tfile;
         } catch ( URIException ex ) {
             throw new IOException(ex.getMessage()); //Java1.6 will change this
