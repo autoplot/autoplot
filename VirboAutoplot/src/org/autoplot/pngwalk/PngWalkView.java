@@ -1,7 +1,6 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -9,7 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -188,8 +186,11 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             g2.drawImage(i, xpos, ypos, this );
 
         } else {
-            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
-            g2.drawImage(i, resizeOp, xpos, ypos);
+            //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
+            //BufferedImageOp resizeOp = new RescaleOp( 1/(float)xfactor, 0,
+            //        new RenderingHints( Collections.singletonMap( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY ) ) );
+            BufferedImage resize= ImageResize.getScaledInstance( i, xs, ys, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR, true );
+            g2.drawImage( resize, xpos, ypos, this );
         }
         if ( showCaptions && caption != null) {
             int cx = xpos;
