@@ -254,14 +254,15 @@ public class CoversWalkView extends PngWalkView  {
                         thumb = resizeOp.filter(thumb, null);
                     }
                 } else {
-                    thumb = loadingImage;
-                    double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
-                    if (s > 1.0) s = 1.0;
-                    int w = (int) (s * thumb.getWidth() / HEIGHT_WIDTH_RATIO);
-                    int h = (int) (s * thumb.getHeight());
-
-                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
-                    thumb = resizeOp.filter(thumb, null);
+                    //thumb = loadingImage;
+                    thumb = tinyLoadingImage;
+//                    double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
+//                    if (s > 1.0) s = 1.0;
+//                    int w = (int) (s * thumb.getWidth() / HEIGHT_WIDTH_RATIO);
+//                    int h = (int) (s * thumb.getHeight());
+//
+//                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
+//                    thumb = resizeOp.filter(thumb, null);
                 }
                 int imgX= i * cellWidth + (cellWidth - thumb.getWidth()) / 2;
                 int imgY= (cellSize - thumb.getHeight()) / 2;

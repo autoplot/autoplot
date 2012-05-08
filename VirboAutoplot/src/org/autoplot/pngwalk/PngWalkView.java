@@ -31,6 +31,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
 
     protected static final BufferedImage loadingImage = initLoadingImage();
+    protected static final BufferedImage tinyLoadingImage= initTinyLoadingImage();
     protected static final ImageIcon okBadge;
     protected static final ImageIcon problemBadge;
     protected static final ImageIcon ignoreBadge;
@@ -216,6 +217,22 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         g2.fillOval(36, 32, 4, 4);
         return li;
     }
+
+    private static BufferedImage initTinyLoadingImage() {
+        BufferedImage li;
+        //e.printStackTrace(System.err);
+        // Construct a backup image to use
+        li = new BufferedImage(8,8, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = li.createGraphics();
+        g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
+        g2.setColor(new java.awt.Color(0.0F, 0.0F, 0.0F, 0.5F));
+        g2.fillRoundRect(0, 0, 8, 8, 4, 4);
+        //TODO: Add text or hourglass or something?
+        g2.setColor(java.awt.Color.WHITE);
+        g2.fillOval( 2, 2, 4, 4 );
+        return li;
+    }
+
 
     protected void paintQualityControlIcon(int i, Graphics2D g2, int imgX, int imgY, boolean icon) {
         QualityControlRecord rec = seq.getQualityControlSequence().getQualityControlRecord(i);

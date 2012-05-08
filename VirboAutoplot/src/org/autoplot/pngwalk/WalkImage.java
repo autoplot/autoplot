@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -409,7 +410,9 @@ public class WalkImage  {
     private static BufferedImage initMissingImage() {
         BufferedImage missing = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = missing.createGraphics();
-        g2.setColor(java.awt.Color.BLACK);
+        g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+        g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
+        g2.setColor(java.awt.Color.GRAY);
         FontMetrics fm = g2.getFontMetrics(g2.getFont());
         String msg = "(Missing)";
         g2.drawString(msg, (200 - fm.stringWidth(msg)) / 2, 100);
