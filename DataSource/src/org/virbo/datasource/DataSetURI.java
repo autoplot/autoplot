@@ -1217,6 +1217,12 @@ public class DataSetURI {
 
         //TODO: handle folder-not-found more gracefully.
 
+        // handle .gz by presenting the uncompressed versions, which are available through the FileStorageModelNew.  This is a
+        for ( int i=0; i<s.length; i++ ) {
+            if ( s[i].endsWith(".gz") ) {
+                s[i]= s[i].substring(0,s[i].length()-3);
+            }
+        }
 
         if ( acceptPattern!=null ) {
             Pattern p= Pattern.compile(acceptPattern);
