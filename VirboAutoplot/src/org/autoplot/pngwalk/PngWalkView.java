@@ -189,7 +189,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
             //BufferedImageOp resizeOp = new RescaleOp( 1/(float)xfactor, 0,
             //        new RenderingHints( Collections.singletonMap( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY ) ) );
-            BufferedImage resize= ImageResize.getScaledInstance( i, xs, ys, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR, true );
+            BufferedImage resize= ImageResize.getScaledInstance( i, xs, ys, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
             g2.drawImage( resize, xpos, ypos, this );
         }
         if ( showCaptions && caption != null) {
