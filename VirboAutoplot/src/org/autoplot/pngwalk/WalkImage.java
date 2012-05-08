@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -36,7 +35,7 @@ public class WalkImage  {
 
     public static final int THUMB_SIZE = 400;
     private static final int SQUASH_FACTOR = 10; // amount to horizontally squash thumbs for covers and contextFlow
-    private static final int LOADED_IMAGE_COUNT_LIMIT = 50;
+    private static final int LOADED_IMAGE_COUNT_LIMIT = 10;
     
     final String uriString;  // Used for sorting
     private URI imgURI;
