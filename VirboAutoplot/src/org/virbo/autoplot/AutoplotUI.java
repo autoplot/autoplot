@@ -176,6 +176,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     private JScrollPane layoutPanel1;
     private LogConsole logConsole;
     private JScrollPane logConsolePanel;
+    private JScrollPane jythonScriptPanel;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
@@ -769,15 +770,15 @@ APSplash.checkTime("init 270");
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             final DataSetSelector fdataSetSelector= this.dataSetSelector; // org.pushngpixels.tracing.TracingEventQueueJMX showed this was a problem.
-            final JScrollPane fjython= new JScrollPane();
-            tabs.addTab( TAB_SCRIPT, null, fjython,
+            jythonScriptPanel= new JScrollPane();
+            tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             invokeLater( 4000, false, new Runnable() {
                 public String toString() { return "addScriptPanel"; }
                 public void run() {
                     scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
-                       fjython.setViewportView(scriptPanel);
+                       jythonScriptPanel.setViewportView(scriptPanel);
                        scriptPanelMenuItem.setSelected(true);
                     } } );
                 }
@@ -2436,28 +2437,37 @@ APSplash.checkTime("init 52");
 
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
-    if (scriptPanelMenuItem.isSelected() && scriptPanel == null) {
+    if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
+        jythonScriptPanel= new JScrollPane();
         scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
-        tabs.insertTab(TAB_SCRIPT, null, scriptPanel,
+        jythonScriptPanel.setViewportView(scriptPanel);
+        tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
+                String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
+    } else if ( scriptPanelMenuItem.isSelected() && jythonScriptPanel!=null ) {
+        tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
     } else {
-        JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
+        tabs.remove( jythonScriptPanel );
     }
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
     applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(logConsoleMenuItem.isSelected());
-    if (applicationModel.getDocumentModel().getOptions().isLogConsoleVisible() && logConsole == null) {
+    if ( logConsoleMenuItem.isSelected() && logConsolePanel == null) {
         logConsolePanel= new JScrollPane();
         tabs.addTab(TAB_CONSOLE, null, logConsolePanel,
             String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         initLogConsole();
         logConsolePanel.setViewportView( logConsole );
+    } else if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
+        tabs.addTab(TAB_CONSOLE, null, logConsolePanel,
+            String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
+        
     } else {
-        if ( logConsole!=null ) {
+        if ( logConsoleMenuItem.isSelected() && logConsolePanel!=null ) {
             logConsole.undoLogConsoleMessages();
         }
-        JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
+        tabs.remove(logConsolePanel);
     }
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
@@ -3450,18 +3460,18 @@ APSplash.checkTime("init 240");
         for ( Plot p: dom.getPlots() ) {
             p.getController().setExpertMode(expert);
         }
-        if ( scriptPanel!=null ) {
+        if ( jythonScriptPanel!=null ) {
             if ( expert ) {
-                tabs.add( TAB_SCRIPT, scriptPanel );
+                tabs.add( TAB_SCRIPT, jythonScriptPanel );
             } else {
-                tabs.remove( scriptPanel );
+                tabs.remove( jythonScriptPanel );
             }
         }
-        if ( logConsole!=null ) {
+        if ( logConsolePanel!=null ) {
             if ( expert ) {
-                tabs.add( "console", logConsole );
+                tabs.add( "console", logConsolePanel );
             } else {
-                tabs.remove( logConsole );
+                tabs.remove( logConsolePanel );
             }
         }
         if ( layoutPanel1!=null ) {
