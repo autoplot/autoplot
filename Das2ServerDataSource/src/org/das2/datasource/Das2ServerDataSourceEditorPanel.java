@@ -533,7 +533,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
             String result= "";
             for ( int ii=0; ii<o.getLength(); ii++ ) {
-                result+= "\n" + o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue();
+                result+=  o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue() + "\n";
             }
             in.close();
 
