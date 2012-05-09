@@ -22,6 +22,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>GUI clean up of pngwalk tool, including wait icons</li>
+            <li>correct pngwalk tool hangs on Bob's folder with thousands of files because of excessive parsing of .listing file.</li>
+            <li>correct pngwalk tool hangs caused by out of memory error due to excessive caching of full-size images.</li>
+            <li>finally disable script panel and log console are immediate and can be re-enabled.</li>
             <li>allow spaces in timerange argument params like "$(o, id=crres)"</li>
             <li>limit the number of parent files listed when resolving ftp://virbo.org/POES/n15/$Y/poes_n15_$Y$m$d.cdf.zip/poes_n15_$Y$m$d.cdf?P1_90&timerange=1998-07-01</li>
             <li>remote zip files on Windows would not work because of c:\</li>
@@ -56,18 +60,14 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Features:</p>
         <ul>
-            <li>three and four argument bundle added to scripting to improve legibility</li>
-            <li>remote bookmarks loading is indicated via icons instead of [loading...]</li>
-            <li>plotElement selection is indicated in thumbnail on layout tab.</li>
+            <li>timerange selector uses droplist to allow selection of recently-entered timeranges</li>
+            <li>likewise, operations selector keeps track of recent operations</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>|valid() added to filters.</li>
-            <li>|dbAboveBackgroundDim1 supports rows that are all fill.</li>
-            <li>das2 server uses "server=peers" to add other das2servers to droplist</li>
-            <li>minor performance enhancements, such as making length methods final</li>
-            <li>export to ascii table includes units in headers</li>
-            <li>facebook group added: http://www.facebook.com/autoplot.org</li>
+            <li>three and four argument bundle added to scripting to improve legibility</li>
+            <li>remote bookmarks loading is indicated via icons instead of [loading...]</li>
+            <li>plotElement selection is indicated in thumbnail on layout tab.</li>
         </ul>
 
 <p>Known issues:</p>
