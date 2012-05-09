@@ -71,10 +71,11 @@ public class DataPanel extends javax.swing.JPanel {
     
     private final static Logger logger = Logger.getLogger("virbo.autoplot");
 
+    final RecentComboBox cb;
     public DataPanel( Application dom ) {
         initComponents();
 
-        final RecentComboBox cb= new RecentComboBox("operations");
+        cb= new RecentComboBox("operations");
         cb.setToolTipText("Recently entered operations");
         cb.addFocusListener( new FocusAdapter() {
             @Override
@@ -832,6 +833,7 @@ public class DataPanel extends javax.swing.JPanel {
         if ( ret==JOptionPane.OK_OPTION ) {
             componentTextField1.setText( p.getFilters() );
             applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
+            cb.actionPerformed(evt); // kludge to get it to log the new filter
             componentChanged();
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
