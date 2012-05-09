@@ -11,9 +11,12 @@
 
 package org.virbo.datasource;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -23,12 +26,16 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.InputVerifier;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
@@ -41,13 +48,58 @@ import org.das2.datum.UnitsUtil;
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
 
+    RecentComboBox cb;
+
     /** Creates new form TimeRangePanel */
     public TimeRangeEditor() {
         initComponents();
+        cb= new RecentComboBox("timerange");
+        cb.setToolTipText("Recently entered time ranges");
+        cb.addFocusListener( new FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                parseRange();
+            }
+        });
+
+        jPanel1.add( cb, BorderLayout.CENTER );
+        cb.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                parseRange();
+            }
+        });
+
+        cb.setVerifier( new RecentComboBox.InputVerifier() {
+            public boolean verify(String text) {
+                try {
+                    DatumRange value = DatumRangeUtil.parseTimeRange(text);
+                    return true;
+                } catch (ParseException e) {
+                    return false;
+                }
+            }
+        });
+
+//        ((JTextField)cb.getEditor().getEditorComponent()).setInputVerifier( new InputVerifier() {
+//            @Override
+//            public boolean verify(JComponent input) {
+//                String text = (String) ((JComboBox) cb).getSelectedItem();
+//                try {
+//                    DatumRange value = DatumRangeUtil.parseTimeRange(text);
+//                    return true;
+//                } catch (ParseException e) {
+//                    return false;
+//                }
+//            }
+//        });
+        revalidate();
         addMousePopupListener();
     }
 
     DatumRange range= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+
+    public static final String PROP_USE_DOY= "useDoy";
+    public static final String PROP_RANGE= "range";
 
     /**
      * use DOY instead of Y-M-D
@@ -62,7 +114,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         boolean old= this.useDoy;
         this.useDoy = useDoy;
         DatumRangeUtil.useDoy= useDoy;
-        firePropertyChange("useDoy",old,useDoy);
+        firePropertyChange( PROP_USE_DOY,old,useDoy);
     }
 
     public DatumRange getRange() {
@@ -73,22 +125,22 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         DatumRange oldValue= this.range;
         this.range= value;
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
-            super.firePropertyChange("range", oldValue, value);
+            super.firePropertyChange( PROP_RANGE, oldValue, value);
         }
-        this.timeRangeTextField.setText( value.toString() );
+        this.cb.setSelectedItem( value.toString() );
     }
 
     private void parseRange() {
         DatumRange dr;
         DatumRange value= this.range;
 
-        String text= timeRangeTextField.getText();
+        String text= (String)cb.getSelectedItem();
         try {
             String rangeString= text;
             dr= DatumRangeUtil.parseTimeRange(rangeString);
             setRange(dr);
         } catch ( ParseException e ) {
-            timeRangeTextField.setText( range.toString() );
+            //timeRangeTextField.setText( range.toString() ); // I think we can just leave the value there.
             if ( UnitsUtil.isTimeLocation(value.getUnits()) ) { // go ahead and handle non-times.
                 showErrorUsage( text, "<html>" +e.getMessage() );
             } else {
@@ -141,8 +193,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         prevButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
-        timeRangeTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
@@ -168,19 +220,6 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        timeRangeTextField.setText("2010-01-01");
-        timeRangeTextField.setToolTipText("<html>Adjust Application Time Range<br>\nFor example:<br>\n2010:  the year 2010.<br>\n2010-01: the month 2010-Jan<br>\n2010-001 or 2010-01-01: Jan 1, 2010<br>\n2010-01-01 08:00 to 09:00<br>\n</html>");
-        timeRangeTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeRangeTextFieldActionPerformed(evt);
-            }
-        });
-        timeRangeTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                timeRangeTextFieldFocusLost(evt);
-            }
-        });
-
         browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
         browseButton.setToolTipText("Edit data source");
         browseButton.setEnabled(false);
@@ -194,12 +233,14 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -212,17 +253,15 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE, false)
-                        .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(nextButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(prevButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE, false)
+                .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(nextButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, prevButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        layout.linkSize(new java.awt.Component[] {browseButton, nextButton, prevButton, timeRangeTextField}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {browseButton, nextButton, prevButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -233,14 +272,6 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
         setRange( range.previous() );
     }//GEN-LAST:event_prevButtonActionPerformed
-
-    private void timeRangeTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusLost
-        parseRange();
-    }//GEN-LAST:event_timeRangeTextFieldFocusLost
-
-    private void timeRangeTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTextFieldActionPerformed
-        parseRange();
-    }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
     DataSetSelector peer;
 
@@ -278,7 +309,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     public static void main( String[] args ) {
         TimeRangeEditor p= new TimeRangeEditor();
-        p.addPropertyChangeListener( "range", new PropertyChangeListener() {
+        p.addPropertyChangeListener( p.PROP_RANGE, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 System.err.println(evt.getOldValue()+" -> "+ evt.getNewValue() );
@@ -294,9 +325,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
-    private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 
     public PropertyChangeListener getUriFocusListener() {
@@ -317,7 +348,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     
     private void addMousePopupListener() {
-        timeRangeTextField.addMouseListener( new MouseAdapter() {
+        cb.getEditor().getEditorComponent().addMouseListener( new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -335,6 +366,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
 
         });
+
     }
     private void showPopup( MouseEvent e ) {
         getPopupMenu().show( this, e.getX(), e.getY() );
@@ -343,7 +375,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private JMenuItem exampleTime( final String s, final String toolTip ) {
         JMenuItem mi= new JMenuItem( new AbstractAction(s) {
             public void actionPerformed( ActionEvent e ) {
-                timeRangeTextField.setText(s);
+                cb.setSelectedItem(s);
             }
         });
         mi.setToolTipText(toolTip);

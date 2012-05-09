@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="timeRangeTextField" pref="256" max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="256" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="prevButton" linkSize="3" min="-2" pref="40" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -34,16 +34,13 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="103" groupAlignment="3" max="-2" attributes="0">
-                      <Component id="browseButton" linkSize="2" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
-                      <Component id="nextButton" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Component id="prevButton" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="timeRangeTextField" linkSize="2" alignment="0" min="-2" pref="27" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="32767" attributes="0"/>
+          <Group type="103" groupAlignment="3" max="-2" attributes="0">
+              <Component id="browseButton" linkSize="2" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+              <Component id="nextButton" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+          </Group>
+          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+              <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
+              <Component id="prevButton" linkSize="2" alignment="0" max="32767" attributes="1"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -89,16 +86,6 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="timeRangeTextField">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="2010-01-01"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Adjust Application Time Range&lt;br&gt;&#xa;For example:&lt;br&gt;&#xa;2010:  the year 2010.&lt;br&gt;&#xa;2010-01: the month 2010-Jan&lt;br&gt;&#xa;2010-001 or 2010-01-01: Jan 1, 2010&lt;br&gt;&#xa;2010-01-01 08:00 to 09:00&lt;br&gt;&#xa;&lt;/html&gt;"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeTextFieldActionPerformed"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeRangeTextFieldFocusLost"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JButton" name="browseButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -123,5 +110,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="browseButtonActionPerformed"/>
       </Events>
     </Component>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+    </Container>
   </SubComponents>
 </Form>
