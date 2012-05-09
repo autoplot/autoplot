@@ -30,10 +30,10 @@ public class RecentComboBox extends JComboBox {
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
 
-    RecentComboBox( String pref ) {
+    public RecentComboBox( String pref ) {
         super();
         setEditable(true);
-        setModel( new DefaultComboBoxModel( new String[] { "A","B","C" } ) );
+        setModel( new DefaultComboBoxModel( new String[] { "" } ) );
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
         loadRecent();
     }
