@@ -28,7 +28,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel2" max="32767" attributes="0"/>
+              <Component id="jPanel2" pref="249" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -63,7 +63,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="componentTextField" pref="422" max="32767" attributes="0"/>
+                          <Component id="operationsRecentComboBoxPanel" pref="422" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Component id="doSliceCheckBox" min="-2" max="-2" attributes="0"/>
@@ -86,27 +86,27 @@
                   <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="editComponentPanel" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="componentTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="operationsRecentComboBoxPanel" alignment="0" max="32767" attributes="1"/>
+                              <Component id="operationsLabel" alignment="0" max="32767" attributes="1"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="doSliceCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="sliceTypeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="sliceIndexLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="sliceIndexSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="sliceAutorangesCB" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="transposeCheckBox" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="50" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="doSliceCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="sliceTypeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="sliceIndexLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="sliceIndexSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="sliceAutorangesCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="transposeCheckBox" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -154,18 +154,6 @@
             <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="componentTextField">
-          <Properties>
-            <Property name="text" type="java.lang.String" value=" "/>
-          </Properties>
-          <Events>
-            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="componentTextFieldMousePressed"/>
-            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="componentTextFieldMouseReleased"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="componentTextFieldActionPerformed"/>
-            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="componentTextFieldFocusGained"/>
-            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="componentTextFieldFocusLost"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="doSliceCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Slice Dimension"/>
@@ -212,6 +200,10 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
           </Events>
         </Component>
+        <Container class="javax.swing.JPanel" name="operationsRecentComboBoxPanel">
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+        </Container>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel1">
