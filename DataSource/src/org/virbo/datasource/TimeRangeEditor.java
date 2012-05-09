@@ -55,6 +55,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         initComponents();
         cb= new RecentComboBox("timerange");
         cb.setToolTipText("Recently entered time ranges");
+        ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
         cb.addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
