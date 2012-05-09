@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -77,6 +78,8 @@ public class DataPanel extends javax.swing.JPanel {
 
         cb= new RecentComboBox("operations");
         cb.setToolTipText("Recently entered operations");
+        ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
+        
         cb.addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
