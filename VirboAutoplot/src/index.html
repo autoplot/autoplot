@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Pig vocalizations studied in Autoplot.  Wav files are read in and fftPower is used to create spectrograms.</small></p>
+        <p><small>The Time Range Selector and Operations Filters GUI now keep track of recent entries.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,12 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <p>Bugfixes:</p>
         <ul>
+            <li>GUI clean up of Manage Cache and Recent URIs dialogs.</li>
+            <li>TimeRange Selector indicates if no one is listening</li>
+            <li>reorder File menu so open .vap and open Data are next to each other</li>
+            <li>Script and Log Consoles are properly hidden in basic mode.</li>
+            <li>TimeRange Selector doesn't reset to valid when parse error occurs.</li>
+            <li>Script and Log Consoles can be turned off and back on within a session.</li>
             <li>GUI clean up of pngwalk tool, including wait icons</li>
             <li>correct pngwalk tool hangs on Bob's folder with thousands of files because of excessive parsing of .listing file.</li>
             <li>correct pngwalk tool hangs caused by out of memory error due to excessive caching of full-size images.</li>
