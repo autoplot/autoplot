@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -20,6 +21,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
@@ -33,11 +39,14 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
     AutoplotUI app;
 
+    TreeModel def= new DefaultTreeModel( new DefaultMutableTreeNode("moment...") );
+    MouseListener l= null;
+
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel(AutoplotUI model) {
         this.app = model;
         initComponents();
-        jTree1.addMouseListener(createMouseListener(jTree1));
+        jTree1.setModel( def );
 
     }
 
@@ -177,9 +186,17 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     public void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
         dumodel.search(root, 0, new NullProgressMonitor());
-        FSTreeModel model = new FSTreeModel(dumodel, root);
+        final FSTreeModel model = new FSTreeModel(dumodel, root);
         model.setHideListingFile(true);
-        jTree1.setModel(model);
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                jTree1.setModel(model);
+                if ( l==null ) {
+                    l= createMouseListener(jTree1);
+                    jTree1.addMouseListener(l);
+                }
+            }
+        } );
     }
 
     /** This method is called from within the constructor to
