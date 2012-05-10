@@ -2493,11 +2493,15 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-    JDiskHogPanel panel = new JDiskHogPanel( this );
-    panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
+    final JDiskHogPanel panel = new JDiskHogPanel( this );
     JDialog dia = new JDialog(this, "Manage Cache", true);
     dia.add(panel);
     dia.pack();
+    RequestProcessor.invokeLater( new Runnable() {
+        public void run() {
+            panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
+        }
+    });
     dia.setVisible(true);
 
 //JOptionPane.showMessageDialog(this, plotElement, "Manage Cache", JOptionPane.DEFAULT_OPTION, null);
