@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -96,26 +97,38 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     private String filter;
     void setFilter(String filter) {
         this.filter= filter;
-        update();
+        RequestProcessor.invokeLater( new Runnable() { 
+            public void run() {
+                update();
+            }
+        });
     }
 
     private void update() {
         theModel= new MyTreeModel();
-        jTree1.setModel( theModel );
 
-        Object r= jTree1.getModel().getRoot();
+        Runnable run= new Runnable() {
+            public void run() {
+                jTree1.setModel( theModel );
 
-        // show >30 URIs if possible
-        int c=0; //URIS
-        int i=0; //index
-        final int SHOW_URIS=30;
-        TreeModel jt= jTree1.getModel();
-        while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
-            Object child= jt.getChild( r,i );
-            jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
-            c+= jt.getChildCount(child);
-            i++;
-        }
+                Object r= jTree1.getModel().getRoot();
+
+                // show >30 URIs if possible
+                int c=0; //URIS
+                int i=0; //index
+                final int SHOW_URIS=30;
+                TreeModel jt= jTree1.getModel();
+                while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
+                    Object child= jt.getChild( r,i );
+                    jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
+                    c+= jt.getChildCount(child);
+                    i++;
+                }
+
+            }
+        };
+        SwingUtilities.invokeLater(run);
+
     }
 
     class MyCellRenderer extends DefaultTreeCellRenderer {
@@ -201,6 +214,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                 String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
                         null );
+                int iline=0;
                 final File f3 = new File(f2, "history.txt");
                 if ( f3.exists()&&f3.canRead() ) {
                     Scanner scan;
@@ -212,6 +226,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                     while (scan.hasNextLine()) {
                         String line = scan.nextLine();
+                        iline++;
                         String[] ss= line.split("\\s+",2);
                         if ( ss.length<2 ) {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
