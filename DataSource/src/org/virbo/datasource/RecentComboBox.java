@@ -69,11 +69,19 @@ public class RecentComboBox extends JComboBox {
                 items.add(s);
                 s= r.readLine();
             }
+
+            Collections.reverse(items);
+            
+            //remove repeat items
+            List nitems= new ArrayList(items.size());
+            for ( int i=0; i<items.size(); i++ ) {
+                String item= items.get(i);
+                if ( !nitems.contains(item) ) nitems.add(item);
+            }
+            items= nitems;
             
             int n= items.size();
-
             if ( n>RECENT_SIZE ) items= items.subList(n-RECENT_SIZE,n);
-            Collections.reverse(items);
             
             setModel( new DefaultComboBoxModel( items.toArray() ) );
             saveRecent(items);
