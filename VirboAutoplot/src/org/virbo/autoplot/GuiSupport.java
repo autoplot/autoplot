@@ -1079,6 +1079,11 @@ public class GuiSupport {
             item = new JMenuItem(new AbstractAction("Bind to Application Time Range") {
 
                 public void actionPerformed(ActionEvent e) {
+                    DatumRange dr= controller.getApplication().getTimeRange();
+                    if ( dr==Application.DEFAULT_TIME_RANGE ) {
+                        controller.getApplication().setTimeRange( dr.next() );
+                        controller.getApplication().setTimeRange( dr.next().previous() ); // so it accepts the value and fires event
+                    }
                     controller.bind(controller.getApplication(), Application.PROP_TIMERANGE, axis, Axis.PROP_RANGE);
                 }
             });
