@@ -54,7 +54,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public TimeRangeEditor() {
         initComponents();
         cb= new RecentComboBox("timerange");
-        cb.setEditor( new PromptComboBoxEditor("Time range to view (not connected)") );
+        cb.setEditor( new PromptComboBoxEditor("Time range to view. (not connected)") );
         cb.setToolTipText("Recently entered time ranges");
         ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
         cb.addFocusListener( new FocusAdapter() {
