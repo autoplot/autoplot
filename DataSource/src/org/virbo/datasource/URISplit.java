@@ -507,6 +507,12 @@ public class URISplit {
             surl= surl+"/";
         }
 
+//        // finally, kludge for Unix ~.  TODO: Get this working some time...
+//        if ( surl.startsWith("~") ) {
+//            surl= System.getProperty("user.home") + surl.substring(1);
+//            caretPos += ( System.getProperty("user.home").length() -1 );
+//        }
+
         String[] popFront= new String[] { "http://autoplot.org/jnlp.cgi?", "http://autoplot.org/autoplot.jnlp?" };
         for ( String s: popFront ) {
             if ( surl.startsWith(s) ) {
