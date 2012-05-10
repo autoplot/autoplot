@@ -17,6 +17,8 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -52,7 +54,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public TimeRangeEditor() {
         initComponents();
         cb= new RecentComboBox("timerange");
-        cb.setEditor( new PromptComboBoxEditor("no one is listening to timerange") );
+        cb.setEditor( new PromptComboBoxEditor("Time range to view (not connected)") );
         cb.setToolTipText("Recently entered time ranges");
         ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
         cb.addFocusListener( new FocusAdapter() {
