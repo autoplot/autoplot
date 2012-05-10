@@ -1438,10 +1438,11 @@ APSplash.checkTime("init 52");
                         nw= screenSize.width * 4 / 5 ;
                         nh= (int)( nw * aspect );
                     } else {
-                        nh= screenSize.height * 4 / 5 ; // slightly smaller to accommodate GUI controls
+                        int controlsHeight= 160;
+                        nh= ( screenSize.height-controlsHeight ); // accommodate GUI controls
                         nw= (int)( nh / aspect );
                     }
-                    parentToAdjust.setSize( nw, nh );
+                    parentToAdjust.setSize( nw + (  w - din.width ) , nh + ( h - din.height ) );
 
                 } else if ( i==1 ) {
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
