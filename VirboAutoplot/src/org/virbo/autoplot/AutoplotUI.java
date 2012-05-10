@@ -1105,11 +1105,6 @@ APSplash.checkTime("init 52");
         expertItems.add(mi);
         fileMenu.add(mi);
 
-        mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
-        mi.setToolTipText("Open local data file");
-        expertItems.add(mi);
-        fileMenu.add(mi);
-
         mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
               public void actionPerformed( ActionEvent e ) {
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
@@ -1125,9 +1120,13 @@ APSplash.checkTime("init 52");
                   }
               }
         } );
-        mi.setToolTipText("Open recent URIs dialog");
+        mi.setToolTipText("Open URI history dialog");
         fileMenu.add( mi );
-        //fileMenu.add(dataSetSelector.getRecentMenu());
+
+        mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
+        mi.setToolTipText("Open local data file");
+        expertItems.add(mi);
+        fileMenu.add(mi);
 
         fileMenu.add( new JSeparator() );
 
