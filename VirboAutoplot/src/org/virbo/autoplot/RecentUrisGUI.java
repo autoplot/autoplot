@@ -12,6 +12,7 @@
 package org.virbo.autoplot;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -31,7 +32,9 @@ import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.datum.Datum;
@@ -39,6 +42,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.system.RequestProcessor;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -50,24 +54,21 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     String selectedURI=null;
     boolean empty= false;
 
+    TreeModel def= new DefaultTreeModel( new DefaultMutableTreeNode("moment...") );
+    MyTreeModel theModel=null;
+
     /** Creates new form RecentUrisGUI */
     public RecentUrisGUI() {
         initComponents();
-        jTree1.setModel(new MyTreeModel());
-        jTree1.setCellRenderer( new MyCellRenderer() );
-        Object r= jTree1.getModel().getRoot();
+        jTree1.setModel( def );
 
-        // show >30 URIs if possible
-        int c=0; //URIS
-        int i=0; //index
-        final int SHOW_URIS=30;
-        TreeModel jt= jTree1.getModel();
-        while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
-            Object child= jt.getChild( r,i );
-            jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
-            c+= jt.getChildCount(child);
-            i++;
-        }
+        RequestProcessor.invokeLater( new Runnable() {
+            public void run() {
+                update();
+                jTree1.setCellRenderer( new MyCellRenderer() );
+            }
+        } );
+
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 Object o= e.getPath().getLastPathComponent();
@@ -77,8 +78,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 }
             }
         });
-
     }
+
 
     public String getSelectedURI() {
         return selectedURI;
@@ -99,7 +100,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     }
 
     private void update() {
-        jTree1.setModel( new MyTreeModel() );
+        theModel= new MyTreeModel();
+        jTree1.setModel( theModel );
 
         Object r= jTree1.getModel().getRoot();
 
@@ -113,7 +115,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
             c+= jt.getChildCount(child);
             i++;
-        }        
+        }
     }
 
     class MyCellRenderer extends DefaultTreeCellRenderer {
@@ -124,7 +126,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 value = ((String[])value)[1];
             } else if ( value instanceof DatumRange ) {
                 int count= tree.getModel().getChildCount(value);
-                value= String.format( "%s (%d)", value, count );
+                value= String.format( "%s (%d)", theModel.nameFor((DatumRange)value), count );
             }
             return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         }
@@ -149,7 +151,26 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         private boolean[] skip;
 
         MyTreeModel() {
-            try {
+            update();
+        }
+
+        private String nameFor( DatumRange dr ) {
+            if ( dr==list[0] ) {
+                return "today";
+            } else if ( dr==list[1] ) {
+                return "yesterday";
+            } else if ( dr==list[2] ) {
+                return "previous week";
+            } else {
+                return dr.toString();
+            }
+
+        }
+
+        public void update() {
+            if ( EventQueue.isDispatchThread() ) {
+                throw new IllegalStateException("should not be called from event queue");
+            }
                 Datum now = TimeUtil.now();
                 list = new DatumRange[8];
                 list[0] = new DatumRange(TimeUtil.prevMidnight(now), TimeUtil.nextMidnight(now));
@@ -182,7 +203,13 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         null );
                 final File f3 = new File(f2, "history.txt");
                 if ( f3.exists()&&f3.canRead() ) {
-                    Scanner scan = new Scanner(f3);
+                    Scanner scan;
+                    try {
+                        scan= new Scanner(f3);
+                    } catch ( FileNotFoundException ex ) {
+                        throw new IllegalStateException(ex);
+                    }
+
                     while (scan.hasNextLine()) {
                         String line = scan.nextLine();
                         String[] ss= line.split("\\s+",2);
@@ -216,7 +243,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         }
                     }
                 }
-                
+
                 skip= new boolean[8];
 
                 // remove empty elements.
@@ -229,7 +256,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         skip[i]= false;
                     }
                 }
-                
+
                 if ( newListLen==0 ) {
                     empty= true; // we'll print a nice message
                     newListLen= 1;
@@ -247,12 +274,6 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     }
                 }
                 list= newlist;
-
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
 
         }
 
