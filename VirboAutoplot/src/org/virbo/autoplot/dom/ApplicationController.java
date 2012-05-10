@@ -467,7 +467,22 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
         });
-        
+
+        this.application.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                // is anyone listening to timerange?
+                boolean noOneListening= true;
+                BindingModel[] bms= application.getBindings();
+                for ( int i=0; i<bms.length; i++ ) {
+                    if ( bms[i].getSrcId().equals( application.getId() ) && bms[i].srcProperty.equals( Application.PROP_TIMERANGE ) ) {
+                        noOneListening= false;
+                    }
+                }
+                if ( noOneListening ) {
+                    application.setTimeRange( Application.DEFAULT_TIME_RANGE );
+                }
+            }
+        });
     }
 
     /**
