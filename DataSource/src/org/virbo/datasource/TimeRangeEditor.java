@@ -26,8 +26,6 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
-import javax.swing.InputVerifier;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -35,12 +33,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
+import org.virbo.datasource.ui.PromptComboBoxEditor;
 
 /**
  *  
@@ -54,6 +52,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public TimeRangeEditor() {
         initComponents();
         cb= new RecentComboBox("timerange");
+        cb.setEditor( new PromptComboBoxEditor("no one is listening to timerange") );
         cb.setToolTipText("Recently entered time ranges");
         ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
         cb.addFocusListener( new FocusAdapter() {
@@ -128,7 +127,21 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
             super.firePropertyChange( PROP_RANGE, oldValue, value);
         }
-        this.cb.setSelectedItem( value.toString() );
+        if ( value==noOneListening ) {
+            this.cb.setSelectedItem("");
+        } else {
+            this.cb.setSelectedItem( value.toString() );
+        }
+    }
+
+    DatumRange noOneListening= range;
+
+    /**
+     * special marker object indicates that the "no one listening" message should be shown.
+     * @param dr
+     */
+    public void setNoOneListeningRange( DatumRange dr ) {
+        this.noOneListening= dr;
     }
 
     private void parseRange() {
@@ -136,6 +149,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         DatumRange value= this.range;
 
         String text= (String)cb.getSelectedItem();
+        if ( text.equals("") ) return;
+        
         try {
             String rangeString= text;
             dr= DatumRangeUtil.parseTimeRange(rangeString);
