@@ -27,6 +27,8 @@ import javax.swing.JComboBox;
  */
 public class RecentComboBox extends JComboBox {
 
+    private static final int RECENT_SIZE = 20;
+
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
 
@@ -64,14 +66,15 @@ public class RecentComboBox extends JComboBox {
                         continue;
                     }
                 }
-                items.add(0,s);
+                items.add(s);
                 s= r.readLine();
             }
             
             int n= items.size();
 
-            if ( n>20 ) items= items.subList(n-20,n);
-
+            if ( n>RECENT_SIZE ) items= items.subList(n-RECENT_SIZE,n);
+            Collections.reverse(items);
+            
             setModel( new DefaultComboBoxModel( items.toArray() ) );
             saveRecent(items);
         } catch (IOException ex) {
