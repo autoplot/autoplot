@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 import org.virbo.datasource.DataSetURI;
@@ -148,6 +149,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
 
         if (timeSpan != null) {
+            if ( timeSpan.width().divide(datumRanges.get(0).width() ).doubleValue(Units.dimensionless) > 100000 ) {
+                System.err.println("way too many possible timespans, limiting to 20000.");
+                timeSpan= new DatumRange( timeSpan.min(), timeSpan.min().add( datumRanges.get(0).width().multiply(20000) ) );
+            }
             possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
         }
 
