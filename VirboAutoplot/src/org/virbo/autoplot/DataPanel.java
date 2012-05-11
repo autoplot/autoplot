@@ -11,7 +11,6 @@
 
 package org.virbo.autoplot;
 
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -52,7 +51,6 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.FilterChainPanel;
-import org.virbo.datasource.RecentComboBox;
 
 /**
  * PlotElement for controlling how data is handled.
@@ -72,15 +70,14 @@ public class DataPanel extends javax.swing.JPanel {
     
     private final static Logger logger = Logger.getLogger("virbo.autoplot");
 
-    final RecentComboBox cb;
     public DataPanel( Application dom ) {
         initComponents();
 
-        cb= new RecentComboBox("operations");
-        cb.setToolTipText("Recently entered operations");
-        ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
+        recentComboBox.setPreferenceNode("operations");
+        recentComboBox.setToolTipText("Recently entered operations");
+        ((JComponent)recentComboBox.getEditor().getEditorComponent()).setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         
-        cb.addFocusListener( new FocusAdapter() {
+        recentComboBox.addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 setAdjusting(false);
@@ -92,18 +89,16 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
-        operationsRecentComboBoxPanel.add( cb, BorderLayout.CENTER );
-        cb.addActionListener( new ActionListener() {
+        recentComboBox.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                applicationController.getPlotElement().setComponentAutomatically( (String)cb.getSelectedItem() );
+                applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
                 setAdjusting(false);
                 componentChanged();
                 setAdjusting(true);
             }
         });
-        operationsRecentComboBoxPanel.revalidate();
 
-        componentTextField1= ((JTextField)cb.getEditor().getEditorComponent());
+        componentTextField1= ((JTextField)recentComboBox.getEditor().getEditorComponent());
         
         //dataSetSelector= new DataSetSelector();
         //dataAddressPanel.add( dataSetSelector, BorderLayout.NORTH );
@@ -558,7 +553,7 @@ public class DataPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         dataSetLabel = new javax.swing.JLabel();
         editComponentPanel = new javax.swing.JButton();
-        operationsRecentComboBoxPanel = new javax.swing.JPanel();
+        recentComboBox = new org.virbo.datasource.RecentComboBox();
         jPanel1 = new javax.swing.JPanel();
         validRangeLabel = new javax.swing.JLabel();
         validRangeComboBox = new javax.swing.JComboBox();
@@ -628,8 +623,6 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
-        operationsRecentComboBoxPanel.setLayout(new java.awt.BorderLayout());
-
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -637,26 +630,28 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(sliceIndexLabel)
+                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(sliceIndexLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                            .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .add(jPanel2Layout.createSequentialGroup()
+                                .add(operationsLabel)
+                                .add(4, 4, 4)
+                                .add(recentComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .add(doSliceCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(sliceTypeComboBox, 0, 382, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
-                    .add(transposeCheckBox)
-                    .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(operationsLabel)
-                        .add(18, 18, 18)
-                        .add(operationsRecentComboBoxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .add(doSliceCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceTypeComboBox, 0, 382, Short.MAX_VALUE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(editComponentPanel)
+                        .add(editComponentPanel))
+                    .add(transposeCheckBox))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -669,9 +664,9 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(editComponentPanel)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, operationsRecentComboBoxPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, operationsLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(operationsLabel)
+                            .add(recentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(doSliceCheckBox)
@@ -785,7 +780,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE))
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -836,7 +831,7 @@ public class DataPanel extends javax.swing.JPanel {
         if ( ret==JOptionPane.OK_OPTION ) {
             componentTextField1.setText( p.getFilters() );
             applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
-            cb.actionPerformed(evt); // kludge to get it to log the new filter
+            recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
             componentChanged();
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
@@ -853,7 +848,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel operationsLabel;
-    private javax.swing.JPanel operationsRecentComboBoxPanel;
+    private org.virbo.datasource.RecentComboBox recentComboBox;
     private javax.swing.JCheckBox sliceAutorangesCB;
     private javax.swing.JLabel sliceIndexLabel;
     private javax.swing.JSpinner sliceIndexSpinner;
