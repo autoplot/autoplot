@@ -37,7 +37,7 @@ public class RecentComboBox extends JComboBox {
     File recentFile;
 
     public RecentComboBox() {
-
+        setEditable(true);
     }
 
     /**
