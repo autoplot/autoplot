@@ -4,7 +4,7 @@
  */
 
 /*
- * TimeRangePanel.java
+ * TimeRangeEditor.java
  *
  * Created on Jun 4, 2011, 9:33:57 AM
  */
@@ -17,8 +17,6 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -48,33 +46,29 @@ import org.virbo.datasource.ui.PromptComboBoxEditor;
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
 
-    RecentComboBox cb;
-
-    /** Creates new form TimeRangePanel */
     public TimeRangeEditor() {
         initComponents();
-        cb= new RecentComboBox("timerange");
-        cb.setEditor( new PromptComboBoxEditor("Time range to view. (not connected)") );
-        cb.setToolTipText("Recently entered time ranges");
-        ((JComponent)cb.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
-        cb.addFocusListener( new FocusAdapter() {
+        recentComboBox.setPreferenceNode("timerange");
+        recentComboBox.setEditor( new PromptComboBoxEditor("Time range to view (e.g. 2010-01-01)") );
+        recentComboBox.setToolTipText("Recently entered time ranges");
+        ((JComponent)recentComboBox.getEditor().getEditorComponent()).setToolTipText("Time Range, right-click for examples");
+        recentComboBox.addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 parseRange();
             }
         });
-
-        jPanel1.add( cb, BorderLayout.CENTER );
-        cb.addActionListener( new ActionListener() {
+        jPanel1.add( recentComboBox, BorderLayout.CENTER );
+        recentComboBox.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 parseRange();
             }
         });
 
-        cb.setVerifier( new RecentComboBox.InputVerifier() {
+        recentComboBox.setVerifier( new RecentComboBox.InputVerifier() {
             public boolean verify(String text) {
                 try {
-                    DatumRange value = DatumRangeUtil.parseTimeRange(text);
+                    DatumRangeUtil.parseTimeRange(text);
                     return true;
                 } catch (ParseException e) {
                     return false;
@@ -82,18 +76,6 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-//        ((JTextField)cb.getEditor().getEditorComponent()).setInputVerifier( new InputVerifier() {
-//            @Override
-//            public boolean verify(JComponent input) {
-//                String text = (String) ((JComboBox) cb).getSelectedItem();
-//                try {
-//                    DatumRange value = DatumRangeUtil.parseTimeRange(text);
-//                    return true;
-//                } catch (ParseException e) {
-//                    return false;
-//                }
-//            }
-//        });
         revalidate();
         addMousePopupListener();
     }
@@ -130,9 +112,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             super.firePropertyChange( PROP_RANGE, oldValue, value);
         }
         if ( value==noOneListening ) {
-            this.cb.setSelectedItem("");
+            this.recentComboBox.setSelectedItem("");
         } else {
-            this.cb.setSelectedItem( value.toString() );
+            this.recentComboBox.setSelectedItem( value.toString() );
         }
     }
 
@@ -150,7 +132,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         DatumRange dr;
         DatumRange value= this.range;
 
-        String text= (String)cb.getSelectedItem();
+        String text= (String)recentComboBox.getSelectedItem();
         if ( text.equals("") ) return;
         
         try {
@@ -213,6 +195,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         nextButton = new javax.swing.JButton();
         browseButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        recentComboBox = new org.virbo.datasource.RecentComboBox();
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
@@ -252,6 +235,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         });
 
         jPanel1.setLayout(new java.awt.BorderLayout());
+
+        recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jPanel1.add(recentComboBox, java.awt.BorderLayout.CENTER);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -346,6 +332,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
+    private org.virbo.datasource.RecentComboBox recentComboBox;
     // End of variables declaration//GEN-END:variables
 
     public PropertyChangeListener getUriFocusListener() {
@@ -366,7 +353,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     
     private void addMousePopupListener() {
-        cb.getEditor().getEditorComponent().addMouseListener( new MouseAdapter() {
+        recentComboBox.getEditor().getEditorComponent().addMouseListener( new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -393,7 +380,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private JMenuItem exampleTime( final String s, final String toolTip ) {
         JMenuItem mi= new JMenuItem( new AbstractAction(s) {
             public void actionPerformed( ActionEvent e ) {
-                cb.setSelectedItem(s);
+                recentComboBox.setSelectedItem(s);
             }
         });
         mi.setToolTipText(toolTip);
