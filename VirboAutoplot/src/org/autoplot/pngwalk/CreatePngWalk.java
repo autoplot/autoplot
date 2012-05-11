@@ -236,7 +236,12 @@ public class CreatePngWalk {
                     }
 
                     if (ScriptContext.getViewWindow() != null) {
-                        PngWalkTool1.start(url + params.product + "_" + params.timeFormat + ".png", ScriptContext.getViewWindow());
+                        final String st= url + params.product + "_" + params.timeFormat + ".png";
+                        SwingUtilities.invokeLater( new Runnable() {
+                            public void run() {
+                                PngWalkTool1.start( st, ScriptContext.getViewWindow() );
+                            }
+                        } );
                     }
                 }
             }
