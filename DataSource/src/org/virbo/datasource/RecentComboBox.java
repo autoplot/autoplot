@@ -21,7 +21,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 /**
- * decorate a comboBox so that it remembers recent entries.
+ * decorate a comboBox so that it remembers recent entries.  This listens for ActionEvents from a JComboBox
+ * and adds valid items to its droplist.  The recent entries are stored in the bookmarks folder in the file
+ * "recent.PREF.txt" where PREF is a string assigned to this object identifying the theme, such as "timerange".
+ * Specifically, the event is validated and recorded into the file, then the file is loaded, sorted and saved
+ * again.
+ * 
  * @author jbf
  */
 public class RecentComboBox extends JComboBox {
@@ -123,6 +128,15 @@ public class RecentComboBox extends JComboBox {
     @Override
     public void actionPerformed(ActionEvent e) {
         super.actionPerformed(e);
+
+        String s = getSelectedItem().toString();
+
+        if ( verifier!=null ) {
+            if ( !verifier.verify(s) ) {
+                return;
+            }
+        }
+        
         BufferedWriter w = null;
         try {
             synchronized (this) {
@@ -131,7 +145,6 @@ public class RecentComboBox extends JComboBox {
                 } else {
                     w = new BufferedWriter(new FileWriter(recentFile));
                 }
-                String s = getSelectedItem().toString();
                 w.append(s, 0, s.length());
                 w.append("\n");
                 w.close();
