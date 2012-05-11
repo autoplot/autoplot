@@ -14,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,25 +54,27 @@ public class RecentComboBox extends JComboBox {
     }
 
     private synchronized void loadRecent() {
-        List<String> items= new LinkedList();
+        List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
-            BufferedReader r = new BufferedReader(new FileReader(recentFile));
-            String s= r.readLine();
-            while ( s!=null ) {
-                if ( verifier!=null ) {
-                    if ( !verifier.verify(s) ) {
-                        s= r.readLine();
-                        continue;
+            if ( recentFile.exists() ) {
+                BufferedReader r = new BufferedReader(new FileReader(recentFile));
+                String s= r.readLine();
+                while ( s!=null ) {
+                    if ( verifier!=null ) {
+                        if ( !verifier.verify(s) ) {
+                            s= r.readLine();
+                            continue;
+                        }
                     }
+                    items.add(s);
+                    s= r.readLine();
                 }
-                items.add(s);
-                s= r.readLine();
             }
 
             Collections.reverse(items);
             
             //remove repeat items
-            List nitems= new ArrayList(items.size());
+            List nitems= new ArrayList( items.size() );
             for ( int i=0; i<items.size(); i++ ) {
                 String item= items.get(i);
                 if ( !nitems.contains(item) ) nitems.add(item);
@@ -95,9 +96,12 @@ public class RecentComboBox extends JComboBox {
      * @param items
      */
     private synchronized void saveRecent( List<String> items ) {
+        if ( !recentFile.getParentFile().exists() ) {
+            return; //not yet, we're initializing for the first time.
+        }
         BufferedWriter w = null;
         try {
-            w = new BufferedWriter(new FileWriter(recentFile,false));
+            w = new BufferedWriter(new FileWriter(recentFile));
             items= new ArrayList(items);
             Collections.reverse(items);
             for ( String s:items ) {
@@ -122,7 +126,11 @@ public class RecentComboBox extends JComboBox {
         BufferedWriter w = null;
         try {
             synchronized (this) {
-                w = new BufferedWriter(new FileWriter(recentFile,true));
+                if ( recentFile.exists() ) {
+                    w = new BufferedWriter(new FileWriter(recentFile,true));
+                } else {
+                    w = new BufferedWriter(new FileWriter(recentFile));
+                }
                 String s = getSelectedItem().toString();
                 w.append(s, 0, s.length());
                 w.append("\n");
