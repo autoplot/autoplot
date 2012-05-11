@@ -648,7 +648,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         WalkImageSequence oldseq= this.seq;
 
-        String surl= DataSetURI.fromUri( DataSetURI.getResourceURI(template) );
+        URI uri= DataSetURI.getResourceURI(template);
+        if ( uri==null ) {
+            throw new IllegalArgumentException("Unable to parse: "+template);
+        }
+        String surl= DataSetURI.fromUri( uri );
+
         try {
             seq= new WalkImageSequence( surl );
         } catch ( Exception ex ) {
@@ -729,9 +734,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                         }
                     }
                 } catch (java.io.IOException e) {
-                    e.printStackTrace();
                     // This probably means the template was invalid. Don't set new sequence.
                     if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
         };
