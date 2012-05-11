@@ -146,8 +146,8 @@ public class BookmarksManagerTransferrable {
             }
         };
     };
-    DataFlavor BOOKMARK_FLAVOR = new DataFlavor(Bookmark.class, "Bookmark");
-    DataFlavor BOOKMARK_LIST_FLAVOR = new DataFlavor(List.class, "BookmarkList");
+    public static DataFlavor BOOKMARK_FLAVOR = new DataFlavor(Bookmark.class, "Bookmark");
+    public static DataFlavor BOOKMARK_LIST_FLAVOR = new DataFlavor(List.class, "BookmarkList");
 
     Transferable createBookmarkTransferrable(final Bookmark.Item bookmark) {
         return new Transferable() {
