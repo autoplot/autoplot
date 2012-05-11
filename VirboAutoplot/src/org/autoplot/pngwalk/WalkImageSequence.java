@@ -1,7 +1,5 @@
 package org.autoplot.pngwalk;
 
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -32,7 +30,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private List<WalkImage> existingImages;
     private List<WalkImage> displayImages = new ArrayList();
     //private List<URI> locations;
-    private boolean showMissing = true;
+    private boolean showMissing = false;
     private boolean useSubRange = false;
     private int index;
 
