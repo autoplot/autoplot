@@ -600,7 +600,8 @@ public class URISplit {
             fileEnd = iquery;
             params = rsurl.substring(iquery + 1);
         } else {
-            if ( ieq>-1 ) {
+            if ( ieq>-1 && ( file==null || file.contains("=") && !( file.contains("(") || file.contains("{") ) ) ) { //TODO: this surely needs more attention.
+                // file:///home/jbf/fun/camE_spot5/2012/05/$(d,Y=2012,m=04)/$H$M$S.jpg
                 iquery = 0;
                 if ( rsurl.startsWith("file:///") ) { // old code used to insert file://, so we check for it here in case of old URIs.
                     params= rsurl.substring(8);
