@@ -378,7 +378,6 @@ public class PlotController extends DomNodeController {
                     if ( uri==null ) {
                         dom.getController().model.showMessage( "couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE );
                     } else {
-                        final Plot dp= dom.getController().getPlotFor(p);
                         final List<PlotElement> pe= dom.getController().getPlotElementsFor(plot);
                         if ( pe.size()==0 ) {
                             dom.getController().model.showMessage( "no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE );
