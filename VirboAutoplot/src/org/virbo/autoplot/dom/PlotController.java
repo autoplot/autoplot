@@ -4,15 +4,25 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
+import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -36,10 +46,13 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.xml.sax.SAXException;
 
 /**
  * Manages a Plot node, for example listening for autoRange updates and layout
@@ -310,6 +323,84 @@ public class PlotController extends DomNodeController {
 
         application.controller.maybeAddContextMenus( this );
 
+        DropTarget dropTarget = new DropTarget();
+        try {
+            dropTarget.addDropTargetListener( createDropTargetListener(dasPlot) );
+        } catch (TooManyListenersException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        dasPlot.setDropTarget(dropTarget);
+
+    }
+
+
+    private DropTargetListener createDropTargetListener( final DasPlot p ) {
+        return new DropTargetListener() {
+
+            public void dragEnter(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR)) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+
+                } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                }
+            }
+
+            public void dragOver(DropTargetDragEvent dtde) {
+            }
+
+            public void dropActionChanged(DropTargetDragEvent dtde) {
+            }
+
+            public void dragExit(DropTargetEvent dte) {
+            }
+
+            public void drop(DropTargetDropEvent dtde) {
+                try {
+                    Bookmark item = null;
+                    List<Bookmark> items = null;
+                    if (dtde.isDataFlavorSupported( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR)) {
+                        item = (Bookmark) dtde.getTransferable().getTransferData( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR);
+                    } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                        dtde.acceptDrop( DnDConstants.ACTION_COPY );
+                        String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                        if (data.length() > 19 && data.startsWith("<bookmark-list")) {
+                            items = Bookmark.parseBookmarks(data);
+                        } else if (data.length() > 14 && data.startsWith("<bookmark")) {
+                            item = Bookmark.parseBookmark(data);
+                        } else {
+                            item = new Bookmark.Item(data);
+                        }
+                    }
+
+                    final String uri= items!=null ? null : ((Bookmark.Item)item).getUri();
+
+                    if ( uri==null ) {
+                        dom.getController().model.showMessage( "couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE );
+                    } else {
+                        final Plot dp= dom.getController().getPlotFor(p);
+                        final List<PlotElement> pe= dom.getController().getPlotElementsFor(plot);
+                        if ( pe.size()==0 ) {
+                            dom.getController().model.showMessage( "no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE );
+                        }
+                        final DataSourceFilter dsf= dom.getController().getDataSourceFilterFor(pe.get(0));
+                        dsf.setUri(uri);
+                    }
+
+                } catch (UnsupportedFlavorException ex) {
+                    ex.printStackTrace();
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+
+                } catch (SAXException ex) {
+                    ex.printStackTrace();
+
+                } catch (BookmarksException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
     }
 
 
