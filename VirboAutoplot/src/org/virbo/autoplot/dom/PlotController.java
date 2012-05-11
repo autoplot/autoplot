@@ -323,13 +323,16 @@ public class PlotController extends DomNodeController {
 
         application.controller.maybeAddContextMenus( this );
 
-        DropTarget dropTarget = new DropTarget();
-        try {
-            dropTarget.addDropTargetListener( createDropTargetListener(dasPlot) );
-        } catch (TooManyListenersException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        boolean headless= "true".equals( System.getProperty("java.awt.headless") );
+        if ( !headless ) {
+            DropTarget dropTarget = new DropTarget();
+            try {
+                dropTarget.addDropTargetListener( createDropTargetListener(dasPlot) );
+            } catch (TooManyListenersException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+            dasPlot.setDropTarget(dropTarget);
         }
-        dasPlot.setDropTarget(dropTarget);
 
     }
 
