@@ -341,10 +341,7 @@ public class PlotController extends DomNodeController {
         return new DropTargetListener() {
 
             public void dragEnter(DropTargetDragEvent dtde) {
-                if (dtde.isDataFlavorSupported( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR)) {
-                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
-
-                } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                     dtde.acceptDrag(DnDConstants.ACTION_COPY);
                 }
             }
@@ -362,9 +359,7 @@ public class PlotController extends DomNodeController {
                 try {
                     Bookmark item = null;
                     List<Bookmark> items = null;
-                    if (dtde.isDataFlavorSupported( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR)) {
-                        item = (Bookmark) dtde.getTransferable().getTransferData( org.virbo.autoplot.bookmarks.BookmarksManagerTransferrable.BOOKMARK_FLAVOR);
-                    } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                         dtde.acceptDrop( DnDConstants.ACTION_COPY );
                         String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
                         if (data.length() > 19 && data.startsWith("<bookmark-list")) {
