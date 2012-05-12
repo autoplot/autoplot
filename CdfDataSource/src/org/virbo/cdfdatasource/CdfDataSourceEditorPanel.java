@@ -184,8 +184,6 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel2.setMaximumSize(new java.awt.Dimension(1000, 500));
 
-        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
         paramInfo.setText("Variable");
         paramInfo.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         paramInfo.setMaximumSize(new java.awt.Dimension(1000, 4000));
