@@ -73,7 +73,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         noInterpMeta = new javax.swing.JCheckBox();
         noDep = new javax.swing.JCheckBox();
         showAllVarTypeCB = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -183,36 +183,28 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 .addContainerGap())
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jScrollPane2.setMaximumSize(new java.awt.Dimension(1000, 600));
 
         paramInfo.setText("Variable");
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(paramInfo)
-                .addContainerGap(111, Short.MAX_VALUE))
-        );
+        paramInfo.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        paramInfo.setMaximumSize(new java.awt.Dimension(1000, 4000));
+        paramInfo.setPreferredSize(new java.awt.Dimension(600, 100));
+        paramInfo.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        jScrollPane2.setViewportView(paramInfo);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -234,9 +226,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JCheckBox noDep;
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
@@ -278,6 +270,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     long subsetMaxRec=-1;
 
     File cdfFile;
+    CDF cdf=null;
 
     /**
      * allow more abstract sources, namely cdaweb, to turn off these controls.
@@ -304,7 +297,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
         DataSetURI.checkLength(cdfFile);
-        
+
+        try {
+            cdf = CDFFactory.getCDF(cdfFile.toString());
+        } catch ( Exception ex ) {
+            throw ex;
+        } catch ( Throwable ex ) {
+            throw new Exception(ex);
+        }
         return true;
     }
 
@@ -320,14 +320,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             String fileName= cdfFile.toString();
 
             logger.log(Level.FINE, "opening cdf file {0}", fileName);
-            CDF cdf;
-            try {
-                cdf = CDFFactory.getCDF(fileName);
-            } catch (Throwable ex) {
-                throw new RuntimeException(ex);
+            if ( cdf==null ) {
+                try {
+                    cdf = CDFFactory.getCDF(fileName);
+                } catch (Throwable ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 //            CDF cdf= CDF.open( fileName, CDF.READONLYoff );
-
+    
             logger.finest("inspect cdf for plottable parameters");
             
             try {
