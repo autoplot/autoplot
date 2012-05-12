@@ -699,6 +699,7 @@ public class CdfUtil {
                         if ( att!=null ) {
                             logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
                             xDependVariable = cdf.getVariable(String.valueOf(att));
+                            if ( xDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             xMaxRec = xDependVariable.getNumberOfValues();
                             if ( xMaxRec!=maxRec ) {
                                 if ( maxRec==-1 ) maxRec+=1; //why?
@@ -718,6 +719,7 @@ public class CdfUtil {
                         if ( att!=null && rank>1 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(att));
+                            if ( yDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             yNumRec = yDependVariable.getNumberOfValues();
                             if (yNumRec == 1) {
                                 yNumRec = yDependVariable.getDimensions()[0];
@@ -737,6 +739,7 @@ public class CdfUtil {
                         if ( att!=null && rank>1  ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(att));
+                            if ( yDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             yNumRec = yDependVariable.getNumberOfValues();
                             if (yNumRec == 1) {
                                 yNumRec = yDependVariable.getDimensions()[0];
@@ -756,6 +759,7 @@ public class CdfUtil {
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(att));
+                            if ( zDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             zNumRec = zDependVariable.getNumberOfValues();
                             if (zNumRec == 1) {
                                 zNumRec = zDependVariable.getDimensions()[0];
@@ -772,6 +776,7 @@ public class CdfUtil {
                         if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(att));
+                            if ( zDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             zNumRec = zDependVariable.getNumberOfValues();
                             if (zNumRec == 0) {
                                 zNumRec = zDependVariable.getDimensions()[0];
