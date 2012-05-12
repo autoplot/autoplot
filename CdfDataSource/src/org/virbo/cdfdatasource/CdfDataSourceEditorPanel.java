@@ -13,8 +13,6 @@ package org.virbo.cdfdatasource;
 
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
@@ -77,6 +74,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         noDep = new javax.swing.JCheckBox();
         showAllVarTypeCB = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -155,7 +153,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(noDep)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showAllVarTypeCB)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -179,25 +177,31 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel2.setMaximumSize(new java.awt.Dimension(1000, 500));
+
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         paramInfo.setText("Variable");
+        paramInfo.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        paramInfo.setMaximumSize(new java.awt.Dimension(1000, 4000));
+        paramInfo.setPreferredSize(new java.awt.Dimension(600, 100));
+        paramInfo.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        jScrollPane2.setViewportView(paramInfo);
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(paramInfo)
-                .addContainerGap(70, Short.MAX_VALUE))
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -237,6 +241,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JCheckBox noDep;
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
@@ -278,6 +283,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     long subsetMaxRec=-1;
 
     File cdfFile;
+    CDF cdf;
 
     /**
      * allow more abstract sources, namely cdaweb, to turn off these controls.
@@ -304,6 +310,9 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
         DataSetURI.checkLength(cdfFile);
 
+        logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
+        cdf= CdfFileDataSourceFactory.getCDFFile( cdfFile.toString() ); // only open the cdf once.
+
         return true;
     }
 
@@ -313,14 +322,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         try {
 
-            cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), new NullProgressMonitor() );
-            DataSetURI.checkLength(cdfFile);
+            if ( cdf==null ) {
+                cdf= CdfFileDataSourceFactory.getCDFFile( cdfFile.toString() ); // only open the cdf once.
+            }
             
-            String fileName= cdfFile.toString();
-
-            logger.fine("opening cdf file "+fileName);
-            CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
-
             logger.finest("inspect cdf for plottable parameters");
             parameterDescriptions= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false );
             if ( parameterDescriptions.isEmpty() ) {
@@ -344,6 +349,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
             logger.finest("close cdf");
             CdfFileDataSourceFactory.closeCDF(cdf);
+            cdf= null;
 
             DefaultListModel model= new DefaultListModel();
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
@@ -381,9 +387,6 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         } catch (CDFException ex) {
             DasExceptionHandler.handle( ex );
-        } catch (IOException ex) {
-            DasExceptionHandler.handle( ex );
-            Logger.getLogger(CdfDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
             DasExceptionHandler.handle( ex );
             Logger.getLogger(CdfDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
