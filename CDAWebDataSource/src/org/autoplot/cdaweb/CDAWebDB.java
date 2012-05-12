@@ -343,7 +343,7 @@ public class CDAWebDB {
         
         try {
             try {
-                DataSetURI.getFile(new URI(master), new NullProgressMonitor() );
+                DataSetURI.getFile(new URI(master), p );
             } catch (URISyntaxException ex) {
                 Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
             }
