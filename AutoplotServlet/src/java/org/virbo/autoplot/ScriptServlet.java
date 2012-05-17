@@ -67,12 +67,15 @@ public class ScriptServlet extends HttpServlet {
             FileWriter w= new FileWriter(f);
             w.append(script);
             w.close();
-            
+
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
             interp.setOut( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) );
             
             interp.set( "response", response );
-            
+
+            //TODO: this limits to one user!
             ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
             
             interp.exec(script);
