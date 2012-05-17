@@ -5,18 +5,24 @@
 
 package org.virbo.autoplot;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.format.TimeDatumFormatter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.scriptconsole.LoggingOutputStream;
 
 /**
- *
+ * Allow the clients to run scripts on the server.
+ * For now, these are logged for security reasons.
  * @author jbf
  */
 public class ScriptServlet extends HttpServlet {
@@ -50,8 +56,17 @@ public class ScriptServlet extends HttpServlet {
             for ( int i=0; i<ss.length; i++ ) {
                 if ( ss[i].contains("import") ) throw new IllegalArgumentException("imports not allowed for security");
                 if ( ss[i].contains("eval") ) throw new IllegalArgumentException("eval not allowed for security");
+                if ( ss[i].contains("formatDataSet") ) throw new IllegalArgumentException("formatDataSet not allowed for security");
             }
 
+            String ts= TimeDatumFormatter.DEFAULT.format( TimeUtil.now() );
+            String who= request.getRemoteAddr();
+
+            File f= new File( "/tmp/autoplotservlet/"+ts+"."+who+".jy" );
+            FileWriter w= new FileWriter(f);
+            w.append(script);
+            w.close();
+            
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
             interp.setOut( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) );
             
@@ -59,8 +74,8 @@ public class ScriptServlet extends HttpServlet {
             
             ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
             
-            throw new IllegalArgumentException("server-side scripting disabled");
-            //interp.exec(script);
+            interp.exec(script);
+            
         } catch ( Exception ex ) {
             ex.printStackTrace();
         } finally { 
