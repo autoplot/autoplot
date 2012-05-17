@@ -483,12 +483,12 @@ public class PlotElementController extends DomNodeController {
      * that cannot occur in interactive time.  They would block the AWT event thread
      * making the GUI uncontrollable while the process is running.  
      * Right now just the FFT processes are marked and run on a different thread.
-     * 
+     *
      * @param cmd
      * @return
      */
     private boolean isAsyncProcess( String cmd ) {
-        return cmd.contains("fft");
+        return DataSetOps.isProcessAsync(cmd);
     }
 
     /**
