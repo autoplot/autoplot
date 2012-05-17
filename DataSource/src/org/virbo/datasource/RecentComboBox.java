@@ -6,6 +6,8 @@
 package org.virbo.datasource;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 /**
  * decorate a comboBox so that it remembers recent entries.  This listens for ActionEvents from a JComboBox
@@ -92,8 +95,8 @@ public class RecentComboBox extends JComboBox {
             items= nitems;
             
             int n= items.size();
-            if ( n>RECENT_SIZE ) items= items.subList(n-RECENT_SIZE,n);
-            
+            if ( n>RECENT_SIZE ) items= items.subList(0,RECENT_SIZE);
+
             setModel( new DefaultComboBoxModel( items.toArray() ) );
             saveRecent(items);
         } catch (IOException ex) {
