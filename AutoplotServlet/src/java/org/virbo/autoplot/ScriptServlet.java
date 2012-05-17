@@ -42,7 +42,7 @@ public class ScriptServlet extends HttpServlet {
             String script= request.getParameter("script");
             
             if ( script==null ) {
-                script= "setCanvasSize( 400, 400 )\n"+
+                script= "setCanvasSize( 600, 400 )\n"+
                     "setDataSourceURL( 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080117.d2s' )\n"+
                     "setTitle( 'Garage 20080117' )\n" +
                     "response.setContentType('image/png')\n" + 
@@ -59,9 +59,10 @@ public class ScriptServlet extends HttpServlet {
                 if ( ss[i].contains("formatDataSet") ) throw new IllegalArgumentException("formatDataSet not allowed for security");
             }
 
-            String ts= TimeDatumFormatter.DEFAULT.format( TimeUtil.now() );
+            String ts= new TimeDatumFormatter("%Y%m%dT%H%M%S.%{milli}").format( TimeUtil.now() );
             String who= request.getRemoteAddr();
 
+            new File("/tmp/autoplotservlet/").mkdirs();
             File f= new File( "/tmp/autoplotservlet/"+ts+"."+who+".jy" );
             FileWriter w= new FileWriter(f);
             w.append(script);
