@@ -21,7 +21,8 @@
     precise specification of an image.
     
     Caveat: this allows arbitrary code to be executed on the server, so this 
-    server should not be left on and should not be advertised.  
+    server should not be left on and should not be advertised.  We try to guard against attacks with
+    taint-checking, but this is not thorough.  Scripts are logged in /tmp/autoplotservlet.
     
     <form action="ScriptServlet" method="POST">
         Enter Script:
