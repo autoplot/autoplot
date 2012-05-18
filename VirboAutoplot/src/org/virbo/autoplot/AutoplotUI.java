@@ -1455,7 +1455,14 @@ APSplash.checkTime("init 52");
                 }
             }
         } else {
+            // there's actually a new bug here, at least on Linux you can't resize to > one screen...
             parentToAdjust.setSize( dout.width, dout.height );
+            if ( parentToAdjust.getSize().getWidth()!=dout.width ) {
+                this.applicationModel.dom.getCanvases(0).setFitted(false);
+                setStatus("warning: unable to resize to requested size, using scrollbars.");
+                this.applicationModel.dom.getCanvases(0).setHeight(h);
+                this.applicationModel.dom.getCanvases(0).setWidth(w);
+            }
         }
         
     }
