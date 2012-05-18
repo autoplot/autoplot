@@ -1419,7 +1419,8 @@ APSplash.checkTime("init 52");
         dout.height= dout.height + ( h - din.height );
 
         GraphicsConfiguration gc= getGraphicsConfiguration();
-        Dimension screenSize = gc.getBounds().getSize();
+        //Dimension screenSize = gc.getBounds().getSize();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         if ( w<640 || h<480 ) {
             this.applicationModel.dom.getCanvases(0).setFitted(false);
