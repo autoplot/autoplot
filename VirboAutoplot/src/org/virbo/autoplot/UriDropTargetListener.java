@@ -50,7 +50,7 @@ public class UriDropTargetListener implements DropTargetListener {
             List<Bookmark> items = null;
             if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                String data = ((String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor)).trim();
                 if (data.length() > 19 && data.startsWith("<bookmark-list")) {
                     items = Bookmark.parseBookmarks(data);
                 } else if (data.length() > 14 && data.startsWith("<bookmark")) {
@@ -60,7 +60,18 @@ public class UriDropTargetListener implements DropTargetListener {
                 }
             }
 
-            final String uri = items != null ? null : ((Bookmark.Item) item).getUri();
+            String uri=null;
+            if ( item != null ) {
+                if ( item instanceof Bookmark.Item ) {
+                    uri= ((Bookmark.Item)item).getUri();
+                } else {
+                    model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
+                }
+            } else if ( items!=null ) {
+                model.showMessage( "only one URI can be dropped", "only one URI", JOptionPane.WARNING_MESSAGE);
+            } else {
+                model.showMessage("couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE);
+            }
             return uri;
 
         } catch (UnsupportedFlavorException ex) {
@@ -110,7 +121,8 @@ public class UriDropTargetListener implements DropTargetListener {
         String uri= getURI( dtde );
 
         if (uri == null) {
-            model.showMessage("couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE);
+            return;
+            
         } else {
 
             DasCanvasComponent cc=null;
