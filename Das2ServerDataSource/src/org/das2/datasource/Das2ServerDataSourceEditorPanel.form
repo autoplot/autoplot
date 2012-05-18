@@ -200,7 +200,7 @@
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
         <Property name="text" type="java.lang.String" value="TCA Interval (sec):"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Interval (in seconds) to use for TCA (ephemeris) data.&lt;br&gt;&#xa;Leave blank for most datasets.&lt;br&gt;&#xa;&lt;/html&gt;&#xa;"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Interval (in seconds) to use for TCA (ephemeris) data.&lt;br&gt;&#xa;Leave blank for most datasets.  For TCA data, specify a cadence based on the rate of change of the data.&lt;br&gt;&#xa;&lt;/html&gt;&#xa;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="tcaTextField">

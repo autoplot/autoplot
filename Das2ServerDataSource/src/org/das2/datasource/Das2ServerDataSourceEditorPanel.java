@@ -160,7 +160,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2.setViewportView(ReaderParamsTextArea);
 
         jLabel5.setText("TCA Interval (sec):");
-        jLabel5.setToolTipText("<html>\nInterval (in seconds) to use for TCA (ephemeris) data.<br>\nLeave blank for most datasets.<br>\n</html>\n");
+        jLabel5.setToolTipText("<html>\nInterval (in seconds) to use for TCA (ephemeris) data.<br>\nLeave blank for most datasets.  For TCA data, specify a cadence based on the rate of change of the data.<br>\n</html>\n");
 
         tcaTextField.setText(" ");
         tcaTextField.setToolTipText("<html> Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html> ");
