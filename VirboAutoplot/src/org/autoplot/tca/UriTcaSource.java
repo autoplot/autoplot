@@ -115,6 +115,23 @@ public class UriTcaSource extends AbstractQFunction {
 
     }
 
+    /**
+     * must have all valid
+     * @param result
+     * @return
+     */
+    private boolean isValid( QDataSet result ) {
+        QDataSet wds= DataSetUtil.weightsDataSet(result);
+        if ( wds.rank()==0 ) {
+            return wds.value()>0;
+        } else {
+            boolean valid= true;
+            for ( int i=0; i<wds.length(); i++ ) {
+                valid= valid && wds.value(i)>0;
+            }
+            return valid;
+        }
+    }
 
     public QDataSet value(QDataSet parm) {
 
@@ -172,7 +189,7 @@ public class UriTcaSource extends AbstractQFunction {
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
                 result= ds.slice(ii);
-                if ( DataSetUtil.weightsDataSet(result).value()==0 ) { // pick a relavant near neighbor
+                if ( !isValid(result) ) { // pick a relavant near neighbor
                     findex= Ops.findex( dep0, Ops.subtract( d0, deltaMinus ) );
                     int imin= (int)( findex.value() + 0.5 );
                     if ( imin<0 ) imin=0;
@@ -183,13 +200,13 @@ public class UriTcaSource extends AbstractQFunction {
                     for ( int iiii= 1; iiii<irad; iiii++ ) {
                         if ( ii-iiii >= imin ) {
                             result= ds.slice(ii-iiii);
-                            if ( DataSetUtil.weightsDataSet(result).value()>0 ) {
+                            if ( isValid(result) ) {
                                 break;
                             }
                         }
                         if ( ii+iiii <= imax ) {
                             result= ds.slice(ii+iiii);
-                            if ( DataSetUtil.weightsDataSet(result).value()>0 ) {
+                            if ( isValid(result) ) {
                                 break;
                             }
                         }
@@ -231,7 +248,7 @@ public class UriTcaSource extends AbstractQFunction {
             //
 
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            ex.printStackTrace(); //TODO: user never sees this...
             return new JoinDataSet( error );
         }
 
