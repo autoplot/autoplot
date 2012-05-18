@@ -37,6 +37,8 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.TimeUtil;
+import org.virbo.dataset.BundleDataSet;
+import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -45,6 +47,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
  *
@@ -273,7 +276,15 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             if ( tcaDesc!=null && tcaDesc.size()>0 ) {
                 if ( item==null ) {
-                    result.putProperty( QDataSet.LABEL, tcaDesc.get(0) );
+                    QDataSet bds= (QDataSet)result.property(QDataSet.BUNDLE_1);
+                    if ( bds!=null && bds instanceof BundleDescriptor ) {
+                        BundleDescriptor bds1= (BundleDescriptor)bds;
+                        for ( int i=0; i<bds1.length(); i++ ) {
+                            bds1.putProperty( QDataSet.LABEL, i, tcaDesc.get(i) );
+                        }
+                    } else {
+                        result.putProperty( QDataSet.LABEL, tcaDesc.get(0) );
+                    }
                 } else {
                     result.putProperty( QDataSet.LABEL, tcaDesc.get( Integer.parseInt(item) ) );
                 }
