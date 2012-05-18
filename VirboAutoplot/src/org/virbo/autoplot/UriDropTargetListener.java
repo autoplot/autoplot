@@ -22,6 +22,7 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
@@ -143,20 +144,41 @@ public class UriDropTargetListener implements DropTargetListener {
             }
 
             if ( plot==null ) {
-                model.showMessage("URIs may only be dropped on plots (for now)", "not plot target", JOptionPane.WARNING_MESSAGE);
+                DasCanvasComponent dcc=  model.getCanvas().getCanvasComponentAt( dtde.getLocation().x, dtde.getLocation().y-50  );
+                if ( dcc!=null ) {
+                    plot= model.dom.getController().getPlotFor(dcc);
+                    plot= model.dom.getController().addPlot( plot, LayoutConstants.BELOW );
+                } else {
+                    dcc=  model.getCanvas().getCanvasComponentAt( dtde.getLocation().x, dtde.getLocation().y+50  );
+                    if ( dcc!=null ) {
+                        plot= model.dom.getController().getPlotFor(dcc);
+                        plot= model.dom.getController().addPlot( plot, LayoutConstants.ABOVE );
+                    }
+                }
+
+                if ( plot==null ) {
+                    model.showMessage("URIs may only be dropped on plots (for now)", "not plot target", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    PlotElement pe= model.dom.getController().addPlotElement( plot, null );
+                    model.dom.getController().setPlotElement(pe);
+                    dss.setValue(uri);
+                    dss.maybePlot(true);
+                }
+                
                 return;
+            } else {
+
+                final List<PlotElement> pe = model.dom.getController().getPlotElementsFor(plot);
+                if (pe.size() == 0) {
+                    model.showMessage("no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                model.dom.getController().setPlotElement(pe.get(0)); // set the focus
+
+                dss.setValue(uri);
+                dss.maybePlot(true);
             }
-
-            final List<PlotElement> pe = model.dom.getController().getPlotElementsFor(plot);
-            if (pe.size() == 0) {
-                model.showMessage("no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            model.dom.getController().setPlotElement(pe.get(0)); // set the focus
-
-            dss.setValue(uri);
-            dss.maybePlot(true);
 
         }
     }
