@@ -5,12 +5,17 @@
 
 package org.virbo.autoplot;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -61,9 +66,43 @@ public class ScriptServlet extends HttpServlet {
 
             String ts= new TimeDatumFormatter("%Y%m%dT%H%M%S.%{milli}").format( TimeUtil.now() );
             String who= request.getRemoteAddr();
+            if ( who.equals("0:0:0:0:0:0:0:1") ) who= "localhost";
+            if ( who.equals("127.0.0.1") ) who= "localhost";
 
-            new File("/tmp/autoplotservlet/").mkdirs();
-            File f= new File( "/tmp/autoplotservlet/"+ts+"."+who+".jy" );
+            String home= System.getProperty( "AUTOPLOT_SERVLET_HOME" );
+            if ( home==null ) home= "/tmp/autoplotservlet/";
+
+            home= new File(home).getCanonicalPath().toString();
+
+            home= home + "/"; // sorry Windows...
+
+            new File(home).mkdirs();
+
+            File hostsallow= new File( home + "allowhosts" );
+            if ( hostsallow.exists() ) {
+                boolean reject= true;
+                BufferedReader r= new BufferedReader( new FileReader( hostsallow ) );
+                String h= r.readLine();
+                while ( h!=null ) {
+                    int i= h.indexOf("#");
+                    if (i>-1 ) h= h.substring(0,i);
+                    if ( h.trim().length()==0 ) continue;
+                    h= h.replaceAll("\\*","\\.\\*");
+
+                    if ( Pattern.matches( h, who ) ) {
+                        reject= false;
+                    }
+
+                    h= r.readLine();
+                }
+
+                if ( reject ) {
+                    response.sendError(403,"allowhosts does not permit host=\""+who+"\"");
+                    return;
+                }
+            }
+
+            File f= new File( home + ts+"."+who+".jy" );
             FileWriter w= new FileWriter(f);
             w.append(script);
             w.close();
