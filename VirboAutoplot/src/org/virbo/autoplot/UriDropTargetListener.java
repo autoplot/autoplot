@@ -157,7 +157,7 @@ public class UriDropTargetListener implements DropTargetListener {
                 }
 
                 if ( plot==null ) {
-                    model.showMessage("URIs may only be dropped on plots (for now)", "not plot target", JOptionPane.WARNING_MESSAGE);
+                    model.showMessage("URIs may only be dropped on plots, just above, or just below", "not plot target", JOptionPane.WARNING_MESSAGE);
                 } else {
                     PlotElement pe= model.dom.getController().addPlotElement( plot, null );
                     model.dom.getController().setPlotElement(pe);
