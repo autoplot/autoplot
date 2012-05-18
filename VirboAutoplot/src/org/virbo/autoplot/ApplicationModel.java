@@ -16,12 +16,15 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.DasApplication;
 import org.das2.graph.DasCanvas;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.qstream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
@@ -47,6 +50,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TooManyListenersException;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -60,6 +64,8 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
+import org.das2.graph.DasCanvasComponent;
+import org.das2.graph.DasPlot;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
@@ -104,6 +110,8 @@ public class ApplicationModel {
     Application dom;
     private ExceptionHandler exceptionHandler;
     boolean applet= false;
+
+    private UriDropTargetListener dropListener;
 
     public void setApplet( boolean v ) {
         this.applet= v;
@@ -1025,6 +1033,43 @@ public class ApplicationModel {
             if ( in!=null ) in.close();
         }
 
+    }
+
+    /**
+     * add a drop listener so that URIs can be dropped on to plots.  This should be added to
+     * plots as they are created.
+     *
+     * @param dataSetSelector
+     */
+    void createDropTargetListener(DataSetSelector dataSetSelector) {
+
+        dropListener= new UriDropTargetListener( dataSetSelector, this ) ;
+
+        DropTarget dropTarget = new DropTarget();
+        dropTarget.setComponent(canvas);
+        try {
+            dropTarget.addDropTargetListener( dropListener );
+        } catch (TooManyListenersException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        this.getCanvas().setDropTarget(dropTarget);
+        for ( DasCanvasComponent cc: this.getCanvas().getCanvasComponents() ) {
+            if ( cc instanceof DasPlot ) { // we need to add to existing plots.
+                DropTarget dropTarget1 = new DropTarget();
+                dropTarget1.setComponent(cc);
+                try {
+                    dropTarget1.addDropTargetListener( dropListener );
+                } catch (TooManyListenersException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                cc.setDropTarget(dropTarget1);
+            }
+        }
+
+    }
+
+    public DropTargetListener getDropTargetListener() {
+        return dropListener;
     }
 
     public static interface ResizeRequestListener {

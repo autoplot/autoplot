@@ -324,80 +324,17 @@ public class PlotController extends DomNodeController {
         application.controller.maybeAddContextMenus( this );
 
         boolean headless= "true".equals( System.getProperty("java.awt.headless") );
-        if ( !headless ) {
+        if ( !headless && application.controller.model.getDropTargetListener()!=null ) {
             DropTarget dropTarget = new DropTarget();
+            dropTarget.setComponent(dasPlot);
             try {
-                dropTarget.addDropTargetListener( createDropTargetListener(dasPlot) );
+                dropTarget.addDropTargetListener( application.controller.model.getDropTargetListener() );
             } catch (TooManyListenersException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
             dasPlot.setDropTarget(dropTarget);
         }
 
-    }
-
-
-    private DropTargetListener createDropTargetListener( final DasPlot p ) {
-        return new DropTargetListener() {
-
-            public void dragEnter(DropTargetDragEvent dtde) {
-                if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
-                }
-            }
-
-            public void dragOver(DropTargetDragEvent dtde) {
-            }
-
-            public void dropActionChanged(DropTargetDragEvent dtde) {
-            }
-
-            public void dragExit(DropTargetEvent dte) {
-            }
-
-            public void drop(DropTargetDropEvent dtde) {
-                try {
-                    Bookmark item = null;
-                    List<Bookmark> items = null;
-                    if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                        dtde.acceptDrop( DnDConstants.ACTION_COPY );
-                        String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
-                        if (data.length() > 19 && data.startsWith("<bookmark-list")) {
-                            items = Bookmark.parseBookmarks(data);
-                        } else if (data.length() > 14 && data.startsWith("<bookmark")) {
-                            item = Bookmark.parseBookmark(data);
-                        } else {
-                            item = new Bookmark.Item(data);
-                        }
-                    }
-
-                    final String uri= items!=null ? null : ((Bookmark.Item)item).getUri();
-
-                    if ( uri==null ) {
-                        dom.getController().model.showMessage( "couldn't find URI in drop target", "no URI", JOptionPane.WARNING_MESSAGE );
-                    } else {
-                        final List<PlotElement> pe= dom.getController().getPlotElementsFor(plot);
-                        if ( pe.size()==0 ) {
-                            dom.getController().model.showMessage( "no plot elements here", "no plot elements", JOptionPane.WARNING_MESSAGE );
-                        }
-                        final DataSourceFilter dsf= dom.getController().getDataSourceFilterFor(pe.get(0));
-                        dsf.setUri(uri);
-                    }
-
-                } catch (UnsupportedFlavorException ex) {
-                    ex.printStackTrace();
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-
-                } catch (SAXException ex) {
-                    ex.printStackTrace();
-
-                } catch (BookmarksException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        };
     }
 
 

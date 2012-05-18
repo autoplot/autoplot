@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -55,6 +56,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -3036,6 +3038,9 @@ APSplash.checkTime("init -70");
                 final AutoplotUI app;
                 if ( !headless ) {
                     app= new AutoplotUI(model);
+
+                    model.createDropTargetListener( app.dataSetSelector );
+
 APSplash.checkTime("init 200");
                     boolean addSingleInstanceListener= true;
                     if ( addSingleInstanceListener ) {
