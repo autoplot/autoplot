@@ -15,38 +15,39 @@
     </head>
     <body>
 
-    <h1>Autoplot Script Servlet</h1>
+    <h1>Autoplot Script Servlet Demo</h1>
 
     <p>
     This demonstrates how scripting might be used with Autoplot to provide
-    precise specification of an image.
-    
+    precise specification of an image or access to the libraries it uses.</p>
+
+    </p>
     Caveat: this allows arbitrary code to be executed on the server, so this 
     server should not be left on and should not be advertised.  We try to guard against attacks with
-    taint-checking, but this is not thorough.  Scripts are logged in /tmp/autoplotservlet.
+    taint-checking (for example imports are not allowed) but this is not thorough.  Scripts are logged in /tmp/autoplotservlet.
+    The file /tmp/allowhosts can be used to restrict access to the service.  It is a list of
+    allowed clients IP, allowing *'s (globs or wildcards) to match multiple IPs.  Note too that the
+    /tmp/autoplotservlet location can be changed with the environment variable AUTOPLOT_SERVLET_HOME.
     </p>
 
     <p>Note there are issues with the design right now, and this lacks abusive testing!</p>
+
+    <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/virbo/autoplot/ScriptContext.html">Script Context</a>
+    <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonSupport/src/org/virbo/jythonsupport/imports.py">Imported Codes</a>
+    <br>
     
     <form action="ScriptServlet" method="POST">
         Enter Script:<br>
         <textarea rows="14" cols="120" name="script" >
-setCanvasSize( 400, 400 )
+response.setContentType("text/plain");
+out = response.getOutputStream();
 
-dom= getDocumentModel()
-plot( 0, 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080117.d2s' )
-dom.plots[0].title= 'Garage 20080117'
-
-plot( 1, 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/8500080044259C10.20080117.d2s' )
-dom.plots[1].title= 'Other Garage 20080117'
-
-response.setContentType("image/png");
-out = response.getOutputStream()
-writeToPng( out )
-out.close()
+for i in listDirectory('http://www.autoplot.org/data/*.cdf'):
+  out.println(i);
+out.close();
         </textarea>
         <br>
-        <input type="submit" value="Plot" />
+        <input type="submit" value="Execute" />
     </form>
 
     
