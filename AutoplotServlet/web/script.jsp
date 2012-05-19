@@ -21,7 +21,7 @@
     This demonstrates how scripting might be used with Autoplot to provide
     precise specification of an image or access to the libraries it uses.</p>
 
-    </p>
+    <p>
     Caveat: this allows arbitrary code to be executed on the server, so this 
     server should not be left on and should not be advertised.  We try to guard against attacks with
     taint-checking (for example imports are not allowed) but this is not thorough.  Scripts are logged in /tmp/autoplotservlet.
@@ -50,6 +50,13 @@ out.close();
         <input type="submit" value="Execute" />
     </form>
 
-    
+    <!--
+response.setContentType("text/plain");
+out = response.getOutputStream();
+
+f= java.io.File( '/etc/passwd' )
+out.println( f.length() )
+out.close();
+    -->
     </body>
 </html>
