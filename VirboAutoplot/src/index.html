@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Time Range Selector and Operations Filters GUI now keep track of recent entries.</small></p>
+        <p><small>Juno data with TCAs (ephemeris).  This still has issues, but it's usable.  See http://www-pw.physics.uiowa.edu/~jbf/juno/vap/efield-tca.vap</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,6 +21,16 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>TCA axis annotations are loaded asynchronously.  Before they were loaded on the event thread.</li>
+            <li>Das2Server TCA labels corrected, they were not reported properly.</li>
+            <li>code in TCAs assumed rank 0, causing failure of some TCAs to load.</li>
+            <li>All children of off-line HTTP folder are automatically off-line.  Before, each would have to time out.</li>
+            <li>recent timeranges and operations corrected.  After 20 entries, history would cause textfield to clear.</li>
+            <li>delay construction of JColorChooser in color selector, on a Mac this could take 500ms!</li>
+            <li>we need to trim preceeding _ and 0's in orbit names, to support orbit-based PNGWalks.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>cdfjava didn't properly indicate that DEPEND_2 pointed to non-existent variable, don't show error when LABL is found.</li>
             <li>cdf files are opened in prepare method so that exceptions are better reported.</li>
@@ -52,34 +62,17 @@
             <li>Datum to Rank0DataSet converter handles fill</li>
             <li>minimum sizes set properly in PNGWalk tool so that tearing off and shrinking won't result in errors</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>timeparser.parse( 20010209 ) with $Y$m01 would not throw parse exception, so $Y$m01 was offered as agg suggestion when it is not valid</li>
-            <li>small round of findbugs cleanup, download resource as temp file uses hex for hashcode</li>
-            <li>rte_0764238028: the print to dialog parent was the canvas, causing confusion when canvas was torn off</li>
-            <li>3520074: need wiki page describing timerange binding:  Behavior is restored and test018 now tests this.</li>
-            <li>3434934: http create method was still synchronized, so http://autoplot.org being down would prevent any other http sites from being created.</li>
-            <li>bookmark descriptions would appear in parent nodes.</li>
-            <li>Pngwalk didn't properly unload full-size images when precalculated thumbs weren't available, running out of memory</li>
-            <li>jython library is loaded explicitly to support Java Webstart.</li>
-            <li>add TrLDataSet to support column-major CDF files with TT2000 timetags.</li>
-            <li>cadence-guessing code would be too restrictive for y tags in many cases.</li>
-            <li>Jython scripts warn when params are overwritten, also code detecting time series browse needed to be loosened</li>
-            <li>minor cleanup of CEF support</li>
-        </ul>
 
         <p>Features:</p>
         <ul>
-            <li>check parameters in time range specs, for example $(H,M) is now an exception.</li>
-            <li>allow URIs to be dropped on to plots.</li>
-            <li>timerange selector uses droplist to allow selection of recently-entered timeranges</li>
-            <li>likewise, operations selector keeps track of recent operations</li>
+            <li>3528211: URIs maybe dropped above or below plot to insert.  Enter editor when URI is rejected.</li>
+            <li>script servlet reincarnated, now has allowhosts file and logs use.</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>three and four argument bundle added to scripting to improve legibility</li>
-            <li>remote bookmarks loading is indicated via icons instead of [loading...]</li>
-            <li>plotElement selection is indicated in thumbnail on layout tab.</li>
+            <li>check parameters in time range specs, for example $(H,M) is now an exception.</li>
+            <li>timerange selector uses droplist to allow selection of recently-entered timeranges</li>
+            <li>likewise, operations selector keeps track of recent operations</li>
         </ul>
 
         <p>Known issues:</p>
