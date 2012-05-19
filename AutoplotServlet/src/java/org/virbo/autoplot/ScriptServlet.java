@@ -6,10 +6,12 @@
 package org.virbo.autoplot;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,15 @@ public class ScriptServlet extends HttpServlet {
             new File(home).mkdirs();
 
             File hostsallow= new File( home + "allowhosts" );
+
+            if ( !hostsallow.exists() ) {
+                PrintWriter write= new PrintWriter( new FileWriter( hostsallow ) );
+                write.println("# Initially, only clients from the localhost can connect.  List the allowed clients, one per line.");
+                write.println("# Globs like 192.168.0.* may be used.");
+                write.println("localhost");
+                write.close();
+            }
+
             if ( hostsallow.exists() ) {
                 boolean reject= true;
                 BufferedReader r= new BufferedReader( new FileReader( hostsallow ) );
@@ -86,7 +97,10 @@ public class ScriptServlet extends HttpServlet {
                 while ( h!=null ) {
                     int i= h.indexOf("#");
                     if (i>-1 ) h= h.substring(0,i);
-                    if ( h.trim().length()==0 ) continue;
+                    if ( h.trim().length()==0 ) {
+                        h= r.readLine();
+                        continue;
+                    }
                     h= h.replaceAll("\\*","\\.\\*");
 
                     if ( Pattern.matches( h, who ) ) {
@@ -97,9 +111,11 @@ public class ScriptServlet extends HttpServlet {
                 }
 
                 if ( reject ) {
-                    response.sendError(403,"allowhosts does not permit host=\""+who+"\"");
+                    response.sendError(403, hostsallow + " does not permit host=\""+who+"\"");
                     return;
                 }
+            } else {
+                response.sendError(403, hostsallow + " file does not exist: "+hostsallow );
             }
 
             File f= new File( home + ts+"."+who+".jy" );
