@@ -52,7 +52,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             File file= DataSetURI.getFile( cc.resourceURI, mon );
             
-            NetcdfDataset dataset= getDataSet( file.toString() );
+            NetcdfDataset dataset= getDataSet( file.toURI().toURL() );
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
             for ( int j=0; j<vars.size();j++ ) {
@@ -74,8 +74,14 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     public MetadataModel getMetadataModel(URL url) {
         return MetadataModel.createNullModel();
     }
-    
-    private NetcdfDataset getDataSet( String resource ) throws IOException {
+
+    /**
+     * @param resource
+     * @return
+     * @throws IOException
+     */
+    private NetcdfDataset getDataSet( URL resourceURL ) throws IOException {
+        String resource= resourceURL.toString();
         if ( resource.endsWith(".ncml") ) {
             return NcMLReader.readNcML( resource, null );
         
@@ -95,7 +101,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
 
             File file= DataSetURI.getFile( surl, mon ); // check for non-ncml.  We always download now because ncml can be slow.
 
-            NetcdfDataset dataset= getDataSet( file.toString() );
+            NetcdfDataset dataset= getDataSet( file.toURI().toURL() );
 
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
             List<Variable> vars= (List<Variable>)dataset.getVariables();
