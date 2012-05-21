@@ -124,6 +124,11 @@ for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWe
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
+for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
+   mkdir -p $(dirname ../temp-volatile-classes/$i)
+   cp $i ../temp-volatile-classes/$i
+done
+
 cd ..
 echo "done copy resources."
 
