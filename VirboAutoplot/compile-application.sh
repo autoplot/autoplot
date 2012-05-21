@@ -150,9 +150,7 @@ for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWe
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-print 'here'
 for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
-   print $i
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
