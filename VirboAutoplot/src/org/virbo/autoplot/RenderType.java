@@ -14,4 +14,5 @@ public enum RenderType {
     pitchAngleDistribution,
     eventsBar,
     vectorPlot,
+    orbitPlot,  // call-outs with time vs position
 }

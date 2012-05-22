@@ -38,6 +38,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -1746,6 +1747,14 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
+        } else if ( spec==RenderType.orbitPlot ) { 
+            QDataSet qube= TickCurveRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
         } else if ( spec==RenderType.image ) {
             QDataSet qube= RGBImageRenderer.doAutorange( fillDs );
             if ( qube==null ) {
@@ -1937,6 +1946,9 @@ public class PlotElementController extends DomNodeController {
             return true;
 
         } else if ( spec==RenderType.vectorPlot ) {
+            return true;
+
+        } else if ( spec==RenderType.orbitPlot ) {
             return true;
 
         } else if ( spec==RenderType.digital ) {

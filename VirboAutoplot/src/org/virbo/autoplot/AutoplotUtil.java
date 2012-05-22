@@ -66,6 +66,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
@@ -1440,6 +1441,14 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new VectorPlotRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+        } else if ( renderType==RenderType.orbitPlot ) {
+            if (recyclable != null && recyclable instanceof TickCurveRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new TickCurveRenderer();
                 result.setDataSetLoader(null);
                 return result;
             }
