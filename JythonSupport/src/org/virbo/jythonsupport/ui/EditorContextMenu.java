@@ -124,7 +124,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() with enumeration") {
                 public void actionPerformed(ActionEvent e) {
-                    insertCode( "sc= getParam( 'sc', 'c1', 'spacecraft', ['c1','c2','c3','c4'] )\n");
+                    insertCode( "sc= getParam( 'sc', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
                 }
             };
             item= new JMenuItem( a );
@@ -140,6 +140,15 @@ public class EditorContextMenu {
             item.setToolTipText("<html>When getParam timerange is read, then the script will the time axis to be set to any time.</html>");
             insertCodeMenu.add( item );
 
+            a= new AbstractAction("getParam() to get the resource URI") {
+                public void actionPerformed(ActionEvent e) {
+                    insertCode( "resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/rainfall_KIOW_20120522_0252.html', 'example file to load' )\n" );
+                }
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>This special variable is the vap+jyds:<resourceURI>?script=<script>");
+            insertCodeMenu.add( item );
+
             JMenu fragmentsMenu= new JMenu("Code Fragments");
             fragmentsMenu.add( createInsertMenuItem( "procedure", "def myproc(x,y):\n  z=x+y\n  return z\n" ) );
 
@@ -150,6 +159,8 @@ public class EditorContextMenu {
             fragmentsMenu.add( createInsertMenuItem( "for loop over dataset", "a= sin( linspace(0,PI,100) )\nfor i in a:\n  print i\n" ) );
 
             fragmentsMenu.add( createInsertMenuItem( "try-except", "try:\n  fil=downloadResourceAsTempFile(URL('http://autoplot.org/data/nofile.dat'),monitor)\nexcept java.io.IOException,ex:\n  print 'file not found'\n" ) );
+
+            fragmentsMenu.add( createInsertMenuItem( "raise exception", "if ( ds.length()==0 ):\n  raise Exception('Dataset is empty')") );
             
             insertCodeMenu.add(fragmentsMenu);
 
