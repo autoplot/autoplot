@@ -17,9 +17,13 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.TagGenDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
@@ -29,7 +33,7 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class AudioSystemDataSource extends AbstractDataSource implements Updating {
-    public static final double LEN_SECONDS = 1.0;
+
     public static final int SAMPLE_RATE = 8000; // SAMPLE_RATE * SAMPLE_LENGTH_SEC should be multiple of BUFSIZE
 
     public AudioSystemDataSource( URI uri ) {
@@ -47,7 +51,8 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        double lenSeconds = LEN_SECONDS;
+        double lenSeconds = Double.parseDouble( getParam( "len", "1.0") );
+
         nsamples = (int) (lenSeconds * SAMPLE_RATE);
         int len = nsamples * 4;
         int nchannels= 1;
@@ -55,6 +60,8 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         int frameSize= bitsPerSample / ( nchannels * 8 );
 
         dataBuffer = ByteBuffer.allocateDirect(len);
+
+        double now= TimeUtil.now().doubleValue(Units.cdfTT2000);
 
         TargetDataLine targetDataLine;
         AudioInputStream audioInputStream;
@@ -78,16 +85,22 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         dataBuffer.limit( 2048 );
         fillBuffer(mon);
 
-        mon.finished();
+        targetDataLine.close();
 
         dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
 
+        QDataSet t= new TagGenDataSet( nsamples, 1000000000./SAMPLE_RATE, now, Units.cdfTT2000 );
         //startUpdateTimer();
         
-        QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+        MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+        ds.putProperty( QDataSet.DEPEND_0, t );
+        
         if ( spec>-1 ) {
-            ds= Ops.fftWindow(ds, spec);
+            ds= (MutablePropertyDataSet)Ops.fftPower( ds, spec, mon );
         }
+
+        mon.finished();
+
         return ds;
     }
 
@@ -103,7 +116,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
     private void fillBuffer(ProgressMonitor mon) throws IllegalArgumentException, IOException {
         System.err.println("fillBuffer"+dataBuffer);
-        while (dataBuffer.position() < dataBuffer.capacity()) {
+        while ( !mon.isCancelled() && dataBuffer.position() < dataBuffer.capacity() ) {
             audioChannel.read(dataBuffer);
             dataBuffer.limit(Math.min(dataBuffer.position() + 2048, dataBuffer.capacity()));
             mon.setTaskProgress(dataBuffer.position());
