@@ -8,6 +8,7 @@ package org.virbo.jythonsupport;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.python.core.Py;
 import org.python.core.PyArray;
@@ -15,8 +16,10 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.PyFloat;
 import org.python.core.PyFunction;
 import org.python.core.PyInteger;
+import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PySingleton;
 import org.python.core.PyString;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -91,8 +94,8 @@ public class JythonOps {
     
     /**
      * coerce a python array into a QDataSet.
-     * @param arg0
-     * @return
+     * @param arg0 Python object or Datum
+     * @return QDataSet
      */
     public static QDataSet dataset( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
@@ -105,6 +108,8 @@ public class JythonOps {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyFloat ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
+            return DataSetUtil.asDataSet( (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class) );
         } else if ( arg0 instanceof PyString ) {
             try {
                return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())); //TODO: someone is going to want lookupUnits that will allocate new units.
