@@ -104,7 +104,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         });
     }
 
-    private void update() {
+    private synchronized void update() {
         theModel= new MyTreeModel();
 
         Runnable run= new Runnable() {
