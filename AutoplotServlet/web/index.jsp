@@ -28,8 +28,14 @@
             production use, and contact us (autoplot@groups.google.com) if you have
             questions.
         </p>
+
+        <p>The "ScriptServlet" allows Python scripts to be sent and interpreted to produce graphics or to access
+            Autoplot internals.  Obviously this introduces security concerns, and access is limited by the "allowhosts" file found
+            by default in /tmp/autoplotservlet.  Also, scripts are logged in this location as well.
+        </p>
         <p>
-            <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet.
+            <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet. <br>
+            <a href="script.jsp"> script.jsp</a>: web form for sending scripts to the ScriptServlet. <br>
         </p>
     </body>
 </html>
