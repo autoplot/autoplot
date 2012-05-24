@@ -275,7 +275,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
 
             if ( tcaDesc!=null && tcaDesc.size()>0 ) {
-                if ( item==null ) {
+                if ( item==null || item.equals("") || item.equals("0") ) {
                     QDataSet bds= (QDataSet)result.property(QDataSet.BUNDLE_1);
                     if ( bds!=null && bds instanceof BundleDescriptor ) {
                         BundleDescriptor bds1= (BundleDescriptor)bds;
