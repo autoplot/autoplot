@@ -503,6 +503,9 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
+        <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -551,6 +554,9 @@ exists or setup the property manually. For example like this:
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+        <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar">
@@ -732,6 +738,7 @@ exists or setup the property manually. For example like this:
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${reference.VirboAutoplot.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.Das2ServerDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QStream.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.DataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
@@ -760,6 +767,7 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${reference.VirboAutoplot.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.Das2ServerDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QStream.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.DataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
@@ -1090,6 +1098,7 @@ exists or setup the property manually. For example like this:
     <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="clean"/>
