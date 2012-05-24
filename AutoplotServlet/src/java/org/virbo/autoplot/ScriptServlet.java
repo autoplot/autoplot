@@ -122,6 +122,11 @@ public class ScriptServlet extends HttpServlet {
             ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
 
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+            interp.set("java",null);
+            interp.set("org",null);
+            interp.set("getFile",null);
+            interp.set("downloadResourceAsTempFile",null);
+
             interp.setOut( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) );
             
             interp.set( "response", response );
@@ -132,7 +137,7 @@ public class ScriptServlet extends HttpServlet {
             interp.exec(script);
             
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            response.sendError(403, ex.toString() );
         } finally { 
             
         }
@@ -163,7 +168,7 @@ public class ScriptServlet extends HttpServlet {
     * Returns a short description of the servlet.
     */
     public String getServletInfo() {
-        return "Short description";
+        return "Autoplot ScriptServlet";
     }// </editor-fold>
 
 }
