@@ -309,8 +309,14 @@ class Das2ServerDataSource extends AbstractDataSource {
                 }
             }
             if ( dep!=null && dep.property( QDataSet.CACHE_TAG )== null ) {
-                QDataSet bounds= SemanticOps.bounds(result1);
-                CacheTag ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(0), true ), resolution );
+                CacheTag ct;
+                if ( SemanticOps.isBundle(result1) ) {
+                    QDataSet bounds= SemanticOps.bounds(dep);
+                    ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(1), true ), resolution );
+                } else {
+                    QDataSet bounds= SemanticOps.bounds(result1);
+                    ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(0), true ), resolution );
+                }
                 MutablePropertyDataSet dep2= DataSetOps.makePropertiesMutable(dep);
                 dep2.putProperty( QDataSet.CACHE_TAG, ct );
                 MutablePropertyDataSet result2= DataSetOps.makePropertiesMutable(result1);
