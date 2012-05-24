@@ -4,17 +4,9 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +14,6 @@ import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -46,13 +37,10 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.xml.sax.SAXException;
 
 /**
  * Manages a Plot node, for example listening for autoRange updates and layout
@@ -324,11 +312,11 @@ public class PlotController extends DomNodeController {
         application.controller.maybeAddContextMenus( this );
 
         boolean headless= "true".equals( System.getProperty("java.awt.headless") );
-        if ( !headless && application.controller.model.getDropTargetListener()!=null ) {
+        if ( !headless && canvas.controller.getDropTargetListener()!=null ) {
             DropTarget dropTarget = new DropTarget();
             dropTarget.setComponent(dasPlot);
             try {
-                dropTarget.addDropTargetListener( application.controller.model.getDropTargetListener() );
+                dropTarget.addDropTargetListener( canvas.controller.getDropTargetListener() );
             } catch (TooManyListenersException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
