@@ -12,7 +12,6 @@ import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -36,7 +35,6 @@ import org.das2.util.AboutUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
@@ -244,13 +242,6 @@ public class SimpleServlet extends HttpServlet {
                         tsb.setTimeRange(timeRange);
                         logit("timeSeriesBrowse got data source", t0, uniq, debug);
                     }
-                }
-
-                QDataSet ds;
-                try {
-                    ds = dsource == null ? null : dsource.getDataSet(new NullProgressMonitor());
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
                 }
 
                 if (!process.equals("")) {
