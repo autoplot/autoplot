@@ -67,8 +67,8 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         height: <input name="height" value="400" > <br>
         <br>
         <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
-        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://autoplot.org/help#Layout">help</a>)<br>
-        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://autoplot.org/help#Layout">help</a>)<br>
+        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://autoplot.org/help#layout">help</a>)<br>
+        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://autoplot.org/help#layout">help</a>)<br>
         <br>
         timerange: <input name="timeRange" value="2003-mar"><br>
         <br>
