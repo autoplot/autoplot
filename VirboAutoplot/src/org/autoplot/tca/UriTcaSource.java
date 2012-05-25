@@ -229,11 +229,19 @@ public class UriTcaSource extends AbstractQFunction {
                         }
                         result= result1;
                     } else {
-                        BundleDataSet result1= new BundleDataSet( error );
-                        for ( int i=1; i<ds.length(0); i++ ) {
-                            result1.bundle(error);
+                        if ( tsb.getTimeRange().contains(DataSetUtil.asDatum(d0)) ) {
+                            BundleDataSet result1= new BundleDataSet( nonValueDs );
+                            for ( int i=1; i<ds.length(0); i++ ) {
+                                result1.bundle(nonValueDs);
+                            }
+                            result= result1;
+                        } else {
+                            BundleDataSet result1= new BundleDataSet( error );
+                            for ( int i=1; i<ds.length(0); i++ ) {
+                                result1.bundle(error);
+                            }
+                            result= result1;
                         }
-                        result= result1;
                     }
                 }
             }
