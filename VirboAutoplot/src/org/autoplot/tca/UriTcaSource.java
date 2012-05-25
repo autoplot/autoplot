@@ -36,6 +36,7 @@ import org.virbo.dsops.Ops;
 public class UriTcaSource extends AbstractQFunction {
 
     TimeSeriesBrowse tsb;
+    boolean needToRead;
     QDataSet ds;
     QDataSet bundleDs;
     DataSource dss;
@@ -66,6 +67,7 @@ public class UriTcaSource extends AbstractQFunction {
             initialError= null;
             this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
             this.dss= dss1;
+            this.needToRead= true;
         } catch ( Exception ex ) {
             ex.printStackTrace();
             initialError= DataSetUtil.asDataSet( eu.createDatum(ex.toString()) );
@@ -81,6 +83,7 @@ public class UriTcaSource extends AbstractQFunction {
         } else {
             logger.log(Level.FINE, "reading TCAs from {0}", dss);
         }
+        needToRead= false; // clear the flag in case there is an exception.
         ds= dss.getDataSet( mon );
         bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
         if ( bundleDs==null ) {
@@ -144,10 +147,8 @@ public class UriTcaSource extends AbstractQFunction {
         QDataSet context= (QDataSet) parm.property( QDataSet.CONTEXT_0, 0 ); // should be a bins dimension
         QDataSet deltaMinus= (QDataSet)parm.property(QDataSet.DELTA_MINUS,0);
         QDataSet deltaPlus= (QDataSet)parm.property(QDataSet.DELTA_PLUS,0);
-        boolean read= false;
-        if ( tsb==null ) {
-            read= false;
-        } else {
+        boolean read= needToRead;
+        if ( tsb!=null ) {
             DatumRange dr= tsb.getTimeRange();
 
             if ( !DatumRangeUtil.sloppyContains( dr, d ) ) {
@@ -269,7 +270,7 @@ public class UriTcaSource extends AbstractQFunction {
             label= "Time";
         } else {
             try {
-                if ( ds==null ) {
+                if ( needToRead ) {
                     doRead();
                 }
                 QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
