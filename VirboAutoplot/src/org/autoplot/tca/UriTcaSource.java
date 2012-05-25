@@ -15,9 +15,9 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractQFunction;
+import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -99,7 +99,6 @@ public class UriTcaSource extends AbstractQFunction {
                 QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
                 Units u= dep1==null ? Units.dimensionless : SemanticOps.getUnits(dep1);
                 for ( int i=0; i<ds.length(0); i++ ) {
-                    String c= "";
                     String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
                     String label= (String) ds.property(QDataSet.LABEL);
                     bds1.putProperty( QDataSet.NAME, i, "ds"+i );
@@ -137,7 +136,7 @@ public class UriTcaSource extends AbstractQFunction {
 
         if ( initialError!=null ) {
             if ( ds==null ) {
-                return new JoinDataSet( error );
+                return new BundleDataSet( error );
             }
         }
 
@@ -173,7 +172,7 @@ public class UriTcaSource extends AbstractQFunction {
                 read= false;
             }
             if ( ds==null ) {
-                return new JoinDataSet( errorNoDs );
+                return new BundleDataSet( errorNoDs );
             }
 
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
@@ -181,7 +180,7 @@ public class UriTcaSource extends AbstractQFunction {
 
             if ( !SemanticOps.isMonotonic(dep0 ) ) {
                 logger.fine("dataset dependence is not monotonic");
-                return new JoinDataSet( nonMonoDs );
+                return new BundleDataSet( nonMonoDs );
             }
             QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
 
@@ -223,15 +222,15 @@ public class UriTcaSource extends AbstractQFunction {
 
                 } else {
                     if ( tsb==null ) {
-                        JoinDataSet result1=  new JoinDataSet( nonValueDs );
+                        BundleDataSet result1=  new BundleDataSet( nonValueDs );
                         for ( int i=1; i<ds.length(0); i++ ) {
-                            result1.join(nonValueDs);
+                            result1.bundle(nonValueDs);
                         }
                         result= result1;
                     } else {
-                        JoinDataSet result1= new JoinDataSet( error );
+                        BundleDataSet result1= new BundleDataSet( error );
                         for ( int i=1; i<ds.length(0); i++ ) {
-                            result1.join(error);
+                            result1.bundle(error);
                         }
                         result= result1;
                     }
@@ -239,7 +238,7 @@ public class UriTcaSource extends AbstractQFunction {
             }
 
             if ( result.rank()==0 ) {
-                result= new JoinDataSet( result );
+                result= new BundleDataSet( result );
             }
 
             ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
@@ -249,7 +248,7 @@ public class UriTcaSource extends AbstractQFunction {
 
         } catch ( Exception ex ) {
             ex.printStackTrace(); //TODO: user never sees this...
-            return new JoinDataSet( error );
+            return new BundleDataSet( error );
         }
 
     }
