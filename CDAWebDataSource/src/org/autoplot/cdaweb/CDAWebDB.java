@@ -495,6 +495,9 @@ public class CDAWebDB {
 
         db.refresh( DasProgressPanel.createFramed("refreshing database") );
 
+        db.getSampleTime("I1_AV_OTT"); // empty trailing folder 1984 caused problem before 20120525.
+        db.getSampleTime("IA_K0_ENF"); // no files...
+
         String[] files= db.getFilesAndRanges( "AC_H0_MFI", DatumRangeUtil.parseTimeRange( "20010101T000000Z-20010131T000000Z" ) );
         for ( String s: files ) {
             System.err.println(s);
