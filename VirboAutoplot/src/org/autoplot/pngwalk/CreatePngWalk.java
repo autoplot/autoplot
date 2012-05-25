@@ -62,7 +62,7 @@ public class CreatePngWalk {
             }
             out= new java.io.FileOutputStream(filename);
             image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
-            DasPNGEncoder encoder = new DasPNGEncoder();
+            DasPNGEncoder encoder = new DasPNGEncoder(); // 20120525: tested against ImageIO.write comparable time and space.
             encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new java.util.Date().toString());
             encoder.write(image, out);
         } finally {
