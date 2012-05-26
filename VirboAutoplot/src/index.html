@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Juno data with TCAs (ephemeris).  This still has issues, but it's usable.  See http://www-pw.physics.uiowa.edu/~jbf/juno/vap/efield-tca.vap</small></p>
+        <p><small>Orbit plots are introduced into Autoplot.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,7 +21,13 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
-        <ul>
+        <ul><li>CDFLeapSeconds.txt, file was never embedded in the jar files.</li>
+            <li>Jython resourceURI can point at HTML file.  Before the new warning would pop up.</li>
+            <li>allow fractional days in getTimeDatum(Y,m,d,H,M,S,N) function</li>
+            <li>URI drop target moved to allow Applet to compile again.</li>
+            <li>cleanup with das2 server and TCA labeling<li>
+            <li>findex function allows repeat values in monotonic dataset.</li>
+            <li>FileStorageModel wouldn't return representative file from $Y/$Y$m$d.dat if the last $Y was empty.</li>
             <li>TCA axis annotations are loaded asynchronously.  Before they were loaded on the event thread.</li>
             <li>Das2Server TCA labels corrected, they were not reported properly.</li>
             <li>code in TCAs assumed rank 0, causing failure of some TCAs to load.</li>
@@ -65,6 +71,11 @@
 
         <p>Features:</p>
         <ul>
+            <li>improvements to the LSpec routine, so inward and outward sweeps can be examined, use timetags to detect breaks</li>
+            <li>add orbitPlot render type, which takes a bundle of time,x,y</li>
+            <li>add example getParam(resourceURI) to the popup in Jython editor, add raise exception.</li>
+            <li>add len and timetags to AudioSystemDataSource.  This makes for a useful source of demo data.</li>
+            <li>jython script server reenabled in the autoplot servlet, along with new security restrictions</li>
             <li>3528211: URIs maybe dropped above or below plot to insert.  Enter editor when URI is rejected.</li>
             <li>script servlet reincarnated, now has allowhosts file and logs use.</li>
         </ul>
