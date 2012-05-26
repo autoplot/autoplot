@@ -1392,18 +1392,18 @@ public class DataSourceController extends DomNodeController {
             setDataSet(null);
             setStatus("operation cancelled");
             if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
-        } catch (NoDataInIntervalException e) {
-            setException(e);
+        } catch (NoDataInIntervalException ex) {
+            setException(ex);
             setDataSet(null);
-            setStatus("warning: "+ e.getMessage());
+            setStatus("warning: "+ ex.getMessage());
 
             if ( dsf.getController().getTsb()==null ) {
                 String title= "no data in interval";
-                model.showMessage( ""+ e.getMessage(), title, JOptionPane.INFORMATION_MESSAGE );
+                model.showMessage( ""+ ex.getMessage(), title, JOptionPane.INFORMATION_MESSAGE );
             } else {
                 // do nothing.
             }
-
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } catch (HtmlResponseIOException ex ) {
             final HtmlResponseIOException htmlEx= (HtmlResponseIOException)ex;
             if ( htmlEx.getURL()!=null ) {
@@ -1426,44 +1426,45 @@ public class DataSourceController extends DomNodeController {
             } else {
                 JOptionPane.showMessageDialog( DataSourceController.this.model.getCanvas(), "<html>Unable to open URI: <br>" +  dsf.getUri()+"<br><br>"+ex );
             }
-
-        } catch (IOException e ) {
-            if ( e instanceof FileNotFoundException || ( e.getMessage()!=null && ( e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) ) ) {
-                String message= e.getMessage();
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
+            
+        } catch (IOException ex ) {
+            if ( ex instanceof FileNotFoundException || ( ex.getMessage()!=null && ( ex.getMessage().contains("No such file") || ex.getMessage().contains("timed out") ) ) ) {
+                String message= ex.getMessage();
                 if ( message.startsWith("550 ") ) {
                     message= message.substring(4);
                 }
-                setException(e);
+                setException(ex);
                 setDataSet(null);
                 setStatus("warning: " + message);
-                String title= e.getMessage().contains("No such file") ? "File not found" : e.getMessage();
+                String title= ex.getMessage().contains("No such file") ? "File not found" : ex.getMessage();
                 model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
-            } else if ( e.getMessage()!=null && e.getMessage().contains("root does not exist") ) {  // bugfix 3053225
-                setException(e);
+            } else if ( ex.getMessage()!=null && ex.getMessage().contains("root does not exist") ) {  // bugfix 3053225
+                setException(ex);
                 setDataSet(null);
-                setStatus("warning: " + e.getMessage() );
-                String title= e.getMessage().contains("No such file") ? "Root does not exist" : e.getMessage();
-                model.showMessage( e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
-            } else if ( e.getMessage()==null  ) {
-                setException(e);
-                e.printStackTrace();
+                setStatus("warning: " + ex.getMessage() );
+                String title= ex.getMessage().contains("No such file") ? "Root does not exist" : ex.getMessage();
+                model.showMessage( ex.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+            } else if ( ex.getMessage()==null  ) {
+                setException(ex);
+                ex.printStackTrace();
                 setDataSet(null);
-                setStatus("error: " + e.getClass() );
-                handleException(e);
+                setStatus("error: " + ex.getClass() );
+                handleException(ex);
             } else {
-                setException(e);
+                setException(ex);
                 setDataSet(null);
-                setStatus("error: " + e.getMessage());
-                handleException(e);
+                setStatus("error: " + ex.getMessage());
+                handleException(ex);
             }
-            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), e );
-        } catch (Exception e) {
-            setException(e);
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
+        } catch (Exception ex) {
+            setException(ex);
             setDataSet(null);
-            e.printStackTrace();
-            setStatus("error: " + e.getMessage());
-            handleException(e);
-            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), e );
+            ex.printStackTrace();
+            setStatus("error: " + ex.getMessage());
+            handleException(ex);
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } finally {
             // don't trust the data sources to call finished when an exception occurs.
             mymon.finished();
