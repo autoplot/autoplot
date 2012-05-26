@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -24,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
@@ -1403,17 +1405,22 @@ public class DataSourceController extends DomNodeController {
             }
 
         } catch (HtmlResponseIOException ex ) {
-            HtmlResponseIOException htmlEx= (HtmlResponseIOException)ex;
+            final HtmlResponseIOException htmlEx= (HtmlResponseIOException)ex;
             if ( htmlEx.getURL()!=null ) {
                 final String link= htmlEx.getURL().toString();
-                JPanel p= new JPanel( new BorderLayout( ) );
+                final JPanel p= new JPanel( new BorderLayout( ) );
                 p.add( new JLabel(  "<html>Unable to open URI: <br>" +  dsf.getUri()+"<br><br>Downloaded file appears to be HTML.<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
-                JPanel p1= new JPanel( new BorderLayout() );
+                JPanel p1= new JPanel( new FlowLayout( FlowLayout.RIGHT ) );
+                p1.add( new JButton( new AbstractAction("Details") {
+                    public void actionPerformed( ActionEvent ev ) {
+                        getApplication().controller.getApplicationModel().getExceptionHandler().handle(htmlEx);
+                    }
+                }) );
                 p1.add( new JButton( new AbstractAction("View Page") {
                     public void actionPerformed( ActionEvent ev ) {
                         AutoplotUtil.openBrowser(link);
                     }
-                }), BorderLayout.EAST );
+                }) );
                 p.add( p1, BorderLayout.SOUTH );
                 JOptionPane.showMessageDialog( DataSourceController.this.model.getCanvas(), p );
             } else {
