@@ -313,12 +313,13 @@ public class ScriptPanelSupport {
 
                     public void run() {
                         int offset = 0;
+                        ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
+
                         try {
                             if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
                                 save();
                                 applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
                             }
-                            ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
                             InteractiveInterpreter interp = null;
                             try {
                                 interp= JythonUtil.createInterpreter(true, false);
@@ -381,6 +382,7 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("script interrupted");
                             }
                         } finally {
+                            mon.finished();
                             setInterruptible( null );
                         }
 
