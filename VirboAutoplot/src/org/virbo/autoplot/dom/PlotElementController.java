@@ -2128,11 +2128,6 @@ public class PlotElementController extends DomNodeController {
                                     throw new IllegalStateException("plot cannot be null");
                                 }
                                 Renderer[] rends= plot.getRenderers();
-                                PlotElement[] pe= new PlotElement[rends.length];
-                                for ( int i=0; i<rends.length; i++ ) {
-                                    PlotElement pe1= dom.controller.findPlotElement(rends[i]);
-                                    pe[i]= pe1;
-                                }
                                 int best=-1;
                                 int myPos= -1;
                                 for ( int i=0; i<dom.getPlotElements().length; i++ ) {
