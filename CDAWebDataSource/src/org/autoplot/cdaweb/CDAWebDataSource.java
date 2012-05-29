@@ -278,7 +278,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         if ( result!=null ) {
             List<String> problems= new ArrayList();
             if ( ! DataSetUtil.validate(result,problems) ) {
-                throw new Exception("calculated dataset is not well-formed: "+uri );
+                throw new Exception("calculated dataset is not well-formed: "+uri + ". " + problems );
             }
         }
         return result;
