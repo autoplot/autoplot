@@ -299,12 +299,6 @@ public class CdfUtil {
 
         if ( dims==0 ) dimSizes= new int[0]; // to simplify code
 
-        // Nand's library
-        if ( dimVaries.length>0 && dimVaries[0]==false && dimSizes.length!=0 ) { //TODO: I don't think this is necessary now, see above "variable.getEffectiveRank() != dimSizes.length"
-            System.err.println("here at 307 CdfUtil");
-//            dimSizes= new int[0];
-        }
-
         //kludge: in library, where majority has no effect on dimSizes.  See
         if ( ! variable.rowMajority()  ) {
             int n= dimSizes.length;
