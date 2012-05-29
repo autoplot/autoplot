@@ -277,11 +277,28 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     if ( s.startsWith("file:/") && !s.startsWith("file:///") && template.startsWith("file:///") ) {
                         s= "file:///"+s.substring(6);
                     }
+                    int i= template.indexOf("$");
+                    if ( i!=-1 ) { // do a little testing
+                        int i2= i+1;
+                        if ( i2==template.length() ) {
+                            throw new IllegalArgumentException("template must start with $Y, $y or $(o,...)");
+                        }
+                        char c= template.charAt(i2);
+                        while ( i2<template.length() && ( Character.isDigit(c) || c=='(' ) ) {
+                            i2++;
+                            c= template.charAt(i2);
+                        }
+                        if ( i2==template.length() || !( c=='Y' || c=='y' || c=='o' ) ) {
+                            throw new IllegalArgumentException("template must start with $Y, $y or $(o,...)");
+                        }
+                    }
                     int i0 = template.indexOf("_$Y");
-                    if ( i0==-1 ) i0= template.indexOf("_%Y");
-                    if ( i0==-1 ) i0= template.indexOf("_%o");
-                    if ( i0==-1 ) i0= template.indexOf("_%(o,");
-
+                    if ( i0==-1 ) i0= template.indexOf("_%Y"); // I don't think this should happen now.
+                    if ( i0==-1 ) i0= template.indexOf("_$y");
+                    if ( i0==-1 ) i0= template.indexOf("_$o");
+                    if ( i0==-1 ) i0= template.indexOf("_$(o,");
+                    //Note, _$(m,Y=2000) is not supported.
+                    
                     //int i1 = template.indexOf(".png");
                     //if ( i1==-1 ) return;
                     //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
