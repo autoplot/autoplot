@@ -176,7 +176,9 @@ public class CoversWalkView extends PngWalkView  {
             if (scrollMin > i * cellWidth || scrollMax < (i + 1) * cellWidth) {
                 scrollPane.getHorizontalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED)) {
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED ) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_BADGE_CHANGE)  ) {
             int i = (Integer) e.getNewValue();
             int x = (i % seq.size()) * (cellWidth);
             canvas.repaint(new Rectangle(x, 0, cellWidth, cellSize));

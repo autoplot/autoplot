@@ -199,7 +199,9 @@ public class GridPngWalkView extends PngWalkView {
             if (scrollMin > y || scrollMax < y+thumbSize) {
                 scrollPane.getVerticalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED)) {
+       } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_BADGE_CHANGE) ) {
             int i = (Integer) e.getNewValue();
             //System.err.printf("Image number %d finished loading%n", i);
             int y = (i / nCols) * thumbSize;
