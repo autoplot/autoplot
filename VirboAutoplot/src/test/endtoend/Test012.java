@@ -116,6 +116,9 @@ public class Test012 {
             // every other value is fill in Virbo data.  These should be skipped.
             doTest( testid, 17, "file:///home/jbf/ct/hudson/data.backup/cdf/virbo/poes_n17_20041228.cdf?P1_90[0:300]" );
 
+            // this has a non-varying second dimension that is automatically removed.
+            doTest( testid, 18, "ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
