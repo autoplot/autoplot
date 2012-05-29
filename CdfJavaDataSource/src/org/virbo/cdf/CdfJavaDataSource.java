@@ -542,10 +542,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     if (labl != null) {
                         try {
                             if ( cdf.getVariable(labl)==null ) {
-                                throw new IllegalArgumentException("no such variable: "+labl+" referred to by variable: "+ svariable );
+                                System.err.println("no such variable: "+labl+" referred to by variable: "+ svariable );
+                            } else {
+                                MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                                result.putProperty("DEPEND_" + idep, depDs);
                             }
-                            MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
-                            result.putProperty("DEPEND_" + idep, depDs);
                         } catch (Exception e) {
                             e.printStackTrace(); // to support lanl.
                         }
