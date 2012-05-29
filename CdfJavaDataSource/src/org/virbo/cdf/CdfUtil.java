@@ -211,7 +211,14 @@ public class CdfUtil {
 
         if ( variable.getEffectiveRank() != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ variable.getEffectiveRank() ];
-            System.arraycopy(dimSizes, 0, dimSizes1, 0, variable.getEffectiveRank());
+            boolean[] varies= variable.getVarys();
+            int k=0;
+            for ( int i=0; i<varies.length; i++ ) {
+                if ( varies[i] ) {
+                    dimSizes1[k]= dimSizes[i];
+                    k++;
+                }
+            }
             dimSizes= dimSizes1;
         }
 
