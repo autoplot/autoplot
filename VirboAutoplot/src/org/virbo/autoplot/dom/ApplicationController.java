@@ -1605,7 +1605,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (bc != null) {
 
                 bc.unbind();
-                bindingContexts.remove(bc);
+                bindingContexts.remove(src);
 
                 String bcid = src.getId();
                 List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
