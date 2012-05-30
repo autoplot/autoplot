@@ -63,11 +63,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    private static final int FILE_CACHE_SIZE_LIMIT= 2;
     protected static final LinkedHashMap<String,CDF> openFiles= new LinkedHashMap();
     protected static final Map<CDF,String> openFilesRev= new HashMap();
     protected static final Map<String,Long> openFilesFresh= new HashMap();
     protected static final Object lock= new Object();
 
+    private static final int DS_CACHE_SIZE_LIMIT= 2;
     protected static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
     protected static final HashMap<String,Long> dsCacheFresh= new HashMap();
     protected static final Object dslock= new Object();
@@ -94,6 +96,25 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
     }
 
+    /**
+     * put the dataset into the cache, probably removing the least valuable entry from the cache.
+     * @param uri
+     * @param result
+     */
+    protected static void dsCachePut( String uri, MutablePropertyDataSet result ) {
+        synchronized ( dslock ) {
+            dsCache.remove( uri ); // freshen by moving to front of the list.
+            dsCache.put( uri, result );
+            dsCacheFresh.put( uri, System.currentTimeMillis() );
+
+            while ( dsCache.size()>DS_CACHE_SIZE_LIMIT ) {
+                Entry<String,MutablePropertyDataSet> first= dsCache.entrySet().iterator().next();
+                dsCache.remove(first.getKey());
+                System.err.println( "remove "+first.getKey() );
+            }
+        }
+    }
+
     public CDF getCdfFile( String fileName ) {
         CDF cdf;
         try {
@@ -109,7 +130,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     openFiles.put(fileName, cdf);
                     openFilesRev.put(cdf, fileName);
                     openFilesFresh.put(fileName,System.currentTimeMillis());
-                    if ( openFiles.size()>10 ) {
+                    if ( openFiles.size()>FILE_CACHE_SIZE_LIMIT ) {
                         String oldest= openFiles.entrySet().iterator().next().getKey();
                         cdfCacheUnload(oldest,true);
                     }
@@ -204,9 +225,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         synchronized ( dslock ) {
             cached= dsCache.get(lsurl);
             if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
-                dsCache.remove(lsurl);
-                dsCache.put( lsurl, cached );
-                dsCacheFresh.put( lsurl, System.currentTimeMillis() );
+                dsCachePut( lsurl, cached ); // freshen
             }
         }
 

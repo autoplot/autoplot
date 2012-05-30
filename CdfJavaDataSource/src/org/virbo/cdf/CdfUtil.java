@@ -191,7 +191,7 @@ public class CdfUtil {
                 cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
             }
             
-            if ( false && cdfFile!=null ) {
+            if ( cdfFile!=null ) {
                 String uri= cdfFile + "?" + variable.getName();
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
@@ -477,10 +477,7 @@ public class CdfUtil {
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
                 }
-                synchronized ( CdfJavaDataSource.dslock ) {
-                    CdfJavaDataSource.dsCache.put( uri, result );
-                    CdfJavaDataSource.dsCacheFresh.put( uri, System.currentTimeMillis() );
-                }
+                CdfJavaDataSource.dsCachePut( uri, result );
             }
         }
         return result;
