@@ -21,11 +21,17 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
-        <ul><li>CDFLeapSeconds.txt, file was never embedded in the jar files.</li>
+        <ul><li>match Nand's CDF library logic where getEffectiveRank skips over 1-element dimensions.  vap+cdaweb:ds=C1_CP_FGM_SPIN&id=B_vec_xyz_gse__C1_CP_FGM_SPIN&timerange=2011-03-02</li>
+            <li>non-varying dimensions were assumed to be the trailing dimension.  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image</li>
+            <li>PNGWalk Covers and Grid didn't update when the Quality status changed.</li>
+            <li>remove extraneous call to load data in SimpleServlet</li>
+            <li>progress monitor finished method wasn't called when script was interrupted.</li>
+            <li>rte_0293612998: remove dead code that would occasionally trigger "java.lang.IllegalArgumentException: unable to find plot element for das renderer" message.</li>
+            <li>CDFLeapSeconds.txt, file was never embedded in the jar files.</li>
             <li>Jython resourceURI can point at HTML file.  Before the new warning would pop up.</li>
             <li>allow fractional days in getTimeDatum(Y,m,d,H,M,S,N) function</li>
             <li>URI drop target moved to allow Applet to compile again.</li>
-            <li>cleanup with das2 server and TCA labeling<li>
+            <li>cleanup with das2 server and TCA labeling</li>
             <li>findex function allows repeat values in monotonic dataset.</li>
             <li>FileStorageModel wouldn't return representative file from $Y/$Y$m$d.dat if the last $Y was empty.</li>
             <li>TCA axis annotations are loaded asynchronously.  Before they were loaded on the event thread.</li>
@@ -75,7 +81,7 @@
             <li>add orbitPlot render type, which takes a bundle of time,x,y</li>
             <li>add example getParam(resourceURI) to the popup in Jython editor, add raise exception.</li>
             <li>add len and timetags to AudioSystemDataSource.  This makes for a useful source of demo data.</li>
-            <li>jython script server reenabled in the autoplot servlet, along with new security restrictions</li>
+            <li>jython script server re-enabled in the autoplot servlet, along with new security restrictions</li>
             <li>3528211: URIs maybe dropped above or below plot to insert.  Enter editor when URI is rejected.</li>
             <li>script servlet reincarnated, now has allowhosts file and logs use.</li>
         </ul>
