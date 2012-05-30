@@ -80,7 +80,9 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.err.println("v20120327.1655");
+        System.err.println("v20120530.1505");
+
+        System.err.println("=======================");
 
         //register java cdf as .cdf handler
         if ( DataSourceRegistry.getInstance().getSource("cdf")==null ) {
@@ -99,6 +101,7 @@ public class SimpleServlet extends HttpServlet {
         }
 
         String debug = request.getParameter("debug");
+        if ( debug==null ) debug= "true";
 
         logit("-- new request " + uniq, t0, uniq, debug);
         try {
@@ -356,6 +359,9 @@ public class SimpleServlet extends HttpServlet {
             }
 
             dom.getController().waitUntilIdle();
+
+            System.err.println( "getDataSet: "+ dom.getPlotElements(0).getController().getRenderer().getDataSet() );
+            System.err.println( "bounds: " +dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds() );
 
             if (format.equals("image/png")) {
                 logit("waiting for image", t0, uniq, debug);
