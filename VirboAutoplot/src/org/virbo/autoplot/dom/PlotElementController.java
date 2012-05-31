@@ -1028,16 +1028,17 @@ public class PlotElementController extends DomNodeController {
             if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child plotElements
                 List<PlotElement> childEles= getChildPlotElements();
                 for ( PlotElement p : childEles ) {
+                    PlotElementController pec= p.getController();
                     if ( dom.plotElements.contains(p) ) { 
                         dom.controller.deletePlotElement(p);
-                        PropertyChangeListener parentListener= p.getController().getParentComponentLister();
+                        PropertyChangeListener parentListener= pec.getParentComponentLister();
                         if ( parentListener!=null ) {
                             this.plotElement.removePropertyChangeListener( parentListener );
                         }
                         this.removePropertyChangeListener(dsfListener);
 
                     }
-                    plotElement.getStyle().removePropertyChangeListener( p.getController().parentStyleListener );
+                    plotElement.getStyle().removePropertyChangeListener( pec.parentStyleListener );
                 }
             }
 
