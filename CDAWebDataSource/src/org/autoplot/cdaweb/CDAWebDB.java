@@ -136,10 +136,10 @@ public class CDAWebDB {
                 refreshServiceProviderIds();
                 mon.setTaskProgress(3);
 
-                mon.finished();
             } finally {
                 if ( fin!=null ) fin.close();
                 if ( altin!=null ) altin.close();
+                mon.finished();
             }
         } catch (XPathExpressionException ex) {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
