@@ -5,6 +5,9 @@
 
 package test.endtoend;
 
+import java.beans.PropertyChangeEvent;
+import org.virbo.autoplot.dom.Axis;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
@@ -44,7 +47,12 @@ public class Test034 {
 
     private static void test003() throws Exception {
         reset();
-        Application dom= getDocumentModel();
+        final Application dom= getDocumentModel();
+        dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.err.println("dom.getPlots(0).getXaxis().range="+dom.getPlots(0).getXaxis().getRange());
+            }
+        });
         plot( noTsbURI );
         dom.getPlots(0).getController().contextOverview();
         dom.getPlotElements(1).setComponent("|slice0(100)");
