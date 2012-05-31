@@ -55,6 +55,7 @@ public class Test034 {
         dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 System.err.println("dom.getPlots(0).getXaxis().range="+dom.getPlots(0).getXaxis().getRange());
+                Thread.currentThread().dumpStack();
             }
         });
         plot( noTsbURI );
