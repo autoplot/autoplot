@@ -249,7 +249,7 @@ public class PlotElementController extends DomNodeController {
                         setStatus("busy: update data set");
                         updateDataSet();
                         setStatus("done update data set");
-                        if ( lock.isEmpty() ) changesSupport.changePerformed(PlotElementController.this, PENDING_COMPONENT_OP);
+                        if ( lock.isEmpty() ) changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
                     }
                 };
                 if ( isAsyncProcess(newv) ) {
