@@ -8,13 +8,17 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * @author jbf
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
+
+    List<String> propNames= new ArrayList();
 
     public DebugPropertyChangeSupport( Object bean ) {
         super(bean);
@@ -27,9 +31,28 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             return;
         }
         super.addPropertyChangeListener(listener);
+        propNames.add( listener.toString() );
     }
 
-    
+    @Override
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        super.addPropertyChangeListener(propertyName, listener);
+        propNames.add( listener.toString()+ " " + propertyName );
+    }
+
+    @Override
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        super.removePropertyChangeListener(listener);
+        propNames.remove( listener.toString() );
+    }
+
+    @Override
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        super.removePropertyChangeListener(propertyName, listener);
+        propNames.remove( listener.toString()+ " " + propertyName );
+    }
+
+
     @Override
     public String toString() {
         PropertyChangeListener[] listeners= getPropertyChangeListeners();
