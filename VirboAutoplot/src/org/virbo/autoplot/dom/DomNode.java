@@ -30,6 +30,13 @@ public abstract class DomNode implements Cloneable {
         }
     }
 
+//    @Override
+//    protected void finalize() throws Throwable {
+//        super.finalize();
+//        System.err.println("finalize DomNode: \""+ this.getId() + "\" " + this.getClass()  );
+//    }
+
+
     /**
      * bulk assignment of properties.  When the node's children differ, then a controller should be used
      * to implement the sync.
