@@ -5,10 +5,13 @@
 
 package test.endtoend;
 
+import org.virbo.autoplot.dom.PlotController;
+import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import org.virbo.autoplot.dom.Axis;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.logging.Level;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
 import org.virbo.autoplot.dom.Application;
@@ -47,6 +50,7 @@ public class Test034 {
 
     private static void test003() throws Exception {
         reset();
+        Logger.getLogger( PlotController.class.getName() ).setLevel(Level.ALL);
         final Application dom= getDocumentModel();
         dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
