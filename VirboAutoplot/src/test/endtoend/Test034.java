@@ -62,6 +62,7 @@ public class Test034 {
     private static void test003() throws Exception {
         reset();
         Logger.getLogger( PlotController.class.getName() ).setLevel(Level.ALL);
+        Logger.getLogger("vap.plotElementController").setLevel(Level.ALL);
         final Application dom= getDocumentModel();
         dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
              public void propertyChange(PropertyChangeEvent evt) {
@@ -99,6 +100,10 @@ public class Test034 {
         getDocumentModel().getOptions().setAutolayout(false);
 
         System .err.println("pwd: "+(new File(".")).getCanonicalPath());
+
+        t0= System.currentTimeMillis();
+        test003();
+        System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
         t0= System.currentTimeMillis();
         test001();
