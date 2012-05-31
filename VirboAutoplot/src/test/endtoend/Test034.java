@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.PlotController;
 import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
@@ -30,21 +31,31 @@ public class Test034 {
 
     private static void test001() throws Exception {
         reset();
-        Application dom= getDocumentModel();
-        plot( tsbURI );
-        dom.getPlots(0).getController().contextOverview();
-        DatumRange z= dom.getPlots(1).getXaxis().getRange();
-        z= DatumRangeUtil.rescale( z, -0.3, 1.3 );
-        dom.getPlots(1).getXaxis().setRange(z);
+        final Application dom = getDocumentModel();
+        plot(tsbURI);
+        Runnable run= new Runnable() {
+            public void run() {
+                dom.getPlots(0).getController().contextOverview();
+                DatumRange z = dom.getPlots(1).getXaxis().getRange();
+                z = DatumRangeUtil.rescale(z, -0.3, 1.3);
+                dom.getPlots(1).getXaxis().setRange(z);
+            }
+        };
+        SwingUtilities.invokeAndWait(run);
         writeToPng( "test034_001.png" );
     }
 
     private static void test002() throws Exception {
         reset();
-        Application dom= getDocumentModel();
+        final Application dom= getDocumentModel();
         plot( tsbURI );
-        dom.getPlots(0).getController().contextOverview();
-        dom.getPlotElements(1).setComponent("|slice0(100)");
+        Runnable run= new Runnable() {
+            public void run() {
+                dom.getPlots(0).getController().contextOverview();
+                dom.getPlotElements(1).setComponent("|slice0(100)");
+            }
+        };
+        SwingUtilities.invokeAndWait(run);
         writeToPng( "test034_002.png" );
     }
 
@@ -53,14 +64,20 @@ public class Test034 {
         Logger.getLogger( PlotController.class.getName() ).setLevel(Level.ALL);
         final Application dom= getDocumentModel();
         dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println("dom.getPlots(0).getXaxis().range="+dom.getPlots(0).getXaxis().getRange());
-                Thread.currentThread().dumpStack();
-            }
+             public void propertyChange(PropertyChangeEvent evt) {
+                 System.err.println("dom.getPlots(0).getXaxis().range="+dom.getPlots(0).getXaxis().getRange());
+                 Thread.currentThread().dumpStack();
+             }
         });
         plot( noTsbURI );
-        dom.getPlots(0).getController().contextOverview();
-        dom.getPlotElements(1).setComponent("|slice0(100)");
+        Runnable run= new Runnable() {
+            public void run() {
+                dom.getPlots(0).getController().contextOverview();
+                dom.getPlotElements(1).setComponent("|slice0(100)");
+            }
+        };
+        SwingUtilities.invokeAndWait(run);
+
         writeToPng( "test034_003.png" );
     }
 
