@@ -104,19 +104,23 @@ public class Test034 {
         t0= System.currentTimeMillis();
         test003();
         System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        System.err.println( "==========================" );
 
         t0= System.currentTimeMillis();
         test001();
         System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        System.err.println( "==========================" );
 
         t0= System.currentTimeMillis();
         test002();
         System.err.printf( "test 002: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        System.err.println( "==========================" );
 
         t0= System.currentTimeMillis();
         test003();
         System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
-        
+        System.err.println( "==========================" );
+
         t0= System.currentTimeMillis();
         // this shows hidden TSB, where bottom two panels listen to the dom.timeRange to filter what they see.
         test004();
