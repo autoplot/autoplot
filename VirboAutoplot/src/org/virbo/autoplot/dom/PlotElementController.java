@@ -1693,6 +1693,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            System.err.println("xdesc.range="+xdesc.range );
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
 
