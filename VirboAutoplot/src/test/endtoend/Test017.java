@@ -43,6 +43,9 @@ public class Test017 {
         setCanvasSize(750, 300);
         getDocumentModel().getOptions().setAutolayout(false);
         getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+        getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5em");
+        getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
+        getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
 
         xxx("start");
 
@@ -95,8 +98,6 @@ public class Test017 {
     
     static String[] uris = new String[]{
         //[edit] 1 Tsds
-        "033 http://cdaweb.gsfc.nasa.gov/istp_public/data/omni/hro_5min/%Y/omni_hro_5min_%Y%m%d_v...cdf?HR[::100]&timerange=1995+to+2000",
-
         "001 vap+tsds:http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0",
         "002 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-22-v0",
         //(this loads:
@@ -254,8 +255,7 @@ public class Test017 {
 
     };
 
-    private static void doTest( final String s, final String label, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
-
+    private static Runnable getRunnable( final String s, final String label ) {
         Runnable run= new Runnable() {
             public void run()  {
                 try {
@@ -279,13 +279,18 @@ public class Test017 {
                     int i = s.lastIndexOf("/");
                     setTitle(s.substring(i + 1));
                     writeToPng(label + ".png");
-                    
+
                 } catch (Exception ex) {
                     Logger.getLogger(Test017.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
+        return run;
+    }
 
+    private static void doTest( final String s, final String label, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
+
+        Runnable run= getRunnable( s, label );
         int timeoutSeconds= 180;
 
         Future f=null;
