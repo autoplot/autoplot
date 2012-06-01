@@ -191,7 +191,7 @@ public class CdfUtil {
                 cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
             }
             
-            if ( false && cdfFile!=null ) {
+            if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
                 String uri= cdfFile + "?" + variable.getName();
                 if ( recStart!=0 || recCount!=variable.getNumberOfValues() || recInterval>1 ) {
                     uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
