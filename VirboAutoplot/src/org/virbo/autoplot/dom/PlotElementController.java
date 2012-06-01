@@ -1407,7 +1407,7 @@ public class PlotElementController extends DomNodeController {
                 //}
 
                 TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
-System.err.println("there's a TSB!");
+System.err.println("tsb: "+tsb );
                 if ( tsb!=null ) {
                     if ( fillDs!=null ) {
                         QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
