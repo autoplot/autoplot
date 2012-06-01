@@ -145,7 +145,6 @@ public class Application extends DomNode {
         if ( timeRange==null ) {
             throw new IllegalArgumentException("timeRange set to null");
         }
-        Thread.currentThread().dumpStack();
         System.err.println("timerange= "+timeRange );
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
