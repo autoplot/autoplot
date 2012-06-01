@@ -1407,7 +1407,6 @@ public class PlotElementController extends DomNodeController {
                 //}
 
                 TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
-System.err.println("tsb: "+tsb );
                 if ( tsb!=null ) {
                     if ( fillDs!=null ) {
                         QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
@@ -1708,6 +1707,7 @@ System.err.println("tsb: "+tsb );
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
 
+            System.err.println("xaxis.isAutoRange="+peleCopy.getPlotDefaults().getXaxis().isAutoRange() );
             if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
                 peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
                 peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
