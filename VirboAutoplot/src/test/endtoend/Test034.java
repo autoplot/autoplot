@@ -64,12 +64,6 @@ public class Test034 {
         Logger.getLogger( PlotController.class.getName() ).setLevel(Level.ALL);
         Logger.getLogger("vap.plotElementController").setLevel(Level.ALL);
         final Application dom= getDocumentModel();
-        dom.getPlots(0).getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
-             public void propertyChange(PropertyChangeEvent evt) {
-                 System.err.println("dom.getPlots(0).getXaxis().range="+dom.getPlots(0).getXaxis().getRange());
-                 Thread.currentThread().dumpStack();
-             }
-        });
         plot( noTsbURI );
         Runnable run= new Runnable() {
             public void run() {
@@ -103,7 +97,7 @@ public class Test034 {
 
         t0= System.currentTimeMillis();
         test003();
-        System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        System.err.printf( "test 003a: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
         System.err.println( "==========================" );
 
         t0= System.currentTimeMillis();
@@ -124,7 +118,7 @@ public class Test034 {
         t0= System.currentTimeMillis();
         // this shows hidden TSB, where bottom two panels listen to the dom.timeRange to filter what they see.
         test004();
-        System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        System.err.printf( "test 004: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
         System.exit(0);
     }
