@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,13 +39,17 @@ public class AutoplotHelpSystem {
     //private CSH.DisplayHelpFromSource helper;
 
     private Map<Component,String> helpIds;
+    private Map<Component,KeyListener> kls;
+    private Map<Component,MouseListener> mls;
 
     private AutoplotHelpSystem(Component uiBase) {
         // custom viewer supports external web links
         SwingHelpUtilities.setContentViewerUI("org.autoplot.help.AutoplotHelpViewer");
 
         helpIds= new HashMap<Component, String>();
-        
+        kls= new HashMap<Component, KeyListener>();
+        mls= new HashMap<Component, MouseListener>();
+
         // First, load the main autoplot helpset.
         URL hsurl;
         try {
@@ -129,6 +134,17 @@ public class AutoplotHelpSystem {
     }
 
     /**
+     * remove the component.
+     * @param c
+     * @param helpID
+     */
+    public void unregisterHelpID( final Component c, final String helpID) {
+        helpIds.remove(c);
+        c.removeKeyListener( kls.get(c) );
+        c.removeMouseListener( mls.get(c) );
+    }
+
+    /**
      * Components can call this method to register a help ID string.  The JavaHelp
      * system will use this ID string as a hash key to find the correct HTML file
      * to display for context-sensitive help.
@@ -143,7 +159,7 @@ public class AutoplotHelpSystem {
      //  broker.enableHelp(c, helpID, mainHS);
         c.setFocusable(true);
         helpIds.put(c, helpID);
-       c.addKeyListener( new KeyListener() {
+        KeyListener kl=  new KeyListener() {
 
             public void keyTyped(KeyEvent e) {
             }
@@ -157,17 +173,21 @@ public class AutoplotHelpSystem {
                     e.consume();
                 }
             }
-        } );
+        };
+        c.addKeyListener( kl );
+        kls.put( c, kl );
 
-        c.addMouseListener( new MouseAdapter() {
+        MouseListener ml= new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 c.requestFocus();
             }
+        };
 
-        });
+        c.addMouseListener( ml );
+        mls.put( c, ml );
 
         if ( c instanceof JPanel ) {
             JPanel jPanel1= (JPanel)c;
