@@ -46,7 +46,10 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
     }
 
     public void releaseElementBindings() {
-        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+        if ( elementBindingContext!=null ) {
+            elementBindingContext.unbind();
+            elementBindingContext= null;
+        }
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
@@ -56,7 +59,7 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
         
-        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+        if ( elementBindingContext!=null ) releaseElementBindings();
         bc.bind();
         
         repaint();
