@@ -46,6 +46,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private final static Color[] fores = new Color[]{Color.BLACK, Color.WHITE, Color.WHITE};
     private final static Color[] backs = new Color[]{Color.WHITE, Color.BLACK, Color.BLUE.darker()};
 
+    public static final String STYLEPANEL_HELP_ID = "stylePanel";
 
     ApplicationModel applicationModel;
     
