@@ -86,7 +86,10 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
     }
 
     public void releaseElementBindings() {
-        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+        if ( elementBindingContext!=null ) {
+            elementBindingContext.unbind();
+            elementBindingContext= null;
+        }
         AutoplotHelpSystem.getHelpSystem().unregisterHelpID( this, PlotStylePanel.STYLEPANEL_HELP_ID );
     }
 
@@ -104,7 +107,9 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillColor" ), fillColorEditor, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "reference" ), referenceEditor, BeanProperty.create("value")));
         
-        if ( elementBindingContext!=null ) elementBindingContext.unbind();
+        if ( elementBindingContext!=null ) {
+            releaseElementBindings();
+        }
         bc.bind();
         
         repaint();
