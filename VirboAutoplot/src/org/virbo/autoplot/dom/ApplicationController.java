@@ -568,7 +568,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             pelement.controller.renderer.setDataSet(null);
             pelement.controller.renderer=null;
             pelement.controller.changesSupport=null;
-            pelement.controller= null;
+            //pelement.controller= null; // we need this to unbind later.
             pelement.removePropertyChangeListener(plotIdListener);
 
         }
