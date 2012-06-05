@@ -2103,7 +2103,10 @@ public class PlotElementController extends DomNodeController {
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             if ( oldRenderer != newRenderer ) {
                 setRenderer(newRenderer);
-                if ( oldRenderer!=null ) oldRenderer.setColorBar(null);
+                if ( oldRenderer!=null ) {
+                    oldRenderer.setActive(false);
+                    oldRenderer.setColorBar(null);
+                }
             }
 
             Runnable run = new Runnable() {
