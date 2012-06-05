@@ -286,11 +286,28 @@ public class UndoRedoSupport {
         return element;
     }
 
+    public static final String PROP_SIZE_LIMIT="sizeLimit";
+
+    private int sizeLimit=50;
+
+    public int getSizeLimit() {
+        return sizeLimit;
+    }
+
+    public void setSizeLimit(int size) {
+        int oldSize= this.sizeLimit;
+        this.sizeLimit = size;
+        removeOldStates();
+        this.propertyChangeSupport.firePropertyChange( PROP_SIZE_LIMIT, oldSize, size );
+    }
+
+
+
     /**
      * remove old states from the bottom of the stack, adjusting stateStackPos as well.
      */
     private synchronized void removeOldStates( ) {
-        int len=50;
+        int len=sizeLimit;
         while ( stateStack.size()>len ) {
             stateStack.remove(0);
             stateStackPos--;
