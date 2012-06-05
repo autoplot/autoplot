@@ -142,6 +142,8 @@ public class AutoplotHelpSystem {
         helpIds.remove(c);
         c.removeKeyListener( kls.get(c) );
         c.removeMouseListener( mls.get(c) );
+        kls.remove( c );
+        mls.remove( c );
     }
 
     /**
