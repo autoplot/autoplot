@@ -549,6 +549,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     p.removeRenderer(r);
                 }
             }
+            Plot domplot= getPlotFor(pelement);
 
             //plotElement.removePropertyChangeListener(application.childListener);
             pelement.removePropertyChangeListener(domListener);
@@ -559,6 +560,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             unbindImpl(pelement.getStyle());
             pelement.controller.unbindDsf();
             pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
+            pelement.controller.renderer.setColorBar(null);
+            //PlotController.pdListen
+            if ( domplot!=null ) {
+                domplot.controller.pdListen.remove(pelement);
+            }
             pelement.controller.renderer.setDataSet(null);
             pelement.controller.renderer=null;
             pelement.controller.changesSupport=null;
