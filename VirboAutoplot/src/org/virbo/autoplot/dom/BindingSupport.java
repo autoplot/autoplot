@@ -62,10 +62,30 @@ public class BindingSupport {
         }
     };
 
-    private PropertyChangeListener propListener(final Object p, final Method setter, final Method getter, final Converter c, final boolean forward) {
-        return new PropertyChangeListener() {
+    private static class MyPropChangeListener implements PropertyChangeListener {
 
-            public void propertyChange(PropertyChangeEvent evt) {
+        final Object p;
+        final Method setter;
+        final Method getter;
+        final Converter c;
+        final boolean forward;
+        final String srcProp;
+        final String pprop;
+
+        private MyPropChangeListener( final Object p, final Method setter, final Method getter, final Converter c, final boolean forward, final String srcProp, final String pprop ) {
+            this.p= p;
+            this.setter= setter;
+            this.getter= getter;
+            this.c= c;
+            this.forward= forward;
+            if ( srcProp.equals("timeRange") ) {
+                System.err.println( "herehere timeRange" );
+            }
+            this.srcProp= srcProp;
+            this.pprop= pprop;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
                 try {
                     if (c == null) {
                         Object oldValue= getter.invoke( p );
@@ -97,9 +117,14 @@ public class BindingSupport {
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
-            }
-        };
+        }
+
     }
+
+    private PropertyChangeListener propListener(final Object p, final Method setter, final Method getter, final Converter c, final boolean forward, final String srcProp, final String pprop ) {
+        return new MyPropChangeListener( p, setter, getter, c, forward, srcProp, pprop );
+    }
+    
     final Map<Object, List<BindingImpl>> implBindingContexts; // these are for controllers to use.
     //final Map<Object, StackTraceElement[] > sources;
 
@@ -183,9 +208,9 @@ public class BindingSupport {
         }
 
         // add the listeners that bind.
-        PropertyChangeListener srcListener = propListener(dst, bi.dstSetter, bi.dstGetter, c, true);
+        PropertyChangeListener srcListener = propListener(dst, bi.dstSetter, bi.dstGetter, c, true, srcProp, dstProp );
         src.addPropertyChangeListener(srcProp, srcListener);
-        PropertyChangeListener dstListener = propListener(src, bi.srcSetter, bi.srcGetter, c, false);
+        PropertyChangeListener dstListener = propListener(src, bi.srcSetter, bi.srcGetter, c, false, dstProp, srcProp );
 
         bi.dstListener = dstListener;
         bi.srcListener = srcListener;
