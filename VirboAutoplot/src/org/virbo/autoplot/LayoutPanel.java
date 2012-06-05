@@ -34,6 +34,7 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -52,6 +53,7 @@ import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
@@ -313,7 +315,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         selected.add(dasPlot);
 
         for ( int i=0; i<iindices.length; i++ ) {
-            selected.add( peles[iindices[i]].getController().getRenderer() );
+            PlotElementController pec= peles[iindices[i]].getController();
+            selected.add( pec.getRenderer() );
         }
 
         canvasLayoutPanel1.setSelectedComponents( selected );
@@ -333,6 +336,24 @@ public class LayoutPanel extends javax.swing.JPanel {
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
     }
 
+    ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            final PlotElement val= (PlotElement)value;
+            if ( val!=null && val.getController()!=null && val.getController().getRenderer()!=null ) {
+                javax.swing.Icon icon= val.getController().getRenderer().getListIcon();
+                label.setIcon(icon);
+                val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        panelListComponent.repaint();
+                    }
+                });
+            }
+            return label;
+        }
+    };
+
     private void updatePlotElementListImmediately() {
         final Object[] foo= app.getPlotElements();
         final AbstractListModel elementsList = new AbstractListModel() {
@@ -344,23 +365,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         };
         panelListComponent.setModel(elementsList);
-        panelListComponent.setCellRenderer( new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                final PlotElement val= (PlotElement)value;
-                if ( val!=null && val.getController()!=null && val.getController().getRenderer()!=null ) {
-                    javax.swing.Icon icon= val.getController().getRenderer().getListIcon();
-                    label.setIcon(icon);
-                    val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            panelListComponent.repaint();
-                        }
-                    });
-                }
-                return label;
-            }
-        } );
+        panelListComponent.setCellRenderer( myListCellRenderer );
     }
 
     private void updatePlotElementList() {
