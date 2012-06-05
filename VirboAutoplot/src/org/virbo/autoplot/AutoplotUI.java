@@ -159,6 +159,8 @@ public class AutoplotUI extends javax.swing.JFrame {
     TickleTimer tickleTimer;
     GuiSupport support;
     LayoutListener autoLayout;
+    private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
+
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -979,11 +981,13 @@ APSplash.checkTime("init 270");
                                 isBound= true;
                             }
                         }
-                        if ( isBound ) {
+                        if ( isBound && dsSelectTimerangeBound ) { // dataSetSelector has a timerange so that entering the datasource GUI will use the current timerange.
                             dom.getController().bind( dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
-                        } else {
+                            dsSelectTimerangeBound= true;
+                        } else if ( !isBound && dsSelectTimerangeBound ) {
                             dom.getController().unbind( dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                             dataSetSelector.setTimeRange(null);
+                            dsSelectTimerangeBound= false;
                         }
                     }
                 });
