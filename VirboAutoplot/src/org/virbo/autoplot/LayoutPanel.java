@@ -333,9 +333,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
     }
 
-    private void updatePlotElementList() {
+    private void updatePlotElementListImmediately() {
+        final Object[] foo= app.getPlotElements();
         final AbstractListModel elementsList = new AbstractListModel() {
-            Object[] foo= app.getPlotElements();
             public int getSize() {
                 return foo.length;
             }
@@ -343,29 +343,31 @@ public class LayoutPanel extends javax.swing.JPanel {
                 return foo[index];
             }
         };
-        Runnable run= new Runnable() { public void run() {
-            panelListComponent.setModel(elementsList);
-            panelListComponent.setCellRenderer( new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    final PlotElement val= (PlotElement)value;
-                    if ( val!=null && val.getController()!=null && val.getController().getRenderer()!=null ) {
-                        javax.swing.Icon icon= val.getController().getRenderer().getListIcon();
-                        label.setIcon(icon);
-                        val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                panelListComponent.repaint();
-                            }
-                        });
-                    }
-                    return label;
+        panelListComponent.setModel(elementsList);
+        panelListComponent.setCellRenderer( new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                final PlotElement val= (PlotElement)value;
+                if ( val!=null && val.getController()!=null && val.getController().getRenderer()!=null ) {
+                    javax.swing.Icon icon= val.getController().getRenderer().getListIcon();
+                    label.setIcon(icon);
+                    val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            panelListComponent.repaint();
+                        }
+                    });
                 }
+                return label;
+            }
+        } );
+    }
 
-            }) ;
+    private void updatePlotElementList() {
+        Runnable run= new Runnable() { public void run() {
+            updatePlotElementListImmediately();
         } };
         SwingUtilities.invokeLater(run);
-
     }
 
     private void updateBindingList() {
