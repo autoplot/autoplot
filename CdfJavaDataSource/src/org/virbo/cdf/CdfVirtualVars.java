@@ -48,7 +48,7 @@ public class CdfVirtualVars {
             QDataSet size=  args.get(1);
             while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int)size.value(), Ops.FFTFilterType.Hanning);
-            return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor());
+            return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor()); //TODO: these should be redone using fftPower(ds,FFTFilterType.TenPercentCos
         } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
             //introduced to support PlasmaWaveGroup
             QDataSet deltaT = args.get(1);       // time between successive measurements.
