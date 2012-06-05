@@ -521,7 +521,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                     try {
                         String depName= (String)dep.get("NAME");
+
+                        Variable depVar= cdf.getVariable( depName );
+                        if ( depVar==null ) {
+                            System.err.println("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
+                            continue;
+                        }
+
                         boolean reformDep= idep > 0;  // make a rank 2 [1,ny] into rank 1 [ny]
+
                         if ( reformDep && cdf.getVariable( depName ).recordVariance() ) {
                             reformDep= false;
                         }
