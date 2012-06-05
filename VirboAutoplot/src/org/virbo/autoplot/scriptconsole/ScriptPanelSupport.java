@@ -313,8 +313,9 @@ public class ScriptPanelSupport {
 
                     public void run() {
                         int offset = 0;
-                        ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
-
+                        //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
+                        ProgressMonitor mon= DasProgressPanel.createFramed("running script");
+                        
                         try {
                             if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
                                 save();
