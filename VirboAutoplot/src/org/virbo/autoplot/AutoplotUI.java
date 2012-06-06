@@ -196,6 +196,9 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static final Icon BUSY_OPAQUE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner_16.gif") );
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
+
+    public static final String READY_MESSAGE= "ready";
+
     private TimeRangeEditor timeRangeEditor;
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
@@ -3154,7 +3157,7 @@ APSplash.checkTime("init 230");
                             try {
                                 ScriptContext.setApplicationModel(model); // initialize
                                 JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
-                                if ( app!=null ) app.setStatus("ready");
+                                if ( app!=null ) app.setStatus( READY_MESSAGE );
                                 if ( headless && !server ) { //TODO: headless doesn't seem to work
                                     AppManager.getInstance().quit();
                                 }
@@ -3167,8 +3170,7 @@ APSplash.checkTime("init 230");
                 } else {
 APSplash.checkTime("init 240");
                     if ( app!=null ) {
-                        app.setStatus("ready");
-                        System.err.println("ready");
+                        app.setStatus( READY_MESSAGE );
                     }
                 }
 
