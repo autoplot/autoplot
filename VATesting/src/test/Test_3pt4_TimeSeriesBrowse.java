@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasAxis;
+import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -17,6 +18,8 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
+import util.NameComponentChooser;
+import util.RegexComponentChooser;
 
 /**
  *
@@ -38,9 +41,10 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             DasAxis xaxis = ScriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
             xaxis.scanNext(); // no gui test, but that's okay...
-            new JButtonOperator(app.getDataSetSelector().getBrowseButton()).clickMouse();
+            new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
+                    //app.getDataSetSelector().getBrowseButton()).clickMouse();
 
-            DialogOperator diaFrame = new DialogOperator("Editing URI vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
+            DialogOperator diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
