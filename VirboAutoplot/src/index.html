@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Orbit plots are introduced into Autoplot.</small></p>
+        <p><small>Jemmy GUI testing found a bug that got in just a day ago.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,7 +21,10 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
-        <ul><li>match Nand's CDF library logic where getEffectiveRank skips over 1-element dimensions.  vap+cdaweb:ds=C1_CP_FGM_SPIN&id=B_vec_xyz_gse__C1_CP_FGM_SPIN&timerange=2011-03-02</li>
+        <ul>
+            <li>Jemmy end-to-end testing at gui level.</li>
+            <li>Profiling used to remove memory leaks.  Now all CDF quantities can be plotted in one session.</li>
+            <li>match Nand's CDF library logic where getEffectiveRank skips over 1-element dimensions.  vap+cdaweb:ds=C1_CP_FGM_SPIN&id=B_vec_xyz_gse__C1_CP_FGM_SPIN&timerange=2011-03-02</li>
             <li>non-varying dimensions were assumed to be the trailing dimension.  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image</li>
             <li>PNGWalk Covers and Grid didn't update when the Quality status changed.</li>
             <li>remove extraneous call to load data in SimpleServlet</li>
