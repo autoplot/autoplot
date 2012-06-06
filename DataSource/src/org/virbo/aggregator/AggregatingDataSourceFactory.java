@@ -252,6 +252,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             String delegateSurl = getDelegateDataSourceFactoryUri(surl);
             if ( delegateFactory==null ) {
                 delegateFactory= getDelegateDataSourceFactory(surl);
+                if ( delegateFactory==null ) {
+                    return true;
+                }
             }
             return delegateFactory.reject( delegateSurl, mon );
         } catch (IOException e) {
