@@ -18,15 +18,15 @@ import org.netbeans.jemmy.ComponentChooser;
  */
 public class NameComponentChooser implements ComponentChooser {
 
-    String regex;
+    String name;
 
     public NameComponentChooser( String regex ) {
-        this.regex= regex;
+        this.name= regex;
     }
 
     public boolean checkComponent(Component comp) {
         String n= comp.getName();
-        return ( n!=null && n.matches(regex) );
+        return ( n!=null && n.equals(name) );
     }
 
     public String getDescription() {
