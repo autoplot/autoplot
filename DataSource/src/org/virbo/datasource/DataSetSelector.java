@@ -1150,6 +1150,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
         browseButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
         browseButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        browseButton.setName("browse"); // NOI18N
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 browseButtonActionPerformed(evt);
@@ -1160,6 +1161,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         plotItButton.setToolTipText("<html>Plot this data location, or URI.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\n");
         plotItButton.setMaximumSize(new java.awt.Dimension(20, 20));
         plotItButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        plotItButton.setName("go"); // NOI18N
         plotItButton.setPreferredSize(new java.awt.Dimension(20, 20));
         plotItButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
