@@ -158,8 +158,30 @@ public class DataSetSelector extends javax.swing.JPanel {
     int keyModifiers = 0;
 
 
+    /**
+     * provide direct access to the editor component.
+     * @return the text editor
+     */
     public JTextField getEditor() {
         return editor;
+    }
+
+    /**
+     * automated GUI testing needs access to subcomponents.
+     * This provides access to the green play button that when pressed fires off a "go" event
+     * @return the green go button
+     */
+    public JButton getGoButton() {
+        return plotItButton;
+    }
+
+    /**
+     * automated GUI testing needs access to subcomponents.
+     * This provides access to the inspect/browse button that when pressed enters a GUI editor to graphically work on the URI.
+     * @return the inspect/browse button
+     */
+    public JButton getBrowseButton() {
+        return browseButton;
     }
 
     private ProgressMonitor getMonitor() {
