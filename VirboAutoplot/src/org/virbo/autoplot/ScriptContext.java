@@ -98,6 +98,8 @@ public class ScriptContext extends PyJavaInstance {
             view = new AutoplotUI(model);
         }
         view.setVisible(true);
+        view.setMessage( AutoplotUI.READY_MESSAGE );
+
     }
 
     /**
