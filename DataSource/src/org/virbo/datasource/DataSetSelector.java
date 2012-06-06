@@ -176,6 +176,14 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     /**
+     * provide access to timer for GUI testing.
+     * @return
+     */
+    public boolean isPendingChanges() {
+        return maybePlotTimer.isRunning();
+    }
+
+    /**
      * automated GUI testing needs access to subcomponents.
      * This provides access to the inspect/browse button that when pressed enters a GUI editor to graphically work on the URI.
      * @return the inspect/browse button
