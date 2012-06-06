@@ -343,6 +343,7 @@ public class DataSetURI {
             URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
         String suri= DataSetURI.fromUri(uri);
+        //suri= URISplit.makeCanonical(suri); //TODO: I was seeing an error and did this fix when playing with GUI testing.
         if ( isAggregating( suri ) ) {
             String eext = DataSetURI.getExplicitExt( suri );
             if (eext != null) {
@@ -375,7 +376,7 @@ public class DataSetURI {
 
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
-
+System.err.println("factory:"+factory);
         if (factory == null && (resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https"))) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
