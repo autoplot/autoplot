@@ -89,6 +89,7 @@ import org.virbo.dsops.Ops;
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
     private static int MAX_RECENT=20;
+    private boolean pendingChanges= false;
 
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
@@ -114,7 +115,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                 Runnable run = new Runnable() {
 
                     public void run() {
-                        maybePlotImmediately();
+                        try {
+                            maybePlotImmediately();
+                        } finally {
+                            pendingChanges= false;
+                        }
                     }
                 };
                 RequestProcessor.invokeLater(run);
@@ -180,7 +185,11 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return
      */
     public boolean isPendingChanges() {
-        return maybePlotTimer.isRunning();
+        if ( maybePlotTimer.isRunning() || pendingChanges ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -386,6 +395,8 @@ public class DataSetSelector extends javax.swing.JPanel {
         if (!allowModifiers) {
             keyModifiers = 0;
         }
+        
+        pendingChanges= true;
         maybePlotTimer.restart();
     }
 
