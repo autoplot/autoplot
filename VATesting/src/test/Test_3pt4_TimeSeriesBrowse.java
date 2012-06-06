@@ -48,7 +48,12 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
-            return 0;
+            if ( ScriptContext.getDocumentModel().getBindings().length==2 &&
+                    ScriptContext.getDocumentModel().getBindings(0).getSrcProperty().equals("timeRange")) {
+                return 0;
+            } else {
+                return 1;
+            }
 
             
         } catch (InterruptedException ex) {
