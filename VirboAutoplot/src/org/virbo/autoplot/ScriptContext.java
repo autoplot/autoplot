@@ -891,6 +891,11 @@ public class ScriptContext extends PyJavaInstance {
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
     public static void waitUntilIdle() throws InterruptedException {
+        if ( view!=null ) {
+            while ( view.getDataSetSelector().isPendingChanges() ) {
+                Thread.sleep(100);
+            }
+        }
         model.waitUntilIdle(false);
     }
 
