@@ -984,7 +984,7 @@ APSplash.checkTime("init 270");
                                 isBound= true;
                             }
                         }
-                        if ( isBound && dsSelectTimerangeBound ) { // dataSetSelector has a timerange so that entering the datasource GUI will use the current timerange.
+                        if ( isBound && !dsSelectTimerangeBound ) { // dataSetSelector has a timerange so that entering the datasource GUI will use the current timerange.
                             dom.getController().bind( dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                             dsSelectTimerangeBound= true;
                         } else if ( !isBound && dsSelectTimerangeBound ) {
