@@ -44,12 +44,12 @@ public class RegexComponentChooser implements ComponentChooser {
         } else if ( n==null && comp instanceof JMenuItem ) {
             n= ((JMenuItem)comp).getText();
         }
-
+        System.err.println( "RegexComponentChooser: " + regex+" == " + n + " ?" );
         return ( n!=null && n.matches(regex) );
     }
 
     public String getDescription() {
-        return "Regex in Text or Title of Dialog or Frame";
+        return "Regex in Text Or Title";
     }
 
 }
