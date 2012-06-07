@@ -48,14 +48,18 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
+            ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
+
             if ( ScriptContext.getDocumentModel().getBindings().length==2 &&
                     ScriptContext.getDocumentModel().getBindings(0).getSrcProperty().equals("timeRange")) {
                 return 0;
             } else {
                 return 1;
             }
+        } catch ( IOException ex ) {
+            Logger.getLogger(Test_3pt4_TimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
 
-            
         } catch (InterruptedException ex) {
             Logger.getLogger(Test_3pt4_TimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
