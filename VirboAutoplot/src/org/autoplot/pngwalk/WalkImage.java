@@ -53,6 +53,8 @@ public class WalkImage  {
     private static BufferedImage missingImage = initMissingImage();
 
     private static final LinkedList<WalkImage> freshness= new LinkedList();
+    private static final LinkedList<WalkImage> thumbLoadingQueue= new LinkedList();
+    private static Runnable thumbLoadingQueueRunner;
 
     //private java.util.concurrent.ThreadPoolExecutor reqProc= new ThreadPoolExecutor( 2, 4, 1, TimeUnit.MINUTES, workQueue );
     
@@ -297,16 +299,54 @@ public class WalkImage  {
         } //end switch
     }
 
+    private static void maybeStartThumbLoadingQueueRunner() {
+        if ( thumbLoadingQueueRunner!=null ) {
+            return;
+        } else {
+            Runnable r= new Runnable() {
+                public void run() {
+                    while ( WalkImage.thumbLoadingQueue.size()>0 ) {
+                        WalkImage image;
+                        synchronized ( thumbLoadingQueue ) {
+                            //String bar="=======================================================";
+                            //String b= thumbLoadingQueue.size()>bar.length() ? bar + " "+bar.length() : bar.substring(0,thumbLoadingQueue.size());
+                            //System.err.println("thumbLoadingQueueRunner: " + b );
+                            image= thumbLoadingQueue.poll();
+                        }
+                        image.getThumbnailImmediately();
+                    }
+                    synchronized ( thumbLoadingQueue ) {
+                        //System.err.println("stopping thumbLoadingQueueRunner");
+                        WalkImage.thumbLoadingQueueRunner= null;
+                    }
+                }
+            };
+            synchronized ( thumbLoadingQueue ) {
+                if ( thumbLoadingQueueRunner==null ) {
+                    //System.err.println("starting up thumbLoadingQueueRunner");
+                    thumbLoadingQueueRunner= r;
+                    RequestProcessor.invokeLater(thumbLoadingQueueRunner);
+                }
+            }
+        }
+    }
+
     private BufferedImage maybeReturnThumb(boolean loadIfNeeded) {
         if (thumb != null) return thumb;
         if (!loadIfNeeded) return null;
-        //acquire thumbnail
-        Runnable r = new Runnable() {
-            public void run() {
-                getThumbnailImmediately();
-            }
-        };
-        RequestProcessor.invokeLater(r);
+
+        synchronized ( thumbLoadingQueue ) {
+            thumbLoadingQueue.add( this );
+        }
+        maybeStartThumbLoadingQueueRunner();
+
+      //  //acquire thumbnail
+      //  Runnable r = new Runnable() {
+      //      public void run() {
+      //          getThumbnailImmediately();
+      //      }
+      //  };
+      //  RequestProcessor.invokeLater(r);
         return null;
     }
 
