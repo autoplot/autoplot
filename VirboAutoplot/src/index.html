@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jemmy GUI testing found a bug that got in just a day ago.</small></p>
+        <p><small>Jemmy Automated GUI Testing found a bug that was introduced just a day ago.  It will run through http://autoplot.org/developer.tests</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,8 +22,18 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Jemmy testing showed that ScriptContext.waitUntilIdle() would not detect pending event from data set selector.</li>
             <li>Jemmy end-to-end testing at gui level.</li>
+            <li>run button on script panel now uses a popup monitor instead of a monitor attached to the canvas.</li>
+            <li>bugfix when remote http host is in accessible, runtime error prevented offline use.</li>
             <li>Profiling used to remove memory leaks.  Now all CDF quantities can be plotted in one session.</li>
+            <li>jsamp jar (Cluster Final Archive) added to Eclipse build script</li>
+            <li>check for fill in Ops.interpolate( rank2ds, xx, yy )</li>
+            <li>Chris pointed out problem where ytagWidth is used from the first table of a rank 3 join dataset.  Now we use the maximum of all tables.</li>
+            <li>$o and $(o properly detected in pngwalk tool</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>match Nand's CDF library logic where getEffectiveRank skips over 1-element dimensions.  vap+cdaweb:ds=C1_CP_FGM_SPIN&id=B_vec_xyz_gse__C1_CP_FGM_SPIN&timerange=2011-03-02</li>
             <li>non-varying dimensions were assumed to be the trailing dimension.  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image</li>
             <li>PNGWalk Covers and Grid didn't update when the Quality status changed.</li>
@@ -45,40 +55,12 @@
             <li>delay construction of JColorChooser in color selector, on a Mac this could take 500ms!</li>
             <li>we need to trim preceeding _ and 0's in orbit names, to support orbit-based PNGWalks.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>cdfjava didn't properly indicate that DEPEND_2 pointed to non-existent variable, don't show error when LABL is found.</li>
-            <li>cdf files are opened in prepare method so that exceptions are better reported.</li>
-            <li>show progress monitor during download of master files.</li>
-            <li>limit the number of pngs in a sequence to 20,000.</li>
-            <li>GUI clean up of Manage Cache and Recent URIs dialogs.</li>
-            <li>TimeRange Selector indicates if no one is listening</li>
-            <li>reorder File menu so open .vap and open Data are next to each other</li>
-            <li>Script and Log Consoles are properly hidden in basic mode.</li>
-            <li>TimeRange Selector doesn't reset to valid when parse error occurs.</li>
-            <li>Script and Log Consoles can be turned off and back on within a session.</li>
-            <li>GUI clean up of pngwalk tool, including wait icons</li>
-            <li>correct pngwalk tool hangs on Bob's folder with thousands of files because of excessive parsing of .listing file.</li>
-            <li>correct pngwalk tool hangs caused by out of memory error due to excessive caching of full-size images.</li>
-            <li>finally disable script panel and log console are immediate and can be re-enabled.</li>
-            <li>allow spaces in timerange argument params like "$(o, id=crres)"</li>
-            <li>limit the number of parent files listed when resolving ftp://virbo.org/POES/n15/$Y/poes_n15_$Y$m$d.cdf.zip/poes_n15_$Y$m$d.cdf?P1_90&timerange=1998-07-01</li>
-            <li>remote zip files on Windows would not work because of c:\</li>
-            <li>exceptions from data source are indicated in a more obvious way.</li>
-            <li>more cleanup of bookmarks, limit the remote loading to once per session.</li>
-            <li>remote bookmarks are all read at once, instead of in deeper and deeper depths</li>
-            <li>remote-remote bookmarks show properly when off-line.</li>
-            <li>remote folder in remote folder could be deleted.</li>
-            <li>do a little rounding when automatically setting the timerange to avoid excessive resolution.</li>
-            <li>any URI ending in slash would trigger filesystem completions.  Now we break it apart first.</li>
-            <li>aggregation source does not fail if timerange is not set, since the TSB might be used to set it.</li>
-            <li>3522211: FTP file locking error with FtpFileSystem on Windows.  Feedback of the error is corrected reported to the user.</li>
-            <li>minor cleanup of CDAWeb GUI, such as sorting recent datasources.  And failure to update when a source is selected twice.</li>
-            <li>Datum to Rank0DataSet converter handles fill</li>
-            <li>minimum sizes set properly in PNGWalk tool so that tearing off and shrinking won't result in errors</li>
-        </ul>
 
         <p>Features:</p>
+        <ul>
+            <li>Reduction.reduce2D puts on error bars to show the range of the data.</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>improvements to the LSpec routine, so inward and outward sweeps can be examined, use timetags to detect breaks</li>
             <li>add orbitPlot render type, which takes a bundle of time,x,y</li>
@@ -87,9 +69,6 @@
             <li>jython script server re-enabled in the autoplot servlet, along with new security restrictions</li>
             <li>3528211: URIs maybe dropped above or below plot to insert.  Enter editor when URI is rejected.</li>
             <li>script servlet reincarnated, now has allowhosts file and logs use.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
             <li>check parameters in time range specs, for example $(H,M) is now an exception.</li>
             <li>timerange selector uses droplist to allow selection of recently-entered timeranges</li>
             <li>likewise, operations selector keeps track of recent operations</li>
