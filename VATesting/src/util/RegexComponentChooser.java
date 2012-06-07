@@ -10,6 +10,8 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 import org.netbeans.jemmy.ComponentChooser;
 
@@ -37,6 +39,10 @@ public class RegexComponentChooser implements ComponentChooser {
             n= ((JLabel)comp).getText();
         } else if ( n==null && comp instanceof JButton ) {
             n= ((JButton)comp).getText();
+        } else if ( n==null && comp instanceof JMenu ) {
+            n= ((JMenu)comp).getText();
+        } else if ( n==null && comp instanceof JMenuItem ) {
+            n= ((JMenuItem)comp).getText();
         }
 
         return ( n!=null && n.matches(regex) );
