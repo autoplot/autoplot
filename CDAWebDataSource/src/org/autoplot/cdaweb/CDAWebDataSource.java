@@ -307,6 +307,12 @@ public class CDAWebDataSource extends AbstractDataSource {
 
 
 
+    /**
+     * caution: see also CDAWebDataSourceFactory.getCapability!
+     * @param <T>
+     * @param clazz
+     * @return
+     */
     @Override
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz==TimeSeriesBrowse.class ) {
