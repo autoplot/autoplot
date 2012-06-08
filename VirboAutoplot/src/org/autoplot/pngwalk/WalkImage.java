@@ -45,7 +45,7 @@ public class WalkImage  {
     /**
      * number of full-size images we can load at once.
      */
-    private static final int LOADED_THUMB_COUNT_LIMIT = 100;
+    private static final int LOADED_THUMB_COUNT_LIMIT = 400;
 
     final String uriString;  // Used for sorting
     private URI imgURI;
@@ -311,14 +311,23 @@ public class WalkImage  {
             thumbFreshness.addFirst(this);
         }
 
+        LinkedList<WalkImage> clear= new LinkedList();
         synchronized ( thumbFreshness ) {
             while ( thumbFreshness.size() > LOADED_THUMB_COUNT_LIMIT ) {
                 WalkImage old= thumbFreshness.getLast();
                 thumbFreshness.remove(old);
+                clear.add(old);
+            }
+        }
+
+        while ( clear.size()>0 ) {
+            WalkImage old= clear.poll();
+            synchronized ( old ) {
                 Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading thumbnail for "+old );
+                old.setStatus( Status.SIZE_THUMB_LOADED );
                 old.squishedThumb= null;
                 old.thumb= null;
-                old.im= null; 
+                old.im= null;
                 old.setStatus( Status.SIZE_THUMB_LOADED );
             }
         }
