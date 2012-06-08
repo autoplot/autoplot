@@ -452,7 +452,12 @@ public class JythonCompletionTask implements CompletionTask {
     }
     
     private String methodSignature(Method javaMethod) {
-        String javadocPath = join(javaMethod.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
+        String n= javaMethod.getDeclaringClass().getCanonicalName();
+        if ( n==null ) {
+            // anonymous methods or inner class.
+            return "<inner>";
+        }
+        String javadocPath = join( n.split("\\."), "/") + ".html";
 
         StringBuffer sig = new StringBuffer(javadocPath);
         //String LPAREN="%28";
