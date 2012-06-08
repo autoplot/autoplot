@@ -329,7 +329,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             }
 
             // add cache tag to avoid unnecessary reads.
-            if ( tsb!=null ) {
+            if ( tsb!=null && res!=null ) {
                 // check for cache tag from script
                 QDataSet dep0= (QDataSet) res.property(QDataSet.DEPEND_0);
                 if ( dep0!=null ) {
