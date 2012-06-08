@@ -1,5 +1,6 @@
 package org.autoplot.pngwalk;
 
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -35,14 +36,45 @@ public class WalkImage  {
 
     public static final int THUMB_SIZE = 400;
     private static final int SQUASH_FACTOR = 10; // amount to horizontally squash thumbs for covers and contextFlow
+    
+    /**
+     * number of full-size images we can load at once.
+     */
     private static final int LOADED_IMAGE_COUNT_LIMIT = 10;
     
+    /**
+     * number of full-size images we can load at once.
+     */
+    private static final int LOADED_THUMB_COUNT_LIMIT = 100;
+
     final String uriString;  // Used for sorting
     private URI imgURI;
+
+    /**
+     * full-size image
+     */
     private BufferedImage im;
+
+    /**
+     * the thumbnail, typically 400 pixels corner-to-corner.
+     */
     private BufferedImage thumb;
-    private BufferedImage squishedThumb; // like thumbnail, but squished horizontally to support coverflox.
-    private BufferedImage sizeThumb; // like thumbnail, but based on the current size.
+
+    private Dimension thumbDimension;
+
+    /**
+     * like thumbnail, but squished horizontally to support coverflow.
+     */
+    private BufferedImage squishedThumb;
+
+    /**
+     *  like thumbnail, but based on the current size.
+     */
+    private BufferedImage sizeThumb;
+
+    /**
+     * the current size of sizeThumb.
+     */
     private int sizeThumbWidth=-1;
 
     private String caption;
@@ -55,6 +87,7 @@ public class WalkImage  {
     private static final LinkedList<WalkImage> freshness= new LinkedList();
     private static final LinkedList<WalkImage> thumbLoadingQueue= new LinkedList();
     private static Runnable thumbLoadingQueueRunner;
+    private static final LinkedList<WalkImage> thumbFreshness= new LinkedList();
 
     //private java.util.concurrent.ThreadPoolExecutor reqProc= new ThreadPoolExecutor( 2, 4, 1, TimeUnit.MINUTES, workQueue );
     
@@ -72,6 +105,7 @@ public class WalkImage  {
 
     public enum Status {
         UNKNOWN,
+        SIZE_THUMB_LOADED, // only the actual size thumb is loaded, because the bigger thumbnail was unloaded.  ThumbDimension will be loaded.
         THUMB_LOADING, // loading only thumbnail
         THUMB_LOADED, // thumbnail loaded but image is not
         IMAGE_LOADING, // loading thumbnail AND image
@@ -163,15 +197,24 @@ public class WalkImage  {
      * @return image or  PngWalkView.loadingImage
      */
     public synchronized BufferedImage getThumbnail( int w, int h, boolean waitOk ) {
+        synchronized (thumbFreshness ) {
+            thumbFreshness.remove(this); // move to freshest position
+            thumbFreshness.addFirst(this);
+        }
+
         if ( sizeThumbWidth==w ) {
             return this.sizeThumb;
         } else {
             if ( waitOk ) {
                 BufferedImage theThumb= getThumbnail(true);
-                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                sizeThumb = resizeOp.filter(theThumb, null);
-                sizeThumbWidth= w;
-                return sizeThumb;
+                if ( theThumb==null ) {
+                    return PngWalkView.loadingImage;
+                } else {
+                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(theThumb.getWidth(), theThumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                    sizeThumb = resizeOp.filter(theThumb, null);
+                    sizeThumbWidth= w;
+                    return sizeThumb;
+                }
             } else {
                 return PngWalkView.loadingImage;
             }
@@ -252,11 +295,40 @@ public class WalkImage  {
             //BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
             //thumb = resizeOp.filter(rawThumb, null);
             thumb = WalkUtil.resizeImage( rawThumb, width, height );
+            thumbDimension= new Dimension(width,height);
             if (status == Status.THUMB_LOADING) {
                 setStatus(Status.THUMB_LOADED);
+            } else if (status == Status.SIZE_THUMB_LOADED) {
+                setStatus(Status.THUMB_LOADED);
+            } else {
+                //setStatus(Status.THUMB_LOADED);
             }
         }
 
+
+        synchronized (thumbFreshness ) {
+            thumbFreshness.remove(this); // move to freshest position
+            thumbFreshness.addFirst(this);
+        }
+
+        synchronized ( thumbFreshness ) {
+            while ( thumbFreshness.size() > LOADED_THUMB_COUNT_LIMIT ) {
+                WalkImage old= thumbFreshness.getLast();
+                thumbFreshness.remove(old);
+                Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading thumbnail for "+old );
+                old.squishedThumb= null;
+                old.thumb= null;
+                old.im= null; 
+                old.setStatus( Status.SIZE_THUMB_LOADED );
+            }
+        }
+    }
+
+    public synchronized Dimension getThumbnailDimension( boolean loadIfNeeded ) {
+        if ( loadIfNeeded ) {
+            getThumbnail(loadIfNeeded);
+        }
+        return this.thumbDimension;
     }
 
     /**
@@ -265,6 +337,12 @@ public class WalkImage  {
      * @return the thumbnail, or null if it is not loaded.
      */
     public synchronized BufferedImage getThumbnail(boolean loadIfNeeded) {
+
+        synchronized (thumbFreshness ) {
+            thumbFreshness.remove(this); // move to freshest position
+            thumbFreshness.addFirst(this);
+        }
+        
         switch (status) {
             case THUMB_LOADING:
                 // We're already working on it in another thread
@@ -285,6 +363,7 @@ public class WalkImage  {
             case MISSING:
                 return missingImage;
 
+            case SIZE_THUMB_LOADED:
             case UNKNOWN:
                 if(!loadIfNeeded) return null;
                 setStatus(Status.THUMB_LOADING);
