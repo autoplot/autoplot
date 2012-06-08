@@ -47,6 +47,11 @@ public class GridPngWalkView extends PngWalkView {
     private GridViewCanvas canvas;
     private double restoreScrollPct = -1;
 
+    /**
+     * time limit where we stop getting new thumbnails, so that the event queue doesn't get blocked.
+     */
+    public static final int PAINT_THUMB_TIMEOUT_MS = 200;
+
     public GridPngWalkView(WalkImageSequence sequence) {
         super(sequence);
 
@@ -279,17 +284,24 @@ public class GridPngWalkView extends PngWalkView {
                     }
                     //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
                     WalkImage wimage = seq.imageAt(i);
-                    BufferedImage thumb = wimage.getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
-                    if (thumb != null) {
-                        double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4 - fm.getHeight()) / thumb.getHeight());
+                    BufferedImage thumb = wimage.getThumbnail( false );
+                    if ( thumb==null && wimage.getStatus()!=WalkImage.Status.SIZE_THUMB_LOADED ) {
+                        thumb = wimage.getThumbnail( !scrollPane.getVerticalScrollBar().getValueIsAdjusting() );
+                    }
+                    Dimension thumbd= wimage.getThumbnailDimension(false);
+                    if (thumbd != null) {
+                        double s = Math.min((double) (thumbSize - 4) / thumbd.getWidth(), (double) (thumbSize - 4 - fm.getHeight()) / thumbd.getHeight());
                         if (s < 1.0) {
-                            int w = (int) (s * thumb.getWidth());
-                            int h = (int) (s * thumb.getHeight());
-                            outOfTime= outOfTime || System.currentTimeMillis()-t0 > 100;
-                            thumb= wimage.getThumbnail(w,h,!outOfTime);
+                            int w = (int) (s * thumbd.getWidth());
+                            int h = (int) (s * thumbd.getHeight());
+                            outOfTime= outOfTime || System.currentTimeMillis()-t0 > PAINT_THUMB_TIMEOUT_MS;
+                            BufferedImage whthumb= wimage.getThumbnail(w,h,!outOfTime);
+                            thumb= whthumb;
                             if ( thumb==loadingImage ) {
                                 this.repaintSoon();
                             }
+                        } else {
+                            thumb = loadingImage;
                         }
                     } else {
                         thumb = loadingImage;
