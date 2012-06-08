@@ -131,7 +131,31 @@ public class Util {
             }
         }
     }
+
+    /**
+     * returns the dataSource for the given URI.  This will include capabilities, like TimeSeriesBrowse.
+     * @param surl
+     * @return
+     * @throws Exception
+     */
+    public static DataSource getDataSource( String surl ) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0})", surl );
+        URI uri = DataSetURI.getURIValid(surl);
+        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        DataSource result = factory.getDataSource( uri );
+        return result;
+    }
     
+    /**
+     * get the TimeSeriesBrowse capability, if available.  Null (None) is returned if it is not found.
+     * @param ds the data source.
+     * @return
+     */
+    public static TimeSeriesBrowse getTimeSeriesBrowse( DataSource ds ) {
+        TimeSeriesBrowse tsb= ds.getCapability( TimeSeriesBrowse.class );
+        return tsb;
+    }
+
     // cache the last metadata url.
     private static Map<String, Object> metadata;
     private static String metadataSurl;
@@ -179,7 +203,18 @@ public class Util {
      * @throws Exception depending on data source.
      */
     public static QDataSet getDataSet(String surl) throws Exception {
-        return getDataSet(surl, null);
+        return getDataSet(surl, new NullProgressMonitor() );
+    }
+
+    /**
+     * load the data specified by URL into Autoplot's internal data model.  This will
+     * block until the load is complete.
+     * @param surl
+     * @return data set for the URL.
+     * @throws Exception depending on data source.
+     */
+    public static QDataSet getDataSet(String surl, String stimerange ) throws Exception {
+        return getDataSet(surl, stimerange, new NullProgressMonitor() );
     }
 
     /**
