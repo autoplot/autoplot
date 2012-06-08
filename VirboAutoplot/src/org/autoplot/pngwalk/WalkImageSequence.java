@@ -535,6 +535,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int loadedCount=0;
         int thumbLoadingCount=0;
         int thumbLoadedCount=0;
+        int sizeThumbCount= 0;
         int totalCount= 0;
         for ( WalkImage i : existingImages ) {
             totalCount++;
@@ -542,6 +543,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
             if ( i.getStatus()==WalkImage.Status.THUMB_LOADING ) thumbLoadingCount++;
             if ( i.getStatus()==WalkImage.Status.THUMB_LOADED ) thumbLoadedCount++;
+            if ( i.getStatus()==WalkImage.Status.SIZE_THUMB_LOADED ) sizeThumbCount++;
         }
 
 /*        if ( loadingCount>5 ) {
@@ -553,11 +555,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
             System.err.println( Thread.currentThread() );
             new Exception().printStackTrace();
         }*/
-        
+
+        long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
         if ( loadingCount==0 && thumbLoadingCount==0) {
-            setStatus(""+loadedCount+" of "+totalCount + " images loaded.");
+            setStatus(""+loadedCount+" of "+totalCount + " images loaded, " + thumbLoadedCount + " thumbs, "
+                    + sizeThumbCount+ " exact size are loaded. " + mem + " MB free" );
         } else {
-            setStatus("busy: "+loadedCount+" of "+totalCount + " images loaded, " + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.  ");
+            setStatus("busy: "+loadedCount+" of "+totalCount + " images loaded, " 
+                    + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.  "
+                    + sizeThumbCount + " exact size are loaded. " + mem + "MB free");
         }
         
     }
