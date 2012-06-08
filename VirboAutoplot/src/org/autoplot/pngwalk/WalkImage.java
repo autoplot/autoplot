@@ -423,11 +423,20 @@ public class WalkImage  {
         if (thumb != null) return thumb;
         if (!loadIfNeeded) return null;
 
-        synchronized ( thumbLoadingQueue ) {
-            thumbLoadingQueue.add( this );
+        if ( false ) {
+            synchronized ( thumbLoadingQueue ) {
+                thumbLoadingQueue.add( this );
+            }
+            maybeStartThumbLoadingQueueRunner();
+        } else {
+            //acquire thumbnail
+            Runnable r = new Runnable() {
+                public void run() {
+                    getThumbnailImmediately();
+                }
+            };
+            RequestProcessor.invokeLater(r);
         }
-        maybeStartThumbLoadingQueueRunner();
-
       //  //acquire thumbnail
       //  Runnable r = new Runnable() {
       //      public void run() {
