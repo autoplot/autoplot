@@ -41,6 +41,12 @@ public class CoversWalkView extends PngWalkView  {
     int DEFAULT_CELL_SIZE = 100;
     private JScrollPane scrollPane;
 
+    /**
+     * time limit where we stop getting new thumbnails, so that the event queue doesn't get blocked.  Paint here needs to be
+     * sped up as well.
+     */
+    public static final int PAINT_THUMB_TIMEOUT_MS = 400;
+
     Canvas canvas;
     
     public CoversWalkView(final WalkImageSequence sequence) {
@@ -208,8 +214,11 @@ public class CoversWalkView extends PngWalkView  {
         
         @Override
         public void paintComponent(Graphics g1) {
-            boolean useSquished= true;
+            boolean useSquished= false;
 
+            boolean outOfTime= false;
+            long t0= System.currentTimeMillis();
+            
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
             g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
@@ -225,8 +234,8 @@ public class CoversWalkView extends PngWalkView  {
             int i = bounds.x / cellWidth;
             int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellWidth);
 
-            //double pp= perspective ? 0.05 : 0.0;
-            double pp= perspective ? ( useSquished ? 0.50 : 0.05 ) : 0.0;
+            double pp= perspective ? 0.05 : 0.0;
+            //double pp= perspective ? 0.5 : 0.0;
             double sh= useSquished ? 1.0 : HEIGHT_WIDTH_RATIO;  // scale horizontal
 
             //System.out.printf("First: %d, Last: %d%n", i, imax);
@@ -241,19 +250,38 @@ public class CoversWalkView extends PngWalkView  {
                 }
 
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-                BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting()) :  seq.imageAt(i).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
-                if (thumb != null) {
-                    double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
+                //BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting()) :  seq.imageAt(i).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
+                WalkImage wimage = seq.imageAt(i);
+                BufferedImage thumb = wimage.getThumbnail( false );
+                if ( thumb==null && wimage.getStatus()!=WalkImage.Status.SIZE_THUMB_LOADED ) {
+                    thumb = wimage.getThumbnail( !scrollPane.getVerticalScrollBar().getValueIsAdjusting() );
+                }
+                Dimension thumbd= wimage.getThumbnailDimension(false);
+
+                if (thumbd != null) {
+                    double s = Math.min((double) (cellSize - 4) / thumbd.getWidth(), (double) (cellSize - 4) / thumbd.getHeight());
+                    outOfTime= outOfTime || System.currentTimeMillis()-t0 > PAINT_THUMB_TIMEOUT_MS;
                     if (s < 1.0) {
-                        int w = (int) (s * thumb.getWidth()/sh );
-                        int h = (int) (s * thumb.getHeight());
-                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
-                        thumb = resizeOp.filter(thumb, null);
+                        int w = (int) (s * thumbd.getWidth() );
+                        int h = (int) (s * thumbd.getHeight());
+                        BufferedImage whthumb= wimage.getThumbnail(w,h,!outOfTime);
+                        if ( whthumb!=loadingImage ) {
+                            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(whthumb.getWidth(), whthumb.getHeight(), 0, 0, (int)(1.1* w/sh), (int)(1.1*h), 0, 1, 1, pp, true);
+                            thumb = resizeOp.filter(whthumb, null);
+                        } else {
+                            thumb= tinyLoadingImage;
+
+                        }
                     } else {
-                        int w = (int) (  thumb.getWidth()/sh );
-                        int h = (int) (  thumb.getHeight());
-                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
-                        thumb = resizeOp.filter(thumb, null);
+                        int w = (int) (  thumbd.getWidth() );
+                        int h = (int) (  thumbd.getHeight());
+                        BufferedImage whthumb= wimage.getThumbnail(w,h,!outOfTime);
+                        if ( whthumb!=loadingImage ) {
+                            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(whthumb.getWidth(), whthumb.getHeight(), 0, 0, (int)(1.1*w/sh), (int)(1.1*h), 0, 1, 1, pp, true);
+                            thumb = resizeOp.filter(whthumb, null);
+                        } else {
+                            thumb= tinyLoadingImage;
+                        }
                     }
                 } else {
                     //thumb = loadingImage;
@@ -266,6 +294,10 @@ public class CoversWalkView extends PngWalkView  {
 //                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
 //                    thumb = resizeOp.filter(thumb, null);
                 }
+                if ( thumb==tinyLoadingImage ) {
+                    this.repaintSoon();
+                }
+
                 int imgX= i * cellWidth + (cellWidth - thumb.getWidth()) / 2;
                 int imgY= (cellSize - thumb.getHeight()) / 2;
                 g2.drawImage(thumb, imgX, imgY, null);
