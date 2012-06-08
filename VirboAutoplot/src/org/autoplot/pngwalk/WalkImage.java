@@ -328,7 +328,6 @@ public class WalkImage  {
                 old.squishedThumb= null;
                 old.thumb= null;
                 old.im= null;
-                old.setStatus( Status.SIZE_THUMB_LOADED );
             }
         }
     }
@@ -499,14 +498,24 @@ public class WalkImage  {
                 freshness.remove(this); // move to freshest position
                 freshness.addFirst(this);
             }
-            
+
+            LinkedList<WalkImage> clear= new LinkedList();
             synchronized ( freshness ) {
                 while ( freshness.size() > LOADED_IMAGE_COUNT_LIMIT ) {
                     WalkImage old= freshness.getLast();
                     freshness.remove(old);
+                    clear.add(old);
+                }
+            }
+
+            while ( clear.size()>0 ) {
+                WalkImage old= clear.poll();
+                synchronized ( old ) {
                     Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading image for "+old );
                     old.im= null;
-                    old.setStatus( Status.THUMB_LOADED );
+                    if ( old.getStatus()==Status.IMAGE_LOADED ) { //bugfix: unloading the thumbnails might have set status to SIZE_THUMB_LOADED
+                         old.setStatus( Status.THUMB_LOADED );
+                    }
                 }
             }
 
