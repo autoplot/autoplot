@@ -703,7 +703,15 @@ public class ApplicationController extends DomNodeController implements RunLater
                 //    deletePlot(src);
                 //}
                 if (getPlotElementsFor(dst).size() == 1) {
-                    dst.syncTo(p.plotDefaults, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+                    dst.syncTo(p.plotDefaults, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID, Plot.PROP_XAXIS, Plot.PROP_YAXIS ) );
+                    List<BindingModel> bb= findBindings( dst.getXaxis(), Axis.PROP_RANGE );
+                    if ( bb.isEmpty() ) {
+                        dst.getXaxis().syncTo( p.getPlotDefaults().getXaxis(), Arrays.asList(Plot.PROP_ID) );
+                    }
+                    bb= findBindings( dst.getYaxis(), Axis.PROP_RANGE );
+                    if ( bb.isEmpty() ) {
+                        dst.getYaxis().syncTo( p.getPlotDefaults().getYaxis(), Arrays.asList(Plot.PROP_ID) );
+                    }
                 }
             }
         }
@@ -1673,6 +1681,21 @@ public class ApplicationController extends DomNodeController implements RunLater
         } else {
             return results.get(0);  // TODO: this should be a singleton.
         }
+    }
+
+
+    /**
+     * returns a list of bindings of the node for the property
+     * @param src
+     * @param srcProp
+     * @return
+     */
+    public List<BindingModel> findBindings( DomNode src, String srcProp ) {
+        List<BindingModel> bindings= findBindings( src, srcProp, null, null );
+        List<BindingModel> bindings2= findBindings( null, null, src, srcProp );
+        bindings2.removeAll(bindings);
+        bindings.addAll(bindings2);
+        return bindings;
     }
 
     /**
