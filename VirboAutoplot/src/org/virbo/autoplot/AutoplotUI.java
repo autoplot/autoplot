@@ -2733,13 +2733,7 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 
 private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
    // Reload All Data
-    for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
-        if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
-            dsf.getController().update();
-        } else {
-            System.err.println( "not updating: " + dsf.getUri() );
-        }
-    }
+    AutoplotUtil.reloadAll(dom);
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {

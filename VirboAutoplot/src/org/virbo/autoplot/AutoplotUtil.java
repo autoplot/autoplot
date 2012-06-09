@@ -225,6 +225,16 @@ public class AutoplotUtil {
         }
     }
 
+    public static void reloadAll( Application dom ) {
+        for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
+            if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
+                dsf.getController().update();
+            } else {
+                System.err.println( "not updating: " + dsf.getUri() );
+            }
+        }
+    }
+
     public static class AutoRangeDescriptor {
 
         public DatumRange range;
