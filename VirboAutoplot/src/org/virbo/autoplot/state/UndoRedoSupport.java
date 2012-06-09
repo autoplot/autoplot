@@ -22,7 +22,9 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Diff;
 
@@ -148,6 +150,9 @@ public class UndoRedoSupport {
             applicationModel.restoreState(elephant.state);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
+            RequestProcessor.invokeLater( new Runnable() { public void run() {
+                AutoplotUtil.reloadAll( applicationModel.getDocumentModel() );
+            } } );
         }
         propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
