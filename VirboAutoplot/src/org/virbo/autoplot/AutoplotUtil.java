@@ -68,6 +68,7 @@ import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
+import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
@@ -225,10 +226,17 @@ public class AutoplotUtil {
         }
     }
 
+    /**
+     * reload all the data.  This should not be called on the event thread.
+     * @param dom
+     */
     public static void reloadAll( Application dom ) {
         for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
             if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
-                dsf.getController().update();
+                final DataSourceFilter fdsf= dsf;
+                RequestProcessor.invokeLater( new Runnable() { public void run() {
+                    fdsf.getController().update();
+                } } );
             } else {
                 System.err.println( "not updating: " + dsf.getUri() );
             }

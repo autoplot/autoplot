@@ -2733,7 +2733,9 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 
 private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
    // Reload All Data
-    AutoplotUtil.reloadAll(dom);
+    RequestProcessor.invokeLater( new Runnable() { public void run() {
+        AutoplotUtil.reloadAll(dom);
+    } } );
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
