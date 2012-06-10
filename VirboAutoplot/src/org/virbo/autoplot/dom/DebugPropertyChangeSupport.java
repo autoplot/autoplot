@@ -31,25 +31,26 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
             return;
         }
         super.addPropertyChangeListener(listener);
-        propNames.add( listener.toString() );
+        if ( listener!=null ) propNames.add( listener.toString() );
     }
 
     @Override
     public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         super.addPropertyChangeListener(propertyName, listener);
-        propNames.add( listener.toString()+ " " + propertyName );
+        if ( listener!=null ) propNames.add( listener.toString()+ " " + propertyName );
     }
 
     @Override
     public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
         super.removePropertyChangeListener(listener);
-        propNames.remove( listener.toString() );
+        if ( listener!=null ) propNames.remove( listener.toString() );
     }
 
     @Override
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         super.removePropertyChangeListener(propertyName, listener);
-        propNames.remove( listener.toString()+ " " + propertyName );
+        //TODO: possible bug: sometimes with TSBs listener is null.
+        if ( listener!=null ) propNames.remove( listener.toString()+ " " + propertyName );
     }
 
 
