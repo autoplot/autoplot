@@ -947,12 +947,16 @@ public class PlotController extends DomNodeController {
             logger.log(Level.FINER, "add binding: {0}", plot.getXaxis());
             plot.getXaxis().setLog(false);
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
+            BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
+            if ( b!=null ) dom.getController().deleteBinding(b); // 3516161
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
             //    plot.getXaxis().setDrawTickLabels(false);
             //} //TODO: could disable tick label drawing automatically.
 
         } else if ( bm!=null && !shouldBindX ) {
             logger.log(Level.FINER, "remove binding: {0}", bm);
+            BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
+            //if ( b!=null ) dom.getController().deleteBinding(b); // 3516161
             dom.getController().deleteBinding(bm);
         }
 
