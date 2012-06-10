@@ -253,7 +253,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             File f= new File(localRoot, directory);
             if ( !f.exists() ) throw new FileSystemOfflineException("unable to list "+f+" when offline");
             String[] listing = f.list();
-            return listing;
+            return listing; //TODO: remove local file '.listing'
         }
 
         URL url= getRootURL();
