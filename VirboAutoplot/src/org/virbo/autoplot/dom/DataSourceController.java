@@ -351,7 +351,9 @@ public class DataSourceController extends DomNodeController {
                         this.dom.setTimeRange( getTsb().getTimeRange() );
                         System.err.println("about to setup Gen for "+this);
                         timeSeriesBrowseController.setupGen( node1, propertyName );
-                        if ( node1!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                        if ( node1!=dom ) {
+                            dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                        }
                         update( );
                     } else {
                         System.err.println("unable to use timerange as guide");
@@ -362,7 +364,12 @@ public class DataSourceController extends DomNodeController {
                 } else {
                     System.err.println("using plot context for TSB: "+this.dsf.getUri() );
                     timeSeriesBrowseController.setupGen( node1, propertyName );
-                    if ( node1!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                    if ( node1!=dom ) {
+                        dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                        BindingModel bm= dom.controller.findBinding( dom, Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
+                        //TODO: verify this! https://sourceforge.net/tracker/index.php?func=detail&aid=3516161&group_id=199733&atid=970682
+                        if ( bm!=null ) dom.controller.deleteBinding(bm);
+                    }
                     update( );
                 }
 
