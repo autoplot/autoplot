@@ -327,6 +327,9 @@ public class TimeSeriesBrowseController {
             this.xAxis= null;
         } else {
             if ( listenNode!=null ) {
+                if ( timeSeriesBrowseListener==null ) {
+                    System.err.println("here timeSeriesBrowseListener is null");
+                }
                 listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
             }
         }
