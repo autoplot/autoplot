@@ -78,9 +78,6 @@ public class BindingSupport {
             this.getter= getter;
             this.c= c;
             this.forward= forward;
-            if ( srcProp.equals("timeRange") ) {
-                System.err.println( "herehere timeRange" );
-            }
             this.srcProp= srcProp;
             this.pprop= pprop;
         }
