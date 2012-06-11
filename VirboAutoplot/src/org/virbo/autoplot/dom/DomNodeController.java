@@ -157,7 +157,19 @@ public class DomNodeController {
         return changesSupport.isValueAdjusting()!=null;
     }
 
-    protected DomLock mutatorLock() {
+    /**
+     * lock the node so that others cannot modify it.  Call the lock object's lock method with a name for the operation,
+     * then unlock it when the operation is complete.  A try/finally block should be used in case exceptions occur, otherwise
+     * the application will be left in an unusable state!
+     * <tt>
+     * DomLock lock = dom.controller.mutatorLock();
+     * lock.lock( "Sync to Application" );
+     *    do atomic operation...
+     * lock.unlock()
+     * </tt>
+     * @return
+     */
+    public DomLock mutatorLock() {
         return changesSupport.mutatorLock();
     }
 
