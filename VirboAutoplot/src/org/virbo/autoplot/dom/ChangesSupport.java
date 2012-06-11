@@ -168,6 +168,7 @@ public final class ChangesSupport {
             super.lock();
             if (valueIsAdjusting!=null) {
                 //System.err.println("lock is already set!");
+                //nested locks result in the outermost lock being used while inner locks are ignored.
             } else {
                 valueIsAdjusting= description;
                 propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, null, description );
