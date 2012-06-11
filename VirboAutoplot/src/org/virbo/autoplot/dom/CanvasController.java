@@ -291,8 +291,16 @@ public class CanvasController extends DomNodeController {
             }
         }
 
+        if ( totalWeight==0 ) { // bug reset after "make stack plot".  Avoid the RTE... TODO: I don't really understand what's going on here
+            weights[0]= 100;
+            totalWeight= 100;
+        }
+
         // normalize to per thousand.
         for (int i = 0; i < rows.size(); i++) {
+            if ( totalWeight==0 ) {
+                System.err.println("here");
+            }
             weights[i] = 1000 * weights[i] / totalWeight;
         }
         totalWeight = 1000;
