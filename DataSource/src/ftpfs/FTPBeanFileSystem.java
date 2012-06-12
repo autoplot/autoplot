@@ -345,9 +345,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
     protected void uploadFile( String filename, File srcFile, final ProgressMonitor mon ) throws IOException {
         logger.log(Level.FINE, "ftpfs uploadFile({0})", filename);
 
-        FileOutputStream out = null;
-        InputStream is = null;
-        
         filename = toCanonicalFilename(filename);
         URL url = new URL(getRootURL(), filename.substring(1));
 
