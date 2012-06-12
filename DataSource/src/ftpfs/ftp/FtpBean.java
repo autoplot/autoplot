@@ -2,16 +2,7 @@ package ftpfs.ftp;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedReader;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
@@ -50,6 +41,8 @@ import java.util.Vector;
  * Date: 20 Aug 1999
  * Last Updated: 28Mar2002
  *
+ * 20120612--add cancel support where the observer can cancel the download.
+ * 
  * Note:
  * 1) To turn on debug mode, change the field DEBUG to true,
  *    then re-compile the class file.
@@ -526,22 +519,28 @@ public class FtpBean
 	    return;
 
 	acquire();
+        
+        Socket sock= null;
+        BufferedInputStream reader = null;
+        RandomAccessFile out= null;
 	try
 	{
-            Socket sock = getDataSocket(CMD_RETR, ftpfile, 0);
+            sock = getDataSocket(CMD_RETR, ftpfile, 0);
 
             // Read bytes from server
-            BufferedInputStream reader = new BufferedInputStream(
+            reader = new BufferedInputStream(
                                              sock.getInputStream());
 
             // File to write to
-	    RandomAccessFile out = new RandomAccessFile(localfile, "rw");
+	    out = new RandomAccessFile(localfile, "rw");
 
             int offset;
             byte[] data = new byte[BUF + 1];
 
+            boolean cont= true;
+            
             // Loop to read file
-            while((offset = reader.read(data, 0, BUF)) != -1)
+            while( cont && (offset = reader.read(data, 0, BUF)) != -1)
             {
                 // Last character is '\r', read one more character.
 		// It is because the next character may be '\n'. Where "\r\n" is the 
@@ -555,13 +554,16 @@ public class FtpBean
                 String content = new String(data, 0, offset, FTP_ENCODING);
                 content = changeLineSeparator(content, "\r\n", separator);
         	out.writeBytes(content);
-                if(observer != null)
-                    observer.byteRead(offset);
+                
+                if(observer != null) {
+                    cont= observer.byteRead(offset);
+                }
             }
-
-	    out.close();
-            reader.close();
-	    sock.close();
+            
+            if ( cont==false ) {
+                throw new IOException("Operation cancelled");
+            }
+            
             getRespond(CMD_RETR);
 
             if(!reply.substring(0, 3).equals("226"))
@@ -570,7 +572,11 @@ public class FtpBean
             }
 	} finally
 	{
-	    release();
+	    if ( out!=null ) out.close();
+            if ( reader!=null ) reader.close();
+	    if ( sock!=null ) sock.close();
+
+            release();
 	}
     }
 
@@ -800,24 +806,28 @@ public class FtpBean
 
         acquire();    // Acquire the object
 
+        Socket sock = null;
+        RandomAccessFile out=null;
+        BufferedInputStream reader= null;
         try
         {
             setTransferType(false);             // Set transfer type to binary
-            Socket sock = null;
+            
             sock = getDataSocket(CMD_RETR ,ftpfile, restart);
  
             // Read bytes from server and write to file.
-            BufferedInputStream reader = new BufferedInputStream(
+            reader = new BufferedInputStream(
                                              sock.getInputStream());
-            RandomAccessFile out = new RandomAccessFile(localfile, "rw");
+            out = new RandomAccessFile(localfile, "rw");
             out.seek(restart);
             readData(reader, out, observer);
-            reader.close();
-            out.close();
-            sock.close();
             getRespond(CMD_RETR);
         } finally
         {
+            if (reader!=null ) reader.close();
+            if ( out!=null ) out.close();
+            if ( sock!=null ) sock.close();
+            
             release();    // Release the object
         }
     }
@@ -1516,11 +1526,17 @@ public class FtpBean
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         int offset;
         byte[] data = new byte[1024];
-        while((offset = reader.read(data)) != -1)
+        boolean cont= true;
+        while( cont && (offset = reader.read(data)) != -1)
         {
             out.write(data, 0, offset);
-            if(observer != null)
-                observer.byteRead(offset);
+            if(observer != null) {
+                cont= observer.byteRead(offset);
+            }
+        }
+        
+        if ( !cont ) {
+            throw new IOException("Operation cancelled");
         }
         return out.toByteArray();
     }
@@ -1812,11 +1828,18 @@ public class FtpBean
     {
         int offset;
         byte[] data = new byte[1024];
-        while((offset = reader.read(data)) != -1)
+        
+        boolean cont= true;
+        while( cont && (offset = reader.read(data)) != -1)
         {
             out.write(data, 0, offset);
-            if(observer != null)
-                observer.byteRead(offset);
+            if(observer != null) {
+                cont= observer.byteRead(offset);
+            }
+        }
+            
+        if ( cont==false ) {
+            throw new IOException("Operation cancelled");
         }
     }
 
@@ -1831,12 +1854,18 @@ public class FtpBean
     {
         int offset;
         byte[] data = new byte[1024];
-        while((offset = din.read(data)) != -1)
+        
+        boolean cont= true;
+        while( cont && (offset = din.read(data)) != -1)
         {
             dout.write(data, 0, offset);
 
-            if(observer != null)
-                observer.byteWrite(offset);
+            if(observer != null) {
+                cont= observer.byteWrite(offset);
+            }
+        }
+        if ( cont==false ) {
+            throw new IOException("Operation cancelled");
         }
     }
 

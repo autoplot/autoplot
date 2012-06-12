@@ -28,6 +28,8 @@ package ftpfs.ftp;
  * Date: 25 March 2000
  * Last Updated: 10 April 2000
  *
+ * 20120612--add cancel so user can cancel the download.
+ * 
  * Updates:
  * This interface was added on version 1.4
  */
@@ -79,12 +81,13 @@ public interface FtpObserver
     /**
      * This method is called every time new bytes are read in downloading process.
      * @param bytes The number of new bytes read from the server.
+     * @return true if the process should continue reading, false indicates cancel and the process should stop
      */
-    void byteRead(int bytes);
+    boolean byteRead(int bytes);
 
     /**
      * This method is called every time new bytes is written to the ftp server in uploading process.
      * @param bytes The number of new bytes write to the server.
      */
-    void byteWrite(int bytes);
+    boolean byteWrite(int bytes);
 }
