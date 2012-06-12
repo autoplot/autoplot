@@ -54,9 +54,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
         try {
             this.listDirectory("/"); // list the root to see if it is offline.
         } catch (IOException ex) {
-            //TODO: how to distinguist UnknownHostException to be offline?  avoid firing an event until I come up with a way.
+            //TODO: how to distinguish UnknownHostException to be offline?  avoid firing an event until I come up with a way.
             ex.printStackTrace();
-            this.offline= true;
+            throw new FileSystemOfflineException(ex);
+            //this.offline= true;
         }
         
     }
@@ -267,6 +268,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 File listingt = new File(localRoot, directory + ".listing.temp");
 
                 FtpBean bean = new FtpBean();
+                bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
@@ -353,7 +355,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         try {
             FtpBean bean = new FtpBean();
-
+            bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
             String fname= ss[2].substring(ss[1].length()); // the name within the filesystem
 
             String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
@@ -379,26 +381,27 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 int totalBytes = 0;
 
-                public void byteRead(int bytes) {
+                public boolean byteRead(int bytes) {
                     totalBytes += bytes;
                     if (mon.isCancelled()) {
-                        throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                        return false;
                     }
                     long dt = System.currentTimeMillis() - t0;
                     mon.setTaskProgress(totalBytes);
                     mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
-
+                    return true;
                 }
 
-                public void byteWrite(int bytes) {
+                public boolean byteWrite(int bytes) {
                     totalBytes += bytes;
                     mon.setTaskProgress(totalBytes);
                     if (mon.isCancelled()) {
-                        throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                        return false;
                     }
                     long dt = System.currentTimeMillis() - t0;
                     mon.setTaskProgress(totalBytes);
                     mon.setProgressMessage(totalBytes / 1000 + "KB written at " + (totalBytes / dt) + " KB/sec");
+                    return true;
                 }
             };
 
@@ -427,7 +430,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     }
 
-    protected void downloadFile( String filename, File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
+    protected void downloadFile( String filename, File targetFile, final File partFile, final ProgressMonitor mon) throws java.io.IOException {
 
         Lock lock= getDownloadLock( filename, targetFile, mon );
 
@@ -435,8 +438,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         logger.log(Level.FINE, "ftpfs downloadFile({0})", filename);
         
-        FileOutputStream out = null;
-        InputStream is = null;
         try {
             filename = toCanonicalFilename(filename);
             URL url = new URL(getRootURL(), filename.substring(1));
@@ -449,8 +450,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
             boolean done= false;
             while ( !done ) {
                 try {
-                    FtpBean bean = new FtpBean();
-
+                    final FtpBean bean = new FtpBean();
+                    bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
                         String[] userHostArr= userInfo.split(":");
@@ -485,20 +486,21 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                         int totalBytes = 0;
 
-                        public void byteRead(int bytes) {
+                        public boolean byteRead(int bytes) {
                             totalBytes += bytes;
                             if (mon.isCancelled()) {
-                                throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                                return false;
                             }
                             long dt = Math.max( 1, System.currentTimeMillis() - t0 );
                             mon.setTaskProgress(totalBytes);
                             mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
-
+                            return true;
                         }
 
-                        public void byteWrite(int bytes) {
+                        public boolean byteWrite(int bytes) {
                             totalBytes += bytes;
                             mon.setTaskProgress(totalBytes);
+                            return true;
                         }
                     };
                     bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
@@ -532,20 +534,20 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
 
             if ( copyFile(partFile, targetFile) ) {
-                if ( ! partFile.delete() ) {
-                    throw new IllegalArgumentException("unable to delete file "+partFile );
+                System.err.println( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
+                synchronized ( FTPBeanFileSystem.class ) {
+                    if ( partFile.exists() && ! partFile.delete() ) {
+                        throw new IllegalArgumentException("unable to delete file "+partFile );
+                    }
                 }
             }
 
         } catch (IOException e) {
-            if (out != null) {
-                out.close();
-            }
-            if (is != null) {
-                is.close();
-            }
-            if ( partFile.exists() && !partFile.delete() ) {
-                throw new IllegalArgumentException("unable to delete file "+partFile);
+            synchronized ( FTPBeanFileSystem.class ) {
+                System.err.println( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
+                if ( partFile.exists() && !partFile.delete() ) {
+                    throw new IllegalArgumentException("unable to delete file "+partFile);
+                }
             }
             throw e;
             
