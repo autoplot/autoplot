@@ -22,6 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>autoranging with colorScatter corrected, it was ignoring the z ranging.</li>
+            <li>CDAWeb uses HTTP for file access instead of problemmatic FTP access</li>
+            <li>bugfix: clean up code in CDAWeb where web transaction occurred on the event thread.</li>
+            <li>clean up of FTP filesystem access, including setting timeout, properly handling cancel, and properly closing channels.</li>
+            <li>3534309:  procedure shows bug in reset after make stack plot. </li>
             <li>rte 0066550323: don't show "local listing file (.listing) not found" when filesystem is offline.</li>
             <li>3516161: clear old binding between timerange and plot.context.</li>
             <li>3533882: reset of timerange when move plot caused by handler ignoring binding</li>
