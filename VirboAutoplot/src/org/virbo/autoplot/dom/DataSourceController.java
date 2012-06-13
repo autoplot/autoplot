@@ -310,12 +310,11 @@ public class DataSourceController extends DomNodeController {
             changesSupport.changePerformed( this, PENDING_SET_DATA_SOURCE );
        }
 
-        this.dsf.setValidRange("");
-        this.dsf.setFill("");
-
         if ( valueWasAdjusting ) {
             this.dataSource = dataSource;
         } else {
+            this.dsf.setValidRange("");
+            this.dsf.setFill("");
             setDataSource(dataSource);
             setResetDimensions(true);
         }
