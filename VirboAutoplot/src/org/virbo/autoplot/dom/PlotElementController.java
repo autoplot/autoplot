@@ -1820,13 +1820,14 @@ public class PlotElementController extends DomNodeController {
                 AutoplotUtil.AutoRangeDescriptor zdesc;
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
                     zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null, ignoreDsProps);
+                    peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
+                    peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                 } else {
                     QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
                     if ( plane0!=null ) {
                         zdesc= AutoplotUtil.autoRange(plane0,
                             (Map) props.get(QDataSet.PLANE_0), ignoreDsProps);
                         peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
-                        peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                         peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                     } else {
                         Logger.getLogger("autoplot.plotelementcontroller").warning("expected color plane_0");
