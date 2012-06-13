@@ -694,6 +694,7 @@ public class GuiSupport {
         tt.put( "Events Bar", RenderType.eventsBar);
         tt.put( "Image", RenderType.image);
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
+        tt.put( "Orbit Plot", RenderType.orbitPlot );
 
         ButtonGroup group= new ButtonGroup();
 
