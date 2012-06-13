@@ -534,7 +534,7 @@ public abstract class Bookmark {
             book.remoteStatus= remoteStatus;
             book.setRemoteStatusMsg( remoteStatusMsg );
             
-            book.getBookmarks().addAll(contents);
+            book.getBookmarks().addAll(contents); 
             for ( int i=0; i<contents.size(); i++ ) {
                 contents.get(i).setParent(book);
             }
