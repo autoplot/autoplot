@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
@@ -99,15 +100,38 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         return true;
     }
 
+    private void refreshDefaultTime( String ds, DatumRange dr ) {
+        try {
+            String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
+            DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
+            String str= timeRangeTextField.getText().trim();
+            if ( !str.equals("") ) {
+                try {
+                    DatumRange tr1 = DatumRangeUtil.parseTimeRange(str);
+                    DatumRange accept = DatumRangeUtil.union(dr, tr);
+                    if (DatumRangeUtil.rescale(accept, -0.1, 1.1).intersects(tr1)) {
+                        // fuzz up, because I found ACE/SWE data outside the valid range
+                        tr = tr1;
+                    }
+                } catch (ParseException ex) {
+                    availableTextField.setText(ex.toString());
+                }
+            }
+            timeRangeTextField.setText(tr.toString());
+        } catch (ParseException ex) {
+            availableTextField.setText(ex.toString());
+        } catch ( IOException ex ) {
+            availableTextField.setText(ex.toString());
+        }
+    }
+
     /**
      * this should be called on the event thread.
      * @param ds
      * @param args
      * @throws Exception
      */
-    private void refreshDataSet( CdfJavaDataSourceEditorPanel panel, String ds, Map<String,String> args ) throws Exception {
-
-
+    private void refreshDataSet( CdfJavaDataSourceEditorPanel panel, final String ds, Map<String,String> args ) throws Exception {
         try {
             if ( ! CDAWebDB.getInstance().getServiceProviderIds().containsKey(ds) ) {
                 messageComponent= new JLabel("<html>Service provider \""+ ds +"\" not found in ftp/cdaweb.gsfc.nasa.gov/pub/cdaweb/all.xml");
@@ -118,18 +142,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
             String avail= CDAWebDB.getInstance().getTimeRange(ds);
             availableTextField.setText(avail);
-            DatumRange dr= DatumRangeUtil.parseTimeRange( avail );
-            String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
-            DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
-            String str= timeRangeTextField.getText().trim();
-            if ( !str.equals("") ) {
-                DatumRange tr1= DatumRangeUtil.parseTimeRange( str );
-                DatumRange accept= DatumRangeUtil.union(dr,tr);
-                if ( DatumRangeUtil.rescale(accept,-0.1,1.1).intersects(tr1) ) { // fuzz up, because I found ACE/SWE data outside the valid range
-                    tr= tr1;
+            final DatumRange dr= DatumRangeUtil.parseTimeRange( avail );
+            Runnable run= new Runnable() {
+                public void run() {
+                    refreshDefaultTime(ds,dr);
                 }
-            }
-            timeRangeTextField.setText(tr.toString());
+            };
+            RequestProcessor.invokeLater(run);
+
         } catch ( ParseException ex ) {
             availableTextField.setText(ex.toString());
         }
