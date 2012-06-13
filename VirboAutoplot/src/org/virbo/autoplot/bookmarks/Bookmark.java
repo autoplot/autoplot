@@ -461,7 +461,7 @@ public abstract class Bookmark {
 
         } else if (element.getNodeName().equals("bookmark-folder")) {
 
-            List<Bookmark> contents = null;
+            List<Bookmark> contents = Collections.emptyList();
 
             Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
             String remoteUrl= null;
