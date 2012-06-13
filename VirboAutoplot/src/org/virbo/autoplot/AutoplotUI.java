@@ -2524,7 +2524,9 @@ private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
     });
     dia.setVisible(true);
-
+    if ( panel.isGoPressed() ) {
+        panel.doPlotSelected();
+    }
 //JOptionPane.showMessageDialog(this, plotElement, "Manage Cache", JOptionPane.DEFAULT_OPTION, null);
 }//GEN-LAST:event_jMenuItem3ActionPerformed
 

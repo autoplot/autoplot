@@ -39,6 +39,8 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     TreeModel def= new DefaultTreeModel( new DefaultMutableTreeNode("moment...") );
     MouseListener l= null;
 
+    boolean goPressed= false;
+
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel(AutoplotUI model) {
         this.app = model;
@@ -97,42 +99,44 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
             public void actionPerformed(ActionEvent e) {
 
-                FSTreeModel model = (FSTreeModel) jtree.getModel();
-
-                TreePath[] paths = jtree.getSelectionPaths();
-
-                if (paths.length == 0) return;
-
-                File f = model.getFile(paths[0]);
-
-                String sf= f.toString();
-                String cache= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE);
-
-                boolean acceptOutside= false;
-                String outsideName= sf.substring( cache.length() );
-
-                if ( sf.startsWith( cache ) ) {    
-                    String[] protos= new String[] { "ftp", "http", "https" };
-                    for ( int i=0; i<protos.length; i++ ) {
-                        if ( outsideName.startsWith("/"+protos[i]+"/") ) {
-                            outsideName= protos[i]+"://"+outsideName.substring(protos[i].length()+2);
-                            acceptOutside= true;
-                        }
-                    }   
-                }
-
-                if ( acceptOutside ) {
-                    app.plotUri(outsideName);
-                } else {
-                    app.plotUri(f.toString());
-                }
+                if ( doPlotSelected() ) return;
 
                 Component p= JDiskHogPanel.this.getTopLevelAncestor();
                 if ( p instanceof JDialog ) {
                     p.setVisible(false); // it's confusing to have this modal dialog still going after this operation.
                 }
             }
+
         };
+    }
+
+    public boolean doPlotSelected() {
+
+        FSTreeModel model = (FSTreeModel) jTree1.getModel();
+        TreePath[] paths = jTree1.getSelectionPaths();
+        if (paths.length == 0) {
+            return true;
+        }
+        File f = model.getFile(paths[0]);
+        String sf = f.toString();
+        String cache = AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
+        boolean acceptOutside = false;
+        String outsideName = sf.substring(cache.length());
+        if (sf.startsWith(cache)) {
+            String[] protos = new String[]{"ftp", "http", "https"};
+            for (int i = 0; i < protos.length; i++) {
+                if (outsideName.startsWith("/" + protos[i] + "/")) {
+                    outsideName = protos[i] + "://" + outsideName.substring(protos[i].length() + 2);
+                    acceptOutside = true;
+                }
+            }
+        }
+        if (acceptOutside) {
+            app.plotUri(outsideName);
+        } else {
+            app.plotUri(f.toString());
+        }
+        return false;
     }
 
     Action getCopyToAction(final JTree jtree) {
@@ -196,6 +200,10 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         } );
     }
 
+    public boolean isGoPressed() {
+        return goPressed;
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -208,6 +216,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jButton1 = new javax.swing.JButton();
+        goButton = new javax.swing.JButton();
 
         jScrollPane2.setViewportView(jTree1);
 
@@ -218,13 +227,23 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             }
         });
 
+        goButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
+        goButton.setText("Plot");
+        goButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                goButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(636, Short.MAX_VALUE)
+                .addContainerGap(551, Short.MAX_VALUE)
+                .add(goButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
@@ -232,7 +251,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jButton1)
+                    .add(goButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -240,7 +261,13 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         SwingUtilities.getWindowAncestor(this).setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+        goPressed= true;
+        SwingUtilities.getWindowAncestor(this).setVisible(false);
+    }//GEN-LAST:event_goButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton goButton;
     public javax.swing.JButton jButton1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
