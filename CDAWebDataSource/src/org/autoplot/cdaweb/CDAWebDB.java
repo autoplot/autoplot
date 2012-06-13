@@ -96,7 +96,8 @@ public class CDAWebDB {
             mon.started();
             mon.setTaskSize(3);
             mon.setProgressMessage("downloading file "+dbloc );
-            
+
+            String lookfor=  "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
             File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ;
             FileInputStream fin=null;
             InputStream altin= null;
@@ -126,6 +127,9 @@ public class CDAWebDB {
                     if ( i>-1 ) ss= ss.substring(0,i);
                     if ( ss.trim().length()>0 ) {
                         String[] sss= ss.split("\\s+");
+                        if ( sss[1].startsWith(lookfor) ) {
+                            sss[1]= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + sss[1].substring(lookfor.length());
+                        }
                         bases.put( sss[0], sss[1] );
                         tmpls.put( sss[0], sss[2] );
                     }
@@ -253,6 +257,10 @@ public class CDAWebDB {
             }
             if ( url.startsWith("/tower3/private/cdaw_data/cluster_private/st") ) {  //get all the cluster stuff
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/private/".length() );
+            }
+            String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
+            if ( url.startsWith(lookfor) ) {
+                url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor.length());
             }
             return url;
 
@@ -393,13 +401,22 @@ public class CDAWebDB {
 
     private String getURL( Node dataset ) {
         NodeList kids= dataset.getChildNodes();
+        String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
+        int n= lookfor.length();
+
         for ( int j=0; j<kids.getLength(); j++ ) {
             Node childNode= kids.item(j);
             if ( childNode.getNodeName().equals("access") ) {
                 NodeList kids2= childNode.getChildNodes();
                 for ( int k=0; k<kids2.getLength(); k++ ) {
                     if ( kids2.item(k).getNodeName().equals("URL") ) {
-                        return kids2.item(k).getFirstChild().getTextContent().trim();
+                        String url= kids2.item(k).getFirstChild().getTextContent().trim();
+                        if ( url.startsWith( lookfor ) ) {
+                            // "ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/mfi_h2"
+                            //  http://cdaweb.gsfc.nasa.gov/istp_public/data/
+                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(n);
+                        }
+                        return url;
                     }
                 }
             }
@@ -462,7 +479,8 @@ public class CDAWebDB {
                             //&& nssdc_ID.contains("None") ) {
                              ) {
                         String url= getURL(node);
-                        if ( url!=null && ( url.startsWith("/") || url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
+                        if ( url!=null && ( url.startsWith( "http://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
+                                url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
                             String desc= getDescription(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
                             //String sid=attrs.getNamedItem("ID").getTextContent();
