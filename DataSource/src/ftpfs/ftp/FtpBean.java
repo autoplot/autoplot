@@ -1408,8 +1408,8 @@ public class FtpBean
         String replymessage = "";
         do
         {
-            line = in.readLine(); // TODO: On Windows, I'm seeing this hang for 10-15seconds with each transaction.
-            System.err.println("FTP Responds: "+line);
+            line = in.readLine();
+            //System.err.println("FTP Responds: "+line);
             if(!checkReply(line))
                 break;
             if ( line.contains("Transfer complete") ) {
