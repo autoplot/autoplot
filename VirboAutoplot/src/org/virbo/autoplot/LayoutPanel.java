@@ -71,8 +71,10 @@ public class LayoutPanel extends javax.swing.JPanel {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Plot plot = app.getController().getPlotFor((Component) canvasLayoutPanel1.getComponent());
+                List<Object> p= canvasLayoutPanel1.getSelectedComponents();
                 if (plot != null) {
                     app.getController().setPlot(plot);
+                    canvasLayoutPanel1.setSelectedComponents(p);
                 }
             }
         });
