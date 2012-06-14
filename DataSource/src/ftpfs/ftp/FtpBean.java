@@ -821,13 +821,17 @@ public class FtpBean
             out = new RandomAccessFile(localfile, "rw");
             out.seek(restart);
             readData(reader, out, observer);
+
+            if (reader!=null ) { reader.close(); reader=null; }
+            if ( out!=null ) { out.close(); out=null; }
+            if ( sock!=null ) { sock.close(); sock=null; }
+
             getRespond(CMD_RETR);
         } finally
         {
             if (reader!=null ) reader.close();
             if ( out!=null ) out.close();
             if ( sock!=null ) sock.close();
-            
             release();    // Release the object
         }
     }
@@ -1405,6 +1409,7 @@ public class FtpBean
         do
         {
             line = in.readLine(); // TODO: On Windows, I'm seeing this hang for 10-15seconds with each transaction.
+            System.err.println("FTP Responds: "+line);
             if(!checkReply(line))
                 break;
             if ( line.contains("Transfer complete") ) {
