@@ -593,21 +593,25 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private void propertiesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propertiesMenuItemActionPerformed
         DasPlot component= (DasPlot)canvasLayoutPanel1.getComponent();
-                Plot domPlot = app.getController().getPlotFor(component);
-                if ( domPlot==null ) {
-                    this.app.getController().setStatus("warning: nothing selected");
-                    return;
-                }
-                List<Object> components= canvasLayoutPanel1.getSelectedComponents();
-                Plot[] plots= new Plot[components.size()];
-                for ( int i=0; i<components.size(); i++ ) plots[i]= app.getController().getPlotFor( (Component) components.get(i) );
-                if ( components.size()>1 ) {
-                    PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots);
-                    edit.showDialog(LayoutPanel.this);
-                } else {
-                    PropertyEditor edit = new PropertyEditor(domPlot);
-                    edit.showDialog(LayoutPanel.this);
-                }
+        Plot domPlot = app.getController().getPlotFor(component);
+        if ( domPlot==null ) {
+            this.app.getController().setStatus("warning: nothing selected");
+            return;
+        }
+        List<Object> components= canvasLayoutPanel1.getSelectedComponents();
+        List<Plot> plots= new ArrayList();
+        for ( int i=0; i<components.size(); i++ ) {
+            if ( components.get(i) instanceof Component ) { // might have renderer selected
+                plots.add( app.getController().getPlotFor( (Component) components.get(i) ) );
+            }
+        }
+        if ( plots.size()>1 ) {
+            PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots.toArray());
+            edit.showDialog(LayoutPanel.this);
+        } else {
+            PropertyEditor edit = new PropertyEditor(domPlot);
+            edit.showDialog(LayoutPanel.this);
+        }
 }//GEN-LAST:event_propertiesMenuItemActionPerformed
 
     private void swapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_swapMenuItemActionPerformed
