@@ -460,49 +460,49 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private List<String> listDas2Servers() {
         List<String> d2ss= new ArrayList( );
         d2ss.add( "http://www-pw.physics.uiowa.edu/das/das2Server" );
-        d2ss.add( "http://cassini.physics.uiowa.edu/das/das2Server" );
+
+        if ( serverURL.length()==0 ) {
+            d2ss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+        } else {
+            d2ss.addAll( listPeers(serverURL) );
+        }
+
         File home = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         File book = new File(home, "bookmarks");
         File hist = new File(book, "history.txt");
-
         //long t0= System.currentTimeMillis();
         System.err.println("reading recent datasources from " + hist.toString() );
-        if ( !hist.exists() ) return d2ss;
-        try {
-            String seek="vap+das2server:";
-            int ttaglen= 25;
-            BufferedReader r = new BufferedReader(new FileReader(hist));
-            String s = r.readLine();
-            LinkedHashSet dss = new LinkedHashSet();
 
-            if ( serverURL.length()==0 ) {
-                dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
-            } else {
-                dss.addAll( listPeers(serverURL) );
-            }
+        if ( hist.exists() ) {
+            try {
+                String seek="vap+das2server:";
+                int ttaglen= 25;
+                BufferedReader r = new BufferedReader(new FileReader(hist));
+                String s = r.readLine();
+                LinkedHashSet dss = new LinkedHashSet();
 
-            while (s != null) {
-                if ( s.length()>ttaglen && s.substring(ttaglen).startsWith(seek)) {
-                    int i= s.indexOf("?");
-                    if ( i==-1 ) i= s.length();
-                    String key= s.substring(ttaglen+seek.length(),i);
-                    if ( dss.contains(key) ) dss.remove( key ); // move to the end
-                    dss.add( key );
+                while (s != null) {
+                    if ( s.length()>ttaglen && s.substring(ttaglen).startsWith(seek)) {
+                        int i= s.indexOf("?");
+                        if ( i==-1 ) i= s.length();
+                        String key= s.substring(ttaglen+seek.length(),i);
+                        if ( dss.contains(key) ) dss.remove( key ); // move to the end
+                        dss.add( key );
+                    }
+                    s = r.readLine();
                 }
-                s = r.readLine();
+
+                d2ss.removeAll(dss);  // remove whatever we have already
+                List<String> d2ssDiscoveryList= new ArrayList(dss);
+                Collections.reverse( d2ssDiscoveryList );
+                d2ssDiscoveryList.addAll(d2ss);
+                d2ss= d2ssDiscoveryList; // put the most recently used ones at the front of the list
+                //System.err.printf("read extra das2servers in %d millis\n",(System.currentTimeMillis()-t0) );
+
+            } catch ( IOException ex ) {
+                JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
             }
-
-            d2ss.removeAll(dss);  // remove whatever we have already
-            List<String> d2ssDiscoveryList= new ArrayList(dss);
-            Collections.reverse( d2ssDiscoveryList );
-            d2ssDiscoveryList.addAll(d2ss);
-            d2ss= d2ssDiscoveryList; // put the most recently used ones at the front of the list
-            //System.err.printf("read extra das2servers in %d millis\n",(System.currentTimeMillis()-t0) );
-
-        } catch ( IOException ex ) {
-            JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
         }
-
         return d2ss;
 
     }
