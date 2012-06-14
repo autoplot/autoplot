@@ -705,6 +705,10 @@ public class CdfUtil {
                                 warn.add("depend0 length is inconsistent with length ("+(maxRec)+")" );
                                 //TODO: warnings are incorrect for Themis data.
                             }
+                        } else {
+                            if ( dataOnly ) {
+                                continue; // vap+cdaweb:ds=GE_K0_PWI&id=freq_b&timerange=2012-06-12
+                            }
                         }
                     }
                 } catch (Exception e) {
