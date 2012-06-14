@@ -417,6 +417,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void updateDas2ServersImmediately() {
         d2ss= listDas2Servers();
         das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
+        
+        if ( serverURL.length()==0 ) {
+            serverURL= d2ss.get(0);
+        }
         das2ServerComboBox.setSelectedItem(serverURL);
     }
 
@@ -470,19 +474,22 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             BufferedReader r = new BufferedReader(new FileReader(hist));
             String s = r.readLine();
             LinkedHashSet dss = new LinkedHashSet();
+
+            if ( serverURL.length()==0 ) {
+                dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+            } else {
+                dss.addAll( listPeers(serverURL) );
+            }
+
             while (s != null) {
                 if ( s.length()>ttaglen && s.substring(ttaglen).startsWith(seek)) {
                     int i= s.indexOf("?");
                     if ( i==-1 ) i= s.length();
-                    dss.add( s.substring(ttaglen+seek.length(),i) );
+                    String key= s.substring(ttaglen+seek.length(),i);
+                    if ( dss.contains(key) ) dss.remove( key ); // move to the end
+                    dss.add( key );
                 }
                 s = r.readLine();
-            }
-
-            if ( serverURL==null ) {
-                dss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
-            } else {
-                dss.addAll( listPeers(serverURL) );
             }
 
             d2ss.removeAll(dss);  // remove whatever we have already
@@ -663,7 +670,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     // End of variables declaration//GEN-END:variables
 
 
-    protected String serverURL = null;
+    protected String serverURL = "";
     public static final String PROP_SERVERURL = "serverURL";
 
     public String getServerURL() {
@@ -739,7 +746,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.equals("file:///") ) {
-            split.resourceUri = home;
+            //split.resourceUri = home;
         }
         List<URI> servers= new ArrayList();
         servers.add(home);
@@ -751,7 +758,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( !split.resourceUri.equals( home ) ) {
             servers.add( split.resourceUri );
         }
-        serverURL= DataSetURI.fromUri( split.resourceUri );
+
+        String uriServerUrl= DataSetURI.fromUri( split.resourceUri );
+        if ( uriServerUrl.length()>0 && !uriServerUrl.startsWith("file:/") ) {
+            serverURL= uriServerUrl;
+        } else {
+            serverURL= "";
+        }
+
         Map<String,String> params= URISplit.parseParams(split.params);
         dataSetId= params.remove("dataset");
         if ( dataSetId!=null && dataSetId.startsWith("/") ) {
@@ -785,8 +799,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
 
-        updateDas2ServersImmediately();
-        this.das2ServerComboBox.setSelectedItem(split.resourceUri);
+        updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
+        this.das2ServerComboBox.setSelectedItem(serverURL);
 
         jTree1.setModel( waitTreeModel() );
         RequestProcessor.invokeLater( getDataSetsRunnable() );
