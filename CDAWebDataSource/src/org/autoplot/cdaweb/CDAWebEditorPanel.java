@@ -167,7 +167,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         Window w= SwingUtilities.getWindowAncestor(this);
         DasProgressPanel mon;
-        if ( w==null ) { 
+        if ( w==null ) {
             mon= DasProgressPanel.createFramed("getting master CDF");  //TODO: this message no longer appears
         } else {
             mon= DasProgressPanel.createFramed(w,"getting master CDF");
@@ -243,11 +243,16 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
 
         final String ds= (String) dsidComboBox.getSelectedItem();
-        if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
-        if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
-        messageComponent= new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
-        parameterPanel.add( messageComponent, BorderLayout.NORTH );
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
+                if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
+
+                messageComponent= new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
+                parameterPanel.add( messageComponent, BorderLayout.NORTH );
+            }
+        } );
 
         URISplit split= URISplit.parse(suri);
         final Map<String,String> args= URISplit.parseParams(split.params);
@@ -445,14 +450,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         parameterPanel.add( messageComponent, BorderLayout.NORTH );
         parameterPanel.revalidate();
         parameterPanel.repaint();
-        if ( this.isShowing() ) {
-            Runnable run= new Runnable() {
-                public void run() {
-                    refresh(getURI());
-                }
-            };
-            new Thread(run).start();
-        }
+        Runnable run= new Runnable() {
+            public void run() {
+                refresh(getURI());
+            }
+        };
+        RequestProcessor.invokeLater(run);
     }//GEN-LAST:event_dsidComboBoxActionPerformed
 
 
