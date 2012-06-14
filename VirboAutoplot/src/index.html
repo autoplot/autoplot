@@ -22,6 +22,14 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>fix 20 second delay in FTP downloads caused by recent changes that closed resources out-of-order</li>
+            <li>rte 0808343081: null pointer exception from bookmarks (guessing at a fix)</li>
+            <li>rte 1769726397: operations " " would cause RTE, now we trim before parsing</li>
+            <li>rte 1882535572: cast exception in layout GUI, because non-components (Renderers) can be in the list</li>
+            <li>multiple plots can be selected by holding down control in the layout tab's layout GUI</li>
+            <li>add "plot" button to file cache window, since I often hit okay when I meant right-click...plot</li>
+            <li>orbitPlot is selectable in list of plots</li>
+            <li>validRange override is properly loaded from vaps</li>
             <li>autoranging with colorScatter corrected, it was ignoring the z ranging.</li>
             <li>CDAWeb uses HTTP for file access instead of problemmatic FTP access</li>
             <li>bugfix: clean up code in CDAWeb where web transaction occurred on the event thread.</li>
