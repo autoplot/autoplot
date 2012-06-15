@@ -124,6 +124,7 @@ public class FilterChainPanel extends JPanel {
         "log10() take the base-10 log of the data." ,
         "magnitude() calculate the magnitude of the vectors ",
         "negate() flip the sign on the data.",
+        "setUnits('nT') reset the units to the new units",
         "sin() sin of the data in radians. (No units check)",
         "slice0(0) slice the data on the zeroth dimension (often time) at the given index.",
         "slice1(0) slice the data on the first dimension at the given index.",
