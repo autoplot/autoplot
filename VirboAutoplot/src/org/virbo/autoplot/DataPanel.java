@@ -517,6 +517,7 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( "|log10()", "take the base-10 log of the data." ) );
         processMenu.add( createMenuItem( "|magnitude()", "calculate the magnitude of the vectors " ) );
         processMenu.add( createMenuItem( "|negate()", "flip the sign on the data." ) );
+        processMenu.add( createMenuItem( "|setUnits('nT')", "reset the units to the new units" ) );
         processMenu.add( createMenuItem( "|sin()", "sin of the data in radians. (No units check)" ) );
         processMenu.add( createMenuItem( "|slice0(0)", "slice the data on the zeroth dimension (often time) at the given index." ) );
         processMenu.add( createMenuItem( "|slice1(0)", "slice the data on the first dimension at the given index." ) );
