@@ -108,6 +108,7 @@ public class FilterChainPanel extends JPanel {
 
         ButtonGroup group= new ButtonGroup();
         String[] opts= new String[] {
+        "abs() return the absolute value of the data.",
         "accum() running sum of the rank 1 data. (opposite of diff).",
         "collapse0() average over the zeroth dimension to reduce the dimensionality.",
         "collapse1() average over the first dimension to reduce the dimensionality.",
@@ -130,6 +131,8 @@ public class FilterChainPanel extends JPanel {
         "slice1(0) slice the data on the first dimension at the given index.",
         "slices(':',2,3)) slice the data on the first and second dimensions, leaving the zeroth alone.",
         "smooth(5) boxcar average over the rank 1 data",
+        "reducex('1 hr') reduce data to 1 hr intervals",
+        "setUnits('nT') explicitly set the units",
         "toDegrees() convert the data to degrees. (No units check)",
         "toRadians() convert the data to radians. (No units check) ",
         "transpose() transpose the rank 2 dataset.",
