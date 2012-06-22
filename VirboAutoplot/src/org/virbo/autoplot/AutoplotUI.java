@@ -449,7 +449,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             public void propertyChange( PropertyChangeEvent e ) {
                 PlotController plotController= (PlotController) e.getNewValue();
                 ApplicationController controller= plotController.getApplication().getController();
-                GuiSupport.addPlotContextMenuItems( controller, plotController.getDasPlot(), plotController, plotController.getPlot() );
+                GuiSupport.addPlotContextMenuItems( AutoplotUI.this, controller, plotController.getDasPlot(), plotController, plotController.getPlot() );
                 GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getXaxis());
                 GuiSupport.addAxisContextMenuItems( controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getYaxis());
                 GuiSupport.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getZaxis());
@@ -3554,6 +3554,9 @@ APSplash.checkTime("init 240");
                 if ( !fexpert ) {
                     ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
                     dom.getOptions().setUseTimeRangeEditor(true);
+                } else {
+                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
+                    dom.getOptions().setUseTimeRangeEditor(false);
                 }
             }
         } );
