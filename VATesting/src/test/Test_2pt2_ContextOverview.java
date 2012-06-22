@@ -45,7 +45,12 @@ public class Test_2pt2_ContextOverview implements Scenario {
             Application dom= getDocumentModel();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
+            System.err.println("after wait, data loaded. "+range0);
 
+            save( "Test_2pt2_ContextOverview.000.vap" );
+
+            waitUntilIdle();
+             
             DatumRange dr;
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getXaxis().getRange(), 0.2, 0.8 );
 
