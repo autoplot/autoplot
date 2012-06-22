@@ -228,6 +228,10 @@ public class WalkImage  {
      */
     public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
         BufferedImage im= ImageIO.read( f );
+        if ( im==null ) { // Bob had pngs on his site that returned an html document decorating.
+            System.err.println("fail to read image: "+f );
+            return missingImage;
+        }
         if ( im.getType()==0 ) {
             BufferedImage imNew= new BufferedImage( im.getWidth(), im.getHeight(), BufferedImage.TYPE_INT_ARGB );
             imNew.getGraphics().drawImage( im, 0, 0, null );
