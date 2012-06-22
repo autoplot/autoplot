@@ -74,11 +74,6 @@ public class PlotController extends DomNodeController {
         super( plot );
         this.dom = dom;
         this.plot = plot;
-        this.plot.addPropertyChangeListener( Plot.PROP_ISOTROPIC, new PropertyChangeListener() {
-            public void propertyChange( PropertyChangeEvent e ) {
-                if ( PlotController.this.plot.isIsotropic() ) checkIsotropic(null);
-            }
-        });
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
         dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
@@ -290,12 +285,7 @@ public class PlotController extends DomNodeController {
         dasPlot1.addPropertyChangeListener(listener);
         dasPlot1.getXAxis().addPropertyChangeListener(listener);
         dasPlot1.getYAxis().addPropertyChangeListener(listener);
-        this.plot.addPropertyChangeListener( Plot.PROP_ISOTROPIC, new PropertyChangeListener() {
-            public void propertyChange( PropertyChangeEvent e ) {
-                if ( plot.isIsotropic() ) checkIsotropic(null);
-            }
-        });
-
+        
         if ( plot.getTicksURI().length()>0 ) { //TODO: understand this better.  We don't have to set titles, right?  Maybe it's because implementation is handled here instead of in das2.
             String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + plot.getTicksURI();
             dasPlot1.getXAxis().setDataPath(dasAddress);
@@ -363,6 +353,7 @@ public class PlotController extends DomNodeController {
                 DasAxis axis = (DasAxis) e.getSource();
                 Axis domAxis= getDomAxis(axis);
                 if ( domAxis==null ) return;
+                if ( e.getPropertyName().equals("Frame.active") ) return;
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS)
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE ) ) {
                     if ( axis.getDrawTca() && domAxis.getLabel().length()==0 ) {
@@ -378,9 +369,6 @@ public class PlotController extends DomNodeController {
                 // we can safely ignore these events.
                 if (((DasAxis) e.getSource()).valueIsAdjusting()) {
                     return;
-                }
-                if (plot.isIsotropic()) {
-                    checkIsotropic(axis);
                 }
 
             } else if ( e.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
@@ -1091,6 +1079,7 @@ public class PlotController extends DomNodeController {
         ApplicationController ac= dom.controller;
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, contextConverter ); // %{CONTEXT} indicates the DataSet CONTEXT property, not the control.
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
+        ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
     }
 
     public BindingModel[] getBindings() {
