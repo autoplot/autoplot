@@ -1200,7 +1200,7 @@ public class GuiSupport {
      * @param plotController
      * @param domPlot
      */
-    static void addPlotContextMenuItems( final ApplicationController controller, final DasPlot plot, final PlotController plotController, final Plot domPlot) {
+    static void addPlotContextMenuItems( final AutoplotUI app, final ApplicationController controller, final DasPlot plot, final PlotController plotController, final Plot domPlot) {
 
         plot.getDasMouseInputAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
 
@@ -1248,6 +1248,23 @@ public class GuiSupport {
 
         JMenu addPlotMenu = new JMenu("Add Plot");
         plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
+
+
+        item = new JMenuItem(new AbstractAction("New Location (URI)...") {
+            public void actionPerformed(ActionEvent e) {
+                Runnable run= new Runnable() {
+                    public void run() {
+                        app.dom.getController().setPlot(domPlot);
+                        app.support.addPlotElement();
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+                //run.run();
+            }
+        });
+        item.setToolTipText("change URI or add plot");
+        addPlotMenu.add(item);
+
 
         item = new JMenuItem(new AbstractAction("Copy Plot Elements Down") {
 
