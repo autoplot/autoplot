@@ -52,7 +52,10 @@ public class Test_2pt2_ContextOverview implements Scenario {
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getYaxis().getRange(), 0.1, 0.9 );
             dom.getPlots(0).getYaxis().setRange( dr );
 
+            Thread.sleep(5000); // get to work on hudson--not sure why
+
             writeToPng( "Test_2pt2_ContextOverview.001.png");
+
 
             // small cheat, because we don't make the menu popup.
             org.das2.graph.DasPlot c= dom.getPlots(0).getController().getDasPlot();
@@ -61,6 +64,8 @@ public class Test_2pt2_ContextOverview implements Scenario {
             JPopupMenuOperator op= new JPopupMenuOperator( menu );
             JMenuItem item= op.pushMenu( new ComponentChooser[] { new RegexComponentChooser("Add Plot"),
             new RegexComponentChooser("Context Overview") } );
+
+            Thread.sleep(5000); // get to work on hudson--not sure why 
 
             writeToPng( "Test_2pt2_ContextOverview.002.png");
 
