@@ -51,9 +51,17 @@ public class DataSetUrlCompletionItem implements CompletionItem {
 
     public void defaultAction(JTextComponent jTextComponent) {
         try {
+            System.err.println("defaultAction of DataSetUrlCompletionItem");
             int pos = jTextComponent.getCaretPosition();
             Document d = jTextComponent.getDocument();
 	    if ( rs.completion.startsWith(rs.completable) ) {
+                String txt= d.getText(pos,d.getLength()-pos);
+                int ii= txt.indexOf("'");
+                int jj= txt.indexOf("\n");
+                if ( ii>-1 && ii<jj ) {
+                    System.err.println("ii="+ii);
+                    d.remove( pos, ii );
+                }
 		d.insertString(pos, rs.completion.substring(rs.completable.length()), null);
 	    } else {
 		throw new IllegalArgumentException("implementation problem, completion must start with completable.");
