@@ -256,7 +256,13 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( panelListComponent.getValueIsAdjusting() ) return;
             if (panelListComponent.getSelectedValues().length == 1) {
                 if ( ! app.getController().isValueAdjusting() ) {
-                    PlotElement p = (PlotElement) panelListComponent.getSelectedValue();
+                    Object o= panelListComponent.getSelectedValue();
+                    if ( !(o instanceof PlotElement ) ) {
+                        System.err.println("expected plotElements in panelListComponent, returning");
+                        //Jemmy had this error...
+                        return;
+                    }
+                    PlotElement p = (PlotElement)o;
                     Plot plot = app.getController().getPlotFor(p);
                     app.getController().setPlot(plot);
                     app.getController().setPlotElement(p);
