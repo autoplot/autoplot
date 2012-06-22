@@ -34,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -187,6 +188,19 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return this;
     }
 
+    /**
+     * TODO: params is object?
+     * @param parms
+     * @return
+     */
+    private boolean isBoolean( List<Object> parms ) {
+        if ( parms.size()==2 && parms.contains("T") && parms.contains("F") ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private boolean doVariables( File f, Map<String,String> params ) {
 
         Map<String,JythonUtil.Param> parms;
@@ -209,26 +223,30 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 String vname= parm.name;                
                 String label= parm.label;
 
+                JComponent ctf= null;
+
+                boolean isBool= isBoolean( parm.enums );
+
                 if ( parm.doc==null ) {
                     label= vname+ ":";
                 } else {
                     String doc= parm.doc;
                     if ( doc.startsWith("'") ) doc= doc.substring(1,doc.length()-1);// pop off the quotes
                     if ( !parm.label.equals(parm.name) ) {
-                        doc= doc + " ("+parm.label+" internally)";
+                        doc= doc + " ("+parm.label+" inside the script)";
                     }
                     label= "<html>" + parm.name + ", <em>" + doc + "</em>:</html>";
                 }      
                 
-                
-                JLabel l= new JLabel( label );
-                l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                paramsPanel.add( l );
+
+                if ( !isBool ) {
+                   JLabel l= new JLabel( label );
+                   l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                   paramsPanel.add( l );
+                }
 
                 JPanel valuePanel= new JPanel(  );
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
-
-                JComponent ctf= null;
 
                 if ( parm.type=='R' ) {
 
@@ -241,6 +259,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     }
 
                     final String fval= val;
+
+                    final DataSetSelector sel= new DataSetSelector();
+                    sel.setHidePlayButton(true);
+                    sel.setSuggestFiles(true);
 
                     final JTextField tf= new JTextField(50);
                     Dimension x= tf.getPreferredSize();
@@ -281,15 +303,22 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                     }
                     if ( parm.enums!=null && parm.enums.size()>0 ) {
-                        JComboBox jcb= new JComboBox(parm.enums.toArray());
-                        jcb.setEditable(false);
-                        jcb.setSelectedItem(val);
-                        ctf= jcb;
-                        Dimension x= ctf.getPreferredSize();
-                        x.width= Integer.MAX_VALUE;
-                        ctf.setMaximumSize(x);
-                        ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                        
+                        if ( isBoolean( parm.enums ) ) {
+                            JCheckBox jcb= new JCheckBox( label );
+                            jcb.setSelected( val.equals("T") );
+                            ctf= jcb;
+
+                        } else {
+                            JComboBox jcb= new JComboBox(parm.enums.toArray());
+                            jcb.setEditable(false);
+                            jcb.setSelectedItem(val);
+                            ctf= jcb;
+                            Dimension x= ctf.getPreferredSize();
+                            x.width= Integer.MAX_VALUE;
+                            ctf.setMaximumSize(x);
+                            ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                        }
+
                     } else {
                         JTextField tf= new JTextField(50);
                         Dimension x= tf.getPreferredSize();
@@ -319,6 +348,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                                     jcb.setSelectedIndex(i);
                                 }
                             }
+                        } else if ( ftf instanceof JCheckBox ) {
+                            ((JCheckBox)ftf).setSelected( fvalue.equals("T") );
                         } else {
                             ((JTextField)ftf).setText(fvalue);
                         }
@@ -460,6 +491,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 value= ((DataSetSelector)jc).getValue();
             } else if ( jc instanceof JComboBox ) {
                 value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
+            } else if ( jc instanceof JCheckBox ) {
+                value= ((JCheckBox)jc).isSelected() ? "T" : "F";
             } else {
                 throw new IllegalArgumentException("the code needs attention: component for "+name+" not supported ");
             }
