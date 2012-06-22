@@ -160,21 +160,34 @@ public class JythonUtil {
         public String doc;
         public List<Object> enums;  // the allowed values
         /**
-         * A (String) or F (Double) or R (URI)
+         * A (String) or F (Double or Integer) or R (URI)
+         * Note a string with the values enumerated either T or F is treated as a boolean.
          */
         public char type;
     }
 
+    /**
+     * scrape through the script looking for getParam calls.  These are executed, and we
+     * get labels and infer types from the defaults.  For example,
+     * getParam( 'foo', 3.0 ) will always return a real and
+     * getParam( 'foo', 3 ) will always return an integer.
+     * @param reader
+     * @return list of parameter descriptions, in the order they were encountered in the file.
+     * @throws IOException
+     */
     public static List<Param> getGetParams( BufferedReader reader ) throws IOException {
         String s= reader.readLine();
 
         StringBuilder build= new StringBuilder();
         Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
+        build.append( "sort_=[]\n");
         while (s != null) {
-
            Matcher m= getParamPattern.matcher(s);
            if ( m.matches() || s.contains("getParam") ) {
                build.append(s).append("\n");
+               int i= s.indexOf("=");
+               String v= s.substring(0,i).trim();
+               build.append("sort_.append( \'").append(v).append( "\')\n");
            }
            s = reader.readLine();
         }
@@ -190,19 +203,15 @@ public class JythonUtil {
         PythonInterpreter interp= new PythonInterpreter();
         interp.exec(prog);
 
-        PyObject locals= interp.getLocals();
-
-        PyStringMap mlocals= (PyStringMap)locals;
-        mlocals.__delitem__("getParam");
+        PyList sort= (PyList) interp.get( "sort_" );
 
         List<Param> result= new ArrayList();
-        PyList list= mlocals.items();
-        for ( int i=0; i<list.__len__(); i++ ) {
-            PyTuple o= (PyTuple) list.get(i);
+        for ( int i=0; i<sort.__len__(); i++ ) {
+
+            PyList oo= (PyList) interp.get( (String)sort.get(i));
             Param p= new Param();
-            p.label= o.__getitem__(0).toString();   // should be name in the script
+            p.label= (String) sort.get(i);   // should be name in the script
             if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
-            PyList oo= (PyList) o.__getitem__(1);
             p.name= oo.__getitem__(0).toString(); // name in the URI
             p.deft= oo.__getitem__(1);
             p.doc= oo.__getitem__(2).toString();
