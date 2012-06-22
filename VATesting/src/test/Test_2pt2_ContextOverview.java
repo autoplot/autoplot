@@ -49,6 +49,8 @@ public class Test_2pt2_ContextOverview implements Scenario {
             DatumRange dr;
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getXaxis().getRange(), 0.2, 0.8 );
             dom.getPlots(0).getXaxis().setRange( dr );
+            Thread.sleep(5000); // get to work on hudson--not sure why
+            
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getYaxis().getRange(), 0.1, 0.9 );
             dom.getPlots(0).getYaxis().setRange( dr );
 
