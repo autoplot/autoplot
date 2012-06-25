@@ -195,10 +195,12 @@ public abstract class Bookmark {
                 URI ruri= rurl.toURI();
                 URI parentUri= FileSystemUtil.isCacheable( ruri );
                 if ( parentUri!=null ) {
+                    System.err.println("Using isCacheable route");
                     FileSystem fd= FileSystem.create(parentUri);
                     if ( fd instanceof WebFileSystem ) {
                         offline= ((WebFileSystem)fd).isOffline();
                     }
+                    System.err.println("  offline: "+offline );
                     FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
                     if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
                         fo= fd.getFileObject( fo.getNameExt()+".gz" );
@@ -210,11 +212,17 @@ public abstract class Bookmark {
                             in= fo.getInputStream();
                         }
                     }
+                    System.err.println("remoteUrl="+remoteUrl);
+
                 } else {
+                    System.err.println("Using downloadResourceAsTempFile route"+rurl);
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
+                    System.err.println("  got it...");
                 }
             } catch ( URISyntaxException ex ) {
+                System.err.println("fall back to Using downloadResourceAsTempFile route"+rurl);
                 in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
+                System.err.println("  got it...");
             }
 
             ByteArrayOutputStream boas=new ByteArrayOutputStream();
