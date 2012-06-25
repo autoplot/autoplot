@@ -483,7 +483,9 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
+                        System.err.println("get remote bookmarks: "+remoteUrl );
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
+                        System.err.println("   got remote bookmarks "+remoteUrl );
 
                         if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
                             System.err.println("unable to parse bookmarks at "+remoteUrl);
