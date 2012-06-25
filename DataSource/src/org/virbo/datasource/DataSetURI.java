@@ -736,6 +736,8 @@ System.err.println("factory:"+factory);
      */
     public static File downloadResourceAsTempFile( URL url, int timeoutSeconds, ProgressMonitor mon ) throws IOException {
 
+        final boolean verbose= true;
+        
         if ( timeoutSeconds==-1 ) timeoutSeconds= 10;
 
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
@@ -792,6 +794,8 @@ System.err.println("factory:"+factory);
         File result= new File( filename );  // final name
         File newf= new File(filename + ".temp");
 
+        if ( verbose ) System.err.println("downloadResourceAsTempFile:\n  sURL: " + url +"\n  file: "+newf);
+        
         synchronized (DataSetURI.class) {
             //TODO: check expires tag and delete after this time.
             if ( result.exists() && ( System.currentTimeMillis()-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
@@ -830,10 +834,12 @@ System.err.println("factory:"+factory);
         }
 
         if ( action==ACTION_USE_CACHE ) {
+            if ( verbose ) System.err.println("downloadResourceAsTempFile-> use cache");
             return result;
 
         } else if (action==ACTION_WAIT_EXISTS ) {
             long t0= System.currentTimeMillis();
+            if ( verbose ) System.err.println("downloadResourceAsTempFile-> waitExists");
             mon.setProgressMessage("waiting for resource");
             mon.started();
             try {
@@ -859,6 +865,7 @@ System.err.println("factory:"+factory);
         } else {
             boolean fail= true;
             try {
+                if ( verbose ) System.err.println("downloadResourceAsTempFile-> transfer");
                 InputStream in;
                 logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
@@ -867,6 +874,7 @@ System.err.println("factory:"+factory);
                 OutputStream out= new FileOutputStream( newf );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
+                if ( verbose ) System.err.println("downloadResourceAsTempFile-> transfer was successful");
             } finally {
                 if ( fail ) { // clean up if there was an exception
                     newf.delete();
@@ -886,6 +894,7 @@ System.err.println("factory:"+factory);
             if ( ! newf.renameTo( result ) ) {
                 throw new IllegalArgumentException("unable to rename "+newf + " to "+ result );
             }
+
         }
         return result;
     }
