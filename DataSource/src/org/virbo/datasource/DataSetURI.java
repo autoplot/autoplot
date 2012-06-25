@@ -795,10 +795,32 @@ System.err.println("factory:"+factory);
         File newf= new File(filename + ".temp");
 
         if ( verbose ) System.err.println("downloadResourceAsTempFile:\n  sURL: " + url +"\n  file: "+newf);
-        
+
+        long tnow= System.currentTimeMillis();
+
         synchronized (DataSetURI.class) {
+
+            // clean up after old dead processes that left file behind.  I had hudson test that would block test035 from working.
+            //TODO: this is a quick-n-dirty fix.  We should be able to check if there's another thread or process loading, or
+            //look for movement in the file...
+            long tlimit= Math.max( timeoutSeconds, 3600 );
+            if ( newf.exists() &&  ( tnow-newf.lastModified() ) / 1000 > 10*tlimit ) { // clean up old files
+                if ( !newf.delete() ) {
+                    System.err.println("old temp file could not be deleted");
+                } else {
+                    System.err.println("old temp file was deleted");
+                }
+            }
+            if ( result.exists() &&  ( tnow-result.lastModified() ) / 1000 > 10*tlimit ) { // clean up old files
+                if ( !result.delete() ) {
+                    System.err.println("old file could not be deleted");
+                } else {
+                    System.err.println("old file was deleted");
+                }
+            }
+
             //TODO: check expires tag and delete after this time.
-            if ( result.exists() && ( System.currentTimeMillis()-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
+            if ( result.exists() && ( tnow-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
                 logger.log(Level.FINE, "using young temp file {0}", result);
                 action= ACTION_USE_CACHE;
             } else if ( newf.exists() ) {
