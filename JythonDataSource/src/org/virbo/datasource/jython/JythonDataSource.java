@@ -220,7 +220,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         String s = nextExec( reader, nextLine );
                         long t0= System.currentTimeMillis();
                         while (s != null) {
-                            Logger.getLogger("virbo.jythondatasource").fine("" + reader.getLineNumber() + ": " + s);
+                            Logger.getLogger("virbo.jythondatasource").log(Level.FINE, "{0}: {1}", new Object[]{reader.getLineNumber(), s});
                             interp.exec(s);
                             System.err.printf("line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s );
                             if ( mon.isCancelled() ) break;
