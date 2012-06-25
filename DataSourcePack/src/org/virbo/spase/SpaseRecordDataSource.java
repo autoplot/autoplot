@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -273,10 +272,6 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         }
     }
     
-    public boolean asynchronousLoad() {
-        return true;
-    }
-    
     private void readXML() throws IOException, SAXException {
         DocumentBuilder builder= null;
         try {
@@ -309,6 +304,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         
     }
     
+    @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
 
         if ( document==null ) {
@@ -347,10 +343,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         
     }
     
-    public String getURI() {
-        return url.toString();
-    }
-    
+    @Override
     public Map<String, Object> getProperties() {
         try {
             return new SpaseMetadataModel().properties( getMetadata( new NullProgressMonitor() ) );
@@ -359,10 +352,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         } 
     }
 
-    public <T> T getCapability(Class<T> clazz) {
-        return null; //TODO
-    }
-
+    @Override
     public MetadataModel getMetadataModel() {
         if ( type==TYPE_SPASE ) {
             return new SpaseMetadataModel();
