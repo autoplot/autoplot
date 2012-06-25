@@ -220,14 +220,14 @@ public abstract class AbstractDataSource implements DataSource {
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
      */
-    final public <T> T getCapability(Class<T> clazz) {
+    public <T> T getCapability(Class<T> clazz) {
         return (T) capabilities.get(clazz);
     }
 
     /**
      * attach a capability
      */
-    final public <T> void addCability(Class<T> clazz, T o) {
+    public <T> void addCability(Class<T> clazz, T o) {
         capabilities.put(clazz, o);
     }
 }
