@@ -83,14 +83,16 @@ public class NetCDFDataSource extends AbstractDataSource {
                 svariable= (String) p.get( "id" );
             } else {
                 svariable= (String) p.get("arg_0"); 
-                svariable= svariable.replaceAll(" ","+");
             }
-            int ic= svariable.indexOf("[");
-            if ( ic>-1 ) {
-                constraint= svariable.substring(ic);
-                svariable= svariable.substring(0,ic);
-            } else {
-                constraint= null;
+            if ( svariable!=null ) {
+                svariable= svariable.replaceAll(" ","+");
+                int ic= svariable.indexOf("[");
+                if ( ic>-1 ) {
+                    constraint= svariable.substring(ic);
+                    svariable= svariable.substring(0,ic);
+                } else {
+                    constraint= null;
+                }
             }
         }
     }
