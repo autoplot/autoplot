@@ -6,12 +6,13 @@
 package test.endtoend;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.datasource.DataSetURI;
 
 
 /**
@@ -43,6 +44,11 @@ public class Test035 {
         book= Bookmark.parseBookmarks( new URL( home + "bookmarks/autoplot_spot6_2010.xml" ) );
         format( book, "test035_001_autoplot_spot6_2010.xml" );
         System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+
+        File f= DataSetURI.downloadResourceAsTempFile( new URL( "http://autoplot.org/data/demos.xml" ), new NullProgressMonitor() );
+        book= Bookmark.parseBookmarks( f.toURI().toURL() );
+        format( book, "test035_003_demos.xml" );
+        System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
         book= Bookmark.parseBookmarks( new URL( "http://autoplot.org/data/demos.xml" ) );
         format( book, "test035_002_demos.xml" );
