@@ -213,20 +213,21 @@ public abstract class AbstractDataSource implements DataSource {
             return Collections.singletonMap("Exception", (Object) e);
         }
     }
-    HashMap<Class, Object> capabilities = new HashMap<Class, Object>();
+
+    private HashMap<Class, Object> capabilities = new HashMap<Class, Object>();
 
     /**
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
      */
-    public <T> T getCapability(Class<T> clazz) {
+    final public <T> T getCapability(Class<T> clazz) {
         return (T) capabilities.get(clazz);
     }
 
     /**
      * attach a capability
      */
-    public <T> void addCability(Class<T> clazz, T o) {
+    final public <T> void addCability(Class<T> clazz, T o) {
         capabilities.put(clazz, o);
     }
 }
