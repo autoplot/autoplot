@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -212,7 +213,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 try {
                     boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
-                        reader = new LineNumberReader( new FileReader( jythonScript ) );
+                        FileReader fr= new FileReader( jythonScript );
+                        reader = new LineNumberReader( fr );
                         String[] nextLine= new String[1];
 
                         String s = nextExec( reader, nextLine );
@@ -226,9 +228,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                             s = nextExec( reader, nextLine );
                             t0= System.currentTimeMillis();
                         }
+                        fr.close();
 
                     } else {
-                        interp.execfile(new FileInputStream( jythonScript ));
+                        FileInputStream in = new FileInputStream( jythonScript );
+                        interp.execfile(in);
+                        in.close();
                     }
                     mon.setProgressMessage( "done executing script");
                 } catch (PyException ex) {
