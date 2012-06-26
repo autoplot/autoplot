@@ -103,6 +103,8 @@ public class NetCDFDataSource extends AbstractDataSource {
         NetCdfVarDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon );
         QDataSet qresult= checkLatLon(result);
         mon.finished();
+        ncfile.close();
+        ncfile= null;
         return qresult;
         
     }
@@ -135,7 +137,12 @@ public class NetCDFDataSource extends AbstractDataSource {
             return v;
         }
     }
-    
+
+    /**
+     * this is sloppy in that it opens the file and then relies on someone else to close it.
+     * @param mon
+     * @throws IOException
+     */
     private synchronized void readData( ProgressMonitor mon ) throws IOException {
 
         String location;
@@ -198,6 +205,16 @@ public class NetCDFDataSource extends AbstractDataSource {
             Attribute at= (Attribute) attr.get(i);
             result.put( at.getName(), at.getStringValue() );
         }
+
+        try {
+            if ( ncfile!=null ) {
+                ncfile.close();
+                ncfile= null;
+            }
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+        }
+
         mon.finished();
         return result;
         
@@ -205,23 +222,37 @@ public class NetCDFDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if (variable==null ) {
+        if ( true ) {
+            return MetadataModel.createNullModel();
+        } else {
+            if (variable==null ) {
+                try {
+                    readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
+                } catch (IOException ex) {
+                    System.err.println("exception when trying to readData to test for ISTP props, returning null model");
+                    return MetadataModel.createNullModel();
+                }
+            }
+            MetadataModel result= MetadataModel.createNullModel();
+
+            List attr= variable.getAttributes();
+            if ( attr==null ) return null; // transient state
+            for( int i=0; i<attr.size(); i++ ) {
+                Attribute at= (Attribute) attr.get(i);
+                if ( at.getName().equals("VAR_TYPE") ) {
+                    result= new IstpMetadataModel();
+                }
+            }
             try {
-                readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
-            } catch (IOException ex) {
-                System.err.println("exception when trying to readData to test for ISTP props, returning null model");
-                return MetadataModel.createNullModel();
+                if ( ncfile!=null ) {
+                    ncfile.close();
+                    ncfile= null;
+                }
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
             }
+            return result;
         }
-        List attr= variable.getAttributes();
-        if ( attr==null ) return null; // transient state
-        for( int i=0; i<attr.size(); i++ ) {
-            Attribute at= (Attribute) attr.get(i);
-            if ( at.getName().equals("VAR_TYPE") ) {
-                return new IstpMetadataModel();
-            }
-        }
-        return MetadataModel.createNullModel();
     }
 
 

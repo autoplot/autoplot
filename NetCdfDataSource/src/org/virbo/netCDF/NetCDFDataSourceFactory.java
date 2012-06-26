@@ -65,6 +65,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
                         v.getName(), this, "arg_0",
                         v.getNameAndDimensions(), v.getDescription(), true ) );
             }
+            dataset.close();
         }
         
         return result;
@@ -132,6 +133,8 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
                 }
                 if ( v.getName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
             }
+
+            dataset.close();
             
             if ( depCount==1 ) {
                 return false;
