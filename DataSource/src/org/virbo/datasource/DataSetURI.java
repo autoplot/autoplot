@@ -802,20 +802,28 @@ System.err.println("factory:"+factory);
 
             // clean up after old dead processes that left file behind.  I had hudson test that would block test035 from working.
             //TODO: this is a quick-n-dirty fix.  We should be able to check if there's another thread or process loading, or
-            //look for movement in the file...
-            long tlimit= Math.max( timeoutSeconds, 3600 );
-            if ( newf.exists() &&  ( tnow-newf.lastModified() ) / 1000 > 10*tlimit ) { // clean up old files
-                if ( !newf.delete() ) {
-                    System.err.println("old temp file could not be deleted");
-                } else {
-                    System.err.println("old temp file was deleted");
+            //look for movement in the file...  Note no process can keep a file open for more than 3600sec.
+            long tlimit= Math.min( timeoutSeconds, 3600 ) ;
+            if ( newf.exists() ) {
+                System.err.println( "tlimit= " + tlimit );
+                System.err.println( "(tnow-newf.lastModified())/1000 " + ( tnow-newf.lastModified() ) );
+                if  ( ( tnow-newf.lastModified() ) / 1000 > tlimit ) { // clean up old files
+                    if ( !newf.delete() ) {
+                        System.err.println("old temp file could not be deleted");
+                    } else {
+                        System.err.println("old temp file was deleted");
+                    }
                 }
             }
-            if ( result.exists() &&  ( tnow-result.lastModified() ) / 1000 > 10*tlimit ) { // clean up old files
-                if ( !result.delete() ) {
-                    System.err.println("old file could not be deleted");
-                } else {
-                    System.err.println("old file was deleted");
+            if ( result.exists() ) { // clean up old files
+                System.err.println( "tlimit= " + tlimit );
+                System.err.println( "(tnow-result.lastModified())/1000 = " + ( tnow-result.lastModified() ) );
+                if ( ( tnow-result.lastModified() ) / 1000 > tlimit )  {
+                    if ( !result.delete() ) {
+                        System.err.println("old file could not be deleted");
+                    } else {
+                        System.err.println("old file was deleted");
+                    }
                 }
             }
 
