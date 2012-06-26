@@ -43,6 +43,7 @@ public class ScriptPanelSupport {
     EditorTextPane editor;
     final EditorAnnotationsSupport annotationsSupport;
     JLabel fileNameLabel;
+    boolean readOnly= false;
 
     public ScriptPanelSupport( final EditorTextPane editor ) {
         this.editor= editor;
@@ -220,6 +221,12 @@ public class ScriptPanelSupport {
         }
     }
 
+    public void setReadOnly() {
+        this.editor.setEditable(false);
+        this.readOnly= true;
+        updateFileNameLabel();
+    }
+
     public void addCaretLabel(final JLabel caretPositionLabel) {
 
        editor.addCaretListener(new CaretListener() {
@@ -254,7 +261,7 @@ public class ScriptPanelSupport {
 
     private void updateFileNameLabel() {
         if ( this.fileNameLabel!=null ) {
-            fileNameLabel.setText( String.valueOf( this.getFile() ) + " " + ( this.isDirty() ? "*" : "" ) );
+            fileNameLabel.setText( String.valueOf( this.getFile() ) + " " + ( this.isDirty() ? "*" : "" ) + ( this.readOnly ? "R/O" : "" ) );
         }
     }
 }
