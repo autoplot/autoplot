@@ -790,9 +790,9 @@ System.err.println("factory:"+factory);
 
         Object action="";
         File result= new File( filename );  // final name
-        File newf= new File(filename + ".temp");
+        File tempfile= new File(filename + ".temp");
 
-        logger.log( Level.FINEST, "downloadResourceAsTempFile:\n  sURL: {0}\n  file: {1}", new Object[]{url, newf});
+        logger.log( Level.FINEST, "downloadResourceAsTempFile:\n  sURL: {0}\n  file: {1}", new Object[]{url, tempfile});
 
         long tnow= System.currentTimeMillis();
 
@@ -802,11 +802,11 @@ System.err.println("factory:"+factory);
             //TODO: this is a quick-n-dirty fix.  We should be able to check if there's another thread or process loading, or
             //look for movement in the file...  Note no process can keep a file open for more than 3600sec.
             long tlimit= Math.min( timeoutSeconds, 3600 ) ;
-            if ( newf.exists() ) {
+            if ( tempfile.exists() ) {
                 logger.log(Level.FINEST, "tlimit= {0}", tlimit);
-                logger.log(Level.FINEST, "(tnow-newf.lastModified())/1000 {0}", (tnow - newf.lastModified()));
-                if  ( ( tnow-newf.lastModified() ) / 1000 > tlimit ) { // clean up old files
-                    if ( !newf.delete() ) {
+                logger.log(Level.FINEST, "(tnow-newf.lastModified())/1000 {0}", (tnow - tempfile.lastModified()));
+                if  ( ( tnow-tempfile.lastModified() ) / 1000 > tlimit ) { // clean up old files
+                    if ( !tempfile.delete() ) {
                         logger.log(Level.FINEST, "old temp file could not be deleted");
                     } else {
                         logger.log(Level.FINEST, "old temp file was deleted");
@@ -826,11 +826,11 @@ System.err.println("factory:"+factory);
             }
 
             //TODO: check expires tag and delete after this time.
-            if ( result.exists() && ( tnow-result.lastModified() ) / 1000 < timeoutSeconds && !newf.exists() ) {
+            if ( result.exists() && ( tnow-result.lastModified() ) / 1000 < timeoutSeconds && !tempfile.exists() ) {
                 logger.log(Level.FINE, "using young temp file {0}", result);
                 action= ACTION_USE_CACHE;
-            } else if ( newf.exists() ) {
-                logger.log(Level.FINE, "waiting for other thread to load temp resource {0}", newf);
+            } else if ( tempfile.exists() ) {
+                logger.log(Level.FINE, "waiting for other thread to load temp resource {0}", tempfile);
                 action= ACTION_WAIT_EXISTS;
             } else {
                 File newName= result;
@@ -848,15 +848,15 @@ System.err.println("factory:"+factory);
                     if ( !result.renameTo(newName) ) {  // move old files out of the way.  This is surely going to cause problems on Windows...
                         logger.log(Level.INFO, "unable to move old file out of the way.  Using alternate name {0}", newName);
                         result= newName;
-                        newf= new File( filename + ".temp" );
+                        tempfile= new File( filename + ".temp" );
                     }
                 }
-                logger.log(Level.FINE, "this thread will downloading temp resource {0}", newf);
+                logger.log(Level.FINE, "this thread will downloading temp resource {0}", tempfile);
                 action= ACTION_DOWNLOAD;
                 OutputStream out= new FileOutputStream(result);  // touch the file
                 out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
                 out.close();
-                OutputStream outf= new FileOutputStream(newf);
+                OutputStream outf= new FileOutputStream(tempfile);
                 outf.close();
             }
         }
@@ -871,11 +871,11 @@ System.err.println("factory:"+factory);
             mon.setProgressMessage("waiting for resource");
             mon.started();
             try {
-                while ( newf.exists() ) {
+                while ( tempfile.exists() ) {
                     try {
                         Thread.sleep(300);
                         if ( System.currentTimeMillis()-t0 > 60000 ) {
-                            logger.log(Level.FINE, "waiting for other process to finish loading %s...{0}", newf);
+                            logger.log(Level.FINE, "waiting for other process to finish loading %s...{0}", tempfile);
                         }
                         if ( mon.isCancelled() ) {
                             throw new InterruptedIOException("cancel pressed");
@@ -899,13 +899,13 @@ System.err.println("factory:"+factory);
                 URLConnection urlc= url.openConnection();
                 urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
                 in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
-                OutputStream out= new FileOutputStream( newf );
+                OutputStream out= new FileOutputStream( tempfile );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
                 logger.log(Level.FINE,"downloadResourceAsTempFile-> transfer was successful");
             } finally {
                 if ( fail ) { // clean up if there was an exception
-                    newf.delete();
+                    tempfile.delete();
                     result.delete();
                 }
             }
@@ -913,14 +913,14 @@ System.err.println("factory:"+factory);
 
         result.deleteOnExit();
 
-        checkNonHtml( newf, url ); // until 9/22/2011 we didn't check this...  
+        checkNonHtml( tempfile, url ); // until 9/22/2011 we didn't check this...
 
         synchronized ( DataSetURI.class ) {
             if ( ! result.delete() ) { // on Windows, rename cannot clobber
-                throw new IllegalArgumentException("unable to delete "+result + " to make way for "+ newf );
+                throw new IllegalArgumentException("unable to delete "+result + " to make way for "+ tempfile );
             }
-            if ( ! newf.renameTo( result ) ) {
-                throw new IllegalArgumentException("unable to rename "+newf + " to "+ result );
+            if ( ! tempfile.renameTo( result ) ) {
+                throw new IllegalArgumentException("unable to rename "+tempfile + " to "+ result );
             }
 
         }
