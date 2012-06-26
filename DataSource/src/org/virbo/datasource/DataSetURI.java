@@ -715,7 +715,7 @@ System.err.println("factory:"+factory);
     /**
      * This was introduced when we needed access to a URL with arguments.  This allows us
      * to download the file in a script and then read the file.  It will put the
-     * file in the directory, and the parameters are encoded in the name.
+     * file in the .../fscache/temp/ directory, and the parameters are encoded in the name.
      * Note this cannot be used to download HTML content, because checkNonHtml is
      * called.  We may introduce "downloadHtmlResourceAsTempFile" or similar if
      * it's needed.
@@ -736,8 +736,6 @@ System.err.println("factory:"+factory);
      */
     public static File downloadResourceAsTempFile( URL url, int timeoutSeconds, ProgressMonitor mon ) throws IOException {
 
-        final boolean verbose= true;
-        
         if ( timeoutSeconds==-1 ) timeoutSeconds= 10;
 
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
@@ -794,7 +792,7 @@ System.err.println("factory:"+factory);
         File result= new File( filename );  // final name
         File newf= new File(filename + ".temp");
 
-        if ( verbose ) System.err.println("downloadResourceAsTempFile:\n  sURL: " + url +"\n  file: "+newf);
+        logger.log( Level.FINEST, "downloadResourceAsTempFile:\n  sURL: {0}\n  file: {1}", new Object[]{url, newf});
 
         long tnow= System.currentTimeMillis();
 
@@ -805,24 +803,24 @@ System.err.println("factory:"+factory);
             //look for movement in the file...  Note no process can keep a file open for more than 3600sec.
             long tlimit= Math.min( timeoutSeconds, 3600 ) ;
             if ( newf.exists() ) {
-                System.err.println( "tlimit= " + tlimit );
-                System.err.println( "(tnow-newf.lastModified())/1000 " + ( tnow-newf.lastModified() ) );
+                logger.log(Level.FINEST, "tlimit= {0}", tlimit);
+                logger.log(Level.FINEST, "(tnow-newf.lastModified())/1000 {0}", (tnow - newf.lastModified()));
                 if  ( ( tnow-newf.lastModified() ) / 1000 > tlimit ) { // clean up old files
                     if ( !newf.delete() ) {
-                        System.err.println("old temp file could not be deleted");
+                        logger.log(Level.FINEST, "old temp file could not be deleted");
                     } else {
-                        System.err.println("old temp file was deleted");
+                        logger.log(Level.FINEST, "old temp file was deleted");
                     }
                 }
             }
             if ( result.exists() ) { // clean up old files
-                System.err.println( "tlimit= " + tlimit );
-                System.err.println( "(tnow-result.lastModified())/1000 = " + ( tnow-result.lastModified() ) );
+                logger.log(Level.FINEST, "tlimit= {0}", tlimit);
+                logger.log(Level.FINEST, "(tnow-result.lastModified())/1000 = {0}", (tnow - result.lastModified()));
                 if ( ( tnow-result.lastModified() ) / 1000 > tlimit )  {
                     if ( !result.delete() ) {
-                        System.err.println("old file could not be deleted");
+                        logger.log(Level.FINEST, "old file could not be deleted");
                     } else {
-                        System.err.println("old file was deleted");
+                        logger.log(Level.FINEST, "old file was deleted");
                     }
                 }
             }
@@ -848,7 +846,7 @@ System.err.println("factory:"+factory);
                 }
                 if ( !newName.equals(result) ) { // DANGER: I think there may be a bug here where another thread has handed off a file reference, but it has not been opened.
                     if ( !result.renameTo(newName) ) {  // move old files out of the way.  This is surely going to cause problems on Windows...
-                        System.err.println("unable to move old file out of the way.  Using alternate name "+ newName );
+                        logger.log(Level.INFO, "unable to move old file out of the way.  Using alternate name {0}", newName);
                         result= newName;
                         newf= new File( filename + ".temp" );
                     }
@@ -864,12 +862,12 @@ System.err.println("factory:"+factory);
         }
 
         if ( action==ACTION_USE_CACHE ) {
-            if ( verbose ) System.err.println("downloadResourceAsTempFile-> use cache");
+            logger.log(Level.FINEST,"downloadResourceAsTempFile-> use cache");
             return result;
 
         } else if (action==ACTION_WAIT_EXISTS ) {
             long t0= System.currentTimeMillis();
-            if ( verbose ) System.err.println("downloadResourceAsTempFile-> waitExists");
+            logger.log(Level.FINEST, "downloadResourceAsTempFile-> waitExists");
             mon.setProgressMessage("waiting for resource");
             mon.started();
             try {
@@ -895,7 +893,7 @@ System.err.println("factory:"+factory);
         } else {
             boolean fail= true;
             try {
-                if ( verbose ) System.err.println("downloadResourceAsTempFile-> transfer");
+                logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 InputStream in;
                 logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
@@ -904,7 +902,7 @@ System.err.println("factory:"+factory);
                 OutputStream out= new FileOutputStream( newf );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
-                if ( verbose ) System.err.println("downloadResourceAsTempFile-> transfer was successful");
+                logger.log(Level.FINE,"downloadResourceAsTempFile-> transfer was successful");
             } finally {
                 if ( fail ) { // clean up if there was an exception
                     newf.delete();
