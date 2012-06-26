@@ -42,11 +42,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
@@ -411,6 +413,11 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             File f = DataSetURI.getFile( furir[0], new NullProgressMonitor() );
 
             support.loadFile(f);
+
+            if ( FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), support.getFile() ) || !support.getFile().canWrite() ) {
+                support.setReadOnly();
+            }
+
             Map<String,String> results= JythonDataSourceFactory.getResultParameters( f.toString(), new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
             int i=0;
