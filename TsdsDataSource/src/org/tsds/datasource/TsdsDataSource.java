@@ -282,6 +282,11 @@ class TsdsDataSource extends AbstractDataSource {
         HttpURLConnection connect = (HttpURLConnection) url2.openConnection();
         connect.connect();
         String type = connect.getContentType();
+
+        if ( !(params.get("out").equals("ncml")) && type==null ) { // saw this in Hudson test 20120626 http://sarahandjeremy.net:8080/hudson/job/autoplot-test018/3564/console
+            throw new IllegalArgumentException("unable to get content type from "+url2 );
+        }
+
         logit("made url2 connection", t0);
 
         QDataSet result;
