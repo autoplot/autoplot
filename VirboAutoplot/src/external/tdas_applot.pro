@@ -1,3 +1,7 @@
+;+
+; plot data from tdas to autoplot.  This assumes that tdas is started and it's internal
+; state is initialized.
+;-
 pro tdas_applot, name
   common tplot_com1, data_quants, tplot_vars , tplot_configs, current_config , foo1,foo2
 
