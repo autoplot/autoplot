@@ -422,6 +422,12 @@ public class BookmarksManagerModel {
         }
     }
 
+    /**
+     * return the bookmark selected in the tree.
+     * @param model
+     * @param path the selected path, or null indicating no selection.
+     * @return
+     */
     protected Bookmark getSelectedBookmark(TreeModel model, TreePath path) {
         if (path == null || path.getPathCount() == 1) return null;
         Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
@@ -431,6 +437,12 @@ public class BookmarksManagerModel {
         return (Bookmark) sel;
     }
 
+    /**
+     * return the bookmarks selected in the tree.
+     * @param model
+     * @param paths the selected paths. This may be null, indicating no selection.
+     * @return
+     */
     protected List<Bookmark> getSelectedBookmarks(TreeModel model, TreePath[] paths) {
         List<Bookmark> result= new ArrayList<Bookmark>();
         if ( paths==null ) return result;
