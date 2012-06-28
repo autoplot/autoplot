@@ -60,6 +60,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                 FSTreeModel model = (FSTreeModel) jtree.getModel();
 
                 TreePath[] paths = jtree.getSelectionPaths();
+                if ( paths==null ) return;
 
                 boolean okay = true;
                 IllegalArgumentException ex = null;
@@ -114,7 +115,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
         FSTreeModel model = (FSTreeModel) jTree1.getModel();
         TreePath[] paths = jTree1.getSelectionPaths();
-        if (paths.length == 0) {
+        if ( paths==null || paths.length == 0) {
             return true;
         }
         File f = model.getFile(paths[0]);
