@@ -57,9 +57,9 @@ import org.xml.sax.SAXException;
 public class CDAWebDB {
 
     private static CDAWebDB instance=null;
-    private static String dbloc= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb/all.xml";
+    private static String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
 
-    private String version;
+    //private String version;
     private Document document; // should consume ~ 2 MB
     private Map<String,String> ids;  // serviceproviderId,Id
     private long refreshTime=0;
@@ -98,6 +98,7 @@ public class CDAWebDB {
             mon.setProgressMessage("downloading file "+dbloc );
 
             String lookfor=  "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
+            String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
             File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ;
             FileInputStream fin=null;
             InputStream altin= null;
@@ -110,8 +111,8 @@ public class CDAWebDB {
                 mon.setProgressMessage("parsing file "+dbloc );
                 document = builder.parse(source);
 
-                XPath xp = XPathFactory.newInstance().newXPath();
-                version= xp.evaluate( "/sites/datasite/@version", document );
+                //XPath xp = XPathFactory.newInstance().newXPath();
+                //version= xp.evaluate( "/sites/datasite/@version", document );
 
                 mon.setTaskProgress(2);
                 mon.setProgressMessage("reading IDs");
@@ -130,6 +131,9 @@ public class CDAWebDB {
                         if ( sss[1].startsWith(lookfor) ) {
                             sss[1]= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + sss[1].substring(lookfor.length());
                         }
+                        if ( sss[1].startsWith(lookfor2) ) {
+                            sss[1]= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + sss[1].substring(lookfor2.length());
+                        }
                         bases.put( sss[0], sss[1] );
                         tmpls.put( sss[0], sss[2] );
                     }
@@ -145,8 +149,8 @@ public class CDAWebDB {
                 if ( altin!=null ) altin.close();
                 mon.finished();
             }
-        } catch (XPathExpressionException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        //} catch (XPathExpressionException ex) {
+        //    Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
@@ -262,6 +266,10 @@ public class CDAWebDB {
             if ( url.startsWith(lookfor) ) {
                 url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor.length());
             }
+            String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
+            if ( url.startsWith(lookfor2) ) {
+                url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor2.length());
+            }
             return url;
 
         } catch (XPathExpressionException ex) {
@@ -344,7 +352,7 @@ public class CDAWebDB {
     }
 
     public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
-        String master= "ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
+        String master= "http://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
         //DasProgressPanel p= DasProgressPanel.createFramed("loading master cdf");
         p.setProgressMessage("loading master cdf");
@@ -402,7 +410,7 @@ public class CDAWebDB {
     private String getURL( Node dataset ) {
         NodeList kids= dataset.getChildNodes();
         String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
-        int n= lookfor.length();
+        String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
 
         for ( int j=0; j<kids.getLength(); j++ ) {
             Node childNode= kids.item(j);
@@ -414,7 +422,10 @@ public class CDAWebDB {
                         if ( url.startsWith( lookfor ) ) {
                             // "ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/mfi_h2"
                             //  http://cdaweb.gsfc.nasa.gov/istp_public/data/
-                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(n);
+                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor.length());
+                        }
+                        if ( url.startsWith(lookfor2) ) {
+                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor2.length());
                         }
                         return url;
                     }
