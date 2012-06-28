@@ -129,10 +129,10 @@ public class CDAWebDB {
                     if ( ss.trim().length()>0 ) {
                         String[] sss= ss.split("\\s+");
                         if ( sss[1].startsWith(lookfor) ) {
-                            sss[1]= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + sss[1].substring(lookfor.length());
+                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length());
                         }
                         if ( sss[1].startsWith(lookfor2) ) {
-                            sss[1]= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + sss[1].substring(lookfor2.length());
+                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor2.length());
                         }
                         bases.put( sss[0], sss[1] );
                         tmpls.put( sss[0], sss[2] );
@@ -264,11 +264,11 @@ public class CDAWebDB {
             }
             String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
             if ( url.startsWith(lookfor) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor.length());
+                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor.length());
             }
             String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
             if ( url.startsWith(lookfor2) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor2.length());
+                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor2.length());
             }
             return url;
 
@@ -422,10 +422,10 @@ public class CDAWebDB {
                         if ( url.startsWith( lookfor ) ) {
                             // "ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/mfi_h2"
                             //  http://cdaweb.gsfc.nasa.gov/istp_public/data/
-                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor.length());
+                            url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor.length());
                         }
                         if ( url.startsWith(lookfor2) ) {
-                            url= "http://cdaweb.gsfc.nasa.gov/istp_public/data/" + url.substring(lookfor2.length());
+                            url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor2.length());
                         }
                         return url;
                     }
@@ -490,7 +490,9 @@ public class CDAWebDB {
                             //&& nssdc_ID.contains("None") ) {
                              ) {
                         String url= getURL(node);
-                        if ( url!=null && ( url.startsWith( "http://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
+                        if ( url!=null && 
+                                ( url.startsWith( "http://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
+                                url.startsWith( "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" ) ||
                                 url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
                             String desc= getDescription(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
