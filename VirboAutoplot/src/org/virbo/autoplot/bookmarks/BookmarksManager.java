@@ -226,12 +226,12 @@ public class BookmarksManager extends javax.swing.JDialog {
      * The root node of a bookmarks file is left in there, so that it may be used to delete the folder.
      * @param bs
      * @param tmodel
-     * @param selectionPaths
+     * @param selectionPaths selection, or null if there was no selection.
      * @return the remaining remote bookmarks.
      */
     private List<Bookmark> removeRemoteBookmarks(List<Bookmark> bs, TreeModel tmodel, TreePath[] selectionPaths) {
-        assert selectionPaths.length==bs.size();
         List<Bookmark> result= new ArrayList();
+        if ( selectionPaths==null ) return result;
         for ( int i=0; i<bs.size(); i++ ) {
             Bookmark bs1= bs.get(i);
             Bookmark parent= bs1.getParent();
