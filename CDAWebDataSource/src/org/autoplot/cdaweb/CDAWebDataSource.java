@@ -106,8 +106,10 @@ public class CDAWebDataSource extends AbstractDataSource {
 
         try {
 
+            mon.started();
+
             try {
-                db.maybeRefresh( mon );
+                db.maybeRefresh( SubTaskMonitor.create(mon,0,10) );
             } catch ( IOException ex ) {
                 ex.printStackTrace();
                 mon.setProgressMessage("unable to connect via ftp");
@@ -133,12 +135,10 @@ public class CDAWebDataSource extends AbstractDataSource {
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
             mon.setTaskSize(files.length*10+10);
-            mon.started();
 
             //we need to look in the file to see if it is virtual
             mon.setProgressMessage("get metadata");
-            getMetadata(mon);
-            mon.started(); //kludge
+            getMetadata( SubTaskMonitor.create( mon,0,10) );
 
             String virtual= (String) metadata.get( "VIRTUAL" );
 
@@ -190,7 +190,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         }
                         try {
                             Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
-                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, mon );
+                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
                         } catch (IllegalArgumentException ex ){
                             throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
                         }
