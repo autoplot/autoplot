@@ -135,7 +135,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
     }
 
     public void close() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // resources should already be closed.
     }
 
     public boolean syncExtend() throws IOException {
