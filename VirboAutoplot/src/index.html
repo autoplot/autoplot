@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Jemmy Automated GUI Testing found a bug that was introduced just the day before.  It will run through http://autoplot.org/developer.tests</small></p>
+        <p><small>Autoplot is used here to analyze images.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,6 +21,18 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>Use CDF library 3.4.1 to avoid initial delay when reading CDF files</li>
+            <li>CDAWeb gets everything over HTTP, and from new location "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"</li>
+            <li>NetCDF/HDF5 reader left all sorts of resources open, eventually causing a runtime error (when labeling axes)</li>
+            <li>.jyds didn't explicitly close script after loading, eventually causing a runtime error. (when labeling axes)<li>
+            <li>3538094: leftover files can cause temp file download to fail. (No temp file may be used for more than an hour.)</li>
+            <li>CDAWeb refresh would add components off the event thread, which could cause application to lock up.</li>
+            <li>in reducex function, weights not properly when accumulating min and max.</li>
+            <li>rte 1031526646: need to check for null in result from jTree.getSelectionPaths().</li>
+            <li>remote jyds would be editable in the editor panel, even though it was pointed to a local copy in the cache.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>cdaweb checks for variables that are improperly listed as "data" and not "support_data" by checking depend_0.</li>
             <li>fix 20 second delay in FTP downloads caused by recent changes that closed resources out-of-order</li>
@@ -49,47 +61,21 @@
             <li>Chris pointed out problem where ytagWidth is used from the first table of a rank 3 join dataset.  Now we use the maximum of all tables.</li>
             <li>$o and $(o properly detected in pngwalk tool</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>match Nand's CDF library logic where getEffectiveRank skips over 1-element dimensions.  vap+cdaweb:ds=C1_CP_FGM_SPIN&id=B_vec_xyz_gse__C1_CP_FGM_SPIN&timerange=2011-03-02</li>
-            <li>non-varying dimensions were assumed to be the trailing dimension.  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image</li>
-            <li>PNGWalk Covers and Grid didn't update when the Quality status changed.</li>
-            <li>remove extraneous call to load data in SimpleServlet</li>
-            <li>progress monitor finished method wasn't called when script was interrupted.</li>
-            <li>rte_0293612998: remove dead code that would occasionally trigger "java.lang.IllegalArgumentException: unable to find plot element for das renderer" message.</li>
-            <li>CDFLeapSeconds.txt, file was never embedded in the jar files.</li>
-            <li>Jython resourceURI can point at HTML file.  Before the new warning would pop up.</li>
-            <li>allow fractional days in getTimeDatum(Y,m,d,H,M,S,N) function</li>
-            <li>URI drop target moved to allow Applet to compile again.</li>
-            <li>cleanup with das2 server and TCA labeling</li>
-            <li>findex function allows repeat values in monotonic dataset.</li>
-            <li>FileStorageModel wouldn't return representative file from $Y/$Y$m$d.dat if the last $Y was empty.</li>
-            <li>TCA axis annotations are loaded asynchronously.  Before they were loaded on the event thread.</li>
-            <li>Das2Server TCA labels corrected, they were not reported properly.</li>
-            <li>code in TCAs assumed rank 0, causing failure of some TCAs to load.</li>
-            <li>All children of off-line HTTP folder are automatically off-line.  Before, each would have to time out.</li>
-            <li>recent timeranges and operations corrected.  After 20 entries, history would cause textfield to clear.</li>
-            <li>delay construction of JColorChooser in color selector, on a Mac this could take 500ms!</li>
-            <li>we need to trim preceeding _ and 0's in orbit names, to support orbit-based PNGWalks.</li>
-        </ul>
-
         <p>Features:</p>
         <ul>
-            <li>Das2Server plugin defaults to last das2server used</li>
-            <li>Reduction.reduce2D puts on error bars to show the range of the data.</li>
+            <li>Add special IDL adapters to make it easy to get data into and out of TDAS.</li>
+            <li>Add Plot->New Location... added for Jan</li>
+            <li>boolean variables in jython scripts when enumeration is either T or F</li>
+            <li>isotropic mode moved to dasCore to support APL</li>
+            <li>add setUnits('nT') to filters</li>
+            <li>add abs function, since magnitude is for vectors</li>
+            <li>QStreams have int2 transfer type</li>
+            <li>QStreams avoid inline-encoding of data for DEPEND_1 when it has many (>100) elements</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>improvements to the LSpec routine, so inward and outward sweeps can be examined, use timetags to detect breaks</li>
-            <li>add orbitPlot render type, which takes a bundle of time,x,y</li>
-            <li>add example getParam(resourceURI) to the popup in Jython editor, add raise exception.</li>
-            <li>add len and timetags to AudioSystemDataSource.  This makes for a useful source of demo data.</li>
-            <li>jython script server re-enabled in the autoplot servlet, along with new security restrictions</li>
-            <li>3528211: URIs maybe dropped above or below plot to insert.  Enter editor when URI is rejected.</li>
-            <li>script servlet reincarnated, now has allowhosts file and logs use.</li>
-            <li>check parameters in time range specs, for example $(H,M) is now an exception.</li>
-            <li>timerange selector uses droplist to allow selection of recently-entered timeranges</li>
-            <li>likewise, operations selector keeps track of recent operations</li>
+            <li>Das2Server plugin defaults to last das2server used</li>
+            <li>Reduction.reduce2D puts on error bars to show the range of the data.</li>
         </ul>
 
         <p>Known issues:</p>
