@@ -229,15 +229,17 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
                 boolean isBool= isBoolean( parm.enums );
 
+                String colon= isBool ? "" : ":";
+
                 if ( parm.doc==null ) {
-                    label= vname+ ":";
+                    label= vname+ colon;
                 } else {
                     String doc= parm.doc;
                     if ( doc.startsWith("'") ) doc= doc.substring(1,doc.length()-1);// pop off the quotes
                     if ( !parm.label.equals(parm.name) ) {
                         doc= doc + " ("+parm.label+" inside the script)";
                     }
-                    label= "<html>" + parm.name + ", <em>" + doc + "</em>:</html>";
+                    label= "<html>" + parm.name + ", <em>" + doc + "</em>"+colon+"</html>";
                 }      
                 
 
