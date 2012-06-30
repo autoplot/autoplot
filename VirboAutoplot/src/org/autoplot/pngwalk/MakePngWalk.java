@@ -20,15 +20,13 @@ import org.virbo.autoplot.ScriptContext;
 import org.virbo.datasource.DataSetURI;
 
 /**
- * class to make pngwalks in headless environment
+ * Old class to make pngwalks in headless environment.  This uses the old Jython script to make the
+ * pngwalk, and should not be used.  Instead, use CreatePngWalk in this same package.
  * @author jbf
  */
 public class MakePngWalk {
-
-
     /**
-     * TODO: update this to use Java version of png walk.
-     * 
+     * See CreatePngWalk.
      * run the png walk by reading in the python script indicated by value.
      * @param value a python script URI defining "vap" and "params".
      */
