@@ -21,6 +21,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
@@ -28,23 +30,65 @@ import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.StatePersistence;
 
 /**
- *
+ * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
+ * rewrite it in Java.
  * @author jbf
  */
 public class CreatePngWalk {
 
     public static class Params {
 
+        /**
+         *  output folder for the walk, e.g. /home/user/pngwalk/
+         */
         public String outputFolder;
+
+        /**
+         *  timerange to cover for the walk, e.g. 2012 through 2014.
+         */
         public String timeRangeStr;
+
+        /**
+         *  rescale to show context for each step, e.g. "0%,100%" or "0%-1hr,100%+1hr"
+         */
+        public String rescalex= "0%,100%";
+
+        /**
+         * autorange dependent dimensions
+         */
+        public boolean autorange= false;
+
+        /**
+         *  version tag to apply to each image, if non-null
+         */
+        public String version= null;
+
+        /**
+         * product name for the walk, e.g. product
+         */
         public String product;
+
+        /**
+         * timeformat for the walk, e.g. $Y$m$d
+         */
         public String timeFormat;
+
+        /*
+         * if true, the also create thumbs.
+         */
         public boolean createThumbs;
+
+        /**
+         * if true, skip over products that appear to be created already.
+         */
+        public boolean update= false;
     }
 
     private static final Logger logger= Logger.getLogger("vap.createPngWalk");
@@ -72,7 +116,7 @@ public class CreatePngWalk {
         return image;
     }
 
-    public static void doBatch(String[] times, Application dom, Params params, ProgressMonitor mon) throws IOException, InterruptedException {
+    public static void doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
 
         if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
             params.outputFolder= params.outputFolder + "/";
@@ -113,11 +157,7 @@ public class CreatePngWalk {
 
         mon.setProgressMessage("synchronize to this application");
 
-        dom2.syncTo(dom, java.util.Arrays.asList("id"));
-        //for (PlotElement p : dom2.getPlotElements()) {     // kludge for bug 2985891 since bug after cleanup.
-        //    p.getController().doResetRenderType(p.getRenderType());
-        //}
-        //dom2.syncTo(dom, java.util.Arrays.asList("id"));
+        dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") );
 
         mon.setProgressMessage("write " + params.product + ".vap");
 
@@ -133,12 +173,22 @@ public class CreatePngWalk {
             thumbW = (int) (thumbH * aspect);
         }
 
-
+        // Write out the vap file to product.vap
         StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
 
+        // Write out the parameters used to create this pngwalk in product.pngwalk
         PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
         ff.println( "product=" + params.product );
         ff.println( "timeFormat=" + params.timeFormat );
+        if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
+            ff.println( "rescalex="+ params.rescalex );
+        }
+        if ( params.autorange ) {
+            ff.println( "autorange="+ params.autorange );
+        }
+        if ( params.version!=null ) {
+            ff.println( "version="+ params.autorange );
+        }
         ff.close();
         
         dom2.getController().waitUntilIdle();
@@ -150,25 +200,62 @@ public class CreatePngWalk {
         long t0 = java.lang.System.currentTimeMillis();
         int count = 0;
 
-        for (String i : times) {
+        String vers= params.version==null ? "" : "_"+params.version;
+
+        for ( String i : times ) {
+
+            String filename= String.format("%s%s_%s%s.png", params.outputFolder, params.product, i, vers );
+
             count = count + 1;
             if (mon.isCancelled()) {
                 break;
             }
             mon.setTaskProgress(count);
+
+            if ( params.update ) {
+                File out= new File( filename );
+                if ( out.exists() ) {
+                    mon.setProgressMessage(String.format("skipping " + params.product + "_%s%s.png", i, vers ));
+                    continue;
+                }
+            }
+
+
             try {
-                dom2.setTimeRange(tp.parse(i).getTimeRange());
+                DatumRange dr= tp.parse(i).getTimeRange();
+                if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
+                    dr= DatumRangeUtil.rescale( dr,params.rescalex );
+                }
+                dom2.setTimeRange(dr);
+
             } catch (ParseException ex) {
                 Logger.getLogger(CreatePngWalk.class.getName()).log(Level.SEVERE, null, ex);
             }
-            mon.setProgressMessage(String.format("write " + params.product + "_%s.png", i));
+            mon.setProgressMessage(String.format("write " + params.product + "_%s%s.png", i, vers ));
             logger.log( Level.INFO, "write {0}_%s.png", params.product);
 
             appmodel.waitUntilIdle(false);
-            BufferedImage image = myWriteToPng(String.format("%s%s_%s.png", params.outputFolder, params.product, i), appmodel, dom2, w0, h0);
+            if ( params.autorange ) {
+                for ( Plot p: dom2.getPlots() ) {
+                    dom2.getController().setPlot(p);
+                    AutoplotUtil.resetZoomY(dom2);
+                    AutoplotUtil.resetZoomZ(dom2);
+                }
+
+            }
+
+            appmodel.waitUntilIdle(false);
+
+            if ( i.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
+                dom2.getOptions().setAutolayout(false);
+                appmodel.waitUntilIdle(false);
+            }
+            
+            BufferedImage image = myWriteToPng( filename, appmodel, dom2, w0, h0);
+
             if (params.createThumbs) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                File outf= new java.io.File(String.format("%sthumbs400/%s_%s.png", params.outputFolder, params.product, i) );
+                File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, i, vers ) );
                 File parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
                     if ( !parentf.mkdirs() ) {
@@ -176,6 +263,17 @@ public class CreatePngWalk {
                     }
                 }
                 if ( !ImageIO.write(thumb400, "png", outf ) ) {
+                    throw new IllegalArgumentException("no appropriate writer is found");
+                }
+                BufferedImage thumb100 = ImageResize.getScaledInstance(thumb400, thumbW/4, thumbH/4, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                outf= new java.io.File(String.format("%sthumbs100/%s_%s%s.png", params.outputFolder, params.product, i, vers ) );
+                parentf= outf.getParentFile();
+                if ( parentf!=null && !parentf.exists() ) {
+                    if ( !parentf.mkdirs() ) {
+                        throw new IllegalArgumentException("failed to make directories: "+parentf);
+                    }
+                }
+                if ( !ImageIO.write(thumb100, "png", outf ) ) {
                     throw new IllegalArgumentException("no appropriate writer is found");
                 }
             }
@@ -225,7 +323,7 @@ public class CreatePngWalk {
 
                 String[] times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
 
-                doBatch(times, dom, params, mon);
+                doBatch( times, dom, params, mon );
 
                 String url;
                 if (!mon.isCancelled()) {
@@ -270,6 +368,10 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
         alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
         alm.addSwitchArgument( "vap", "v", "vap", "vap file or URI to plot");
+        alm.addOptionalSwitchArgument( "rescalex", null, "rescalex", "0%,100%", "rescale factor, such as '0%-1hr,100%+1hr', to provide context to each image");
+        alm.addOptionalSwitchArgument( "version", null, "version", null, "additional version string to add to each filename, like v1.0");
+        alm.addBooleanSwitchArgument( "autorange", null, "autorange", "rerange dependent dimensions Y and Z");
+        alm.addBooleanSwitchArgument( "update", null, "update", "only calculate missing images");
         alm.process(args);
 
         Params params= new Params();
@@ -278,6 +380,10 @@ public class CreatePngWalk {
         params.product= alm.getValue("product");
         params.timeFormat= alm.getValue("timeFormat");
         params.timeRangeStr= alm.getValue("timeRange");
+        params.rescalex= alm.getValue("rescalex");
+        params.version= alm.getValue("version");
+        params.autorange= alm.getBooleanValue("autorange");
+        params.update= alm.getBooleanValue("update");
         
         String vap= alm.getValue("vap");
         ScriptContext.plot(vap);
