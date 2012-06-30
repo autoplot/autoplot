@@ -80,6 +80,34 @@ public class Test033 {
 
     }
 
+
+    /**
+     * new features for pngwalk from https://sourceforge.net/tracker/index.php?func=detail&aid=2984095&group_id=199733&atid=970685
+     * include context
+     * @throws Exception
+     */
+    private static void makePngWalk4() throws Exception {
+        Application dom= ScriptContext.getDocumentModel();
+
+        String pwd= new File("pngwalk4").getAbsoluteFile().toString();
+
+        CreatePngWalk.Params pp= new CreatePngWalk.Params();
+        pp.outputFolder= pwd;
+        pp.product= "product4";
+        pp.timeFormat= "$Y$m";
+        pp.timeRangeStr= "2005 through 2007";
+        pp.rescalex="-300%,400%";
+        pp.autorange= true;
+        pp.version= "v1.2";
+
+        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+
+        System.err.println("writing pngwalk at "+pwd );
+        CreatePngWalk.doIt( dom, pp );
+
+    }
+
+
     public static void main( String[] args ) throws Exception {
 
         long t0;
@@ -97,6 +125,10 @@ public class Test033 {
         t0= System.currentTimeMillis();
         makePngWalk3();
         System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+
+        //t0= System.currentTimeMillis();
+        //makePngWalk4();
+        //System.err.printf( "test 004: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
         
         System.exit(0);
     }
