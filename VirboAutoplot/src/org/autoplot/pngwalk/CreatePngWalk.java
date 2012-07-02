@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -200,7 +199,7 @@ public class CreatePngWalk {
         long t0 = java.lang.System.currentTimeMillis();
         int count = 0;
 
-        String vers= params.version==null ? "" : "_"+params.version;
+        String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version;
 
         for ( String i : times ) {
 
@@ -287,20 +286,14 @@ public class CreatePngWalk {
 
     public static void doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
         if (params == null) {
+
             CreatePngWalkDialog p = new CreatePngWalkDialog();
+
             if (JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), p, "PngWalk Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 
                 p.writeDefaults();
-                
-                params = new Params();
-                params.outputFolder = p.getOutputFolderTf().getText();
-                if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
-                    params.outputFolder= params.outputFolder + "/";
-                }
-                params.timeRangeStr = p.getTimeRangeTf().getText();
-                params.product = p.getFlnRootTf().getText();
-                params.timeFormat = p.getTimeFormatTf().getText();
-                params.createThumbs = p.getCreateThumbsCb().isSelected();
+
+                params= p.getParams();
 
                 File ff= new File( params.outputFolder );
                 if ( p.getOverwriteCb().isSelected() && ff.exists() ) {
