@@ -17,58 +17,80 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                              <Component id="flnRootTf" pref="238" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="overwriteCB" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="outputFolderTf" pref="195" max="32767" attributes="0"/>
+                                      <Component id="outputFolderTf" min="-2" pref="529" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="pickFolderButton" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="overwriteCB" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
+                      <EmptySpace pref="12" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="timeFormatTf" pref="238" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="timeRangeTf" pref="238" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Group type="102" alignment="0" attributes="1">
+                                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                                  <Component id="timeRangeTf" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                              <Component id="timeFormatCB" alignment="0" max="32767" attributes="0"/>
+                                              <Component id="flnRootTf" alignment="0" pref="207" max="32767" attributes="1"/>
+                                          </Group>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="12" pref="12" max="12" attributes="0"/>
+                              <Component id="rescaleComboBox" min="-2" pref="174" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="updateCB" min="-2" max="-2" attributes="0"/>
+                          <Component id="autorangeCB" alignment="0" pref="206" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="12" pref="12" max="12" attributes="0"/>
+                              <Component id="versionTextField" min="-2" pref="74" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="flnRootTf" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -78,17 +100,42 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="overwriteCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="flnRootTf" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="versionTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="timeFormatTf" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="timeFormatCB" min="-2" max="-2" attributes="0"/>
+                  <Component id="rescaleComboBox" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="timeRangeTf" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="timeRangeTf" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="autorangeCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="updateCB" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="46" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -97,6 +144,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Filename Root:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Stem to identify result within folder."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="flnRootTf">
@@ -130,19 +178,13 @@
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
         <Property name="text" type="java.lang.String" value="Time Format:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Time format for each png, used to infer cadence of sequence"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="timeFormatTf">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="$Y$m$d"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeFormatTfActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
         <Property name="text" type="java.lang.String" value="Time Range:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Time span to cover"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="timeRangeTf">
@@ -154,12 +196,73 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Create Thumbs"/>
+        <Property name="toolTipText" type="java.lang.String" value="create thumbs subfolders for performance"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="overwriteCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Overwrite"/>
         <Property name="toolTipText" type="java.lang.String" value="overwrite existing pngwalk"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel5">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Version (Optional):"/>
+        <Property name="toolTipText" type="java.lang.String" value="Add this version id to files"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="versionTextField">
+      <Properties>
+        <Property name="text" type="java.lang.String" value=" "/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="updateCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Update Sequence"/>
+        <Property name="toolTipText" type="java.lang.String" value="Only update the sequence, skipping images already computed"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel6">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Rescale (Optional):"/>
+        <Property name="toolTipText" type="java.lang.String" value="Rescale before making image, possibly showing surrounding context."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="rescaleComboBox">
+      <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="3">
+            <StringItem index="0" value="0%,100%"/>
+            <StringItem index="1" value="0%-1hr,100%+1hr"/>
+            <StringItem index="2" value="-300%,400%"/>
+          </StringArray>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="autorangeCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Autorange Each"/>
+        <Property name="toolTipText" type="java.lang.String" value="Autorange in Y and Z each image of the sequence"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="timeFormatCB">
+      <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="10">
+            <StringItem index="0" value="$Y$m$d"/>
+            <StringItem index="1" value="$Y"/>
+            <StringItem index="2" value="$Y$(m,span=3)"/>
+            <StringItem index="3" value="$Y$m"/>
+            <StringItem index="4" value="$Y_$j"/>
+            <StringItem index="5" value="$Y$m$d_$H"/>
+            <StringItem index="6" value="$Y$m$d_$H$M"/>
+            <StringItem index="7" value="$Y$m$d_$H$M$S"/>
+            <StringItem index="8" value="$(o,id=rbspa-pp)"/>
+            <StringItem index="9" value="$(o,id=http://das2.org/wiki/index.php/Orbits/crres)"/>
+          </StringArray>
+        </Property>
       </Properties>
     </Component>
   </SubComponents>

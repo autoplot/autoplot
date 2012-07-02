@@ -11,18 +11,15 @@
 
 package org.autoplot.pngwalk;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import org.virbo.autoplot.GuiSupport;
 
 /**
  *
@@ -37,12 +34,6 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         home= home.replaceAll("\\\\","/");
         outputFolderTf.setText( home + "pngwalk/" );
 
-        timeFormatTf.addMouseListener( GuiSupport.createExamplesPopup(
-                timeFormatTf,
-                new String[] { "$Y$m$d", "$(o,id=crres)", "$(o,id=rbspa-pp)", "$Y$m" },
-                new String[] { "daily files", "CRRES orbits", "RBSP-A PP orbits", "Monthly files" }
-                ) );
-
         setDefaults();
         checkExists();
     }
@@ -54,26 +45,57 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         flnRootTf.setText(file);
         String home= prefs.get( "outputFolder", outputFolderTf.getText() );
         outputFolderTf.setText(home);
-        String timeFormat= prefs.get("timeFormat", timeFormatTf.getText() );
-        timeFormatTf.setText(timeFormat);
+        String timeFormat= prefs.get("timeFormat", (String)timeFormatCB.getSelectedItem() );
+        timeFormatCB.setSelectedItem(timeFormat);
         String timeRange= prefs.get("timeRange", timeRangeTf.getText() );
         timeRangeTf.setText( timeRange );
         boolean thumbs= prefs.getBoolean( "createThumbs", createThumbsCb.isSelected() );
         createThumbsCb.setSelected(thumbs);
+
+        autorangeCB.setSelected( prefs.getBoolean( "autorange", autorangeCB.isSelected() ) );
+        rescaleComboBox.setSelectedItem( prefs.get( "rescalex", (String)rescaleComboBox.getSelectedItem() ) );
+        updateCB.setSelected( prefs.getBoolean( "update", updateCB.isSelected() ) );
+        versionTextField.setText( prefs.get( "version", versionTextField.getText() ) );
+
     }
 
     public void writeDefaults() {
         Preferences prefs= Preferences.userNodeForPackage( CreatePngWalkDialog.class );
-        prefs.put( "filenameRoot", flnRootTf.getText() );
-        prefs.put( "outputFolder", outputFolderTf.getText() );
-        prefs.put("timeFormat", timeFormatTf.getText() );
-        prefs.put("timeRange", timeRangeTf.getText() );
+        prefs.put( "filenameRoot", flnRootTf.getText().trim() );
+        prefs.put( "outputFolder", outputFolderTf.getText().trim() );
+        prefs.put( "timeFormat", ((String)timeFormatCB.getSelectedItem()).trim() );
+        prefs.put( "timeRange", timeRangeTf.getText().trim() );
         prefs.putBoolean( "createThumbs", createThumbsCb.isSelected() );
+
+        prefs.putBoolean( "autorange", autorangeCB.isSelected() );
+        prefs.put( "rescalex", ((String)rescaleComboBox.getSelectedItem()).trim() );
+        prefs.putBoolean( "update", updateCB.isSelected() );
+        prefs.put( "version", ((String)versionTextField.getText().trim()) );
+
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
             Logger.getLogger(CreatePngWalkDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public CreatePngWalk.Params getParams() {
+        CreatePngWalk.Params params = new CreatePngWalk.Params();
+        params.outputFolder = getOutputFolderTf().getText();
+        if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
+            params.outputFolder= params.outputFolder + "/";
+        }
+        params.timeRangeStr = getTimeRangeTf().getText().trim();
+        params.product = getFlnRootTf().getText().trim();
+        params.timeFormat = ((String)getTimeFormatCB().getSelectedItem()).trim();
+        params.createThumbs = getCreateThumbsCb().isSelected();
+
+        params.autorange= autorangeCB.isSelected();
+        params.rescalex= ((String)rescaleComboBox.getSelectedItem()).trim();
+        params.update= updateCB.isSelected();
+        params.version= versionTextField.getText().trim();
+
+        return params;
     }
 
     private void checkExists() {
@@ -93,12 +115,12 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         return outputFolderTf;
     }
 
-    public JTextField getTimeFormatTf() {
-        return timeFormatTf;
-    }
-
     public JTextField getTimeRangeTf() {
         return timeRangeTf;
+    }
+
+    public JComboBox getTimeFormatCB() {
+        return timeFormatCB;
     }
 
     public JCheckBox getCreateThumbsCb() {
@@ -125,13 +147,20 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         outputFolderTf = new javax.swing.JTextField();
         pickFolderButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        timeFormatTf = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         timeRangeTf = new javax.swing.JTextField();
         createThumbsCb = new javax.swing.JCheckBox();
         overwriteCB = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
+        versionTextField = new javax.swing.JTextField();
+        updateCB = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
+        rescaleComboBox = new javax.swing.JComboBox();
+        autorangeCB = new javax.swing.JCheckBox();
+        timeFormatCB = new javax.swing.JComboBox();
 
         jLabel1.setText("Filename Root:");
+        jLabel1.setToolTipText("Stem to identify result within folder.");
 
         flnRootTf.setText("product");
         flnRootTf.setToolTipText("Stem used to ensure unique filenames");
@@ -156,69 +185,99 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         });
 
         jLabel3.setText("Time Format:");
-
-        timeFormatTf.setText("$Y$m$d");
-        timeFormatTf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeFormatTfActionPerformed(evt);
-            }
-        });
+        jLabel3.setToolTipText("Time format for each png, used to infer cadence of sequence");
 
         jLabel4.setText("Time Range:");
+        jLabel4.setToolTipText("Time span to cover");
 
         timeRangeTf.setText("2010");
 
         createThumbsCb.setSelected(true);
         createThumbsCb.setText("Create Thumbs");
+        createThumbsCb.setToolTipText("create thumbs subfolders for performance");
 
         overwriteCB.setText("Overwrite");
         overwriteCB.setToolTipText("overwrite existing pngwalk");
+
+        jLabel5.setText("Version (Optional):");
+        jLabel5.setToolTipText("Add this version id to files");
+
+        versionTextField.setText(" ");
+
+        updateCB.setText("Update Sequence");
+        updateCB.setToolTipText("Only update the sequence, skipping images already computed");
+
+        jLabel6.setText("Rescale (Optional):");
+        jLabel6.setToolTipText("Rescale before making image, possibly showing surrounding context.");
+
+        rescaleComboBox.setEditable(true);
+        rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0%,100%", "0%-1hr,100%+1hr", "-300%,400%" }));
+
+        autorangeCB.setText("Autorange Each");
+        autorangeCB.setToolTipText("Autorange in Y and Z each image of the sequence");
+
+        timeFormatCB.setEditable(true);
+        timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "$Y$m$d", "$Y", "$Y$(m,span=3)", "$Y$m", "$Y_$j", "$Y$m$d_$H", "$Y$m$d_$H$M", "$Y$m$d_$H$M$S", "$(o,id=rbspa-pp)", "$(o,id=http://das2.org/wiki/index.php/Orbits/crres)" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(flnRootTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
-                            .add(jLabel1)
                             .add(jLabel2)
-                            .add(jLabel3)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(overwriteCB)
                                     .add(layout.createSequentialGroup()
-                                        .add(outputFolderTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                                        .add(outputFolderTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 529, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(pickFolderButton))))))
+                                        .add(pickFolderButton))
+                                    .add(overwriteCB))))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 12, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(24, 24, 24)
-                        .add(timeFormatTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jLabel4))
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(createThumbsCb))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(24, 24, 24)
-                        .add(timeRangeTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                    .add(24, 24, 24)
+                                    .add(timeRangeTf))
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(jLabel1)
+                                        .add(jLabel3)
+                                        .add(layout.createSequentialGroup()
+                                            .add(12, 12, 12)
+                                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                                .add(org.jdesktop.layout.GroupLayout.LEADING, timeFormatCB, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .add(org.jdesktop.layout.GroupLayout.LEADING, flnRootTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))))))
+                            .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(createThumbsCb))
+                            .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(jLabel4)))
+                        .add(25, 25, 25)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(rescaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 174, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(updateCB)
+                            .add(autorangeCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                            .add(layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jLabel5)
+                            .add(jLabel6))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(flnRootTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -226,17 +285,35 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                     .add(pickFolderButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(overwriteCB)
+                .add(28, 28, 28)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel3)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(flnRootTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeFormatTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(jLabel6))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel4)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(timeFormatCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(rescaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(12, 12, 12)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel4)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(autorangeCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(updateCB)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(createThumbsCb)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -253,27 +330,29 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         checkExists();
     }//GEN-LAST:event_outputFolderTfKeyTyped
 
-    private void timeFormatTfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFormatTfActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_timeFormatTfActionPerformed
-
     private void outputFolderTfKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_outputFolderTfKeyReleased
         checkExists();
     }//GEN-LAST:event_outputFolderTfKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox autorangeCB;
     private javax.swing.JCheckBox createThumbsCb;
     private javax.swing.JTextField flnRootTf;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JTextField outputFolderTf;
     private javax.swing.JCheckBox overwriteCB;
     private javax.swing.JButton pickFolderButton;
-    private javax.swing.JTextField timeFormatTf;
+    private javax.swing.JComboBox rescaleComboBox;
+    private javax.swing.JComboBox timeFormatCB;
     private javax.swing.JTextField timeRangeTf;
+    private javax.swing.JCheckBox updateCB;
+    private javax.swing.JTextField versionTextField;
     // End of variables declaration//GEN-END:variables
 
 }
