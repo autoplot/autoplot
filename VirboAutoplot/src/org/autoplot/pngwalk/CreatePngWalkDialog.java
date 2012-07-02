@@ -22,7 +22,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 
 /**
- *
+ * Provide dialog to control make pngwalk code.
+ * 
+ * see http://sourceforge.net/tracker/index.php?func=detail&aid=2984095&group_id=199733&atid=970685
  * @author jbf
  */
 public class CreatePngWalkDialog extends javax.swing.JPanel {
@@ -90,7 +92,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         params.timeFormat = ((String)getTimeFormatCB().getSelectedItem()).trim();
         params.createThumbs = getCreateThumbsCb().isSelected();
 
-        params.autorange= autorangeCB.isSelected();
+        params.autorange= autorangeCB.isSelected(); 
         params.rescalex= ((String)rescaleComboBox.getSelectedItem()).trim();
         params.update= updateCB.isSelected();
         params.version= versionTextField.getText().trim();
