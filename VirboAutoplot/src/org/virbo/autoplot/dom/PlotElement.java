@@ -84,6 +84,23 @@ public class PlotElement extends DomNode {
     }
 
     /**
+     * additional properties for the renderer, e.g. rend+series:fill=red,above,5.0V;grey,below,0.0V
+     */
+    protected String renderControl = "";
+    public static final String PROP_RENDERCONTROL = "renderControl";
+
+    public String getRenderControl() {
+        return renderControl;
+    }
+
+    public void setRenderControl(String renderUri) {
+        String oldRenderUri = this.renderControl;
+        this.renderControl = renderUri;
+        propertyChangeSupport.firePropertyChange(PROP_RENDERCONTROL, oldRenderUri, renderUri);
+    }
+
+
+    /**
      * cadence check disabled will always connect valid points.
      */
     protected boolean cadenceCheck = true;
@@ -330,6 +347,10 @@ public class PlotElement extends DomNode {
             result.add( new PropertyChangeDiff( PROP_RENDERTYPE, that.renderType, this.renderType ) );
         }
 
+        if ( !( that.renderControl.equals(this.renderControl) )  ) {
+            result.add( new PropertyChangeDiff(  PROP_RENDERCONTROL, that.renderControl, this.renderControl ) );
+        }
+
         if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
             result.add( new PropertyChangeDiff( PROP_DATASOURCEFILTERID, that.dataSourceFilterId, this.dataSourceFilterId ) );
         }
@@ -371,6 +392,7 @@ public class PlotElement extends DomNode {
         if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
         if ( !exclude.contains( PROP_ACTIVE ) ) this.setActive(that.isActive());
         if ( !exclude.contains( PROP_RENDERTYPE ) ) this.setRenderType( that.getRenderType() );
+        if ( !exclude.contains( PROP_RENDERCONTROL ) ) this.setRenderControl( that.getRenderControl() );
         if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( PROP_AUTORENDERTYPE ) ) this.setAutoRenderType(that.isAutoRenderType());
         if ( !exclude.contains( PROP_STYLE ) ) this.style.syncTo(that.style,exclude); // possibly exclude id's.
