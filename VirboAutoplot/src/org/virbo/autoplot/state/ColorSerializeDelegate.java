@@ -19,7 +19,8 @@ public class ColorSerializeDelegate implements SerializeDelegate {
     }
 
     public String format(Object o) {
-        return "#" + Integer.toHexString(((Color)o).getRGB() & 0xFFFFFF);
+        return String.format( "#%06x",((Color)o).getRGB() & 0xFFFFFF );
+        //return "#" + Integer.toHexString(((Color)o).getRGB() & 0xFFFFFF);
     }
 
     public Object parse(String typeId, String s) throws ParseException {
