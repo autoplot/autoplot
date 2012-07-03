@@ -1303,7 +1303,7 @@ public class PlotElementController extends DomNodeController {
         if ( oldRenderer!=null ) {
             ac.unbind( plotElement, PlotElement.PROP_LEGENDLABEL, oldRenderer, Renderer.PROP_LEGENDLABEL );
             ac.unbind( plotElement, PlotElement.PROP_DISPLAYLEGEND, oldRenderer, Renderer.PROP_DRAWLEGENDLABEL);
-            ac.unbind( plotElement, PlotElement.PROP_RENDERURI, oldRenderer, Renderer.PROP_CONTROL );
+            ac.unbind( plotElement, PlotElement.PROP_RENDERCONTROL, oldRenderer, Renderer.PROP_CONTROL );
             ac.unbind( plotElement, PlotElement.PROP_ACTIVE, oldRenderer, Renderer.PROP_ACTIVE );
         }
         this.renderer = renderer;
@@ -1332,7 +1332,7 @@ public class PlotElementController extends DomNodeController {
         renderer.setId( "rend_"+plotElement.getId());
         ac.bind(plotElement, PlotElement.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(plotElement, PlotElement.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
-        ac.bind(plotElement, PlotElement.PROP_RENDERURI, renderer, Renderer.PROP_CONTROL );
+        ac.bind(plotElement, PlotElement.PROP_RENDERCONTROL, renderer, Renderer.PROP_CONTROL );
         ac.bind(plotElement, PlotElement.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
     }
 
