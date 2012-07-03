@@ -51,6 +51,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsConverter;
+import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
@@ -1470,6 +1471,16 @@ public class AutoplotUtil {
                 result.setDataSetLoader(null);
                 return result;
             }
+        } else if ( renderType==RenderType.contour ) {
+            if (recyclable != null && recyclable instanceof ContoursRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new ContoursRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+
+
         } else if ( renderType==RenderType.pitchAngleDistribution ) {
             if (recyclable != null && recyclable instanceof PitchAngleDistributionRenderer ) {
                 return recyclable;
