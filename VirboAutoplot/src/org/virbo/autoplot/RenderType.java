@@ -15,4 +15,5 @@ public enum RenderType {
     eventsBar,
     vectorPlot,
     orbitPlot,  // call-outs with time vs position
+    contour,
 }
