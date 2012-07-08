@@ -796,6 +796,57 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * calculate the slices based on the slices command.  This results in a trivial amount of extra work
+     * but makes the code cleaner.
+     * 
+     * @param fillDs
+     * @param slicePref
+     * @return
+     */
+    private static String guessSliceSlices( QDataSet fillDs, List<Integer> slicePref ) {
+        String newResult="|slices(";
+        String[] slices= new String[] { "':'", "':'", "':'", "':'", "':'" } ;
+
+        List<Integer> slicePref1= new ArrayList<Integer>();
+        slicePref1.addAll(slicePref);
+        slicePref= slicePref1;
+
+        int ndim= fillDs.rank();
+
+        int nslice= fillDs.rank()-2;
+
+        List<Integer> qube= new ArrayList(); // we remove elements from this one.
+        int[] a= DataSetUtil.qubeDims(fillDs);
+        for ( int i=0; i<a.length; i++ ) {
+            qube.add(a[i]);
+        }
+
+        for ( int islice=0; islice<nslice; islice++ ) {
+            int sliceIndex = 0;
+            int bestSlice = 0;
+
+            for (int i = 0; i < a.length; i++) {
+                if (slicePref.get(i) > bestSlice) {
+                    sliceIndex = i;
+                    bestSlice = slicePref.get(i);
+                }
+            }
+
+            slicePref.set( sliceIndex, 0 );
+
+            slices[sliceIndex]= String.valueOf( qube.get(sliceIndex)/2 );
+        }
+
+        for ( int i=0; i<ndim; i++ ) {
+            newResult+= slices[i];
+            if ( i<ndim-1 ) newResult+=",";
+        }
+
+        newResult+= ")";
+        return newResult;
+    }
+
+    /**
      * guess the best sprocess to reduce the rank to something we can display.
      * guess the best dimension to slice by default, based on metadata.  Currently,
      * this looks for the names lat, lon, and angle.
@@ -809,7 +860,7 @@ public class PlotElementController extends DomNodeController {
 
         int lat = -1, lon = -1;
 
-        List<Integer> slicePref = new ArrayList( Arrays.asList( 2, 2, 2, 2, 2 ) ); // slicePref big means more likely to slice.
+        List<Integer> slicePref = new ArrayList( Arrays.asList( 2, 2, 2, 2, 2 ) ); // slicePref big means more likely to slice.//TODO: hard-code rank 5.
         for (int i = 0; i < depNames.length; i++) {
             String n = depNames[i].toLowerCase();
             Units u= depUnits[i];
@@ -837,19 +888,17 @@ public class PlotElementController extends DomNodeController {
 
         }
 
-        List<Integer> qube= new ArrayList();
+        List<Integer> qube= new ArrayList(); // we remove elements from this one.
         int[] a= DataSetUtil.qubeDims(fillDs);
         for ( int i=0; i<a.length; i++ ) {
             qube.add(a[i]);
         }
 
-        String newResult="|slices(";
         boolean transpose= false;
         String result="";
         int nslice= fillDs.rank()-2;
 
-        int idim=0;
-        int ndim= fillDs.rank();
+        String newResult= guessSliceSlices( fillDs, slicePref );
 
         for ( int islice=0; islice<nslice; islice++ ) {
             int sliceIndex = 0;
@@ -887,17 +936,6 @@ public class PlotElementController extends DomNodeController {
             // pick a slice index near the middle, which is less likely to be all fill.
             int n= qube.get(sliceIndex)/2;
 
-            if ( sliceIndex>0 ) {
-                for ( int i=0; i<(sliceIndex-islice); i++ ) {
-                    newResult+= "':',";
-                    idim++;
-                }
-            }
-            newResult+= n;
-            idim++;
-
-            if ( (idim-islice)<(ndim-1) ) newResult+= ",";
-            
             result+= "|slice"+sliceIndex+"("+n+")";
             if (lat > -1 && lon > -1 && lat < lon) {
                 result+="|transpose()";
@@ -909,12 +947,6 @@ public class PlotElementController extends DomNodeController {
 
         }
 
-        for ( int i=idim; i<ndim; i++ ) {
-            newResult+= "':'";
-            if ( i<ndim-1 ) newResult+=",";
-        }
-
-        newResult+= ")";
         if ( transpose ) {
             newResult+="|transpose()";
         }
