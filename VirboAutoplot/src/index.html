@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used here to analyze images.</small></p>
+        <p><small>The new slices function is exercised.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix in IDataSet.wrap and guessSlice when slices is used</li>
             <li>Use CDF library 3.4.1 to avoid initial delay when reading CDF files</li>
             <li>CDAWeb gets everything over HTTP, and from new location "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"</li>
             <li>NetCDF/HDF5 reader left all sorts of resources open, eventually causing a runtime error (when labeling axes)</li>
@@ -63,6 +64,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new controls for MakePngWalk: autorange, rescalex, update, version</li>
+            <li>contour plots introduced to demonstrate new rendererControl string.</li>
             <li>Add special IDL adapters to make it easy to get data into and out of TDAS.</li>
             <li>Add Plot->New Location... added for Jan</li>
             <li>boolean variables in jython scripts when enumeration is either T or F</li>
