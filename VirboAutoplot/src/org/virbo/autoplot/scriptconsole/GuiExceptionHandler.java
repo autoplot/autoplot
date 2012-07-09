@@ -525,6 +525,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             focus.appendChild( doc.createTextNode((String)data.get(FOCUS_URI)) );
             e.appendChild(focus);
 
+            formatBuildInfos( doc, e, bis );
+
+            formatPlatform( doc, e );
 
             formatException( doc, e, t );
 
@@ -559,11 +562,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     formatUndos( doc, e, undoRedoSupport );
                 }
             }
-
-            formatBuildInfos( doc, e, bis );
-
-            formatPlatform( doc, e );
-
             
             DOMImplementationLS ls = (DOMImplementationLS)
                             doc.getImplementation().getFeature("LS", "3.0");
