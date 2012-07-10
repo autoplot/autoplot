@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The new slices function is exercised.</small></p>
+        <p><small>Nearest neighbor interpolation fixed when there are gaps in Y.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,10 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix where Mike pointed out that spectrogram Y averaging would occur when it was not appropriate.</li>
+            <li>minor bugfix with TearoffTabbedPane when removing undocked tabs when going to basic mode.</li>
+            <li>in display data slice, bundles containing rank 2 data would cause RuntimeException.</li>
+            <li>improve feedback when packet in qstream doesn't match expected length.</li>
             <li>bugfix in IDataSet.wrap and guessSlice when slices is used</li>
             <li>Use CDF library 3.4.1 to avoid initial delay when reading CDF files</li>
             <li>CDAWeb gets everything over HTTP, and from new location "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"</li>
@@ -64,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>initial coding of mechanism to support local read-only mirror of remote data.</li>
             <li>new controls for MakePngWalk: autorange, rescalex, update, version</li>
             <li>contour plots introduced to demonstrate new rendererControl string.</li>
             <li>Add special IDL adapters to make it easy to get data into and out of TDAS.</li>
