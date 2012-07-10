@@ -30,7 +30,7 @@
             <li>Use CDF library 3.4.1 to avoid initial delay when reading CDF files</li>
             <li>CDAWeb gets everything over HTTP, and from new location "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"</li>
             <li>NetCDF/HDF5 reader left all sorts of resources open, eventually causing a runtime error (when labeling axes)</li>
-            <li>.jyds didn't explicitly close script after loading, eventually causing a runtime error. (when labeling axes)<li>
+            <li>.jyds didn't explicitly close script after loading, eventually causing a runtime error. (when labeling axes)</li>
             <li>3538094: leftover files can cause temp file download to fail. (No temp file may be used for more than an hour.)</li>
             <li>CDAWeb refresh would add components off the event thread, which could cause application to lock up.</li>
             <li>in reducex function, weights not properly when accumulating min and max.</li>
