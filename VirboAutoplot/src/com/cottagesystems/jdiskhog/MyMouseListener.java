@@ -4,24 +4,15 @@
  */
 package com.cottagesystems.jdiskhog;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 /**
- *
+ * Provide popup menu for JDiskHogPanel.
  * @author jbf
  */
 public class MyMouseListener extends MouseAdapter {
@@ -62,13 +53,19 @@ public class MyMouseListener extends MouseAdapter {
 
     private synchronized void showPopup(MouseEvent e) {
         if (popup == null) {
+            JMenuItem mi;
             popup = new JPopupMenu();
-            popup.add(new JMenuItem( panel.getDeleteAction(jtree) ));
+            mi= new JMenuItem( panel.getDeleteAction(jtree) );
+            mi.setToolTipText( "Delete files or folders from the local cache" );
+            popup.add(mi);
 
-            //popup.add(new JSeparator());
-            popup.add(new JMenuItem( panel.getPlotAction(jtree) ));
+            mi= new JMenuItem( panel.getCopyToAction(jtree) );
+            mi.setToolTipText( "Make a copy of files or folders to location outside of file cache." );
+            popup.add(mi);
 
-            popup.add(new JMenuItem( panel.getCopyToAction(jtree) ));
+            mi= new JMenuItem( panel.getLocalROCacheAction(jtree) );
+            mi.setToolTipText( "Specify a local copy of the remote files, and use files from here before downloading." );
+            popup.add(mi);
         }
         popup.show(jtree, e.getX(), e.getY());
     }
