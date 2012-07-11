@@ -8,15 +8,19 @@ package com.cottagesystems.jdiskhog;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -24,6 +28,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
@@ -111,18 +117,15 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         };
     }
 
-    public boolean doPlotSelected() {
-
-        FSTreeModel model = (FSTreeModel) jTree1.getModel();
-        TreePath[] paths = jTree1.getSelectionPaths();
-        if ( paths==null || paths.length == 0) {
-            return true;
-        }
-        File f = model.getFile(paths[0]);
-        String sf = f.toString();
+    /**
+     * return null or the url of the folder.
+     * @param sf
+     * @return
+     */
+    private String outsideName( String sf ) {
         String cache = AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        boolean acceptOutside = false;
         String outsideName = sf.substring(cache.length());
+        boolean acceptOutside= false;
         if (sf.startsWith(cache)) {
             String[] protos = new String[]{"ftp", "http", "https"};
             for (int i = 0; i < protos.length; i++) {
@@ -132,10 +135,26 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                 }
             }
         }
-        if (acceptOutside) {
+        if ( acceptOutside ) {
+            return outsideName;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean doPlotSelected() {
+        FSTreeModel model = (FSTreeModel) jTree1.getModel();
+        TreePath[] paths = jTree1.getSelectionPaths();
+        if ( paths==null || paths.length == 0) {
+            return true;
+        }
+        File f = model.getFile(paths[0]);
+        String sf = f.toString();
+        String outsideName= outsideName( sf );
+        if ( outsideName!=null ) {
             app.plotUri(outsideName);
         } else {
-            app.plotUri(f.toString());
+            app.plotUri(sf);
         }
         return false;
     }
@@ -184,6 +203,77 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             }
         };
     }
+
+    private boolean writeROCacheLink( File src, File dest ) throws IOException {
+        BufferedWriter write= new BufferedWriter( new FileWriter( new File( src, "ro_cache.txt" ) ) );
+        write.append( dest.toString() );
+        write.append( "\n" );
+        write.close();
+        return true;
+    }
+    
+    Action getLocalROCacheAction(final JTree jtree) {
+        return new AbstractAction("Link to Local Read-Only Cache...") {
+
+            public void actionPerformed(ActionEvent e) {
+                FSTreeModel model = (FSTreeModel) jtree.getModel();
+
+                TreePath path = jtree.getSelectionPath();
+                if ( path==null ) return;
+
+                File f = model.getFile(path);
+
+
+                if (f.isFile()) {
+                    JOptionPane.showConfirmDialog(jtree, "Folder must be selected, not a file", "Link to Local R/O Cache",  JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE );
+                } else {
+// see http://stackoverflow.com/questions/1356273/jfilechooser-for-directories-on-the-mac-how-to-make-it-not-suck
+//    JFrame frame = new JFrame();
+//    System.setProperty("apple.awt.fileDialogForDirectories", "true");
+//    FileDialog d = new FileDialog(frame);
+//    d.setVisible(true);
+
+                    String outsideName= outsideName(f.toString());
+                    String[] nn= null;
+                    if ( outsideName!=null ) {
+                        try {
+                            FileSystem fs = FileSystem.create(outsideName);
+                            nn= fs.listDirectory("/");
+
+                        } catch ( IOException ex ) {
+                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    
+                    JFileChooser choose= new JFileChooser();
+                    if ( nn!=null && nn.length>1 ) {
+                        String s= ""+nn[0];
+                        for ( int i=1; i<6; i++ ) {
+                            if ( nn.length>i ) s+= "<br>"+nn[i];
+                        }
+                        final JLabel label= new JLabel("<html>Target should contain the files:<br>"+ s );
+                        choose.setAccessory( label );
+                    }
+
+                    choose.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+                    
+                    if ( choose.showOpenDialog(jtree)==JFileChooser.APPROVE_OPTION ) {
+                        try {
+                            File ff= choose.getSelectedFile();
+                            writeROCacheLink( f, ff );
+                            JOptionPane.showConfirmDialog(jtree, "<html>Wrote link file in "+ f, "Link to Local R/O Cache",  JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE );
+                        } catch ( IOException ex2 ) {
+                            JOptionPane.showConfirmDialog(jtree, "<html>Unable to write link file in "+ f +"<br>"+ex2.toString(), "Link to Local R/O Cache",  JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE );
+                        }
+                    }
+
+                }
+
+            }
+        };
+    }
+
 
     public void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
