@@ -254,9 +254,21 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             daysURIs.put( ss[1], ss[0] );
 
                         } catch (ParseException ex) {
-                            Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
+                            ex.printStackTrace();
                         }
                     }
+
+                    for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
+                        try {
+                            String uri= ii.next();
+                            Datum tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                            uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
+                        } catch ( ParseException ex ) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+                    System.err.println("stevens"+daysURIs);
                 }
 
                 skip= new boolean[8];
@@ -264,7 +276,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 // remove empty elements.
                 int newListLen= list.length;
                 for ( int i=0; i<list.length; i++ ) {
-                    if ( getChildCount(list[i])==0 ) {
+                    if ( false && getChildCount(list[i])==0 ) {
                         skip[i]=true;
                         newListLen--;
                     } else {
