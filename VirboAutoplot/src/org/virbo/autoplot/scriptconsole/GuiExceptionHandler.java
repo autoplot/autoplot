@@ -28,6 +28,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
@@ -37,6 +38,7 @@ import java.util.logging.Logger;
 import org.das2.DasApplication;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.LogRecord;
 import java.util.logging.XMLFormatter;
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -74,6 +77,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
+import org.das2.util.Base64;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
@@ -123,6 +127,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static final String EMAIL="EMAIL";
     private static final String FOCUS_URI="FOCUS_URI";
     private static final String INCLDOM= "INCLDOM";
+    private static final String INCLSCREEN= "INCLSCREEN";
 
     private ApplicationModel appModel=null;
     private UndoRedoSupport undoRedoSupport= null;
@@ -265,6 +270,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
         map.put( INCLDOM, form.isAllowDom() );
+        map.put( INCLSCREEN, form.isAllowScreenshot() );
         map.put( EMAIL, form.getEmailTextField().getText() );
         map.put( USER_ID, form.getUsernameTextField().getText().replaceAll(" ","_") );
 
@@ -562,7 +568,42 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     formatUndos( doc, e, undoRedoSupport );
                 }
             }
-            
+
+            if ( data.get(INCLSCREEN)!=null && (Boolean)data.get( INCLSCREEN ) ) {
+
+                if ( appModel!=null ) {
+                    Window w= SwingUtilities.getWindowAncestor( appModel.getCanvas() );
+
+                    BufferedImage img= new BufferedImage( w.getWidth(), w.getHeight(), BufferedImage.TYPE_INT_RGB );
+
+                    w.print( img.getGraphics() );
+
+                    ByteArrayOutputStream baos= new ByteArrayOutputStream();
+
+                    try {
+                        ImageIO.write( img, "png", baos );
+                        baos.close();
+
+                        byte[] array= baos.toByteArray();
+
+                        String image64= Base64.encodeBytes(array);
+
+                        Element screen= doc.createElement("screenshot");
+                        screen.setAttribute( "mimetype", "image/png" );
+
+                        screen.appendChild( doc.createTextNode( "\n"+image64+"\n" ) );
+                        e.appendChild(screen);
+
+                    } catch ( IOException ex ) {
+                        ex.printStackTrace();
+                    }
+
+                } else {
+                    System.err.println("couldnt find appModel");
+                }
+                
+            }
+
             DOMImplementationLS ls = (DOMImplementationLS)
                             doc.getImplementation().getFeature("LS", "3.0");
             LSOutput output = ls.createLSOutput();
@@ -684,6 +725,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                 String email= form.getEmailTextField().getText();
                 map.put( EMAIL, email );
+
+                map.put( INCLSCREEN, form.isAllowScreenshot() );
 
                 report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
 
