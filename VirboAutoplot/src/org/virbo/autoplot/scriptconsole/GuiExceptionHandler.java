@@ -756,6 +756,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 String email= form.getEmailTextField().getText();
                 map.put( EMAIL, email );
 
+                map.put( INCLSCREEN, form.isAllowScreenshot() );
+
                 report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
                 String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
 
