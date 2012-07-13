@@ -44,6 +44,7 @@ import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasPlot;
+import org.das2.graph.Renderer;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingModel;
@@ -349,14 +350,20 @@ public class LayoutPanel extends javax.swing.JPanel {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             final PlotElement val= (PlotElement)value;
-            if ( val!=null && val.getController()!=null && val.getController().getRenderer()!=null ) {
-                javax.swing.Icon icon= val.getController().getRenderer().getListIcon();
-                label.setIcon(icon);
-                val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        panelListComponent.repaint();
+            if ( val!=null ) {
+                final PlotElementController cont= val.getController();
+                if ( cont!=null ) {
+                    final Renderer rend= val.getController().getRenderer();
+                    if ( rend!=null ) {
+                        javax.swing.Icon icon= rend.getListIcon();
+                        label.setIcon(icon);
+                        val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                panelListComponent.repaint();
+                            }
+                        });
                     }
-                });
+                }
             }
             return label;
         }
