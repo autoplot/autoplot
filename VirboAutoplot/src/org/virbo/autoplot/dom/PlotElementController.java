@@ -1148,6 +1148,7 @@ public class PlotElementController extends DomNodeController {
                             addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
+                        ele.setActive(false); // setComponentAutomatically resets this
                         ele.setDisplayLegend(true);
                         if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(label1);
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
@@ -1158,6 +1159,9 @@ public class PlotElementController extends DomNodeController {
                         if ( i % nsubsample == 0 ) {
                             ele.setActive(true); //TODO: test load/save
                             ele.controller.getRenderer().setActive(true);
+                        } else {
+                            ele.setActive(false);
+                            ele.controller.getRenderer().setActive(false);
                         }
                     }
                     renderer.setActive(false);
