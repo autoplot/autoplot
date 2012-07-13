@@ -1038,8 +1038,7 @@ public class PlotElementController extends DomNodeController {
             }
                     
             boolean shouldHaveChildren= fillDs.rank() == 2
-                    &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps )
-                    &&  fillDs.length(0) <= QDataSet.MAX_UNIT_BUNDLE_COUNT;
+                    &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps );
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
@@ -1111,8 +1110,10 @@ public class PlotElementController extends DomNodeController {
                     Color c = plotElement.getStyle().getColor();
                     Color fc= plotElement.getStyle().getFillColor();
                     Plot domPlot = dom.controller.getPlotFor(plotElement);
-                    List<PlotElement> cp = new ArrayList<PlotElement>(fillDs.length(0));
-                    int nsubsample= 1 + ( fillDs.length(0)-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
+
+                    int count= Math.min(QDataSet.MAX_UNIT_BUNDLE_COUNT, fillDs.length(0));
+                    List<PlotElement> cp = new ArrayList<PlotElement>(count);
+                    int nsubsample= 1 + ( count-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
 
                     //check for non-unique labels.
                     boolean uniqLabels= true;
@@ -1122,7 +1123,7 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
 
-                    for (int i = 0; i < fillDs.length(0); i++) {
+                    for (int i = 0; i < count; i++) {
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
                         ele.controller.getRenderer().setActive(false);
                         cp.add(ele);
@@ -1154,7 +1155,7 @@ public class PlotElementController extends DomNodeController {
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
                         //ele.controller.setDataSet(fillDs, false);
                     }
-                    for ( int i=0; i<fillDs.length(0); i++ ) {
+                    for ( int i=0; i<count; i++ ) {
                         PlotElement ele= cp.get(i);
                         if ( i % nsubsample == 0 ) {
                             ele.setActive(true); //TODO: test load/save
