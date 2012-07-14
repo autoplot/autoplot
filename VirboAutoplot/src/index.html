@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>first attempt at filling in cadence when depend_0 is rank 1.</small></p>
+        <p><small>Multiple slices are adjusted at once by adjusting the hidden node's slice.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3543992: PlotElementController doesn't check dom.controller adjusting</li>
             <li>with CDF, use LABL_PTR_1 when DEPEND_1 is just 0,1,2,3,...</li>
             <li>bugfix in metadata panel, where values=VALID_MAX were treated as invalid when FILL_VALUE was not specified</li>
             <li>bugfix where Mike pointed out that spectrogram Y averaging would occur when it was not appropriate.</li>
