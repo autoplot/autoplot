@@ -48,6 +48,7 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
+import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
@@ -678,13 +679,7 @@ public class PlotElementController extends DomNodeController {
         return false;
     }
 
-    /**
-     * get the dataset from the dataSourceFilter, and plot it possibly after
-     * slicing component.
-     * @throws IllegalArgumentException
-     */
-    private void updateDataSet() throws IllegalArgumentException {
-        if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+    private void updateDataSetImmediately() {
         QDataSet fillDs = dsf.controller.getFillDataSet();
         if (fillDs != null) {
             if (resetPlotElement) {
@@ -733,6 +728,25 @@ public class PlotElementController extends DomNodeController {
             setDataSet(null, false);
         } else {
             setDataSet(fillDs, true);
+        }
+    }
+
+    /**
+     * get the dataset from the dataSourceFilter, and plot it possibly after
+     * slicing component.
+     * @throws IllegalArgumentException
+     */
+    private void updateDataSet() throws IllegalArgumentException {
+        if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+        if (!dom.controller.isValueAdjusting()) {
+             updateDataSetImmediately();       
+        } else {
+            new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
+                @Override
+                public void run() {
+                    updateDataSetImmediately();       
+                }
+            };
         }
     }
 
@@ -1115,16 +1129,19 @@ public class PlotElementController extends DomNodeController {
                     List<PlotElement> cp = new ArrayList<PlotElement>(count);
                     int nsubsample= 1 + ( count-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
 
-                    //check for non-unique labels.
+                    //check for non-unique labels, or labels that are simply numbers.
                     boolean uniqLabels= true;
                     for ( int i=0;i<labels.length; i++ ) {
+                        if ( AutoplotUtil.isParsableDouble( labels[i] ) ) uniqLabels= false;
                         for ( int j=i+1; j<labels.length; j++ ) {
                             if ( labels[i].equals(labels[j]) ) uniqLabels= false;
                         }
                     }
 
                     for (int i = 0; i < count; i++) {
+                        long t0= System.currentTimeMillis();
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
+                        System.err.println("copyPlotElement took (ms):"+ ( System.currentTimeMillis()-t0) );
                         ele.controller.getRenderer().setActive(false);
                         cp.add(ele);
                         ele.setParent( plotElement.getId() );
@@ -1441,7 +1458,13 @@ public class PlotElementController extends DomNodeController {
                 //}
 
                 logger.fine("doAutoranging");
+                if ( fillDs.rank()>2 ) {
+                    System.err.println("fillDs.rank()>2");
+                }
+                long t0= System.currentTimeMillis();
+
                 doAutoranging( peleCopy,props,fillDs, false );
+                System.err.println("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
 
                 //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
                 //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
