@@ -10,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,7 +33,7 @@ public class DomNodeController {
 
     private static WeakHashMap<DomNode,Long> instances= new WeakHashMap();
 
-    private long t0= System.currentTimeMillis();
+    private static long t0= System.currentTimeMillis();
 
     public DomNodeController( DomNode node ) {
         this.node= node;
@@ -40,9 +41,15 @@ public class DomNodeController {
     }
 
     public static void printStats() {
+        ArrayList<String> list= new ArrayList();
         for ( Entry<DomNode,Long> t: instances.entrySet() ) {
-            System.err.println( t.getKey() + " " +t.getValue() );
+            list.add( t.getKey() + " " +t.getValue() );
         }
+        Collections.sort(list);
+        for ( String s: list ) {
+            System.err.println(s);
+        }
+        System.err.println("("+list.size()+" items)");
     }
     /**
      * replace %{LABEL} or $(LABEL) with value.
