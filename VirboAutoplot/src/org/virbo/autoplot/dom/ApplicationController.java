@@ -572,6 +572,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             //pelement.controller= null; // we need this to unbind later.
             pelement.removePropertyChangeListener(plotIdListener);
 
+            PlotElement parent= pelement.controller.getParentPlotElement();
+            if ( parent!=null ) {
+                parent.getStyle().removePropertyChangeListener( pelement.controller.parentStyleListener );
+            }
+
         }
 
         DataSourceFilter dsf = getDataSourceFilterFor(pelement);
