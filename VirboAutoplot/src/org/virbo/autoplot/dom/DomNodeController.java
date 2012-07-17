@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
@@ -28,10 +30,20 @@ public class DomNodeController {
     protected PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     protected ChangesSupport changesSupport = new ChangesSupport(propertyChangeSupport, this);
 
+    private static WeakHashMap<DomNode,Long> instances= new WeakHashMap();
+
+    private long t0= System.currentTimeMillis();
+
     public DomNodeController( DomNode node ) {
         this.node= node;
+        instances.put( node, ( System.currentTimeMillis()-t0 ) );
     }
 
+    public static void printStats() {
+        for ( Entry<DomNode,Long> t: instances.entrySet() ) {
+            System.err.println( t.getKey() + " " +t.getValue() );
+        }
+    }
     /**
      * replace %{LABEL} or $(LABEL) with value.
      * @param title
