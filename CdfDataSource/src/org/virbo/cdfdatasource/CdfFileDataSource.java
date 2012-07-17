@@ -334,12 +334,15 @@ public class CdfFileDataSource extends AbstractDataSource {
                         //if ( "ion_en".equals( (String) dep.get("NAME") ) ) reformDep= false;
                         MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, reformDep, false, null);
 
-                        if ( labl!=null && idep==1 && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                        if ( labl!=null && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                             boolean lanlKludge= true;
                             for ( int jj=0; jj<depDs.length(); jj++ ) {
                                 if ( depDs.value(jj)!=jj ) lanlKludge=false;
                             }
-                            if ( lanlKludge ) depDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
+                            if ( lanlKludge ) {
+                                QDataSet bundleDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
+                                result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                            }
                         }
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682

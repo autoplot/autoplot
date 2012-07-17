@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -536,12 +537,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                         MutablePropertyDataSet depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, null);
 
-                        if ( labl!=null && idep==1 && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                        if ( labl!=null && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                             boolean lanlKludge= true;
                             for ( int jj=0; jj<depDs.length(); jj++ ) {
                                 if ( depDs.value(jj)!=jj ) lanlKludge=false;
                             }
-                            if ( lanlKludge ) depDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
+                            if ( lanlKludge ) {
+                                QDataSet bundleDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
+                                result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                            }
                         }
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
