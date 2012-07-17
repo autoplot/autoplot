@@ -98,6 +98,16 @@ public class PlotElementController extends DomNodeController {
         plotElement.getStyle().addPropertyChangeListener(styleListener);
     }
 
+    protected void disconnect() {
+        plotElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, plotElementListener);
+        plotElement.removePropertyChangeListener(PlotElement.PROP_DATASOURCEFILTERID, plotElementListener);
+        plotElement.removePropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
+        PlotElement parent= getParentPlotElement();
+        if ( parent!=null ) {
+            parent.removePropertyChangeListener( getParentComponentLister() );
+        }
+    }
+
     /**
      * return child plotElements, which are plotElements that share a datasource but pull out
      * a component of the data.
@@ -237,11 +247,19 @@ public class PlotElementController extends DomNodeController {
                     if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
                 }
                 if ( newv.startsWith("|") ) dom.getOptions().setDataVisible(true);
+                if ( changesSupport==null ) {
+                    System.err.println("changesSupport is null!!!");
+                    System.err.println("this is a sad, leftover PlotElementController that should have been GC'd");
+                    return;
+                }
                 Runnable run= new Runnable() {
                     public void run() {
+                        if ( changesSupport==null ) {
+                           System.err.println("changesSupport is null!!!");
+                        }
                         // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
                         // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
-                        List<Object> lock= changesSupport.whoIsChanging(PENDING_COMPONENT_OP); 
+                        List<Object> lock= changesSupport.whoIsChanging(PENDING_COMPONENT_OP);
                         if ( lock.isEmpty() ) {
                             changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
                         } else {
