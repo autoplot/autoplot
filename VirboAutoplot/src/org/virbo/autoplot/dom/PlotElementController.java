@@ -966,7 +966,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             // pick a slice index near the middle, which is less likely to be all fill.
-            int n= qube.get(sliceIndex)/2;
+            int n= Math.max( 0, qube.get(sliceIndex)/2-1 );
 
             result+= "|slice"+sliceIndex+"("+n+")";
             if (lat > -1 && lon > -1 && lat < lon) {
