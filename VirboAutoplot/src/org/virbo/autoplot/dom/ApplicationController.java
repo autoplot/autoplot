@@ -559,6 +559,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             unbindImpl(pelement); //TODO: I need to remind myself why there are two types of bindings...
             unbindImpl(pelement.getStyle());
             pelement.controller.unbindDsf();
+            pelement.controller.disconnect();
             pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
             pelement.controller.renderer.setColorBar(null);
             //PlotController.pdListen
