@@ -26,7 +26,6 @@ import org.das2.graph.DasColumn;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,6 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Options;
-import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
@@ -102,14 +100,12 @@ import org.xml.sax.SAXException;
  */
 public class AutoplotUtil {
 
-    private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
+    private final static Logger logger = Logger.getLogger("autoplot.AutoplotUtil");
     /**
      * absolute length limit for plots.  This is used to limit the elements used in autoranging, etc.
      */
     public final static int DS_LENGTH_LIMIT = 10000000;
 
-    private static final Logger logger= Logger.getLogger( "virbo.autoplot.AutoplotUtil" );
-    
     /**
      * this is not used.  It is called from createIcon, which is not used.
      * @param c
@@ -252,6 +248,7 @@ public class AutoplotUtil {
         private double robustMax;
         private double median;
 
+        @Override
         public String toString() {
             return "" + range + " " + (log ? "log" : "");
         }
@@ -290,7 +287,7 @@ public class AutoplotUtil {
 
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
 
-        log.fine("enter autoRange "+ds );
+        logger.log(Level.FINE, "enter autoRange {0}", ds);
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -463,7 +460,7 @@ public class AutoplotUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
 
-        log.fine("exit autoRange");
+        logger.fine("exit autoRange");
 
         return result;
     }
@@ -587,7 +584,7 @@ public class AutoplotUtil {
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
 
-        log.fine("enter autoRange "+ds);
+        logger.log(Level.FINE, "enter autoRange {0}", ds);
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -976,7 +973,7 @@ public class AutoplotUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
 
-        log.fine("exit autoRange");
+        logger.fine("exit autoRange");
 
         if ( typical!=null ) {
             if ( result.log && typical.log ) {
