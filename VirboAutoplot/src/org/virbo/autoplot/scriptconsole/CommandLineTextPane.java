@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -41,6 +43,13 @@ public class CommandLineTextPane extends JTextPane {
                 while ( history.size()>HIST_LENGTH ) history.remove(0);
                 historyIndex= history.size();
                 pendingEntry= "";
+                Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+                prefs.put( "lastCommand", history.get(historyIndex-1));
+                try {
+                    prefs.flush();
+                } catch ( BackingStoreException ex ) {
+                    
+                }
                 fireActionPerformed( e );
             }
         };
@@ -82,7 +91,18 @@ public class CommandLineTextPane extends JTextPane {
         imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "histPrev" );
         imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "histNext" );
 
+        loadFromPrefs();
     }
+
+    private void loadFromPrefs() {
+        Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+        String last= prefs.get( "lastCommand", "" );
+        if ( last.trim().length()>0 ) {
+            history.add( last );
+            historyIndex= history.size();
+        }
+    }
+
 
     /**
      * Adds an <code>ActionListener</code> to the button.
