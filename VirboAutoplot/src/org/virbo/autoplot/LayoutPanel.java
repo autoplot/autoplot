@@ -357,7 +357,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                     if ( rend!=null ) {
                         javax.swing.Icon icon= rend.getListIcon();
                         label.setIcon(icon);
-                        val.getController().getRenderer().addPropertyChangeListener( new PropertyChangeListener() {
+                        rend.addPropertyChangeListener( new PropertyChangeListener() {
                             public void propertyChange(PropertyChangeEvent evt) {
                                 panelListComponent.repaint();
                             }
