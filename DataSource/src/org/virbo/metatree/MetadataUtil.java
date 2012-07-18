@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.MetadataModel;
@@ -119,28 +120,46 @@ public class MetadataUtil {
      * slice the properties to reduce rank.  TODO: This all needs review, since the QDataSet model is mature.
      * @param properties
      * @param sliceDimension
+     * @see DataSetUtil.sliceProperties
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
-        Map result = new LinkedHashMap(properties);
+
+        String[] ss= DataSetUtil.dimensionProperties();
+        Map<String,Object> result = new LinkedHashMap();
+        for ( String s: ss ) {
+            Object val= properties.get(s);
+            if ( val!=null ) result.put( s, val );
+        }
+
         List<Object> deps = new ArrayList(4);
+        List<Object> bund = new ArrayList(4);
+        List<Object> bins = new ArrayList(4);
         for (int i = 0; i < 4; i++) {
             deps.add(i, properties.get("DEPEND_" + i));
+            bund.add(i, properties.get("BUNDLE_" + i));
+            bins.add(i, properties.get("BINS_" + i));
         }
 
         deps.remove(sliceDimension);
-        deps.add(2, null);
+        bund.remove(sliceDimension);
+        bins.remove(sliceDimension);
 
         for (int i = 0; i < 3; i++) {
-            result.put("DEPEND_" + i, deps.get(i));
+            if ( deps.get(i)!=null ) result.put("DEPEND_" + i, deps.get(i));
+            if ( bund.get(i)!=null ) result.put("BUNDLE_" + i, bund.get(i));
+            if ( bins.get(i)!=null ) result.put("BINS_" + i, bins.get(i));
         }
+
         return result;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @param properties
+     * @return
+     */
     public static Map<String,Object> transposeProperties(Map<String,Object> properties) {
-        Map result = new LinkedHashMap(properties);
+        Map<String,Object> result = new LinkedHashMap(properties);
         result.put("DEPEND_1", properties.get("DEPEND_0"));
         result.put("DEPEND_0", properties.get("DEPEND_1"));
         return result;
