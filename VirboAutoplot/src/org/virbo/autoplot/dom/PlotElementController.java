@@ -1055,7 +1055,7 @@ public class PlotElementController extends DomNodeController {
      */
     private void resetPlotElement(QDataSet fillDs, RenderType renderType) {
         logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
-        if (renderer != null) {
+        if ( false && renderer != null) {
             renderer.setActive(true);
         }
 
@@ -1204,6 +1204,10 @@ public class PlotElementController extends DomNodeController {
                     setChildPlotElements(cp);
                 } finally {
                     lock.unlock();
+                }
+            } else {
+                if ( plotElement.getComponent().length()==0 ) {
+                    renderer.setActive(true);
                 }
             }
 
