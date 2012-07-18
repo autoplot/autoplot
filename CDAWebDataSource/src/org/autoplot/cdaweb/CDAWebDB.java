@@ -537,6 +537,11 @@ public class CDAWebDB {
         for ( String s: files ) {
             System.err.println(s);
         }
+
+        String[] files2= db.getFilesAndRanges( "TIMED_L1B_SABER", DatumRangeUtil.parseTimeRange( "2002-01-26" ) );
+        for ( String s: files2 ) {
+            System.err.println(s);
+        }
         
         Map<String,String> ids= db.getServiceProviderIds( );
 
