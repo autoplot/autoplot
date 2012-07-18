@@ -43,6 +43,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ds=" ) );
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "id=" ) );
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=" ) );
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ws=", "ws=", "use web service" ) );
             return ccresult;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String param= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
@@ -117,6 +118,11 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                 }
 
 
+            } else if ( param.equals("ws") ) {
+                List<CompletionContext> ccresult= new ArrayList<CompletionContext>(10);
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "T", "T", "use webservice" ) );
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "F", "F", "use files for offline use" ) );
+                return ccresult;
             }
         }
         return new ArrayList<CompletionContext>() {};
