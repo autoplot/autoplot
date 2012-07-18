@@ -117,7 +117,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                 throw ex;
             }
 
-            boolean webService= false;
+            boolean webService= getParam("ws", "F").equals("T");
+            
             String[] files= null;
 
             String tmpl= db.getNaming(ds.toUpperCase());
