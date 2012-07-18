@@ -120,38 +120,11 @@ public class MetadataUtil {
      * slice the properties to reduce rank.  TODO: This all needs review, since the QDataSet model is mature.
      * @param properties
      * @param sliceDimension
-     * @see DataSetUtil.sliceProperties
+     * @see DataSetOps.sliceProperties
      * @return
      */
     public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
-
-        Map<String,Object> result = new LinkedHashMap();
-        String[] ss= DataSetUtil.dimensionProperties();
-        for ( String s: ss ) {
-            Object val= properties.get(s);
-            if ( val!=null ) result.put( s, val );
-        }
-
-        List<Object> deps = new ArrayList(QDataSet.MAX_RANK);
-        List<Object> bund = new ArrayList(QDataSet.MAX_RANK);
-        List<Object> bins = new ArrayList(QDataSet.MAX_RANK);
-        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
-            deps.add(i, properties.get("DEPEND_" + i));
-            bund.add(i, properties.get("BUNDLE_" + i));
-            bins.add(i, properties.get("BINS_" + i));
-        }
-
-        deps.remove(sliceDimension);
-        bund.remove(sliceDimension);
-        bins.remove(sliceDimension);
-
-        for (int i = 0; i < QDataSet.MAX_RANK-1; i++) {
-            if ( deps.get(i)!=null ) result.put("DEPEND_" + i, deps.get(i));
-            if ( bund.get(i)!=null ) result.put("BUNDLE_" + i, bund.get(i));
-            if ( bins.get(i)!=null ) result.put("BINS_" + i, bins.get(i));
-        }
-
-        return result;
+        return org.virbo.dataset.DataSetOps.sliceProperties(properties, sliceDimension);
     }
 
     /**
