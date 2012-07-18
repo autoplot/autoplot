@@ -125,8 +125,8 @@ public class MetadataUtil {
      */
     public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
 
-        String[] ss= DataSetUtil.dimensionProperties();
         Map<String,Object> result = new LinkedHashMap();
+        String[] ss= DataSetUtil.dimensionProperties();
         for ( String s: ss ) {
             Object val= properties.get(s);
             if ( val!=null ) result.put( s, val );
@@ -159,9 +159,17 @@ public class MetadataUtil {
      * @return
      */
     public static Map<String,Object> transposeProperties(Map<String,Object> properties) {
-        Map<String,Object> result = new LinkedHashMap(properties);
-        result.put("DEPEND_1", properties.get("DEPEND_0"));
-        result.put("DEPEND_0", properties.get("DEPEND_1"));
+
+        Map<String,Object> result = new LinkedHashMap();
+        String[] ss= DataSetUtil.dimensionProperties();
+        for ( String s: ss ) {
+            Object val= properties.get(s);
+            if ( val!=null ) result.put( s, val );
+        }
+
+        if ( properties.get("DEPEND_0")!=null ) result.put("DEPEND_1", properties.get("DEPEND_0"));
+        if ( properties.get("DEPEND_1")!=null ) result.put("DEPEND_0", properties.get("DEPEND_1"));
+
         return result;
 
     }
@@ -185,6 +193,7 @@ public class MetadataUtil {
 
         while ( s.hasNext() ) {
             String cmd= s.next();
+            if ( cmd.trim().length()==0 ) continue;
             if ( cmd.equals("|slices") ) {
                 Pattern skipPattern= Pattern.compile("\\':?\\'");
                 List<Object> args= new ArrayList();
