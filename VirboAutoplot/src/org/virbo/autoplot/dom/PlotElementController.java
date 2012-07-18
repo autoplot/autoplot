@@ -1206,7 +1206,7 @@ public class PlotElementController extends DomNodeController {
                     lock.unlock();
                 }
             } else {
-                if ( plotElement.getComponent().length()==0 ) {
+                if ( plotElement.controller.getParentPlotElement()==null ) {
                     renderer.setActive(true);
                 }
             }
