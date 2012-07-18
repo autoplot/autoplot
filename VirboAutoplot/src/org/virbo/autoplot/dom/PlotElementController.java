@@ -1111,6 +1111,9 @@ public class PlotElementController extends DomNodeController {
             setResetPlotElement(false);
 
             if ( resetRanges && !shouldSlice ) {
+                if ( getParentPlotElement()==null ) {
+                    renderer.setActive(true); // we need this to be on for doResetRanges
+                }
                 doResetRanges();
                 setResetRanges(false);
             }
