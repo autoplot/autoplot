@@ -133,3 +133,4 @@ WI_H1_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_h1 %Y/wi_h1_swe_%Y%m01_?%
 #FILE NOT FOUND: 2001-07-10
 CRRES_H0_MEA ftp://cdaweb.gsfc.nasa.gov/pub/istp/crres/mea %Y/crres_h0_mea_%Y%m%(d,span=10)_?%v.cdf
 UY_1MIN_VHM ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/vhm_1min %Y/uy_1min_vhm_%Y%m%(d,span=10)_?%v.cdf  # these are 10-day files...
+TIMED_L1B_SABER http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/saber/l1bv7 %Y/%m/timed_l1bv7_saber_%Y%m%d%(H,span=4)%M_?%v.cdf
