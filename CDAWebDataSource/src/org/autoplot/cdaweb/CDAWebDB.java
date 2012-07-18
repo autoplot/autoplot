@@ -256,6 +256,10 @@ public class CDAWebDB {
             XPath xp = XPathFactory.newInstance().newXPath();
             String url= (String)xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access/URL/text()", spid), document, XPathConstants.STRING );
             url= url.trim();
+            if ( url.contains(" ") ) {
+                String[] ss= url.split("\\s+"); // See saber/l1bv7
+                url= ss[ss.length-1];
+            }
             if ( url.startsWith("/tower3/public/pub/istp/") ) {
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/public/".length() );
             }
