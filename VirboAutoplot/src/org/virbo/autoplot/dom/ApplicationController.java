@@ -1612,6 +1612,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         synchronized (bindingImpls) {
             List<BindingModel> bb = new ArrayList(Arrays.asList(application.getBindings()));
+            boolean changed= false;
             for (BindingModel b : application.getBindings()) {
                 if (b.getSrcId().equals(src.getId()) || b.getDstId().equals(src.getId())) {
                     bb.remove(b);
@@ -1620,9 +1621,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                         bimpl.unbind();
                         bindingImpls.remove(b);
                     }
+                    changed= true;
                 }
             }
-            application.setBindings(bb.toArray(new BindingModel[bb.size()]));
+            if ( changed ) {
+                application.setBindings(bb.toArray(new BindingModel[bb.size()]));
+            }
         }
 
         synchronized (bindingContexts) {
@@ -1635,13 +1639,17 @@ public class ApplicationController extends DomNodeController implements RunLater
                 String bcid = src.getId();
                 List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
                 List<BindingModel> remove = new ArrayList<BindingModel>();
+                boolean changed= false;
                 for (BindingModel bb : bindings) { // avoid concurrent modification
                     if (bb.getBindingContextId().equals(bcid)) {
                         remove.add(bb);
+                        changed= true;
                     }
                 }
-                bindings.removeAll(remove);
-                application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                if ( changed ) {
+                    bindings.removeAll(remove);
+                    application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                }
 
             }
         }
