@@ -1445,7 +1445,7 @@ public class PlotElementController extends DomNodeController {
             if ( comp.length()>0 ) {
                 fillDs = processDataSet( comp, fillDs );
                 props= processProperties( comp, props ); //TODO: support components
-                if ( props.size()==0 ) { // many of the filters drop the propertyis
+                if ( props.size()==0 ) { // many of the filters drop the properties
                   props= AutoplotUtil.extractProperties(fillDs);
                 }
             }
