@@ -1250,23 +1250,6 @@ public class GuiSupport {
         JMenu addPlotMenu = new JMenu("Add Plot");
         plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
 
-
-        item = new JMenuItem(new AbstractAction("New Location (URI)...") {
-            public void actionPerformed(ActionEvent e) {
-                Runnable run= new Runnable() {
-                    public void run() {
-                        app.dom.getController().setPlot(domPlot);
-                        app.support.addPlotElement();
-                    }
-                };
-                SwingUtilities.invokeLater(run);
-                //run.run();
-            }
-        });
-        item.setToolTipText("change URI or add plot");
-        addPlotMenu.add(item);
-
-
         item = new JMenuItem(new AbstractAction("Copy Plot Elements Down") {
 
             public void actionPerformed(ActionEvent e) {
@@ -1309,7 +1292,24 @@ public class GuiSupport {
         });
         item.setToolTipText("make a new plot, and copy the plot elements into it.  The plot is not bound,\n" +
                 "and a connector is drawn between the two.  The panel uris are bound as well.");
+        
         addPlotMenu.add(item);
+        item = new JMenuItem(new AbstractAction("New Location (URI)...") {
+            public void actionPerformed(ActionEvent e) {
+                Runnable run= new Runnable() {
+                    public void run() {
+                        app.dom.getController().setPlot(domPlot);
+                        app.support.addPlotElement();
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+                //run.run();
+            }
+        });
+        item.setToolTipText("change URI or add plot");
+        addPlotMenu.add(item);
+
+
         expertMenuItems.add(addPlotMenu);
 
         JMenu editPlotMenu = new JMenu("Edit Plot");
