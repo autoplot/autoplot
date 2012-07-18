@@ -132,10 +132,10 @@ public class MetadataUtil {
             if ( val!=null ) result.put( s, val );
         }
 
-        List<Object> deps = new ArrayList(4);
-        List<Object> bund = new ArrayList(4);
-        List<Object> bins = new ArrayList(4);
-        for (int i = 0; i < 4; i++) {
+        List<Object> deps = new ArrayList(QDataSet.MAX_RANK);
+        List<Object> bund = new ArrayList(QDataSet.MAX_RANK);
+        List<Object> bins = new ArrayList(QDataSet.MAX_RANK);
+        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
             deps.add(i, properties.get("DEPEND_" + i));
             bund.add(i, properties.get("BUNDLE_" + i));
             bins.add(i, properties.get("BINS_" + i));
@@ -145,7 +145,7 @@ public class MetadataUtil {
         bund.remove(sliceDimension);
         bins.remove(sliceDimension);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < QDataSet.MAX_RANK-1; i++) {
             if ( deps.get(i)!=null ) result.put("DEPEND_" + i, deps.get(i));
             if ( bund.get(i)!=null ) result.put("BUNDLE_" + i, bund.get(i));
             if ( bins.get(i)!=null ) result.put("BINS_" + i, bins.get(i));
