@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -266,12 +267,18 @@ public class PlotElementController extends DomNodeController {
                             if ( !lock.contains(plotElementListener) ) throw new IllegalStateException("shouldn't happen");
                         }
                         setStatus("busy: update data set");
-                        updateDataSet();
-                        setStatus("done update data set");
-                        if ( lock.isEmpty() ) changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
+                        try {
+                            updateDataSet();
+                            setStatus("done update data set");
+                        } catch ( RuntimeException ex ) {
+                            setStatus("warning: "+ex.toString());
+                            throw ex;
+                        } finally {
+                            if ( lock.isEmpty() ) changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
+                        }
                     }
                 };
-                if ( isAsyncProcess(newv) ) {
+                if ( true ) { //isAsyncProcess(newv) ) {
                     RequestProcessor.invokeLater(run);
                 } else {
                     run.run();
@@ -374,7 +381,7 @@ public class PlotElementController extends DomNodeController {
      * @return
      * @throws RuntimeException
      */
-    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException {
+    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, ParseException {
         String label= null;
         c= c.trim();
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
@@ -556,6 +563,12 @@ public class PlotElementController extends DomNodeController {
 
             }
             _setDataSet(fillDs);
+        } catch ( ParseException ex ) {
+            getRenderer().setException(ex);
+            getRenderer().setDataSet(null);
+            _setDataSet(null);
+            return;
+            
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
                 getRenderer().setException(ex);
@@ -697,7 +710,7 @@ public class PlotElementController extends DomNodeController {
         return false;
     }
 
-    private void updateDataSetImmediately() {
+    private void updateDataSetImmediately() throws Exception {
         QDataSet fillDs = dsf.controller.getFillDataSet();
         if (fillDs != null) {
             if (resetPlotElement) {
@@ -757,12 +770,20 @@ public class PlotElementController extends DomNodeController {
     private void updateDataSet() throws IllegalArgumentException {
         if ( getRenderer()!=null ) getRenderer().setDataSet(null);
         if (!dom.controller.isValueAdjusting()) {
-             updateDataSetImmediately();       
+            try {
+                updateDataSetImmediately();
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException(ex);
+            }
         } else {
             new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
                 @Override
                 public void run() {
-                    updateDataSetImmediately();       
+                    try {
+                        updateDataSetImmediately();
+                    } catch ( Exception ex ) {
+                        throw new IllegalArgumentException(ex);
+                    }
                 }
             };
         }
@@ -1443,7 +1464,11 @@ public class PlotElementController extends DomNodeController {
             Map props= dsc.getFillProperties();
             String comp= plotElement.getComponent();
             if ( comp.length()>0 ) {
-                fillDs = processDataSet( comp, fillDs );
+                try {
+                    fillDs = processDataSet(comp, fillDs);
+                } catch (ParseException ex) {
+                    throw new RuntimeException(ex);
+                }
                 props= processProperties( comp, props ); //TODO: support components
                 if ( props.size()==0 ) { // many of the filters drop the properties
                   props= AutoplotUtil.extractProperties(fillDs);
