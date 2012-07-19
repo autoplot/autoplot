@@ -1269,7 +1269,7 @@ public class AutoplotUtil {
 
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         if ( srenderType!=null ) {
-            if ( srenderType.equals("time_series") ) {
+            if ( srenderType.equals("time_series") ) { //TODO: CDAWeb time_series will be fixed to "series" once it can automatically reduce data.
                 if (fillds.length() > 80000) {
                     spec = RenderType.hugeScatter;
                 } else {
