@@ -67,7 +67,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     boolean haveAddedRecent= false;
     private static final String MSG_NO_DATASET = "<html><em>No dataset selected, pick initial dataset...</em></html>";
     private String currentDs= "";
-    private String filter=""; 
+    private String filter="";
+    private String id="";
 
     private boolean pickDs() {
         Window win = SwingUtilities.getWindowAncestor(this);
@@ -191,6 +192,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         String master= fmaster;
 
                         String id= args.get("id");
+                        if ( id==null ) id= CDAWebEditorPanel.this.id; //kludge
                         if ( id!=null ) {
                             master= master + "?" + id;
                         }
@@ -492,6 +494,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( filter1!=null ) {
             this.filter= filter1;
         }
+        this.id= args.get( "id" );
         
         if ( args.get( CDAWebDataSource.PARAM_DS )==null ) {
             Runnable run= new Runnable() {
@@ -529,8 +532,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             Map<String,String> args= URISplit.parseParams(split.params);
             id= args.get("arg_0");
         }
+        if ( id!=null ) this.id= id;
+        if ( id==null && this.id!=null ) id=this.id;
         if ( id==null ) id="";
+        
         String timeRange= timeRangeTextField.getText();
+        if ( timeRange==null ) {
+            System.err.println("here it's null");
+        }
         timeRange= timeRange.replaceAll(" ", "+");
         
         String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id;
