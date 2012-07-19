@@ -35,7 +35,7 @@ public class Test011 {
         t0 = System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws Exception {
         try {
             timer("reset");
 
