@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import org.das2.dataset.VectorDataSet;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
@@ -34,7 +35,7 @@ public class Test011 {
         t0 = System.currentTimeMillis();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         try {
             timer("reset");
 
