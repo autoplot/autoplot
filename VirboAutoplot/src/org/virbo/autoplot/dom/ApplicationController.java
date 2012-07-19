@@ -543,11 +543,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         if (application.plotElements.size() > 1 ) {
 
             DasPlot p = pelement.controller.getDasPlot();
-            if (p != null) {
-                Renderer r = pelement.controller.getRenderer();
-                if (r != null) {
-                    p.removeRenderer(r);
-                }
+            Renderer r= pelement.controller.getRenderer();
+            if (p != null && r != null ) {
+                p.removeRenderer(r);    
             }
             Plot domplot= getPlotFor(pelement);
 
@@ -561,12 +559,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             pelement.controller.unbindDsf();
             pelement.controller.disconnect();
             pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
-            pelement.controller.renderer.setColorBar(null);
+            if ( r!=null ) r.setColorBar(null);
             //PlotController.pdListen
             if ( domplot!=null ) {
                 domplot.controller.pdListen.remove(pelement);
             }
-            pelement.controller.renderer.setDataSet(null);
+            if ( r!=null ) r.setDataSet(null);
             pelement.controller.renderer=null;
             pelement.controller.changesSupport=null;
             //pelement.controller= null; // we need this to unbind later.
