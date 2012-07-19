@@ -380,8 +380,9 @@ public class PlotElementController extends DomNodeController {
      * @param fillDs
      * @return
      * @throws RuntimeException
+     * @throws Exception when the processStr cannot be processed.
      */
-    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, ParseException {
+    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, Exception {
         String label= null;
         c= c.trim();
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
@@ -563,12 +564,6 @@ public class PlotElementController extends DomNodeController {
 
             }
             _setDataSet(fillDs);
-        } catch ( ParseException ex ) {
-            getRenderer().setException(ex);
-            getRenderer().setDataSet(null);
-            _setDataSet(null);
-            return;
-            
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
                 getRenderer().setException(ex);
@@ -577,6 +572,11 @@ public class PlotElementController extends DomNodeController {
             } else {
                 throw ex;
             }
+            return;
+        } catch ( Exception ex ) {
+            getRenderer().setException(ex);
+            getRenderer().setDataSet(null);
+            _setDataSet(null);
             return;
         }
 
@@ -1466,7 +1466,7 @@ public class PlotElementController extends DomNodeController {
             if ( comp.length()>0 ) {
                 try {
                     fillDs = processDataSet(comp, fillDs);
-                } catch (ParseException ex) {
+                } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
                 props= processProperties( comp, props ); //TODO: support components
