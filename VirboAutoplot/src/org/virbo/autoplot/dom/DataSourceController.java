@@ -970,8 +970,13 @@ public class DataSourceController extends DomNodeController {
                     setReduceDataSetString(null);
                     ds= getDataSet();
                 } else {
-                    ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
-                    setReduceDataSetString(filters);
+                    try {
+                        ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
+                        setReduceDataSetString(filters);
+                    } catch ( Exception ex ) {
+                        setException(ex);
+                        throw new RuntimeException(ex);
+                    }
                 }
 
                 //TODO: must we process the props as well?
