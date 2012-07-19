@@ -245,7 +245,11 @@ public class TimeSeriesBrowseController {
                         //Axis xaxis= null;
                         //dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
                         //dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );//TODO: think about if this is really correct
-                        this.setupGen( dsf.getController().getApplication(), Application.PROP_TIMERANGE );
+                        //this.setupGen( dsf.getController().getApplication(), Application.PROP_TIMERANGE );
+                        this.setupGen( domPlot, Plot.PROP_CONTEXT );
+                        Application dom= domPlot.getController().getApplication();
+                        dom.getController().bind( dom, Application.PROP_TIMERANGE, domPlot, Plot.PROP_CONTEXT );
+                        
                     } else {
                         System.err.println("  unable to bind to application timeRange because of units." );
                         return;
