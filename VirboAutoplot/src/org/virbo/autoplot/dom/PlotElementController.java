@@ -1513,7 +1513,7 @@ public class PlotElementController extends DomNodeController {
                 long t0= System.currentTimeMillis();
 
                 doAutoranging( peleCopy,props,fillDs, false );
-                System.err.println("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
+                //System.err.println("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
 
                 //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
                 //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
