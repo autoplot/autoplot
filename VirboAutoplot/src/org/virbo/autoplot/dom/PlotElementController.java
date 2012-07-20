@@ -74,6 +74,7 @@ public class PlotElementController extends DomNodeController {
     private static final String PENDING_RESET_RANGE = "resetRanges";
     private static final String PENDING_SET_DATASET= "setDataSet";
     private static final String PENDING_COMPONENT_OP= "componentOp";
+    private static final String PENDING_UPDATE_DATASET= "updateDataSet";
 
     static final Logger logger = Logger.getLogger("vap.plotElementController");
     final private Application dom;
@@ -711,54 +712,65 @@ public class PlotElementController extends DomNodeController {
     }
 
     private void updateDataSetImmediately() throws Exception {
-        QDataSet fillDs = dsf.controller.getFillDataSet();
-        if (fillDs != null) {
-            if (resetPlotElement) {
-                if (plotElement.getComponent().equals("")) {
-                    RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
-                    plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
-                    resetPlotElement(fillDs, renderType);
-                    setResetPlotElement(false);
-                } else if ( plotElement.getComponent().startsWith("|") ) {
-                    try {
-                        QDataSet fillDs2 = fillDs;
-                        String comp= plotElement.getComponent();
-                        if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
-                        RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
+        performingChange( this, PENDING_UPDATE_DATASET );
+        try {
+            QDataSet fillDs = dsf.controller.getFillDataSet();
+            if (fillDs != null) {
+                if (resetPlotElement) {
+                    if (plotElement.getComponent().equals("")) {
+                        RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
+                        System.err.println(" fillDs:" + fillDs + "  renderType:"+ renderType );
+
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
-                        resetPlotElement(fillDs2, renderType);
+                        resetPlotElement(fillDs, renderType);
                         setResetPlotElement(false);
-                    } catch ( RuntimeException ex ) {
-                        setStatus("warning: Exception in process: " + ex );
-                        //getRenderer().setException(ex);
-                        throw ex;
+                    } else if ( plotElement.getComponent().startsWith("|") ) {
+                        try {
+                            QDataSet fillDs2 = fillDs;
+                            String comp= plotElement.getComponent();
+                            if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
+                            RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
+                            plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
+                            resetPlotElement(fillDs2, renderType);
+                            setResetPlotElement(false);
+                        } catch ( RuntimeException ex ) {
+                            setStatus("warning: Exception in process: " + ex );
+                            //getRenderer().setException(ex);
+                            throw ex;
+                        } finally {
+                            changePerformed( this, PENDING_UPDATE_DATASET );
+                        }
+                    } else {
+                        if (renderer == null) maybeCreateDasPeer();
+                        try {
+                            if (resetRanges) doResetRanges();
+                            setResetPlotElement(false);
+                        } catch ( RuntimeException ex ) {
+                            setStatus("warning: Exception in process: " + ex );
+                            //getRenderer().setException(ex);
+                            throw ex;
+                        } finally {
+                            changePerformed( this, PENDING_UPDATE_DATASET );
+                        }
                     }
-                } else {
-                    if (renderer == null) maybeCreateDasPeer();
-                    try {
-                        if (resetRanges) doResetRanges();
-                        setResetPlotElement(false);
-                    } catch ( RuntimeException ex ) {
-                        setStatus("warning: Exception in process: " + ex );
-                        //getRenderer().setException(ex);
-                        throw ex;
-                    }
+                } else if (resetRanges) {
+                    doResetRanges();
+                    setResetRanges(false);
+                } else if (resetRenderType) {
+                    doResetRenderType(plotElement.getRenderType());
                 }
-            } else if (resetRanges) {
-                doResetRanges();
-                setResetRanges(false);
-            } else if (resetRenderType) {
-                doResetRenderType(plotElement.getRenderType());
             }
-        }
-        if (fillDs == null) {
-            if (getRenderer() != null) {
-                getRenderer().setDataSet(null);
-                getRenderer().setException(null); // remove leftover message.
+            if (fillDs == null) {
+                if (getRenderer() != null) {
+                    getRenderer().setDataSet(null);
+                    getRenderer().setException(null); // remove leftover message.
+                }
+                setDataSet(null, false);
+            } else {
+                setDataSet(fillDs, true);
             }
-            setDataSet(null, false);
-        } else {
-            setDataSet(fillDs, true);
+        } finally {
+            changePerformed( this, PENDING_UPDATE_DATASET );
         }
     }
 
@@ -769,6 +781,7 @@ public class PlotElementController extends DomNodeController {
      */
     private void updateDataSet() throws IllegalArgumentException {
         if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+        registerPendingChange( this, PENDING_UPDATE_DATASET );
         if (!dom.controller.isValueAdjusting()) {
             try {
                 updateDataSetImmediately();
