@@ -1183,7 +1183,6 @@ public class PlotElementController extends DomNodeController {
                     for (int i = 0; i < count; i++) {
                         long t0= System.currentTimeMillis();
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
-                        System.err.println("copyPlotElement took (ms):"+ ( System.currentTimeMillis()-t0) );
                         ele.controller.getRenderer().setActive(false);
                         cp.add(ele);
                         ele.setParent( plotElement.getId() );
