@@ -700,7 +700,7 @@ public class CdfUtil {
                             xDependVariable = cdf.getVariable(String.valueOf(att));
                             if ( xDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
                             xMaxRec = xDependVariable.getNumberOfValues();
-                            if ( xMaxRec!=maxRec ) {
+                            if ( xMaxRec!=maxRec && vdescr==null && var.recordVariance() ) {
                                 if ( maxRec==-1 ) maxRec+=1; //why?
                                 warn.add("depend0 length is inconsistent with length ("+(maxRec)+")" );
                                 //TODO: warnings are incorrect for Themis data.
