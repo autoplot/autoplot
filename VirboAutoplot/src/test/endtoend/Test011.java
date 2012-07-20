@@ -43,7 +43,7 @@ public class Test011 {
             timer("ds=findgen(4000,30)");
 
             for (int i = 0; i < 4000; i++) {
-                String cmd = "_s0(40)"; //String.format("_s0(%d)", i );
+                String cmd = "|nop()"; //String.format("_s0(%d)", i );
                 DataSetOps.sprocess(cmd, ds, null);
             }
 
