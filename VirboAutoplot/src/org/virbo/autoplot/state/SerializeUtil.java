@@ -79,11 +79,11 @@ public class SerializeUtil {
                     //special node should runtime data
                     continue;
                 }
-                log.fine("serializing property \"" + propertyName + "\" of " + elementName + " id=" + node.getId());
+                log.log(Level.FINE, "serializing property \"{0}\" of {1} id={2}", new Object[]{propertyName, elementName, node.getId()});
                 Method readMethod = pd.getReadMethod();
                 Method writeMethod = pd.getWriteMethod();
                 if (writeMethod == null || readMethod == null) {
-                    log.info("skipping property \"" + propertyName + "\" of " + elementName + ", failed to find read and write method.");
+                    log.log(Level.INFO, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
                     continue;
                 }
                 Object value = null;
@@ -100,7 +100,7 @@ public class SerializeUtil {
                     continue;
                 }
                 if (value == null) {
-                    log.info("skipping property " + propertyName + " of " + elementName + ", value is null.");
+                    log.log(Level.INFO, "skipping property {0} of {1}, value is null.", new Object[]{propertyName, elementName});
                     continue;
                 }
                 if (propertyName.equals("id") && ((String) value).length() > 0) {
@@ -148,7 +148,7 @@ public class SerializeUtil {
                     Object defltValue = DomUtil.getPropertyValue(defl, pd.getName());
                     Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
                     if (prop == null) {
-                        log.warning("unable to serialize " + propertyName);
+                        log.log(Level.WARNING, "unable to serialize {0}", propertyName);
                         continue;
                     }
                     prop.setAttribute("name", pd.getName());
