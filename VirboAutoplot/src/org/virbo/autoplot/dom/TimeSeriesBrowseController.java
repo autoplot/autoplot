@@ -13,13 +13,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.beans.BeansUtil;
 import org.virbo.autoplot.util.TickleTimer;
 import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -102,6 +100,7 @@ public class TimeSeriesBrowseController {
 
     protected void setupGen( DomNode node, final String property ) {
         timeSeriesBrowseListener = new PropertyChangeListener() {
+            @Override
             public String toString() {
                return ""+TimeSeriesBrowseController.this;
             }
