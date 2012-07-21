@@ -965,9 +965,13 @@ public class ApplicationModel {
 
         for ( BindingModel m: state.getBindings() ) {
             Object src= DomUtil.getElementById( state, m.getSrcId() );
+            if ( src==null ) {
+                System.err.println("invalid binding:" + m + ", unable to find source node: "+ m.getSrcId() );
+                continue;
+            }
             Object dst= DomUtil.getElementById( state, m.getDstId() );
-            if ( src==null || dst==null ) {
-                System.err.println("invalid binding:" + m );
+            if ( dst==null ) {
+                System.err.println("invalid binding:" + m + ", unable to find destination node: "+ m.getDstId() );
                 continue;
             }
             BeanProperty srcProp= BeanProperty.create(m.getSrcProperty());
