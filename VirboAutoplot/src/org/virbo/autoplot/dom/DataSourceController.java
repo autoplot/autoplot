@@ -300,7 +300,18 @@ public class DataSourceController extends DomNodeController {
                 if ( pe==null ) {
                     setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
                 } else {
-                    setTsb(null);
+                    List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
+                    pe= null;
+                    for ( int i=0; i<pele.size(); i++ ) {
+                        if ( doesPlotElementSupportTsb( pele.get(i) ) ) {
+                            pe= pele.get(i);
+                        }
+                    }
+                    if ( pe!=null ) {
+                        setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+                    } else {
+                        setTsb(null);
+                    }
                 }
             }
             if ( dsf.getUri().length()>0 ) {
