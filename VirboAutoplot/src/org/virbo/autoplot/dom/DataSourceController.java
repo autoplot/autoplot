@@ -257,9 +257,13 @@ public class DataSourceController extends DomNodeController {
      * @return
      */
     private boolean doesPlotElementSupportTsb( PlotElement p ) {
-        return p.isAutoComponent() || (
-                !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
-
+        Plot plot= p.getController().getApplication().getController().getPlotFor(p);
+        if ( plot==null ) return false;
+        if ( UnitsUtil.isTimeLocation( plot.getXaxis().getRange().getUnits() ) 
+                || UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) return true;
+        return false;
+        //return p.isAutoComponent() || (
+        //        !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
     }
 
     public synchronized void resetDataSource(boolean valueWasAdjusting,DataSource dataSource) {
