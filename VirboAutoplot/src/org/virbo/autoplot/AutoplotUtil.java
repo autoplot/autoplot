@@ -1314,6 +1314,9 @@ public class AutoplotUtil {
         }
 
         if (fillds.rank() >= 2) {
+//            if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
+//                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
+//            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
             if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
                 if (fillds.length() > 80000) {
                     spec = RenderType.hugeScatter;
