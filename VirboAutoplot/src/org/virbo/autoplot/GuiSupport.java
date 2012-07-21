@@ -55,6 +55,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -1429,8 +1430,18 @@ public class GuiSupport {
         chooser.setCurrentDirectory( new File( parent.stateSupport.getDirectory() ) );
         if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(parent) ) {
             try {
-                Application vap = (Application) StatePersistence.restoreState( chooser.getSelectedFile() );
+                final File f= chooser.getSelectedFile();
+                final Application vap = (Application) StatePersistence.restoreState( f );
                 PropertyEditor edit = new PropertyEditor(vap);
+                edit.addSaveAction( new AbstractAction("Save") {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            StatePersistence.saveState(f, vap);
+                        } catch (IOException ex) {
+                            JOptionPane.showConfirmDialog( parent, "Unable to save to file: "+ f );
+                        }
+                    }
+                });
                 edit.showDialog(this.parent);
             } catch ( Exception ex ) {
                 JOptionPane.showMessageDialog( parent, "File does not appear to well-formatted .vap file" );
