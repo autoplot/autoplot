@@ -102,6 +102,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
                 if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==null ) { //put in state after atomtic operation
                     String description= (String) evt.getOldValue();
+                    if ( description==null ) {
+                        System.err.println("description is null"); // debugging observed 7/23/2012
+                    }
                     if ( description.length()>0 ) {
                         fireActionEvent( new ActionEvent(this,0,"label: "+description ) );
                     } else {
