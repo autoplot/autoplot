@@ -24,7 +24,7 @@ public class Test012 {
         QDataSet ds;
         long t0= System.currentTimeMillis();
 
-        System.err.printf( "== %s ==\n", uri );
+        System.err.printf( String.format( "== %03d %s ==\n", id, uri ) );
 
         ds= Util.getDataSet( uri );
         double t= (System.currentTimeMillis()-t0)/1000.;
