@@ -156,7 +156,7 @@ public class DataSourceController extends DomNodeController {
         
         this.model = model;
         this.dom = model.getDocumentModel();
-        this.changesSupport = new ChangesSupport(this.propertyChangeSupport, this);
+        //this.changesSupport = new ChangesSupport(this.propertyChangeSupport, this);
         this.dsf = dsf;
 
         //dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, updateSlicePropertyChangeListener);
