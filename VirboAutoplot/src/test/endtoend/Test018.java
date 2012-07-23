@@ -228,13 +228,13 @@ public class Test018 {
             }
 
             String testId= "test018";
-            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
-
             setCanvasSize(600, 600);
 
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getOptions().setCanvasFont("sans-8");
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             test1( testId );
             test2( testId );
