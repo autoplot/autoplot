@@ -245,14 +245,15 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                         }
                     }
 
-                    
+
                     JFileChooser choose= new JFileChooser();
                     if ( nn!=null && nn.length>1 ) {
-                        String s= ""+nn[0];
+                        for ( int i=0; i<nn.length; i++ ) if ( nn[i]==null ) nn[i]= "";
+                        StringBuilder s= new StringBuilder( nn[0] );
                         for ( int i=1; i<6; i++ ) {
-                            if ( nn.length>i ) s+= "<br>"+nn[i];
+                            if ( nn.length>i ) s.append( "<br>").append( nn[i] );
                         }
-                        final JLabel label= new JLabel("<html>Target should contain the files:<br>"+ s );
+                        final JLabel label= new JLabel("<html>Target should contain the files:<br>"+ s.toString() );
                         choose.setAccessory( label );
                     }
 
