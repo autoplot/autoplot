@@ -269,7 +269,6 @@ public class GridPngWalkView extends PngWalkView {
             List<DatumRange> drs= seq.getActiveSubrange();
 
             boolean outOfTime= false;
-            int npaint= (rowMax-rowMin)*(colMax-colMin);
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
                     int i = (row * nCols) + col;
