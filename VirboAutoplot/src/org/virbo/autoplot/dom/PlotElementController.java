@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1201,7 +1200,7 @@ public class PlotElementController extends DomNodeController {
                     }
 
                     for (int i = 0; i < count; i++) {
-                        long t0= System.currentTimeMillis();
+                        //long t0= System.currentTimeMillis();
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
                         ele.controller.getRenderer().setActive(false);
                         cp.add(ele);
