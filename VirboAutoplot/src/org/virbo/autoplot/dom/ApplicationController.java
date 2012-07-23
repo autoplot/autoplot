@@ -565,7 +565,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 domplot.controller.pdListen.remove(pelement);
             }
             if ( r!=null ) r.setDataSet(null);
-            pelement.controller.renderer=null;
+            pelement.controller.deleted= true;
+            //pelement.controller.renderer=null; //TODO: check that the renderer gets GC'd.
             //pelement.controller.changesSupport=null;
             //pelement.controller= null; // we need this to unbind later.
             pelement.removePropertyChangeListener(plotIdListener);

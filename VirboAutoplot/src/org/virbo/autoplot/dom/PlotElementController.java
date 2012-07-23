@@ -88,6 +88,10 @@ public class PlotElementController extends DomNodeController {
     private QDataSet processDataSet= null;
     String procressStr= null;
 
+    // introduced as tool for making sure PlotElementControllers are properly garbage collected.  This
+    // will be set to true as the PlotElement and its controller are deleted.
+    boolean deleted= false;
+
     public PlotElementController(final ApplicationModel model, final Application dom, final PlotElement plotElement) {
         super(plotElement);
         this.dom = dom;
