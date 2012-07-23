@@ -4,14 +4,13 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +35,7 @@ import org.virbo.autoplot.util.TransparentLogger;
  */
 public final class ChangesSupport {
     Map<Object,Object> changesPending;
-    Object parent;
+    WeakReference<Object> parent;
     private static final Logger logger= TransparentLogger.getLogger( "dom" );
 
     /**
@@ -46,7 +45,7 @@ public final class ChangesSupport {
      * @param parent  the object this is supporting, for debugging purposes.
      */
     ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
-        this.parent= parent;
+        this.parent= new WeakReference<Object>(parent);
         this.changesPending= new HashMap<Object,Object>(); // client->lock
         if ( pcs==null ) {
             pcs= new PropertyChangeSupport(parent);
@@ -83,7 +82,7 @@ public final class ChangesSupport {
      * @param lockObject object identifying the change.
      */
     synchronized void registerPendingChange( Object client, Object lockObject ) {
-        String msg= "registerPendingChange "+lockObject+" by "+client + "  in "+parent ;
+        String msg= "registerPendingChange "+lockObject+" by "+client + "  in "+ parent.get() ;
         logger.fine( msg );
         Object existingClient= changesPending.get(lockObject);
         if ( existingClient!=null ) {

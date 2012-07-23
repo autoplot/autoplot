@@ -29,7 +29,7 @@ public class DomNodeController {
     DomNode node;
 
     protected PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
-    protected ChangesSupport changesSupport = new ChangesSupport(propertyChangeSupport, this);
+    protected final ChangesSupport changesSupport = new ChangesSupport(propertyChangeSupport, this);
 
     private static WeakHashMap<DomNode,Long> instances= new WeakHashMap();
 
