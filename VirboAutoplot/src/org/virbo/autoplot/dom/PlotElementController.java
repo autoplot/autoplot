@@ -783,11 +783,18 @@ public class PlotElementController extends DomNodeController {
         if ( getRenderer()!=null ) getRenderer().setDataSet(null);
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         if (!dom.controller.isValueAdjusting()) {
-            try {
-                updateDataSetImmediately();
-            } catch ( Exception ex ) {
-                throw new IllegalArgumentException(ex);
-            }
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        updateDataSetImmediately();
+                    } catch ( Exception ex ) {
+                        throw new IllegalArgumentException(ex);
+                    }
+                }
+            };
+            RequestProcessor.invokeLater(run);
+            
         } else {
             new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
                 @Override
