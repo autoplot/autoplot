@@ -787,8 +787,7 @@ public class PlotElementController extends DomNodeController {
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         if (!dom.controller.isValueAdjusting()) {
             Runnable run= new Runnable() {
-                @Override
-                public void run() {
+                public void run() { // java complains about method not override.
                     try {
                         updateDataSetImmediately();
                     } catch ( Exception ex ) {
