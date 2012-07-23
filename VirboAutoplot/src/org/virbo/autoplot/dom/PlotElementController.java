@@ -2221,8 +2221,18 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-    protected void maybeCreateDasPeer(){
+    /**
+     * create the peer that will actually do the painting.  This may be called from either the event thread or off the event thread,
+     * but work will be done on the event thread in either case using SwingUtilities.invokeAndWait.
+     *
+     * preconditions: the new render type is identified.  The plotElement may already contain a corresponding renderer for this or
+     * another type.
+     * postconditions: The correct renderer is installed in the plot.
+     */
+    protected synchronized void maybeCreateDasPeer(){
         final Renderer oldRenderer = getRenderer();
+
+        //System.err.println( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
         DasColorBar cb= null;
         if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
 
@@ -2239,6 +2249,7 @@ public class PlotElementController extends DomNodeController {
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             if ( oldRenderer != newRenderer ) {
                 setRenderer(newRenderer);
+                //System.err.println( "getRenderer= "+getRenderer() + "  plotElementController="+ this + " ("+this.hashCode()+")" );
                 if ( oldRenderer!=null ) {
                     oldRenderer.setActive(false);
                     oldRenderer.setColorBar(null);
@@ -2305,7 +2316,13 @@ public class PlotElementController extends DomNodeController {
             if ( SwingUtilities.isEventDispatchThread() ) {
                 run.run();
             } else {
-                SwingUtilities.invokeLater(run);
+                try {
+                    SwingUtilities.invokeAndWait(run);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
             //if (getDataSourceFilter().controller.getFillDataSet() != null) {
