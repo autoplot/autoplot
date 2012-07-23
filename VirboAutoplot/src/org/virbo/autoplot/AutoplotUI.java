@@ -1164,7 +1164,14 @@ APSplash.checkTime("init 52");
 //        });
         fileMenu.addSeparator();
 
-        mi= new JMenuItem( DasCanvas.PRINT_ACTION );
+        //TODO: decorate print action to set focus.
+        AbstractAction printAction= new AbstractAction( "Print...") {
+            public void actionPerformed(ActionEvent e) {
+                applicationModel.getCanvas().makeCurrent();
+                DasCanvas.PRINT_ACTION.actionPerformed(e);
+            }
+        };
+        mi= new JMenuItem( printAction );
         mi.setToolTipText("Print to printer");
         fileMenu.add( mi );
 
