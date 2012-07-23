@@ -829,8 +829,8 @@ public class GuiSupport {
     public static Action getPrintAction( final Application app, final Component parent,final String ext) {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
             public void actionPerformed(ActionEvent e) {
-                final DasCanvas canvas= DasCanvas.getFocusCanvas();
-                //final DasCanvas canvas = app.getController().getDasCanvas();
+                //final DasCanvas canvas= DasCanvas.getFocusCanvas();
+                final DasCanvas canvas = app.getController().getDasCanvas();
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
                 fileChooser.setFileFilter(getFileNameExtensionFilter( ext + " files", ext ));
