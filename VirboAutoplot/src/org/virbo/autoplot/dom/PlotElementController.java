@@ -722,7 +722,7 @@ public class PlotElementController extends DomNodeController {
                 if (resetPlotElement) {
                     if (plotElement.getComponent().equals("")) {
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
-                        System.err.println(" fillDs:" + fillDs + "  renderType:"+ renderType );
+                        //System.err.println(" fillDs:" + fillDs + "  renderType:"+ renderType );
 
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs, renderType);
