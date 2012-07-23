@@ -795,7 +795,8 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             };
-            RequestProcessor.invokeLater(run);
+            //RequestProcessor.invokeLater(run); // this allows listening PlotElements to each do their stuff.
+            run.run();
             
         } else {
             new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
