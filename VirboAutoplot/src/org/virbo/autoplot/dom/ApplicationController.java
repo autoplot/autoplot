@@ -336,29 +336,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public void fillEditPlotMenu(JMenu editPlotMenu, final Plot domPlot) {
         JMenuItem item;
-        item = new JMenuItem(new AbstractAction("Remove Bindings") {
-
-            public void actionPerformed(ActionEvent e) {
-                List<BindingModel> bms= new ArrayList<BindingModel>();
-
-                List<PlotElement> peles = getPlotElementsFor(domPlot);
-                for (PlotElement pele : peles) {
-                    bms.addAll( Arrays.asList( getBindingsFor(pele) ) );
-                    unbind(pele);
-                }
-                bms.addAll( Arrays.asList( getBindingsFor(domPlot) ) );
-                unbind(domPlot);
-                bms.addAll( Arrays.asList( getBindingsFor(domPlot.xaxis) ) );
-                unbind(domPlot.xaxis);
-                bms.addAll( Arrays.asList( getBindingsFor(domPlot.yaxis) ) );
-                unbind(domPlot.yaxis);
-                bms.addAll( Arrays.asList( getBindingsFor(domPlot.zaxis) ) );
-                unbind(domPlot.zaxis);
-                setStatus("removed "+bms.size()+" bindings");
-            }
-        });
-        item.setToolTipText("remove any plot and plot element property bindings");
-        editPlotMenu.add(item);
         item = new JMenuItem(new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
@@ -383,6 +360,40 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         });
         editPlotMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+
+            public void actionPerformed(ActionEvent e) {
+                List<BindingModel> bms= new ArrayList<BindingModel>();
+
+                List<PlotElement> peles = getPlotElementsFor(domPlot);
+                for (PlotElement pele : peles) {
+                    bms.addAll( Arrays.asList( getBindingsFor(pele) ) );
+                    unbind(pele);
+                }
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot) ) );
+                unbind(domPlot);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.xaxis) ) );
+                unbind(domPlot.xaxis);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.yaxis) ) );
+                unbind(domPlot.yaxis);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.zaxis) ) );
+                unbind(domPlot.zaxis);
+                setStatus("removed "+bms.size()+" bindings");
+            }
+        });
+        item.setToolTipText("remove any plot and plot element property bindings");
+        editPlotMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Bind Plot Context to Application Time Range") {
+
+            public void actionPerformed(ActionEvent e) {
+                bind( application, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
+            }
+        });
+        item.setToolTipText("bind the plot's context property to the application timerange, for example when browsing histograms of data.");
+        editPlotMenu.add(item);
+
     }
 
     public Plot getPlotFor(Component c) {
