@@ -810,12 +810,19 @@ public class PlotController extends DomNodeController {
             this.plotElement= p;
             this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
             if ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
-                if ( plot.isAutoLabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
-                if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
-                if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
-                if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
-                if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
-                    plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+                if ( p.isActive() ) {
+                    if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( p.getPlotDefaults().getTitle() );
+                    if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( p.getPlotDefaults().getXaxis().getLabel() );
+                    if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( p.getPlotDefaults().getYaxis().getLabel() );
+                    if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( p.getPlotDefaults().getZaxis().getLabel() );
+                    if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
+                        plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+                    }
+                } else {
+                    if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( p.getPlotDefaults().getTitle() ); // stack of traces
+                    if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( "" );
+                    if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( "" );
+                    if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( "" );
                 }
             }
         }
