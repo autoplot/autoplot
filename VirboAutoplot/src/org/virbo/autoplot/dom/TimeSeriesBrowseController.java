@@ -18,11 +18,13 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -190,13 +192,24 @@ public class TimeSeriesBrowseController {
                 if (e.getPropertyName().equals("datumRange")) {
                     changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
-                    setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
-                    updateTsbTimer.tickle();
+                    if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
+                        setTimeRange( dr );
+                        updateTsbTimer.tickle();
+                    }
+                } else if ( e.getPropertyName().equals( Plot.PROP_CONTEXT ) ) {
+                    changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
+                    DatumRange dr=(DatumRange)e.getNewValue();
+                    if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
+                        setTimeRange( dr );
+                        updateTsbTimer.tickle();
+                    }
                 }
+
             }
         };
 
         this.plot.getXAxis().addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, timeSeriesBrowseListener);
+        this.domPlot.addPropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
 
     }
 
