@@ -551,6 +551,10 @@ public class PlotElementController extends DomNodeController {
                 }
                 QDataSet context= (QDataSet) fillDs.property(QDataSet.CONTEXT_0);
                 if ( context!=null ) {
+
+                    //TODO: we should provide feedback to user somehow.  This could be a property of the plotElement, that
+                    // is displayable in the plot.
+
                     //DatumRange cdr;
                     //if ( context.rank()==1 ) {
                     //    cdr= DataSetUtil.asDatumRange( context, true );
@@ -567,12 +571,12 @@ public class PlotElementController extends DomNodeController {
                 }
 
             }
-            _setDataSet(fillDs);
+            setDataSetInternal(fillDs);
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
                 getRenderer().setException(ex);
                 getRenderer().setDataSet(null);
-                _setDataSet(null);
+                setDataSetInternal(null);
             } else {
                 throw ex;
             }
@@ -580,7 +584,7 @@ public class PlotElementController extends DomNodeController {
         } catch ( Exception ex ) {
             getRenderer().setException(ex);
             getRenderer().setDataSet(null);
-            _setDataSet(null);
+            setDataSetInternal(null);
             return;
         }
 
@@ -612,7 +616,7 @@ public class PlotElementController extends DomNodeController {
         return dataSet;
     }
 
-    public void _setDataSet(QDataSet dataSet) {
+    private void setDataSetInternal(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet; //TODO: we should probably synchronize dataSet access.
         synchronized (this) {
