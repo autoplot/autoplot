@@ -186,6 +186,13 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_COLUMNID, oldColumnId, columnId);
     }
 
+    /**
+     * The context is the "fourth axis" of a plot: allowing one last place to control the dimensions of data to be loaded..
+     * For example, if a histogram is shown of
+     * http://sarahandjeremy.net/~jbf/autoplot/data/jyds/demoTsb.jyds?y3&timerange=2012-04-17 , then the
+     * context property of the plot can be used to control the range.  Note this is presently a "open-loop" where
+     * control can be set.
+     */
     private DatumRange context= Axis.DEFAULT_RANGE;
     public static final String PROP_CONTEXT= "context";
 
