@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Using Pngwalk to see that auroras were visible in Iowa.</small></p>
+        <p><small>The Jython dataset editor panel allows "#description:" and "#title:" to be set in the script.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +22,20 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>more mucking with how the transitions operate to support bundles of mageis stuff at LANL, trying to get autoranging to work correctly</li>
+            <li>users can switch back and forth between series and spectrogram with complex slices</li>
+            <li>limits on slices applied in the GUI to avoid index out of bounds errors</li>
+            <li>bugfix: updateDataSet always moves over to a new thread, to support one dataSource and many plotElements.</li>
+            <li>tsb code can switch from looking at the xaxis to looking at the context more gracefully</li>
+            <li>plot.context to dom.timeRange is automatic now.</li>
+            <li>bugfix when unbundling is done automatically.  Before the y axis label was incorrect.</li>
             <li>print action was attached to focus, even though we added a print button to the slice dialog years ago<</li>
+            <li>transpose would not handle BUNDLE_i correctly.</li>
+            <li>round timeranges in context as string</li>
+            <li>clean up reccount warning with virtual variables in CDF files. </li>
+            <li>bugfix: sliceProperties properly preserves CONTEXT property.</li>
+            <li>bugfix: changesDimensions function didn't properly handle "slices" function</li>
+            <li>bugfix: sliceMetadata function didn't properly slice metadata like BUNDLE_1</li>
             <li>sliceProperties properly preserves CONTEXT property.</li>
             <li>changesDimensions function didn't properly handle "slices" function</li>
             <li>sliceMetadata function didn't properly slice metadata like BUNDLE_1</li>
@@ -77,6 +90,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>jython data source editor panel looks for #description and #title to label the dialog.</li>
             <li>3545095: introduce support for BUNDLE_2 and BUNDLE_3 properties.</li>
             <li>Events Bar renderer reduces data before displaying it.</li>
             <li>increase QDataSet.MAX_UNIT_BUNDLE_COUNT to 65 for Seth's CDF file.</li>
