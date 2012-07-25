@@ -551,7 +551,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.lock("Delete Plot Element");
         int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
-            throw new IllegalArgumentException("deletePlotElement but plot element isn't part of application");
+            System.err.println("deletePlotElement but plot element isn't part of application, ignoring");
+            lock.unlock();
+            return;
         }
         String id= pelement.getId();
         if (application.plotElements.size() > 1 ) {
