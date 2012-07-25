@@ -1233,15 +1233,19 @@ public class ApplicationController extends DomNodeController implements RunLater
         unbind(domPlot.getYaxis());
         unbind(domPlot.getZaxis());
 
-        final DasPlot p = domPlot.controller.getDasPlot();
-        final DasColorBar cb = domPlot.controller.getDasColorBar();
-        final DasCanvas lcanvas= this.getDasCanvas();
-        SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
-            public void run() {
-                lcanvas.remove(p);
-                lcanvas.remove(cb);
-            }
-        } );
+        if ( domPlot.controller==null ) {
+            System.err.println("domPlot.controller is null, this shouldn't happen");
+        } else {
+            final DasPlot p = domPlot.controller.getDasPlot();
+            final DasColorBar cb = domPlot.controller.getDasColorBar();
+            final DasCanvas lcanvas= this.getDasCanvas();
+            SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
+                public void run() {
+                    lcanvas.remove(p);
+                    lcanvas.remove(cb);
+                }
+            } );
+        }
 
         synchronized (this) {
             List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
