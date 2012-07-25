@@ -804,14 +804,11 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( !rows.contains(row) ) rows.add(row);
         }
         
-        double size= 0;
-        int n= 0;
-
         for ( Row r: rows ) {
             try {
                 double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
                 double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
-                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 2;
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.5;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
         }
@@ -876,7 +873,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             try {
                 double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
                 double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
-                d2[0]= d1[0] + ( d2[0]-d1[0] ) / 2;
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.6666;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
         }
