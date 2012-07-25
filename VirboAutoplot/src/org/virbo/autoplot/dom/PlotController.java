@@ -416,6 +416,11 @@ public class PlotController extends DomNodeController {
 
         boolean haveTsb= false;
 
+//        System.err.println("== resetZoom Elements==" );
+//        for ( PlotElement p: elements ) {
+//            System.err.println( p  +  " y= " + p.getPlotDefaults().getYaxis().getRange() );
+//        }
+
         boolean warnedAboutUnits= false;
         for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
