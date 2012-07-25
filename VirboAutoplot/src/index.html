@@ -25,6 +25,7 @@
             <li>more mucking with how the transitions operate to support bundles of mageis stuff at LANL, trying to get autoranging to work correctly</li>
             <li>users can switch back and forth between series and spectrogram with complex slices</li>
             <li>limits on slices applied in the GUI to avoid index out of bounds errors</li>
+            <li>support ISO8601 times spans like "2012-04-05T00:00/PT0.1S".  Before the seconds had to be an integers.</li>
             <li>bugfix: updateDataSet always moves over to a new thread, to support one dataSource and many plotElements.</li>
             <li>tsb code can switch from looking at the xaxis to looking at the context more gracefully</li>
             <li>plot.context to dom.timeRange is automatic now.</li>
@@ -91,6 +92,8 @@
         <p>Features:</p>
         <ul>
             <li>jython data source editor panel looks for #description and #title to label the dialog.</li>
+            <li>link to read-only file cache to support where FTP or HTTP site is available locally.</li>
+            <li>passwords can be stored in fscache keychain.txt to support scripting.</li>
             <li>3545095: introduce support for BUNDLE_2 and BUNDLE_3 properties.</li>
             <li>Events Bar renderer reduces data before displaying it.</li>
             <li>increase QDataSet.MAX_UNIT_BUNDLE_COUNT to 65 for Seth's CDF file.</li>
