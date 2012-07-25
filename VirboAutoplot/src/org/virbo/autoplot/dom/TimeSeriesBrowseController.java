@@ -272,6 +272,12 @@ public class TimeSeriesBrowseController {
                 testCacheTag= new CacheTag(trange,null);
             }
 
+            System.err.println( "was: " + tag );
+            System.err.println( "try: " + testCacheTag );
+            if ( UnitsUtil.isTimeLocation( testCacheTag.getRange().getUnits() ) ) {
+                testCacheTag= new CacheTag(trange,null); // transitional state?  hudson autoplot-test034 was hitting this.
+            }
+
             if (tag == null || !tag.contains(testCacheTag)) {
                 TimeSeriesBrowse tsb= dataSourceController.getTsb();
                 if ( tsb==null ) {
