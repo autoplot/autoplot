@@ -1101,7 +1101,7 @@ public class PlotElementController extends DomNodeController {
      * @param fillDs
      * @param renderType
      */
-    private void resetPlotElement(QDataSet fillDs, RenderType renderType) {
+    private synchronized void resetPlotElement(QDataSet fillDs, RenderType renderType) {
         logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
         if ( false && renderer != null) {
             renderer.setActive(true);
@@ -1143,7 +1143,7 @@ public class PlotElementController extends DomNodeController {
                 for ( PlotElement p : childEles ) {
                     PlotElementController pec= p.getController();
                     if ( dom.plotElements.contains(p) ) { 
-                        dom.controller.deletePlotElement(p);
+                        dom.controller.deletePlotElement(p); //TODO: there are times when things change between the contains(p) and deletePlotElement(p).
                         PropertyChangeListener parentListener= pec.getParentComponentLister();
                         if ( parentListener!=null ) {
                             this.plotElement.removePropertyChangeListener( parentListener );
@@ -1159,11 +1159,15 @@ public class PlotElementController extends DomNodeController {
             setResetPlotElement(false);
 
             if ( resetRanges && !shouldSlice ) {
-                if ( getParentPlotElement()==null ) {
+                boolean doTurnOn= getParentPlotElement()==null && renderer.isActive()==false;
+                if ( doTurnOn ) {
                     renderer.setActive(true); // we need this to be on for doResetRanges
                 }
                 doResetRanges();
                 setResetRanges(false);
+                if ( doTurnOn ) {
+                    renderer.setActive(false);
+                }
             }
 
             if ( shouldHaveChildren ) {
