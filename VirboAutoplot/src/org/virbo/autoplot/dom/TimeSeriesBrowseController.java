@@ -360,6 +360,10 @@ public class TimeSeriesBrowseController {
     }
 
     public void setTimeRange(DatumRange timeRange) {
+        if ( !UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+            System.err.println("ignoring call to setTimeRange with non-time-location "+timeRange );
+            return;
+        }
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
         propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
