@@ -15,7 +15,10 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
@@ -201,6 +204,41 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         } else {
             return false;
         }
+    }
+
+    /**
+     * add JLabels if documentation is available.
+     * @param f
+     * @return true if some documentation was found.
+     */
+    private boolean doDocumentation( File f ) {
+        BufferedReader reader=null;
+        boolean hasDoc= false;
+        try {
+            reader = new BufferedReader( new FileReader(f) );
+            Map<String,String> doc= JythonUtil.getDocumentation( reader );
+
+            String title= doc.get("TITLE");
+            if ( title!=null ) {
+                 paramsPanel.add( new JLabel("<html><b>"+title+"</b></html>") );
+                 hasDoc= true;
+            }
+            String description= doc.get("DESCRIPTION");
+            if ( description!=null ) {
+                 paramsPanel.add( new JLabel("<html>"+description+"</html>") );
+                 hasDoc= true;
+            }
+
+        } catch (IOException ex ) {
+            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if ( reader!=null ) try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return hasDoc;
     }
 
     private boolean doVariables( File f, Map<String,String> params ) {
@@ -431,7 +469,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             dropList[0]= "";
             for ( Entry<String,String> ent: results.entrySet()  ) {
-                dropList[i+1]= ent.getKey()+":  "+ent.getValue();
+                dropList[i+1]= "<html>"+ent.getKey()+"<span color=#808080>: <em>"+ent.getValue()+"</em></span>";
                 if ( param!=null && param.equals(ent.getKey()) ) {
                     idx= i+1;
                 }
@@ -442,6 +480,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 variableComboBox.setSelectedIndex(idx);
             } else {
                 variableComboBox.setSelectedIndex(0);
+            }
+
+            if ( doDocumentation(f) ) {
+                paramsPanel.add( new JLabel("<html><br></html>") );
             }
 
             Map<String,String> ffparams= new HashMap( params );
@@ -483,11 +525,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         Map<String,String> params= URISplit.parseParams(split.params);
 
         String param= (String)variableComboBox.getSelectedItem();
-        int i= param.indexOf(":");
+        int i= param.indexOf("<span");
         if ( i==-1 ) {
             params.put( "arg_0", param.trim() );
         } else {
-            params.put( "arg_0", param.substring(0,i).trim() );
+            int j= param.startsWith("<html>") ? 6 : 0;
+            params.put( "arg_0", param.substring(j,i).trim() );
         }
 
         for ( int j=0; j<paramsList.size(); j++ ) {
