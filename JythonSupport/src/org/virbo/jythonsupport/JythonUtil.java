@@ -12,6 +12,7 @@ import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +166,35 @@ public class JythonUtil {
          */
         public char type;
     }
+
+    /**
+     * scrape through the script looking for documentation declarations
+     * returns an array, possibly containing:
+     *   LABEL few words
+     *   TITLE sentence
+     *   DESCRIPTION short paragraph
+     */
+     public static Map<String,String> getDocumentation( BufferedReader reader ) throws IOException {
+
+         Map<String,String> result= new HashMap<String, String>();
+         String s= reader.readLine();
+         Pattern p= Pattern.compile("#\\s*([a-zA-Z]+)\\s*:(.*)");
+         while ( s!=null ) {
+             Matcher m= p.matcher(s);
+             if ( m.matches() ) {
+                 String prop= m.group(1).toUpperCase();
+                 String value= m.group(2).trim();
+                 if ( prop.equals("LABEL") || prop.equals("TITLE") || prop.equals("DESCRIPTION" ) ) {
+                     result.put( prop, value );
+                 }
+            }
+            s=  reader.readLine();
+        }
+
+        reader.close();
+        return result;
+        
+     }
 
     /**
      * scrape through the script looking for getParam calls.  These are executed, and we
