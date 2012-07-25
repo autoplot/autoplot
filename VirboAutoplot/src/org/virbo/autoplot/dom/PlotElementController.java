@@ -1134,9 +1134,7 @@ public class PlotElementController extends DomNodeController {
             String[] labels = null;
             if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
 
-            boolean weShallAddChildren=
-                    plotElement.isAutoComponent()
-                    && shouldHaveChildren;
+            boolean weShallAddChildren= shouldHaveChildren;
 
             if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child plotElements
                 List<PlotElement> childEles= getChildPlotElements();
