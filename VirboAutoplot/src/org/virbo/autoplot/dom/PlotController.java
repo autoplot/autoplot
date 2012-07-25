@@ -1185,4 +1185,20 @@ public class PlotController extends DomNodeController {
             mi.setVisible(expert);
         }
     }
+
+    /**
+     * return the row for this plot.  This just calls dom.canvases.get(0).getController().getRowFor(this.plot);
+     * @return
+     */
+    public Row getRow() {
+        return dom.canvases.get(0).getController().getRowFor(this.plot);
+    }
+
+    /**
+     * return the row for this plot.  This just calls dom.canvases.get(0).getController().getRowFor(this.plot);
+     * @return
+     */
+    public Column getColumn() {
+        return dom.canvases.get(0).getController().getColumnFor(this.plot);
+    }
 }
