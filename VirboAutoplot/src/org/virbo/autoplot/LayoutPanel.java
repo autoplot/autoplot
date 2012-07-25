@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.Renderer;
 import org.virbo.autoplot.dom.Application;
@@ -451,6 +453,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         plotsMenu = new javax.swing.JMenu();
         swapMenuItem = new javax.swing.JMenuItem();
         addHiddenMenuItem = new javax.swing.JMenuItem();
+        sizeMenu = new javax.swing.JMenu();
+        biggerMI = new javax.swing.JMenuItem();
+        smallerMI = new javax.swing.JMenuItem();
+        sameSizeMI = new javax.swing.JMenuItem();
         bindingActionsMenu = new javax.swing.JPopupMenu();
         deleteBindingsMenuItem = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
@@ -509,6 +515,38 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         plotsMenu.add(addHiddenMenuItem);
+
+        sizeMenu.setText("Plot Size");
+        sizeMenu.setToolTipText("Adjust the selected plots' size");
+
+        biggerMI.setText("Taller");
+        biggerMI.setToolTipText("Make the selected plots taller relative to others");
+        biggerMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                biggerMIActionPerformed(evt);
+            }
+        });
+        sizeMenu.add(biggerMI);
+
+        smallerMI.setText("Shorter");
+        smallerMI.setToolTipText("Make the selected plots shorter relative to others");
+        smallerMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                smallerMIActionPerformed(evt);
+            }
+        });
+        sizeMenu.add(smallerMI);
+
+        sameSizeMI.setText("Same Height");
+        sameSizeMI.setToolTipText("Make the selected plots have the same height");
+        sameSizeMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sameSizeMIActionPerformed(evt);
+            }
+        });
+        sizeMenu.add(sameSizeMI);
+
+        plotsMenu.add(sizeMenu);
 
         plotActionsMenu.add(plotsMenu);
 
@@ -759,9 +797,98 @@ public class LayoutPanel extends javax.swing.JPanel {
         updateSelected();
     }//GEN-LAST:event_panelListComponentValueChanged
 
+    private void biggerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biggerMIActionPerformed
+        List<Row> rows= new ArrayList<Row>();
+        for ( Plot p1: getSelectedPlots() ) {
+            Row row= p1.getController().getRow();
+            if ( !rows.contains(row) ) rows.add(row);
+        }
+        
+        double size= 0;
+        int n= 0;
+
+        for ( Row r: rows ) {
+            try {
+                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 2;
+                r.setBottom( DasDevicePosition.formatFormatStr(d2) );
+            } catch ( ParseException ex ) {}
+        }
+
+        org.virbo.autoplot.dom.DomOps.newCanvasLayout(app);
+        
+    }//GEN-LAST:event_biggerMIActionPerformed
+
+    private void sameSizeMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sameSizeMIActionPerformed
+                List<Row> rows= new ArrayList<Row>();
+        for ( Plot p1: getSelectedPlots() ) {
+            Row row= p1.getController().getRow();
+            if ( !rows.contains(row) ) rows.add(row);
+        }
+
+        double size= 0;
+        double emMaxTop= 0;
+        double emMaxBottom= 0;
+        int n= 0;
+
+        // calculate the average size
+        for ( Row r: rows ) {
+            try {
+                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                size= size + ( d2[0]-d1[0] );
+                emMaxBottom= Math.max( emMaxBottom, d2[1] );
+                emMaxTop= Math.max( emMaxTop, d2[1] );
+                n= n+1;
+            } catch ( ParseException ex ) {}
+        }
+
+        size= size / n;
+
+        for ( Row r: rows ) {
+            try {
+                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                d2[0]= d1[0] + size;
+                d2[1]= emMaxBottom;
+                d1[1]= emMaxTop;
+                r.setBottom( DasDevicePosition.formatFormatStr(d2) );
+                r.setTop( DasDevicePosition.formatFormatStr(d1) );
+            } catch ( ParseException ex ) {}
+        }
+
+        org.virbo.autoplot.dom.DomOps.newCanvasLayout(app);
+        
+    }//GEN-LAST:event_sameSizeMIActionPerformed
+
+    private void smallerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_smallerMIActionPerformed
+        List<Row> rows= new ArrayList<Row>();
+        for ( Plot p1: getSelectedPlots() ) {
+            Row row= p1.getController().getRow();
+            if ( !rows.contains(row) ) rows.add(row);
+        }
+
+        double size= 0;
+        int n= 0;
+
+        for ( Row r: rows ) {
+            try {
+                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) / 2;
+                r.setBottom( DasDevicePosition.formatFormatStr(d2) );
+            } catch ( ParseException ex ) {}
+        }
+
+        org.virbo.autoplot.dom.DomOps.newCanvasLayout(app);
+
+    }//GEN-LAST:event_smallerMIActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
+    private javax.swing.JMenuItem biggerMI;
     private javax.swing.JPopupMenu bindingActionsMenu;
     private javax.swing.JList bindingListComponent;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
@@ -778,6 +905,9 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JMenu plotsMenu;
     private javax.swing.JMenuItem propertiesMenuItem;
     private javax.swing.JMenuItem removeBindingsMenuItem;
+    private javax.swing.JMenuItem sameSizeMI;
+    private javax.swing.JMenu sizeMenu;
+    private javax.swing.JMenuItem smallerMI;
     private javax.swing.JMenuItem swapMenuItem;
     // End of variables declaration//GEN-END:variables
 }
