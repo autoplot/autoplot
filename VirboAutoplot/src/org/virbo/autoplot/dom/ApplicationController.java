@@ -539,10 +539,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
 
     /**
-     * delete the plot element completely, or if it is the last, then empty the
-     * data source.
-     * Earlier versions of this would throw an exception if the last panel were
-     * deleted.
+     * delete the plot element completely, or if it is the last, then empty the data source.
+     * Earlier versions of this would throw an exception if the last plotElement was deleted.
      * @param pelement
      */
     public void deletePlotElement(PlotElement pelement) {
