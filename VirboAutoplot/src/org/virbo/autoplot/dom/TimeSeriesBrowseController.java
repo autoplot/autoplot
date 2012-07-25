@@ -18,6 +18,7 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
@@ -272,9 +273,7 @@ public class TimeSeriesBrowseController {
                 testCacheTag= new CacheTag(trange,null);
             }
 
-            System.err.println( "was: " + tag );
-            System.err.println( "try: " + testCacheTag );
-            if ( UnitsUtil.isTimeLocation( testCacheTag.getRange().getUnits() ) ) {
+            if ( !UnitsUtil.isTimeLocation( testCacheTag.getRange().getUnits() ) ) {
                 testCacheTag= new CacheTag( this.getTimeRange(), null ); // transitional state?  hudson autoplot-test034 was hitting this.
             }
 
