@@ -1158,7 +1158,7 @@ public class PlotElementController extends DomNodeController {
             if ( !shouldSlice ) doResetRenderType(plotElement.getRenderType());
             setResetPlotElement(false);
 
-            if ( resetRanges && !shouldSlice ) {
+            if ( resetRanges && !shouldSlice && !weShallAddChildren ) {
                 boolean doTurnOn= getParentPlotElement()==null && renderer.isActive()==false;
                 if ( doTurnOn ) {
                     renderer.setActive(true); // we need this to be on for doResetRanges
