@@ -496,6 +496,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
                 if ( noOneListening ) {
+                    System.err.println("resetting application to default time range");
                     application.setTimeRange( Application.DEFAULT_TIME_RANGE );
                 }
             }
