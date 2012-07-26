@@ -142,7 +142,7 @@ public class SocketOpener
     {socketThread.join (timeout);}
     catch (InterruptedException e)
     {}
-    socketThread.stop();
+    //socketThread.stop();
     if (ioexception != null)
       throw ioexception;
     if (socket == null)
