@@ -111,6 +111,8 @@ public class Test026 {
 
             //month boundaries crossing year boundary caused problems.
             doTest(35, "Aug 1969 through Sep 1970", "Aug 1 1969 to Oct 1 1970" );
+            doTest(36, "2004-12-03T20:19:59.990/PT.02S", "2004-12-03 20:19:59.990 to 20:20:00.010" );
+            doTest(37, "2004-12-03T20:19:56.2/PT.2S", "2004-12-03 20:19:56.200 to 20:19:56.400" );
 
             testTimeRangeFormatParse(); // these are tests that used to be in test009.
 
