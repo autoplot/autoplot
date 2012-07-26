@@ -81,6 +81,8 @@ import org.xml.sax.SAXException;
  */
 public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
+
     //DANGER: NB gui code doesn't use this...
     private static final String EXAMPLE_TIME_RANGES = "Example Time Ranges";
 
@@ -328,12 +330,24 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     Node description= (Node) xpath.evaluate( "/stream/properties/@description", document, XPathConstants.NODE );
                     descriptionLabel.setText( description==null ? "" : description.getNodeValue() );
 
-                    Node exampleRange= (Node) xpath.evaluate( "/stream/properties/@exampleRange", document, XPathConstants.NODE );
-                    if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
-                        Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( exampleRange.getNodeValue() );
+                    NodeList exs=  (NodeList) xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
+                    List<String> examples= new ArrayList<String>();
+                    String example= null;
+                    for ( int i=0; i<exs.getLength(); i++ ) {
+                        Node ex= exs.item(i);
+                        if ( ex.getNodeName().startsWith("exampleRange") ) {
+                            examples.add(ex.getNodeValue());
+                        }
+                        if (ex.equals("exampleRange") ) {
+                            example= ex.getNodeValue();
+                        }
                     }
-                    if ( exampleRange!=null ) {
-                        DefaultComboBoxModel model= new DefaultComboBoxModel( new String[] { "Example Time Ranges", exampleRange.getNodeValue() } );
+                    if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
+                        Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( example );
+                    }
+                    if ( examples.size()>0 ) {
+                        examples.add( 0, "Example Time Ranges" );
+                        DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(true);
                     } else {
@@ -342,8 +356,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(false);
                     }
 
-                    if ( exampleRange==null ) {
-                        exampleRange= (Node) xpath.evaluate( "/stream/properties/@x_range", document, XPathConstants.NODE );
+                    if ( example==null ) { // legacy
+                        Node exampleRange= (Node) xpath.evaluate( "/stream/properties/@x_range", document, XPathConstants.NODE );
                         if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
                             Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( exampleRange.getNodeValue() );
                         }
@@ -641,7 +655,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
         String item= (String) examplesComboBox.getSelectedItem();
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
-            timeRangeTextField.setText(item);
+            int i= item.indexOf(EXAMPLE_TIMERANGE_LABEL_DELIM);
+            if ( i==-1 ) {
+                timeRangeTextField.setText(item.trim());
+            } else {
+                timeRangeTextField.setText(item.substring(0,i).trim());
+            }
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
 
