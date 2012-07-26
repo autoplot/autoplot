@@ -30,10 +30,10 @@ done
 echo "done copy sources"
 
 cd temp-classes
-jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
-jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
-jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
-jar xvf ../../APLibs/lib/javacsv.jar
+${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
+${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
+${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
+${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/javacsv.jar
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
 echo "Remove codes that are not used by the applet and cause problems, such as AutoplotUI.java and *EditorPanel.java"
