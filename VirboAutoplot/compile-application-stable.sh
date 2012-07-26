@@ -59,12 +59,12 @@ jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
    echo jar xf $i
-   jar xf $i
+   ${JAVA5_HOME}bin/jar xf $i
 done
 
 for i in ../../APLibs/lib/commons/*.jar; do
    echo jar xf $i
-   jar xf $i
+   ${JAVA5_HOME}bin/jar xf $i
 done
 
 cd ..
