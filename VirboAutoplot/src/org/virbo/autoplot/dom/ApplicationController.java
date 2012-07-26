@@ -484,6 +484,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         this.application.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
+                if ( isValueAdjusting() ) {
+                    return;
+                }
                 // is anyone listening to timerange?
                 boolean noOneListening= true;
                 BindingModel[] bms= application.getBindings();
@@ -2178,7 +2181,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
             application.setTimeRange(that.getTimeRange());
-
+            
             syncSupport.syncBindingsNew( that.getBindings(), nameMap );
             syncSupport.syncConnectors(that.getConnectors());
 
