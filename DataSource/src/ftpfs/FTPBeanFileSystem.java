@@ -56,8 +56,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
         } catch (IOException ex) {
             //TODO: how to distinguish UnknownHostException to be offline?  avoid firing an event until I come up with a way.
             ex.printStackTrace();
-            throw new FileSystemOfflineException(ex);
-            //this.offline= true;
+            //throw new FileSystemOfflineException(ex);
+            this.offline= true;
         }
         
     }
