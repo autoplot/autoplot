@@ -48,22 +48,22 @@ mkdir temp-classes
 echo "copy jar file classes..."
 cd temp-classes
 for i in ../../APLibs/lib/*.jar; do
-   echo jar xf $i
-   jar xf $i
+   echo ${JAVA5_HOME}bin/jar xf $i
+   ${JAVA5_HOME}bin/jar xf $i
 done
 
 # use beta version of cdf library that supports tt2000.
 echo "using tt2000 support"
 rm -rf gsfc/
-jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
+${JAVA5_HOME}bin/jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
-   echo jar xf $i
+   echo ${JAVA5_HOME}bin/jar xf $i
    ${JAVA5_HOME}bin/jar xf $i
 done
 
 for i in ../../APLibs/lib/commons/*.jar; do
-   echo jar xf $i
+   echo ${JAVA5_HOME}bin/jar xf $i
    ${JAVA5_HOME}bin/jar xf $i
 done
 
