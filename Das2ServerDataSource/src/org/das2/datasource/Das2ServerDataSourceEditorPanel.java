@@ -84,7 +84,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
 
     //DANGER: NB gui code doesn't use this...
-    private static final String EXAMPLE_TIME_RANGES = "Example Time Ranges";
+    private static final String EXAMPLE_TIME_RANGES = "<html><em>Example Time Ranges</em>";
 
 
     private String DEFAULT_TIMERANGE="2001-01-01";
@@ -191,7 +191,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Example Time Ranges", "" }));
+        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<html><em>Example Time Ranges</em>", " " }));
         examplesComboBox.setToolTipText("Example times specified in the data set descriptor file");
         examplesComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -212,34 +212,34 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(das2ServerComboBox, 0, 455, Short.MAX_VALUE)
+                            .add(das2ServerComboBox, 0, 549, Short.MAX_VALUE)
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 220, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 314, Short.MAX_VALUE)
                                 .add(discoveryCb))
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)))
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel4)
                             .add(layout.createSequentialGroup()
                                 .add(21, 21, 21)
-                                .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                                .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(examplesComboBox, 0, 167, Short.MAX_VALUE))
+                                .add(examplesComboBox, 0, 234, Short.MAX_VALUE))
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel7)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE))
+                                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE))
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel3)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(viewDsdfButton))))
                     .add(layout.createSequentialGroup()
@@ -265,7 +265,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jLabel2)
                     .add(discoveryCb))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel7)
@@ -346,7 +346,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( example );
                     }
                     if ( examples.size()>0 ) {
-                        examples.add( 0, "Example Time Ranges" );
+                        for ( int i=0; i<examples.size(); i++ ) {
+                            String s= examples.get(i);
+                            int j= s.indexOf("|");
+                            if ( j>-1 ) {
+                                s= "<html>" + s.substring(0,j) + " <em><nbsp>"+s.substring(j+1).trim() + "</em>";
+                            }
+                            examples.set(i,s);
+                        }
+                        examples.add( 0, String.format( "<html><em>Example Time Ranges (%d)</em>", examples.size() ) );
                         DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(true);
@@ -655,11 +663,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
         String item= (String) examplesComboBox.getSelectedItem();
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
-            int i= item.indexOf(EXAMPLE_TIMERANGE_LABEL_DELIM);
-            if ( i==-1 ) {
-                timeRangeTextField.setText(item.trim());
+            int i= item.indexOf("<em>");
+            if ( i>-1 && item.startsWith("<html>") ) {
+                timeRangeTextField.setText(item.substring(6,i).trim());
             } else {
-                timeRangeTextField.setText(item.substring(0,i).trim());
+                timeRangeTextField.setText(item.trim());
             }
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed

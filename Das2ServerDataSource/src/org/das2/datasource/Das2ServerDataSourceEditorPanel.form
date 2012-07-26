@@ -20,40 +20,40 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="jScrollPane2" pref="443" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" pref="537" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="das2ServerComboBox" alignment="0" pref="455" max="32767" attributes="0"/>
+                          <Component id="das2ServerComboBox" alignment="0" pref="549" max="32767" attributes="0"/>
                           <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="220" max="32767" attributes="0"/>
+                              <EmptySpace pref="314" max="32767" attributes="0"/>
                               <Component id="discoveryCb" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="jScrollPane1" alignment="0" pref="455" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="549" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                              <Component id="validRangeLabel" pref="255" max="32767" attributes="0"/>
+                              <Component id="validRangeLabel" pref="282" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="examplesComboBox" pref="167" max="32767" attributes="0"/>
+                              <Component id="examplesComboBox" pref="234" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="descriptionLabel" pref="373" max="32767" attributes="0"/>
+                              <Component id="descriptionLabel" pref="467" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="timeRangeTextField" pref="281" max="32767" attributes="0"/>
+                              <Component id="timeRangeTextField" pref="375" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="viewDsdfButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -70,7 +70,7 @@
                       <Component id="tcaItem" min="-2" pref="42" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -87,7 +87,7 @@
                   <Component id="discoveryCb" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="200" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="240" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -250,8 +250,8 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
-            <StringItem index="0" value="Example Time Ranges"/>
-            <StringItem index="1" value=""/>
+            <StringItem index="0" value="&lt;html&gt;&lt;em&gt;Example Time Ranges&lt;/em&gt;"/>
+            <StringItem index="1" value=" "/>
           </StringArray>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Example times specified in the data set descriptor file"/>
