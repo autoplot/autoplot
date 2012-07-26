@@ -785,6 +785,24 @@ public class PlotController extends DomNodeController {
         checkRenderType();
     }
 
+    private Plot getPlotDefaultsOneFamily( List<PlotElement> pes ) {
+        Plot result= null;
+        for ( PlotElement pe : pes ) {
+            if ( pe.isActive() ) {
+                if ( result==null ) {
+                    result= pe.getPlotDefaults();
+                } else {
+                    //merge
+                }
+            }
+        }
+        if ( result==null && pes!=null && pes.size()>0 ) {
+            result= pes.get(0).getPlotDefaults();
+        }
+        return result;
+    }
+
+
     /**
      * check all the plotElements' plot defaults, so that properties marked as automatic can be reset.
      * @param plotElement
@@ -801,27 +819,24 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( DomUtil.oneFamily( dom.getController().getPlotElementsFor(plot) ) ) {
-            PlotElement p= dom.getController().getPlotElementsFor(plot).get(0);
-            if ( !p.getParent().equals("") && p.getController().getParentPlotElement()!=null ) {
-                p = p.getController().getParentPlotElement();
-            }
-            if ( !p.getParent().equals("") && p.getController().getParentPlotElement()==null ) {
-                logger.log(Level.WARNING, "reference to non-existent parent in {0}", p);
-            }
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(plot);
+        if ( DomUtil.oneFamily( pes ) ) {
+            Plot defaults= getPlotDefaultsOneFamily(pes);
+            PlotElement p= pes.get(0);
+
             if ( this.plotElement!=null ) {
                 this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
             }
             this.plotElement= p;
             this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
-            if ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
-                if ( p.isActive() ) {
-                    if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( p.getPlotDefaults().getTitle() );
-                    if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( p.getPlotDefaults().getXaxis().getLabel() );
-                    if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( p.getPlotDefaults().getYaxis().getLabel() );
-                    if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( p.getPlotDefaults().getZaxis().getLabel() );
+            if ( pele==null || defaults.getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
+                if ( defaults!=null ) {
+                    if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( defaults.getTitle() );
+                    if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( defaults.getXaxis().getLabel() );
+                    if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( defaults.getYaxis().getLabel() );
+                    if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( defaults.getZaxis().getLabel() );
                     if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
-                        plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+                        plot.setIsotropic( defaults.isIsotropic() );
                     }
                 } else {
                     if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( p.getPlotDefaults().getTitle() ); // stack of traces
