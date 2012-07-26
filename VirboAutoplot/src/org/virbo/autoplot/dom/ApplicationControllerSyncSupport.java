@@ -163,7 +163,7 @@ public class ApplicationControllerSyncSupport {
                 if ( and.getAction()==ArrayNodeDiff.Action.Delete ) {
                     // disconnect from das2 peer
                     BindingModel domBinding= (BindingModel) and.getNode();
-                    controller.deleteBinding(domBinding);
+                    controller.deleteBinding(domBinding); //there was a nasty little bug where this would reset app.timerange.
                 } if ( and.getAction()==ArrayNodeDiff.Action.Insert ) {
                     BindingModel c= (BindingModel) and.getNode();
                     DomNode src= DomUtil.getElementById(application,idMap.get(c.srcId));
