@@ -551,21 +551,15 @@ public class PlotElementController extends DomNodeController {
                 }
                 QDataSet context= (QDataSet) fillDs.property(QDataSet.CONTEXT_0);
                 if ( context!=null ) {
+                    DatumRange cdr;
+                    if ( context.rank()==1 ) {
+                        cdr= DataSetUtil.asDatumRange( context, true );
+                    } else {
+                        cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
+                    }
+                    Plot plot= this.dom.getController().getPlotFor(plotElement);
+                    plot.getController().getDasPlot().setDisplayContext( cdr );  // note this property is just a placeholder, and is sensed by ColumnColumnConnector.
 
-                    //TODO: we should provide feedback to user somehow.  This could be a property of the plotElement, that
-                    // is displayable in the plot.
-
-                    //DatumRange cdr;
-                    //if ( context.rank()==1 ) {
-                    //    cdr= DataSetUtil.asDatumRange( context, true );
-                    //} else {
-                    //    cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
-                    //}
-                    //Plot plot= this.dom.getController().getPlotFor(plotElement);
-                    //DatumRange oldContext= plot.getContext();
-                    //if ( ( oldContext.equals( Axis.DEFAULT_RANGE ) || UnitsUtil.isTimeLocation( oldContext.getUnits() ) ) && UnitsUtil.isTimeLocation( cdr.getUnits() ) ) {
-                    //    plot.setContext( cdr ); //TODO: this is really backwards, this is intended to be a controller, not a display.
-                    //}
                 } else {
                     // TODO: ???
                 }
