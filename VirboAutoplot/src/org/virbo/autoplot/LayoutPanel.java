@@ -301,18 +301,42 @@ public class LayoutPanel extends javax.swing.JPanel {
             for (int i = 0; i < p.size(); i++) {
                 if ( p.get(i).isActive() ) indices.add( allElements.indexOf(p.get(i)) );
             }
-            int[] iindices= new int[indices.size()];
-            for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
-            panelListComponent.setSelectedIndices(iindices);
 
-            updateSelected();
+            final int[] iindices= new int[indices.size()];
+            for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
+
+            Runnable run= new Runnable() {
+                public void run() {
+                    System.err.println("plotListener");
+                    panelListComponent.setSelectedIndices(iindices);
+                    updateSelected();
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeLater(run);
+            }
+            
         }
     };
     transient private PropertyChangeListener plotElementListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             PlotElement p = app.getController().getPlotElement();
             List<PlotElement> allElements = Arrays.asList(app.getPlotElements());
-            panelListComponent.setSelectedIndex(allElements.indexOf(p));
+
+            final int index= allElements.indexOf(p);
+            Runnable run= new Runnable() {
+                public void run() {
+                    panelListComponent.setSelectedIndex(index);
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeLater(run);
+            }
+            
         }
     };
 
