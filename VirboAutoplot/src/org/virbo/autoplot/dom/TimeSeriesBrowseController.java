@@ -112,7 +112,12 @@ public class TimeSeriesBrowseController {
                 if (e.getPropertyName().equals(property)) {
                     changesSupport.registerPendingChange( this, PENDING_TIMERANGE_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
-                    setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
+                    if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
+                        setTimeRange( dr );
+                    } else {
+                        release();
+                    }
+                    
                     updateTsbTimer.tickle();
                 }
             }
