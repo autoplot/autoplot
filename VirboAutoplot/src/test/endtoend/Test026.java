@@ -4,6 +4,7 @@
  */
 package test.endtoend;
 
+import org.das2.datum.Units;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.DatumRange;
@@ -61,16 +62,25 @@ public class Test026 {
     }
 
     public static void doTest(int id, String test, String ref) throws Exception {
+        doTest( id, test, ref, 0. );
+    }
+
+    public static void doTest( int id, String test, String ref, double diffMicros ) throws Exception {
 
         DatumRange dr= parseTimeRange(test);
         DatumRange drref= parseTimeRange(ref);
         if ( drref.equals(dr) ) {
             System.err.println( id + ": "+ test + "\t" + drref.min() + "\t" + DatumUtil.asOrderOneUnits( drref.width() ) );
         } else {
-            System.err.println( id + ": "+ test + " != " + ref + "     " + dr + " != " + drref );
-            //dr= parseTimeRange(test); // for debugging
-            //drref= parseTimeRange(ref);
-            throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
+            if ( dr.min().subtract(drref.min()).lt( Units.microseconds.createDatum(diffMicros) )
+                    && dr.max().subtract(drref.max()).lt( Units.microseconds.createDatum(diffMicros) ) ) {
+                System.err.println( id + ": " + test + "\t" + drref + "\t within "+ diffMicros + " micros" );
+            } else {
+                System.err.println( id + ": "+ test + " != " + ref + "     " + dr + " != " + drref );
+                //dr= parseTimeRange(test); // for debugging
+                //drref= parseTimeRange(ref);
+                throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
+            }
         }
     }
 
@@ -111,7 +121,7 @@ public class Test026 {
 
             //month boundaries crossing year boundary caused problems.
             doTest(35, "Aug 1969 through Sep 1970", "Aug 1 1969 to Oct 1 1970" );
-            doTest(36, "2004-12-03T20:19:59.990/PT.02S", "2004-12-03 20:19:59.990 to 20:20:00.010" );
+            doTest(36, "2004-12-03T20:19:59.990/PT.02S", "2004-12-03 20:19:59.990 to 20:20:00.010", 30 );
             doTest(37, "2004-12-03T20:19:56.2/PT.2S", "2004-12-03 20:19:56.200 to 20:19:56.400" );
 
             testTimeRangeFormatParse(); // these are tests that used to be in test009.
