@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -128,6 +129,28 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         this.noOneListening= dr;
     }
 
+    /**
+     * return true if the string appears to be a URI.
+     * @param text
+     * @return
+     */
+    private static boolean isUri( String text ) {
+        boolean isUri= false;
+        if ( text.startsWith("/") ) {
+            isUri= true;
+        }
+        if ( !isUri  ) {
+            int icolon= text.indexOf(":");
+            if ( icolon>-1 ) {
+                String pref= text.substring(0,icolon);
+                if ( Character.isLetter(pref.charAt(0)) && Pattern.matches( "[a-zA-Z_\\+0-9]*", pref ) ) {
+                    isUri= true;
+                }
+            }
+        }
+        return isUri;
+    }
+
     private void parseRange() {
         DatumRange dr;
         DatumRange value= this.range;
@@ -140,6 +163,16 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             dr= DatumRangeUtil.parseTimeRange(rangeString);
             setRange(dr);
         } catch ( ParseException e ) {
+            boolean isUri= isUri( text );
+            if ( isUri ) {
+                if ( peer!=null ) {
+                    peer.setValue(text);
+                    peer.maybePlot(true);
+                    return;
+                } else {
+                    showErrorUsage( text, "Appears to be a dataset location, and this expects timeranges" );
+                }
+            }
             //timeRangeTextField.setText( range.toString() ); // I think we can just leave the value there.
             if ( UnitsUtil.isTimeLocation(value.getUnits()) ) { // go ahead and handle non-times.
                 showErrorUsage( text, "<html>" +e.getMessage() );
