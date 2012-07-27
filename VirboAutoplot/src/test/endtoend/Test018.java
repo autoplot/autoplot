@@ -234,7 +234,7 @@ public class Test018 {
 
             String testId= "test018";
             getDocumentModel().getOptions().setAutolayout(false);
-            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             setCanvasSize(600, 600);
 
@@ -249,7 +249,7 @@ public class Test018 {
             test5( testId );
             test6( testId ); // test out binding
 
-            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
