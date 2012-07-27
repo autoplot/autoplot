@@ -43,6 +43,7 @@ public class Test018 {
      * @throws InterruptedException
      */
     private static void test2(String testId) throws IOException, InterruptedException {
+        System.err.println("=== test018 test2 ===");
         reset();
         Application dom = getDocumentModel();
         dom.getController().reset(); 
@@ -77,6 +78,7 @@ public class Test018 {
     }
 
     private static void test1(String testId) throws IOException, InterruptedException {
+        System.err.println("=== test018 test1 ===");
         reset();
         Application dom = getDocumentModel();
 
@@ -106,6 +108,7 @@ public class Test018 {
      * @throws InterruptedException
      */
     public static void test4( String testId ) throws IOException, InterruptedException {
+        System.err.println("=== test018 test4 ===");
         reset();
         setCanvasSize(400,300);
 
@@ -127,6 +130,7 @@ public class Test018 {
     }
 
     public static void test5( String testId ) throws InterruptedException, IOException {
+        System.err.println("=== test018 test5 ===");
         reset();
         Application dom = getDocumentModel();
         plot( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
@@ -144,6 +148,7 @@ public class Test018 {
      * @throws Exception
      */
     public static void test6( String testId ) throws Exception {
+        System.err.println("=== test018 test6 ===");
         reset();
         plot( "http://autoplot.org/vap/swpc.vap?timeRange=2012-04-07+through+2012-04-17" );
         waitUntilIdle();
@@ -175,7 +180,7 @@ public class Test018 {
     public static void test7_bindings( String testId ) throws Exception {
         Application dom= getDocumentModel();
 
-        System.err.println("=== 007_1 ========================");
+        System.err.println("=== test018 007_1 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
@@ -185,7 +190,7 @@ public class Test018 {
         System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_1.png");
 
-        System.err.println("=== 007_2 ========================");
+        System.err.println("=== test018 007_2 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
@@ -195,7 +200,7 @@ public class Test018 {
         System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_2.png");
 
-        System.err.println("=== 007_3 ========================");
+        System.err.println("=== test018 007_3 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
@@ -204,7 +209,7 @@ public class Test018 {
         System.err.println(bindStr(dom).replaceAll("!c","\n"));
         writeToPng(testId + "_007_3.png"); // this should disengage from timerange
 
-        System.err.println("=== 007_4 ========================");
+        System.err.println("=== test018 007_4 ========================");
         reset();
         plot( "vap+cdaweb:ds=AC_H2_SWE&id=Np&timerange=1998-03-01" );
         waitUntilIdle();
@@ -229,7 +234,7 @@ public class Test018 {
 
             String testId= "test018";
             getDocumentModel().getOptions().setAutolayout(false);
-            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             setCanvasSize(600, 600);
 
@@ -244,7 +249,7 @@ public class Test018 {
             test5( testId );
             test6( testId ); // test out binding
 
-            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
