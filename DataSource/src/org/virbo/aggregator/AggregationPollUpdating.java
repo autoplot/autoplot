@@ -41,16 +41,18 @@ public class AggregationPollUpdating implements Updating {
     private final static int LIMIT_SHORT_CYCLE_PERIOD= 1;
     private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD= 10;
 
-    public AggregationPollUpdating( FileStorageModelNew fsm, DatumRange dr, final long pollCyclePeriodSeconds ) {
+    public AggregationPollUpdating( FileStorageModelNew fsm, DatumRange dr, long pollCyclePeriodSeconds ) {
         this.fsm= fsm;
         this.dr= dr;
         if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
             if ( pollCyclePeriodSeconds<LIMIT_SHORT_CYCLE_PERIOD ) {
-                throw new IllegalArgumentException("pollCyclePeriorSeconds too low");
+                System.err.println("pollCyclePeriodSeconds too low, for local files it must be at least "+LIMIT_SHORT_CYCLE_PERIOD+" seconds");
+                pollCyclePeriodSeconds= LIMIT_SHORT_CYCLE_PERIOD;
             }
         } else {
             if ( pollCyclePeriodSeconds<LIMIT_SHORT_REMOTE_CYCLE_PERIOD ) {
-                throw new IllegalArgumentException("pollCyclePeriorSeconds too low");
+                System.err.println("pollCyclePeriodSeconds too low, for remote files it must be at least "+LIMIT_SHORT_REMOTE_CYCLE_PERIOD+" seconds");
+                pollCyclePeriodSeconds= LIMIT_SHORT_REMOTE_CYCLE_PERIOD;
             }
         }
         this.pollCyclePeriodSeconds= pollCyclePeriodSeconds;
