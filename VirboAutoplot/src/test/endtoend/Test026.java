@@ -4,6 +4,7 @@
  */
 package test.endtoend;
 
+import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
@@ -72,9 +73,11 @@ public class Test026 {
         if ( drref.equals(dr) ) {
             System.err.println( id + ": "+ test + "\t" + drref.min() + "\t" + DatumUtil.asOrderOneUnits( drref.width() ) );
         } else {
-            if ( dr.min().subtract(drref.min()).lt( Units.microseconds.createDatum(diffMicros) )
-                    && dr.max().subtract(drref.max()).lt( Units.microseconds.createDatum(diffMicros) ) ) {
-                System.err.println( id + ": " + test + "\t" + drref + "\t within "+ diffMicros + " micros" );
+            Datum d1= dr.min().subtract(drref.min());
+            Datum d2= dr.max().subtract(drref.max());
+            if ( d1.lt( Units.microseconds.createDatum(diffMicros) )
+                    && d2.lt( Units.microseconds.createDatum(diffMicros) ) ) {
+                System.err.println( id + ": " + test + "\t" + drref + "\t within " + diffMicros + " micros (" + d1 + " " + d2 + ")" );
             } else {
                 System.err.println( id + ": "+ test + " != " + ref + "     " + dr + " != " + drref );
                 //dr= parseTimeRange(test); // for debugging
