@@ -1106,7 +1106,8 @@ public class ApplicationModel {
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
                     ex.printStackTrace();
-                    throw new IOException( ex );
+                    IOException ioex= new IOException( ex.getMessage() );
+                    throw ioex;
                     //Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
