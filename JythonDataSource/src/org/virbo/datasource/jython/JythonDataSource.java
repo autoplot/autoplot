@@ -155,6 +155,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         String suri= DataSetURI.fromUri(uri);
         if ( tsb!=null ) {
+            tsb.setURI(suri);
             suri= tsb.getURI();
         }
 
