@@ -1141,9 +1141,15 @@ System.err.println("factory:"+factory);
                 String result1 = s[j] + "/";
                 // drill down single entries, since often the root doesn't provide a list.
                 String[] s2 = new File(cacheF, result1).list();
+                if ( s2==null ) { // does not exist
+                    s2= new String[0];
+                }
                 while (s2.length == 1 && new File(cacheF, result1 + "/" + s2[0]).isDirectory()) {
                     result1 += s2[0] + "/";
                     s2 = new File(cacheF, result1).list();
+                    if ( s2==null ) { // does not exist
+                        s2= new String[0];
+                    }
                 }
                 completions.add(new DataSetURI.CompletionResult(surlDir + result1, result1, null, surl.substring(0, carotpos), true));
             }
