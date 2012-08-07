@@ -792,11 +792,11 @@ public class CdfUtil {
                 if ( var.getName().equals("FEDU" ) ) {
                     System.err.println("Here FEDU");
                 }
-                DepDesc ydesc= getDepDesc( cdf, var, rank, dims, 1, warn );
+                DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
 
-                DepDesc zdesc= getDepDesc( cdf, var, rank, dims, 2, warn );
+                DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
 
-                DepDesc z1desc= getDepDesc( cdf, var, rank, dims, 3, warn );
+                DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
 
                 if (deep) {
                     Object o= (Object) getAttribute( cdf, var.getName(), "CATDESC" );
@@ -817,12 +817,12 @@ public class CdfUtil {
                     if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
                          desc+= "=" + (xMaxRec);
                     }
-                    if ( ydesc.dep != null) {
-                        desc += "," + ydesc.dep.getName() + "=" + ydesc.nrec + ( ydesc.rank2 ? "*": "" );
-                        if ( zdesc.dep != null) {
-                            desc += "," + zdesc.dep.getName() + "=" + zdesc.nrec + ( zdesc.rank2 ? "*": "" );
-                            if (z1desc.dep != null) {
-                                desc += "," + z1desc.dep.getName() + "=" + z1desc.nrec + ( z1desc.rank2 ? "*": "" );
+                    if ( dep1desc.dep != null) {
+                        desc += "," + dep1desc.dep.getName() + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                        if ( dep2desc.dep != null) {
+                            desc += "," + dep2desc.dep.getName() + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                            if (dep3desc.dep != null) {
+                                desc += "," + dep3desc.dep.getName() + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
                             }
                         }
                     } else if ( rank>1 ) {
