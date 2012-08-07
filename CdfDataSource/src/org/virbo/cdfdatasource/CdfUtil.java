@@ -835,6 +835,91 @@ public class CdfUtil {
         }
     }
 
+    //container for description of depend
+    private static class DepDesc {
+        Variable dep;
+        Variable labl;
+        long nrec;
+        boolean rank2;
+    }
+
+    /**
+     * factor out common code that gets the properties for each dimension.
+     * @param cdf
+     * @param var
+     * @param rank
+     * @param dims
+     * @param dim
+     * @param warn
+     * @return
+     */
+    private static DepDesc getDepDesc( CDF cdf, Variable var, int rank, long[] dims, int dim, List<String> warn ) {
+        Attribute bAttr=null;
+        try {
+            bAttr = cdf.getAttribute("DEPEND_"+dim);  // check for PB5, Vectors
+        } catch (CDFException e) {
+        }
+
+        Attribute blAttr=null;
+        try {
+           blAttr = cdf.getAttribute("LABL_PTR_1");
+        } catch (CDFException e) {
+        }
+
+        long yMaxRec=-1;
+
+        DepDesc result= new DepDesc();
+        try {
+            if (bAttr != null && rank>1 && hasEntry( bAttr, var) ) {  // check for metadata for DEPEND_1
+                logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{bAttr.getName(), var.getName()});
+                Entry yEntry = bAttr.getEntry(var);
+                result.dep = cdf.getVariable(String.valueOf(yEntry.getData()));
+                result.nrec = result.dep.getMaxWrittenRecord();
+                if (result.nrec == 0) {
+                    result.nrec = result.dep.getDimSizes()[0];
+                }
+                if ( result.dep.getDimSizes().length>0 && result.dep.getRecVariance() ) {
+                            result.rank2= true;
+                            result.nrec = result.dep.getDimSizes()[0];
+                            warn.add( "NOTE: " + result.dep.getName() + " is record varying" );
+                } else {
+                    if ( result.dep.getRecVariance() ) {
+                        //TODO: some sanity check here?
+                    } else {
+                        if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
+                            warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
+                        }
+                    }
+                }
+            }
+        } catch (CDFException e) {
+            //e.printStackTrace();
+            warn.add( "problem with " + bAttr.getName() + ": " + e.getMessage() );
+        }
+
+        try {
+            if ( yMaxRec==-1 && blAttr != null && rank>1 && hasEntry( blAttr, var)  ) {  // check for metadata for LABL_PTR_1
+                logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{blAttr.getName(), var.getName()});
+                Entry yEntry = blAttr.getEntry(var);
+                result.labl = cdf.getVariable(String.valueOf(yEntry.getData()));
+                result.nrec = result.labl.getMaxWrittenRecord();
+                if (result.nrec == 0) {
+                    result.nrec = result.labl.getDimSizes()[0];
+                }
+                if ( result.labl.getRecVariance() ) {
+                    //TODO: some sanity check here?
+                } else {
+                    if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
+                        warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
+                    }
+                }
+            }
+        } catch (CDFException e) {
+            warn.add( "problem with " + blAttr.getName() + ": " + e.getMessage() );
+        }
+        return result;
+    }
+
     /**
      * keys are the names of the variables. values are descriptions.
      * @param cdf
@@ -854,8 +939,7 @@ public class CdfUtil {
         Vector v = cdf.getVariables();
         logger.log(Level.FINE, "got {0} variables", v.size());
 
-        Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
-        Attribute blAttr = null, clAttr = null, dlAttr = null;
+        Attribute aAttr = null;
 
         Attribute catDesc = null;
         Attribute varNotes= null;
@@ -867,30 +951,6 @@ public class CdfUtil {
         try {
             aAttr = cdf.getAttribute("DEPEND_0");
         } catch (CDFException ex) {
-        }
-        try {
-            bAttr = cdf.getAttribute("DEPEND_1");  // check for PB5, Vectors
-        } catch (CDFException e) {
-        }
-        try {
-            cAttr = cdf.getAttribute("DEPEND_2");  // check for too many dimensions
-        } catch (CDFException e) {
-        }
-        try {
-            dAttr = cdf.getAttribute("DEPEND_3");  // check for too many dimensions
-        } catch (CDFException e) {
-        }
-        try {
-            blAttr = cdf.getAttribute("LABL_PTR_1");  
-        } catch (CDFException e) {
-        }
-        try {
-            clAttr = cdf.getAttribute("LABL_PTR_2");  // check for too many dimensions
-        } catch (CDFException e) {
-        }
-        try {
-            dlAttr = cdf.getAttribute("LABL_PTR_3");  // check for too many dimensions
-        } catch (CDFException e) {
         }
         try {
             catDesc = cdf.getAttribute("CATDESC");
@@ -1001,12 +1061,6 @@ public class CdfUtil {
 
                 Variable xDependVariable = null;
                 long xMaxRec = -1;
-                Variable yDependVariable = null;
-                long yMaxRec = -1;
-                Variable zDependVariable = null;
-                long zMaxRec = -1;
-                Variable z1DependVariable = null;
-                long z1MaxRec = -1;
                 String scatDesc = null;
                 String svarNotes = null;
 
@@ -1040,130 +1094,11 @@ public class CdfUtil {
                     warn.add( "problem with " + aAttr.getName() + ": " + e.getMessage() );
                 }
 
+                DepDesc bdesc= getDepDesc( cdf, var, rank, dims, 1, warn );
 
-                try {
-                    if (bAttr != null && rank>1 && hasEntry( bAttr, var) ) {  // check for metadata for DEPEND_1
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{bAttr.getName(), var.getName()});
-                        Entry yEntry = bAttr.getEntry(var);
-                        yDependVariable = cdf.getVariable(String.valueOf(yEntry.getData()));
-                        yMaxRec = yDependVariable.getMaxWrittenRecord();
-                        if (yMaxRec == 0) {
-                            yMaxRec = yDependVariable.getDimSizes()[0] - 1;
-                        }
-                        if ( yDependVariable.getRecVariance() ) {
-                            //TODO: some sanity check here?
-                        } else {
-                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
-                                warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
-                            }
-                        }
-                    }
-                } catch (CDFException e) {
-                    //e.printStackTrace();
-                    warn.add( "problem with " + bAttr.getName() + ": " + e.getMessage() );
-                }
+                DepDesc cdesc= getDepDesc( cdf, var, rank, dims, 2, warn );
 
-                try {
-                    if ( yMaxRec==-1 && blAttr != null && rank>1 && hasEntry( blAttr, var)  ) {  // check for metadata for LABL_PTR_1
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{blAttr.getName(), var.getName()});
-                        Entry yEntry = blAttr.getEntry(var);
-                        yDependVariable = cdf.getVariable(String.valueOf(yEntry.getData()));
-                        yMaxRec = yDependVariable.getMaxWrittenRecord();
-                        if (yMaxRec == 0) {
-                            yMaxRec = yDependVariable.getDimSizes()[0] - 1;
-                        }
-                        if ( yDependVariable.getRecVariance() ) {
-                            //TODO: some sanity check here?
-                        } else {
-                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
-                                warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
-                            }
-                        }
-                    }
-                } catch (CDFException e) {
-                    warn.add( "problem with " + blAttr.getName() + ": " + e.getMessage() );
-                }
-
-                try {
-                    if (cAttr != null && rank>2 && hasEntry( cAttr, var) ) { // check for existence of DEPEND_2, dimensionality too high
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{cAttr.getName(), var.getName()});
-                        Entry zEntry = cAttr.getEntry(var);
-                        zDependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
-                        zMaxRec = zDependVariable.getMaxWrittenRecord();
-                        if (zMaxRec == 0) {
-                            zMaxRec = zDependVariable.getDimSizes()[0] - 1;
-                        }
-                    }
-                } catch (CDFException e) {
-                    warn.add( "problem with " + cAttr.getName() + ": " + e.getMessage() );
-                }
-
-                try {
-                    if ( zMaxRec==-1 && clAttr != null && rank>2 && hasEntry( clAttr, var) ) {  // check for metadata for LABL_PTR_1
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{clAttr.getName(), var.getName()});
-                        Entry zEntry = clAttr.getEntry(var);
-                        zDependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
-                        zMaxRec = zDependVariable.getMaxWrittenRecord();
-                        if (zMaxRec == 0) {
-                            zMaxRec = zDependVariable.getDimSizes()[0] - 1;
-                        }
-                    }
-                } catch (CDFException e) {
-                    warn.add( "problem with " + clAttr.getName() + ": " + e.getMessage() );
-                }
-
-                try {
-                    if (dAttr != null && rank>3 && hasEntry( dAttr, var) ) { // check for existence of DEPEND_2, dimensionality too high
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{dAttr.getName(), var.getName()});
-                        Entry zEntry = dAttr.getEntry(var);
-                        z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
-                        z1MaxRec = z1DependVariable.getMaxWrittenRecord();
-                        if (z1MaxRec == 0) {
-                            z1MaxRec = z1DependVariable.getDimSizes()[0] - 1;
-                        }
-                    }
-                } catch (CDFException e) {
-                    warn.add( "problem with " + dAttr.getName() + ": " + e.getMessage() );
-                }
-
-                try {
-                    if ( z1MaxRec==-1 && dlAttr != null && rank>3 && hasEntry( dlAttr, var) ) {  // check for metadata for LABL_PTR_1
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{dlAttr.getName(), var.getName()});
-                        Entry zEntry = dlAttr.getEntry(var);
-                        z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
-                        z1MaxRec = z1DependVariable.getMaxWrittenRecord();
-                        if (z1MaxRec == 0) {
-                            z1MaxRec = z1DependVariable.getDimSizes()[0] - 1;
-                        }
-                    }
-                } catch (CDFException e) {
-                    warn.add( "problem with " + dlAttr.getName() + ": " + e.getMessage() );
-                }
-
-                if (deep) {
-                    try {
-                        if (catDesc != null) {
-                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{catDesc.getName(), var.getName()});
-                            if ( hasEntry( catDesc, var ) ) {
-                                Entry entry = catDesc.getEntry(var);
-                                scatDesc = String.valueOf(entry.getData());                        
-                            } else {
-                                scatDesc = "";
-                            }
-                        }
-                        if (varNotes!=null ) {
-                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{varNotes.getName(), var.getName()});
-                            if ( hasEntry( varNotes, var) ) {
-                                Entry entry = varNotes.getEntry(var);
-                                svarNotes = String.valueOf(entry.getData());
-                            } else {
-                                svarNotes = "";
-                            }
-                        }
-                    } catch (CDFException e) {
-                        warn.add( e.getMessage() );
-                    }
-                }
+                DepDesc ddesc= getDepDesc( cdf, var, rank, dims, 3, warn );
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
@@ -1171,12 +1106,12 @@ public class CdfUtil {
                     if ( xMaxRec>=0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
                          desc+= "=" + (xMaxRec + 1);
                     }
-                    if (yDependVariable != null) {
-                        desc += "," + yDependVariable.getName() + "=" + (yMaxRec + 1);
-                        if (zDependVariable != null) {
-                            desc += "," + zDependVariable.getName() + "=" + (zMaxRec + 1);
-                            if (z1DependVariable != null) {
-                                desc += "," + z1DependVariable.getName() + "=" + (z1MaxRec + 1);
+                    if ( bdesc.dep != null) {
+                        desc += "," + bdesc.dep.getName() + "=" + bdesc.nrec + ( bdesc.rank2 ? "*": "" );
+                        if ( cdesc.dep != null) {
+                            desc += "," + cdesc.dep.getName() + "=" + cdesc.nrec + ( cdesc.rank2 ? "*": "" );
+                            if (ddesc.dep != null) {
+                                desc += "," + ddesc.dep.getName() + "=" + ddesc.nrec + ( ddesc.rank2 ? "*": "" );
                             }
                         }
                     } else if ( rank>1 ) {
@@ -1190,10 +1125,10 @@ public class CdfUtil {
                     }
                 }
 
+
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                    StringBuilder sdims= new StringBuilder();
                     String recDesc= CDFUtils.getStringDataType(var);
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
@@ -1206,8 +1141,16 @@ public class CdfUtil {
                         descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
                     }
 
+                    //if ( vdescr!=null && vdescr.length()>0 ) {
+                    //    descbuf.append("<br>virtual variable implemented by ").append(vdescr).append("<br>");
+                    //}
+
                     for ( String s: warn ) {
-                        descbuf.append("<br>WARNING: ").append(s);
+                        if ( s.startsWith("NOTE") ) {
+                            descbuf.append("<br>").append(s);
+                        } else {
+                            descbuf.append("<br>WARNING: ").append(s);
+                        }
                     }
                     
                     descbuf.append("</html>");
