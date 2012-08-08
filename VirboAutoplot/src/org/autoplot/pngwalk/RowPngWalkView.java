@@ -19,6 +19,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JComponent;
@@ -27,6 +28,8 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 
 /**
  *
@@ -237,7 +240,7 @@ public class RowPngWalkView extends PngWalkView {
             int i = bounds.x / cellSize;
             int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellSize);
 
-            //List<DatumRange> drs= seq.getActiveSubrange();
+            List<DatumRange> drs= seq.getActiveSubrange();
 
             //System.out.printf("First: %d, Last: %d%n", i, imax);
             for (; i <= imax; i++) {
@@ -270,25 +273,26 @@ public class RowPngWalkView extends PngWalkView {
                 if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( i, g2, imgX, imgY, true );
                 }
-//                int ds=40;
-//                if ( drs!=null && i<seq.size()-1 && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
-//                    g2.setColor(Color.GRAY);
-//                    int cx = i*cellSize + ( cellSize ) - ds;
-//                    int cy = ( cellSize ) - fm.getHeight() - 3;
-//                    Shape oldClip = g2.getClip();
-//                    g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
-//                    g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
-//                    g2.setClip(oldClip);
-//                }
-//                if ( drs!=null && i>0 && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
-//                    g2.setColor(Color.GRAY);
-//                    int cx = i*cellSize;
-//                    int cy = ( cellSize ) - fm.getHeight() - 3;
-//                    Shape oldClip = g2.getClip();
-//                    g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
-//                    g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
-//                    g2.setClip(oldClip);
-//                }
+                int ds=6;
+                if ( drs!=null && i<seq.size()-1 && wimage.getDatumRange()!=null && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                    g2.setColor(Color.GRAY);
+                    int cx = i*cellSize + ( cellSize ) - ds;
+                    int cy = ( cellSize ) - fm.getHeight() - 3;
+                    Shape oldClip = g2.getClip();
+                    //g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
+                    g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                    g2.setClip(oldClip);
+                }
+                if ( drs!=null && i>0 && wimage.getDatumRange()!=null  && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                    g2.setColor(Color.GRAY);
+                    int cx = i*cellSize;
+                    int cy = ( cellSize ) - fm.getHeight() - 3;
+                    Shape oldClip = g2.getClip();
+                    //g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
+                    g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                    g2.setClip(oldClip);
+                }
+                
                 if (showCaptions && wimage.getCaption()!=null) {
                     //The following two lines center the caption under the image
                     //int cx = i*cellSize + (cellSize - fm.stringWidth(wimage.getCaption())) / 2;
