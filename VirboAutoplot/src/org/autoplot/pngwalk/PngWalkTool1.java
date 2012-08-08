@@ -983,7 +983,6 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         statusLabel.setText("starting application...");
 
-        showMissingCheckBox.setSelected(true);
         showMissingCheckBox.setText("Show Missing");
         showMissingCheckBox.setToolTipText("Insert placeholder images where there are gaps detected in the sequence");
         showMissingCheckBox.setEnabled(false);
@@ -1021,7 +1020,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 78, Short.MAX_VALUE)
                 .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
@@ -1036,12 +1035,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                         .add(editRangeButton)
                         .add(18, 18, 18)
                         .add(showMissingCheckBox))
-                    .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE))
+                    .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE))
                 .addContainerGap())
             .add(layout.createSequentialGroup()
-                .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE)
+                .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 906, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 918, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

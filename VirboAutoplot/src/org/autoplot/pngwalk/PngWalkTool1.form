@@ -201,7 +201,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="showMissingCheckBox">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Show Missing"/>
         <Property name="toolTipText" type="java.lang.String" value="Insert placeholder images where there are gaps detected in the sequence"/>
         <Property name="enabled" type="boolean" value="false"/>
