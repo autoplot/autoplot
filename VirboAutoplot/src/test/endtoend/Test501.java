@@ -47,7 +47,7 @@ public class Test501 {
         }
     }
 
-    private static void do1( String uri, int id ) throws Exception {
+    private static void do1( String uri, int id, boolean doTest ) throws Exception {
         
         long t0= System.currentTimeMillis();
         QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri );
@@ -84,7 +84,13 @@ public class Test501 {
         }
 
         setTitle(fileUri);
-        writeToPng( String.format( "test%03d_%03d.png", testid, id ) );
+        String name;
+        if ( doTest ) {
+            name= String.format( "test%03d_%03d.png", testid, id );
+        } else {
+            name= String.format( "ex_test%03d_%03d.png", testid, id );
+        }
+        writeToPng( name );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -135,20 +141,37 @@ public class Test501 {
             try {
 
                 StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
-                String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this.
-
+                String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this, just make sure something comes back.
                 int ic= exampleRange.indexOf("|");
                 if ( ic>-1 ) {
                     exampleRange= exampleRange.substring(0,ic);
                 }
-            
+
                 DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
                 uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
                 System.err.println("id: "+id );
                 System.err.println("uri: "+uri);
 
-                do1( uri, iid );
+                do1( uri, iid, false );
+
+                String testRange= (String) dsdf.getProperty("testRange"); // this is a more thorough test, and should not change
+                if ( testRange!=null ) {
+
+                    ic= testRange.indexOf("|");
+                    if ( ic>-1 ) {
+                        testRange= testRange.substring(0,ic);
+                    }
+
+                    tr= DatumRangeUtil.parseTimeRangeValid(testRange);
+                    uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+
+                    System.err.println("id: "+id );
+                    System.err.println("uri: "+uri);
+
+                    do1( uri, iid, true );
+
+                }
             } catch ( Exception ex ) {
                 ex.printStackTrace();
                 failures.put(iid,uri);
