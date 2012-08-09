@@ -600,7 +600,7 @@ public class CdfUtil {
                             }
                         }
                         if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
-                            warn.add("depend"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
+                            warn.add("DEPEND_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                         }
                     }
                 }
@@ -610,8 +610,7 @@ public class CdfUtil {
         }
 
         try {
-             //TODO: if there is DEPEND_i, then there is no check on LABEL.  The logic above needs to be repeated.
-            if (result.nrec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_"+dim ) ) {  // check for metadata for LABL_PTR_1
+             if (result.nrec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_"+dim ) ) {  // check for metadata for LABL_PTR_1
                 Object att= getAttribute( cdf, var.getName(), "LABL_PTR_"+dim );
                 if ( att!=null && rank>1  ) {
                     logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", var.getName());
@@ -622,7 +621,24 @@ public class CdfUtil {
                         result.nrec = result.labl.getDimensions()[0];
                     }
                     if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
-                        warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[0]+")" );
+                        warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
+                    }
+                }
+            } else if ( hasAttribute( cdf, var.getName(), "LABL_PTR_"+dim ) ) { // check that the LABL_PTR_i is the right length as well.
+                Object att= getAttribute( cdf, var.getName(), "LABL_PTR_"+dim );
+                if ( att!=null && rank>1  ) {
+                    logger.log(Level.FINE, "get attribute LABL_PTR_"+dim+" entry for {0}", var.getName());
+                    result.labl= cdf.getVariable(String.valueOf(att));
+                    if ( result.labl==null ) {
+                        warn.add("LABL_PTR_"+dim+" refers to "+String.valueOf(att)+" but this is not found" );
+                    } else {
+                        int nrec = result.labl.getNumberOfValues();
+                        if ( nrec == 1) {
+                            nrec = result.labl.getDimensions()[0];
+                        }
+                        if ( dims.length>(dim-2) && (nrec)!=dims[dim-1] ) {
+                            warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
+                        }
                     }
                 }
             }
