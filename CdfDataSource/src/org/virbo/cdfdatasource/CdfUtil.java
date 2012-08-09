@@ -866,19 +866,19 @@ public class CdfUtil {
         } catch (CDFException e) {
         }
 
-        long yMaxRec=-1;
-
         DepDesc result= new DepDesc();
+        result.nrec= -1;
+
         try {
             if (bAttr != null && rank>1 && hasEntry( bAttr, var) ) {  // check for metadata for DEPEND_1
                 logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{bAttr.getName(), var.getName()});
                 Entry yEntry = bAttr.getEntry(var);
                 result.dep = cdf.getVariable(String.valueOf(yEntry.getData()));
-                result.nrec = result.dep.getMaxWrittenRecord();
-                if (result.nrec == 0) {
+                result.nrec = result.dep.getMaxWrittenRecord()+1;
+                if (result.nrec == 1) {
                     result.nrec = result.dep.getDimSizes()[0];
                 }
-                if ( result.dep.getDimSizes().length>0 && result.dep.getRecVariance() ) {
+                if ( result.dep.getDimSizes().length>0 && result.dep.getMaxWrittenRecord()>0 && result.dep.getRecVariance() ) {
                             result.rank2= true;
                             result.nrec = result.dep.getDimSizes()[0];
                             warn.add( "NOTE: " + result.dep.getName() + " is record varying" );
@@ -887,7 +887,7 @@ public class CdfUtil {
                         //TODO: some sanity check here?
                     } else {
                         if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
-                            warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
+                            warn.add("depend"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                         }
                     }
                 }
@@ -898,19 +898,20 @@ public class CdfUtil {
         }
 
         try {
-            if ( yMaxRec==-1 && blAttr != null && rank>1 && hasEntry( blAttr, var)  ) {  // check for metadata for LABL_PTR_1
+            //TODO: if there is DEPEND_i, then there is no check on LABEL.
+            if ( result.nrec==-1 && blAttr != null && rank>1 && hasEntry( blAttr, var)  ) {  // check for metadata for LABL_PTR_1
                 logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{blAttr.getName(), var.getName()});
                 Entry yEntry = blAttr.getEntry(var);
                 result.labl = cdf.getVariable(String.valueOf(yEntry.getData()));
-                result.nrec = result.labl.getMaxWrittenRecord();
-                if (result.nrec == 0) {
+                result.nrec = result.labl.getMaxWrittenRecord()+1;
+                if (result.nrec == 1) {
                     result.nrec = result.labl.getDimSizes()[0];
                 }
                 if ( result.labl.getRecVariance() ) {
                     //TODO: some sanity check here?
                 } else {
                     if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
-                        warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
+                        warn.add("LABL_PTR_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                     }
                 }
             }
@@ -1099,6 +1100,31 @@ public class CdfUtil {
                 DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
 
                 DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
+
+                if (deep) {
+                    try {
+                        if (catDesc != null) {
+                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{catDesc.getName(), var.getName()});
+                            if ( hasEntry( catDesc, var ) ) {
+                                Entry entry = catDesc.getEntry(var);
+                                scatDesc = String.valueOf(entry.getData());
+                            } else {
+                                scatDesc = "";
+                            }
+                        }
+                        if (varNotes!=null ) {
+                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{varNotes.getName(), var.getName()});
+                            if ( hasEntry( varNotes, var) ) {
+                                Entry entry = varNotes.getEntry(var);
+                                svarNotes = String.valueOf(entry.getData());
+                            } else {
+                                svarNotes = "";
+                            }
+                        }
+                    } catch (CDFException e) {
+                        warn.add( e.getMessage() );
+                    }
+                }
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
