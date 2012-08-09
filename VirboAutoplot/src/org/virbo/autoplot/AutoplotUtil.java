@@ -54,6 +54,7 @@ import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -255,9 +256,28 @@ public class AutoplotUtil {
 
     static void doSearchToolTips1( final JComponent aThis, Pattern p, Map<Component,String> result  ) {
         String s= aThis.getToolTipText();
+        boolean foundIt= false;
         if ( s!=null ) {
             if ( p.matcher(s).find() ) {
                 result.put( aThis, s );
+                foundIt= true;
+            }
+        }
+        if ( !foundIt ) {
+            s= null;
+            if ( aThis instanceof javax.swing.JLabel ) {
+                s= ((javax.swing.JLabel)aThis).getText();
+            } else if ( aThis instanceof javax.swing.JMenuItem ) {
+                s= ((javax.swing.JMenuItem)aThis).getText();
+            } else if ( aThis instanceof JPanel ) {
+                javax.swing.border.Border b= ((javax.swing.JPanel)aThis).getBorder();
+                if ( b instanceof TitledBorder ) {
+                    s= ((TitledBorder)b).getTitle();
+                }
+            }
+            if ( s!=null && p.matcher(s).find() ) {
+                result.put( aThis, s );
+                foundIt= true;
             }
         }
         for ( int i=0; i<aThis.getComponentCount(); i++ ) {
