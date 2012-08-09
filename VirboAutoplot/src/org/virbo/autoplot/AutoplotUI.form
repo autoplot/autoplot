@@ -467,6 +467,15 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem7ActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="workOfflineCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Work Offline"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Only use previously downloaded files. "/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="workOfflineCheckBoxMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator3">
@@ -602,6 +611,15 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoplotHomepageButtonActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="searchToolTipsMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Search Tooltips..."/>
+                <Property name="toolTipText" type="java.lang.String" value="Experimental search all GUI tooltips"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="searchToolTipsMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exceptionReport">

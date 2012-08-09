@@ -1690,6 +1690,7 @@ APSplash.checkTime("init 52");
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        workOfflineCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
@@ -1707,6 +1708,7 @@ APSplash.checkTime("init 52");
         jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
         autoplotHomepageButton = new javax.swing.JMenuItem();
+        searchToolTipsMenuItem = new javax.swing.JMenuItem();
         exceptionReport = new javax.swing.JMenuItem();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
 
@@ -2117,6 +2119,15 @@ APSplash.checkTime("init 52");
         });
         cacheMenu.add(jMenuItem7);
 
+        workOfflineCheckBoxMenuItem.setText("Work Offline");
+        workOfflineCheckBoxMenuItem.setToolTipText("Only use previously downloaded files. ");
+        workOfflineCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                workOfflineCheckBoxMenuItemActionPerformed(evt);
+            }
+        });
+        cacheMenu.add(workOfflineCheckBoxMenuItem);
+
         toolsMenu.add(cacheMenu);
         toolsMenu.add(jSeparator3);
 
@@ -2242,6 +2253,15 @@ APSplash.checkTime("init 52");
             }
         });
         helpMenu.add(autoplotHomepageButton);
+
+        searchToolTipsMenuItem.setText("Search Tooltips...");
+        searchToolTipsMenuItem.setToolTipText("Experimental search all GUI tooltips");
+        searchToolTipsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchToolTipsMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(searchToolTipsMenuItem);
 
         exceptionReport.setText("Provide Feedback...");
         exceptionReport.setToolTipText("Send feedback to application support");
@@ -2746,6 +2766,15 @@ private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
         AutoplotUtil.reloadAll(dom);
     } } );
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
+
+private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workOfflineCheckBoxMenuItemActionPerformed
+    FileSystem.settings().setOffline(workOfflineCheckBoxMenuItem.isSelected());
+    FileSystem.reset();
+}//GEN-LAST:event_workOfflineCheckBoxMenuItemActionPerformed
+
+private void searchToolTipsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchToolTipsMenuItemActionPerformed
+    AutoplotUtil.doSearchToolTips(this);
+}//GEN-LAST:event_searchToolTipsMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3353,6 +3382,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu resetZoomMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
+    private javax.swing.JMenuItem searchToolTipsMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem specialEffectsMenuItem;
     private javax.swing.JLabel statusLabel;
@@ -3366,6 +3396,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
     private javax.swing.JMenu viewMenu;
+    private javax.swing.JCheckBoxMenuItem workOfflineCheckBoxMenuItem;
     private javax.swing.JMenuItem zoomInMenuItem;
     private javax.swing.JMenuItem zoomOutMenuItem;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
