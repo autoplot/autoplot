@@ -674,7 +674,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         String surl2= surl1.trim();
         int off= surl1.indexOf(surl2);
         final String surl= surl2;
-        final int carotpos= carotpos1 - off;
+        final int carotpos= Math.min( carotpos1 - off, surl2.length() );
 
         URISplit split = URISplit.parse(surl, carotpos, true);
 
