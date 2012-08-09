@@ -573,6 +573,9 @@ public class CdfUtil {
      */
     private static DepDesc getDepDesc( CDF cdf, Variable var, int rank, int[] dims, int dim, List<String> warn ) {
         DepDesc result= new DepDesc();
+
+        result.nrec=-1;
+        
         try {
             if ( hasAttribute( cdf, var.getName(), "DEPEND_"+dim ) ) {  // check for metadata for DEPEND_1
                 Object att= getAttribute( cdf, var.getName(), "DEPEND_"+dim );
@@ -586,7 +589,7 @@ public class CdfUtil {
 
                         }
                     } else {
-                        if ( result.dep.getDimensions().length>0 && result.dep.recordVariance() ) {
+                        if ( result.dep.getDimensions().length>0 && result.dep.getNumberOfValues()>1 && result.dep.recordVariance() ) {
                             result.rank2= true;
                             result.nrec = result.dep.getDimensions()[0];
                             warn.add( "NOTE: " + result.dep.getName() + " is record varying" );
@@ -597,7 +600,7 @@ public class CdfUtil {
                             }
                         }
                         if ( dims.length>(dim-2) && (result.nrec)!=dims[dim-1] ) {
-                            warn.add("depend"+dim+" length is inconsistent with length ("+dims[0]+")" );
+                            warn.add("depend"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
                         }
                     }
                 }
@@ -607,6 +610,7 @@ public class CdfUtil {
         }
 
         try {
+             //TODO: if there is DEPEND_i, then there is no check on LABEL.  The logic above needs to be repeated.
             if (result.nrec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_"+dim ) ) {  // check for metadata for LABL_PTR_1
                 Object att= getAttribute( cdf, var.getName(), "LABL_PTR_"+dim );
                 if ( att!=null && rank>1  ) {
