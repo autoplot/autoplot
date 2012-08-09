@@ -112,6 +112,10 @@ public class Test501 {
 
         System.err.println( "Skipping the tests: " + skip );
 
+        // special for testing
+        //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
+        //ids.add(0,s);
+
         int iid=0;
         for ( String id: ids ) {
             System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
@@ -131,7 +135,11 @@ public class Test501 {
             StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
             String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this.
 
-
+            int ic= exampleRange.indexOf("|");
+            if ( ic>-1 ) {
+                exampleRange= exampleRange.substring(0,ic);
+            }
+            
             DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
             String uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
