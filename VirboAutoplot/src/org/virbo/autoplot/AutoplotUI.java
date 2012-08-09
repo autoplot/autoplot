@@ -2979,7 +2979,13 @@ private void updateFrameTitle() {
         String tag;
         try {
             tag = AboutUtil.getReleaseTag(APSplash.class);
-            if ( tag!=null ) welcome+=" ("+tag+")";
+            if ( tag!=null ) {
+                welcome+=" ("+tag+")";
+                System.setProperty("http.agent", "Autoplot "+tag );
+            } else {
+                System.setProperty("http.agent", "Autoplot dev" );
+            }
+            
         } catch (IOException ex) {
             Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();
