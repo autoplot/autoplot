@@ -39,6 +39,19 @@ import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -237,6 +250,71 @@ public class AutoplotUtil {
             } else {
                 System.err.println( "not updating: " + dsf.getUri() );
             }
+        }
+    }
+
+    static void doSearchToolTips1( final JComponent aThis, Pattern p, Map<Component,String> result  ) {
+        String s= aThis.getToolTipText();
+        if ( s!=null ) {
+            if ( p.matcher(s).find() ) {
+                result.put( aThis, s );
+            }
+        }
+        for ( int i=0; i<aThis.getComponentCount(); i++ ) {
+            Component kid= aThis.getComponent(i);
+            if ( kid!=null && kid instanceof JComponent ) {
+                doSearchToolTips1( (JComponent)kid, p, result );
+            }
+        }
+        if ( aThis instanceof JMenu ) {
+            JMenu m= (JMenu)aThis;
+            for ( int i=0; i<m.getItemCount(); i++ ) {
+                JMenuItem item= m.getItem(i);
+                if ( item!=null ) doSearchToolTips1( item, p, result );
+            }
+        }
+    }
+    
+    static void doSearchToolTips( final Container aThis ) {
+        JPanel panel= new JPanel( new BorderLayout() );
+        javax.swing.JTextField tf= new JTextField();
+        panel.add( tf );
+        int i= JOptionPane.showConfirmDialog( aThis, panel, "Experimental Tooltips documentation search", JOptionPane.OK_CANCEL_OPTION );
+        if ( i==JOptionPane.OK_OPTION ) {
+            final String search= tf.getText();
+            Runnable run= new Runnable() {
+                public void run() {
+                    Map<Component,String> result= new LinkedHashMap();
+                    Pattern p= Pattern.compile(search,Pattern.CASE_INSENSITIVE);
+                    for ( int i=0; i<aThis.getComponentCount(); i++ ) {
+                        Component kid= aThis.getComponent(i);
+                        if ( kid!=null && kid instanceof JComponent ) {
+                            doSearchToolTips1( (JComponent)kid, p, result );
+                        }
+                    }
+                    for ( Entry<Component,String> e: result.entrySet() ) {
+                        System.err.println( e.getValue() );
+                    }
+                    if ( aThis instanceof JFrame ) {
+                        JMenuBar mb= ((JFrame)aThis).getJMenuBar();
+                        for ( int i=0; i<mb.getMenuCount(); i++ ) {
+                            JMenu m= mb.getMenu(i);
+                            if ( m!=null ) doSearchToolTips1(m,p,result);
+                        }
+                    }
+
+                    JTable t= new JTable( result.size(), 2 );
+                    TableModel m= t.getModel();
+                    int i=0;
+                    for ( Entry e: result.entrySet() ) {
+                        m.setValueAt( e.getKey().getClass(), i, 0 );
+                        m.setValueAt( e.getValue(), i, 1 );
+                        i++;
+                    }
+                    JOptionPane.showConfirmDialog( aThis, t, "Tooltips search results", JOptionPane.OK_OPTION );
+               }
+            };
+            new Thread(run).start();
         }
     }
 
