@@ -131,22 +131,23 @@ public class Test501 {
                 continue;
             }
 
-
-            StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
-            String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this.
-
-            int ic= exampleRange.indexOf("|");
-            if ( ic>-1 ) {
-                exampleRange= exampleRange.substring(0,ic);
-            }
-            
-            DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
-            String uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
-
-            System.err.println("id: "+id );
-            System.err.println("uri: "+uri);
-
+            String uri= "";
             try {
+
+                StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
+                String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this.
+
+                int ic= exampleRange.indexOf("|");
+                if ( ic>-1 ) {
+                    exampleRange= exampleRange.substring(0,ic);
+                }
+            
+                DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
+                uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+
+                System.err.println("id: "+id );
+                System.err.println("uri: "+uri);
+
                 do1( uri, iid );
             } catch ( Exception ex ) {
                 ex.printStackTrace();
