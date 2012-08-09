@@ -792,6 +792,8 @@ public class PlotController extends DomNodeController {
                 if ( result==null ) {
                     result= pe.getPlotDefaults();
                 } else {
+                    Plot second= pe.getPlotDefaults();
+                    //System.err.println("second: "+second);
                     //merge
                 }
             }
@@ -873,7 +875,9 @@ public class PlotController extends DomNodeController {
             } else {
                 dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
             }
+            boolean auto= plot.getXaxis().autoRange;
             plot.getXaxis().setRange( dr );
+            plot.getXaxis().setAutoRange(auto);
         }
         elerange= e.getPlotDefaults().getYaxis().getRange();
         range=  plot.getYaxis().getRange();
@@ -884,7 +888,9 @@ public class PlotController extends DomNodeController {
             } else {
                 dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
             }
+            boolean auto= plot.getYaxis().autoRange;
             plot.getYaxis().setRange( dr );
+            plot.getYaxis().setAutoRange(auto);
         }
         elerange= e.getPlotDefaults().getZaxis().getRange();
         range=  plot.getZaxis().getRange();
@@ -895,7 +901,9 @@ public class PlotController extends DomNodeController {
             } else {
                 dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
             }
+            boolean auto= plot.getZaxis().autoRange;
             plot.getZaxis().setRange( dr );
+            plot.getZaxis().setAutoRange(auto);
         }
 
     }
