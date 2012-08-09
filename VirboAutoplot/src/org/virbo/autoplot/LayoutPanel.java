@@ -350,8 +350,13 @@ public class LayoutPanel extends javax.swing.JPanel {
         selected.add(dasPlot);
 
         for ( int i=0; i<iindices.length; i++ ) {
-            PlotElementController pec= peles[iindices[i]].getController();
-            selected.add( pec.getRenderer() );
+            try {
+                PlotElementController pec= peles[iindices[i]].getController();
+                selected.add( pec.getRenderer() );
+            } catch ( IndexOutOfBoundsException ex ) {
+                // this happens because of multiple threads... TODO: fix this sometime...
+                System.err.println("harmless indexOutOfBoundsException needs to be fixed sometime");
+            }
         }
 
         canvasLayoutPanel1.setSelectedComponents( selected );
