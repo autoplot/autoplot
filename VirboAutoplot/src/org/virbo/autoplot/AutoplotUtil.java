@@ -269,6 +269,10 @@ public class AutoplotUtil {
                 s= ((javax.swing.JLabel)aThis).getText();
             } else if ( aThis instanceof javax.swing.JMenuItem ) {
                 s= ((javax.swing.JMenuItem)aThis).getText();
+            } else if ( aThis instanceof javax.swing.JButton ) {
+                s= ((javax.swing.JButton)aThis).getText();
+            } else if ( aThis instanceof javax.swing.JCheckBox ) {
+                s= ((javax.swing.JCheckBox)aThis).getText();
             } else if ( aThis instanceof JPanel ) {
                 javax.swing.border.Border b= ((javax.swing.JPanel)aThis).getBorder();
                 if ( b instanceof TitledBorder ) {
