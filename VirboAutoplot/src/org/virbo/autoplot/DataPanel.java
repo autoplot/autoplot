@@ -579,6 +579,7 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
+        sliceIndexSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(sliceIndexSpinner, "#"));
         sliceIndexSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 sliceIndexSpinnerStateChanged(evt);
