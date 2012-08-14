@@ -1579,15 +1579,19 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
             peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
 
-            if ( peleCopy.getPlotDefaults()==null ) {
+            //if ( peleCopy.getPlotDefaults()==null ) {
                 System.err.println("plotDefaults is null here!");
-            }
+                System.err.println("1.1"+peleCopy.getPlotDefaults().toString());
+                System.err.println("1.2"+peleCopy.getPlotDefaults().getXaxis().toString());
+                System.err.println("1.3"+peleCopy.getPlotDefaults().getXaxis().getRange().toString());
+
+            //}
 
             if ( logger.isLoggable(Level.FINEST) ) {
                 System.err.println("1"+peleCopy.toString());
-                System.err.println("1"+peleCopy.getPlotDefaults().toString());
-                System.err.println("1"+peleCopy.getPlotDefaults().getXaxis().toString());
-                System.err.println("1"+peleCopy.getPlotDefaults().getXaxis().getRange().toString());
+                System.err.println("1.1"+peleCopy.getPlotDefaults().toString());
+                System.err.println("1.2"+peleCopy.getPlotDefaults().getXaxis().toString());
+                System.err.println("1.3"+peleCopy.getPlotDefaults().getXaxis().getRange().toString());
                 System.err.println("2"+peleCopy.getPlotDefaults().getYaxis().getRange().toString());
 
                 logger.finest( String.format( "done, autorange  x:%s, y:%s ",
