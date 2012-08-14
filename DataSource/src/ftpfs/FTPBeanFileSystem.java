@@ -3,6 +3,7 @@
  *
  * Created on August 17, 2005, 3:33 PM
  *
+ * This uses open-source code from ftp4j, found at https://sourceforge.net/projects/ftp4j/
  *
  */
 package ftpfs;
@@ -15,6 +16,14 @@ import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
 import ftpfs.ftp.FtpObserver;
+import it.sauronsoftware.ftp4j.FTPFile;
+import it.sauronsoftware.ftp4j.FTPListParseException;
+import it.sauronsoftware.ftp4j.FTPListParser;
+import it.sauronsoftware.ftp4j.listparsers.DOSListParser;
+import it.sauronsoftware.ftp4j.listparsers.EPLFListParser;
+import it.sauronsoftware.ftp4j.listparsers.MLSDListParser;
+import it.sauronsoftware.ftp4j.listparsers.NetWareListParser;
+import it.sauronsoftware.ftp4j.listparsers.UnixListParser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +32,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -32,12 +40,12 @@ import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.util.FileUtil;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -138,6 +146,84 @@ public class FTPBeanFileSystem extends WebFileSystem {
         }
     }
 
+    FTPListParser parser= null;
+    private static final List<FTPListParser> listParsers;
+    static {
+        listParsers= new ArrayList(5);
+        listParsers.add(new UnixListParser() );
+        listParsers.add(new DOSListParser());
+        listParsers.add(new EPLFListParser());
+        listParsers.add(new NetWareListParser());
+        listParsers.add(new MLSDListParser());
+    }
+    /**
+     * use open source library that has several formats.
+     * @param dir
+     * @param listing
+     * @return
+     * @throws IOException
+     */
+    public DirectoryEntry[] parseLslNew( String dir, File listing ) throws IOException {
+
+        InputStream in = new FileInputStream(listing);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        List<String> llist= new ArrayList<String>(370);
+        
+        String aline = reader.readLine();
+        while ( aline!=null ) {
+            llist.add(aline);
+            aline = reader.readLine();
+        }
+        String[] list= llist.toArray( new String[llist.size()] );
+
+        FTPFile[] ret=null;
+
+        // open source taken from it.sauronsoftware.ftp4j.FTPClient.java
+        // Is there any already successful parser?
+            if (parser != null) {
+                    // Yes, let's try with it.
+                    try {
+                            ret = parser.parse(list);
+                    } catch (FTPListParseException e) {
+                            // That parser doesn't work anymore.
+                            parser = null;
+                    }
+            }
+            // Is there an available result?
+            if (ret == null) {
+                    // Try to parse the list with every available parser.
+                    for (Iterator i = listParsers.iterator(); i.hasNext();) {
+                            FTPListParser aux = (FTPListParser) i.next();
+                            try {
+                                    // Let's try!
+                                    ret = aux.parse(list);
+                                    // This parser smells good!
+                                    parser = aux;
+                                    // Leave the loop.
+                                    break;
+                            } catch (FTPListParseException e) {
+                                    // Let's try the next one.
+                                    continue;
+                            }
+                    }
+            }
+
+        DirectoryEntry[] result= new DirectoryEntry[ret.length];
+        for ( int i=0; i<result.length; i++ ) {
+            DirectoryEntry de1= new DirectoryEntry();
+            de1.modified= ret[i].getModifiedDate().getTime();
+            de1.name= ret[i].getName();
+            de1.size= ret[i].getSize();
+            de1.type= ret[i].getType()==FTPFile.TYPE_FILE ? 'f' : 'd';
+            result[i]= de1;
+        }
+        return result;
+    }
+
+
+    //this is the old parser that make all sorts of assumptions.
     public DirectoryEntry[] parseLsl(String dir, File listing) throws IOException {
         InputStream in = new FileInputStream(listing);
 
@@ -231,21 +317,16 @@ public class FTPBeanFileSystem extends WebFileSystem {
     public synchronized final String[] listDirectory(String directory) throws IOException {
         directory = toCanonicalFolderName(directory);
 
-        String[] result;
+        DirectoryEntry[] result;
         if ( isListingCached(directory) ) {
             logger.log(Level.FINE, "using cached listing for {0}", directory);
 
             File listing= listingFile(directory);
-            DirectoryEntry[] des = parseLsl(directory, listing);
+            DirectoryEntry[] des = parseLslNew(directory, listing);
 
-            result = new String[des.length];
-            for (int i = 0; i < des.length; i++) {
-                result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
-            }
+            cacheListing(directory, des );
 
-            cacheListing(directory, result );
-
-            return result;
+            return FileSystem.getListing(des);
         }
 
         boolean successOrCancel= false;
@@ -314,15 +395,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
                 successOrCancel= true;
                 
-                DirectoryEntry[] des = parseLsl(directory, listing);
-                result = new String[des.length];
-                for (int i = 0; i < des.length; i++) {
-                    result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
-                }
+                result = parseLslNew(directory, listing);
 
                 cacheListing(directory, result );
 
-                return result;
+                return FileSystem.getListing(result);
                 
             } catch (FtpException e) {
                 if ( e.getMessage().startsWith("530" ) ) { // invalid login
@@ -557,7 +634,26 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     @Override
     public FileObject getFileObject(String filename) {
-        return new FtpFileObject(this, filename, new Date(System.currentTimeMillis()));
+        String path= toCanonicalFilename(filename);
+        int i= path.lastIndexOf("/");
+
+        // we should be able to get the listing that we just did from memory.
+        DirectoryEntry[] des= listDirectoryFromMemory(path.substring(0,i+1));
+        DirectoryEntry result= null;
+        if ( des!=null ) {
+            for ( i=0; i<des.length; i++ ) {
+                if ( filename.equals(des[i].name) ) {
+                    result= des[i];
+                }
+            }
+        }
+        if ( result==null ) {
+            // this won't exist.
+            return new FtpFileObject(this, filename, new Date(System.currentTimeMillis()));//TODO:DATE!
+        } else {
+            return new FtpFileObject(this, filename, new Date( result.modified ) );
+        }
+
     }
 
     boolean delete(FtpFileObject aThis) throws IOException {
