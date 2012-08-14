@@ -1366,7 +1366,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * resets the dom to the initial state by deleting added plotElements, plots and data sources.
      */
-    public synchronized void reset() {
+    public void reset() {
         System.err.println("Resetting application...");
         
         synchronized (this) {
