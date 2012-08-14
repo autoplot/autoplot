@@ -362,42 +362,50 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         return tool;
     }
 
+    /**
+     * save a copy of the current selection to a local disk.
+     */
+    protected void saveLocalCopy() {
+        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
+        String srecent = prefs.get( PngWalkTool1.PREF_RECENT, System.getProperty("user.home") );
+        String ssrc= getSelectedFile();
+        if ( ssrc==null ) {
+            JOptionPane.showMessageDialog( this, "No image is selected." );
+            return;
+        }
+        File src;
+        try {
+            src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog( this, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
+            return;
+        }
+
+        JFileChooser chooser= new JFileChooser( srecent );
+        chooser.setMultiSelectionEnabled(false);
+        chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
+        int r= chooser.showSaveDialog(this);
+        if ( r==JFileChooser.APPROVE_OPTION ) {
+            prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent().toString() );
+            try {
+                if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
+                    JOptionPane.showMessageDialog( this, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
+                }
+            } catch (IOException ex) {
+                this.setStatus("Unable to save to: " + chooser.getSelectedFile() );
+                JOptionPane.showMessageDialog( this, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
+            }
+        }
+    }
+
+
     private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame frame ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
 
         fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
             public void actionPerformed( ActionEvent e ) {
-                Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
-                String srecent = prefs.get( PngWalkTool1.PREF_RECENT, System.getProperty("user.home") );
-                String ssrc= tool.getSelectedFile();
-                if ( ssrc==null ) {
-                    JOptionPane.showMessageDialog( tool, "No image is selected." );
-                    return;
-                }
-                File src;
-                try {
-                    src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog( tool, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
-                    return;
-                }
-
-                JFileChooser chooser= new JFileChooser( srecent );
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
-                int r= chooser.showSaveDialog(tool);
-                if ( r==JFileChooser.APPROVE_OPTION ) {
-                    prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent().toString() );
-                    try {
-                        if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
-                            JOptionPane.showMessageDialog( tool, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
-                        }
-                    } catch (IOException ex) {
-                        tool.setStatus("Unable to save to: " + chooser.getSelectedFile() );
-                        JOptionPane.showMessageDialog( tool, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
-                    }
-                }
+                tool.saveLocalCopy();
             }
         } );
 
