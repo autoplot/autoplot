@@ -501,7 +501,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         public void setURI(String suri) throws ParseException {
             this.uri= suri;
-            this.timeRange= URISplit.parseTimeRange(uri);
+            DatumRange tr= URISplit.parseTimeRange(uri);
+            if ( tr!=null ) this.timeRange= tr;
         }
 
     }
