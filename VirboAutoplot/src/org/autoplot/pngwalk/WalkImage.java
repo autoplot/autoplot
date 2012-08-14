@@ -348,46 +348,48 @@ public class WalkImage  {
      * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
      * @return the thumbnail, or null if it is not loaded.
      */
-    public synchronized BufferedImage getThumbnail(boolean loadIfNeeded) {
+    public BufferedImage getThumbnail(boolean loadIfNeeded) {
 
         synchronized (thumbFreshness ) {
             thumbFreshness.remove(this); // move to freshest position
             thumbFreshness.addFirst(this);
         }
-        
-        switch (status) {
-            case THUMB_LOADING:
-                // We're already working on it in another thread
-                return null;
 
-            case THUMB_LOADED:
-                if ( thumb==null ) {
-                    throw new RuntimeException("thumb should not be null");
-                }
-                return thumb;
+        synchronized (this) {
+            switch (status) {
+                case THUMB_LOADING:
+                    // We're already working on it in another thread
+                    return null;
 
-            case IMAGE_LOADED:
-                return thumb;
+                case THUMB_LOADED:
+                    if ( thumb==null ) {
+                        throw new RuntimeException("thumb should not be null");
+                    }
+                    return thumb;
 
-            case ERROR:
-                return thumb;   //TODO: May be null; use error placeholder?
+                case IMAGE_LOADED:
+                    return thumb;
 
-            case MISSING:
-                return missingImage;
+                case ERROR:
+                    return thumb;   //TODO: May be null; use error placeholder?
 
-            case SIZE_THUMB_LOADED:
-            case UNKNOWN:
-                if(!loadIfNeeded) return null;
-                setStatus(Status.THUMB_LOADING);
-                return maybeReturnThumb(loadIfNeeded);
-            
-            case IMAGE_LOADING:
-                return maybeReturnThumb(loadIfNeeded);
+                case MISSING:
+                    return missingImage;
 
-            default:
-                //should never get here, but keeps Java from warning about missing return
-                throw new IllegalArgumentException("Encountered invalid status in walk image.");
-        } //end switch
+                case SIZE_THUMB_LOADED:
+                case UNKNOWN:
+                    if(!loadIfNeeded) return null;
+                    setStatus(Status.THUMB_LOADING);
+                    return maybeReturnThumb(loadIfNeeded);
+
+                case IMAGE_LOADING:
+                    return maybeReturnThumb(loadIfNeeded);
+
+                default:
+                    //should never get here, but keeps Java from warning about missing return
+                    throw new IllegalArgumentException("Encountered invalid status in walk image.");
+            } //end switch
+        }
     }
 
     private static void maybeStartThumbLoadingQueueRunner() {
