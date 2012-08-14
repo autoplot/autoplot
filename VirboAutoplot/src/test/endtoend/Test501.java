@@ -122,6 +122,9 @@ public class Test501 {
         //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
         //ids.add(0,s);
 
+        getDocumentModel().getOptions().setAutolayout(false);
+        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
         int iid=0;
         for ( String id: ids ) {
             System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
