@@ -257,7 +257,7 @@ public class ContextFlowView extends PngWalkView {
                         //allowing such images to take full width reduces flicker
                         bounds = bounds(x, y, width, height, currentWidth, 10000, 1.0, false);
                     } else {
-                        bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                        bounds = bounds(x, y, width, height, currentWidth, currentWidth * height / width, 1.0, false);
                     }
 
                     BufferedImage im = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
