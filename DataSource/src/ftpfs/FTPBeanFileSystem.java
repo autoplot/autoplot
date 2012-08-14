@@ -178,6 +178,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
         }
         String[] list= llist.toArray( new String[llist.size()] );
 
+        if ( dir!=null && dir.length()>1 ) {
+            System.err.println("herehere");
+        }
+
+
         FTPFile[] ret=null;
 
         // open source taken from it.sauronsoftware.ftp4j.FTPClient.java
