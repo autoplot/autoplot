@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>rte 1243117384: new check for timerange in JythonDataSource would result in null pointer exception when default time is used with logging</li>
             <li>more mucking with how the transitions operate to support bundles of mageis stuff at LANL, trying to get autoranging to work correctly</li>
             <li>users can switch back and forth between series and spectrogram with complex slices</li>
             <li>limits on slices applied in the GUI to avoid index out of bounds errors</li>
@@ -91,6 +92,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>indicate the dataset and context after slicing on data tab.</li>
             <li>layout tab now has menu items to make selected plots bigger or smaller, or all the same size.</li>
             <li>jython data source editor panel looks for #description and #title to label the dialog.</li>
             <li>link to read-only file cache to support where FTP or HTTP site is available locally.</li>
