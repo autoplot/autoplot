@@ -47,7 +47,9 @@ import org.virbo.autoplot.dom.BindingSupport;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.util.TickleTimer;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.FilterChainPanel;
@@ -409,10 +411,34 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * show the context after the slicing and operations for the user's reference.
+     * TODO: make sure this is released so stray datasets can be garbage collected.
+     */
+    PropertyChangeListener contextListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateProcessDataSetLabel();
+        }
+    };
+
+    private void updateProcessDataSetLabel() {
+        QDataSet orig= dom.getController().getDataSourceFilterFor(element).getController().getFillDataSet();
+        QDataSet proc= element.getController().getDataSet();
+        if ( orig==proc ) {
+            processDataSetLabel.setText( "" );
+        } else {
+            String lbl= String.valueOf( proc );
+            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + "<br>@ "+ DataSetUtil.contextAsString( element.getController().getDataSet() ) );
+        }
+    }
+
     private synchronized void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         if (elementBindingGroup != null) elementBindingGroup.unbind();
-        if ( element!=null ) element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
+        if ( element!=null ) {
+            element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
+            element.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
+        }
 
         PlotElement p = applicationController.getPlotElement();
         element= p;
@@ -427,6 +453,9 @@ public class DataPanel extends javax.swing.JPanel {
 
         elementBindingGroup = bc;
         bc.bind();
+
+        p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
+        updateProcessDataSetLabel();
 
     }
 
@@ -555,6 +584,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetLabel = new javax.swing.JLabel();
         editComponentPanel = new javax.swing.JButton();
         recentComboBox = new org.virbo.datasource.RecentComboBox();
+        processDataSetLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         validRangeLabel = new javax.swing.JLabel();
         validRangeComboBox = new javax.swing.JComboBox();
@@ -625,6 +655,9 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
+        processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-2f));
+        processDataSetLabel.setText("(dataset will go here)");
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -634,27 +667,35 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
                             .add(jPanel2Layout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(sliceIndexLabel)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
-                            .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jPanel2Layout.createSequentialGroup()
+                                        .add(12, 12, 12)
+                                        .add(sliceIndexLabel)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE))
+                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                                        .add(doSliceCheckBox)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(sliceTypeComboBox, 0, 410, Short.MAX_VALUE))
+                                    .add(transposeCheckBox)))
                             .add(jPanel2Layout.createSequentialGroup()
-                                .add(operationsLabel)
-                                .add(4, 4, 4)
-                                .add(recentComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .add(doSliceCheckBox)
+                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                                    .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                                    .add(jPanel2Layout.createSequentialGroup()
+                                        .add(operationsLabel)
+                                        .add(4, 4, 4)
+                                        .add(recentComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(sliceTypeComboBox, 0, 382, Short.MAX_VALUE)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editComponentPanel))
-                    .add(transposeCheckBox))
-                .addContainerGap())
+                                .add(editComponentPanel)))
+                        .addContainerGap())
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .add(processDataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                        .add(52, 52, 52))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -670,6 +711,7 @@ public class DataPanel extends javax.swing.JPanel {
                             .add(operationsLabel)
                             .add(recentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(doSliceCheckBox)
                     .add(sliceTypeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -680,7 +722,9 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(sliceAutorangesCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .add(60, 60, 60))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(processDataSetLabel)
+                .add(40, 40, 40))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Source [?]"));
@@ -782,7 +826,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE))
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -850,6 +894,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel operationsLabel;
+    private javax.swing.JLabel processDataSetLabel;
     private org.virbo.datasource.RecentComboBox recentComboBox;
     private javax.swing.JCheckBox sliceAutorangesCB;
     private javax.swing.JLabel sliceIndexLabel;
