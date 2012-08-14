@@ -35,6 +35,10 @@ public class Axis extends DomNode {
      * @param range
      */
     public void setRange(DatumRange range) {
+        if ( range==null ) {
+            System.err.println("range set to null!");
+            new Exception().printStackTrace();
+        }
         DatumRange oldRange = this.range;
         this.range= range;
         propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
