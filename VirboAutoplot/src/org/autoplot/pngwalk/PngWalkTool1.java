@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -43,6 +44,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -51,6 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileView;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -62,8 +65,10 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -95,6 +100,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     private QualityControlPanel qcPanel=null;
 
     public static final String PREF_RECENT = "pngWalkRecent";
+    
+    /**
+     * last location where image was exported
+     */
+    public static final String PREF_LAST_EXPORT= "pngWalkLastExport";
 
     public PngWalkView[] views;
     TearoffTabbedPane tabs;
@@ -356,6 +366,41 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
 
+        fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
+            public void actionPerformed( ActionEvent e ) {
+                Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
+                String srecent = prefs.get( PngWalkTool1.PREF_RECENT, System.getProperty("user.home") );
+                String ssrc= tool.getSelectedFile();
+                if ( ssrc==null ) {
+                    JOptionPane.showMessageDialog( tool, "No image is selected." );
+                    return;
+                }
+                File src;
+                try {
+                    src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog( tool, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
+                    return;
+                }
+
+                JFileChooser chooser= new JFileChooser( srecent );
+                chooser.setMultiSelectionEnabled(false);
+                chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
+                int r= chooser.showSaveDialog(tool);
+                if ( r==JFileChooser.APPROVE_OPTION ) {
+                    prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent().toString() );
+                    try {
+                        if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
+                            JOptionPane.showMessageDialog( tool, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
+                        }
+                    } catch (IOException ex) {
+                        tool.setStatus("Unable to save to: " + chooser.getSelectedFile() );
+                        JOptionPane.showMessageDialog( tool, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
+                    }
+                }
+            }
+        } );
+
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
@@ -371,12 +416,14 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 }
             }
         } );
+
         fileMenu.add( new AbstractAction( "Quit" ) {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
                 AppManager.getInstance().quit();
             }
         } );
+
         result.add(fileMenu);
 
         BindingGroup bg= new BindingGroup();
@@ -841,7 +888,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         actionButtonsPanel.add( b );
     }
 
+    /**
+     * returns the current selection, or null if no sequence has been selected.
+     * @return
+     */
     String getSelectedFile() {
+        if ( seq==null ) return null;
         return DataSetURI.fromUri( seq.currentImage().getUri() );
     }
 
