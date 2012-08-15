@@ -389,6 +389,9 @@ public class PlotElementController extends DomNodeController {
     private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, Exception {
         String label= null;
         c= c.trim();
+        if ( c.length()>0 && c.startsWith("|slice1(31)|slice1(31)") ) {
+            System.err.println("something is horribly wrong...  See sftp://jbf@papco.org/home/jbf/uploads/rte_1760330581_20120815_113557_jbf.xml");
+        }
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
                 String[] labels = SemanticOps.getComponentLabels(fillDs);
@@ -613,10 +616,6 @@ public class PlotElementController extends DomNodeController {
     private void setDataSetInternal(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet; //TODO: we should probably synchronize dataSet access.
-        synchronized (this) {
-            this.processDataSet= null;
-            this.procressStr= null;
-        }
         if ( ( plotElement.getLegendLabel().contains("%{") || plotElement.getLegendLabel().contains("$(") ) && renderer!=null ) {
             String s= (String)getLabelConverter().convertForward(plotElement.getLegendLabel());
             renderer.setLegendLabel(s);
@@ -787,7 +786,7 @@ public class PlotElementController extends DomNodeController {
             Runnable run= new Runnable() {
                 public void run() { // java complains about method not override.
                     try {
-                        updateDataSetImmediately();
+                         updateDataSetImmediately();
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException(ex);
                     }
