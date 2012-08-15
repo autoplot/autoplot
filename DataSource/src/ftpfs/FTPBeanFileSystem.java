@@ -157,13 +157,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
         listParsers.add(new MLSDListParser());
     }
     /**
-     * use open source library that has several formats.
+     * use open source library that supports several formats for list result.
      * @param dir
      * @param listing
      * @return
      * @throws IOException
      */
-    public DirectoryEntry[] parseLslNew( String dir, File listing ) throws IOException {
+    protected DirectoryEntry[] parseLslNew( String dir, File listing ) throws IOException {
 
         InputStream in = new FileInputStream(listing);
 
@@ -214,6 +214,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                             }
                     }
             }
+        // end  it.sauronsoftware.ftp4j.FTPClient.java portion
 
         DirectoryEntry[] result= new DirectoryEntry[ret.length];
         for ( int i=0; i<result.length; i++ ) {
@@ -228,7 +229,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
 
-    //this is the old parser that make all sorts of assumptions.
+    /**
+     * this is the old parser that make all sorts of assumptions.
+     * @param dir
+     * @param listing
+     * @deprecated use parseLslNew
+     * @return
+     * @throws IOException
+     */
     public DirectoryEntry[] parseLsl(String dir, File listing) throws IOException {
         InputStream in = new FileInputStream(listing);
 
@@ -373,7 +381,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 } catch (NullPointerException ex) {
                     ex.printStackTrace();
-                    IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost());
+                    IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost()); // TODO: Java 1.6 will fix this
                     ex2.initCause(ex);
                     throw ex2;
                 } catch (CancelledOperationException ex ) {
