@@ -37,6 +37,12 @@ public class TestFileSystemCaching {
         System.err.println( fo.lastModified() );
         System.err.println( fo.getSize() );
 
+        fs= FileSystem.create( "http://autoplot.org/data/");
+        fo= fs.getFileObject( "autoplot.cdf" );
+        System.err.println( fo.getClass() );
+        System.err.println( fo.lastModified() );
+        System.err.println( fo.getSize() );
+
 
     }
 }
