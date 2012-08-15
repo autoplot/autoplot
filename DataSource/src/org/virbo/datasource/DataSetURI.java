@@ -626,6 +626,18 @@ System.err.println("factory:"+factory);
     }
 
     /**
+     * check if the URI can be handled as a URL.  For example,
+     *   http://autoplot.org/data/foo.dat  is true, and
+     *   sftp://jbf@klunk.physics.uiowa.edu/home/jbf/data.nobackup/gnc_A_July_06_2012.mat.hdf5  is false.
+     * @param uri
+     * @return true if the URI can be used as a URL.
+     */
+    private static boolean isUrl( URI uri ) {
+        String s= uri.getScheme();
+        return s.equals("http") || s.equals("https") || s.equals("ftp");
+    }
+
+    /**
      * return a file reference for the url.  The file must have a nice name
      * on the server, and cannot be the result of a server query with parameters. (Use 
      * downloadResourceAsTempFile for this).
@@ -635,7 +647,9 @@ System.err.println("factory:"+factory);
      */
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
-        URL url= split.resourceUri.toURL();
+
+        URL url= isUrl( split.resourceUri ) ? split.resourceUri.toURL() : null;
+
         try {
             FileSystem fs = FileSystem.create(toUri(split.path),mon); // mon because of ZipFileSystem
             String filename = split.file.substring(split.path.length());
@@ -643,12 +657,12 @@ System.err.println("factory:"+factory);
             File tfile;
             if ( fo.exists() ) {
                 tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
-                if ( !allowHtml && tfile.exists() ) checkNonHtml( tfile, url );
+                if ( !allowHtml && tfile.exists() && url!=null ) checkNonHtml( tfile, url );
             } else {
                 FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
                 if ( foz.exists() ) {
                     File fz= foz.getFile(mon);
-                    if ( !allowHtml && fz.exists() ) checkNonHtml( fz, url );
+                    if ( !allowHtml && fz.exists() && url!=null ) checkNonHtml( fz, url );
                     File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
                     tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
                     org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
@@ -661,7 +675,7 @@ System.err.println("factory:"+factory);
                         throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
                     }
                 } else {
-                    throw new FileNotFoundException("File not found: "+url );
+                    throw new FileNotFoundException("File not found: "+ split.resourceUri );
                 }
             }
             return tfile;
@@ -672,7 +686,7 @@ System.err.println("factory:"+factory);
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {
-                IOException ex2= new IOException(ex.getMessage());
+                IOException ex2= new IOException(ex.getMessage()); // JAVA 1.6 will clean this up.
                 ex2.initCause(ex);
                 throw ex2;
             } else if ( ex.getMessage().contains("unable to delete") ) {
