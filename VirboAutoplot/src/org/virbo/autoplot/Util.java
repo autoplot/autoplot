@@ -167,6 +167,13 @@ public class Util {
         return success;
     }
 
+    /**
+     * copy a file.  This will probably always returns true or an exception, but check the status to be sure.
+     * @param srcf the source file
+     * @param dstf the destination file
+     * @return true if successful.
+     * @throws IOException 
+     */
     public static boolean copyFile( File srcf, File dstf ) throws IOException {
         WritableByteChannel dest = Channels.newChannel(new FileOutputStream(dstf));
         ReadableByteChannel src = Channels.newChannel(new FileInputStream(srcf));
