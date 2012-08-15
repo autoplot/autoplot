@@ -646,8 +646,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
         DirectoryEntry[] des= listDirectoryFromMemory(path.substring(0,i+1));
         DirectoryEntry result= null;
         if ( des!=null ) {
+            String fname= path.substring(i+1);
             for ( i=0; i<des.length; i++ ) {
-                if ( filename.equals(des[i].name) ) {
+                if ( fname.equals(des[i].name) ) {
                     result= des[i];
                 }
             }
