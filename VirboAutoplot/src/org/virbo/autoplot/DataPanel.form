@@ -65,19 +65,19 @@
                                       <Group type="102" alignment="1" attributes="0">
                                           <Component id="doSliceCheckBox" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Component id="sliceTypeComboBox" pref="410" max="32767" attributes="0"/>
+                                          <Component id="sliceTypeComboBox" pref="412" max="32767" attributes="0"/>
                                       </Group>
                                       <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" pref="514" max="32767" attributes="0"/>
-                                      <Component id="dataSetLabel" alignment="0" pref="514" max="32767" attributes="0"/>
+                                      <Component id="jLabel1" pref="518" max="32767" attributes="0"/>
+                                      <Component id="dataSetLabel" alignment="0" pref="518" max="32767" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                                          <Component id="recentComboBox" pref="436" max="32767" attributes="0"/>
+                                          <Component id="recentComboBox" pref="440" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -103,12 +103,9 @@
                   <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="editComponentPanel" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="1"/>
-                              <Component id="recentComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                          <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="1"/>
+                          <Component id="recentComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>

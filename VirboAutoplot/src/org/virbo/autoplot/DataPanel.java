@@ -429,7 +429,8 @@ public class DataPanel extends javax.swing.JPanel {
         } else {
             String lbl= String.valueOf( proc );
             QDataSet ds= element.getController().getDataSet();
-            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + "<br>@ "+ DataSetUtil.contextAsString( ds ) );
+            String s=  DataSetUtil.contextAsString( ds ).trim();
+            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + ( s.length()==0 ? "" : ( "<br>@ "+ s ) ) );
         }
     }
 
