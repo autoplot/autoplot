@@ -424,11 +424,12 @@ public class DataPanel extends javax.swing.JPanel {
     private void updateProcessDataSetLabel() {
         QDataSet orig= dom.getController().getDataSourceFilterFor(element).getController().getFillDataSet();
         QDataSet proc= element.getController().getDataSet();
-        if ( orig==proc ) {
+        if ( orig==proc || proc==null ) {
             processDataSetLabel.setText( "" );
         } else {
             String lbl= String.valueOf( proc );
-            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + "<br>@ "+ DataSetUtil.contextAsString( element.getController().getDataSet() ) );
+            QDataSet ds= element.getController().getDataSet();
+            processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + "<br>@ "+ DataSetUtil.contextAsString( ds ) );
         }
     }
 
