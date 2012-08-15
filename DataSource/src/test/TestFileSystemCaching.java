@@ -8,7 +8,7 @@ package test;
 import ftpfs.FTPBeanFileSystemFactory;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.KeyChain;
+//import org.das2.util.filesystem.KeyChain;
 
 /**
  *
@@ -25,8 +25,8 @@ public class TestFileSystemCaching {
         System.err.println( fo.lastModified() );
         System.err.println( fo.getSize() );
 
-        KeyChain.getDefault().writeKeysFile();
-        
+       //KeyChain.getDefault().writeKeysFile();
+
         fs.listDirectory("/a");
         fo= fs.getFileObject("/a/afile.txt");
         System.err.println( fo.lastModified() );
