@@ -9,7 +9,9 @@
 
 package org.virbo.netCDF;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,6 +78,21 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
+    protected static void checkMatlab( String resource ) throws IOException {
+        if ( resource.startsWith("file:/") ) {
+            BufferedReader r=null;
+            try {
+                r= new BufferedReader( new FileReader( new URL(resource).getFile() ) );
+                String magic= r.readLine();
+                if ( magic.contains("MATLAB") && !magic.contains("HDF5") ) {
+                    r.close();
+                    throw new IllegalArgumentException("Matlab file is not an HDF5 file.  Use Matlab 7.3 or greater, and save with -v7.3");
+                }
+            } finally {
+                if ( r!=null ) r.close();
+            }
+        }
+    }
     /**
      * @param resource
      * @return
@@ -87,6 +104,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             return NcMLReader.readNcML( resource, null );
         
         } else {
+            checkMatlab( resource );
             NetcdfFile f= NetcdfFile.open( resource );
             NetcdfDataset dataset= new NetcdfDataset( f );
             return dataset;

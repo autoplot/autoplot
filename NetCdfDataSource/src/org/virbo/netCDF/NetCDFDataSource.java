@@ -160,6 +160,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         if ( sMyUrl.endsWith(".ncml" ) ) {
             dataset= NcMLReader.readNcML( location, null );
         } else {
+            NetCDFDataSourceFactory.checkMatlab(location);
             NetcdfFile f= NetcdfFile.open( location );
             dataset= new NetcdfDataset( f );
         }
