@@ -107,6 +107,8 @@ public class FilterChainPanel extends JPanel {
         optionsPanel.setLayout( new BoxLayout(optionsPanel,BoxLayout.Y_AXIS) );
 
         ButtonGroup group= new ButtonGroup();
+
+        // CAUTION: ") " is used to delimit the annotation from the command.
         String[] opts= new String[] {
         "abs() return the absolute value of the data.",
         "accum() running sum of the rank 1 data. (opposite of diff).",
@@ -129,11 +131,12 @@ public class FilterChainPanel extends JPanel {
         "sin() sin of the data in radians. (No units check)",
         "slice0(0) slice the data on the zeroth dimension (often time) at the given index.",
         "slice1(0) slice the data on the first dimension at the given index.",
-        "slices(':',2,3)) slice the data on the first and second dimensions, leaving the zeroth alone.",
+        "slices(':',2,3) slice the data on the first and second dimensions, leaving the zeroth alone.",
         "smooth(5) boxcar average over the rank 1 data",
         "reducex('1 hr') reduce data to 1 hr intervals",
         "toDegrees() convert the data to degrees. (No units check)",
         "toRadians() convert the data to radians. (No units check) ",
+        "total1() total over the first dimension to reduce the dimensionality.",
         "transpose() transpose the rank 2 dataset.",
         "unbundle('Bx') unbundle a component ",
         "valid() replace data with 1 where valid, 0 where invalid",
@@ -153,8 +156,8 @@ public class FilterChainPanel extends JPanel {
                AbstractButton b= ee.nextElement();
                if ( b.isSelected() ) {
                    String s= b.getText();
-                   int ii= s.indexOf(" ");
-                   ss= s.substring(0,ii);
+                   int ii= s.indexOf(") ");
+                   ss= s.substring(0,ii+1);
                }
            }
            if ( ss!=null ) {
