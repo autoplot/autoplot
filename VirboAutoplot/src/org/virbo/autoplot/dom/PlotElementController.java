@@ -1487,8 +1487,12 @@ public class PlotElementController extends DomNodeController {
 
             DataSourceController dsc= getDataSourceFilter().getController();
 
-            QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
+            QDataSet fillDs = dsc.getFillDataSet();
             Map props= dsc.getFillProperties();
+            if ( props==null || fillDs==null ) { // need a atomic operation here...
+                return;
+            }
+
             String comp= plotElement.getComponent();
             if ( comp.length()>0 ) {
                 try {
@@ -1499,18 +1503,6 @@ public class PlotElementController extends DomNodeController {
                 props= processProperties( comp, props ); //TODO: support components
                 if ( props.size()==0 ) { // many of the filters drop the properties
                   props= AutoplotUtil.extractProperties(fillDs);
-                }
-            }
-
-            if ( props==null ) {
-                Thread.yield(); // kludge...
-                System.err.println("null properties in doResetRanges");
-                props= dsc.getFillProperties();
-                if ( comp.length()>0 ) {
-                    props= processProperties( comp, props ); //TODO: support components
-                    if ( props.size()==0 ) { // many of the filters drop the properties
-                        props= AutoplotUtil.extractProperties(fillDs);
-                    }
                 }
             }
 
