@@ -1106,9 +1106,11 @@ public class PlotElementController extends DomNodeController {
             }
 
             QDataSet sliceDs= fillDs; // dataset after initial slicing
-            if ( shouldSlice && plotElement.getComponent().length()>0 ) {
+            String existingComponent= plotElement.getComponent();
+
+            if ( shouldSlice && existingComponent.length()>0 ) {
                 try {
-                    sliceDs = DataSetOps.sprocess(plotElement.getComponent(), fillDs, new NullProgressMonitor());
+                    sliceDs = DataSetOps.sprocess( existingComponent, fillDs, new NullProgressMonitor() );
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
@@ -1175,8 +1177,10 @@ public class PlotElementController extends DomNodeController {
             if ( shouldSlice ) {
                 String component= guessSlice( sliceDs );
                 setSliceAutoranges( sliceShouldAutorange(fillDs, component) );
-                String existingComponent= plotElement.getComponent();
                 if ( !existingComponent.equals("") ) {
+                    if ( component.equals(existingComponent) ) {
+                        System.err.println("here again...");
+                    }
                     plotElement.setComponentAutomatically( existingComponent + component );
                 } else {
                     plotElement.setComponentAutomatically( component );  // it'll reenter this code now.  problem--autorange is based on slice.
@@ -1217,7 +1221,7 @@ public class PlotElementController extends DomNodeController {
                         plotElement.getStyle().addPropertyChangeListener( ele.controller.parentStyleListener );
                         ele.getStyle().setColor(deriveColor(c, i/nsubsample));
                         ele.getStyle().setFillColor( deriveColor(fc,i/nsubsample).brighter() );
-                        String s= plotElement.getComponent();
+                        String s= existingComponent;
                         String label1= labels[i];
                         if ( s.equals("") && uniqLabels ) {
                             s= labels[i];
