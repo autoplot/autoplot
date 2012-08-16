@@ -395,7 +395,7 @@ public class PlotElementController extends DomNodeController {
         }
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
-                String[] labels = SemanticOps.getComponentLabels(fillDs);
+                String[] labels = SemanticOps.getComponentNames(fillDs);
                 String comp= plotElement.getComponent();
                 int ip= comp.indexOf("|");
                 if ( ip!=-1 ) {
@@ -1135,7 +1135,11 @@ public class PlotElementController extends DomNodeController {
             }
 
             String[] labels = null;
-            if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
+            String[] llabels= null;
+            if ( shouldHaveChildren ) {
+                labels= SemanticOps.getComponentNames(fillDs);
+                llabels= SemanticOps.getComponentLabels(fillDs);
+            }
 
             boolean weShallAddChildren= shouldHaveChildren;
 
@@ -1229,6 +1233,9 @@ public class PlotElementController extends DomNodeController {
                             s= labels[i];
                             QDataSet ds1= DataSetOps.unbundle(fillDs,i);
                             String l1= (String) ds1.property(QDataSet.LABEL);
+                            if ( l1==null ) { // TODO: kludge: das2 dataset doesn't unbundle properly and looses LABEL.
+                                l1= llabels[i];
+                            }
                             if ( l1!=null ) {
                                 label1= l1;
                             }
