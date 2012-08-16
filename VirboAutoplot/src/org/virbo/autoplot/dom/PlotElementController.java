@@ -41,6 +41,7 @@ import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
@@ -668,13 +669,7 @@ public class PlotElementController extends DomNodeController {
                 QDataSet fillDs = dsf.controller.getFillDataSet();
                 logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
                 if ( resetComponent ) {
-                    //if ( !plotElement.component.equals("") )  {
-                    //    plotElement.setComponent("");
-                    //} else {
-                    plotElement.setComponent("");
-                    //    plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
-                        plotElement.autoComponent=true;
-                    //}
+                    plotElement.setComponentAutomatically("");
                     setResetComponent(false);
                 }
                 updateDataSet();
@@ -1109,7 +1104,18 @@ public class PlotElementController extends DomNodeController {
             if ( renderType==RenderType.image && fillDs.rank()==3 ) {
                 shouldSlice= false; //TODO: some how render types should indicate they can handle a slice.
             }
-                    
+
+            QDataSet sliceDs= fillDs; // dataset after initial slicing
+            if ( shouldSlice && plotElement.getComponent().length()>0 ) {
+                try {
+                    sliceDs = DataSetOps.sprocess(plotElement.getComponent(), fillDs, new NullProgressMonitor());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            
             boolean shouldHaveChildren= fillDs.rank() == 2
                     &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps );
             //if ( joinOfBundle ) shouldHaveChildren= true;
@@ -1167,7 +1173,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             if ( shouldSlice ) {
-                String component= guessSlice( fillDs );
+                String component= guessSlice( sliceDs );
                 setSliceAutoranges( sliceShouldAutorange(fillDs, component) );
                 String existingComponent= plotElement.getComponent();
                 if ( !existingComponent.equals("") ) {
@@ -1497,7 +1503,15 @@ public class PlotElementController extends DomNodeController {
             }
 
             if ( props==null ) {
+                Thread.yield(); // kludge...
                 System.err.println("null properties in doResetRanges");
+                props= dsc.getFillProperties();
+                if ( comp.length()>0 ) {
+                    props= processProperties( comp, props ); //TODO: support components
+                    if ( props.size()==0 ) { // many of the filters drop the properties
+                        props= AutoplotUtil.extractProperties(fillDs);
+                    }
+                }
             }
 
             if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autoLabel property.
