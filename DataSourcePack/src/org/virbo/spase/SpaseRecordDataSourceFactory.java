@@ -55,7 +55,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public boolean reject( String surl, ProgressMonitor mon ) throws IllegalArgumentException {
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) throws IllegalArgumentException {
 
         DocumentBuilder builder= null;
         

@@ -163,7 +163,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     @Override
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         if (surl.contains("?")) {
             URISplit split= URISplit.parse(surl);
             if ( split.params.length()>0 ) {

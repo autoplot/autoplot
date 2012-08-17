@@ -5,6 +5,8 @@
 package org.virbo.idlsupport;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
@@ -64,7 +66,8 @@ public class APDataSet extends QDataSetBridge {
         URI uri= DataSetURI.getURI(surl);
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
-        if ( f.reject( surl, mon ) ) {
+        List<String> problems= new ArrayList();
+        if ( f.reject( surl, problems, mon ) ) {
             throw new Exception("URI was rejected by the datasource: "+surl +" rejected by "+ f );
         }
 

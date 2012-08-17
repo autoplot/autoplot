@@ -107,7 +107,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         return !surl.contains("column=");
     }
 

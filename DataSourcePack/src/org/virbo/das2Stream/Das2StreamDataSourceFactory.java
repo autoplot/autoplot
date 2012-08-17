@@ -50,7 +50,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         return false;
     }
     
