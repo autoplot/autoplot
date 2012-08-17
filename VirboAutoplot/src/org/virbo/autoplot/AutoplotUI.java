@@ -161,6 +161,9 @@ public class AutoplotUI extends javax.swing.JFrame {
     LayoutListener autoLayout;
     private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
 
+    // if non-null, then load this set of initial bookmarks.
+    private String initialBookmarksUrl= null;
+
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -1579,6 +1582,11 @@ APSplash.checkTime("init 52");
 
         Runnable run= new Runnable() { public void run() {
             bookmarksManager.setPrefNode("bookmarks"); 
+            if ( initialBookmarksUrl!=null ) {
+                loadInitialBookmarks(initialBookmarksUrl);
+                initialBookmarksUrl= null;
+            }
+
         } };
         invokeLater( -1, false, run );
 
@@ -3170,22 +3178,7 @@ APSplash.checkTime("init 230");
                 }
                 
                 if (bookmarks != null) {
-                    Runnable run = new Runnable() {
-                        public String toString() { return "initialLoadBookmarksRunnable"; }
-                        public void run() {
-                            try {
-                                final URL url = new URL(bookmarks);
-                                System.err.println("Reading bookmarks from "+url);
-                                Document doc = AutoplotUtil.readDoc(url.openStream());
-                                Bookmark.parseBookmarks(doc.getDocumentElement());  // findbugs DLS_DEAD_LOCAL_STORE fixed
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                model.getExceptionHandler().handleUncaught(ex);
-                            }
-                        }
-                    };
-                    new Thread(run, "LoadBookmarksThread").start();
-
+                    app.initialBookmarksUrl= bookmarks;
                 }
 
                 final String script= alm.getValue("script");
@@ -3614,5 +3607,25 @@ APSplash.checkTime("init 240");
 
     public boolean isBasicMode() {
         return expertMenuItems.get(0).isVisible()==false;
+    }
+
+    /**
+     * support legacy --bookmarks command line option.
+     * @param bookmarks
+     */
+    private void loadInitialBookmarks( String bookmarks ) {
+        try {
+            final URL url = new URL(bookmarks);
+            System.err.println("Reading bookmarks from "+url);
+            Document doc = AutoplotUtil.readDoc(url.openStream());
+            List<Bookmark> b= Bookmark.parseBookmarks(doc.getDocumentElement());  // findbugs DLS_DEAD_LOCAL_STORE fixed
+            BookmarksManagerModel mm= bookmarksManager.getModel();
+            List<Bookmark> l= mm.getList();
+            mm.mergeList(b,l);
+            mm.setList(l);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            applicationModel.getExceptionHandler().handleUncaught(ex);
+        }
     }
 }
