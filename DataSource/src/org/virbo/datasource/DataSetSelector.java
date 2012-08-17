@@ -322,7 +322,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
-                    if (f.reject(surl1, new ArrayList<String>(),mon)) {
+                    List<String> problems= new ArrayList();
+                    if (f.reject(surl1, problems,mon)) {
                         TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                         if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
@@ -352,7 +353,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             }
                         }
                         setMessage("busy: uri rejected, inspecting resource for parameters");
-                        browseSourceType();
+                        browseSourceType(problems);
                     } else {
                         if ( mon.isCancelled() ) {
                             setMessage("download cancelled");
@@ -512,6 +513,16 @@ public class DataSetSelector extends javax.swing.JPanel {
      * This can be called from the event thread.
      */
     public void browseSourceType() {
+        browseSourceType( new ArrayList<String>() );
+    }
+
+    /**
+     * show the initial parameters completions for the type, or the
+     * editor, if that's available.
+     * This can be called from the event thread.
+     * @param problems we're entering this GUI because of problems with the URI, so mark these problems
+     */
+    public void browseSourceType( final List<String> problems ) {
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
@@ -590,6 +601,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
 
                     fedit.setURI(surl);
+                    fedit.markProblems(problems);
+                    
                     final String fsurl= surl;
 
                     Runnable run= new Runnable() {
