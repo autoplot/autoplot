@@ -136,7 +136,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
     }
 
 
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 

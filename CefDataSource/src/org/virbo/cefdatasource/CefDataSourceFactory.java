@@ -67,7 +67,7 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
     }
     
     @Override
-    public boolean reject( String surl ,ProgressMonitor mon ) {
+    public boolean reject( String surl, List<String> problems,ProgressMonitor mon ) {
         return ! surl.contains("?") || surl.indexOf("?")==surl.length()-1;
     }
 

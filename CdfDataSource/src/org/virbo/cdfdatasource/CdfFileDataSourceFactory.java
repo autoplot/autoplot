@@ -163,7 +163,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         }
     }
     
-    public boolean reject( String surl, ProgressMonitor mon ) {
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) {
         try {
             if (!surl.contains("?") || surl.indexOf("?") == surl.length() - 1) {
                 return true;

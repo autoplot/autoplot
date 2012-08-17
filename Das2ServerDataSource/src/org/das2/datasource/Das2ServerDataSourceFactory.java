@@ -98,7 +98,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         
     }
 
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
         Map<String,String> params= URISplit.parseParams(split.params);
         String ds= params.get("dataset");
