@@ -162,6 +162,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             opsCbs.add(jcheckBox);
 
+            if ( cc1.doc!=null && cc1.doc.trim().length()>0 ) {
+                jcheckBox.setToolTipText( cc1.doc );
+            }
             int pos= ss.indexOf(cc1.completable);
             if ( pos>-1 ) pos+=cc1.completable.length(); // carot immediately following "<parmName>="
 
@@ -183,6 +186,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             String sel= null;
             int isel= -1;
+            String deft=null;
+
             for ( int ii=0; ii<second.size(); ii++ ) {
                 CompletionContext cc3= second.get(ii);
                 String ss2= CompletionContext.insert( cc2, cc3 );
@@ -190,16 +195,30 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 if ( cc3.label.startsWith( cc3.completable+":" ) ) {
                     options.add( cc3.label );
                 } else {
-                    options.add( cc3.completable + ": " + cc3.label );
+                    if ( cc3.completable.equals(cc3.label ) ) {
+                        options.add( cc3.label );
+                    } else {
+                        options.add( cc3.completable + ": " + cc3.label );
+                    }
                 }
-                
+                if ( cc3.completable.startsWith("<double")
+                        || cc3.completable.startsWith("<int") ) {
+                    deft= "";
+                    jcheckBox.setToolTipText( ( cc1.doc!=null ? (cc1.doc+" ") : "" ) + cc3.completable );
+                }
+
             }
 
             JComboBox jopts=  new JComboBox( new Vector(options) );
+            jopts.setEditable(true);
             optPanel.add( BorderLayout.CENTER, jopts );
             if ( isel!=-1 ) {
                 jopts.setSelectedIndex(isel);
                 jcheckBox.setSelected(true);
+            } else {
+                if ( deft!=null ) {
+                    jopts.setSelectedItem(deft);
+                }
             }
 
             opsComboBoxes.add(jopts);
