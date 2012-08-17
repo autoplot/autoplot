@@ -214,9 +214,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             JPanel optPanel= new JPanel( new BorderLayout() );
 
             String val= map.get("arg_0");
-            int ib= val.indexOf("[");
-            if ( ib>-1 && val.endsWith("]") ) { // vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_U[0]
-                arg0Extra= val.substring(ib);
+            if ( val!=null ) {
+                int ib= val.indexOf("[");
+                if ( ib>-1 && val.endsWith("]") ) { // vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_U[0]
+                    arg0Extra= val.substring(ib);
+                }
             }
 
             int isel=-1;
@@ -347,7 +349,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1 = new javax.swing.JScrollPane();
         optionsPanel = new javax.swing.JPanel();
 
-        jLabel1.setText("Automatic Editor Based on Completions:");
+        jLabel1.setText("<html>This is an editor created automatically based on the completions the data source reports.  This will attempt to create a GUI that is not optimal, but is better than nothing. ");
 
         optionsPanel.setAlignmentY(0.0F);
         optionsPanel.setLayout(new javax.swing.BoxLayout(optionsPanel, javax.swing.BoxLayout.Y_AXIS));
@@ -357,21 +359,19 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jLabel1)
-                .addContainerGap(168, Short.MAX_VALUE))
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jLabel1)
-                .addContainerGap(283, Short.MAX_VALUE))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(333, Short.MAX_VALUE))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                    .add(29, 29, 29)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)))
+                .add(layout.createSequentialGroup()
+                    .add(68, 68, 68)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
