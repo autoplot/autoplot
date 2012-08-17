@@ -24,6 +24,7 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -37,7 +38,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
     List<JCheckBox> opsCbs;
     List<JComboBox> opsComboBoxes;
-
+    JComboBox arg0Cbs=null;
+    String arg0Extra=null;
+    JTextField arg0ExtraTF=null;
 
     /** Creates new form CompletionsDataSourceEditor */
     public CompletionsDataSourceEditor() {
@@ -137,6 +140,14 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         List<CompletionContext> first= getCompletions( dsf, suri, cc, mon );
 
+        List<CompletionContext> arg0= new ArrayList();
+        for ( CompletionContext cc1: first ) {
+            if ( cc1.implicitName!=null && cc1.implicitName.equals("arg_0") ) {
+                arg0.add(cc1);
+            }
+        }
+        first.removeAll(arg0);
+
         opsCbs= new ArrayList<JCheckBox>();
         opsComboBoxes= new ArrayList<JComboBox>();
         
@@ -199,6 +210,47 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             optionsPanel.add( Box.createVerticalStrut(8) );
         }
 
+        if ( arg0.size()>0 ) {
+            JPanel optPanel= new JPanel( new BorderLayout() );
+
+            String val= map.get("arg_0");
+            int ib= val.indexOf("[");
+            if ( ib>-1 && val.endsWith("]") ) { // vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_U[0]
+                arg0Extra= val.substring(ib);
+            }
+
+            int isel=-1;
+            List<String> arg0options= new ArrayList();
+            for ( int ii=0; ii<arg0.size(); ii++ ) {
+                arg0options.add( arg0.get(ii).completable );
+                if ( arg0.get(ii).completable.equals(val) ) {
+                    isel= ii;
+                }
+            }
+
+
+            JComboBox jopts= new JComboBox( new Vector(arg0options) );
+            optPanel.add( BorderLayout.CENTER, jopts );
+            if ( isel!=-1 ) {
+                jopts.setSelectedIndex(isel);
+            }
+
+            if ( arg0Extra!=null ) {
+                arg0ExtraTF= new JTextField(12);
+                arg0ExtraTF.setText(arg0Extra);
+                arg0ExtraTF.setToolTipText( "subset specifier like [2:] or [-100:]");
+                optPanel.add( BorderLayout.EAST, arg0ExtraTF );
+            }
+
+            arg0Cbs= jopts;
+
+            optPanel.setMaximumSize( new Dimension(10000,16) );
+
+            optionsPanel.add( optPanel );
+            optionsPanel.add( Box.createVerticalStrut(8) );
+            
+        }
+
         optionsPanel.add( Box.createGlue() );
     }
 
@@ -227,7 +279,21 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         if ( j!=-1 ) {
             base= base.substring(0,j);
         }
+
         boolean amp= false;
+
+        if ( arg0Cbs!=null ) {
+            base += "?";
+            base += arg0Cbs.getSelectedItem();
+            amp= true;
+        }
+
+        if ( arg0ExtraTF!=null ) {
+            if ( arg0ExtraTF.getText().trim().length()>0 ) {
+                base+= arg0ExtraTF.getText().trim();
+            }
+        }
+
         for ( int i=0; i<opsCbs.size(); i++ ) {
             if ( opsCbs.get(i).isSelected() ) {
                 String paramName= opsCbs.get(i).getText();
@@ -246,6 +312,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 base+= paramValue;
             }
         }
+
         this.suri= base;
         return this.suri;
     }
@@ -277,11 +344,14 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         optionsPanel = new javax.swing.JPanel();
 
-        jLabel1.setText("Experimental editor based on completions");
+        jLabel1.setText("Automatic Editor Based on Completions:");
 
+        optionsPanel.setAlignmentY(0.0F);
         optionsPanel.setLayout(new javax.swing.BoxLayout(optionsPanel, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane1.setViewportView(optionsPanel);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -289,21 +359,26 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
-                .addContainerGap(130, Short.MAX_VALUE))
-            .add(optionsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                .addContainerGap(168, Short.MAX_VALUE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(optionsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
+                .addContainerGap(283, Short.MAX_VALUE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                    .add(29, 29, 29)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
 
