@@ -27,7 +27,7 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
         return null;
     }
 
-    public boolean reject(String surl, ProgressMonitor mon) {
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         return false;
     }
     

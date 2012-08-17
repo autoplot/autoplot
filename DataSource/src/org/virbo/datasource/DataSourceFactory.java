@@ -38,10 +38,12 @@ public interface DataSourceFactory {
     public <T> T getCapability( Class<T> clazz );
 
     /**
-     * quick check to see that an url looks acceptable.  This is introduced to 
-     * get Bob's desired behavior, that hitting return after a CDF filename should
-     * bring up the completions list.
+     * quick check to see that an uri looks acceptable.
+     *
+     * since 2012b, this should provide a list of objects marking reasons for rejecting.  Though each object
+     * is simply a marker, toString method of each should provide some meaningful information to developers.
+     * This list will be passed into the editor if available.
      */
-    public boolean reject( String surl, ProgressMonitor mon ) ;
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) ;
     
 }

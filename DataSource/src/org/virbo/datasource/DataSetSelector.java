@@ -322,7 +322,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
-                    if (f.reject(surl1,mon)) { 
+                    if (f.reject(surl1, new ArrayList<String>(),mon)) {
                         TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                         if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
@@ -330,7 +330,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     tsb.setURI(surl1);
                                     tsb.setTimeRange(timeRange);
                                     String suri= tsb.getURI();
-                                    if ( !f.reject( suri, mon) ) {
+                                    if ( !f.reject( suri, new ArrayList<String>(), mon) ) {
                                         setMessage("accepted uri after setting timerange");
                                         int modifiers= this.keyModifiers;
                                         setValue(suri);

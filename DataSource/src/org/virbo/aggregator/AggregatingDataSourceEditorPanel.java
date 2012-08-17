@@ -441,7 +441,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         try {
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI() );
             DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
-            if ( !dsf.reject( delegateUrl, new NullProgressMonitor() ) ) {
+            if ( !dsf.reject( delegateUrl, new ArrayList<String>() , new NullProgressMonitor()) ) {
                 if ( timeRangeTextField.getText().trim().length()==0 ) {
                     timeRangeTextField.requestFocus();
                 }

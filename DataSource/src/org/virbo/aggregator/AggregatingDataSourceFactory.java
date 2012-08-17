@@ -230,7 +230,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
-    public boolean reject( String surl, ProgressMonitor mon) {
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split = URISplit.parse(surl);
         Map map = URISplit.parseParams(split.params);
 
@@ -256,7 +256,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                     return true;
                 }
             }
-            return delegateFactory.reject( delegateSurl, mon );
+            return delegateFactory.reject( delegateSurl, new ArrayList<String>(), mon );
         } catch (IOException e) {
             e.printStackTrace();
             return false;
