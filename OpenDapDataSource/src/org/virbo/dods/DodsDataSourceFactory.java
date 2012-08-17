@@ -54,7 +54,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
         return Collections.emptyList();
     }
 
-    public boolean reject( String surl, ProgressMonitor mon) {
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon) {
         if ( surl.contains("?") ) {
             return false;
         } else {

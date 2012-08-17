@@ -113,7 +113,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public boolean reject( String surl, ProgressMonitor mon ) {
+    public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) {
         try {
             URISplit split = URISplit.parse( surl );
             Map params= URISplit.parseParams( split.params );
