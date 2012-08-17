@@ -35,6 +35,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  * @author jbf
  */
 public class AggregatingDataSourceFactory implements DataSourceFactory {
+    public static final String PROB_NO_TIMERANGE_PROVIDED = "no timerange provided";
+    public static final String PROB_PARSE_ERROR_IN_TIMERANGE = "parse error in timeRange";
 
     private DataSourceFactory delegateFactory=null;
 
@@ -236,16 +238,19 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         try {
             if (!map.containsKey("timerange")) {
+                problems.add( PROB_NO_TIMERANGE_PROVIDED );
                 return true;
             }
             String timeRange = ((String) map.get("timerange"));
             timeRange= timeRange.replaceAll("\\+"," ");
             if (timeRange.length() < 3) { // P2D is a valid timerange
+                problems.add( PROB_NO_TIMERANGE_PROVIDED );
                 return true;
             }
             try {
                 DatumRange dr= DatumRangeUtil.parseTimeRange(timeRange);
             } catch ( ParseException ex ) {
+                problems.add( PROB_PARSE_ERROR_IN_TIMERANGE);
                 return true;
             }
 
@@ -256,7 +261,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                     return true;
                 }
             }
-            return delegateFactory.reject( delegateSurl, new ArrayList<String>(), mon );
+            return delegateFactory.reject( delegateSurl, problems, mon );
+            
         } catch (IOException e) {
             e.printStackTrace();
             return false;
