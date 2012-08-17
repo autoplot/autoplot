@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Jython dataset editor panel allows "#description:" and "#title:" to be set in the script.</small></p>
+        <p><small>Quite a few of the datasources don't have editors, but all have completions.  Autoplot now creates
+                GUIs automatically from the completions for those datasources without editors.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +23,15 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>pngwalk now has show missing off by default.</li>
+            <li>restore --bookmarks= command line switch, which was probably broken with remote bookmarks loading.</li>
+            <li>guessSlice didn't consider existing slice, causing problems with high-rank datasets.</li>
+            <li>das2 ephemeris labels wouldn't show up when legend labels would show component labels.</li>
+            <li>FTP filesystem now uses real timestamps for remote files.  Thanks ftp4j!</li>
+            <li>clean up leftover sloppiness and incorrect warnings in CDF reporting</li>
+            <li>rte 0449679029: look for ") " in filters GUI instead of just " " because of reducex needs it.</li>
             <li>rte 1243117384: new check for timerange in JythonDataSource would result in null pointer exception when default time is used with logging</li>
+            <li>"<url> <COMP>" would trigger index out of bounds because of trim.</li>
             <li>more mucking with how the transitions operate to support bundles of mageis stuff at LANL, trying to get autoranging to work correctly</li>
             <li>users can switch back and forth between series and spectrogram with complex slices</li>
             <li>limits on slices applied in the GUI to avoid index out of bounds errors</li>
@@ -35,6 +44,9 @@
             <li>transpose would not handle BUNDLE_i correctly.</li>
             <li>round timeranges in context as string</li>
             <li>clean up reccount warning with virtual variables in CDF files. </li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>bugfix: sliceProperties properly preserves CONTEXT property.</li>
             <li>bugfix: changesDimensions function didn't properly handle "slices" function</li>
             <li>bugfix: sliceMetadata function didn't properly slice metadata like BUNDLE_1</li>
@@ -61,37 +73,15 @@
             <li>rte 1031526646: need to check for null in result from jTree.getSelectionPaths().</li>
             <li>remote jyds would be editable in the editor panel, even though it was pointed to a local copy in the cache.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>cdaweb checks for variables that are improperly listed as "data" and not "support_data" by checking depend_0.</li>
-            <li>fix 20 second delay in FTP downloads caused by recent changes that closed resources out-of-order</li>
-            <li>rte 0808343081: null pointer exception from bookmarks (guessing at a fix)</li>
-            <li>rte 1769726397: operations " " would cause RTE, now we trim before parsing</li>
-            <li>rte 1882535572: cast exception in layout GUI, because non-components (Renderers) can be in the list</li>
-            <li>multiple plots can be selected again by holding down control in the layout tab's layout GUI</li>
-            <li>add "plot" button to file cache window, since I often hit okay when I meant right-click...plot</li>
-            <li>orbitPlot is selectable in list of plots</li>
-            <li>validRange override is properly loaded from vaps</li>
-            <li>autoranging with colorScatter corrected, it was ignoring the z ranging.</li>
-            <li>CDAWeb uses HTTP for file access instead of problemmatic FTP access</li>
-            <li>bugfix: clean up code in CDAWeb where web transaction occurred on the event thread.</li>
-            <li>clean up of FTP filesystem access, including setting timeout, properly handling cancel, and properly closing channels.</li>
-            <li>3534309:  procedure shows bug in reset after make stack plot. </li>
-            <li>rte 0066550323: don't show "local listing file (.listing) not found" when filesystem is offline.</li>
-            <li>3516161: clear old binding between timerange and plot.context.</li>
-            <li>3533882: reset of timerange when move plot caused by handler ignoring binding</li>
-            <li>Jemmy testing showed that ScriptContext.waitUntilIdle() would not detect pending event from data set selector.</li>
-            <li>Jemmy end-to-end testing at gui level.</li>
-            <li>run button on script panel now uses a popup monitor instead of a monitor attached to the canvas.</li>
-            <li>bugfix when remote http host is in accessible, runtime error prevented offline use.</li>
-            <li>Profiling used to remove memory leaks.  Now all CDF quantities can be plotted in one session.</li>
-            <li>jsamp jar (Cluster Final Archive) added to Eclipse build script</li>
-            <li>check for fill in Ops.interpolate( rank2ds, xx, yy )</li>
-            <li>Chris pointed out problem where ytagWidth is used from the first table of a rank 3 join dataset.  Now we use the maximum of all tables.</li>
-            <li>$o and $(o properly detected in pngwalk tool</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>start to keep track of reasons why a URI is rejected</li>
+            <li>add File->"save local copy" option to pngwalk.</li>
+            <li>give a meaningful error when an old matlab .mat file is read in as HDF5</li>
+            <li>add total1 operator, which works like collapse1 but totals instead of averages</li>
+            <li>Tools->Cache->"Work Offline" explicitly forces add filesystems to go into offline mode (and resets).</li>
+            <li>Clean up control loop when timerange is not visible with time series browse on an axis.</li>
+            <li>Experimental search on tooltips in help menu. (Not terribly useful, yet...)</li>
             <li>indicate the dataset and context after slicing on data tab.</li>
             <li>layout tab now has menu items to make selected plots bigger or smaller, or all the same size.</li>
             <li>jython data source editor panel looks for #description and #title to label the dialog.</li>
@@ -99,6 +89,9 @@
             <li>passwords can be stored in fscache keychain.txt to support scripting.</li>
             <li>3545095: introduce support for BUNDLE_2 and BUNDLE_3 properties.</li>
             <li>Events Bar renderer reduces data before displaying it.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>increase QDataSet.MAX_UNIT_BUNDLE_COUNT to 65 for Seth's CDF file.</li>
             <li>when rank 1 depend0 is used with EventsBar renderer try to figure the cadence and fill the bar appropriately.</li>
             <li>initial coding of mechanism to support local read-only mirror of remote data.</li>
@@ -112,11 +105,6 @@
             <li>add abs function, since magnitude is for vectors</li>
             <li>QStreams have int2 transfer type</li>
             <li>QStreams avoid inline-encoding of data for DEPEND_1 when it has many (>100) elements</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Das2Server plugin defaults to last das2server used</li>
-            <li>Reduction.reduce2D puts on error bars to show the range of the data.</li>
         </ul>
 
         <p>Known issues:</p>
