@@ -39,7 +39,11 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
             if ( DataSetURI.fromUri( cc.resourceURI ).endsWith(".qds") ) {
                 List<String> params= getNames( cc, mon );
                 for ( String s: params ) {
-                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s ) );
+                    //result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s ) );
+                    result.add( new CompletionContext(
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        s, this, "arg_0",
+                        s, null, true ) );
                 }
             }
         }
