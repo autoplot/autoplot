@@ -43,6 +43,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.CompletionsDataSourceEditor;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -419,7 +420,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
 
         if (delegateEditorPanel == null) {
-            return true;
+            delegateEditorPanel= new CompletionsDataSourceEditor();
+            return delegateEditorPanel.prepare( delegateUrl, parent, mon );
+            //return true;
         } else {
             return delegateEditorPanel.prepare( delegateUrl, parent, mon );
         }
