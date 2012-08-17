@@ -215,7 +215,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
 
         if ( params.containsKey("eventListColumn") ) {
-            parser.setUnits( parser.getFieldIndex(params.get("eventListColumn")), new EnumerationUnits("events") );;
+            int i= parser.getFieldIndex(params.get("eventListColumn"));
+            if ( i!=-1 ) parser.setUnits( i, new EnumerationUnits("events") );;
         }
         String line= parser.readFirstParseableRecord(file.toString());
         if ( line==null ) {
