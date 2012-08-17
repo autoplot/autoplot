@@ -25,11 +25,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
 
 /**
  * Generic Editor based on completions was first developed with JunoWavesDataSource, now will be used instead of completions
@@ -311,6 +306,10 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
+
+    public void markProblems(List<String> problems) {
+        
+    }
 
 
 }

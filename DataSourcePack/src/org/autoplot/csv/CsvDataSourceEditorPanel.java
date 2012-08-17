@@ -67,6 +67,10 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         return true;
     }
 
+    public void markProblems(List<String> problems) {
+
+    }
+
     private enum Tool {
         NONE, FIRSTROW, COLUMN, DEPEND_0, TIMEFORMAT,
     }

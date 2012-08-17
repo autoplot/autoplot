@@ -72,6 +72,10 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         return true;
     }
 
+    public void markProblems(List<String> problems) {
+
+    }
+
     private enum Tool {
         NONE, FIRSTROW, COLUMN, DEPEND_0, TIMEFORMAT,
     }

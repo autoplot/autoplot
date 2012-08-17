@@ -624,4 +624,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return true;
     }
 
+    public void markProblems(List<String> problems) {
+        
+    }
+
 }

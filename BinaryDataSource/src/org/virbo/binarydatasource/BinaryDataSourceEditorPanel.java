@@ -14,6 +14,7 @@ package org.virbo.binarydatasource;
 import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -150,6 +151,10 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         } catch (IOException ex) {
             Logger.getLogger(BinaryDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void markProblems(List<String> problems) {
+    
     }
 
     public String getURI() {

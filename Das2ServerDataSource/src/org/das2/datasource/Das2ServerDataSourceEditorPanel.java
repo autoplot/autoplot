@@ -964,6 +964,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return result;
     }
 
+    public void markProblems(List<String> problems) {
+
+    }
+
+
     //private boolean expert;
     
     /**

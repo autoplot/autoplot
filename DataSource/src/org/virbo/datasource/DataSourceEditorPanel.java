@@ -1,5 +1,6 @@
 package org.virbo.datasource;
 
+import java.util.List;
 import javax.swing.JPanel;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -42,6 +43,14 @@ public interface DataSourceEditorPanel {
      * @param url
      */
     public void setURI( String uri );
+
+    /**
+     * mark the problems identified by the data source.  Note the reject method here doesn't provide the list,
+     * but instead the DataSourceFactory.reject method.  This is because often data providers intentionally provide a
+     * partial URI for the user to complete via the editor.
+     * @param problems
+     */
+    public void markProblems( List<String> problems );
 
     /**
      * return the GUI to edit the URI.

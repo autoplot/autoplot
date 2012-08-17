@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -569,5 +570,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public void setExpertMode( boolean expert ) {
         this.expert= expert;
+    }
+
+    public void markProblems(List<String> problems) {
+
     }
 }

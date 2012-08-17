@@ -16,6 +16,7 @@ import gsfc.nssdc.cdf.CDFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -418,6 +419,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
+    }
+
+    public void markProblems(List<String> problems) {
+        
     }
 
 }

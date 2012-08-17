@@ -65,6 +65,10 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     boolean focusDep0 = false;
     TableCellRenderer defaultCellRenderer;
 
+    public void markProblems(List<String> problems) {
+        
+    }
+
     private enum Tool {
         NONE, SKIPLINES, COLUMN, DEPEND_0, TIMEFORMAT, GUESSTIMEFORMAT, FILLVALUE,
     }

@@ -600,4 +600,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
         return URISplit.format(split);
     }
+
+    public void markProblems(List<String> problems) {
+        
+    }
 }
