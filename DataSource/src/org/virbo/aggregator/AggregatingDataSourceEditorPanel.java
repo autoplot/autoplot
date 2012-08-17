@@ -11,6 +11,7 @@
 package org.virbo.aggregator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -100,7 +101,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
+        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10));
         outerRangeTextField.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/aggregator/spinner_16.gif"))); // NOI18N
         outerRangeTextField.setText("listing to get available time ranges...");
 
@@ -123,7 +124,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         daysComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "...", " " }));
         daysComboBox.setToolTipText("Select from available days");
 
-        jButton1.setText("Copy");
+        jButton1.setText("Select This Time Range");
         jButton1.setToolTipText("<html>\nCopy the date into the time range field.<br>\nHolding shift down will add the selected time to the aggregation.<br>\n</html>");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -164,12 +165,12 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(322, Short.MAX_VALUE))
+                .addContainerGap(206, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, delegateFileLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
-                    .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, delegateFileLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                    .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE))
                 .add(26, 26, 26))
         );
 
@@ -199,7 +200,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 649, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -465,7 +466,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 try {
                     DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
                 } catch (ParseException ex) {
-                    timeRange = "!!! " + timeRange + " !!!";
+
                 }
             }
             timeRangeTextField.setText(timeRange);
@@ -586,12 +587,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         allParams.putAll(params);
         allParams.putAll(URISplit.parseParams(dsplit.params));
         String tr = timeRangeTextField.getText();
-        if (tr.startsWith("!!! ")) {
-            tr = tr.substring(4);
-        }
-        if (tr.endsWith(" !!!")) {
-            tr = tr.substring(0, tr.length() - 4);
-        }
         tr= tr.replaceAll(" ","+");
         allParams.put("timerange", tr);
         split.params = URISplit.formatParams(allParams);
@@ -602,6 +597,25 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }
 
     public void markProblems(List<String> problems) {
-        
+        List<String> p= new ArrayList(problems);
+        if ( p.contains(AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED ) ) {
+            p.remove(AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED );
+            timeRangeTextField.setBackground( Color.YELLOW );
+            jLabel1.setBackground( Color.YELLOW );
+            jLabel1.setForeground( Color.RED );
+            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><b>"+AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED  );
+            timeRangeTextField.setToolTipText( AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED );
+        } else if ( p.contains(AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE ) ) {
+            p.remove(AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE );
+            timeRangeTextField.setBackground( Color.YELLOW );
+            jLabel1.setBackground( Color.YELLOW );
+            jLabel1.setForeground( Color.RED );
+            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><br><b>"+AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE  );
+            timeRangeTextField.setToolTipText( AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE );
+        }
+
+        //if ( p.size()==0 && problems.size()>0 ) {
+        //    delegatePanel.setVisible(false);
+        //}
     }
 }
