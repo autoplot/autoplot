@@ -155,6 +155,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             String ss= CompletionContext.insert(cc, cc1);
 
+            //TODO: make this look like the jython data source dialog!
             JPanel optPanel= new JPanel( new BorderLayout() );
 
             JCheckBox jcheckBox= new JCheckBox( cc1.label );
