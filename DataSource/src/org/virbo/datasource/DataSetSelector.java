@@ -520,7 +520,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * show the initial parameters completions for the type, or the
      * editor, if that's available.
      * This can be called from the event thread.
-     * @param problems we're entering this GUI because of problems with the URI, so mark these problems
+     * @param problems we're entering this GUI because of problems with the URI, so mark these problems.  See DataSourceFactory.reject.
      */
     public void browseSourceType( final List<String> problems ) {
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
@@ -541,7 +541,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch ( NoSuchMethodException ex ) {
                     //ex.printStackTrace(); //okay
                 }
+            } else {
+
+                if ( true ) {
+                    //experiment with GUI based on completions.
+                    edit= new CompletionsDataSourceEditor();
+                }
             }
+            
         } catch (URISyntaxException ex) {
             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
             edit= null;
