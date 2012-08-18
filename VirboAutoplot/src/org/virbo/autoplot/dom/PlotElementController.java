@@ -1220,10 +1220,8 @@ public class PlotElementController extends DomNodeController {
 
                     for (int i = 0; i < count; i++) {
                         //long t0= System.currentTimeMillis();
-                        PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
-                        ele.controller.getRenderer().setActive(false);
+                        PlotElement ele = dom.controller.makeChildPlotElement(plotElement, domPlot, dsf);
                         cp.add(ele);
-                        ele.setParent( plotElement.getId() );
                         plotElement.getStyle().addPropertyChangeListener( ele.controller.parentStyleListener );
                         ele.getStyle().setColor(deriveColor(c, i/nsubsample));
                         ele.getStyle().setFillColor( deriveColor(fc,i/nsubsample).brighter() );
@@ -1252,6 +1250,7 @@ public class PlotElementController extends DomNodeController {
                         ele.setDisplayLegend(true);
                         if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(label1);
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
+                        ele.controller.maybeCreateDasPeer();
                         //ele.controller.setDataSet(fillDs, false);
                     }
                     for ( int i=0; i<count; i++ ) {
