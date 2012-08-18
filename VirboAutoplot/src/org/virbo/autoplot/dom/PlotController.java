@@ -8,8 +8,10 @@ import java.awt.dnd.DropTarget;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +41,7 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
+import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -683,6 +686,8 @@ public class PlotController extends DomNodeController {
     }
 
 
+    private Map<String,String> pendingDefaultsChanges= new HashMap();
+
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
 
@@ -704,7 +709,25 @@ public class PlotController extends DomNodeController {
         //p.setPlotId(plot.getId());
         p.plotId= plot.getId();
         if ( reset ) p.controller.doResetRenderType(rt);
-        doPlotElementDefaultsChange(p);
+
+        if ( !dom.controller.isValueAdjusting() ) {
+            doPlotElementDefaultsChange(p);
+        } else {
+            final PlotElement fp= p;
+            final String parent= fp.getParent().length()==0 ? fp.getId() : fp.getParent();
+            if ( ! pendingDefaultsChanges.containsKey(parent) ) { // call just once please
+                pendingDefaultsChanges.put( parent, fp.getId() );
+                new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
+                    @Override
+                    public void run() {
+                        doPlotElementDefaultsChange(fp);
+                        pendingDefaultsChanges.remove(parent);
+                    }
+                };
+            } else {
+                System.err.println("already accounted for: "+fp);
+            }
+        }
         if ( !pdListen.contains(p) ) {
             p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
             p.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
@@ -796,6 +819,12 @@ public class PlotController extends DomNodeController {
                     //System.err.println("second: "+second);
                     //merge
                 }
+            }
+        }
+        // get the title from the parent.
+        for ( PlotElement pe : pes ) {
+            if ( pe.getParent().length()==0 ) {
+                result.setTitle( pe.getPlotDefaults().getTitle() );
             }
         }
         if ( result==null && pes!=null && pes.size()>0 ) {
