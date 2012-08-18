@@ -740,7 +740,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     };
 
-
     /**
      * add a plotElement to the application, attaching it to the given Plot and DataSourceFilter.
      * @param domPlot if null, create a Plot, if non-null, add the plotElement to this plot.
@@ -748,6 +747,17 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public PlotElement addPlotElement(Plot domPlot, DataSourceFilter dsf) {
+        return addPlotElement( domPlot, null, dsf );
+    }
+
+    /**
+     * add a plotElement to the application, attaching it to the given Plot and DataSourceFilter.
+     * @param domPlot if null, create a Plot, if non-null, add the plotElement to this plot.
+     * @param parent if non-null, then make this plotElement the child of parent.
+     * @param dsf if null, create a DataSourceFilter.  If non-null, connect the plotElement to this data source.
+     * @return
+     */
+    public PlotElement addPlotElement( Plot domPlot, PlotElement parent, DataSourceFilter dsf) {
         logger.log(Level.FINE, "enter addPlotElement({0},{1})", new Object[]{domPlot, dsf});
 
         final PlotElement pele1 = new PlotElement();
@@ -771,6 +781,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         pele1.addPropertyChangeListener(PlotElement.PROP_PLOTID, plotIdListener);
 
+        if ( parent!=null ) pele1.setParent( parent.getId() );
+        
         pele1.setPlotId(domPlot.getId());
         pele1.setDataSourceFilterId(dsf.getId());
 
@@ -1111,7 +1123,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param srcElement the plotElement to copy.
      * @param domPlot  plot to contain the new plotElement, which may be the same plot.
      * @param dsf     if non-null, then use this dataSourceFilter
-     * @return
+     * @return the new plotElement.
      */
     protected PlotElement copyPlotElement(PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
         logger.log( Level.FINER, "copyPlotElement({0},{1},{2})", new Object[]{srcElement, domPlot, dsf});
@@ -1127,6 +1139,29 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
         return newp;
     }
+
+    /**
+     * copy the plotElement and put it in domPlot, but make it a child immediately.  This was introduced because
+     * of code that was responding to changes, but didn't know that these were child elements.
+     * @param srcElement the plotElement to copy.
+     * @param domPlot  plot to contain the new plotElement, which may be the same plot.
+     * @param dsf     if non-null, then use this dataSourceFilter
+     * @return the new plotElement.
+     */
+    protected PlotElement makeChildPlotElement( PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
+        logger.log( Level.FINER, "makeChildPlotElement({0},{1},{2})", new Object[]{srcElement, domPlot, dsf});
+        PlotElement newp = addPlotElement(domPlot, srcElement, dsf);
+        newp.getController().setResetPlotElement(false);// don't add children, trigger autoRange, etc.
+        newp.getController().setDsfReset(false); // dont' reset when the dataset changes
+        newp.syncTo(srcElement, Arrays.asList(DomNode.PROP_ID,PlotElement.PROP_PLOTID,
+                PlotElement.PROP_DATASOURCEFILTERID));
+        if (dsf == null) { // new DataSource, but with the same URI.
+            DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
+            DataSourceFilter dsfsrc = srcElement.controller.getDataSourceFilter();
+            copyDataSourceFilter(dsfsrc, dsfnew);
+        }
+        return newp;
+    };
 
     /**
      * Copy the plot and its axis settings, optionally binding the axes. Whether
