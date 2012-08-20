@@ -66,14 +66,14 @@ public class Test002 {
             "008 file:///home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
             "009 file:///home/jbf/ct/hudson/vap/ninePanels.vap",
             "010 http://autoplot.org/data/autoplot-applet.vap",
-            "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.vap",
+            "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.v1_07.vap",
             "012 file:///home/jbf/ct/hudson/vap/cassini_kp.vap", // das2Server
             "013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
          //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudson/vap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
             "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
             "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
-            "021 file:///home/jbf/ct/hudson/vap/auto4.vap",
+            "021 file:///home/jbf/ct/hudson/vap/auto4.v1_07.vap",
             "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
 
         };
