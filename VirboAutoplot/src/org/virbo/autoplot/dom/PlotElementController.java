@@ -1173,6 +1173,9 @@ public class PlotElementController extends DomNodeController {
                 if ( doTurnOn ) {
                     renderer.setActive(false);
                 }
+            } else {
+                // get properties like the title and yrange for a stack of line plots.
+                if ( weShallAddChildren ) doResetRanges();
             }
 
             if ( shouldHaveChildren ) {
