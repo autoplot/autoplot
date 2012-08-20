@@ -433,7 +433,7 @@ public class StatePersistence {
                     pp[i].getYaxis().setAutoRange(true);
                     pp[i].getZaxis().setAutoRange(true);
                 }
-            } else if ( domVersion.compareTo("1.06")<=0 ) {
+            } else if ( domVersion.compareTo("1.07")<=0 ) {
                 // file:///home/jbf/ct/hudson/vap/ninePanels.vap shows that old vap files often didn't have the autorange cleared
                 // when changes were made.  Now the code properly handles these, so autorange needs to be turned off when loading vaps.
                 // This showed that 1.06 files would have this problem too: file:/home/jbf/ct/hudson/vap/cassini_kp.vap
