@@ -821,6 +821,7 @@ public class PlotController extends DomNodeController {
                 }
             }
         }
+        if ( result==null && pes.size()>0 ) result= pes.get(0).getPlotDefaults(); // more like old behavior
         // get the title from the parent.
         for ( PlotElement pe : pes ) {
             if ( pe.getParent().length()==0 ) {
