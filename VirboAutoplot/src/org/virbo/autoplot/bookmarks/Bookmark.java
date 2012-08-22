@@ -193,7 +193,7 @@ public abstract class Bookmark {
             // See if the URI is file-like, not containing query parameters, in which case we allow caching to occur.
             try {
                 URI ruri= rurl.toURI();
-                URI parentUri= FileSystemUtil.isCacheable( ruri );
+                URI parentUri= null; // FileSystemUtil.isCacheable( ruri );
                 if ( parentUri!=null ) {
                     System.err.println("Using isCacheable route");
                     FileSystem fd= FileSystem.create(parentUri);
