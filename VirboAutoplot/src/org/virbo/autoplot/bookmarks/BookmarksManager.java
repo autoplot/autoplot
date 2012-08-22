@@ -1417,12 +1417,15 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         } catch (BookmarksException ex) {
             logger.log(Level.SEVERE, null, ex);
             showMessage( "Semantic error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+            model.setList(new ArrayList());
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
             showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+            model.setList(new ArrayList());
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
             showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+            model.setList(new ArrayList());
         } finally {
             try {
                 if ( read!=null ) read.close();
