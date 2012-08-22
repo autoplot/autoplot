@@ -29,6 +29,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
@@ -1892,7 +1893,7 @@ APSplash.checkTime("init 52");
 
         resetZoomMenu.setText("Reset Zoom");
 
-        resetZoomMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        resetZoomMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Event.CTRL_MASK|Event.SHIFT_MASK ));
         resetZoomMenuItem.setText("Reset Zoom");
         resetZoomMenuItem.setToolTipText("Revert to the original axis settings");
         resetZoomMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1902,6 +1903,7 @@ APSplash.checkTime("init 52");
         });
         resetZoomMenu.add(resetZoomMenuItem);
 
+        resetXMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK|Event.SHIFT_MASK ));
         resetXMenuItem.setText("Reset X");
         resetXMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1910,7 +1912,7 @@ APSplash.checkTime("init 52");
         });
         resetZoomMenu.add(resetXMenuItem);
 
-        resetYMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,(java.awt.event.InputEvent.SHIFT_MASK | (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()))));
+        resetYMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK|Event.SHIFT_MASK ));
         resetYMenuItem.setText("Reset Y");
         resetYMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1919,6 +1921,7 @@ APSplash.checkTime("init 52");
         });
         resetZoomMenu.add(resetYMenuItem);
 
+        resetZMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK|Event.SHIFT_MASK ));
         resetZMenuItem.setText("Reset Z");
         resetZMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
