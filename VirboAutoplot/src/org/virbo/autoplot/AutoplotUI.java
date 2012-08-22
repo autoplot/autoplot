@@ -3044,6 +3044,13 @@ private void updateFrameTitle() {
             initialURL = null;
         }
 
+        // it's easy to forget the -- in --open=. Check for this and give a nice error.
+        if ( initialURL!=null ) {
+            if ( initialURL.startsWith("open=") ) {
+                JOptionPane.showMessageDialog( null, "<html>open= switch is missing -- prefix: should be<br>--"+initialURL, "open= switch is missing -- ", JOptionPane.ERROR_MESSAGE );
+            }
+        }
+
         bookmarks= alm.getValue("bookmarks");
 
         if (alm.getBooleanValue("scriptPanel")) {
