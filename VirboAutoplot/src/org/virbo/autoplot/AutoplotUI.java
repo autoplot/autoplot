@@ -2373,6 +2373,15 @@ APSplash.checkTime("init 52");
 
     private void resetZoomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZoomMenuItemActionPerformed
         dom.getController().getPlot().getController().resetZoom(true, true, true);
+        if ( !AutoplotUtil.resetZoomX(dom)) {
+            System.err.println("unable to zoom x");
+        }
+        if ( !AutoplotUtil.resetZoomY(dom)) {
+            System.err.println("unable to zoom y");
+        }
+        if ( !AutoplotUtil.resetZoomZ(dom)) {
+            System.err.println("unable to zoom z");
+        }
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
