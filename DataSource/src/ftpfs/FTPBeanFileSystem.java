@@ -59,6 +59,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     FTPBeanFileSystem(URI root) throws FileSystemOfflineException {
         super(root, userLocalRoot(root) );
+        if ( FileSystem.settings().isOffline() ) {
+            this.setOffline(true);
+        }
         try {
             this.listDirectory("/"); // list the root to see if it is offline.
         } catch (IOException ex) {
@@ -662,8 +665,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
         }
         if ( result==null ) {
-            // this won't exist.
-            return new FtpFileObject(this, filename, new Date(System.currentTimeMillis()));//TODO:DATE!
+            File localfile= new File( getLocalRoot(), filename );
+            Date t= new Date(System.currentTimeMillis());
+            if ( localfile.exists() ) {
+                t= new Date( localfile.lastModified() );
+            }
+            return new FtpFileObject(this, filename, t );
         } else {
             return new FtpFileObject(this, filename, new Date( result.modified ) );
         }
