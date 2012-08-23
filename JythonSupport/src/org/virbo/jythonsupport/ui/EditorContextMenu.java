@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -84,6 +87,33 @@ public class EditorContextMenu {
         result.setToolTipText( "<html><tt>" + htmlText + "</tt></html>" );
         return result;
 
+    }
+
+    /**
+     * indent or dedent the code.  When amount is positive, we indent.  When it's negative, we remove so many spaces
+     * from each line.
+     * @param txt the block of text, starting but not including the newline, and ending just before a newline.
+     * @param amount positive or negative number of spaces.
+     * @return
+     */
+    private static String indent( String txt, int amount ) {
+        try {
+            StringBuilder result= new StringBuilder();
+            BufferedReader r= new BufferedReader( new StringReader(txt) );
+            String dedent= amount<0 ? "   ".substring(0,-1*amount) : "";
+            String indent= amount>0 ? "   ".substring(0,   amount) : "";
+            String line= r.readLine();
+            while ( line!=null ) {
+                if ( amount<0 && line.startsWith(dedent) ) line= line.substring(dedent.length());
+                if ( amount>0 ) line= indent + line;
+                result.append(line);
+                line= r.readLine();
+                if ( line!=null ) result.append("\n");
+            }
+            return result.toString();
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private synchronized void maybeCreateMenu() {
@@ -177,6 +207,50 @@ public class EditorContextMenu {
                 }
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
+            actionsMenu.add( mi );
+            mi= new JMenuItem( new AbstractAction("indent block") {
+                public void actionPerformed(ActionEvent e) {
+                    int i= editor.getSelectionStart();  // note the netbeans source has all these operators, implemented correctly...
+                    int j= editor.getSelectionEnd();
+                    int limit= editor.getText().length();
+                    try {
+                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
+                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        String txt= editor.getText( i, j-i );
+                        txt= indent( txt, 2 );
+                        editor.getDocument().remove( i, j-i );
+                        editor.getDocument().insertString( i, txt, null );
+                        editor.setSelectionStart(i);
+                        editor.setSelectionEnd(i+txt.length());
+                    } catch ( BadLocationException ex ) {
+
+                    }
+                }
+            } );
+            mi.setToolTipText("indent the selected block of lines");
+            actionsMenu.add( mi );
+            mi= new JMenuItem( new AbstractAction("dedent block") {
+                public void actionPerformed(ActionEvent e) {
+                    int i= editor.getSelectionStart();
+                    int j= editor.getSelectionEnd();
+                    int limit= editor.getText().length();
+                    try {
+                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
+                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        String txt= editor.getText( i, j-i );
+                        txt= indent( txt, -2 );
+                        editor.getDocument().remove( i, j-i );
+                        editor.getDocument().insertString( i, txt, null );
+                        editor.setSelectionStart(i);
+                        editor.setSelectionEnd(i+txt.length());
+                    } catch ( BadLocationException ex ) {
+
+                    }
+                }
+            } );
+            mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
             menu.add( actionsMenu );
             JMenu settingsMenu= new JMenu("Settings");
