@@ -452,12 +452,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             String[] furir= getScriptURI( split );
             File f = DataSetURI.getFile( furir[0], new NullProgressMonitor() );
 
-            support.loadFile(f);
-
-            if ( FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), support.getFile() ) || !support.getFile().canWrite() ) {
-                support.setReadOnly();
-            }
-
             Map<String,String> results= JythonDataSourceFactory.getResultParameters( f.toString(), new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
             int i=0;
@@ -493,6 +487,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             if ( hasVariables ) {
                 tearoffTabbedPane1.setSelectedIndex(1);
+            }
+
+            support.loadFile(f);
+
+            if ( FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), support.getFile() ) || !support.getFile().canWrite() ) {
+                support.setReadOnly();
             }
 
             List<String> errs= new ArrayList();
