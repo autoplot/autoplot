@@ -23,12 +23,15 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
+import jsyntaxpane.DefaultSyntaxKit;
 import org.python.core.PyObject;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
@@ -37,11 +40,14 @@ import org.virbo.qstream.StreamException;
  *
  * @author jbf
  */
-public class EditorTextPane extends JTextPane {
+public class EditorTextPane extends JEditorPane {
     
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
     public EditorTextPane() {
+
+        Runnable run= new Runnable() {
+            public void run() {
 
         final UndoManager undo = new UndoManager();
         getDocument().addUndoableEditListener(undo);
@@ -86,6 +92,16 @@ public class EditorTextPane extends JTextPane {
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y,tk.getMenuShortcutKeyMask() ), "redo" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
+
+        DefaultSyntaxKit.initKit();
+
+        EditorTextPane.this.setContentType("text/python");
+
+        
+            }
+        };
+        SwingUtilities.invokeLater(run);
+
     }
 
 

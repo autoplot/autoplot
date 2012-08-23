@@ -41,26 +41,29 @@ public class EditorContextMenu {
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
         maybeCreateMenu();
-        editor.addMouseListener(new MouseAdapter() {
+        
+        editor.setComponentPopupMenu(menu); // override the default popup for the editor.
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    if (menu != null) {
-                        menu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    if (menu != null) {
-                        menu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-            }
-        });
+//        editor.addMouseListener(new MouseAdapter() {
+//
+//            @Override
+//            public void mousePressed(MouseEvent e) {
+//                if (e.isPopupTrigger()) {
+//                    if (menu != null) {
+//                        menu.show(e.getComponent(), e.getX(), e.getY());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void mouseReleased(MouseEvent e) {
+//                if (e.isPopupTrigger()) {
+//                    if (menu != null) {
+//                        menu.show(e.getComponent(), e.getX(), e.getY());
+//                    }
+//                }
+//            }
+//        });
 
     }
     

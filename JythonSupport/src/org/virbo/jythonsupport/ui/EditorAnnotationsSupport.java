@@ -9,18 +9,15 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JTextPane;
+import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
+import jsyntaxpane.components.Markers;
+import jsyntaxpane.components.Markers.SimpleMarker;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -43,10 +40,10 @@ public class EditorAnnotationsSupport {
      */
     public static final String ANNO_WARNING = "warning";
 
-    private JTextPane editorPanel;
+    private JEditorPane editorPanel;
     PythonInterpreter interp;
 
-    EditorAnnotationsSupport(JTextPane editorPanel) {
+    EditorAnnotationsSupport(JEditorPane editorPanel) {
         this.editorPanel = editorPanel;
         editorPanel.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -65,25 +62,13 @@ public class EditorAnnotationsSupport {
         editorPanel.setToolTipText("this will contain annotations");
     }
 
-    private synchronized void addStyles(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        Style s1 = doc.addStyle( ANNO_ERROR, def);
-        StyleConstants.setBackground(s1, Color.PINK);
-        Style s2 = doc.addStyle( ANNO_PROGRAM_COUNTER, def);
-        StyleConstants.setBackground(s2, Color.GREEN.brighter().brighter() );
-        Style s3 = doc.addStyle( ANNO_WARNING, def);
-        StyleConstants.setBackground(s3, Color.YELLOW );
-    }
-
     /**
      * remove all annotations
      */
     public void clearAnnotations() {
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
-                Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-                StyledDocument doc = editorPanel.getStyledDocument();
-                doc.setCharacterAttributes(0, doc.getLength(), def, true);
+                Markers.removeMarkers(editorPanel);
             }
         } );
         annotations= new TreeMap<Integer, Annotation>();
@@ -97,9 +82,7 @@ public class EditorAnnotationsSupport {
         if (ann != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-                    StyledDocument doc = editorPanel.getStyledDocument();
-                    doc.setCharacterAttributes(ann.offset, ann.len, def, true);
+                    Markers.removeMarkers(editorPanel,ann.marker);
                     annotations.remove(ann.offset);
                 }
             } );
@@ -110,6 +93,7 @@ public class EditorAnnotationsSupport {
         String text;
         int offset;
         int len;
+        SimpleMarker marker;
     }
     SortedMap<Integer, Annotation> annotations = new TreeMap<Integer, Annotation>();
 
@@ -150,7 +134,7 @@ public class EditorAnnotationsSupport {
     public void annotateLine( final int line, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
-                StyledDocument doc = editorPanel.getStyledDocument();
+                Document doc = editorPanel.getDocument();
                 Element root = editorPanel.getDocument().getDefaultRootElement();
 
                 if ( line<1 || line>root.getElementCount()+1 ) {
@@ -175,16 +159,20 @@ public class EditorAnnotationsSupport {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
-                StyledDocument doc = editorPanel.getStyledDocument();
-                Element root = editorPanel.getDocument().getDefaultRootElement();
+                Document doc = editorPanel.getDocument();
 
-                Style style = doc.getStyle(name);
-                if (style == null) {
-                    addStyles(doc);
-                    style = doc.getStyle(name);
+                SimpleMarker mark;
+                if ( name.equals(ANNO_WARNING) ) {
+                    mark= new SimpleMarker(Color.YELLOW);
+                } else if ( name.equals(ANNO_ERROR) ) {
+                    mark= new SimpleMarker(Color.PINK);
+                } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){
+                    mark=  new SimpleMarker(Color.GREEN.brighter().brighter() );
+                } else {
+                    mark=  new SimpleMarker(Color.GRAY );
                 }
-                doc.setParagraphAttributes(i0, i1 - i0, StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), false);
-                doc.setCharacterAttributes(i0, i1 - i0, style, true);
+                
+                Markers.markText( editorPanel, i0, i1, mark );
                 Annotation ann = new Annotation();
                 ann.len = i1 - i0;
                 ann.offset = i0;
@@ -196,11 +184,11 @@ public class EditorAnnotationsSupport {
     }
 
     private String htmlify( String text ) {
-        StringBuffer buff= new StringBuffer();
+        StringBuilder buff= new StringBuilder();
         buff.append("<html>");
         String[] ss= text.split("\n",-2);
         for ( int i=0; i<ss.length-1; i++ ) {
-            buff.append(ss[i]+"<br>");
+            buff.append(ss[i]).append("<br>");
         }
         buff.append(ss[ss.length-1]);
         buff.append("</html>");
