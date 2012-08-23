@@ -212,6 +212,8 @@ public class JythonUtil {
         Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
         build.append( "sort_=[]\n");
         while (s != null) {
+           int ic= s.indexOf("#");
+           if ( ic>-1 ) s= s.substring(0,ic);
            Matcher m= getParamPattern.matcher(s);
            if ( m.matches() || s.contains("getParam") ) {
                build.append(s).append("\n");
