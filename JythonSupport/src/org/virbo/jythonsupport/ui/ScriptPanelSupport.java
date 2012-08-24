@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -127,22 +128,35 @@ public class ScriptPanelSupport {
 
     protected void loadInputStream( InputStream in ) throws IOException {
         BufferedReader r = null;
+        final StringBuilder buf= new StringBuilder();
         try {
-            StringBuilder buf = new StringBuilder();
             r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
             while (s != null) {
                 buf.append(s).append("\n");
                 s = r.readLine();
             }
-            Document d = editor.getDocument();
-            d.remove(0, d.getLength());
-            d.insertString(0, buf.toString(), null);
-            setDirty(false);
-        } catch (BadLocationException ex) {
-            throw new RuntimeException(ex);
         } finally {
             if (r != null) r.close();
+        }
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    Document d = editor.getDocument();
+                    d.remove(0, d.getLength());
+                    d.insertString(0, buf.toString(), null);
+                    setDirty(false);
+
+                } catch (BadLocationException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            run.run();
+            //SwingUtilities.invokeLater(run);
         }
     }
 
