@@ -6,7 +6,6 @@
 package org.virbo.autoplot.scriptconsole;
 
 import org.virbo.jythonsupport.ui.EditorContextMenu;
-import java.awt.BorderLayout;
 import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -27,12 +26,10 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
-import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -61,7 +58,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
-        jPanel1.add( textArea, BorderLayout.CENTER );
 
         setContext(CONTEXT_APPLICATION);
         
@@ -233,26 +229,16 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
+        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         newScriptButton = new javax.swing.JButton();
         interruptButton = new javax.swing.JButton();
         fileNameTextField = new javax.swing.JTextField();
-
-        textArea.setFont(new java.awt.Font("Monospaced", 0, 13));
-        textArea.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                textAreaFocusGained(evt);
-            }
-        });
-        jScrollPane1.setViewportView(textArea);
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("Execute");
@@ -289,8 +275,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         caretPositionLabel.setText("1,1");
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
-        jScrollPane2.setViewportView(jPanel1);
+        textArea.setFont(new java.awt.Font("Monospaced", 0, 13));
+        textArea.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                textAreaFocusGained(evt);
+            }
+        });
+        jScrollPane2.setViewportView(textArea);
 
         newScriptButton.setText("New");
         newScriptButton.setToolTipText("Reset the buffer to a new file.");
@@ -358,6 +349,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
+        if ( dirty ) {
+            try {
+                support.save();
+            } catch ( IOException ex ) {
+                
+            }
+        }
         if ( ( evt.getModifiers() & Event.CTRL_MASK ) ==Event.CTRL_MASK ) {
             support.executeScript(true);
         } else {
@@ -396,7 +394,6 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JComboBox contextSelector;
     private javax.swing.JTextField fileNameTextField;
     private javax.swing.JButton interruptButton;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton newScriptButton;
