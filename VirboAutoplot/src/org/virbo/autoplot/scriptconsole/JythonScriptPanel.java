@@ -351,7 +351,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
         if ( dirty ) {
             try {
-                support.save();
+                support.save(); 
             } catch ( IOException ex ) {
                 
             }
