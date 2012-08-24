@@ -93,6 +93,7 @@ public class EditorTextPane extends JEditorPane {
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
 
+        doLayout(); // kludge for DefaultSyntaxKit
         DefaultSyntaxKit.initKit();
 
         EditorTextPane.this.setContentType("text/python");
