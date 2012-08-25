@@ -30,11 +30,11 @@
               <Component id="contextSelector" min="-2" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
-              <Component id="fileNameTextField" pref="490" max="32767" attributes="0"/>
+              <Component id="fileNameTextField" pref="506" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="caretPositionLabel" min="-2" pref="81" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane2" alignment="0" pref="583" max="32767" attributes="0"/>
+          <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

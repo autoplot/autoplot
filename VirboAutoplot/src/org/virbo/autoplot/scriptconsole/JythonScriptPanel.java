@@ -349,7 +349,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
-        if ( dirty ) {
+        if ( dirty && support.file!=null ) {
             try {
                 support.save(); 
             } catch ( IOException ex ) {
