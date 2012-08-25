@@ -699,9 +699,7 @@ public class GuiSupport {
         tt.put( "Image", RenderType.image);
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
         tt.put( "Orbit Plot", RenderType.orbitPlot );
-        tt.put( "Contour Plot", RenderType.contour );
-
-        ButtonGroup group= new ButtonGroup();
+        //tt.put( "Contour Plot", RenderType.contour );  //this has issues, hide for now.
 
         for ( Entry<String,RenderType> ee: tt.entrySet() ) {
             final Entry<String,RenderType> fee= ee;
