@@ -50,7 +50,6 @@ public class EditorTextPane extends JEditorPane {
             public void run() {
 
         final UndoManager undo = new UndoManager();
-        getDocument().addUndoableEditListener(undo);
 
         getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
             public void actionPerformed( ActionEvent e ) {
@@ -92,11 +91,12 @@ public class EditorTextPane extends JEditorPane {
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y,tk.getMenuShortcutKeyMask() ), "redo" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
-
+        
         doLayout(); // kludge for DefaultSyntaxKit
         DefaultSyntaxKit.initKit();
 
         EditorTextPane.this.setContentType("text/python");
+        getDocument().addUndoableEditListener(undo);
 
         
             }
