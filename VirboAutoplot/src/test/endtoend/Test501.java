@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Arrays;
@@ -97,7 +98,19 @@ public class Test501 {
 
     public static void main( String[] args ) throws Exception {
 
-        TreeModel tm= DasServer.plasmaWaveGroup.getDataSetListWithDiscovery();
+        // special for testing
+        //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
+        //ids.add(0,s);
+
+        getDocumentModel().getOptions().setAutolayout(false);
+        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
+        int itest= 0;
+
+        DasServer dss= DasServer.plasmaWaveGroup;
+        //DasServer dss= DasServer.create(new URL("http://emfisis.physics.uiowa.edu/das/das2Server"));
+
+        TreeModel tm= dss.getDataSetListWithDiscovery();
 
         List<String> ids= new ArrayList();
 
@@ -105,7 +118,13 @@ public class Test501 {
 
         Map<Integer,String> failures= new LinkedHashMap();
 
-        List<Integer> skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
+        List<Integer> skip;
+        if ( dss==DasServer.plasmaWaveGroup ) {
+            skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
+        } else {
+            skip= new ArrayList(  );
+        }
+
         int count=0;
         for ( String id: ids ) {
             if ( id.contains("/testing/") ) {
@@ -118,14 +137,7 @@ public class Test501 {
 
         System.err.println( "Skipping the tests: " + skip );
 
-        // special for testing
-        //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
-        //ids.add(0,s);
-
-        getDocumentModel().getOptions().setAutolayout(false);
-        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-
-        int iid=0;
+        int iid=itest;
         for ( String id: ids ) {
             System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
 
@@ -143,7 +155,7 @@ public class Test501 {
             String uri= "";
             try {
 
-                StreamDescriptor dsdf= DasServer.plasmaWaveGroup.getStreamDescriptor( DasServer.plasmaWaveGroup.getURL(id) );
+                StreamDescriptor dsdf= dss.getStreamDescriptor( dss.getURL(id) );
                 String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this, just make sure something comes back.
                 int ic= exampleRange.indexOf("|");
                 if ( ic>-1 ) {
@@ -151,7 +163,7 @@ public class Test501 {
                 }
 
                 DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
-                uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+                uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
                 System.err.println("id: "+id );
                 System.err.println("uri: "+uri);
@@ -167,7 +179,7 @@ public class Test501 {
                     }
 
                     tr= DatumRangeUtil.parseTimeRangeValid(testRange);
-                    uri= "vap+das2server:"+DasServer.plasmaWaveGroup.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+                    uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
                     System.err.println("id: "+id );
                     System.err.println("uri: "+uri);
@@ -181,6 +193,7 @@ public class Test501 {
             }
             iid++;
         }
+        itest+= iid;
 
         System.err.println("DONE...");
 
