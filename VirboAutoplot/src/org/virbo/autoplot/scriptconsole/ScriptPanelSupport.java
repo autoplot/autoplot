@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -201,12 +202,20 @@ public class ScriptPanelSupport {
                 buf.append(s).append("\n");
                 s = r.readLine();
             }
-            Document d = panel.getEditorPanel().getDocument();
-            d.remove(0, d.getLength());
-            d.insertString(0, buf.toString(), null);
-            panel.setDirty(false);
-        } catch (BadLocationException ex) {
-            throw new RuntimeException(ex);
+            final String fs= buf.toString();
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        Document d = panel.getEditorPanel().getDocument();
+                        d.remove(0, d.getLength());
+                        d.insertString(0, fs, null);
+                        panel.setDirty(false);
+                    } catch ( BadLocationException ex ) {
+                        
+                    }
+                }
+            };
+            SwingUtilities.invokeLater(run);;
         } finally {
             if (r != null) r.close();
         }
