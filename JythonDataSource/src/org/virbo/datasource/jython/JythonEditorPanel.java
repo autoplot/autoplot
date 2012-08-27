@@ -18,9 +18,11 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -81,6 +83,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         support= new ScriptPanelSupport(textArea);
         support.addCaretLabel(caretPositionLabel);
         support.addFileLabel(fileNameLabel);
+        support.setReadOnly();
 
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
 
@@ -520,6 +523,27 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     public String getURI() {
+
+        if ( support.isDirty() && support.getFile()!=null ) {
+            OutputStream out=null;
+            try {
+                out = new FileOutputStream( support.getFile() );
+                String text = textArea.getText();
+                out.write(text.getBytes());
+                support.setDirty(false);
+            } catch ( IOException ex ) {
+                
+            } finally {
+                if ( out!=null ) {
+                    try {
+                        out.close();
+                    } catch ( IOException ex ) {
+                        //nothing
+                    }
+                }
+            }
+        }
+
         URISplit split=  URISplit.parse(suri);
 
         Map<String,String> params= URISplit.parseParams(split.params);
