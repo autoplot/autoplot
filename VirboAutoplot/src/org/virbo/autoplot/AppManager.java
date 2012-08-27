@@ -41,6 +41,10 @@ public class AppManager {
         }
     }
 
+    public Object getApplication( int i ) {
+        return this.apps.get(i);
+    }
+
     public void quit(  ) {
         System.exit(0);
     }
