@@ -107,93 +107,104 @@ public class Test501 {
 
         int itest= 0;
 
-        DasServer dss= DasServer.plasmaWaveGroup;
-        //DasServer dss= DasServer.create(new URL("http://emfisis.physics.uiowa.edu/das/das2Server"));
 
-        TreeModel tm= dss.getDataSetListWithDiscovery();
-
-        List<String> ids= new ArrayList();
-
-        flatten( tm, "", tm.getRoot(), ids );
-
+        DasServer[] dsss= new DasServer[] { DasServer.plasmaWaveGroup,
+            DasServer.create(new URL("http://emfisis.physics.uiowa.edu/das/das2Server")) };
+        
         Map<Integer,String> failures= new LinkedHashMap();
 
-        List<Integer> skip;
-        if ( dss==DasServer.plasmaWaveGroup ) {
-            skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
-        } else {
-            skip= new ArrayList(  );
-        }
+        for ( int idsss= 0; idsss<dsss.length; idsss++ ) {
 
-        int count=0;
-        for ( String id: ids ) {
-            if ( id.contains("/testing/") ) {
-                System.err.println("skipping /testing/: "+id);
-                continue;
-            }
-            if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(count);
-            count++;
-        }
+            DasServer dss= dsss[idsss];
 
-        System.err.println( "Skipping the tests: " + skip );
-
-        int iid=itest;
-        for ( String id: ids ) {
-            System.err.println( String.format( "==== test %d of %d ========================================================", iid, count ) );
-
-            if ( id.contains("/testing/") ) {
-                System.err.println( "ids containing /testing/ are automatically skipped: " + id );
-                continue;
-            }
+            System.err.println("## Testing server: "+dss );
             
-            if ( skip.contains(iid ) ) {
-                iid++;
-                System.err.println( "test marked for skipping in Test501.java: " + id );
-                continue;
+            TreeModel tm= dss.getDataSetListWithDiscovery();
+
+            List<String> ids= new ArrayList();
+
+            flatten( tm, "", tm.getRoot(), ids );
+
+            List<Integer> skip;
+            if ( dss==DasServer.plasmaWaveGroup ) {
+                skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
+            } else {
+                skip= new ArrayList(  );
             }
 
-            String uri= "";
-            try {
+            int count=0;
+            for ( String id: ids ) {
+                if ( id.contains("/testing/") ) {
+                    System.err.println("skipping /testing/: "+id);
+                    continue;
+                }
+                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(count);
+                count++;
+            }
 
-                StreamDescriptor dsdf= dss.getStreamDescriptor( dss.getURL(id) );
-                String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this, just make sure something comes back.
-                int ic= exampleRange.indexOf("|");
-                if ( ic>-1 ) {
-                    exampleRange= exampleRange.substring(0,ic);
+            System.err.println( "Skipping the tests: " + skip );
+
+            int iis= 0; // index of element from this server.
+
+            int iid=itest;
+            for ( String id: ids ) {
+
+                System.err.println( String.format( "==== test %d of %d ========================================================", iis, count ) );
+
+                if ( id.contains("/testing/") ) {
+                    System.err.println( "ids containing /testing/ are automatically skipped: " + id );
+                    continue;
                 }
 
-                DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
-                uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+                if ( skip.contains(iid ) ) {
+                    iid++;
+                    System.err.println( "test marked for skipping in Test501.java: " + id );
+                    continue;
+                }
 
-                System.err.println("id: "+id );
-                System.err.println("uri: "+uri);
+                String uri= "";
+                try {
 
-                do1( uri, iid, false );
-
-                String testRange= (String) dsdf.getProperty("testRange"); // this is a more thorough test, and should not change
-                if ( testRange!=null ) {
-
-                    ic= testRange.indexOf("|");
+                    StreamDescriptor dsdf= dss.getStreamDescriptor( dss.getURL(id) );
+                    String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this, just make sure something comes back.
+                    int ic= exampleRange.indexOf("|");
                     if ( ic>-1 ) {
-                        testRange= testRange.substring(0,ic);
+                        exampleRange= exampleRange.substring(0,ic);
                     }
 
-                    tr= DatumRangeUtil.parseTimeRangeValid(testRange);
+                    DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
                     uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
                     System.err.println("id: "+id );
                     System.err.println("uri: "+uri);
 
-                    do1( uri, iid, true );
+                    do1( uri, iid, false );
 
+                    String testRange= (String) dsdf.getProperty("testRange"); // this is a more thorough test, and should not change
+                    if ( testRange!=null ) {
+
+                        ic= testRange.indexOf("|");
+                        if ( ic>-1 ) {
+                            testRange= testRange.substring(0,ic);
+                        }
+
+                        tr= DatumRangeUtil.parseTimeRangeValid(testRange);
+                        uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
+
+                        System.err.println("id: "+id );
+                        System.err.println("uri: "+uri);
+
+                        do1( uri, iid, true );
+
+                    }
+                } catch ( Exception ex ) {
+                    ex.printStackTrace();
+                    failures.put(iid,uri);
                 }
-            } catch ( Exception ex ) {
-                ex.printStackTrace();
-                failures.put(iid,uri);
+                iid++;
             }
-            iid++;
+            itest+= iid;
         }
-        itest+= iid;
 
         System.err.println("DONE...");
 
