@@ -51,17 +51,14 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 result, type);
 
         int limit= type.equals("short") ? 32768 : 65536;
+        if ( extent.value(1)>limit ) {
+            throw new IllegalArgumentException("data extent is too great: "+extent);
+        }
 
-        boolean rescale= false;
         QubeDataSetIterator it = new QubeDataSetIterator(data);
         while (it.hasNext()) {
             it.next();
-            if ( it.getValue(data)>limit ) rescale= true;
             it.putValue(ddata, it.getValue(data));
-        }
-
-        if ( rescale ) {
-            throw new IllegalArgumentException("data extent is too great: "+extent);
         }
 
         return result;
