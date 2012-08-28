@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -95,9 +95,11 @@ public class EditorTextPane extends JEditorPane {
         doLayout(); // kludge for DefaultSyntaxKit
         DefaultSyntaxKit.initKit();
 
+        JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
         EditorTextPane.this.setContentType("text/python");
         getDocument().addUndoableEditListener(undo);
-
+        if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
+        
         
             }
         };
