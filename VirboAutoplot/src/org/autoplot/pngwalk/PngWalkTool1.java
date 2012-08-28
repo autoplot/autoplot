@@ -856,10 +856,13 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
      * @param timeRange
      */
     public void setTimeRange(DatumRange timeRange) {
+        boolean setting0= setting;
+        setting= true;
         DatumRange old= this.timeRange;
         this.timeRange = timeRange;
         if ( timeRange!=null ) seq.gotoSubrange(timeRange);
-        firePropertyChange(PROP_TIMERANGE, old, thumbnailSize);
+        if ( setting0 ) firePropertyChange(PROP_TIMERANGE, old, thumbnailSize);
+        setting= false;
     }
 
     PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
@@ -868,10 +871,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     };
 
+    boolean setting= false;
+
     PropertyChangeListener seqIndexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
+            boolean setting0= setting;
+            setting= true;
             DatumRange dr= seq.currentImage().getDatumRange();
-            if ( dr!=null ) setTimeRange( dr );
+            if ( setting0 && dr!=null ) setTimeRange( dr );
+            setting= false;
         }
     };
 
