@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     //public static final String PROP_SHOWMISSING = "showMissing";
     public static final String PROP_INDEX = "index";
+    public static final String PROP_SELECTED_INDECES = "selectedIndeces";
     public static final String PROP_IMAGE_LOADED = "imageLoaded";
     public static final String PROP_THUMB_LOADED = "thumbLoaded";
     public static final String PROP_USESUBRANGE = "useSubRange";
@@ -400,6 +402,18 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int oldIndex = this.index;
         this.index = index;
         pcs.firePropertyChange(PROP_INDEX, oldIndex, this.index);
+    }
+
+    List<Integer> sel= Collections.emptyList();
+
+    public void setSelectedIndeces( List<Integer> sel ) {
+        List<Integer> old= this.sel;
+        this.sel= sel;
+        pcs.firePropertyChange( PROP_SELECTED_INDECES, old, sel );
+    }
+
+    public List<Integer> getSelectedIndeces(  ) {
+        return this.sel;
     }
 
     /** Advance the index to the next image in the list.  If the index is already
