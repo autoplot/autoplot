@@ -1844,7 +1844,7 @@ public class FtpBean
         }
             
         if ( cont==false ) {
-            throw new IOException("Operation cancelled");
+            throw new InterruptedIOException("Operation cancelled");
         }
     }
 
@@ -1870,7 +1870,7 @@ public class FtpBean
             }
         }
         if ( cont==false ) {
-            throw new IOException("Operation cancelled");
+            throw new InterruptedIOException("Operation cancelled");
         }
     }
 
