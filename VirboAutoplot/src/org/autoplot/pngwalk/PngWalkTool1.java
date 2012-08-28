@@ -736,11 +736,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             oldseq.removePropertyChangeListener(WalkImageSequence.PROP_INDEX, indexListener );
             oldseq.removePropertyChangeListener(WalkImageSequence.PROP_STATUS, statusListener);
             if (ENABLE_QUALITY_CONTROL) oldseq.removePropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
+            oldseq.removePropertyChangeListener( PROP_TIMERANGE, seqTimeRangeListener );
+            oldseq.removePropertyChangeListener( WalkImageSequence.PROP_INDEX, seqIndexListener );
         }
         if ( seq!=null ) {
             seq.addPropertyChangeListener( WalkImageSequence.PROP_INDEX, indexListener );
             seq.addPropertyChangeListener( WalkImageSequence.PROP_STATUS, statusListener );
             if (ENABLE_QUALITY_CONTROL) seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
+            seq.addPropertyChangeListener( PROP_TIMERANGE, seqTimeRangeListener );
+            seq.addPropertyChangeListener( WalkImageSequence.PROP_INDEX, seqIndexListener );
         }
 
         if ( template.length()==0 ) {
@@ -774,6 +778,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     editRangeButton.setEnabled(false);
                     timeFilterTextField.setEnabled(false);
                     timeFilterTextField.setText("");
+
+                    DatumRange tr=seq.currentImage().getDatumRange();
+                    if ( tr!=null ) setTimeRange( tr );
                     
                     showMissingCheckBox.setEnabled(seq.getTimeSpan() != null);
                     if (seq.getTimeSpan() == null) {
@@ -832,6 +839,41 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         this.thumbnailSize = thumbnailSize;
         firePropertyChange(PROP_THUMBNAILSIZE, oldThumbnailSize, thumbnailSize);
     }
+
+
+    /**
+     * roughly the timerange displayed and selected.  This is left loose to support binding.
+     */
+    DatumRange timeRange;
+    public static final String PROP_TIMERANGE = "timeRange";
+
+    public DatumRange getTimeRange() {
+        return timeRange;
+    }
+
+    /**
+     * timerange roughly the focus timerange.  This property is introduced to allow for binding between pngwalks.
+     * @param timeRange
+     */
+    public void setTimeRange(DatumRange timeRange) {
+        DatumRange old= this.timeRange;
+        this.timeRange = timeRange;
+        if ( timeRange!=null ) seq.gotoSubrange(timeRange);
+        firePropertyChange(PROP_TIMERANGE, old, thumbnailSize);
+    }
+
+    PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            setTimeRange((DatumRange)evt.getNewValue());
+        }
+    };
+
+    PropertyChangeListener seqIndexListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            DatumRange dr= seq.currentImage().getDatumRange();
+            if ( dr!=null ) setTimeRange( dr );
+        }
+    };
 
     protected String status = "initializing...";
     public static final String PROP_STATUS = "status";
