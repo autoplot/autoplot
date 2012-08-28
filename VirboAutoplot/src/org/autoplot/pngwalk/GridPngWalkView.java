@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -20,7 +21,12 @@ import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JComponent;
@@ -65,13 +71,29 @@ public class GridPngWalkView extends PngWalkView {
         for ( MouseWheelListener l : ll ) scrollPane.removeMouseWheelListener( l );
 
         scrollPane.addMouseWheelListener( getMouseWheelListener() );
-        canvas.addMouseListener(new MouseAdapter() {
+
+        MouseAdapter ma= new MouseAdapter() {
+            Point p0;
             @Override
             public void mouseClicked(MouseEvent e) {
+                p0= null;
                 if (seq == null) return;
                 selectCellAt(e.getX(), e.getY());
             }
-        });
+            @Override
+            public void mousePressed(MouseEvent e) {
+                p0= e.getPoint();
+            }
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if ( p0!=null ) {
+                    Point p2= e.getPoint();
+                    selectCellsWithin(p0,p2);
+                }
+            }
+        };
+        canvas.addMouseListener(ma);
+        canvas.addMouseMotionListener(ma);
 
         canvas.addComponentListener(new ComponentAdapter() {
             @Override
@@ -184,6 +206,37 @@ public class GridPngWalkView extends PngWalkView {
         seq.setIndex(n);
     }
 
+    private void selectCellsWithin( Point p1, Point p2 ) {
+        if (p2.x > nCols * thumbSize) {
+            return;
+        }
+        int col1 = p1.x / thumbSize;
+        int row1 = p1.y / thumbSize;
+        int col2 = p2.x / thumbSize;
+        int row2 = p2.y / thumbSize;
+        if ( row2<row1 ) {
+            int t= row1;
+            row1= row2;
+            row2= t;
+        }
+        if ( col2<col1 ) {
+            int t= col1;
+            col1= col2;
+            col2= t;
+        }
+        List<Integer> sel= new ArrayList();
+        for ( int j=row1; j<=row2; j++ ) {
+            for ( int i=col1; i<=col2; i++ ) {
+                int n = j * nCols + i;
+                if ( n<seq.size() ) {
+                    sel.add(n);
+                }
+            }
+        }
+        seq.setSelectedIndeces(sel);
+        repaint();
+    }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
@@ -268,12 +321,20 @@ public class GridPngWalkView extends PngWalkView {
 
             List<DatumRange> drs= seq.getActiveSubrange();
 
+            List<Integer> sel= seq.getSelectedIndeces();
+
             boolean outOfTime= false;
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
                     int i = (row * nCols) + col;
                     if (i >= seq.size()) {
                         break;
+                    }
+                    if (sel.contains(i)) {
+                        Color oldColor = g2.getColor();
+                        g2.setColor(Color.orange);
+                        g2.drawRect(col * thumbSize, row * thumbSize, thumbSize-1, thumbSize-1);
+                        g2.setColor(oldColor);
                     }
                     if (seq.getIndex() == i) {
                         Color oldColor = g2.getColor();
