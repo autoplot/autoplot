@@ -24,6 +24,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
+import org.virbo.dsops.Ops;
 
 /**
  * Format data to binary file.
@@ -33,10 +34,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
     private ByteBuffer formatRank1(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
-        QDataSet dep0 = null;
-        
         String type = params.get("type");
 
+        QDataSet extent= Ops.extent(data);
         int dep0Len = 0; //(dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
         int recSize = typeSize * (dep0Len + 1);
@@ -50,24 +50,18 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 data.length(), 1, 1, 1,
                 result, type);
 
-        QubeDataSetIterator it = new QubeDataSetIterator(data);
+        int limit= type.equals("short") ? 32768 : 65536;
 
+        boolean rescale= false;
+        QubeDataSetIterator it = new QubeDataSetIterator(data);
         while (it.hasNext()) {
             it.next();
+            if ( it.getValue(data)>limit ) rescale= true;
             it.putValue(ddata, it.getValue(data));
         }
 
-        if (dep0 != null) {
-            BufferDataSet ddep0 = BufferDataSet.makeDataSet(1,
-                    recSize, 0 * typeSize,
-                    data.length(), 1, 1, 1,
-                    result, type);
-            it = new QubeDataSetIterator(dep0);
-
-            while (it.hasNext()) {
-                it.next();
-                it.putValue(ddep0, it.getValue(dep0));
-            }
+        if ( rescale ) {
+            throw new IllegalArgumentException("data extent is too great: "+extent);
         }
 
         return result;
@@ -154,19 +148,21 @@ public class WavDataSourceFormat implements DataSourceFormat {
             samplesPerSecond= (float) Math.round( 1 / periodSeconds );
         }
 
-        AudioFormat outDataFormat;
-        if ( data.rank()==1 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, true, false);
-        } else if ( data.rank()==2 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) data.length(0), true, false);
-        } else {
-            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
-        }
-
         Map<String, String> params2 = new HashMap<String, String>();
         params2.put("type", "short");
         params2.put("byteOrder","little");
 
+        params2.putAll( URISplit.parseParams( split.params ) );
+
+        AudioFormat outDataFormat;
+        if ( data.rank()==1 ) {
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+        } else if ( data.rank()==2 ) {
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) data.length(0), params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+        } else {
+            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        }
+        
         ByteBuffer buf;
         if ( data.rank()==1 ) {
             buf= formatRank1(data, new NullProgressMonitor(), params2);
