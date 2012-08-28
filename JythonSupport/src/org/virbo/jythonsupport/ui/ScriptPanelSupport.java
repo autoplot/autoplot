@@ -4,6 +4,7 @@
  */
 package org.virbo.jythonsupport.ui;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -41,14 +42,17 @@ import org.virbo.datasource.FileSystemUtil;
  */
 public class ScriptPanelSupport {
 
-    EditorTextPane editor;
-    final EditorAnnotationsSupport annotationsSupport;
-    JLabel fileNameLabel;
-    boolean readOnly= false;
+    private EditorTextPane editor;
+    private final EditorAnnotationsSupport annotationsSupport;
+    private JLabel fileNameLabel;
+    private boolean readOnly= false;
+
+    private DocumentListener dirtyListener;
 
     public ScriptPanelSupport( final EditorTextPane editor ) {
         this.editor= editor;
-        this.editor.getDocument().addDocumentListener(new DocumentListener() {
+
+        dirtyListener= new DocumentListener() {
 
             public void insertUpdate(DocumentEvent e) {
                 setDirty(true);
@@ -60,6 +64,18 @@ public class ScriptPanelSupport {
 
             public void changedUpdate(DocumentEvent e) {
             }
+        };
+
+        this.editor.getDocument().addDocumentListener(dirtyListener);
+        this.editor.addPropertyChangeListener( "document", new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getOldValue()!=null ) {
+                    ((Document)evt.getOldValue()).removeDocumentListener(dirtyListener);
+                }
+                ((Document)evt.getNewValue()).addDocumentListener(dirtyListener);
+            }
+            
         });
 
         this.annotationsSupport = editor.getEditorAnnotationsSupport();
