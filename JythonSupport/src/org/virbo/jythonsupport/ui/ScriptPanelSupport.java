@@ -291,7 +291,7 @@ public class ScriptPanelSupport {
 
     private void updateFileNameLabel() {
         if ( this.fileNameLabel!=null ) {
-            fileNameLabel.setText( String.valueOf( this.getFile() ) + " " + ( this.isDirty() ? "*" : "" ) + ( this.readOnly ? "R/O" : "" ) );
+            fileNameLabel.setText( String.valueOf( this.getFile() ) + " " + ( this.isDirty() ? "*" : "" ) + ( this.readOnly ? "(Read Only)" : "" ) );
         }
     }
 }
