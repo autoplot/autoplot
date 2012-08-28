@@ -789,7 +789,7 @@ APSplash.checkTime("init 270");
             jythonScriptPanel= new JScrollPane();
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
-            invokeLater( 4000, false, new Runnable() {
+            invokeLater( 4000, true, new Runnable() {
                 public String toString() { return "addScriptPanel"; }
                 public void run() {
                     scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
@@ -804,7 +804,7 @@ APSplash.checkTime("init 270");
             logConsolePanel= new JScrollPane();
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-            invokeLater( 4020, false, new Runnable() {
+            invokeLater( 4020, true, new Runnable() {
                 public String toString() { return "addLogConsole"; }
                 public void run() {
                     initLogConsole();
