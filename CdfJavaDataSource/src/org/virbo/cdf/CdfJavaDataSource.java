@@ -301,6 +301,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
                 result.putProperty(QDataSet.LABEL, istpProps.get("FIELDNAM") );
                 result.putProperty(QDataSet.TITLE, istpProps.get("CATDESC" ) );
+                result.putProperty(QDataSet.RENDER_TYPE, istpProps.get(QDataSet.RENDER_TYPE));
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
                     if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
                         String rt= (String)istpProps.get("RENDER_TYPE" );
