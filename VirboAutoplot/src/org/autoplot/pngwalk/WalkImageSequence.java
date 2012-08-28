@@ -177,6 +177,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 idx= i;
                 break;
             }
+            if ( datumRanges.get(i).contains(ds) ) {
+                idx= i;
+                break;
+            }
             if ( datumRanges.get(i).min().ge( ds.min() ) ) {
                 idx=i;
             }
