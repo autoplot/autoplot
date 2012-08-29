@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -139,6 +140,14 @@ public class DomNodeController {
             List<DomNodeController> kids= getChildControllers();
             for ( DomNodeController k: kids ) {
                 if ( k.isPendingChanges() ) {
+                    //Map<Object,Object> changes= new HashMap();
+                    //k.pendingChanges(changes);
+                    //if ( changes.isEmpty() ) {
+                    //    k.pendingChanges(changes);
+                    //    if ( k.isPendingChanges() ) {
+                    //        System.err.println("Wei's problem!");
+                    //    }
+                    //}
                     //useful for debugging, see https://sourceforge.net/tracker/index.php?func=detail&aid=3410461&group_id=199733&atid=970682
                     //for ( Object o:  k.changesSupport.changesPending.keySet() ) {
                     //    System.err.println( "pending change "+o );

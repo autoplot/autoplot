@@ -1677,6 +1677,17 @@ public class DataSourceController extends DomNodeController {
         return super.isPendingChanges();
     }
 
+    @Override
+    public void pendingChanges(Map<Object, Object> changes) {
+        super.pendingChanges(changes);
+        TimeSeriesBrowseController tsbc= timeSeriesBrowseController;
+        if (tsbc != null && tsbc.isPendingChanges()) {
+            tsbc.pendingChanges(changes);
+        }
+    }
+
+
+
     private void handleException(Exception e) {
         if ( model.getExceptionHandler()==null ) {
             e.printStackTrace();

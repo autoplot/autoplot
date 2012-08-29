@@ -69,8 +69,8 @@ public class TickleTimer {
                     d= System.currentTimeMillis() - tickleTime;
                 }
                 log.log(Level.FINER, "tickleTimer fire after {0}", d );
+                running= false; //sometimes listeners need to retickle the timer...
                 propertyChangeSupport.firePropertyChange("running",true,false);
-                running= false;
                 messages= new ArrayList<String>();
             }
         };

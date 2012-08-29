@@ -2525,6 +2525,14 @@ public class PlotElementController extends DomNodeController {
         return getDataSourceFilter().controller.isPendingChanges() || super.isPendingChanges();
     }
 
+    @Override
+    public void pendingChanges(Map<Object, Object> changes) {
+        super.pendingChanges(changes);
+        getDataSourceFilter().controller.pendingChanges(changes);
+    }
+
+
+
     private void setStatus(String string) {
         this.dom.controller.setStatus(string);
     }

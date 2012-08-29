@@ -11,6 +11,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.util.TickleTimer;
@@ -18,14 +19,11 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.InconvertibleUnitsException;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -345,6 +343,10 @@ public class TimeSeriesBrowseController {
         } else {
             return changesSupport.isPendingChanges();
         }
+    }
+
+    public void pendingChanges( Map<Object,Object> c ) {
+        c.putAll( changesSupport.changesPending );
     }
 
     void release() {
