@@ -158,24 +158,31 @@ public class EditorTextPane extends JEditorPane {
         }
     }
 
-    public void loadFile( File f ) throws FileNotFoundException, IOException {
+    public static String loadFileToString( File f ) throws FileNotFoundException, IOException {
         BufferedReader r = null;
+        StringBuilder buf = new StringBuilder();
         try {
-            StringBuilder buf = new StringBuilder();
             r = new BufferedReader( new InputStreamReader( new FileInputStream(f) ));
             String s = r.readLine();
             while (s != null) {
                 buf.append(s).append("\n");
                 s = r.readLine();
             }
+        } finally {
+            if ( r!=null ) r.close();
+        }
+        return buf.toString();
+    }
+
+    public void loadFile( File f ) throws FileNotFoundException, IOException {
+        try {
+            String s= loadFileToString(f);
             Document d = this.getDocument();
-            d.remove(0, d.getLength());
-            d.insertString(0, buf.toString(), null);
+            d.remove( 0, d.getLength() );
+            d.insertString( 0, s, null );
             //setDirty(false);
         } catch (BadLocationException ex) {
             throw new RuntimeException(ex);
-        } finally {
-            if ( r!=null ) r.close();
         }
     }
 }
