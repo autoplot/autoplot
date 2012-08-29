@@ -20,6 +20,9 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
+import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.virbo.datasource.AutoplotSettings;
@@ -76,12 +79,31 @@ public class RunScriptPanel extends javax.swing.JPanel {
         return toolsCB;
     }
 
-    void loadFile(File ff) throws IOException {
-        getTextArea().loadFile(ff);
-        if ( ff.getCanonicalPath().startsWith( new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" ).getCanonicalPath() ) ) {
-            toolsCB.setEnabled(false);
+    void loadFile( final File ff) throws IOException {
+        final String src= getTextArea().loadFileToString(ff);
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    Document d = getTextArea().getDocument();
+                    d.remove( 0, d.getLength() );
+                    d.insertString( 0, src, null );
+                    if ( ff.getCanonicalPath().startsWith( new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" ).getCanonicalPath() ) ) {
+                        toolsCB.setEnabled(false);
+                    };
+                    scriptFilename.setText(ff.toString());
+
+                } catch ( IOException ex ) {
+
+                } catch ( BadLocationException ex ) {
+
+                }
+            }
         };
-        scriptFilename.setText(ff.toString());
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
     }
     
 
