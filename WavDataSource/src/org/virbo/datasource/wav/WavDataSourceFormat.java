@@ -146,16 +146,22 @@ public class WavDataSourceFormat implements DataSourceFormat {
         }
 
         Map<String, String> params2 = new HashMap<String, String>();
-        params2.put("type", "short");
+        params2.put("type", "short"); // only short and ushort.
         params2.put("byteOrder","little");
+
+        if ( !( params2.get("type").equals("short") || params2.get("type").equals("ushort") ) ) {
+            throw new IllegalArgumentException("type must be short or ushort");
+        }
+        
+        int bytesPerFrame= 2;
 
         params2.putAll( URISplit.parseParams( split.params ) );
 
         AudioFormat outDataFormat;
         if ( data.rank()==1 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerFrame*8, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
         } else if ( data.rank()==2 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) data.length(0), params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerFrame*8, (int) data.length(0), params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
         } else {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
@@ -169,7 +175,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
 
-        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity() );
+        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/bytesPerFrame );
 
         File outFile=  new File( split.resourceUri );
         
