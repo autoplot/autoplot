@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -73,17 +74,33 @@ public class FTPBeanFileSystem extends WebFileSystem {
         
     }
 
-    private static File userLocalRoot( URI root ) {
-        File local = FileSystem.settings().getLocalCacheDir();
+    private static File userLocalRoot( URI rooturi ) {
+        String auth= rooturi.getAuthority();
+        String[] ss= auth.split("@");
 
-        String userInfo= root.getUserInfo();
-        if ( userInfo!=null && userInfo.contains(":") ) {
-            userInfo= userInfo.substring(0,userInfo.indexOf(':') );
+        String userInfoNoPassword= null;
+        String host;
+        if ( ss.length>3 ) {
+            throw new IllegalArgumentException("user info section can contain at most two at (@) symbols");
+        } else if ( ss.length==3 ) {//bugfix 3299977.  Seth's proxy server.
+            if ( ss[1].endsWith(":") ) {
+                ss[1]= ss[1].substring(0,ss[1].length()-1);
+            }
+            userInfoNoPassword= ss[0] + "@" + ss[1];
+            host= ss[2];
+        } else if ( ss.length==1 ) {
+            userInfoNoPassword= null;
+            host= ss[0];
+        } else {
+            userInfoNoPassword= ss[0]; // TODO: there's a problem here, that we need to know the username, if there is one, to create the cache.
+            host= rooturi.getHost();
         }
 
-        String s = root.getScheme() + "/" 
-                + ( (userInfo!=null ) ? userInfo + "@" : "" )
-                + root.getHost() + "/" + root.getPath(); 
+        File local = FileSystem.settings().getLocalCacheDir();
+
+        String s = rooturi.getScheme() + "/"
+                + ( (userInfoNoPassword!=null ) ? userInfoNoPassword + "@" : "" )
+                + host + rooturi.getPath();
 
         local = new File(local, s);
 
