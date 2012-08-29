@@ -84,16 +84,15 @@ public class GridPngWalkView extends PngWalkView {
             public void mousePressed(MouseEvent e) {
                 p0= e.getPoint();
             }
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if ( p0!=null ) {
-                    Point p2= e.getPoint();
-                    selectCellsWithin(p0,p2);
-                }
-            }
+//            public void mouseDragged(MouseEvent e) {
+//                if ( p0!=null ) {
+//                    Point p2= e.getPoint();
+//                    selectCellsWithin(p0,p2);
+//                }
+//            }
         };
         canvas.addMouseListener(ma);
-        canvas.addMouseMotionListener(ma);
+        //canvas.addMouseMotionListener(ma);
 
         canvas.addComponentListener(new ComponentAdapter() {
             @Override
@@ -330,12 +329,12 @@ public class GridPngWalkView extends PngWalkView {
                     if (i >= seq.size()) {
                         break;
                     }
-                    if (sel.contains(i)) {
-                        Color oldColor = g2.getColor();
-                        g2.setColor(Color.orange);
-                        g2.drawRect(col * thumbSize, row * thumbSize, thumbSize-1, thumbSize-1);
-                        g2.setColor(oldColor);
-                    }
+//                    if (sel.contains(i)) {
+//                        Color oldColor = g2.getColor();
+//                        g2.setColor(Color.orange);
+//                        g2.drawRect(col * thumbSize, row * thumbSize, thumbSize-1, thumbSize-1);
+//                        g2.setColor(oldColor);
+//                    }
                     if (seq.getIndex() == i) {
                         Color oldColor = g2.getColor();
                         g2.setColor(Color.orange);
