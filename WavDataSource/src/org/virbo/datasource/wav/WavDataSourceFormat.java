@@ -153,15 +153,17 @@ public class WavDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("type must be short or ushort");
         }
         
-        int bytesPerFrame= 2;
+        int bytesPerField= 2;
+        int fieldsPerFrame= 1;
 
         params2.putAll( URISplit.parseParams( split.params ) );
 
         AudioFormat outDataFormat;
         if ( data.rank()==1 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerFrame*8, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
         } else if ( data.rank()==2 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerFrame*8, (int) data.length(0), params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+            fieldsPerFrame= (int) data.length(0);
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, fieldsPerFrame, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
         } else {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
@@ -175,7 +177,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
 
-        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/bytesPerFrame );
+        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/(bytesPerField*fieldsPerFrame) );
 
         File outFile=  new File( split.resourceUri );
         
