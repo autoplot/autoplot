@@ -26,6 +26,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -1465,6 +1466,8 @@ public class PlotElementController extends DomNodeController {
             bindToEventsRenderer((EventsRenderer)renderer);
         } else if (renderer instanceof DigitalRenderer ) {
             bindToDigitalRenderer((DigitalRenderer)renderer);
+        } else if (renderer instanceof ContoursRenderer ) {
+            bindToContoursRenderer((ContoursRenderer)renderer);
         }
         Plot mip= ac.getPlotFor(plotElement);
         if ( mip!=null ) {  // transitional state
@@ -2440,7 +2443,13 @@ public class PlotElementController extends DomNodeController {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "color", renderer, "color");
     }
-    
+
+
+    public void bindToContoursRenderer(Renderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+        ac.bind(plotElement.style, "lineWidth", renderer, "lineThick");
+    }
     /**
      * special converter that fills in %{CONTEXT} macro, or inserts it when 
      * label is consistent with macro.  Also now does %{COMPONENT}.  Note
