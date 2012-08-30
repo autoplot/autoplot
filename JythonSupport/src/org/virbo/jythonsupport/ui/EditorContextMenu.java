@@ -179,7 +179,7 @@ public class EditorContextMenu {
                 }
             };
             item= new JMenuItem( a );
-            item.setToolTipText("<html>This special variable is the vap+jyds:<resourceURI>?script=<script>");
+            item.setToolTipText("<html>This special variable is the vap+jyds:&lt;resourceURI&gt;?script=&lt;script&gt;");
             insertCodeMenu.add( item );
 
             JMenu fragmentsMenu= new JMenu("Code Fragments");
