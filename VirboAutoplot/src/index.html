@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Quite a few of the datasources don't have editors, but all have completions.  Autoplot now creates
-                GUIs automatically from the completions for those datasources without editors.</small></p>
+        <p><small>The export to wav feature got a little attention as we get ready for RBSP.  Here, a dummy sound has an interesting initial plot.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,15 +22,30 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>further investigation into making sure that offline means http is really offline.</li>
+            <li>contoursRender is properly bound to color and line thick.</li>
+            <li>bugfixes in export to wav file</li>
+            <li>preserve render_type=spectrogram property through rank 3 to rank 2 slice.</li>
             <li>pngwalk now has show missing off by default.</li>
+            <li>rte_0409055860: tooltip html was not properly escaped with &amp;lt; which resulted in a runtime error.</li>
+            <li>rte 0449679029: look for ") " instead of just " " because of reducex needs it</li>
+            <li>running flag prevented TimeSeriesBrowse from retickling the tickle timer and left unfinished operations pending.</li>
+            <li>remove "import graph" from Jython scripts, which was causing problems and was not necessary.</li>
+            <li>add makeChildPlotElement so that this is more of an atomic operation</li>
             <li>restore --bookmarks= command line switch, which was probably broken with remote bookmarks loading.</li>
             <li>guessSlice didn't consider existing slice, causing problems with high-rank datasets.</li>
+            <li>bugfix 3440253: add test for http lastModified</li>
+            <li>ascii parser error messages limited to once per file, to support batch processing</li>
+            <li>report a warning when "open=bookmarks:...." is used instead of "--open=bookmarks..."</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>das2 ephemeris labels wouldn't show up when legend labels would show component labels.</li>
             <li>FTP filesystem now uses real timestamps for remote files.  Thanks ftp4j!</li>
             <li>clean up leftover sloppiness and incorrect warnings in CDF reporting</li>
             <li>rte 0449679029: look for ") " in filters GUI instead of just " " because of reducex needs it.</li>
             <li>rte 1243117384: new check for timerange in JythonDataSource would result in null pointer exception when default time is used with logging</li>
-            <li>"<url> <COMP>" would trigger index out of bounds because of trim.</li>
+            <li>"&lt;url&gt; &lt;COMP&gt;" would trigger index out of bounds because of trim.</li>
             <li>more mucking with how the transitions operate to support bundles of mageis stuff at LANL, trying to get autoranging to work correctly</li>
             <li>users can switch back and forth between series and spectrogram with complex slices</li>
             <li>limits on slices applied in the GUI to avoid index out of bounds errors</li>
@@ -45,35 +59,23 @@
             <li>round timeranges in context as string</li>
             <li>clean up reccount warning with virtual variables in CDF files. </li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>bugfix: sliceProperties properly preserves CONTEXT property.</li>
-            <li>bugfix: changesDimensions function didn't properly handle "slices" function</li>
-            <li>bugfix: sliceMetadata function didn't properly slice metadata like BUNDLE_1</li>
-            <li>sliceProperties properly preserves CONTEXT property.</li>
-            <li>changesDimensions function didn't properly handle "slices" function</li>
-            <li>sliceMetadata function didn't properly slice metadata like BUNDLE_1</li>
-            <li>in metadata tab, round fill_value to 6 digits since -1e31 picks up numerical noise</li>
-            <li>3543992: PlotElementController doesn't check dom.controller adjusting</li>
-            <li>with CDF, use LABL_PTR_1 when DEPEND_1 is just 0,1,2,3,...</li>
-            <li>bugfix in metadata panel, where values=VALID_MAX were treated as invalid when FILL_VALUE was not specified</li>
-            <li>bugfix where Mike pointed out that spectrogram Y averaging would occur when it was not appropriate.</li>
-            <li>bugfix in recent history dialog, where filters sometimes dropped result and notes were mislabeled "today"</li>
-            <li>minor bugfix with TearoffTabbedPane when removing undocked tabs when going to basic mode.</li>
-            <li>in display data slice, bundles containing rank 2 data would cause RuntimeException.</li>
-            <li>improve feedback when packet in qstream doesn't match expected length.</li>
-            <li>bugfix in IDataSet.wrap and guessSlice when slices is used</li>
-            <li>Use CDF library 3.4.1 to avoid initial delay when reading CDF files</li>
-            <li>CDAWeb gets everything over HTTP, and from new location "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"</li>
-            <li>NetCDF/HDF5 reader left all sorts of resources open, eventually causing a runtime error (when labeling axes)</li>
-            <li>.jyds didn't explicitly close script after loading, eventually causing a runtime error. (when labeling axes)</li>
-            <li>3538094: leftover files can cause temp file download to fail. (No temp file may be used for more than an hour.)</li>
-            <li>CDAWeb refresh would add components off the event thread, which could cause application to lock up.</li>
-            <li>in reducex function, weights not properly when accumulating min and max.</li>
-            <li>rte 1031526646: need to check for null in result from jTree.getSelectionPaths().</li>
-            <li>remote jyds would be editable in the editor panel, even though it was pointed to a local copy in the cache.</li>
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>pngs have metadata indicating plot coordinates to support thin-client mouse operations</li>
+            <li>syntax-aware editor is used for the Jython Scripts</li>
+            <li>JythonMain passes in command-line parameters into getParam area.  Thanks jsyntaxpane!</li>
+            <li>add actions/"indent block" and actions/"dedent block" to the popup menu.</li>
+            <li>timeRange property added to PngWalkTool, so several can be bound together.</li>
+            <li>support HDF5 URIs like vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_W[0]</li>
+            <li>HDF5 source flags old matlab save files which are not actually HDF5 files.</li>
+            <li>use automatic completions-based GUI instead of quite confusing data set selector droplist completions</li>
+            <li>keep track of reasons why a URI was rejected, and editors can visually hint at what is wrong</li>
+            <li>remote filesystems can have pointer to local copy, since data providers are often data consumers.</li>
+            <li>"keychain.txt" file can contain passwords to support batch processing.</li>
+            <li>reset zoom is now ctrl+shift+A, reset zoom X is ctrl+shift+X, reset zoom Y is ctrl+shift+Y, reset zoom Z is ctrl+shift+Z.</li>
+            <li>reset zoom now calls resetZoomX, resetZoomY, and resetZoomY so that we get a more precise zoom.</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>start to keep track of reasons why a URI is rejected</li>
             <li>add File->"save local copy" option to pngwalk.</li>
@@ -89,22 +91,6 @@
             <li>passwords can be stored in fscache keychain.txt to support scripting.</li>
             <li>3545095: introduce support for BUNDLE_2 and BUNDLE_3 properties.</li>
             <li>Events Bar renderer reduces data before displaying it.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>increase QDataSet.MAX_UNIT_BUNDLE_COUNT to 65 for Seth's CDF file.</li>
-            <li>when rank 1 depend0 is used with EventsBar renderer try to figure the cadence and fill the bar appropriately.</li>
-            <li>initial coding of mechanism to support local read-only mirror of remote data.</li>
-            <li>new controls for MakePngWalk: autorange, rescalex, update, version</li>
-            <li>contour plots introduced to demonstrate new rendererControl string.</li>
-            <li>Add special IDL adapters to make it easy to get data into and out of TDAS.</li>
-            <li>Add Plot->New Location... added for Jan</li>
-            <li>boolean variables in jython scripts when enumeration is either T or F</li>
-            <li>isotropic mode moved to dasCore to support APL</li>
-            <li>add setUnits('nT') to filters</li>
-            <li>add abs function, since magnitude is for vectors</li>
-            <li>QStreams have int2 transfer type</li>
-            <li>QStreams avoid inline-encoding of data for DEPEND_1 when it has many (>100) elements</li>
         </ul>
 
         <p>Known issues:</p>
@@ -128,7 +114,7 @@
             <li>QStreams (.qds), QDataSet on a das2Stream
             <li>Plasma Wave Group das2 Server</li>
             <li>NetCDF files (.nc,.ncml)</li>
-            <li>HDF5 files</li>
+            <li>HDF5 files (.h5,.hdf5)</li>
             <li>DODs servers (.dds)</li>
             <li>Cluster Exchange Format files (.cef)</li>
             <li>Fits Format Files</li>
