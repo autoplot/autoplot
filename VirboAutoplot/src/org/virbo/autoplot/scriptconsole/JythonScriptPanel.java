@@ -25,6 +25,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
@@ -53,6 +54,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     static final int CONTEXT_DATA_SOURCE = 1;
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
+
+    private DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport
 
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
@@ -91,7 +94,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
-        this.textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+        dirtyListener= new DocumentListener() {
 
             public void insertUpdate(DocumentEvent e) {
                 setDirty(true);
@@ -103,6 +107,18 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
             public void changedUpdate(DocumentEvent e) {
             }
+        };
+
+        this.textArea.getDocument().addDocumentListener(dirtyListener);
+        this.textArea.addPropertyChangeListener( "document", new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getOldValue()!=null ) {
+                    ((Document)evt.getOldValue()).removeDocumentListener(dirtyListener);
+                }
+                ((Document)evt.getNewValue()).addDocumentListener(dirtyListener);
+            }
+
         });
 
         this.textArea.getActionMap().put( "save", new AbstractAction( "save" ) {
