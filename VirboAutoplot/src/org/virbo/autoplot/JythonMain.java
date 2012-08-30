@@ -38,8 +38,9 @@ public class JythonMain {
     private static void insertArgs( String[] argv ) {
         interp.exec("params=dict()"); // untested.
         int iargv=-1;  // skip the zeroth one, it is the name of the script
-        for (String s : argv ) {
-            int ieq= s.indexOf("=");
+        for ( int i=0; i<argv.length; i++ ) {
+            String s= argv[i];
+            int ieq= s.indexOf("="); 
             if ( ieq>0 ) {
                 String snam= s.substring(0,ieq).trim();
                 if ( DataSourceUtil.isJavaIdentifier(snam) ) {
@@ -79,7 +80,7 @@ public class JythonMain {
             inIdentifier= "<stdin>";
         } else {
             if ( args.length>1 ) {
-                insertArgs( Arrays.copyOfRange(args, 1, args.length ) );
+                insertArgs( args );
             }
             File f= new File( args[0] );
             if ( !f.exists() ) {
