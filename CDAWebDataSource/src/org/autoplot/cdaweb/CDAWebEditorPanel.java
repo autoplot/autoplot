@@ -254,6 +254,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
                 messageComponent= new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
                 parameterPanel.add( messageComponent, BorderLayout.NORTH );
+                parameterPanel.validate();
             }
         } );
 
@@ -275,6 +276,16 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
+            final String msg= ex.toString();
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
+                    if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
+                    messageComponent= new JLabel("<html><em><br>"+msg+"</em></html>");
+                    parameterPanel.add( messageComponent, BorderLayout.NORTH );
+                    parameterPanel.validate();
+                }
+            } );
         }
     }
 
