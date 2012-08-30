@@ -125,25 +125,14 @@ public class EditorContextMenu {
             Action a;
             JMenuItem item;
             JMenu insertCodeMenu= new JMenu("Insert Code");
-            a= new AbstractAction("getDataSet()") {
-                public void actionPerformed(ActionEvent e) {
-                    String var= editor.getSelectedText();
-                    String surl= dataSetSelector.getValue();
-                    if ( var==null || var.length()==0 ) {
-                        String name= DataSourceUtil.guessNameFor(surl);
-                        insertCode( name + "= getDataSet('"+surl+"')\n");
-                    } else {
-                        insertCode( var + "= getDataSet('"+surl+"')\n");
-                    }
-                }
-            };
-            item= new JMenuItem( a );
-            item.setToolTipText("<html>load the dataset from the specified URL into a variable.</html>");
-            insertCodeMenu.add( item );
+
+            JMenu getParamMenu= new JMenu("Get Parameter");
+            getParamMenu.setToolTipText("<html>Parameters provide a consistent and clean method for passing parameters into scripts.");
 
             a= new AbstractAction("getParam()") {
                 public void actionPerformed(ActionEvent e) {
                     String var= editor.getSelectedText();
+                    System.err.println( "editor.getdoc: " + editor.getDocument() );
                     if ( var==null || var.length()==0 ) {
                         insertCode( "p1= getParam( 'p1', 0.0, 'parameter p1 (default=0.0)' )\n");
                     } else {
@@ -153,7 +142,7 @@ public class EditorContextMenu {
             };
             item= new JMenuItem( a );
             item.setToolTipText("<html>get a parameter for the script, for example, from the URI or command line depending on context<br>The first argument is the parameter name,<br>second is the default value and type,<br>optional third is description</html>");
-            insertCodeMenu.add( item );
+            getParamMenu.add( item );
 
             a= new AbstractAction("getParam() with enumeration") {
                 public void actionPerformed(ActionEvent e) {
@@ -162,7 +151,17 @@ public class EditorContextMenu {
             };
             item= new JMenuItem( a );
             item.setToolTipText("<html>get a parameter for the script, constraining the list of values to an enumeration.</html>");
-            insertCodeMenu.add( item );
+            getParamMenu.add( item );
+
+            a= new AbstractAction("getParam() for boolean checkbox") {
+                public void actionPerformed(ActionEvent e) {
+                    insertCode( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
+                }
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>get a parameter for the script, constraining the list of values to be True or False.  A checkbox is used when a GUI is generated.</html>");
+            getParamMenu.add( item );
+
 
             a= new AbstractAction("getParam() for timerange to support time series browse") {
                 public void actionPerformed(ActionEvent e) {
@@ -171,7 +170,7 @@ public class EditorContextMenu {
             };
             item= new JMenuItem( a );
             item.setToolTipText("<html>When getParam timerange is read, then the script will the time axis to be set to any time.</html>");
-            insertCodeMenu.add( item );
+            getParamMenu.add( item );
 
             a= new AbstractAction("getParam() to get the resource URI") {
                 public void actionPerformed(ActionEvent e) {
@@ -180,7 +179,9 @@ public class EditorContextMenu {
             };
             item= new JMenuItem( a );
             item.setToolTipText("<html>This special variable is the vap+jyds:&lt;resourceURI&gt;?script=&lt;script&gt;");
-            insertCodeMenu.add( item );
+            getParamMenu.add( item );
+
+            insertCodeMenu.add(getParamMenu);
 
             JMenu fragmentsMenu= new JMenu("Code Fragments");
             fragmentsMenu.add( createInsertMenuItem( "procedure", "def myproc(x,y):\n  z=x+y\n  return z\n" ) );
@@ -194,8 +195,24 @@ public class EditorContextMenu {
             fragmentsMenu.add( createInsertMenuItem( "try-except", "try:\n  fil=downloadResourceAsTempFile(URL('http://autoplot.org/data/nofile.dat'),monitor)\nexcept java.io.IOException,ex:\n  print 'file not found'\n" ) );
 
             fragmentsMenu.add( createInsertMenuItem( "raise exception", "if ( ds.length()==0 ):\n  raise Exception('Dataset is empty')") );
-            
+
             insertCodeMenu.add(fragmentsMenu);
+            
+            a= new AbstractAction("getDataSet()") {
+                public void actionPerformed(ActionEvent e) {
+                    String var= editor.getSelectedText();
+                    String surl= dataSetSelector.getValue();
+                    if ( var==null || var.length()==0 ) {
+                        String name= DataSourceUtil.guessNameFor(surl);
+                        insertCode( name + "= getDataSet('"+surl+"')\n");
+                    } else {
+                        insertCode( var + "= getDataSet('"+surl+"')\n");
+                    }
+                }
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>load the dataset from the specified URI into a variable.  An example URI is grabbed from the dataset selector.</html>");
+            insertCodeMenu.add( item );
 
             menu.add( insertCodeMenu );
             JMenu submenu= new JMenu("Example Scripts");
