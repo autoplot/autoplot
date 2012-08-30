@@ -41,6 +41,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import javax.swing.JComponent;
@@ -54,6 +55,7 @@ import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -328,6 +330,8 @@ public class AutoplotUtil {
                     }
 
                     JTable t= new JTable( result.size(), 2 );
+                    t.setMinimumSize( new Dimension(640,480) );
+                    t.setPreferredSize( new Dimension(640,480) );
                     TableModel m= t.getModel();
                     int i=0;
                     for ( Entry e: result.entrySet() ) {
@@ -335,7 +339,9 @@ public class AutoplotUtil {
                         m.setValueAt( e.getValue(), i, 1 );
                         i++;
                     }
-                    JOptionPane.showConfirmDialog( aThis, t, "Tooltips search results", JOptionPane.OK_OPTION );
+                    JScrollPane sp= new JScrollPane(t);
+
+                    JOptionPane.showMessageDialog( aThis, sp, "Tooltips search results", JOptionPane.OK_OPTION );
                }
             };
             new Thread(run).start();
