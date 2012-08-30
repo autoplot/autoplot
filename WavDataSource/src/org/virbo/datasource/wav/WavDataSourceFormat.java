@@ -20,8 +20,10 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.dsops.Ops;
@@ -50,15 +52,24 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 data.length(), 1, 1, 1,
                 result, type);
 
+        double shift= 0;
         int limit= type.equals("short") ? 32768 : 65536;
         if ( extent.value(1)>limit ) {
-            throw new IllegalArgumentException("data extent is too great: "+extent);
+            if ( ( extent.value(1)-extent.value(0) ) < 65536 ) {
+                if ( extent.value(0)>0 ) {
+                    shift= 32768;
+                } else {
+                    shift= ( extent.value(1)+extent.value(0) ) / 2;
+                }
+            } else {
+                throw new IllegalArgumentException("data extent is too great: "+extent);
+            }
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
         while (it.hasNext()) {
             it.next();
-            it.putValue(ddata, it.getValue(data));
+            it.putValue(ddata, it.getValue(data)-shift );
         }
 
         return result;
