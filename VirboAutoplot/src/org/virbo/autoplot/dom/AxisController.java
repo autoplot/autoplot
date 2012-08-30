@@ -111,6 +111,9 @@ public class AxisController extends DomNodeController {
      * @param label
      */
     public void setLabelAutomatically( String label ) {
+        if ( axis.getLabel().contains("%{RANGE}") && !label.contains("%{RANGE}") ) {
+            return;
+        }
         axis.setLabel(label);
         axis.setAutoLabel(true);
     }
