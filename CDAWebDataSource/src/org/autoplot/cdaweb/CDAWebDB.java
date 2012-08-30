@@ -129,7 +129,7 @@ public class CDAWebDB {
                     if ( ss.trim().length()>0 ) {
                         String[] sss= ss.split("\\s+");
                         if ( sss[1].startsWith(lookfor) ) {
-                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length());
+                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length()); //TODO: this location will change eventually
                         }
                         if ( sss[1].startsWith(lookfor2) ) {
                             sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor2.length());
@@ -415,7 +415,7 @@ public class CDAWebDB {
         NodeList kids= dataset.getChildNodes();
         String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
         String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
-
+//  http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml  Sept18 changeover
         for ( int j=0; j<kids.getLength(); j++ ) {
             Node childNode= kids.item(j);
             if ( childNode.getNodeName().equals("access") ) {
