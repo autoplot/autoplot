@@ -519,7 +519,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
             for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
-                int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
+                //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
+                int sidep= idep;
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
                 if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
