@@ -30,8 +30,8 @@ def getParam( x, default, title='', enums='' ):
      print 'resourceURI may be used, but resourceUri cannot.'
      x= 'resourceURI'
   if type(params) is dict:
-     if params.has_key(x):
-         t= type(default)
+     if params.has_key(x): 
+         t= type(default)  # Ed demonstrated this allows some pretty crazy things, e.g. open file, so be careful...
          return t(params[x])
      else:
          return default
