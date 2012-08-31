@@ -5,7 +5,7 @@
     spec="1.0+" 
     codebase="#{codebase}"
     href="autoplot.jnlp">
-    <!-- codebase="http://autoplot.org/jnlp/${tag}/" -->
+    <!-- codebase="http://autoplot.org/jnlp/#{tag}/" -->
    
     <information> 
         <title>Autoplot(#{tag})</title> 
@@ -40,7 +40,7 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120310.jar" /> -->
+        <!-- <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120831.jar" /> -->
         <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
@@ -50,7 +50,7 @@
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1.jnlp" > -->
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.4.0.jnlp" > -->
-        <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.0/cdf-3.4.0.jnlp" > -->
+        <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" > -->
            <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
         </extension>
         
