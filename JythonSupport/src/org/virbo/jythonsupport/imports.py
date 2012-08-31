@@ -31,10 +31,8 @@ def getParam( x, default, title='', enums='' ):
      x= 'resourceURI'
   if type(params) is dict:
      if params.has_key(x):
-         if ( operator.isNumberType(default) ): #TODO: complex
-             return float(params[x])
-         else:
-             return str(params[x])
+         t= type(default)
+         return t(params[x])
      else:
          return default
   else:
