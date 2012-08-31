@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -301,7 +300,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
                 result.putProperty(QDataSet.LABEL, istpProps.get("FIELDNAM") );
                 result.putProperty(QDataSet.TITLE, istpProps.get("CATDESC" ) );
-                result.putProperty(QDataSet.RENDER_TYPE, istpProps.get(QDataSet.RENDER_TYPE));
+                String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
+                if ( renderType!=null && renderType.equals( "time_series" ) ) {
+                    // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
+                    // Note Seth (RBSP/ECT Team) has a file with 64 channels, and that's why I have the goofy 2*...
+                    if ( result.rank()>1 && result.length(0)>=2*QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
+                        renderType=null;
+                    }
+                }
+                result.putProperty(QDataSet.RENDER_TYPE, renderType );
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
                     if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
                         String rt= (String)istpProps.get("RENDER_TYPE" );
