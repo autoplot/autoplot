@@ -66,7 +66,7 @@ public class Test029 {
         //
         // note abs() is redefined but behaves like the built-in.
         String builtIns = "abs() 	divmod() 	input() 	open() 	staticmethod() " + "all() 	enumerate() 	int() 	ord() 	str() " + "any() 	eval() 	isinstance() 	pow() 	sum() " + "basestring() 	execfile() 	issubclass() 	print() 	super() " + "bin() 	file() 	iter() 	property() 	tuple() " + "bool() 	filter() 	len() 	range() 	type() " + "bytearray() 	float() 	list() 	raw_input() 	unichr() " + "callable() 	format() 	locals() 	reduce() 	unicode()" + "chr() 	frozenset() 	long() 	reload() 	vars()" + "classmethod() 	getattr() 	map() 	repr() 	xrange()" + "cmp() 	globals() 	max() 	reversed() 	zip()" + "compile() 	hasattr() 	memoryview() 	round() 	__import__()" + "complex() 	hash() 	min() 	set() 	apply()" + "delattr() 	help() 	next() 	setattr() 	buffer()" + "dict() 	hex() 	object() 	slice() 	coerce()" + "dir() 	id() 	oct() 	sorted() 	intern()";
-        String supported= "abs() pow()";
+        String supported= "abs() pow() round()";
         String notYetSupported= "all() any()  print()  bin()  bytearray()   format()  frozenset()   reversed()   memoryview()   set()   help()   next()   buffer()   sorted() ";
 
         String[] bb = builtIns.replaceAll("\\(\\)", " ").split("\\s+");
