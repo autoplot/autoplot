@@ -303,8 +303,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
                 if ( renderType!=null && renderType.equals( "time_series" ) ) {
                     // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
-                    // Note Seth (RBSP/ECT Team) has a file with 64 channels, and that's why I have the goofy 2*...
-                    if ( result.rank()>1 && result.length(0)>=2*QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
+                    // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
+                    if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
                         renderType=null;
                     }
                 }
