@@ -189,12 +189,22 @@ public class MetadataUtil {
             } else if ( cmd.startsWith("|collapse") ) {
                 int dim= cmd.charAt(9)-'0';
                 properties= sliceProperties( properties, dim );
+                if ( s.hasNextInt() ) {
+                     int st= s.nextInt();
+                     int en= s.nextInt();
+                }
+            } else if ( cmd.startsWith("|total") ) {
+                int dim= cmd.charAt(9)-'0';
+                properties= sliceProperties( properties, dim );
             } else if ( cmd.equals("|autoHistogram") ) {
                 Map<String,Object> newproperties= new HashMap<String,Object>();
                 newproperties.put( QDataSet.DEPEND_0, properties );
                 properties= newproperties;
             } else if ( cmd.equals("|transpose") ) {
                 properties= transposeProperties(properties);
+            } else if ( cmd.equals("|smooth") ) {
+                int idx= s.nextInt();
+                //
             } else {
                 return new HashMap();
             }
