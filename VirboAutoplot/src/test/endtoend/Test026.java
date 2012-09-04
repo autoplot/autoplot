@@ -4,11 +4,13 @@
  */
 package test.endtoend;
 
+import org.virbo.dataset.SemanticOps;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.DatumRange;
+import org.das2.datum.UnitsConverter;
 import static org.das2.datum.DatumRangeUtil.*;
 
 /**
@@ -87,8 +89,31 @@ public class Test026 {
         }
     }
 
+    private static void doTestDR( int id, String test, DatumRange norm ) throws Exception {
+        DatumRange dr= DatumRangeUtil.parseDatumRange( test, norm.getUnits() ) ;
+        if ( !norm.equals(dr) ) {
+            throw new IllegalArgumentException("test \""+test+"\" is not equal to "+norm );
+        }
+    }
+
     public static void main(String[] args) {
         try {
+
+            doTestDR( 70, "0 to 35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
+            doTestDR( 71, "0to35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
+            doTestDR( 72, "0 to 35 apples", DatumRange.newDatumRange(0,35,SemanticOps.lookupUnits("apples")) );
+            doTestDR( 73, "0 to 35 sector", DatumRange.newDatumRange(0,35,SemanticOps.lookupUnits("sector")) );
+            doTestDR( 74, "0to35 sector", DatumRange.newDatumRange(0,35,SemanticOps.lookupUnits("sector")) );
+            doTestDR( 75, "-50to-35", DatumRange.newDatumRange(-50,-35,Units.dimensionless) );
+            doTestDR( 76, "0 to 10 kHz", DatumRange.newDatumRange( 0, 10000, Units.hertz ) );
+            doTestDR( 77, "0 to .01 MHz", DatumRange.newDatumRange( 0, 10000, Units.hertz ) );
+            Units cm= SemanticOps.lookupUnits("cm");
+            cm.registerConverter( Units.meters, new UnitsConverter.ScaleOffset( 1./100, 0 ) );
+            doTestDR( 78, "0 to 10 cm", DatumRange.newDatumRange( 0, .1, Units.meters ) );
+            Units mm= SemanticOps.lookupUnits("mm");
+            mm.registerConverter( Units.meters, new UnitsConverter.ScaleOffset( 1./1000, 0 ) );
+            doTestDR( 79, "0 to 100 mm", DatumRange.newDatumRange( 0, 10, cm ) );
+            doTestDR( 80, "0 to 100 mm", DatumRange.newDatumRange( 0, .1, Units.meters ) );
 
             //das2 times.  Note das2 likes to format things with through, not "to" as used in the tests.
             doTest(0, "2000-01-01T13:00Z to 2000-01-01T14:00",  "2000-01-01T13:00Z to 2000-01-01T14:00" );
