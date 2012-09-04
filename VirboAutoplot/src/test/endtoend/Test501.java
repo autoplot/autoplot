@@ -208,6 +208,7 @@ public class Test501 {
 
         System.err.println("DONE...");
 
+        System.err.println("======= Report Summary =======");
         if ( failures.size()>0 ) {
             System.err.println( String.format( "found %d failures:", failures.size() ) );
             for ( int i: failures.keySet() ) {
@@ -215,6 +216,7 @@ public class Test501 {
             }
             System.exit(1);
         } else {
+            System.err.println( "no failures, happy day.");
             System.exit(0);
         }
         
