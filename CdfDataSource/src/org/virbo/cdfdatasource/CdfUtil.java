@@ -776,7 +776,7 @@ public class CdfUtil {
                 String[] sdata = (String[]) odata;
                 double[] back = new double[sdata.length];
                 for (int i = 0; i < sdata.length; i++) {
-                    back[i] = units.createDatum( Ops.saferName(sdata[i]) ).doubleValue(units);
+                    back[i] = units.createDatum( sdata[i] ).doubleValue(units);
                 }
                 result = DDataSet.wrap(back);
                 result.putProperty(QDataSet.UNITS, units);
