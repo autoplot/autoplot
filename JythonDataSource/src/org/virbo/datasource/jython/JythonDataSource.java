@@ -59,6 +59,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     ExceptionListener listener;
     private Map<String, Object> metadata;
     private final static String PARAM_SCRIPT= "script";
+    private final static String PARAM_TIMERANGE= "timerange";
+
     private static final Logger logger= Logger.getLogger("vap.jythondatasource");
     private boolean notCheckedTsb= true;
 
@@ -155,7 +157,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         String suri= DataSetURI.fromUri(uri);
         if ( tsb!=null ) {
-            tsb.setURI(suri);
+            //tsb.setURI(suri);
             suri= tsb.getURI();
         }
 
@@ -478,7 +480,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             this.timeRange= dr;
             URISplit split= URISplit.parse(uri);
             Map<String,String> params= URISplit.parseParams(split.params);
-            params.put( "timerange", dr.toString() );
+            params.put( PARAM_TIMERANGE, dr.toString() );
             split.params= URISplit.formatParams(params);
             this.uri= URISplit.format(split);
         }
@@ -520,6 +522,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             if ( m.matches() ) {
                 TimeSeriesBrowse tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
                 String str= m.group(1);
+                URISplit split= URISplit.parse(uri);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String stimerange= params.get( JythonDataSource.PARAM_TIMERANGE );
+                if ( stimerange!=null && stimerange.length()>0 ) {
+                    str= params.get( JythonDataSource.PARAM_TIMERANGE );
+                }
                 DatumRange tr= DatumRangeUtil.parseTimeRange(str);
                 tsb1.setTimeRange(tr);
                 reader.close();
