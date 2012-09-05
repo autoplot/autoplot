@@ -472,6 +472,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 
         } catch ( Exception ex ) {
             ex.printStackTrace();
+            System.err.println( "resulted in listPeers error:"+ uri );
             return new ArrayList();
         }
     }
