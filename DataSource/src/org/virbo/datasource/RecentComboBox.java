@@ -44,16 +44,18 @@ public class RecentComboBox extends JComboBox {
         addItemListener( new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if ( e.getStateChange()==ItemEvent.SELECTED ) {
-                    String item= (String) e.getItem();
-                    List<String> items= new ArrayList( RECENT_SIZE+2 );
-                    ComboBoxModel model= RecentComboBox.this.getModel();
-                    for ( int i=0; i<model.getSize(); i++ ) {
-                        items.add( (String) model.getElementAt(i) );
-                    }
-                    items.remove( item );
-                    items.add(0,item);
-                    setModel( new DefaultComboBoxModel( items.toArray() ) );
-                    saveRecent(items);
+
+                    //TODO: too bad this doesn't work properly!
+//                    String item= (String) e.getItem();
+//                    List<String> items= new ArrayList( RECENT_SIZE+2 );
+//                    ComboBoxModel model= RecentComboBox.this.getModel();
+//                    for ( int i=0; i<model.getSize(); i++ ) {
+//                        items.add( (String) model.getElementAt(i) );
+//                    }
+//                    items.remove( item );
+//                    items.add(0,item);
+//                    setModel( new DefaultComboBoxModel( items.toArray() ) );
+//                    saveRecent(items);
                 }
             }
         } );
