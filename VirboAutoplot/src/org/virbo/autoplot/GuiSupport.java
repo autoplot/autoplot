@@ -310,7 +310,7 @@ public class GuiSupport {
                 DatumRange xbounds= p.getXAxis().getDatumRange();
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
-                    dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                    dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
                     dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
                 } else {
@@ -320,7 +320,7 @@ public class GuiSupport {
             } else if ( dscontrol.equals("plotElement") ) {
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
-                    dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                    dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
                     format.formatData( uriOut, dsout, mon );
                 } else {
                     format.formatData( uriOut, dsout, mon );
