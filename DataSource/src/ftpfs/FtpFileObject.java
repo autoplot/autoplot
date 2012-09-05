@@ -186,7 +186,7 @@ public class FtpFileObject extends WebFileObject {
             this.setLastModified( new Date( result.modified ) );
         }
         File localFile= getLocalFile();
-        if ( !getLocalFile().exists() || ( lastModified().getTime()-getLocalFile().lastModified() > 10 ) ) { //TODO: test me!
+        if ( !getLocalFile().exists() || ( lastModified().getTime()-getLocalFile().lastModified() > 10 ) ) {
             File partFile = new File( localFile.toString() + ".part");
             ftpfs.downloadFile( getNameExt(), localFile, partFile, monitor );
         }
