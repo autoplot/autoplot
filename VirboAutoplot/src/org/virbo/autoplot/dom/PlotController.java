@@ -810,27 +810,9 @@ public class PlotController extends DomNodeController {
 
     private Plot getPlotDefaultsOneFamily( List<PlotElement> pes ) {
         Plot result= null;
-        for ( PlotElement pe : pes ) {
-            if ( pe.isActive() ) {
-                if ( result==null ) {
-                    result= pe.getPlotDefaults();
-                } else {
-                    Plot second= pe.getPlotDefaults();
-                    //System.err.println("second: "+second);
-                    //merge
-                }
-            }
-        }
-        if ( result==null && pes.size()>0 ) result= pes.get(0).getPlotDefaults(); // more like old behavior
-        // get the title from the parent.
-        for ( PlotElement pe : pes ) {
-            if ( pe.getParent().length()==0 ) {
-                result.setTitle( pe.getPlotDefaults().getTitle() );
-            }
-        }
-        if ( result==null && pes!=null && pes.size()>0 ) {
-            result= pes.get(0).getPlotDefaults();
-        }
+
+        if ( pes.size()>0 ) result= pes.get(0).getPlotDefaults(); // more like old behavior
+        
         return result;
     }
 
