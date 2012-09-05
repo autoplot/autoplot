@@ -665,29 +665,24 @@ public class FTPBeanFileSystem extends WebFileSystem {
         
     }
 
+
     @Override
     public FileObject getFileObject(String filename) {
-        String path= toCanonicalFilename(filename);
-        int i= path.lastIndexOf("/");
-
-        // we should be able to get the listing that we just did from memory.
-        DirectoryEntry[] des= listDirectoryFromMemory(path.substring(0,i+1));
-        DirectoryEntry result= null;
-        if ( des!=null ) {
-            String fname= path.substring(i+1);
-            for ( i=0; i<des.length; i++ ) {
-                if ( fname.equals(des[i].name) ) {
-                    result= des[i];
-                }
-            }
+        DirectoryEntry result=null;
+        try {
+            result= maybeUpdateDirectoryEntry( filename, false );
+        } catch ( IOException ex ) {
+            ex.printStackTrace(); // shouldn't happen when force=false.
         }
-        if ( result==null ) {
+        if ( result==null && this.isOffline() ) {
             File localfile= new File( getLocalRoot(), filename );
             Date t= new Date(System.currentTimeMillis());
             if ( localfile.exists() ) {
                 t= new Date( localfile.lastModified() );
             }
             return new FtpFileObject(this, filename, t );
+        } else if ( result==null ) {
+            return new FtpFileObject(this, filename, new Date(0) ); //flag to retrieve if necessary
         } else {
             return new FtpFileObject(this, filename, new Date( result.modified ) );
         }
@@ -739,5 +734,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
             return false;
         }
+    }
+
+    protected static final Logger getLogger() {
+        return logger;
     }
 }

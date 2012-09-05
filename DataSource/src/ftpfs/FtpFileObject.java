@@ -6,8 +6,11 @@
 package ftpfs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.logging.Level;
@@ -18,6 +21,7 @@ import org.das2.util.filesystem.WebFileObject;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.filesystem.WriteCapability;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  *
@@ -26,7 +30,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 public class FtpFileObject extends WebFileObject {
     
     FTPBeanFileSystem ftpfs;
-    
+
     protected FtpFileObject( WebFileSystem wfs, String pathname, Date modifiedDate ) {
         super( wfs, pathname, modifiedDate );
         this.ftpfs= (FTPBeanFileSystem)wfs;
@@ -164,5 +168,31 @@ public class FtpFileObject extends WebFileObject {
         }
 
     }
+
+    /**
+     * get the input stream, checking for 0 for the lastModified indicating the date was never loaded.
+     * @param monitor
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    @Override
+    public InputStream getInputStream(ProgressMonitor monitor) throws FileNotFoundException, IOException {
+        if ( this.isFolder() ) {
+            throw new IllegalArgumentException("is a folder");
+        }
+        if ( this.lastModified().getTime()==0 ) {
+            DirectoryEntry result= ftpfs.maybeUpdateDirectoryEntry( this.getNameExt(), true ); // trigger load of the modifiedDate
+            this.setLastModified( new Date( result.modified ) );
+        }
+        File localFile= getLocalFile();
+        if ( !getLocalFile().exists() || ( lastModified().getTime()-getLocalFile().lastModified() > 10 ) ) { //TODO: test me!
+            File partFile = new File( localFile.toString() + ".part");
+            ftpfs.downloadFile( getNameExt(), localFile, partFile, monitor );
+        }
+        ftpfs.getLogger().log( Level.FINE, "read local file {0}", localFile);
+        return new FileInputStream(localFile);
+    }
+
 
 }
