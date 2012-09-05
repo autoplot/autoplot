@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The export to wav feature got a little attention as we get ready for RBSP.  Here, a dummy sound has an interesting initial plot.</small></p>
+        <p><small>PDF output closely more mimics the screen now and handles greek characters properly.  If it would
+            bother you that the PDF text is not editable, please let me know!</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +23,10 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>jyds time series browse wouldn't work because of botched bugfix from 2012/8/16.</li>
+            <li>jyds has scroll pane when there are lots of parameters.</li>
+            <li>total, smooth, and collapse properly propagate metadata.</li>
+            <li>PDF fonts are painted in Java itext library, resulting in a closer screen representation, but text is no longer editable for post-processing</li>
             <li>new code that forced series to be used when CDF indicated the type needs to detect implicit waveform type</li>
             <li>further investigation into making sure that offline means http is really offline.</li>
             <li>contoursRender is properly bound to color and line thick.</li>
