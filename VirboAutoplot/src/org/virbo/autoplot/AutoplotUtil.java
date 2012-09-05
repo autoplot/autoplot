@@ -115,6 +115,7 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class AutoplotUtil {
+    public static final int SERIES_SIZE_LIMIT = 80000;
 
     private final static Logger logger = Logger.getLogger("autoplot.AutoplotUtil");
     /**
@@ -1378,7 +1379,7 @@ public class AutoplotUtil {
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         if ( srenderType!=null ) {
             if ( srenderType.equals("time_series") ) { //TODO: CDAWeb time_series will be fixed to "series" once it can automatically reduce data.
-                if (fillds.length() > 80000) {
+                if (fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
@@ -1426,7 +1427,7 @@ public class AutoplotUtil {
 //                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
 //            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
             if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
-                if (fillds.length() > 80000) {
+                if (fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
@@ -1472,7 +1473,7 @@ public class AutoplotUtil {
                 spec= RenderType.eventsBar;
             }
         } else {
-            if (fillds.length() > 80000) {
+            if (fillds.length() > SERIES_SIZE_LIMIT) {
                 spec = RenderType.hugeScatter;
             } else {
                 spec = RenderType.series;
