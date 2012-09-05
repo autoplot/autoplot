@@ -1135,10 +1135,10 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            String[] labels = null;
+            String[] lnames = null;
             String[] llabels= null;
             if ( shouldHaveChildren ) {
-                labels= SemanticOps.getComponentNames(fillDs);
+                lnames= SemanticOps.getComponentNames(fillDs);
                 llabels= SemanticOps.getComponentLabels(fillDs);
             }
 
@@ -1215,10 +1215,10 @@ public class PlotElementController extends DomNodeController {
 
                     //check for non-unique labels, or labels that are simply numbers.
                     boolean uniqLabels= true;
-                    for ( int i=0;i<labels.length; i++ ) {
-                        if ( AutoplotUtil.isParsableDouble( labels[i] ) ) uniqLabels= false;
-                        for ( int j=i+1; j<labels.length; j++ ) {
-                            if ( labels[i].equals(labels[j]) ) uniqLabels= false;
+                    for ( int i=0;i<lnames.length; i++ ) {
+                        if ( AutoplotUtil.isParsableDouble( lnames[i] ) ) uniqLabels= false;
+                        for ( int j=i+1; j<lnames.length; j++ ) {
+                            if ( lnames[i].equals(lnames[j]) ) uniqLabels= false;
                         }
                     }
 
@@ -1230,9 +1230,9 @@ public class PlotElementController extends DomNodeController {
                         ele.getStyle().setColor(deriveColor(c, i/nsubsample));
                         ele.getStyle().setFillColor( deriveColor(fc,i/nsubsample).brighter() );
                         String s= existingComponent;
-                        String label1= labels[i];
+                        String label1= lnames[i];
                         if ( s.equals("") && uniqLabels ) {
-                            s= labels[i];
+                            s= lnames[i];
                             QDataSet ds1= DataSetOps.unbundle(fillDs,i);
                             String l1= (String) ds1.property(QDataSet.LABEL);
                             if ( l1==null ) { // TODO: kludge: das2 dataset doesn't unbundle properly and looses LABEL.
@@ -1243,10 +1243,11 @@ public class PlotElementController extends DomNodeController {
                             }
                         } else {
                             if ( uniqLabels ) {
-                                s= s+"|unbundle('"+labels[i]+"')";
+                                s= s+"|unbundle('"+lnames[i]+"')";
                             } else {
                                 s= s+"|unbundle('ch_"+i+"')";
                             }
+                            label1= llabels[i];
                             addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
