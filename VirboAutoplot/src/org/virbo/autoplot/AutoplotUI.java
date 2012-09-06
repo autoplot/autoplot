@@ -2937,12 +2937,22 @@ private void updateFrameTitle() {
                             raise= true;
                         }
                     } else {
-                        String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                                String.format( "<html>Autoplot is already running.<br>"
-                                + "Autoplot can use this address in a new window, <br>"
+                        String msg;
+                        if ( app.isExpertMode() ) {
+                                msg= String.format(
+                                "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
+                                + "or replace the current plot with the new URI, possibly entering the editor, <br>"
+                                + "or always enter the editor to inspect and insert the plot below.<br>"
+                                + "Replace or Inspect, replacing data with<br>%s?", url );
+                        } else {
+                                msg= String.format(
+                                "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                                 + "or replace the current plot with the new URI, possibly entering the editor <br>"
-                                + "or always enter the editor to inspect and insert the plot below (in expert mode).<br>"
-                                + "Replace URI, replacing data with<br>%s?", url ),
+                                + "or always enter the editor to inspect before plotting.<br>"
+                                + "Replace or Inspect, replacing data with<br>%s?", url );
+                        }
+                        String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
+                                msg,
                                 "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                                 new String[] { "New Window", "Replace", "Inspect" }, "Inspect" );
                         if ( action!=null ) {
