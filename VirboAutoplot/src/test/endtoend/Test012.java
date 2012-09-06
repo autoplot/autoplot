@@ -119,6 +119,12 @@ public class Test012 {
             // this has a non-varying second dimension that is automatically removed.
             doTest( testid, 18, "ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image" );
 
+            // this is a hugeScatter.
+            doTest( testid, 19, "/home/jbf/ct/hudson/data.backup/cdf/pw/rbsp/rbsp-a_magnetometer_emfisis-L1_20120904_v1.2.2.cdf?Mag_UVW[0:100000]" );
+
+            // this is a hugeScatter.  4,072,000 points.
+            doTest( testid, 20, "/home/jbf/ct/hudson/data.backup/cdf/pw/rbsp/rbsp-a_magnetometer_emfisis-L1_20120904_v1.2.2.cdf?Mag_UVW" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
