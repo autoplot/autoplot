@@ -2938,14 +2938,21 @@ private void updateFrameTitle() {
                         }
                     } else {
                         String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                                String.format( "<html>Autoplot is already running.<br>Replace URI, replacing data with<br>%s?", url ),
+                                String.format( "<html>Autoplot is already running.<br>"
+                                + "Autoplot can use this address in a new window, <br>"
+                                + "or replace the current plot with the new URI, possibly entering the editor <br>"
+                                + "or always enter the editor to inspect and insert the plot below (in expert mode).<br>"
+                                + "Replace URI, replacing data with<br>%s?", url ),
                                 "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
-                                new String[] { "New Window", "Replace" }, "Replace" );
+                                new String[] { "New Window", "Replace", "Inspect" }, "Inspect" );
                         if ( action!=null ) {
                             if (action.equals("Replace")) {
                                 app.dataSetSelector.setValue(url);
                                 app.dataSetSelector.maybePlot(false); // allow for completions
-                                //app.applicationModel.setDataSourceURL(url);
+                                raise= true;
+                            } else if (action.equals("Inspect")) {
+                                app.dataSetSelector.setValue(url);
+                                app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
                                 raise= true;
                             } else if (action.equals("New Window")) {
                                 ApplicationModel nmodel = app.support.newApplication();
