@@ -781,11 +781,14 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         pele1.addPropertyChangeListener(PlotElement.PROP_PLOTID, plotIdListener);
 
-        if ( parent!=null ) pele1.setParent( parent.getId() );
+        if ( parent!=null ) {
+            pele1.setParent( parent.getId() );
+            pele1.setRenderType(parent.getRenderType());
+        }
         
         pele1.setPlotId(domPlot.getId());
         pele1.setDataSourceFilterId(dsf.getId());
-
+        
         pele1.setAutoLabel(true);
 
         synchronized (this) {
