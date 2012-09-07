@@ -1160,6 +1160,7 @@ public class PlotController extends DomNodeController {
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, contextConverter ); // %{CONTEXT} indicates the DataSet CONTEXT property, not the control.
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
+        ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
     }
 
     public BindingModel[] getBindings() {
