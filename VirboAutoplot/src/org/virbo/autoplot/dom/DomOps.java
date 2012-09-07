@@ -265,7 +265,7 @@ public class DomOps {
             double MaxDownJ= 0.;
             for ( int j=0; j<plots.length; j++ ) {
                 String title= plots[j].getTitle();
-                MaxUpJEm= lineCount(title);
+                MaxUpJEm= plots[j].isDisplayTitle() ? lineCount(title) : 0;
                 if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 Rectangle plot= plots[j].getController().getDasPlot().getBounds();
