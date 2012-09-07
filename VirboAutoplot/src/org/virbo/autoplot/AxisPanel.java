@@ -164,7 +164,7 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.visible"), cbVisibleCB, BeanProperty.create("selected")));
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("title"), titleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
-
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("displayTitle"), titleCB, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("isotropic"), this.isotropicCheckBox, BeanProperty.create("selected")));
 
         plotBindingGroup = bc;
@@ -223,9 +223,9 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         titleTextField = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
         legendEnableCheckbox = new javax.swing.JCheckBox();
         legendTextField = new javax.swing.JTextField();
+        titleCB = new javax.swing.JCheckBox();
 
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
         xAxisPanel.setToolTipText("click title for help");
@@ -259,7 +259,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(xLog)
                         .add(18, 18, 18)
@@ -267,7 +267,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)))
+                        .add(xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         xAxisPanelLayout.setVerticalGroup(
@@ -317,7 +317,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(zAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(zLog)
                         .add(18, 18, 18)
@@ -325,7 +325,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)))
+                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -376,13 +376,13 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(yAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
                     .add(yLog)
                     .add(isotropicCheckBox)
                     .add(yAxisPanelLayout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(yTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)))
+                        .add(yTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         yAxisPanelLayout.setVerticalGroup(
@@ -413,9 +413,6 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel6.setText("Title:");
-        jLabel6.setToolTipText("title for the selected plot. ");
-
         legendEnableCheckbox.setText("Legend Label:");
         legendEnableCheckbox.setToolTipText("when selected, the label is added to the legend of the plot for the selected plot element.\n\n");
 
@@ -433,6 +430,8 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
+        titleCB.setText("Title:");
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -441,21 +440,21 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
-                        .add(jLabel6)
+                        .add(titleCB)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE))
+                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
                         .add(legendEnableCheckbox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(legendTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)))
+                        .add(legendTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel6)
-                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(titleCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(legendEnableCheckbox)
@@ -522,11 +521,11 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JCheckBox legendEnableCheckbox;
     private javax.swing.JTextField legendTextField;
     private javax.swing.JCheckBox showXAxisLabelsCB;
+    private javax.swing.JCheckBox titleCB;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JPanel xAxisPanel;
     private javax.swing.JPanel xAxisRangePanel;
