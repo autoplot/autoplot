@@ -14,6 +14,8 @@ package org.virbo.datasource;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.das2.util.monitor.ProgressMonitor;
@@ -150,7 +153,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         opsCbs= new ArrayList<JCheckBox>();
         opsComboBoxes= new ArrayList<JComboBox>();
-        
+
+        boolean empty= true;
+
         for ( CompletionContext cc1: first ) {
 
             String ss= CompletionContext.insert(cc, cc1);
@@ -158,10 +163,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             //TODO: make this look like the jython data source dialog!
             JPanel optPanel= new JPanel( new BorderLayout() );
 
-            JCheckBox jcheckBox= new JCheckBox( cc1.label );
+            final JCheckBox jcheckBox= new JCheckBox( cc1.label );
             optPanel.add( BorderLayout.WEST, jcheckBox );
 
             opsCbs.add(jcheckBox);
+            empty= false;
 
             if ( cc1.doc!=null && cc1.doc.trim().length()>0 ) {
                 jcheckBox.setToolTipText( cc1.doc );
@@ -210,7 +216,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             }
 
-            JComboBox jopts=  new JComboBox( new Vector(options) );
+            final JComboBox jopts=  new JComboBox( new Vector(options) );
             jopts.setEditable(true);
             optPanel.add( BorderLayout.CENTER, jopts );
             if ( isel!=-1 ) {
@@ -222,6 +228,13 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 }
             }
 
+            jcheckBox.addItemListener( new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    jopts.setEnabled( jcheckBox.isSelected());
+                }
+            } );
+            jopts.setEnabled( jcheckBox.isSelected());
+
             opsComboBoxes.add(jopts);
 
             optPanel.setMaximumSize( new Dimension(10000,16) );
@@ -232,6 +245,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         if ( arg0.size()>0 ) {
             JPanel optPanel= new JPanel( new BorderLayout() );
+            empty= false;
 
             String val= map.get("arg_0");
             if ( val!=null ) {
@@ -271,6 +285,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             optionsPanel.add( optPanel );
             optionsPanel.add( Box.createVerticalStrut(8) );
             
+        }
+
+        if ( empty ) {
+            String id= split.vapScheme==null ? ( "for " + split.ext ) : split.vapScheme;
+            optionsPanel.add( new JLabel("<html><em>Data source "+ id + " provides no completions, so presumably there are no options available.</em></html>"));
         }
 
         optionsPanel.add( Box.createGlue() );
