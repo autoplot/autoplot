@@ -70,6 +70,22 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TITLE, oldTitle, title);
     }
 
+    /**
+     * do display the title.  Turning this off has the same effect as setting the title to ""
+     */
+    protected boolean displayTitle = true;
+    public static final String PROP_DISPLAYTITLE = "displayTitle";
+
+    public boolean isDisplayTitle() {
+        return displayTitle;
+    }
+
+    public void setDisplayTitle(boolean displayTitle) {
+        boolean oldDisplayTitle = this.displayTitle;
+        this.displayTitle = displayTitle;
+        propertyChangeSupport.firePropertyChange(PROP_DISPLAYTITLE, oldDisplayTitle, displayTitle);
+    }
+
     protected LegendPosition legendPosition = LegendPosition.NE;
     public static final String PROP_LEGENDPOSITION = "legendPosition";
 
