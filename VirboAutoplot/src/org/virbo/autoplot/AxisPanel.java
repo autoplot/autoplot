@@ -414,7 +414,7 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
         legendEnableCheckbox.setText("Legend Label:");
-        legendEnableCheckbox.setToolTipText("when selected, the label is added to the legend of the plot for the selected plot element.\n\n");
+        legendEnableCheckbox.setToolTipText("When selected, the label is added to the legend of the plot containing the focus plot element.\n\n");
 
         legendTextField.setText("label will go here");
 
@@ -431,6 +431,7 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
         titleCB.setText("Title:");
+        titleCB.setToolTipText("Title for the focus plot.  When deselected, the plot title is hidden.\n");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
