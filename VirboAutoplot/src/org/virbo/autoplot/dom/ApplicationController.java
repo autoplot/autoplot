@@ -317,6 +317,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                 setFocusUri( getFocusUriFor( ps.get(0) ) );
             }
 
+            if ( p==null && ps.size()>0 ) { // allow the user to select the first inactive plot element
+                for ( int i=ps.size()-1; i>=0; i-- ) {
+                    PlotElement pe1= ps.get(i);
+                    if ( pe1.isActive()==false ) {
+                        p= pe1;
+                        break;
+                    }
+                }
+            }
+
             setPlot(domPlot);
 
             if (p != null) {
