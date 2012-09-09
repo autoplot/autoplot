@@ -32,6 +32,13 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
+# we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
+if [ "" = "$AP_KEEP_STABLE" ]; then
+    AP_KEEP_STABLE=F
+fi
+
+echo "$AP_KEEP_STABLE=${AP_KEEP_STABLE}  # if T then keep the stable jars for release"
+
 if [ "" = "$ALIAS" ]; then
     ALIAS=virbo
 fi
@@ -292,8 +299,14 @@ cd ..
 ${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
-mv AutoplotStable.jar.pack.gz dist/
-mv AutoplotStable.jar dist/
+# if these are needed
+if [ $AP_KEEP_STABLE = 'T' ]; then
+  mv AutoplotStable.jar.pack.gz dist/
+  mv AutoplotStable.jar dist/
+else
+  rm AutoplotStable.jar.pack.gz
+  rm AutoplotStable.jar
+fi
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
