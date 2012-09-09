@@ -298,14 +298,15 @@ cd ..
 ${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
-# if these are needed
-if [ $AP_KEEP_STABLE = 'T' ]; then
-  mv AutoplotStable.jar.pack.gz dist/
-  mv AutoplotStable.jar dist/
-else
-  rm AutoplotStable.jar.pack.gz
-  rm AutoplotStable.jar
-fi
+# if these are needed.
+# These are needed for the single-jar build.
+#if [ $AP_KEEP_STABLE = 'T' ]; then
+mv AutoplotStable.jar.pack.gz dist/
+mv AutoplotStable.jar dist/
+#else
+#  rm AutoplotStable.jar.pack.gz
+#  rm AutoplotStable.jar
+#fi
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
