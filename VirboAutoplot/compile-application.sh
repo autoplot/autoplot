@@ -199,6 +199,7 @@ if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../Autoplot
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/event/*.java; then hasErrors=1; fi
+if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/dataset/NoDataInIntervalException.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
@@ -249,6 +250,7 @@ echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
 mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
+rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
@@ -274,6 +276,7 @@ if ! ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.j
    echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
    exit 1
 fi
+rm dist/AutoplotVolatile_pack_gz.jar
 
 echo "=== create jnlp file for build..."
 cp src/autoplot.jnlp dist
