@@ -338,7 +338,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         if ( ex.getNodeName().startsWith("exampleRange") ) {
                             examples.add(ex.getNodeValue());
                         }
-                        if (ex.equals("exampleRange") ) {
+                        if (ex.getNodeName().equals("exampleRange") ) {
                             example= ex.getNodeValue();
                         }
                     }
