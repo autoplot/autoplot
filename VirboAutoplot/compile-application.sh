@@ -82,12 +82,11 @@ echo "copy jar file classes..."
 ${WGET} -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
 ${WGET} -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
 #TODO: check exit status, and stop if it fails.
-echo "done copy jar file classes."
-
 if [ $? -ne 0 ]; then
    echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
    exit -1
 fi
+echo "done copy jar file classes."
 
 echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
 #echo 'ls -1 ../*/src/META-INF/org.virbo.datasource.DataSourceFactory.extensions | awk  \'BEGIN { FS = "/" } ; { print $2 }\' | sort | uniq | xargs'
