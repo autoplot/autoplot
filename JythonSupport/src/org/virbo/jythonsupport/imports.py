@@ -19,6 +19,12 @@ import java
 import org
 # end, security concerns.
 
+# jython is tricky with single-jar releases, and using star imports to find classes doesn't work.
+import org.das2
+import org.das2.dataset
+import org.das2.dataset.NoDataInIntervalException
+import org.das2.graph
+
 params= dict()
 
 import operator.isNumberType
