@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -104,6 +105,7 @@ public class FilterChainPanel extends JPanel {
 
     private String addFilter( int idx ) {
         JPanel optionsPanel= new JPanel();
+
         optionsPanel.setLayout( new BoxLayout(optionsPanel,BoxLayout.Y_AXIS) );
 
         ButtonGroup group= new ButtonGroup();
@@ -142,13 +144,29 @@ public class FilterChainPanel extends JPanel {
         "valid() replace data with 1 where valid, 0 where invalid",
         };
 
+        //Font font= Font.decode("sans-38");
+
         for ( int i=0; i<opts.length; i++ ) {
             JRadioButton cb= new JRadioButton(opts[i]);
+            //cb.setFont( font );
             group.add(cb);
             optionsPanel.add(cb);
         }
 
-       int r= JOptionPane.showConfirmDialog(this, new JScrollPane(optionsPanel),"Add Filter",JOptionPane.OK_CANCEL_OPTION);
+        JScrollPane p= new JScrollPane(optionsPanel);
+        Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension ps= new Dimension( 800, 800 );
+
+        //if ( ps.getHeight()+100 >d.getHeight() ) {
+            //Dimension v= new Dimension( Math.min( ps.width, d.width ), d.height-100 );
+            Dimension v= new Dimension( 800, Math.min( 800, d.height ) );
+            p.setMaximumSize(v);
+            p.setPreferredSize(v);
+        //}
+        
+        p.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
+
+       int r= JOptionPane.showConfirmDialog( this, p, "Add Filter", JOptionPane.OK_CANCEL_OPTION );
        if ( r==JOptionPane.OK_OPTION ) {
            String ss=null;
            Enumeration<AbstractButton> ee= group.getElements();
@@ -265,9 +283,7 @@ public class FilterChainPanel extends JPanel {
         JScrollPane pane= new JScrollPane( content );
         pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
         for ( int i=0; i<filters.size(); i++ ) {
-
             content.add( onePanel(i) );
-            
         }
 
         add= onePanel(-1);
@@ -290,4 +306,10 @@ public class FilterChainPanel extends JPanel {
         return this;
     }
 
+    public static void main( String[] args ) {
+        FilterChainPanel fpc= new FilterChainPanel();
+        fpc.setFilters("");
+        fpc.init();
+        JOptionPane.showMessageDialog( null, fpc.getPanel() );
+    }
 }
