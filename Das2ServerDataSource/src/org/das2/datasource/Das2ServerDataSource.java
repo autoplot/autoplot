@@ -261,14 +261,18 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
             
             AbstractDataSet result;
-            if ( item==null || item.equals("") || item.equals("0") ) {
+            if ( item==null || item.equals("") ) {
                 result= DataSetAdapter.create(ds); //TODO: danger if it has TCA planes, it will return bundle.  Probably not what we want.
             } else {
                 DataSet das2ds;
                 das2ds= ds.getPlanarView( item );
                 if ( das2ds==null ) {
                     int iitem= Integer.parseInt(item);
-                    das2ds= ds.getPlanarView( "plane_"+iitem );
+                    if ( iitem==0 ) {
+                        das2ds= ds.getPlanarView( "" );
+                    } else {
+                        das2ds= ds.getPlanarView( "plane_"+iitem );
+                    }
                 }
                 if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
                 result= DataSetAdapter.create( das2ds ); // fragile
