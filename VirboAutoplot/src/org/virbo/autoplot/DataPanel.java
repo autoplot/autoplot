@@ -422,7 +422,8 @@ public class DataPanel extends javax.swing.JPanel {
     };
 
     private void updateProcessDataSetLabel() {
-        QDataSet orig= dom.getController().getDataSourceFilterFor(element).getController().getFillDataSet();
+        DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(element);
+        QDataSet orig= dsf1==null ? null : dsf1.getController().getFillDataSet();
         QDataSet proc= element.getController().getDataSet();
         if ( orig==proc || proc==null ) {
             processDataSetLabel.setText( "" );
