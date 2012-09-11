@@ -762,6 +762,12 @@ public class GuiSupport {
             }
         });
 
+        thisPanel.getActionMap().put("SAVE", new AbstractAction() {
+            public void actionPerformed( ActionEvent e ) {
+                parent.stateSupport.createSaveAction().actionPerformed(e);
+            }
+        });
+
         InputMap map = new ComponentInputMap(thisPanel);
 
         Toolkit tk= Toolkit.getDefaultToolkit();
@@ -774,6 +780,7 @@ public class GuiSupport {
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");  // american keyboard
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PLOT_ELEMENT");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PLOT_ELEMENT");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, tk.getMenuShortcutKeyMask() ), "SAVE");
         thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
 
     }
