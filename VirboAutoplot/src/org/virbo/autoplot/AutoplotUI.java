@@ -3014,6 +3014,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
+        alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",alm.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
@@ -3125,6 +3126,12 @@ private void updateFrameTitle() {
 APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
+
+                if ( !alm.getBooleanValue("autoLayout") ) { // Chris had a vap that autolayout was mucking with.
+                   logger.fine("set autoLayout");
+                    model.getDocumentModel().getOptions().setAutolayout(false);
+                }
+
 APSplash.checkTime("init -90");
                 if ( ! headless ) {
                     APSplash.showSplash();
@@ -3199,7 +3206,6 @@ APSplash.checkTime("init 220");
 
 
                     logger.fine("UI is visible");
-                    //APSplash.getInstance().setVisible(false);
                     APSplash.hideSplash();
 
                     if ( alm.getValue("mode").equals("basic") ) {
