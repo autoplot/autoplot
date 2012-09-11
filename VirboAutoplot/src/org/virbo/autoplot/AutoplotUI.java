@@ -1158,6 +1158,7 @@ APSplash.checkTime("init 52");
 
         mi= new JMenuItem(stateSupport.createSaveAction());
         mi.setToolTipText("Save the application state to a file");
+        mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ));
         fileMenu.add(mi);
 //        fileMenu.add(new AbstractAction("Save With Data...") {
 //
