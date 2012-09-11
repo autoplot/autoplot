@@ -691,7 +691,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 int rtype = bb.getInt(offset_RECORD_TYPE);
                 if (rtype != vrtype) {
                     if (compressed) {
-                        System.out.println("setting record type to " + 
+                        System.err.println("setting record type to " +
                         "uncompressed");
                         compressed = false;
                     }
@@ -769,7 +769,7 @@ public abstract class CDFImpl implements java.io.Serializable {
     ByteBuffer getValueBuffer(int offset, int size, int number) {
         ByteBuffer bv = getRecord(offset);
         if (bv.getInt(offset_RECORD_TYPE) == VVR_RECORD_TYPE) {
-            System.out.println("Encountered uncompressed instead of " +
+            System.err.println("Encountered uncompressed instead of " +
             " compressed at offset " + offset);
             bv.position(offset_RECORDS);
             return bv;
@@ -792,8 +792,8 @@ public abstract class CDFImpl implements java.io.Serializable {
                 toRead -= n;
             }
         } catch (IOException ex) {
-            System.out.println(ex.toString() + " at offset " + offset);
-            System.out.println("Trying to get data as uncompressed");
+            System.err.println(ex.toString() + " at offset " + offset);
+            System.err.println("Trying to get data as uncompressed");
             return getValueBuffer(offset);
         }
         if (n < 0) return null;
@@ -1091,7 +1091,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 }
             }
         } catch(Exception ex) {
-            System.out.println("getNumberAttribute: " + vbuf);
+            System.err.println("getNumberAttribute: " + vbuf);
             ex.printStackTrace();
             return null;
         }

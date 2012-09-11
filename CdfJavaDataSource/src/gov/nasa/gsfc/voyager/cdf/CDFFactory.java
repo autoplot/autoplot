@@ -132,7 +132,7 @@ public class CDFFactory {
                 toRead -= n;
             }
         } catch (IOException ex) {
-            System.out.println(ex.toString());
+            System.err.println(ex.toString());
             return null;
         }
         if (n < 0) return null;
