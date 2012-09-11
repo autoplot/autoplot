@@ -466,7 +466,7 @@ public class CdfUtil {
 
         }
 
-//System.out.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
+//System.err.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
         if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
             String cdfFile;
             synchronized ( CdfJavaDataSource.lock ) {
