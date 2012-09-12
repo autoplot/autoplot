@@ -346,16 +346,20 @@ public class LayoutPanel extends javax.swing.JPanel {
         PlotElement[] peles=  app.getPlotElements();
 
         List<Object> selected= new ArrayList();
-        DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
-        selected.add(dasPlot);
 
-        for ( int i=0; i<iindices.length; i++ ) {
-            try {
-                PlotElementController pec= peles[iindices[i]].getController();
-                selected.add( pec.getRenderer() );
-            } catch ( IndexOutOfBoundsException ex ) {
-                // this happens because of multiple threads... TODO: fix this sometime...
-                System.err.println("harmless indexOutOfBoundsException needs to be fixed sometime");
+        DasPlot dasPlot=null;
+        if ( app.getController().getPlot()!=null ) {
+            dasPlot = app.getController().getPlot().getController().getDasPlot();
+            selected.add(dasPlot);
+
+            for ( int i=0; i<iindices.length; i++ ) {
+                try {
+                    PlotElementController pec= peles[iindices[i]].getController();
+                    selected.add( pec.getRenderer() );
+                } catch ( IndexOutOfBoundsException ex ) {
+                    // this happens because of multiple threads... TODO: fix this sometime...
+                    System.err.println("harmless indexOutOfBoundsException needs to be fixed sometime");
+                }
             }
         }
 
