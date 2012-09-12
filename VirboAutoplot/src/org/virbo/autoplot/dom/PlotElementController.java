@@ -1109,7 +1109,7 @@ public class PlotElementController extends DomNodeController {
             QDataSet sliceDs= fillDs; // dataset after initial slicing
             String existingComponent= plotElement.getComponent();
 
-            System.err.println("fillDs="+ fillDs + "  renderType="+renderType  + "  existingComponent="+existingComponent );
+            //System.err.println("fillDs="+ fillDs + "  renderType="+renderType  + "  existingComponent="+existingComponent );
 
             if ( shouldSlice && existingComponent.length()>0 ) {
                 try {
