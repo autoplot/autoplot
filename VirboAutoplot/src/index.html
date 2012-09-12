@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Moire patterns in problematic RBSP mag data</small></p>
+        <p><small>Plotting RBSP data by orbit.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>operations selector tool uses scrollpane to support small screens</li>
+            <li>java cdf printed messages to stdout instead of stderr, preventing use with AutoplotDataServer</li>
             <li>axis visible=false now works nicely with fix layout.</li>
             <li>timestamps in FTP still prevented updates from happening. </li>
             <li>automatic labelling when stack-of-lineplots used</li>
@@ -69,6 +71,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>--autolayout=F command line option because autolayout was triggering with Chris' vap.</li>
+            <li>ctrl-S is bound to save</li>
+            <li>ascii parser now detects non-ascii files and displays appropriate error.</li>
             <li>title now has checkbox and can be turned off without erasing useful context.</li>
             <li>clicking on background selects hidden parent plot element.</li>
             <li>pngs have metadata indicating plot coordinates to support thin-client mouse operations</li>
