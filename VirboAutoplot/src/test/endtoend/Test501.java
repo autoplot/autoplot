@@ -138,6 +138,10 @@ public class Test501 {
                     System.err.println("skipping /testing/: "+id);
                     continue;
                 }
+                if ( id.contains("/test/") ) { // Dan's server
+                    System.err.println("skipping /test/: "+id);
+                    continue;
+                }
                 if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(count);
                 count++;
             }
@@ -149,15 +153,16 @@ public class Test501 {
             int iid=itest;
             for ( String id: ids ) {
 
-                System.err.println( String.format( "==== test %d of %d ========================================================", iis, count ) );
+                System.err.println( String.format( "==== test %d of %d (%d) ========================================================", iis, count, iid ) );
 
                 if ( id.contains("/testing/") ) {
                     System.err.println( "ids containing /testing/ are automatically skipped: " + id );
+                    iis++;
                     continue;
                 }
 
-                if ( skip.contains(iid ) ) {
-                    iid++;
+                if ( skip.contains(iis) ) {
+                    iis++;
                     System.err.println( "test marked for skipping in Test501.java: " + id );
                     continue;
                 }
@@ -201,9 +206,10 @@ public class Test501 {
                     ex.printStackTrace();
                     failures.put(iid,uri);
                 }
+                iis++;
                 iid++;
             }
-            itest+= iid;
+            itest+= iis;
         }
 
         System.err.println("DONE...");
