@@ -348,8 +348,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         List<Object> selected= new ArrayList();
 
         DasPlot dasPlot=null;
-        if ( app.getController().getPlot()!=null ) {
-            dasPlot = app.getController().getPlot().getController().getDasPlot();
+        Plot plot= app.getController().getPlot();
+        if ( plot!=null ) {
+            dasPlot = plot.getController().getDasPlot();
             selected.add(dasPlot);
 
             for ( int i=0; i<iindices.length; i++ ) {
