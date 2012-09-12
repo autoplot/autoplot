@@ -64,7 +64,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/datasource/go.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Plot this data location, or URI.&lt;br&gt;&#xa;Ctrl modifier: plot the dataset by adding a new plot&lt;br&gt;&#xa;Shift modifier: plot the dataset as an overplot&lt;br&gt;&#xa;"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Plot this data location, or URI.&lt;br&gt;&#xa;Ctrl modifier: plot the dataset by adding a new plot&lt;br&gt;&#xa;Shift modifier: plot the dataset as an overplot&lt;br&gt;&#xa;Alt modifier: inspect this resource.&lt;br&gt;"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[20, 20]"/>
         </Property>

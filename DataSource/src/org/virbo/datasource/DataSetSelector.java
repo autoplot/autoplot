@@ -305,7 +305,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                     DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor());
                     if (f == null) {
                         SourceTypesBrowser browser= new SourceTypesBrowser();
-                        browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
+                        URI resourceURI= DataSetURI.getResourceURI(surl);
+                        if ( resourceURI==null ) {
+                            showPluginsScreen();
+                            return;
+                        }
+                        browser.getDataSetSelector().setValue(DataSetURI.fromUri(resourceURI));
                         int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
                         if ( r==JOptionPane.OK_OPTION ) {
                             surl= browser.getUri();
@@ -1178,7 +1183,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         });
 
         plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
-        plotItButton.setToolTipText("<html>Plot this data location, or URI.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\n");
+        plotItButton.setToolTipText("<html>Plot this data location, or URI.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
         plotItButton.setMaximumSize(new java.awt.Dimension(20, 20));
         plotItButton.setMinimumSize(new java.awt.Dimension(20, 20));
         plotItButton.setName("go"); // NOI18N
