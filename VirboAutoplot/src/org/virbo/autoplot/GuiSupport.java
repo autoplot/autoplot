@@ -15,6 +15,7 @@ import java.awt.Frame;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.MenuEvent;
 import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
 import java.awt.Image;
@@ -69,6 +70,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -680,11 +682,8 @@ public class GuiSupport {
             }
         };
     }
-    public static JMenu createEZAccessMenu(final Plot plot) {
 
-        JMenu result = new JMenu("Plot Style");
-        JMenuItem mi;
-
+    private static Map<String,RenderType> getRenderTypeForString( ) {
         Map<String,RenderType> tt= new LinkedHashMap();
         tt.put( "Scatter", RenderType.scatter );
         tt.put( "Color Scatter", RenderType.colorScatter );
@@ -699,11 +698,21 @@ public class GuiSupport {
         tt.put( "Image", RenderType.image);
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
         tt.put( "Orbit Plot", RenderType.orbitPlot );
+        return tt;
+    }
+
+    public static JMenu createEZAccessMenu(final Plot plot) {
+
+        JMenu result = new JMenu("Plot Style");
+        JMenuItem mi;
+
+        Map<String,RenderType> tt= getRenderTypeForString();
+
         //tt.put( "Contour Plot", RenderType.contour );  //this has issues, hide for now.
 
         for ( Entry<String,RenderType> ee: tt.entrySet() ) {
             final Entry<String,RenderType> fee= ee;
-            mi= new JMenuItem(new AbstractAction(fee.getKey()) {
+            mi= new JCheckBoxMenuItem(new AbstractAction(fee.getKey()) {
                 public void actionPerformed(ActionEvent e) {
                     PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
                     pe.setRenderType(fee.getValue());
@@ -1256,7 +1265,31 @@ public class GuiSupport {
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
-        JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
+        final JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
+        ezMenu.addMenuListener( new MenuListener() {
+            public void menuSelected(MenuEvent e) {
+                PlotElement pe= app.dom.getController().getPlotElement();
+                Map<String,RenderType> tt= getRenderTypeForString();
+                System.err.println( pe.getRenderType().toString() );
+                for ( int i=0; i<ezMenu.getItemCount(); i++ ) {
+                    if ( ezMenu.getItem(i) instanceof JCheckBoxMenuItem ) {
+                        if ( tt.get(ezMenu.getItem(i).getText()).equals(pe.getRenderType()) ) {
+                            ((JCheckBoxMenuItem)ezMenu.getItem(i)).setSelected(true);
+                        } else {
+                            ((JCheckBoxMenuItem)ezMenu.getItem(i)).setSelected(false);
+                        }
+                    }
+                }
+            }
+
+            public void menuDeselected(MenuEvent e) {
+
+            }
+
+            public void menuCanceled(MenuEvent e) {
+                
+            }
+        });
         plot.getDasMouseInputAdapter().addMenuItem(ezMenu);
         expertMenuItems.add(ezMenu);
 
