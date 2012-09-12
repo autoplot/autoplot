@@ -725,7 +725,7 @@ public class PlotController extends DomNodeController {
                     }
                 };
             } else {
-                System.err.println("already accounted for: "+fp);
+                //System.err.println("already accounted for: "+fp);
             }
         }
         if ( !pdListen.contains(p) ) {
