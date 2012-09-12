@@ -11,7 +11,9 @@
 
 package org.virbo.autoplot;
 
+import java.awt.event.ItemEvent;
 import javax.swing.JSpinner;
+import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  *
@@ -35,16 +37,14 @@ public class AddPlotsDialog extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        aboveCB = new javax.swing.JCheckBox();
         numberOfRowsSpinner = new javax.swing.JSpinner();
         numberOfColumnsSpinner = new javax.swing.JSpinner();
+        jComboBox1 = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
 
         jLabel1.setText("Number of plots per row:");
 
         jLabel2.setText("Number of rows:");
-
-        aboveCB.setText("Add plots above current");
-        aboveCB.setToolTipText("Add the plots above instead of below the current plot.");
 
         numberOfRowsSpinner.setToolTipText("Number of rows to add.");
         numberOfRowsSpinner.setValue(1);
@@ -52,13 +52,28 @@ public class AddPlotsDialog extends javax.swing.JPanel {
         numberOfColumnsSpinner.setToolTipText("Number of plots per row.");
         numberOfColumnsSpinner.setValue(1);
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "above current", "replace current", "below current" }));
+        jComboBox1.setSelectedIndex(2);
+        jComboBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBox1ItemStateChanged(evt);
+            }
+        });
+
+        jLabel3.setText("Add plots:");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(layout.createSequentialGroup()
+                        .add(18, 18, 18)
+                        .add(jLabel3)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jComboBox1, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
@@ -66,8 +81,7 @@ public class AddPlotsDialog extends javax.swing.JPanel {
                         .add(41, 41, 41)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                             .add(numberOfColumnsSpinner)
-                            .add(numberOfRowsSpinner, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
-                    .add(aboveCB))
+                            .add(numberOfRowsSpinner, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE))))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -82,19 +96,44 @@ public class AddPlotsDialog extends javax.swing.JPanel {
                     .add(jLabel1)
                     .add(numberOfColumnsSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(aboveCB)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel3))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public boolean isAbove() {
-        return aboveCB.isSelected();
+    private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+        if ( evt.getStateChange()==ItemEvent.SELECTED && evt.getItem()==jComboBox1.getModel().getElementAt(1) ) {
+            numberOfRowsSpinner.setValue(1);
+            numberOfRowsSpinner.setEnabled(false);
+        } else {
+            if ( !numberOfRowsSpinner.isEnabled() ) {
+                numberOfRowsSpinner.setValue(1);
+                numberOfRowsSpinner.setEnabled(true);
+            }
+        }
+    }//GEN-LAST:event_jComboBox1ItemStateChanged
+
+    /**
+     * return the direction, LayoutConstants.ABOVE, LayoutConstants.BELOW, or null for in-the-place-of.
+     * @return
+     */
+    public Object getDirection() {
+        if ( jComboBox1.getSelectedIndex()==0 ) {
+            return LayoutConstants.ABOVE;
+        } else if ( jComboBox1.getSelectedIndex()==2 ) {
+            return LayoutConstants.BELOW;
+        } else {
+            return null; // in the place of
+        }
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JCheckBox aboveCB;
+    public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
+    public javax.swing.JLabel jLabel3;
     public javax.swing.JSpinner numberOfColumnsSpinner;
     public javax.swing.JSpinner numberOfRowsSpinner;
     // End of variables declaration//GEN-END:variables

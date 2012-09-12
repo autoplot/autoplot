@@ -175,7 +175,11 @@ public class LayoutPanel extends javax.swing.JPanel {
                     if ( nr>5 || nc>5 ) {
                         JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 5 rows or columns can be added at once.");
                     } else {
-                        app.getController().addPlots( nr,nc, dia.isAbove() ? LayoutConstants.ABOVE : LayoutConstants.BELOW );
+                        Plot p= app.getController().getPlot();
+                        app.getController().addPlots( nr,nc, dia.getDirection() );
+                        if ( dia.getDirection()==null ) {
+                            app.getController().deletePlot(p);
+                        }
                     }
                 }
             }
