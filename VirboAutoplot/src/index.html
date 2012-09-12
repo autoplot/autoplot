@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Plotting RBSP data by orbit.</small></p>
+        <p><small>Orbit number is indicated on plot, and the das2 server is used to demonstrate mag data.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>remove "sqrt()" label change from sqrt</li>
+            <li>split-plot function showed where there was code that didn't check for null</li>
+            <li>qstream serialize of Y(X) where Y(T) and X(T) would fail because of leftover reference to T. </li>
             <li>operations selector tool uses scrollpane to support small screens</li>
             <li>java cdf printed messages to stdout instead of stderr, preventing use with AutoplotDataServer</li>
             <li>axis visible=false now works nicely with fix layout.</li>
@@ -71,6 +74,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>addPlots dialog in layout panel allows the current plot to be replaced by a row of plots.</li>
+            <li>Plot Style indicates current plot style.  Moved up at Craig's request.</li>
+            <li>aggregation GUI has a button to show wildcard codes</li>
+            <li>aggregation throws FileNotFound instead of just showing no data</li>
             <li>--autolayout=F command line option because autolayout was triggering with Chris' vap.</li>
             <li>ctrl-S is bound to save</li>
             <li>ascii parser now detects non-ascii files and displays appropriate error.</li>
