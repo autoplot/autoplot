@@ -177,6 +177,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if ( ss.length==0 ) {
             if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
                 throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
+            } else {
+                throw new FileNotFoundException("No files in interval "+viewRange );
             }
         }
         if (ss.length > 1) {
