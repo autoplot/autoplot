@@ -1256,6 +1256,10 @@ public class GuiSupport {
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
+        JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
+        plot.getDasMouseInputAdapter().addMenuItem(ezMenu);
+        expertMenuItems.add(ezMenu);
+
         JMenu addPlotMenu = new JMenu("Add Plot");
         plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
 
@@ -1407,10 +1411,6 @@ public class GuiSupport {
         }));
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
-
-        JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
-        plot.getDasMouseInputAdapter().addMenuItem(ezMenu);
-        expertMenuItems.add(ezMenu);
 
         plotController.setExpertMenuItems( expertMenuItems.toArray(new JMenuItem[expertMenuItems.size()] ) );
 
