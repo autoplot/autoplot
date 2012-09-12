@@ -60,7 +60,8 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
             Util.pushContextMenu( dom.getPlots(1).getController().getDasPlot(),
                     new String[] { "Edit Plot Element", "Delete Plot Element" } );
 
-
+            writeToPng("Test_3pt5_3533882_timerange_reset.png");
+            save("Test_3pt5_3533882_timerange_reset.vap");
 
             if ( true ) {
                 return 0;
@@ -68,6 +69,9 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
                 return 1;
             }
 
+        } catch (IOException ex) {
+            Logger.getLogger(Test_3pt8_CopyPlotElementsDown.class.getName()).log(Level.SEVERE, null, ex);
+            return 1;
         } catch (ParseException ex) {
             Logger.getLogger(Test_3pt5_3533882_timerange_reset.class.getName()).log(Level.SEVERE, null, ex);
             return -2;
