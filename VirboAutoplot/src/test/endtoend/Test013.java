@@ -454,6 +454,7 @@ public class Test013 {
 
             formatDataSet( ds, "test013_002.qds" );
 
+            // see https://sourceforge.net/tracker/?func=detail&aid=3567174&group_id=199733&atid=970682
             xxx("test013_002.qds");
 
             System.exit(0);  // TODO: something is firing up the event thread
