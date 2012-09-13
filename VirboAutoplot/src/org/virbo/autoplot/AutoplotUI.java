@@ -617,7 +617,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 //        }
         APSplash.checkTime("init 110");
 
-
+        // jython is often slow to start up the first time, so go ahead and do this in the background.
         run= new Runnable() {
             public String toString() { return "addInitializePython"; }
             public void run() {
