@@ -12,15 +12,13 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
-import org.python.core.Py;
-import org.python.core.PyDictionary;
-import org.python.util.PythonInterpreter;
-import org.virbo.datasource.DataSourceUtil;
 
 
 /**
- *
+ * Support for invoking Jython script.  This is Just ".../AutoplotIU --script ..." stripped down, and was rewritten after Bob and Jeremy
+ * would see inconsistent behavior between:
+ *   /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.JythonMain `pwd`/testVars.jy   (and)
+ *   /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.AutoplotUI --script=`pwd`/testVars.jy
  * @author jbf
  */
 public class JythonMain {
@@ -29,69 +27,26 @@ public class JythonMain {
     public JythonMain() {
     }
     
-    static PythonInterpreter interp = null;
-    
-    public static PythonInterpreter getInterpreter() {
-        return interp;
-    }
-
-    private static void insertArgs( String[] argv ) {
-        interp.exec("params=dict()"); // untested.
-        int iargv=-1;  // skip the zeroth one, it is the name of the script
-        for ( int i=0; i<argv.length; i++ ) {
-            String s= argv[i];
-            int ieq= s.indexOf("="); 
-            if ( ieq>0 ) {
-                String snam= s.substring(0,ieq).trim();
-                if ( DataSourceUtil.isJavaIdentifier(snam) ) {
-                    String sval= s.substring(ieq+1).trim();
-                    interp.exec("params['" + snam + "']='" + sval+"'");
-                } else {
-                    if ( snam.startsWith("-") ) {
-                        System.err.println("script arguments should not start with -, they should be name=value");
-                    }
-                    System.err.println("bad parameter: "+ snam);
-                }
-            } else {
-                if ( iargv>=0 ) {
-                    interp.exec("params['arg_" + iargv + "']='" + s +"'" );
-                    iargv++;
-                } else {
-                    //System.err.println("skipping parameter" + s );
-                    iargv++;
-                }
-            }
-        }
-    }
-    
     public static void main(String[] args) throws Exception {
 
         System.err.println("org.virbo.autoplot.JythonMain "+APSplash.getVersion());
-        interp = JythonUtil.createInterpreter(true,false);
-        interp.set("dom", ScriptContext.getDocumentModel() );
-        interp.set("params", new PyDictionary()); //TODO: mimic autoplotUI, which allows arguments to script.
-        interp.set("resourceURI", Py.None );
 
-        InputStream in;
-        String inIdentifier;
-        
+        String argv[]= new String[ Math.max(0,args.length-1) ];
+        for ( int i=1; i<args.length; i++ ) { // first arg is the name of the script.
+            argv[i-1]= args[i];
+        }
+
+        ApplicationModel model= ScriptContext.getApplicationModel();
+
+        InputStream in= null;
         if ( args.length==0 ) {
             in= System.in;
-            inIdentifier= "<stdin>";
         } else {
-            if ( args.length>1 ) {
-                insertArgs( args );
-            }
-            File f= new File( args[0] );
-            if ( !f.exists() ) {
-                System.err.println("File does not exist: "+f);
-                System.exit(-1);
-            }
-            in= new FileInputStream(f);
-            inIdentifier= f.toString();
+            in= new FileInputStream( new File( args[0] ) );
         }
-        
-        interp.execfile( in, inIdentifier );
+        JythonUtil.runScript( model, in, argv );
+
+        in.close();
         System.exit(0);
     }
 }
