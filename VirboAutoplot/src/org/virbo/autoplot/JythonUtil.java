@@ -53,6 +53,20 @@ public class JythonUtil {
     }
 
     protected static void runScript( ApplicationModel model, String script, String[] argv ) throws IOException {
+        URL url= DataSetURI.getURL(script);
+        InputStream in= url.openStream();
+        runScript( model, in, argv );
+        in.close();
+    }
+
+    /**
+     * Run the script in the input stream.
+     * @param model
+     * @param in stream containing script. This will be left open.
+     * @param argv
+     * @throws IOException
+     */
+    protected static void runScript( ApplicationModel model, InputStream in, String[] argv ) throws IOException {
         if ( argv==null ) argv= new String[] {""};
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
@@ -85,10 +99,8 @@ public class JythonUtil {
             }
         }
         
-        URL url= DataSetURI.getURL(script);
-        InputStream in= url.openStream();
         interp.execfile(in);
-        in.close();
+
     }
 
     /**
