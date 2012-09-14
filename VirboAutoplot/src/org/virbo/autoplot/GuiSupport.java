@@ -90,6 +90,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.dom.Connector;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.OptionsPrefsController;
@@ -1080,6 +1081,10 @@ public class GuiSupport {
             expertMenuItems.add( addPlotMenu );
         }
 
+        JMenu bindingMenu = new JMenu("Binding");
+
+        mouseAdapter.addMenuItem(bindingMenu);
+
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             public void actionPerformed(ActionEvent e) {
                 BindingModel[] bms= controller.getBindingsFor(axis);
@@ -1087,16 +1092,11 @@ public class GuiSupport {
                 controller.setStatus("removed "+bms.length+" bindings");
             }
         });
-        item.setToolTipText("remove any plot and panel property bindings");
-        mouseAdapter.addMenuItem(item);
-        expertMenuItems.add(item);
-
-        JMenu bindingMenu = new JMenu("Add Binding");
-
-        mouseAdapter.addMenuItem(bindingMenu);
+        item.setToolTipText("remove any plot and plot element property bindings");
+        bindingMenu.add(item);
 
         if (axis == plot.getXaxis()) {
-            item = new JMenuItem(new AbstractAction("Bind to Application Time Range") {
+            item = new JMenuItem(new AbstractAction("Add Binding to Application Time Range") {
 
                 public void actionPerformed(ActionEvent e) {
                     DatumRange dr= controller.getApplication().getTimeRange();
@@ -1110,7 +1110,7 @@ public class GuiSupport {
             bindingMenu.add(item);
         }
 
-        item = new JMenuItem(new AbstractAction("Bind to Plot Above") {
+        item = new JMenuItem(new AbstractAction("Add Binding to Plot Above") {
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
@@ -1121,7 +1121,7 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Bind to Plot Below") {
+        item = new JMenuItem(new AbstractAction("Add Binding to Plot Below") {
 
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotBelow(plot);
@@ -1133,7 +1133,7 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Bind to Plot to the Right") {
+        item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Right") {
 
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.RIGHT);
@@ -1145,7 +1145,7 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Bind to Plot to the Left") {
+        item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Left") {
 
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.LEFT);
@@ -1159,12 +1159,11 @@ public class GuiSupport {
         bindingMenu.add(item);
         expertMenuItems.add(bindingMenu);
 
-        JMenu connectorMenu = new JMenu("Add Connector");
+        JMenu connectorMenu = new JMenu("Connector");
 
         mouseAdapter.addMenuItem(connectorMenu);
 
-        item = new JMenuItem(new AbstractAction("Connector to Plot Above") {
-
+        item = new JMenuItem(new AbstractAction("Add Connector to Plot Above") {
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
@@ -1175,6 +1174,33 @@ public class GuiSupport {
             }
         });
         connectorMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Add Connector to Plot Below") {
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = controller.getPlotBelow(plot);
+                if (dstPlot == null) {
+                    controller.setStatus("warning: no plot below");
+                } else {
+                    controller.addConnector(plot,dstPlot);
+                }
+            }
+        });
+        connectorMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Delete Connectors") {
+            public void actionPerformed(ActionEvent e) {
+                Application dom= plot.getController().getApplication();
+                for (Connector c : DomUtil.asArrayList(dom.getConnectors())) {
+                    if (c.getPlotA().equals(plot.getId()) || c.getPlotB().equals(plot.getId())) {
+                        dom.getController().deleteConnector(c);
+                    }
+                }
+                dom.getController().getCanvas().getController().getDasCanvas().repaint();
+            }
+        });
+        
+        connectorMenu.add(item);
+
         expertMenuItems.add(connectorMenu);
 
         if ( axis.getController().getDasAxis().isHorizontal() ) {
