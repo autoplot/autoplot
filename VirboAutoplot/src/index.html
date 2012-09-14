@@ -22,7 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
-            <li>uncaught runtime exception when orbit file cannot be read is removed from the history.</li>
+            <li>limit resolution of timerange reported with %{RANGE}</li>
+            <li>uncaught runtime exception when orbit file cannot be read is removed from the timerange history.</li>
             <li>reduce the effect of make taller/make shorter</li>
             <li>JythonMain reimplemented to mimic AutoplotUI --script, since it was not showing problem </li>
             <li>3566288: single tick with short plots.</li>
@@ -60,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>eventsRenderer uses control for showLabels, allowing use with orbit files.</li>
             <li>clean up x-axis menu</li>
             <li>PngWalkTool has right-click "save local copy" (Reiner)</li>
             <li>addPlots dialog in layout panel allows the current plot to be replaced by a row of plots. (Seth)</li>
