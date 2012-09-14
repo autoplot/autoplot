@@ -78,7 +78,7 @@ class Das2ServerDataSource extends AbstractDataSource {
     Map dsdfParams=null;
 
     @Override
-    public synchronized QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
+    public QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
