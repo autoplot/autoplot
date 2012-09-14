@@ -160,7 +160,12 @@ public class Test501 {
                     iis++;
                     continue;
                 }
-
+                if ( id.contains("/test/") ) {
+                    System.err.println( "ids containing /test/ are automatically skipped: " + id );
+                    iis++;
+                    continue;
+                }
+                
                 if ( skip.contains(iis) ) {
                     iis++;
                     System.err.println( "test marked for skipping in Test501.java: " + id );
