@@ -642,19 +642,20 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * adds a context overview plotId below the plotId.
-     * @param domPlot
+     * @param upperPlot the upper plot
+     * @param lowerPlot the lower plot
      */
-    public void addConnector(Plot domPlot, Plot that) {
-        logger.log( Level.FINE, "addConnector({0},{1})", new Object[]{domPlot, that});
+    public void addConnector(Plot upperPlot, Plot lowerPlot) {
+        logger.log( Level.FINE, "addConnector({0},{1})", new Object[]{upperPlot, lowerPlot});
         List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
-        final Connector connector = new Connector(domPlot.getId(), that.getId());
+        final Connector connector = new Connector(upperPlot.getId(), lowerPlot.getId());
         connectors.add(connector);
 
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
         DasCanvas lcanvas = getDasCanvas();
-        DasPlot upper = domPlot.controller.getDasPlot();
-        DasPlot lower = that.controller.getDasPlot();
+        DasPlot upper = upperPlot.controller.getDasPlot();
+        DasPlot lower = lowerPlot.controller.getDasPlot();
 
         //overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(overviewZoom);
         ColumnColumnConnector overviewPlotConnector =
