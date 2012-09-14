@@ -83,7 +83,21 @@ public class GridPngWalkView extends PngWalkView {
             @Override
             public void mousePressed(MouseEvent e) {
                 p0= e.getPoint();
+                if ( e.isPopupTrigger() ) {
+                    if (seq == null) return;
+                    selectCellAt(e.getX(), e.getY());
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
+
 //            public void mouseDragged(MouseEvent e) {
 //                if ( p0!=null ) {
 //                    Point p2= e.getPoint();

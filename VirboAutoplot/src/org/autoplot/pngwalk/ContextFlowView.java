@@ -49,6 +49,20 @@ public class ContextFlowView extends PngWalkView {
                     }
                 }
             }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
         });
     }
 

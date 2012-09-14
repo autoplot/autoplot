@@ -12,6 +12,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Window;
@@ -365,35 +366,33 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * save a copy of the current selection to a local disk.
      */
-    protected void saveLocalCopy() {
+    protected static void saveLocalCopy( Component parent, String ssrc ) {
         Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
         String srecent = prefs.get( PngWalkTool1.PREF_RECENT, System.getProperty("user.home") );
-        String ssrc= getSelectedFile();
         if ( ssrc==null ) {
-            JOptionPane.showMessageDialog( this, "No image is selected." );
+            JOptionPane.showMessageDialog( parent, "No image is selected." );
             return;
         }
         File src;
         try {
             src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog( this, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
+            JOptionPane.showMessageDialog( parent, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
             return;
         }
 
         JFileChooser chooser= new JFileChooser( srecent );
         chooser.setMultiSelectionEnabled(false);
         chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
-        int r= chooser.showSaveDialog(this);
+        int r= chooser.showSaveDialog(parent);
         if ( r==JFileChooser.APPROVE_OPTION ) {
             prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent().toString() );
             try {
                 if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
-                    JOptionPane.showMessageDialog( this, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
+                    JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
                 }
             } catch (IOException ex) {
-                this.setStatus("Unable to save to: " + chooser.getSelectedFile() );
-                JOptionPane.showMessageDialog( this, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
+                JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile()+"<br><br>"+ex.toString() );
             }
         }
     }
@@ -405,7 +404,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
             public void actionPerformed( ActionEvent e ) {
-                tool.saveLocalCopy();
+                saveLocalCopy(tool,tool.getSelectedFile());
             }
         } );
 

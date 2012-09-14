@@ -5,15 +5,20 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import org.virbo.datasource.DataSetURI;
 
 /**
  * This is the abstract superclass for views in the PNGWalk tool.  Concrete
@@ -147,6 +152,18 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
                 if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
             }
         };
+    }
+
+    public JPopupMenu getPopup() {
+        JPopupMenu m= new JPopupMenu();
+        m.add( new JMenuItem( new AbstractAction( "Save local copy..." ) {
+            public void actionPerformed(ActionEvent e) {
+                if ( PngWalkView.this.seq==null ) return;
+                String file= DataSetURI.fromUri( seq.currentImage().getUri() );
+                PngWalkTool1.saveLocalCopy(PngWalkView.this,file);
+            }
+        } ) );
+        return m;
     }
 
     // Error message painting (e.g. "No matching images")

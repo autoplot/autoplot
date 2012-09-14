@@ -3,6 +3,8 @@ package org.autoplot.pngwalk;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 /**
@@ -18,6 +20,21 @@ public class SinglePngWalkView extends PngWalkView {
         super(s);
         setShowCaptions(true);
         addMouseWheelListener( getMouseWheelListener() );
+        addMouseListener( new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
+        } );
+
     }
 
     @Override

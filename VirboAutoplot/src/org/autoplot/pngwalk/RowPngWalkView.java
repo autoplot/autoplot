@@ -65,6 +65,23 @@ public class RowPngWalkView extends PngWalkView {
                 //System.err.printf("Click at %d, %d (cell %d)%n", e.getX(), e.getY(), clickCell);
                 selectCell(clickCell);
             }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    int clickCell = (int) Math.floor((double) e.getX() / (double) cellSize);
+                    //System.err.printf("Click at %d, %d (cell %d)%n", e.getX(), e.getY(), clickCell);
+                    selectCell(clickCell);
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                if ( e.isPopupTrigger() ) {
+                    getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+            }
         });
 
         canvas.addComponentListener(new ComponentAdapter() {
