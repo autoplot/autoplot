@@ -489,12 +489,12 @@ public class LayoutPanel extends javax.swing.JPanel {
         addPlotsBelowMenuItem = new javax.swing.JMenuItem(addPlotsAction);
         removeBindingsMenuItem = new javax.swing.JMenuItem(removeBindingsAction);
         plotsMenu = new javax.swing.JMenu();
-        swapMenuItem = new javax.swing.JMenuItem();
-        addHiddenMenuItem = new javax.swing.JMenuItem();
         sizeMenu = new javax.swing.JMenu();
         biggerMI = new javax.swing.JMenuItem();
         smallerMI = new javax.swing.JMenuItem();
         sameSizeMI = new javax.swing.JMenuItem();
+        swapMenuItem = new javax.swing.JMenuItem();
+        addHiddenMenuItem = new javax.swing.JMenuItem();
         bindingActionsMenu = new javax.swing.JPopupMenu();
         deleteBindingsMenuItem = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
@@ -537,28 +537,11 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         plotsMenu.setText("Canvas");
 
-        swapMenuItem.setText("Swap Position");
-        swapMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                swapMenuItemActionPerformed(evt);
-            }
-        });
-        plotsMenu.add(swapMenuItem);
-
-        addHiddenMenuItem.setText("Add Hidden Plot...");
-        addHiddenMenuItem.setToolTipText("Add hidden plot for this plot/plots to bind plots together.\n");
-        addHiddenMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addHiddenMenuItemActionPerformed(evt);
-            }
-        });
-        plotsMenu.add(addHiddenMenuItem);
-
         sizeMenu.setText("Plot Size");
         sizeMenu.setToolTipText("Adjust the selected plots' size");
 
         biggerMI.setText("Taller");
-        biggerMI.setToolTipText("Make the selected plots taller relative to others");
+        biggerMI.setToolTipText("Make the selected plots 25% taller relative to others");
         biggerMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 biggerMIActionPerformed(evt);
@@ -567,7 +550,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         sizeMenu.add(biggerMI);
 
         smallerMI.setText("Shorter");
-        smallerMI.setToolTipText("Make the selected plots shorter relative to others");
+        smallerMI.setToolTipText("Make the selected plots 25% shorter relative to others");
         smallerMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 smallerMIActionPerformed(evt);
@@ -585,6 +568,23 @@ public class LayoutPanel extends javax.swing.JPanel {
         sizeMenu.add(sameSizeMI);
 
         plotsMenu.add(sizeMenu);
+
+        swapMenuItem.setText("Swap Position");
+        swapMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                swapMenuItemActionPerformed(evt);
+            }
+        });
+        plotsMenu.add(swapMenuItem);
+
+        addHiddenMenuItem.setText("Add Hidden Plot...");
+        addHiddenMenuItem.setToolTipText("Add hidden plot for this plot/plots to bind plots together.\n");
+        addHiddenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addHiddenMenuItemActionPerformed(evt);
+            }
+        });
+        plotsMenu.add(addHiddenMenuItem);
 
         plotActionsMenu.add(plotsMenu);
 
@@ -846,7 +846,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             try {
                 double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
                 double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
-                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.5;
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.25;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
         }
@@ -856,7 +856,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_biggerMIActionPerformed
 
     private void sameSizeMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sameSizeMIActionPerformed
-                List<Row> rows= new ArrayList<Row>();
+        List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
             Row row= p1.getController().getRow();
             if ( !rows.contains(row) ) rows.add(row);
@@ -904,14 +904,11 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( !rows.contains(row) ) rows.add(row);
         }
 
-        double size= 0;
-        int n= 0;
-
         for ( Row r: rows ) {
             try {
                 double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
                 double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
-                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.6666;
+                d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.80;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
         }

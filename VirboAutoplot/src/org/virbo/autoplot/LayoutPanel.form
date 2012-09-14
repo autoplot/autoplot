@@ -58,6 +58,41 @@
             <Property name="text" type="java.lang.String" value="Canvas"/>
           </Properties>
           <SubComponents>
+            <Menu class="javax.swing.JMenu" name="sizeMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Plot Size"/>
+                <Property name="toolTipText" type="java.lang.String" value="Adjust the selected plots&apos; size"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="biggerMI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Taller"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots 25% taller relative to others"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="biggerMIActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="smallerMI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Shorter"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots 25% shorter relative to others"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="smallerMIActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="sameSizeMI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Same Height"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots have the same height"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sameSizeMIActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="swapMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Swap Position"/>
@@ -75,41 +110,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addHiddenMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <Menu class="javax.swing.JMenu" name="sizeMenu">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Plot Size"/>
-                <Property name="toolTipText" type="java.lang.String" value="Adjust the selected plots&apos; size"/>
-              </Properties>
-              <SubComponents>
-                <MenuItem class="javax.swing.JMenuItem" name="biggerMI">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Taller"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots taller relative to others"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="biggerMIActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="smallerMI">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Shorter"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots shorter relative to others"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="smallerMIActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="sameSizeMI">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Same Height"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Make the selected plots have the same height"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sameSizeMIActionPerformed"/>
-                  </Events>
-                </MenuItem>
-              </SubComponents>
-            </Menu>
           </SubComponents>
         </Menu>
       </SubComponents>
