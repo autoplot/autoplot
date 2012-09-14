@@ -71,6 +71,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 try {
                     DatumRangeUtil.parseTimeRange(text);
                     return true;
+                } catch ( IllegalArgumentException ex ) {
+                    return false;
                 } catch (ParseException e) {
                     return false;
                 }
