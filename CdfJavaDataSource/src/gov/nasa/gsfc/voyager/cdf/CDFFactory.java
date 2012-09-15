@@ -3,6 +3,7 @@ import java.nio.*;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
+import java.util.logging.Logger;
 import java.util.zip.*;
 /**
  * CDFFactory creates an object which implements methods of interface
@@ -10,6 +11,9 @@ import java.util.zip.*;
  * be a file, a byte array, or a URL.
  */
 public class CDFFactory {
+
+    private static final Logger logger= Logger.getLogger("apdss");
+    
     public static final long CDF3_MAGIC =((long)0xcdf3 << 48) +
         ((long)0x0001 << 32) + 0x0000ffff;
     public static final long CDF3_COMPRESSED_MAGIC =((long)0xcdf3 << 48) +
@@ -132,7 +136,7 @@ public class CDFFactory {
                 toRead -= n;
             }
         } catch (IOException ex) {
-            System.err.println(ex.toString());
+            logger.fine(ex.toString());
             return null;
         }
         if (n < 0) return null;

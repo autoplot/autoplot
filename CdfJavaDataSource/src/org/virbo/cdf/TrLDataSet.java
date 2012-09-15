@@ -368,7 +368,7 @@ public final class TrLDataSet extends TrArrayDataSet implements WritableDataSet,
         int len1,len2,len3;
         if ( !DataSetUtil.isQube(ds) ) {
             //throw new IllegalArgumentException("copy non-qube");
-            System.err.println("copy of non-qube to DDataSet, which must be qube");
+            logger.fine("copy of non-qube to DDataSet, which must be qube");
         }
         switch (rank) {
             case 0:

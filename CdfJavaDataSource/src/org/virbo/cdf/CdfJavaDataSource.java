@@ -56,7 +56,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_SLICE1 = "slice1";
 
-    static final Logger logger= Logger.getLogger("org.virbo.cdfjava");
+    static final Logger logger= Logger.getLogger("apdss.cdfjava");
     Map<String, Object> attributes;
 
     CdfJavaDataSource( URI uri ) {
@@ -110,7 +110,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
             while ( dsCache.size()>DS_CACHE_SIZE_LIMIT ) {
                 Entry<String,MutablePropertyDataSet> first= dsCache.entrySet().iterator().next();
                 dsCache.remove(first.getKey());
-                System.err.println( "remove "+first.getKey() );
+                logger.fine( "remove "+first.getKey() );
             }
         }
     }
@@ -387,7 +387,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         newVal.put("NAME", name); // tuck it away, we'll need it later.
                         props.put(vv[i], newVal);
                     } else {
-                        System.err.println( "No such variable: "+ name + " in CDF " );
+                        logger.fine( "No such variable: "+ name + " in CDF " );
                     }
 
                 } else if ( ipass==1 && !isDep ) {
@@ -534,7 +534,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                         Variable depVar= cdf.getVariable( depName );
                         if ( depVar==null ) {
-                            System.err.println("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
+                            logger.fine("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
                             continue;
                         }
 
@@ -590,7 +590,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     if (labl != null) {
                         try {
                             if ( cdf.getVariable(labl)==null ) {
-                                System.err.println("no such variable: "+labl+" referred to by variable: "+ svariable );
+                                logger.fine("no such variable: "+labl+" referred to by variable: "+ svariable );
                             } else {
                                 MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
                                 result.putProperty("DEPEND_" + idep, depDs);
@@ -613,7 +613,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
             if (n1 != n2 && dep1 != null && dep1.length() == n2) {
                 if (dep2 != null && dep2.length() == n1) {
                     swapHack = true;
-                    System.err.println("swaphack avoids runtime error");
+                    logger.fine("swaphack avoids runtime error");
                 }
             }
         }
@@ -626,7 +626,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
             if (n0 != n1 && dep0 != null && dep0.length() == n1) {
                 if (dep1 != null && dep1.length() == n0) {
                     swapHack = true;
-                    System.err.println("swaphack avoids runtime error");
+                    logger.fine("swaphack avoids runtime error");
                 }
             }
         }

@@ -412,7 +412,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             p= p.replaceAll("=", "%3D");
             params.put( "arg_0", p + ( slice==null ? "" : slice ) );
         } else {
-            System.err.println("param was null");
+            logger.fine("param was null");
         }
 
         if ( noDep.isSelected() ) {

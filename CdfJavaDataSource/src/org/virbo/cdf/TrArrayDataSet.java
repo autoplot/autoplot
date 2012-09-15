@@ -6,6 +6,7 @@
 package org.virbo.cdf;
 
 import java.lang.reflect.Array;
+import java.util.logging.Logger;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
 
@@ -14,7 +15,8 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public abstract class TrArrayDataSet extends AbstractDataSet {
-    
+
+    protected static final Logger logger= Logger.getLogger("apdss");
     float fill= Float.NaN;
     double dfill= Double.NaN;
     long lfill= Long.MAX_VALUE;

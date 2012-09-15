@@ -273,7 +273,7 @@ public class CdfUtil {
                     }
                     //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
-                    //System.err.println("reading variable "+variable.getName());
+                    //logger.fine("reading variable "+variable.getName());
                     odata= cdf.get1D( variable.getName(), true );
                 }
             } else {
@@ -292,7 +292,7 @@ public class CdfUtil {
         }
 
         if ( ( odata==null && buf==null ) && ( varType != CDFConstants.CDF_CHAR && varType!=CDFConstants.CDF_UCHAR ) ) {
-            System.err.println("something went wrong");
+            logger.fine("something went wrong");
             throw new NullPointerException("something went wrong");
         }
 
@@ -466,7 +466,7 @@ public class CdfUtil {
 
         }
 
-//System.err.println( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
+//logger.fine( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
         if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
             String cdfFile;
             synchronized ( CdfJavaDataSource.lock ) {
@@ -688,7 +688,7 @@ public class CdfUtil {
             }
         }
         if ( skipCount==v.length ) {
-            System.err.println( "turning off dataOnly because it rejects everything");
+            logger.fine( "turning off dataOnly because it rejects everything");
             dataOnly= false;
         }
 
@@ -755,7 +755,7 @@ public class CdfUtil {
                                 if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
                                 if ( !CdfVirtualVars.isSupported(funct) ) {
                                     if ( !funct.startsWith("comp_themis") ) {
-                                        System.err.println("virtual function not supported: "+funct );
+                                        logger.fine("virtual function not supported: "+funct );
                                     }
                                     continue;
                                 } else {
@@ -810,7 +810,7 @@ public class CdfUtil {
                 }
 
                 if ( var.getName().equals("FEDU" ) ) {
-                    System.err.println("Here FEDU");
+                    logger.fine("Here FEDU");
                 }
                 DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
 
