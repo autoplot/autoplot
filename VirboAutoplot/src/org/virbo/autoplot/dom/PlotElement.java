@@ -173,6 +173,11 @@ public class PlotElement extends DomNode {
         this.setAutoComponent(false);
     }
 
+    /**
+     * Set the property, and also set the autoComponent property.  Note setComponent will clear the property.
+     * TODO: this should probably be in the controller.
+     * @param component
+     */
     public void setComponentAutomatically( String component ) {
         String oldComponent = this.component;
         this.component = component;
