@@ -80,7 +80,7 @@ public class TimeSeriesBrowseController {
             this.domPlot= dsf.getController().getApplication().getController().getPlotFor(p);
             this.panelController = p.getController();
         } else {
-            System.err.println("no plotElement provided, better come back to set up from timerange.");
+            logger.fine("no plotElement provided, better come back to set up from timerange.");
         }
 
         if ( p!=null ) {
@@ -233,7 +233,7 @@ public class TimeSeriesBrowseController {
                     QDataSet qdsj= (QDataSet)join0;
                     tag= (CacheTag) qdsj.property( QDataSet.CACHE_TAG );
                 } else {
-                    System.err.println( "join property was not a QDataSet: "+join0.toString() );
+                    logger.log( Level.FINE, "join property was not a QDataSet: {0}", join0.toString());
                 }
             }
 
@@ -245,18 +245,18 @@ public class TimeSeriesBrowseController {
                 if ( xAxis.getDLength()>2 ) {
                     newResolution = visibleRange.width().divide(xAxis.getDLength());
                 } else {
-                    System.err.println("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                    logger.fine("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
                 }
                 // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
                 testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
                 trange= newRange;
                 if ( !UnitsUtil.isTimeLocation( visibleRange.getUnits() ) ) {
-                   System.err.println("x-axis for TSB not time location units: " + visibleRange );
+                   logger.log(Level.FINE, "x-axis for TSB not time location units: {0}", visibleRange);
 
                    trange= dsf.getController().getApplication().getTimeRange();
                    if ( UnitsUtil.isTimeLocation( trange.getUnits() ) ) {
-                        System.err.println("  rebinding application timeRange" );
+                        logger.fine("  rebinding application timeRange" );
                         this.release();
                         //Axis xaxis= null;
                         //dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
@@ -267,7 +267,7 @@ public class TimeSeriesBrowseController {
                         dom.getController().bind( dom, Application.PROP_TIMERANGE, domPlot, Plot.PROP_CONTEXT );
                         
                     } else {
-                        System.err.println("  unable to bind to application timeRange because of units." );
+                        logger.fine("  unable to bind to application timeRange because of units." );
                         return;
                     }
 
@@ -283,7 +283,7 @@ public class TimeSeriesBrowseController {
             if (tag == null || !tag.contains(testCacheTag)) {
                 TimeSeriesBrowse tsb= dataSourceController.getTsb();
                 if ( tsb==null ) {
-                    System.err.println("tsbc253: tsb was null");
+                    logger.warning("tsbc253: tsb was null");
                     return;
                 }
                 if ( xAxis!=null ) {
@@ -356,7 +356,7 @@ public class TimeSeriesBrowseController {
         } else {
             if ( listenNode!=null ) {
                 if ( timeSeriesBrowseListener==null ) {
-                    System.err.println("here timeSeriesBrowseListener is null");
+                    logger.fine("here timeSeriesBrowseListener is null");
                 }
                 listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
             }
@@ -373,7 +373,7 @@ public class TimeSeriesBrowseController {
 
     public void setTimeRange(DatumRange timeRange) {
         if ( !UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
-            System.err.println("ignoring call to setTimeRange with non-time-location "+timeRange );
+            logger.log(Level.FINE, "ignoring call to setTimeRange with non-time-location {0}", timeRange);
             return;
         }
         DatumRange oldTimeRange = this.timeRange;
