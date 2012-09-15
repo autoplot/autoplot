@@ -535,24 +535,24 @@ public class CDAWebDB {
 
         String[] files= db.getFilesAndRanges( "AC_H0_MFI", DatumRangeUtil.parseTimeRange( "20010101T000000Z-20010131T000000Z" ) );
         for ( String s: files ) {
-            System.err.println(s);
+            System.err.println(s); //logger ok
         }
 
         String[] files2= db.getFilesAndRanges( "TIMED_L1B_SABER", DatumRangeUtil.parseTimeRange( "2002-01-26" ) );
         for ( String s: files2 ) {
-            System.err.println(s);
+            System.err.println(s); //logger ok
         }
         
         Map<String,String> ids= db.getServiceProviderIds( );
 
         for ( String s: ids.keySet() ) {
-            System.err.println(s + ":\t" + ids.get(s) );
+            System.err.println(s + ":\t" + ids.get(s) ); //logger ok
         }
-        System.err.println( ids.size() );
-        System.err.println( db.getNaming( "AC_H0_MFI" )  );
-        System.err.println( db.getTimeRange( "AC_H0_MFI" )  );
+        System.err.println( ids.size() ); //logger ok
+        System.err.println( db.getNaming( "AC_H0_MFI" )  ); //logger ok
+        System.err.println( db.getTimeRange( "AC_H0_MFI" )  ); //logger ok
         
-        System.err.println( "Timer: " + ( System.currentTimeMillis() - t0 ) );
+        System.err.println( "Timer: " + ( System.currentTimeMillis() - t0 ) ); //logger ok
 
     }
 }

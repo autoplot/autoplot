@@ -50,6 +50,8 @@ import org.virbo.datasource.URISplit;
  */
 public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= Logger.getLogger("apdss");
+    
     /** Creates new form CDAWebEditorPanel */
     public CDAWebEditorPanel() {
         initComponents();
@@ -206,7 +208,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             messageComponent= new JLabel("<html>CDF file subpanel prepare method failed");
                             paramEditor= null;
                         } else {
-//System.err.println( "messageComponent="+messageComponent );
+//logger.fine( "messageComponent="+messageComponent );
                             if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
                             parameterPanel.add( panel, BorderLayout.CENTER );
 
@@ -214,7 +216,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             paramEditor= panel;
                             parameterPanel.revalidate();
                             messageComponent= null;
-//System.err.println( " after count=" + parameterPanel.getComponentCount() );
+//logger.fine( " after count=" + parameterPanel.getComponentCount() );
                             refreshDataSet( panel, ds, args );
                         }
                     } catch ( Exception ex ) {
@@ -238,7 +240,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     public synchronized void refresh(String suri) {
 
         if ( EventQueue.isDispatchThread() ) {
-            System.err.println("TODO: refresh should not be called from the event thread");
+            CDAWebDataSource.logger.warning("TODO: refresh should not be called from the event thread");
         }
         if ( !haveAddedRecent ) {
             addRecent();
@@ -297,7 +299,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             File book = new File(home, "bookmarks");
             File hist = new File(book, "history.txt");
             long t0= System.currentTimeMillis();
-            System.err.println("reading recent datasources from " + hist.toString() );
+            logger.log(Level.FINE, "reading recent datasources from {0}", hist.toString());
             if ( !hist.exists() ) return;
             r = new BufferedReader(new FileReader(hist));
             String s = r.readLine();
@@ -321,7 +323,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             dsidComboBox.setModel( new DefaultComboBoxModel( items ) );
             dsidComboBox.setSelectedItem(val);
             t0= System.currentTimeMillis() - t0 ;
-            System.err.printf("done in %d millis\n", t0 );
+            logger.log( Level.FINE, "done in {0} millis\n", t0 );
             
         } catch (IOException ex) {
             Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -525,7 +527,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             parameterPanel.add( messageComponent, BorderLayout.NORTH );
                             parameterPanel.revalidate();
                             if ( !pickDs() ) {
-                                //System.err.println("no dataset picked.");
+                                //logger.fine("no dataset picked.");
                             }
                         }
                     } );
@@ -550,7 +552,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         
         String timeRange= timeRangeTextField.getText();
         if ( timeRange==null ) {
-            System.err.println("here it's null");
+            logger.warning("here the timeRange is null");
         }
         timeRange= timeRange.replaceAll(" ", "+");
         

@@ -50,6 +50,8 @@ import org.virbo.metatree.IstpMetadataModel;
  */
 public class CDAWebDataSource extends AbstractDataSource {
 
+    protected static final Logger logger= Logger.getLogger("apdss");
+
     public static final String PARAM_ID= "id";
     public static final String PARAM_DS= "ds";
     public static final String PARAM_TIMERANGE= "timerange";
@@ -208,7 +210,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     } else {
                         file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                     }
-                    System.err.println( "loading "+file1 );
+                    logger.fine( "loading "+file1 );
                     CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                 }
@@ -355,6 +357,6 @@ public class CDAWebDataSource extends AbstractDataSource {
     public static void main( String[] args ) throws URISyntaxException, Exception {
         CDAWebDataSource dss= new CDAWebDataSource( new URI( "vap+cdaweb:file:///foo.xml?ds=cl_sp_fgm&id=B_mag&timerange=2001-10-10") );
         QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
-        System.err.println(ds);
+        logger.fine(ds.toString());
     }
 }
