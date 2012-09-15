@@ -37,7 +37,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * Utility class for creating a Document from a DomNode.  Note that there is special
+ * handling for:
+ *    controller -- these nodes are dropped.
+ *    class -- this is noise from java.
+ *    *Automatically -- this is a property used to set another property.
+ * There may be other exceptional properties that are not documented here.
  * @author jbf
  */
 public class SerializeUtil {
