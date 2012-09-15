@@ -31,6 +31,8 @@ import org.virbo.datasource.capability.Updating;
  */
 public class AggregationPollUpdating implements Updating {
 
+    private static final Logger logger= Logger.getLogger("apdss");
+
     FileStorageModelNew fsm;
     DatumRange dr;
     long dirHash;
@@ -46,12 +48,12 @@ public class AggregationPollUpdating implements Updating {
         this.dr= dr;
         if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
             if ( pollCyclePeriodSeconds<LIMIT_SHORT_CYCLE_PERIOD ) {
-                System.err.println("pollCyclePeriodSeconds too low, for local files it must be at least "+LIMIT_SHORT_CYCLE_PERIOD+" seconds");
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for local files it must be at least {0} seconds", LIMIT_SHORT_CYCLE_PERIOD);
                 pollCyclePeriodSeconds= LIMIT_SHORT_CYCLE_PERIOD;
             }
         } else {
             if ( pollCyclePeriodSeconds<LIMIT_SHORT_REMOTE_CYCLE_PERIOD ) {
-                System.err.println("pollCyclePeriodSeconds too low, for remote files it must be at least "+LIMIT_SHORT_REMOTE_CYCLE_PERIOD+" seconds");
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for remote files it must be at least {0} seconds", LIMIT_SHORT_REMOTE_CYCLE_PERIOD);
                 pollCyclePeriodSeconds= LIMIT_SHORT_REMOTE_CYCLE_PERIOD;
             }
         }
@@ -65,7 +67,7 @@ public class AggregationPollUpdating implements Updating {
         try {
             startPolling();
         } catch ( IOException ex ) {
-            ex.printStackTrace();
+            logger.severe(ex.getLocalizedMessage());
         }
     }
 
@@ -93,12 +95,12 @@ public class AggregationPollUpdating implements Updating {
     }
     public void startPolling( ) throws IOException {
 
-        //System.err.println("start polling");
+        //logger.fine("start polling");
         if ( dirHash!=0 || polling ) {
             return;
         }
         dirHash= dirHash( this.dr );
-        //System.err.println("start polling "+this.fsm+ " in " + this.dr);
+        //logger.fine("start polling "+this.fsm+ " in " + this.dr);
         Runnable run= new Runnable() {
             public void run() {
                 while ( dirHash!=0 ) {
@@ -118,7 +120,7 @@ public class AggregationPollUpdating implements Updating {
                             dirty= false;
                         }
                     } catch ( IOException ex ) {
-                        System.err.println(ex);
+                        logger.severe(ex.toString());
                         throw new RuntimeException(ex);
                     }
                 }
@@ -130,7 +132,7 @@ public class AggregationPollUpdating implements Updating {
     }
 
     public void stopPolling() {
-        //System.err.println("stop polling "+this.fsm+ " in " + this.dr);
+        //logger.fine("stop polling "+this.fsm+ " in " + this.dr);
         dirHash=0;
         polling= false;
     }
@@ -144,20 +146,20 @@ public class AggregationPollUpdating implements Updating {
         AggregationPollUpdating a= new AggregationPollUpdating( fsm, null, 1 );
         a.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println( evt.toString() );
+                logger.fine( evt.toString() );
             } 
         });
 
         a.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println( evt.getNewValue() + "  " + Thread.currentThread().getName() );
+                logger.log( Level.FINE, "{0}  {1}", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
             }
         });
 
         Thread.sleep(6000);
         a.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println( evt.getNewValue() + "  " + Thread.currentThread().getName() + "  *** ");
+                logger.log( Level.FINE, "{0}  {1}  *** ", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
             }
         });
 

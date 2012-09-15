@@ -34,6 +34,8 @@ import org.virbo.datasource.capability.Updating;
  */
 public abstract class AbstractDataSource implements DataSource {
 
+    protected static final Logger logger= Logger.getLogger("apdss");
+
     protected URI uri;
     /**
      * available to subclasses for convenience.  This is the name of the file,
@@ -45,7 +47,7 @@ public abstract class AbstractDataSource implements DataSource {
         this.uri = uri;
         String s = DataSetURI.fromUri(uri);
         if ( !s.startsWith("vap") ) {
-            Logger.getLogger("vap.abstractDataSource").fine( "uri didn't start with vap!" );
+            logger.fine( "uri didn't start with vap!" );
         }
         URISplit split = URISplit.parse(s);
 
@@ -57,7 +59,7 @@ public abstract class AbstractDataSource implements DataSource {
                 resourceURI = DataSetURI.toUri(f);
             } catch (Exception e) {
                 //URI syntax exception
-                System.err.println(e); // InlineDataSource is subclass, need to fix this...
+                logger.fine(e.toString()); // InlineDataSource is subclass, need to fix this...
             }
         }
     }
@@ -76,7 +78,7 @@ public abstract class AbstractDataSource implements DataSource {
         try {
             return getExt(url.toURI());
         } catch (URISyntaxException e) {
-            System.err.println("Failed to convert URL to URI.");
+            logger.fine("Failed to convert URL to URI.");
             e.printStackTrace();
             return "";
         }

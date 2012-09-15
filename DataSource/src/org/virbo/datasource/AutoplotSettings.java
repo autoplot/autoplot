@@ -8,6 +8,7 @@ package org.virbo.datasource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import org.das2.util.filesystem.FileSystem;
 
@@ -16,7 +17,7 @@ import org.das2.util.filesystem.FileSystem;
  * @author jbf
  */
 public final class AutoplotSettings {
-
+    private static final Logger logger= Logger.getLogger("apdss");
     private static AutoplotSettings instance;
 
     public synchronized static AutoplotSettings settings() {
@@ -32,7 +33,7 @@ public final class AutoplotSettings {
             addPropertyChangeListener(listener);
             loadPreferences();
         } catch ( Exception ex ) {
-            System.err.println("Problem encountered when attempting to load user preferences, continuing with autoplot_data in $HOME");
+            logger.warning("Problem encountered when attempting to load user preferences, continuing with autoplot_data in $HOME");
             this.autoplotData= "${HOME}/autoplot_data";
             this.fscache= "${HOME}/autoplot_data/fscache";
         }

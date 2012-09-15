@@ -25,6 +25,8 @@ import javax.swing.filechooser.FileFilter;
  */
 public class DataSetSelectorSupport {
 
+    private static final Logger logger= Logger.getLogger("apdss.dss");
+
     DataSetSelector ui;
     public static final String PREF_LAST_OPEN_FOLDER = "last_open_folder";
     public static final String PREF_RECENTLY_OPENED_FILES = "recently_opened_files";
@@ -61,7 +63,7 @@ public class DataSetSelectorSupport {
                 }
                 String t = f.toString();
                 if (t==null ) {
-                    System.err.println("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
+                    logger.fine("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
                     //t= "" + f; // TODO: do we still get this?
                     return false;
                 }
@@ -108,7 +110,7 @@ public class DataSetSelectorSupport {
                 }
                 String t = f.toString();
                 if (t==null ) {
-                    System.err.println("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
+                    logger.fine("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
                     //t= "" + f;  //TODO: do we still get this?
                     return false;
                 }

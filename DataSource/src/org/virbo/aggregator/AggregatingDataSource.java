@@ -271,7 +271,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 }
             } catch ( Exception ex ) {
                 if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
-                    System.err.println("no data found in "+delegateUri );
+                    logger.log(Level.FINE, "no data found in {0}", delegateUri);
                     // do nothing
                 } else if ( ss.length==1 ) {
                     throw ex;

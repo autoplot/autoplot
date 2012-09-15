@@ -376,7 +376,7 @@ public class DataSetURI {
 
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
-System.err.println("factory:"+factory);
+
         if (factory == null && (resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https"))) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
@@ -1627,14 +1627,14 @@ System.err.println("factory:"+factory);
 
     public static void main(String[] args) throws MalformedURLException, IOException {
 //        File f = new File("c:\\documents and settings\\");
-//        System.err.println(f.exists());
-//        System.err.println(f.toURI().toString());
+//        logger.fine(f.exists());
+//        logger.fine(f.toURI().toString());
         
-        System.err.println(  getResourceURI("file:C:\\documents and settings\\jbf\\pngwalk") );
+        logger.fine( getResourceURI("file:C:\\documents and settings\\jbf\\pngwalk").toString() );
 
         URL url= new URL("http://apps-pw/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo64x64.png");
         File x= downloadResourceAsTempFile( url, new NullProgressMonitor() );
-        System.err.println( x );
+        logger.fine( x.toString() );
 
     }
 }

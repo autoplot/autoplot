@@ -24,12 +24,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 /**
  *
  * @author jbf
  */
 public class DataSourceRegistry {
+
+    private static final Logger logger= Logger.getLogger("apdss.uri");
 
     private static DataSourceRegistry instance;
     HashMap<String,Object> dataSourcesByExt;
@@ -227,10 +230,10 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                System.err.println("META-INF/org.virbo.datasource.DataSourceFactory.extensions contains extension that contains period: ");
-                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
-                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                System.err.println("");
+                                logger.warning("META-INF/org.virbo.datasource.DataSourceFactory.extensions contains extension that contains period: ");
+                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
                             }
                             registry.registerExtension(ss[0], ss[i], null);
@@ -280,10 +283,10 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                System.err.println("META-INF/org.virbo.datasource.DataSourceFormat.extensions contains extension that contains period: ");
-                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
-                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                System.err.println("");
+                                logger.warning("META-INF/org.virbo.datasource.DataSourceFormat.extensions contains extension that contains period: ");
+                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
                             }
                             registry.registerFormatter(ss[0], ss[i]);
@@ -310,10 +313,10 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                System.err.println("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
-                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
-                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                System.err.println("");
+                                logger.warning("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
+                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
                             }
                             registry.registerEditor(ss[0], ss[i]);
@@ -339,10 +342,10 @@ public class DataSourceRegistry {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
-                                System.err.println("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
-                                System.err.println( ss[0] + " " + ss[i] + " in " + url);
-                                System.err.println("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
-                                System.err.println("");
+                                logger.warning("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
+                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
+                                logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
                             }
                             registry.registerFormatEditor(ss[0], ss[i]);
@@ -437,7 +440,7 @@ public class DataSourceRegistry {
         if ( old!=null ) {
             String oldClassName= ( old instanceof String ) ? (String) old : old.getClass().getName() ;
             if ( !(oldClassName.equals(className)) ) {
-                System.err.println("extension "+extension+ " is already handled by "+oldClassName + ", replacing with "+className );
+                logger.fine("extension "+extension+ " is already handled by "+oldClassName + ", replacing with "+className );
             }
         }
         dataSourcesByExt.put(extension, className);
@@ -509,7 +512,7 @@ public class DataSourceRegistry {
                 throw new RuntimeException(ex);
             } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
                 if ( extension.equals(".cdf") ) {
-                    System.err.println("attempting to use java based reader to handle cdf.");
+                    logger.fine("attempting to use java based reader to handle cdf.");
                     DataSourceFactory dsf=  getSource(".cdfj");
                     if ( dsf!=null ) {
                         dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
