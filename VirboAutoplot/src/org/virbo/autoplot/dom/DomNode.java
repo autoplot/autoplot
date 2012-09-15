@@ -12,6 +12,28 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Autoplot's state is stored in a tree of nodes, with Java types constraining to particular abstractions.  Each node
+ * can have children, and implements:
+ *   copy -- make a copy of this node and its children.
+ *   syncTo -- make this node look like another node.  (e.g. undo to old state). syncTo can also be told to exclude properties.
+ *   diffs -- show differences between this and another node.
+ * All nodes have the property "id" which must be unique within the tree.  Each node has properties of the following types:
+ *   String
+ *   double
+ *   boolean
+ *   Datum
+ *   DatumRange
+ *   Color
+ *   RenderType
+ *   PlotSymbol
+ *   PsymConnector
+ *   RebinnerEnum
+ *
+ * Any DomNode can be saved and restored using SerializeUtil, which uses Java introspection to look at all the properties.
+ *
+ * Some nodes currently have the method "setXAutomatically" where X is a property.  This is currently used to indicate who is setting
+ * the property.  For example, PlotElement has setComponentAutomatically for use when a slice is set automatically by the application.
+ * This is handled specially in SerializeUtil
  *
  * @author jbf
  */
