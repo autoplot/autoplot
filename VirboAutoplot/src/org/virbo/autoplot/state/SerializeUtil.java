@@ -79,6 +79,12 @@ public class SerializeUtil {
                     //special node should runtime data
                     continue;
                 }
+
+                // setters like "setComponentAutomatically" which should probably not be in the dom node anyway.
+                if ( propertyName.endsWith("Automatically" ) ) {
+                    continue;
+                }
+                
                 log.log(Level.FINE, "serializing property \"{0}\" of {1} id={2}", new Object[]{propertyName, elementName, node.getId()});
                 Method readMethod = pd.getReadMethod();
                 Method writeMethod = pd.getWriteMethod();
