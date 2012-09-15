@@ -12,7 +12,7 @@ import java.util.zip.*;
  */
 public class CDFFactory {
 
-    private static final Logger logger= Logger.getLogger("apdss");
+    private static final Logger logger= Logger.getLogger("apdss.cdfjava");
     
     public static final long CDF3_MAGIC =((long)0xcdf3 << 48) +
         ((long)0x0001 << 32) + 0x0000ffff;

@@ -46,7 +46,7 @@ import org.virbo.dsops.Ops;
  */
 public class CdfUtil {
 
-    private final static Logger logger = Logger.getLogger("virbo.cdfdatasource");
+    private final static Logger logger = Logger.getLogger("apdss.cdfjava");
 
     /**
      * Creates a new instance of CdfUtil
