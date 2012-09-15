@@ -1496,7 +1496,7 @@ APSplash.checkTime("init 52");
     public void setStatus(String message) {
         if ( message.startsWith("busy:" ) ) {
             setMessage( BUSY_ICON, message.substring(5).trim() );
-            logger.info(message);
+            logger.fine(message);
         } else if ( message.startsWith("warning:" ) ) {
             setMessage( WARNING_ICON, message.substring(8).trim() );
             logger.warning(message);
@@ -1504,7 +1504,7 @@ APSplash.checkTime("init 52");
             setMessage( ERROR_ICON, message.substring(6).trim() );
             logger.severe(message);
         } else {
-            logger.info(message);
+            logger.fine(message);
             setMessage(message);
         }
         
@@ -1516,7 +1516,7 @@ APSplash.checkTime("init 52");
         } else if ( WARNING_ICON==icon ) {
             logger.warning(message);
         } else {
-            logger.info(message);
+            logger.fine(message);
         }
         setMessage(icon,message);
     }

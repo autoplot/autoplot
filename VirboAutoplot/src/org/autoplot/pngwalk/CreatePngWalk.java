@@ -231,7 +231,7 @@ public class CreatePngWalk {
                 logger.log(Level.SEVERE, null, ex);
             }
             mon.setProgressMessage(String.format("write " + params.product + "_%s%s.png", i, vers ));
-            logger.log( Level.INFO, "write {0}_%s.png", params.product);
+            logger.log( Level.FINE, "write {0}_%s.png", params.product);
 
             appmodel.waitUntilIdle(false);
             if ( params.autorange ) {
