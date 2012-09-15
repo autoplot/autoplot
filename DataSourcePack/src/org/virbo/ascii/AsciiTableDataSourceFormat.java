@@ -36,6 +36,8 @@ import org.virbo.dataset.DDataSet;
  */
 public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
+    private static final Logger logger= Logger.getLogger("apdss.ascii");
+
     private DatumFormatter getTimeFormatter( String ft ) {
         DatumFormatter tformat;
         String ft0= ft;
@@ -73,7 +75,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 } else if (ft.startsWith("microsec")) {
                     tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
                 } else {
-                    System.err.println("not implemented: " + ft);
+                    logger.log(Level.FINE, "not implemented: {0}", ft);
                     tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
                 }
 
@@ -123,7 +125,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         for ( int i=0; i<bundleDesc.length(); i++ ) {
             String name= (String) bundleDesc.property( QDataSet.NAME,i );
             if ( name==null ) {
-                System.err.println("unnamed dataset!");
+                logger.info("unnamed dataset!");
                 name= "field"+i;
             }
             JSONObject jo1= new JSONObject();

@@ -32,7 +32,7 @@ import org.virbo.dsutil.DataSetBuilder;
  * @author jbf
  */
 public class CsvDataSource extends AbstractDataSource {
-
+    private static final Logger logger= Logger.getLogger("apdss.csv");
     public CsvDataSource(URI uri) {
         super(uri);
     }
@@ -218,7 +218,7 @@ public class CsvDataSource extends AbstractDataSource {
 
 
             } catch ( ParseException ex ) {
-                System.err.println("skipping line: "+reader.getRawRecord() );
+                logger.fine("skipping line: "+reader.getRawRecord() );
                 continue;
             }
 

@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -52,6 +53,8 @@ import org.xml.sax.SAXException;
  */
 public class SpaseRecordDataSource extends AbstractDataSource {
 
+    private static final Logger logger= Logger.getLogger("apdss.spase");
+
     protected static final Object TYPE_HELM = "HELM";
     protected static final Object TYPE_SPASE = "SPASE";
     protected static final Object TYPE_VOTABLE = "VOTABLE";
@@ -80,7 +83,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         try {
             this.url= new URL( uri.getSchemeSpecificPart() );
         } catch (MalformedURLException ex) {
-            System.err.println("Failed to convert URI to URL");
+            logger.warning("Failed to convert URI to URL");
             throw new RuntimeException(ex);
         }
         

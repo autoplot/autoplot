@@ -6,6 +6,7 @@ package org.autoplot.html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
@@ -17,6 +18,8 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
+
+    private static final Logger logger= Logger.getLogger("apdss.html");
 
     int state;
     int tableCount = -1;
@@ -101,7 +104,7 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
                     fieldCount = currentRow.size();
                 }
                 if (currentRow.size() != fieldCount) {
-                    System.err.println("skipping row because of field count");
+                    logger.fine("skipping row because of field count");
                 }
                 if ( isHeader ) {
                     ascii.addHeader( currentRow );

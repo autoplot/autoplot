@@ -21,7 +21,7 @@ public class EditorTest {
 
         JOptionPane.showConfirmDialog( null, panel );
         
-        System.err.println( panel.getURI() );
+        System.err.println( panel.getURI() ); // logger okay
         
         
     }

@@ -59,7 +59,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     String column = null;
     String depend0 = null;
 
-    private final static Logger logger= Logger.getLogger("vap.asciiTableDataSource");
+    private final static Logger logger= Logger.getLogger("apdss.ascii");
 
     public final static String PARAM_INTERVAL_TAG="intervalTag";
 
@@ -186,9 +186,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         if ( ds.length()==0 ) {
-            System.err.println("===========================================");
-            System.err.println("no records found when parsing ascii file!!!");
-            System.err.println("===========================================");
+            logger.info("===========================================");
+            logger.info("no records found when parsing ascii file!!!");
+            logger.info("===========================================");
             // this may raise an exception in a future version.
         }
 
@@ -291,7 +291,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     ds.putProperty(QDataSet.VALID_MIN, validMin);
                 }
             } else {
-                System.err.println("removing bundleDescriptor because of rank2");
+                logger.fine("removing bundleDescriptor because of rank2");
             }
 
             MutablePropertyDataSet mds;
