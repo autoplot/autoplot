@@ -413,7 +413,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (n1 != n2 && dep1 != null && dep1.length() == n2) {
                 if (dep2 != null && dep2.length() == n1) {
                     swapHack = true;
-                    System.err.println("swaphack avoids runtime error");
+                    logger.fine("swaphack avoids runtime error");
                 }
             }
         }
@@ -426,7 +426,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (n0 != n1 && dep0 != null && dep0.length() == n1) {
                 if (dep1 != null && dep1.length() == n0) {
                     swapHack = true;
-                    System.err.println("swaphack avoids runtime error");
+                    logger.fine("swaphack avoids runtime error");
                 }
             }
         }

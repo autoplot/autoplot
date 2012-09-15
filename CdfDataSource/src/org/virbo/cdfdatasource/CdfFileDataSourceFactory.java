@@ -59,14 +59,14 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         String cdfLib2 = System.getProperty("cdfLib2");
         
         if ( cdfLib1==null && cdfLib2==null ) {
-            System.err.println("System properties for cdfLib not set, setting up for debugging");
+            logger.fine("System properties for cdfLib not set, setting up for debugging");
             String os= System.getProperty("os.name");
             if ( os.startsWith("Windows") ) {
                 cdfLib1= "dllcdf";
                 cdfLib2= "cdfNativeLibrary";
             } else {
-                System.err.println("no values set identifying cdf libraries, hope you're on a mac or linux!");
-                System.err.println( System.getProperty("java.library.path" ));
+                logger.fine("no values set identifying cdf libraries, hope you're on a mac or linux!");
+                logger.fine( System.getProperty("java.library.path" ));
                 cdfLib2= "cdfNativeLibrary";
             }
         }
@@ -77,7 +77,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             if (cdfLib2 != null) System.loadLibrary(cdfLib2);
         } catch ( UnsatisfiedLinkError ex ) {
             ex.printStackTrace();
-            System.err.println( "java.library.path: " + System.getProperty("java.library.path" ));
+            logger.fine( "java.library.path: " + System.getProperty("java.library.path" ));
             throw ex;
         }
         logger.fine("cdf binaries loaded");
@@ -210,7 +210,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
      */
     protected static CDF getCDFFile( String cdfFile ) throws CDFException {
         //if ( currentFile!=null && currentFile.equals(cdfFile) ) {
-        //    System.err.println("caching open CDF file satisfies");
+        //    logger.fine("caching open CDF file satisfies");
         //    return currentCDF;
         //}
 

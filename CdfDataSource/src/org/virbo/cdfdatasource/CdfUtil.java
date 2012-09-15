@@ -528,7 +528,7 @@ public class CdfUtil {
         Object odata;
         boolean breakUp= ( ( varType == Variable.CDF_REAL4 ||varType == Variable.CDF_FLOAT ) && recCount*recSizeCount>10000000 && recInterval==1 );
         if ( breakUp ) {
-            logger.info("breaking up into smaller reads to save memory");
+            logger.fine("breaking up into smaller reads to save memory");
             odata= new float[(int)(recSizeCount*rc)];
             long blockSize= Math.max( 20, 10000000 / recSizeCount ); // in records. target blockSize of 10Mb, but read in at least 20 recs each time.
             int nread= (int)(rc/blockSize);
@@ -569,8 +569,7 @@ public class CdfUtil {
                     o2= Array.newInstance( byte.class, 1 );
                 }
                 if ( o2!=null ) {
-                    System.err.println("handling rank 0 value by making 1-element array");
-                    System.err.println("  in "+variable );        
+                    logger.fine( "handling rank 0 value by making 1-element array in "+variable );
                     Array.set( o2, 0, odata );
                     odata= o2;
                 }
@@ -991,7 +990,7 @@ public class CdfUtil {
             }
         }
         if ( skipCount==v.size() ) {
-            System.err.println( "turning off dataOnly because it rejects everything");
+            logger.fine( "turning off dataOnly because it rejects everything");
             dataOnly= false;
         }
 
