@@ -1119,7 +1119,7 @@ public class DataSourceController extends DomNodeController {
         if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
             ProgressMonitor monitor= mon;
             if (monitor != null) {
-                logger.info("cancel running request");
+                logger.fine("cancel running request");
                 monitor.cancel();
             }
         }
