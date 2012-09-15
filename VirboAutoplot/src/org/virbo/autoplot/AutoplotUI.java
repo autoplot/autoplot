@@ -1268,15 +1268,15 @@ APSplash.checkTime("init 52");
         Handler h = logConsole.getHandler();
         Logger.getLogger("das2").setLevel(Level.INFO);  // see http://www.autoplot.org/developer.logging
         Logger.getLogger("das2").addHandler(h);
-        Logger.getLogger("datum").setLevel(Level.ALL);
+        Logger.getLogger("datum").setLevel(Level.INFO);
         Logger.getLogger("datum").addHandler(h);
-        Logger.getLogger("qdataset").setLevel(Level.ALL);
+        Logger.getLogger("qdataset").setLevel(Level.INFO);
         Logger.getLogger("qdataset").addHandler(h);
-        Logger.getLogger("autoplot").setLevel(Level.ALL);
+        Logger.getLogger("autoplot").setLevel(Level.INFO);
         Logger.getLogger("autoplot").addHandler(h);
-        Logger.getLogger("apdss").setLevel(Level.ALL);
+        Logger.getLogger("apdss").setLevel(Level.INFO);
         Logger.getLogger("apdss").addHandler(h);
-        Logger.getLogger("console").setLevel(Level.ALL);
+        Logger.getLogger("console").setLevel(Level.INFO);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
