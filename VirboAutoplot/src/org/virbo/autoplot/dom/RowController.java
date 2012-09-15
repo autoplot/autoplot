@@ -11,7 +11,6 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
@@ -59,7 +58,7 @@ public class RowController extends DomNodeController {
                     }
                     //DasDevicePosition.parseLayoutStr( dasRow, row.getTop() + "," + row.getBottom() );
                 } catch (ParseException ex) {
-                    Logger.getLogger(RowController.class.getName()).log(Level.WARNING, "parse exception: {0}", ex);
+                    logger.log(Level.WARNING, "parse exception: {0}", ex);
                     row.setTop( DasDevicePosition.formatLayoutStr(dasRow, true) );
                     row.setBottom( DasDevicePosition.formatLayoutStr(dasRow, false ) );
                 }

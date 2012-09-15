@@ -22,6 +22,8 @@ import org.das2.graph.DasDevicePosition;
  */
 public class ColumnController extends DomNodeController {
 
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
+    
     Column column;
     DasColumn dasColumn;
     Canvas canvas;
@@ -58,7 +60,7 @@ public class ColumnController extends DomNodeController {
                     }
                     //DasDevicePosition.parseLayoutStr( dasColumn, column.getLeft() + "," + column.getRight() );
                 } catch (ParseException ex) {
-                    Logger.getLogger(ColumnController.class.getName()).log(Level.WARNING, "parse exception: {0}", ex);
+                    logger.log(Level.WARNING, "parse exception: {0}", ex);
                     column.setLeft( DasDevicePosition.formatLayoutStr(dasColumn, true) );
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
                 }

@@ -28,6 +28,8 @@ import org.virbo.autoplot.dom.PlotElement;
  */
 public class BindingTest {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+    
     public static void bind(DomNode master, String prop, DomNode p, String destProp, Converter c ) {
         Binding binding;
         BeanProperty bp = BeanProperty.create(prop);
@@ -63,15 +65,15 @@ public class BindingTest {
             Method apcl = p.getClass().getMethod("addPropertyChangeListener", String.class, PropertyChangeListener.class);
             apcl.invoke(p, destProp, propListener(master,bp,c,false) );
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         //Object value= bp.getValue(master);
         //dbp.setValue( p, value );

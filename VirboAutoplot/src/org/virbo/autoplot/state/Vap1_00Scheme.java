@@ -7,7 +7,6 @@ package org.virbo.autoplot.state;
 
 import java.text.ParseException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.PlotElementStyle;
@@ -29,7 +28,7 @@ public class Vap1_00Scheme extends AbstractVapScheme {
         try {
             value = SerializeUtil.getLeafNode(element);
         } catch (ParseException ex) {
-            Logger.getLogger(Vap1_00Scheme.class.getName()).log(Level.SEVERE, null, ex);
+            org.virbo.autoplot.Util.logger.log(Level.SEVERE, null, ex);
             return false;
         }
 

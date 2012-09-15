@@ -603,9 +603,9 @@ public abstract class Bookmark {
                 try {
                     parseBookmark( n, vers, remoteLevel );
                 } catch (UnsupportedEncodingException ex1) {
-                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, null, ex1);
                 } catch (IOException ex1) {
-                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, null, ex1);
                 }
                 System.err.println("## bookmark number=" + i);
                 ex.printStackTrace();

@@ -22,11 +22,13 @@ import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 
 /**
- *
+ * Handles requests coming in from the server.
+ * TODO: check against --script option in Autoplot.  JythonMain had a problem with imports.
  * @author jbf
  */
 public class RequestHandler {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
 
     public RequestHandler() {
     }
@@ -85,7 +87,7 @@ public class RequestHandler {
             return null;
             
         } catch (IOException ex) {
-            Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return null;
         }
     }

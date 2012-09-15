@@ -47,7 +47,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet nonMonoDs;
     QDataSet initialError;
 
-    static final Logger logger= Logger.getLogger( "virbo.autoplot.uritcasource" );
+    static final Logger logger= Logger.getLogger( "autoplot" );
 
     public UriTcaSource( String uri ) throws Exception {
         logger.log(Level.FINE, "new tca source: {0}", uri);

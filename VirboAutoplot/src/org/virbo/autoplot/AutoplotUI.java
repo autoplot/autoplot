@@ -179,7 +179,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
     };
     
-    private static final Logger logger = Logger.getLogger("org.virbo.autoplot");
+    private static final Logger logger = Logger.getLogger("autoplot");
     private JythonScriptPanel scriptPanel;
     private DataPanel dataPanel;
     private LayoutPanel layoutPanel;
@@ -349,7 +349,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                     if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
@@ -429,9 +429,9 @@ public class AutoplotUI extends javax.swing.JFrame {
                             RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
                         }
                     } catch (URISyntaxException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -625,7 +625,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     //initialize the python interpretter
                     JythonUtil.createInterpreter(true, false);
                 } catch (IOException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         };
@@ -692,7 +692,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 try {
                     DataSourceRegistry.getInstance().registerDataSourceJar(null, new URL(jar));
                 } catch (IOException ex) {
-                    Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -1055,7 +1055,7 @@ APSplash.checkTime("init 270");
                             dataSetSelector.maybePlot( true );
                         }
                     } catch (Exception ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             };
@@ -1266,12 +1266,16 @@ APSplash.checkTime("init 52");
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
         Handler h = logConsole.getHandler();
-        Logger.getLogger("das2").setLevel(Level.INFO);
+        Logger.getLogger("das2").setLevel(Level.INFO);  // see http://www.autoplot.org/developer.logging
         Logger.getLogger("das2").addHandler(h);
-        Logger.getLogger("virbo").setLevel(Level.ALL);
-        Logger.getLogger("virbo").addHandler(h);
-        Logger.getLogger("vap").setLevel(Level.ALL);
-        Logger.getLogger("vap").addHandler(h);
+        Logger.getLogger("datum").setLevel(Level.ALL);
+        Logger.getLogger("datum").addHandler(h);
+        Logger.getLogger("qdataset").setLevel(Level.ALL);
+        Logger.getLogger("qdataset").addHandler(h);
+        Logger.getLogger("autoplot").setLevel(Level.ALL);
+        Logger.getLogger("autoplot").addHandler(h);
+        Logger.getLogger("apdss").setLevel(Level.ALL);
+        Logger.getLogger("apdss").addHandler(h);
         Logger.getLogger("console").setLevel(Level.ALL);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
@@ -1315,7 +1319,7 @@ APSplash.checkTime("init 52");
 
     private void plotUrl( String surl ) {
         try {
-            Logger.getLogger("ap").log(Level.FINE, "plotUrl({0})", surl);
+            logger.log(Level.FINE, "plotUrl({0})", surl);
             URISplit split= URISplit.parse(surl);
             ProgressMonitor mon= getStatusBarProgressMonitor("Finished loading "+surl);
             if ( split.file==null || !( split.file.endsWith(".vap")|| split.file.endsWith(".vapx") ) ) {
@@ -1325,7 +1329,7 @@ APSplash.checkTime("init 52");
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } catch (URISyntaxException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch ( IllegalArgumentException ex ) {
                         SourceTypesBrowser browser= new SourceTypesBrowser();
                         browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
@@ -1387,7 +1391,7 @@ APSplash.checkTime("init 52");
 
     private void plotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").log(Level.FINE, "plotAnotherUrl({0})", surl);
+            logger.log(Level.FINE, "plotAnotherUrl({0})", surl);
             PlotElement panel= dom.getController().addPlotElement( null,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             dom.getController().setPlotElement(panel);
@@ -1407,7 +1411,7 @@ APSplash.checkTime("init 52");
 
     private void overplotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").log(Level.FINE, "overplotAnotherUrl({0})", surl);
+            logger.log(Level.FINE, "overplotAnotherUrl({0})", surl);
             PlotElement panel= dom.getController().addPlotElement( dom.getController().getPlot() ,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             dom.getController().setPlotElement(panel);
@@ -2637,7 +2641,7 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
                 ex.printStackTrace();
                 return;
             } catch ( Exception ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
@@ -3055,7 +3059,7 @@ private void updateFrameTitle() {
             }
             
         } catch (IOException ex) {
-            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             ex.printStackTrace();
         }
 
@@ -3176,8 +3180,8 @@ APSplash.checkTime("init 210");
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
                     public void uncaughtException(Thread t, Throwable e) {
-//                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
-                        Logger.getLogger("virbo.autoplot").log(Level.SEVERE, "runtime exception: " + e, e);
+//                        logger.severe("runtime exception: " + e);
+                        logger.log(Level.SEVERE, "runtime exception: " + e, e);
 
                         app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
                         if (e instanceof InconvertibleUnitsException) {
@@ -3447,7 +3451,7 @@ APSplash.checkTime("init 240");
             if ( millis==-1 ) millis= 500;
             Thread.sleep(millis);
         } catch (InterruptedException ex) {
-            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -3524,7 +3528,7 @@ APSplash.checkTime("init 240");
                                     plotUri("script:"+ ((Bookmark.Item) tt).getUri() );
                                 }
                             } catch (MalformedURLException ex) {
-                                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.log(Level.SEVERE, null, ex);
                             }
                         }
                     };

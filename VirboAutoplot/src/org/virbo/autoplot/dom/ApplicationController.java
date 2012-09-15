@@ -75,7 +75,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
-    private final static Logger logger = Logger.getLogger("virbo.controller");
+    private final static Logger logger = org.virbo.autoplot.Util.logger;
 
     private static AtomicInteger canvasIdNum = new AtomicInteger(0);
     private static AtomicInteger plotIdNum = new AtomicInteger(0);

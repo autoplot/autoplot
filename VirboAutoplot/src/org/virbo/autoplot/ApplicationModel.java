@@ -128,15 +128,15 @@ public class ApplicationModel {
                 m.invoke(eh, this);
                 //((GuiExceptionHandler)eh).setApplicationModel(this);
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (InvocationTargetException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (NoSuchMethodException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (SecurityException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -461,19 +461,19 @@ public class ApplicationModel {
             try {
                 recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
             } catch (BookmarksException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (SAXException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (IOException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (ParserConfigurationException ex) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return new ArrayList<Bookmark>();
             }
 
@@ -1072,13 +1072,13 @@ public class ApplicationModel {
                 try {
                     c = DomUtil.getPropertyType(state, node);
                 } catch (IllegalAccessException ex) {
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 }
                 SerializeDelegate sd = SerializeRegistry.getDelegate(c);
@@ -1097,18 +1097,18 @@ public class ApplicationModel {
                     DomUtil.setPropertyValue(state, node, val);
                 } catch (IllegalAccessException ex) {
                     ex.printStackTrace();
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
                     ex.printStackTrace();
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
                     ex.printStackTrace();
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
                     ex.printStackTrace();
                     IOException ioex= new IOException( ex.getMessage() );
                     throw ioex;
-                    //Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    //logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -1234,9 +1234,9 @@ public class ApplicationModel {
             embedDs = new String(data);
             embedDsDirty = false;
         } catch (StreamException ex) {
-            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1265,7 +1265,7 @@ public class ApplicationModel {
             getDataSourceFilterController().setDataSetInternal(handler.getDataSet());
 
         } catch (org.virbo.qstream.StreamException ex) {
-            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }

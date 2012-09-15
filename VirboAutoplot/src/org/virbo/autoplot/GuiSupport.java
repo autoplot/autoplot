@@ -42,7 +42,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +51,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -72,7 +69,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.parsers.ParserConfigurationException;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
@@ -81,7 +77,6 @@ import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
-import org.das2.system.RequestProcessor;
 import org.das2.util.Entities;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -117,6 +112,8 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class GuiSupport {
+
+    private static final Logger logger= Logger.getLogger("autoplot");
 
     AutoplotUI parent;
 
@@ -915,7 +912,7 @@ public class GuiSupport {
                 dom.getController().changePerformed( d, lock );
             }
         } catch (IOException ex) {
-            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -948,23 +945,23 @@ public class GuiSupport {
                 }
                 parent.setMessage( "imported bookmarks file "+bookmarksFile );
             } catch (BookmarksException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 parent.applicationModel.showMessage( "Semantic Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 parent.applicationModel.showMessage( "XML Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex ) {
                 parent.applicationModel.showMessage( "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 parent.applicationModel.showMessage( "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
-import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
@@ -28,6 +27,9 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class Util {
+
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     /**
      * load and maintain recent entries in the context name.  This will also add
      * a listener to save recent entries.
@@ -52,16 +54,16 @@ public class Util {
                 setRecent(sel,recent);
             } catch (BookmarksException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (ParserConfigurationException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
 
         }
@@ -108,6 +110,5 @@ public class Util {
         }
         sel.setRecent(result);
     }
-
 
 }

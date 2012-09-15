@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.logging.Logger;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -27,6 +28,8 @@ import org.virbo.datasource.DataSourceUtil;
  * @author jbf
  */
 public class Util {
+
+    public static final Logger logger= Logger.getLogger("autoplot");
 
     private static String tagName(String svnURL, Map<String, String> abbrevs) {
         if ( svnURL==null ) return "untagged";

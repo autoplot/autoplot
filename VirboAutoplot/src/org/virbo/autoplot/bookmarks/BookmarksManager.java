@@ -872,27 +872,27 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                 }
                 JOptionPane.showMessageDialog( this, "imported bookmarks file "+bookmarksFile );
             } catch (BookmarksException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( this, "XML error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (FileNotFoundException ex ) {
                 JOptionPane.showMessageDialog( this, "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (MalformedURLException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
-                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog( this, "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

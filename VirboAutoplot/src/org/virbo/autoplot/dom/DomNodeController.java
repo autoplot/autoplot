@@ -11,7 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +25,8 @@ import org.virbo.autoplot.dom.ChangesSupport.DomLock;
  * @author jbf
  */
 public class DomNodeController {
+
+    protected static final Logger logger= Logger.getLogger("autoplot.dom");
 
     DomNode node;
 
@@ -107,11 +108,11 @@ public class DomNodeController {
             Method m= n.getClass().getMethod( "getController" );
             return (DomNodeController) m.invoke( n );
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(DomNodeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(DomNodeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(DomNodeController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch ( NoSuchMethodException ex ) {
         }
         return null;

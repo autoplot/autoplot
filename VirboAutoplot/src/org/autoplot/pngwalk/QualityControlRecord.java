@@ -48,6 +48,8 @@ import org.xml.sax.SAXException;
 
 public class QualityControlRecord {
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     public static enum Status {
         OK ("OK"), PROBLEM ("Problem"), IGNORE ("Ignore"), UNKNOWN ("Unknown");
         private String sval;
@@ -227,12 +229,12 @@ public class QualityControlRecord {
         try {
             fs = (FileSystem) getFileSystem(qcFolder);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(QualityControlRecord.class.getName()).log(Level.SEVERE,
+            logger.log(Level.SEVERE,
                         "Unknown host error when attempting to access quality control folder.", ex);
             throw(ex);
         } catch (IOException ex) {
             // How to distinguish between simple non-existent folder and some other problem accessing file system?      
-            Logger.getLogger(QualityControlRecord.class.getName()).log(Level.SEVERE,
+            logger.log(Level.SEVERE,
                         "I/O error while opening quality control folder",ex);
             throw(ex);
         }
@@ -354,12 +356,12 @@ public class QualityControlRecord {
                     // This folder should already exist!
                     fs = (FileSystem) getFileSystem(qcFolder);
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(QualityControlRecord.class.getName()).log(Level.SEVERE,
+                    logger.log(Level.SEVERE,
                             "Unknown host error when attempting to access quality control folder.", ex);
                     throw (ex);
                 } catch (IOException ex) {
                     // How to distinguish between simple non-existent folder and some other problem accessing file system?
-                    Logger.getLogger(QualityControlRecord.class.getName()).log(Level.SEVERE,
+                    logger.log(Level.SEVERE,
                             "I/O error while opening quality control folder", ex);
                     throw (ex);
                 }

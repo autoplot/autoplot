@@ -26,6 +26,9 @@ import org.virbo.datasource.DataSourceUtil;
  * @author jbf
  */
 public class JythonUtil {
+
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     /**
      * create an interpreter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
@@ -132,7 +135,7 @@ public class JythonUtil {
                     interp.execfile(url.openStream(), url.toString());
                     mon.finished();
                 } catch (IOException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         };

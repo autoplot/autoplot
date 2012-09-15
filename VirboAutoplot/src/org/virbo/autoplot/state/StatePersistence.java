@@ -64,6 +64,7 @@ import org.virbo.autoplot.dom.Plot;
  */
 public class StatePersistence {
 
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
     
     private StatePersistence() {
     }
@@ -117,7 +118,7 @@ public class StatePersistence {
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
 
@@ -448,10 +449,10 @@ public class StatePersistence {
             return state;
 
         } catch (ParseException ex) {
-            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (TransformerException ex) {
-            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (SAXException ex) {
             throw new RuntimeException(ex);

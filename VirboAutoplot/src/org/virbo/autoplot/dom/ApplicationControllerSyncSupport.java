@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class ApplicationControllerSyncSupport {
     ApplicationController controller;
     Application application;
-    Logger logger= Logger.getLogger("virbo.autoplot");
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
     
     ApplicationControllerSyncSupport( ApplicationController controller ) {
         this.controller= controller;
@@ -169,7 +169,7 @@ public class ApplicationControllerSyncSupport {
                     DomNode src= DomUtil.getElementById(application,idMap.get(c.srcId));
                     DomNode dst= DomUtil.getElementById(application,idMap.get(c.dstId));
                     if ( src==null || dst==null ) {
-                        Logger.getLogger( ApplicationControllerSupport.class.getName() ).finer("node was null");
+                        logger.finer("node was null");
                     } else {
                         controller.bind( src, c.srcProperty, dst, c.dstProperty  );
                     }
@@ -201,7 +201,7 @@ public class ApplicationControllerSyncSupport {
             DomNode src= DomUtil.getElementById(application,c.srcId);
             DomNode dst= DomUtil.getElementById(application,c.dstId);
             if ( src==null || dst==null ) {
-                Logger.getLogger( ApplicationControllerSupport.class.getName() ).finer("node was null");
+                logger.finer("node was null");
             } else {
                 controller.bind( src, c.srcProperty, dst, c.dstProperty  );
             }

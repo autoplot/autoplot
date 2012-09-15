@@ -29,6 +29,9 @@ import org.virbo.datasource.DataSetURI;
  * @author Ed Jackson
  */
 public class WalkImageSequence implements PropertyChangeListener  {
+
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+
     private List<WalkImage> existingImages;
     private List<WalkImage> displayImages = new ArrayList();
     //private List<URI> locations;
@@ -93,7 +96,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     setStatus( "warning: Done listing "+template+", and no files were found" );
                 }
             } catch (Exception ex) {
-                Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
             }
@@ -247,7 +250,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 pcs.firePropertyChange(PROP_BADGE_CHANGE, -1, i);
             }
         } catch (IOException ex) {
-            Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             setStatus("warning: "+ ex.toString());
             throw new RuntimeException(ex);
         }

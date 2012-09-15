@@ -36,7 +36,7 @@ import org.virbo.autoplot.util.TransparentLogger;
 public final class ChangesSupport {
     Map<Object,Object> changesPending;
     WeakReference<Object> parent;
-    private static final Logger logger= TransparentLogger.getLogger( "dom" );
+    private static final Logger logger= Logger.getLogger( "autoplot.dom" );
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to

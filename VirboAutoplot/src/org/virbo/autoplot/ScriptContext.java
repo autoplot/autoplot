@@ -62,6 +62,8 @@ import org.virbo.qstream.StreamException;
  */
 public class ScriptContext extends PyJavaInstance {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     private static ApplicationModel model = null;
     private static Application dom= null;
 
@@ -749,7 +751,7 @@ public class ScriptContext extends PyJavaInstance {
             SimpleStreamFormatter f= new SimpleStreamFormatter();
             f.format( ds, out, ascii );
         } catch (StreamException ex) {
-            Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

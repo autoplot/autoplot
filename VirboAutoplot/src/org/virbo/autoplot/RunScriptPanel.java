@@ -34,6 +34,8 @@ import org.virbo.jythonsupport.ui.EditorTextPane;
  */
 public class RunScriptPanel extends javax.swing.JPanel {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     org.virbo.jythonsupport.ui.EditorTextPane textArea;
 
     /** Creates new form RunScriptPanel */
@@ -70,7 +72,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
             }
             mon.finished();
         } catch (IOException ex) {
-            Logger.getLogger(RunScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }

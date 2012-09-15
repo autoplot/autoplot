@@ -25,6 +25,7 @@ import org.virbo.dsops.Ops;
  */
 public class TestSupport {
 
+    protected static final Logger logger= Logger.getLogger("autoplot.test");
     /**
      * input vaps for testing.
      */
@@ -65,7 +66,7 @@ public class TestSupport {
             xx.putProperty(QDataSet.NAME, "Time" );
             rank1Rand.putProperty(QDataSet.DEPEND_0, xx );
         } catch (ParseException ex) {
-            Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         Random r= new Random(-12345);
         // simulate data dropout.
@@ -169,9 +170,9 @@ public class TestSupport {
                 } catch ( SecurityException ex ) {
                     //expected to come here because we disable System.exit.
                 } catch (IllegalAccessException ex) {
-                    //Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    //logger.log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
-                    //Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    //logger.log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
                     
                 }

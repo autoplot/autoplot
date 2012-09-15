@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
@@ -30,6 +29,8 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class BookmarksManagerTransferrable {
+
+    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
 
     private BookmarksManagerModel model;
     private JTree jTree1;
@@ -99,16 +100,16 @@ public class BookmarksManagerTransferrable {
                     }
 
                 } catch (UnsupportedFlavorException ex) {
-                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     ex.printStackTrace();
                 } catch (BookmarksException ex ) {
                     ex.printStackTrace();
 
                 } catch (IOException ex) {
-                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     ex.printStackTrace();
                 } catch (SAXException ex) {
-                    Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     ex.printStackTrace();
                 }
 

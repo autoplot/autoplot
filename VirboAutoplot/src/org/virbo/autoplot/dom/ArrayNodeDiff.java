@@ -20,7 +20,9 @@ import java.util.logging.Logger;
  * @author jbf
  */
 public class ArrayNodeDiff implements Diff {
-        
+
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
+
     String propertyName;
     Object node;
     int index;
@@ -120,13 +122,13 @@ public class ArrayNodeDiff implements Diff {
             ipd.getWriteMethod().invoke(node, newArray);
 
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(ArrayNodeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ArrayNodeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(ArrayNodeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IntrospectionException ex) {
-            Logger.getLogger(ArrayNodeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

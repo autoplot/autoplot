@@ -46,6 +46,8 @@ import org.virbo.jythonsupport.ui.EditorTextPane;
  */
 public class JythonScriptPanel extends javax.swing.JPanel {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     File file;
     ApplicationModel model;
     ApplicationController applicationController;
@@ -190,7 +192,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
             this.support.loadInputStream(url.openStream());
         } catch (IOException ex) {
-            Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

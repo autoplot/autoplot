@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import java.awt.Component;
@@ -24,7 +25,7 @@ public class LayoutListener implements PropertyChangeListener {
 
     ApplicationModel model;  
     Timer t;
-    static Logger logger = Logger.getLogger("virbo.autoplot.autolayout");
+    private static final Logger logger = Logger.getLogger("autoplot");
     public static final String PENDING_CHANGE_AUTOLAYOUT= "autolayout";
 
     public LayoutListener(ApplicationModel model) {
@@ -45,7 +46,7 @@ public class LayoutListener implements PropertyChangeListener {
 
     public void propertyChange(PropertyChangeEvent evt) {
         if (model.dom.getOptions().isAutolayout() ) {
-            logger.fine("property change: " + evt.getPropertyName());
+            logger.log(Level.FINE, "property change: {0}", evt.getPropertyName());
             if (evt.getSource() instanceof Component &&
                     ((Component) evt.getSource()).isVisible()) {
                 if (t == null) {

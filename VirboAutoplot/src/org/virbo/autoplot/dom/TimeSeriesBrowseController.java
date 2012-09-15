@@ -44,7 +44,7 @@ public class TimeSeriesBrowseController {
     private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
     private static final String PENDING_TIMERANGE_DIRTY= "tsbTimerangeDirty";
 
-    private static final Logger logger = Logger.getLogger("ap.tsb");
+    private static final Logger logger = Logger.getLogger("autoplot.tsb");
     TickleTimer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
     private DomNode listenNode=null;
@@ -142,13 +142,13 @@ public class TimeSeriesBrowseController {
             //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
             node.addPropertyChangeListener( property, timeSeriesBrowseListener );
         } catch (IntrospectionException ex) {
-            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         listenNode= node;
         listenProp= property;

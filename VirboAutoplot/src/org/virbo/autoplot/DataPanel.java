@@ -70,7 +70,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     PropertyChangeListener compListener; // listen to component property changes
     
-    private final static Logger logger = Logger.getLogger("virbo.autoplot");
+    private final static Logger logger = Logger.getLogger("autoplot");
 
     public DataPanel( Application dom ) {
         initComponents();

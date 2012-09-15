@@ -61,7 +61,6 @@ import org.virbo.dsutil.AutoHistogram;
  */
 public class DataSourceController extends DomNodeController {
 
-    static final Logger logger = Logger.getLogger("vap.dataSourceController");
     DataSourceFilter dsf;
     private ApplicationModel model;
     private Application dom;
@@ -909,7 +908,7 @@ public class DataSourceController extends DomNodeController {
                         try {
                             Thread.sleep(delay);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                     updateFill();
@@ -1551,7 +1550,7 @@ public class DataSourceController extends DomNodeController {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
-                Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         String surl = dsf.getUri();

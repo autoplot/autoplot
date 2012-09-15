@@ -37,7 +37,8 @@ import org.virbo.datasource.DataSetURI;
  * @author jbf
  */
 public class WalkUtil {
-
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     private static int firstIndexOf( String str, List<String> targets ) {
         int i0= Integer.MAX_VALUE;
         for ( String t: targets ) {
@@ -68,7 +69,7 @@ public class WalkUtil {
         try {
             fs = FileSystem.create( DataSetURI.getResourceURI( surl.substring(0, i + 1) ) );
         } catch (UnknownHostException ex) {
-            Logger.getLogger(WalkUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
         return fs.getFileObject(surl.substring(i+1)).exists();

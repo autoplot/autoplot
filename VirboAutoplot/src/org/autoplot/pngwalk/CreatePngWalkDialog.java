@@ -29,6 +29,8 @@ import javax.swing.JTextField;
  */
 public class CreatePngWalkDialog extends javax.swing.JPanel {
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     /** Creates new form CreatePngWalkDialog */
     public CreatePngWalkDialog() {
         initComponents();
@@ -77,7 +79,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            Logger.getLogger(CreatePngWalkDialog.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

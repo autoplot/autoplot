@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdesktop.beansbinding.Converter;
@@ -27,6 +26,7 @@ import org.jdesktop.beansbinding.Converter;
  */
 public class BindingSupport {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
     protected BindingSupport() {
         implBindingContexts = new HashMap();
         //sources= new HashMap();
@@ -154,7 +154,7 @@ public class BindingSupport {
             }
             return;
         } catch (IntrospectionException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -216,15 +216,15 @@ public class BindingSupport {
             Method apcl = dst.getClass().getMethod("addPropertyChangeListener", String.class, PropertyChangeListener.class);
             apcl.invoke(dst, dstProp, dstListener);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         synchronized (implBindingContexts) {
@@ -255,15 +255,15 @@ public class BindingSupport {
                     Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
                     apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
                 } catch (IllegalAccessException ex) {
-                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (NoSuchMethodException ex) {
-                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (SecurityException ex) {
-                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
             }
@@ -286,15 +286,15 @@ public class BindingSupport {
                         Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
                         apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
                     } catch (IllegalAccessException ex) {
-                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch (IllegalArgumentException ex) {
-                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch (InvocationTargetException ex) {
-                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch (NoSuchMethodException ex) {
-                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     } catch (SecurityException ex) {
-                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                     bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
                     list2.remove(bi);

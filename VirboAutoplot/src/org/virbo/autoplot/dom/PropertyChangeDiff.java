@@ -14,6 +14,8 @@ import java.util.logging.Logger;
  */
 public class PropertyChangeDiff implements Diff {
 
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
+
     String propertyName;
     Object oldVal;
     Object newVal;
@@ -33,11 +35,11 @@ public class PropertyChangeDiff implements Diff {
             }
             DomUtil.setPropertyValue( node, propertyName, newVal );
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

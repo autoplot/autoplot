@@ -31,6 +31,8 @@ import org.virbo.datasource.URISplit;
  */
 public class WalkImage  {
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
     public static final String PROP_BADGE_CHANGE = "badgeChange";
 
@@ -327,7 +329,7 @@ public class WalkImage  {
         while ( clear.size()>0 ) {
             WalkImage old= clear.poll();
             synchronized ( old ) {
-                Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading thumbnail for "+old );
+                logger.fine( "unloading thumbnail for "+old );
                 old.setStatus( Status.SIZE_THUMB_LOADED );
                 old.squishedThumb= null;
                 old.thumb= null;
@@ -517,7 +519,7 @@ public class WalkImage  {
             while ( clear.size()>0 ) {
                 WalkImage old= clear.poll();
                 synchronized ( old ) {
-                    Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading image for "+old );
+                    logger.log( Level.FINE, "unloading image for {0}", old);
                     old.im= null;
                     if ( old.getStatus()==Status.IMAGE_LOADED ) { //bugfix: unloading the thumbnails might have set status to SIZE_THUMB_LOADED
                          old.setStatus( Status.THUMB_LOADED );
@@ -538,7 +540,7 @@ public class WalkImage  {
 
         } catch (Exception ex) {
             System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
-            Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             setStatus(Status.MISSING);
             throw new RuntimeException(ex);
         }

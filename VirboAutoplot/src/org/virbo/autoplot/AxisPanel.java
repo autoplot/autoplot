@@ -50,7 +50,7 @@ public class AxisPanel extends javax.swing.JPanel {
     PropertyChangeListener dsfListener;
     DataSourceFilter dsf; // current focus
     
-    private final static Logger logger = Logger.getLogger("virbo.autoplot");
+    private final static Logger logger = Logger.getLogger("autoplot");
 
     /** Creates new form PlotStylePanel */
     public AxisPanel(final ApplicationModel applicationModel) {

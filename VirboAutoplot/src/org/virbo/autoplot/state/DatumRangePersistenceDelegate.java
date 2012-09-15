@@ -30,7 +30,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     public DatumRangePersistenceDelegate()  {
     }
 
-    private static final Logger logger= Logger.getLogger( DatumRangePersistenceDelegate.class.getName() );
+    private static final Logger logger= Logger.getLogger( "autoplot.dom" );
 
     private Datum abs( Datum w ) {
         return w.getUnits().createDatum( Math.abs(w.doubleValue(w.getUnits() )) );

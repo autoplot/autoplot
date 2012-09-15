@@ -58,6 +58,8 @@ import org.virbo.datasource.jython.JythonDataSourceFactory;
  */
 public class ScriptPanelSupport {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     File file;
     final ApplicationModel model;
     final ApplicationController applicationController;
@@ -121,10 +123,10 @@ public class ScriptPanelSupport {
             panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
             panel.setFilename(file.toString());
         } catch (NullPointerException ex) {
-            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         }
 
@@ -244,12 +246,12 @@ public class ScriptPanelSupport {
      */
     private void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
         if (ex instanceof PySyntaxError) {
-            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
-            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString(),interp);
         }
     }
@@ -375,7 +377,7 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
                                 mon.finished();
-                                Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.log(Level.SEVERE, null, ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
                                 mon.finished();
@@ -460,7 +462,7 @@ public class ScriptPanelSupport {
                     out.close();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         return result;
@@ -484,7 +486,7 @@ public class ScriptPanelSupport {
             panel.setFilename(null);
             this.file= null;
         } catch (BadLocationException ex) {
-            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

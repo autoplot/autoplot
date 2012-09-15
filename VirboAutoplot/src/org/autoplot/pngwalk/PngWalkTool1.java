@@ -115,7 +115,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     Pattern actionMatch=null;
     String actionCommand=null;
 
-    static final Logger logger= Logger.getLogger("org.autoplot.pngwalk");
+    static final Logger logger= Logger.getLogger("autoplot.pngwalk");
     private static final String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
@@ -184,9 +184,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") + ".png";
             template= t;
         } catch (FileSystemOfflineException ex) {
-            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("File does not exist: "+template);
         } catch (IOException ex) {
@@ -236,11 +236,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             deft = Bookmark.parseBookmarks(sdeft);
 
         } catch (BookmarksException ex) {
-            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );

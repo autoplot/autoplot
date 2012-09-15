@@ -28,8 +28,6 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
-import org.das2.util.monitor.ProgressMonitor;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,18 +64,18 @@ public class BookmarksManagerModel {
 
             } catch (SAXException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
 
             } catch (ParserConfigurationException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
 
             } catch (BookmarksException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
 
             } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }

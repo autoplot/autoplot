@@ -165,7 +165,7 @@ public class Test019 {
             testFileSystemModel();
             testTimeParser();
         } catch (Exception ex) {
-            Logger.getLogger( Test019.class.getName()).log( Level.SEVERE, "error in test019", ex );
+            TestSupport.logger.log( Level.SEVERE, "error in test019", ex );
             ex.printStackTrace();
             System.exit(1);
         }

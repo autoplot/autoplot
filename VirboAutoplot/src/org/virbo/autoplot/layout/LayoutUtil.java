@@ -21,7 +21,8 @@ import java.util.logging.Logger;
  */
 public class LayoutUtil {
 
-    private static final Logger logger = Logger.getLogger("virbo.autoplot.autolayout");
+    private static final Logger logger = Logger.getLogger("autoplot");
+
     private static boolean ALLOW_EXCESS_SPACE = true;
 
     private static boolean maybeSetMaximum(DasDevicePosition c, double need, double norm, double em, int pt) {
@@ -126,7 +127,7 @@ public class LayoutUtil {
         boolean changed = false;
 
         if ( Math.abs(xmin)>9999 || Math.abs(xmax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
-            System.err.println("invalid bounds returned, returning.");
+            logger.warning("invalid bounds returned, returning.");
             return;
         }
         int old;
@@ -146,7 +147,7 @@ public class LayoutUtil {
         needYmax = ymax - old;
 
         if ( needXmax<-120 ) {
-            System.err.println("needXmax: "+needXmax);
+            logger.log(Level.WARNING, "needXmax: {0}", needXmax);
             c.getParent().resizeAllComponents();
             return;
         }

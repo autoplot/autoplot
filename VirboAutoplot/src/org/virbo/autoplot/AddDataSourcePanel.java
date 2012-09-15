@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
@@ -59,13 +58,13 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
                 dataSetSelector1.setRecent(urls);
             } catch (BookmarksException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, null, ex);
             }
         } else {
             String[] recent= new String[] { "(no recent entries)" };

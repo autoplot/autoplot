@@ -281,7 +281,7 @@ public class Test017 {
                     writeToPng(label + ".png");
 
                 } catch (Exception ex) {
-                    Logger.getLogger(Test017.class.getName()).log(Level.SEVERE, null, ex);
+                    TestSupport.logger.log(Level.SEVERE, null, ex);
                 }
             }
         };

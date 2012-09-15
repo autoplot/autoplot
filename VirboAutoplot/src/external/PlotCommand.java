@@ -40,6 +40,8 @@ import org.virbo.jythonsupport.Util;
  */
 public class PlotCommand extends PyObject {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
@@ -182,7 +184,7 @@ public class PlotCommand extends PyObject {
             try {
                 ScriptContext.plot(((PyString) po0).toString());
             } catch (InterruptedException ex) {
-                Logger.getLogger(PlotCommand.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } else {
             for ( int i=0; i<nargs; i++ ) {

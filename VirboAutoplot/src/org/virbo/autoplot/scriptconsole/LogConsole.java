@@ -56,7 +56,6 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.JythonUtil;
-import org.virbo.dataset.QDataSet;
 import org.xml.sax.SAXException;
 
 /**
@@ -68,6 +67,8 @@ import org.xml.sax.SAXException;
  * @author  jbf
  */
 public class LogConsole extends javax.swing.JPanel {
+
+    private static final Logger logger= Logger.getLogger("autoplot");
 
     public static final int RECORD_SIZE_LIMIT = 1000;
     List<LogRecord> records = new LinkedList<LogRecord>();
@@ -105,7 +106,7 @@ public class LogConsole extends javax.swing.JPanel {
                             }
                             commandLineTextPane1.setText("");
                         } catch (IOException ex) {
-                            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                             commandLineTextPane1.setText("");
                         } catch (PyException ex) {
                             System.err.println(ex.toString());
@@ -397,7 +398,7 @@ public class LogConsole extends javax.swing.JPanel {
                         recMsg += "\n";
                         doc.insertString(doc.getLength(), recMsg, attr);
                     } catch (BadLocationException ex) {
-                        Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -405,7 +406,7 @@ public class LogConsole extends javax.swing.JPanel {
                 records.remove(0);
             }
         } catch (BadLocationException ex) {
-            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -540,18 +541,18 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 fo = new FileInputStream(chooser.getSelectedFile());
                 records = LogConsoleUtil.deserializeLogRecords(fo);
             } catch (ParserConfigurationException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     fo.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -564,14 +565,14 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 LogConsoleUtil.serializeLogRecords(records, fo);
                 fo.close();
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     fo.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

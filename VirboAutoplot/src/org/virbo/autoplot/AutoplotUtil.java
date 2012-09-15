@@ -117,7 +117,7 @@ import org.xml.sax.SAXException;
 public class AutoplotUtil {
     public static final int SERIES_SIZE_LIMIT = 80000;
 
-    private final static Logger logger = Logger.getLogger("autoplot.AutoplotUtil");
+    private final static Logger logger = Logger.getLogger("autoplot");
     /**
      * absolute length limit for plots.  This is used to limit the elements used in autoranging, etc.
      */

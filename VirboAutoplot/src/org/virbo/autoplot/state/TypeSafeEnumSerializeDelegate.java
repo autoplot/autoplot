@@ -18,6 +18,8 @@ import org.virbo.qstream.SerializeDelegate;
  */
 public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
 
+    protected static final Logger logger= Logger.getLogger("autoplot.dom");
+    
     public TypeSafeEnumSerializeDelegate() {
     }
 
@@ -44,7 +46,7 @@ public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
             }
 
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TypeSafeEnumSerializeDelegate.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         throw new ParseException("unable to find type-safe enum field for "+description,0 );

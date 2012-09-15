@@ -37,6 +37,8 @@ import org.xml.sax.SAXException;
  */
 public class DemoPngWalk {
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     public static void main(String[] args) {
 
         DataSetURI.init();  // FtpFileSystem implementation
@@ -84,11 +86,11 @@ public class DemoPngWalk {
                     List<Bookmark> books = Bookmark.parseBookmarks(srecent);
                     tool.setTemplate( ((Bookmark.Item)books.get(0)).getUri() );
                 } catch (BookmarksException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (SAXException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
             }
@@ -108,10 +110,10 @@ public class DemoPngWalk {
                 try {
                     return WalkUtil.fileExists(productFile);
                 } catch (FileSystemOfflineException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     return false;
                 } catch (URISyntaxException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     return false;
                 }
             }
@@ -146,7 +148,7 @@ public class DemoPngWalk {
                             ScriptContext.plot(suri);
                             ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 };

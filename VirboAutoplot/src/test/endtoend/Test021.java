@@ -182,12 +182,12 @@ public class Test021 {
                     writeToPng(label + ".png");
                     
                 } catch (Exception ex) {
-                    Logger.getLogger(Test021.class.getName()).log(Level.SEVERE, ex.toString(), ex);
+                    TestSupport.logger.log(Level.SEVERE, ex.toString(), ex);
                     try {
                         QDataSet ds = Util.getDataSet(s);
                         System.err.println(ds);
                     } catch (Exception ex1) {
-                        Logger.getLogger(Test021.class.getName()).log(Level.SEVERE, null, ex1);
+                        TestSupport.logger.log(Level.SEVERE, null, ex1);
                     }
                 }
             }

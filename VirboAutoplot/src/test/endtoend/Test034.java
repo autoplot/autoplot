@@ -61,8 +61,7 @@ public class Test034 {
 
     private static void test003() throws Exception {
         reset();
-        Logger.getLogger( PlotController.class.getName() ).setLevel(Level.ALL);
-        Logger.getLogger("vap.plotElementController").setLevel(Level.ALL);
+        Logger.getLogger("autoplot.dom").setLevel(Level.ALL);
         final Application dom= getDocumentModel();
         plot( noTsbURI );
         Runnable run= new Runnable() {

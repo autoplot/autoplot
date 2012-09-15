@@ -90,7 +90,7 @@ public class CreatePngWalk {
         public boolean update= false;
     }
 
-    private static final Logger logger= Logger.getLogger("vap.createPngWalk");
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
 
     private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
         OutputStream out=null;
@@ -228,7 +228,7 @@ public class CreatePngWalk {
                 dom2.setTimeRange(dr);
 
             } catch (ParseException ex) {
-                Logger.getLogger(CreatePngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             mon.setProgressMessage(String.format("write " + params.product + "_%s%s.png", i, vers ));
             logger.log( Level.INFO, "write {0}_%s.png", params.product);

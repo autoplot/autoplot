@@ -674,9 +674,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         bis= null;
         try {
-             bis = AboutUtil.getBuildInfos();
+            bis = AboutUtil.getBuildInfos();
         } catch (IOException ex) {
-            Logger.getLogger(GuiExceptionHandler.class.getName()).log(Level.SEVERE, null, ex);
+            org.virbo.autoplot.Util.logger.log(Level.SEVERE, null, ex);
         }
 
         recs=null;
@@ -697,8 +697,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
-        String url =
-         "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
+        String url = "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
         form.setGuiExceptionHandler( this );

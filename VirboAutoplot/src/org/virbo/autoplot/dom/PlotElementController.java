@@ -77,7 +77,6 @@ public class PlotElementController extends DomNodeController {
     private static final String PENDING_COMPONENT_OP= "componentOp";
     private static final String PENDING_UPDATE_DATASET= "updateDataSet";
 
-    static final Logger logger = Logger.getLogger("vap.plotElementController");
     final private Application dom;
     private PlotElement plotElement;
     private DataSourceFilter dsf; // This is the one we are listening to.
@@ -301,11 +300,11 @@ public class PlotElementController extends DomNodeController {
             try {
                 DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IllegalArgumentException ex) {
-                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (InvocationTargetException ex) {
-                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     };
@@ -1116,7 +1115,7 @@ public class PlotElementController extends DomNodeController {
                     sliceDs = DataSetOps.sprocess( existingComponent, fillDs, new NullProgressMonitor() );
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -2348,9 +2347,9 @@ public class PlotElementController extends DomNodeController {
                 try {
                     SwingUtilities.invokeAndWait(run);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
 

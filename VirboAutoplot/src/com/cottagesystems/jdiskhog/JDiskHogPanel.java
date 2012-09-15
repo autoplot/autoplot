@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -29,7 +28,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
@@ -46,6 +44,8 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     MouseListener l= null;
 
     boolean goPressed= false;
+
+    private static final Logger logger= Logger.getLogger("autoplot");
 
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel(AutoplotUI model) {
@@ -190,10 +190,10 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                         try {
                             Util.fileCopy(f, destdir);
                         } catch (FileNotFoundException ex1) {
-                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                            logger.log(Level.SEVERE, null, ex1);
                             JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
                         } catch (IOException ex1) {
-                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                            logger.log(Level.SEVERE, null, ex1);
                             JOptionPane.showMessageDialog(jtree, "Error Occurred:\n" + ex1.getLocalizedMessage());
                         }
                     }
@@ -241,7 +241,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                             nn= fs.listDirectory("/");
 
                         } catch ( IOException ex ) {
-                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
 

@@ -20,6 +20,8 @@ import java.util.logging.Logger;
  */
 public class RequestListener {
 
+    private static final Logger logger= Logger.getLogger("autoplot");
+
     public RequestListener() {
     }
 
@@ -71,7 +73,7 @@ public class RequestListener {
                                 }
                                 setData(buf.toString());
                             } catch (IOException ex) {
-                                Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.log(Level.SEVERE, null, ex);
                             }
                         }
 
@@ -80,7 +82,7 @@ public class RequestListener {
                     }
                 } catch (IOException ex) {
                     listening = false;
-                    Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
             }

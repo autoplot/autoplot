@@ -25,6 +25,9 @@ import org.virbo.datasource.DataSetURI;
  * @author jbf
  */
 public class MakePngWalk {
+
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     /**
      * See CreatePngWalk.
      * run the png walk by reading in the python script indicated by value.
@@ -52,7 +55,7 @@ public class MakePngWalk {
             in.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }

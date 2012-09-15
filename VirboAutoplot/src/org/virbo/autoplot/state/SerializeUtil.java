@@ -47,6 +47,8 @@ import org.w3c.dom.NodeList;
  */
 public class SerializeUtil {
 
+    private static final Logger logger = Logger.getLogger("autoplot.dom");
+
     static {
         SerializeRegistry.register( BindingModel.class, new BindingModelSerializeDelegate() );
         SerializeRegistry.register( Connector.class, new ConnectorSerializeDelegate() );
@@ -65,7 +67,6 @@ public class SerializeUtil {
     
     public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
         try {
-            Logger log = DasLogger.getLogger(DasLogger.SYSTEM_LOG);
             String elementName = scheme.getName(node.getClass());
             DomNode defl = node.getClass().newInstance();
             Element element = null;
@@ -90,28 +91,28 @@ public class SerializeUtil {
                     continue;
                 }
                 
-                log.log(Level.FINE, "serializing property \"{0}\" of {1} id={2}", new Object[]{propertyName, elementName, node.getId()});
+                logger.log(Level.FINE, "serializing property \"{0}\" of {1} id={2}", new Object[]{propertyName, elementName, node.getId()});
                 Method readMethod = pd.getReadMethod();
                 Method writeMethod = pd.getWriteMethod();
                 if (writeMethod == null || readMethod == null) {
-                    log.log(Level.INFO, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
+                    logger.log(Level.INFO, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
                     continue;
                 }
                 Object value = null;
                 try {
                     value = readMethod.invoke(node, new Object[0]);
                 } catch (IllegalAccessException ex) {
-                    log.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 } catch (IllegalArgumentException ex) {
-                    log.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 } catch (InvocationTargetException ex) {
-                    log.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     continue;
                 }
                 if (value == null) {
-                    log.log(Level.INFO, "skipping property {0} of {1}, value is null.", new Object[]{propertyName, elementName});
+                    logger.log(Level.INFO, "skipping property {0} of {1}, value is null.", new Object[]{propertyName, elementName});
                     continue;
                 }
                 if (propertyName.equals("id") && ((String) value).length() > 0) {
@@ -159,7 +160,7 @@ public class SerializeUtil {
                     Object defltValue = DomUtil.getPropertyValue(defl, pd.getName());
                     Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
                     if (prop == null) {
-                        log.log(Level.WARNING, "unable to serialize {0}", propertyName);
+                        logger.log(Level.WARNING, "unable to serialize {0}", propertyName);
                         continue;
                     }
                     prop.setAttribute("name", pd.getName());
@@ -168,19 +169,19 @@ public class SerializeUtil {
             }
             return element;
         } catch (IntrospectionException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
             
@@ -353,16 +354,16 @@ public class SerializeUtil {
             return node;
 
         } catch (IntrospectionException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
     }

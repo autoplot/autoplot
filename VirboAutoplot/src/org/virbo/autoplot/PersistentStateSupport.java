@@ -62,7 +62,9 @@ import org.xml.sax.SAXException;
  * @author Jeremy
  */
 public class PersistentStateSupport {
-    
+
+    private static final Logger logger= Logger.getLogger("autoplot.dom");
+
     String ext;
     private String currentFile;
     JMenu openRecentMenu;
@@ -211,7 +213,7 @@ public class PersistentStateSupport {
                 }
                 chooser.setSelectedFile( child );
             } catch (IOException ex) {
-                Logger.getLogger(PersistentStateSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -338,7 +340,7 @@ public class PersistentStateSupport {
                             save(new File(getCurrentFile()),"");
                         }
                     } catch (IOException ex) {
-                        Logger.getLogger(PersistentStateSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }

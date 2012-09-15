@@ -21,13 +21,15 @@ public class QualityControlSequence {
     WalkImageSequence walkImageSequence;
     URI qcFolder;
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     QualityControlSequence( WalkImageSequence wis, URI qcFolder ) throws IOException {
         this.walkImageSequence= wis;
         this.qcFolder= qcFolder;
         try {
             QualityControlRecord.getRecord(walkImageSequence.imageAt(0).getUri(), qcFolder);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(QualityControlSequence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         refreshQCTotals();
     }

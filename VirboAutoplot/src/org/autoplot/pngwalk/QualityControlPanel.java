@@ -36,6 +36,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private QualityControlRecord qcRecord;
     public static final String KEY_QUALITY_CONTROL_URI = "QualityControlURI";
 
+    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    
     /** Creates new form QualityControlPanel */
     public QualityControlPanel() {
         initComponents();
@@ -143,14 +145,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 loginButton.setEnabled(true);
                 
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
