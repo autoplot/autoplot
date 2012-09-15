@@ -27,7 +27,9 @@ import java.util.List;
  *   RenderType
  *   PlotSymbol
  *   PsymConnector
- *   RebinnerEnum
+ *   Enum
+ *   Connector
+ *   LegendPosition
  *
  * Any DomNode can be saved and restored using SerializeUtil, which uses Java introspection to look at all the properties.
  *
