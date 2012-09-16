@@ -40,6 +40,8 @@ import org.virbo.datasource.URISplit;
  */
 public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= Logger.getLogger("apdss.binary");
+
     /** Creates new form BinaryDataSourceEditorPanel */
     public BinaryDataSourceEditorPanel() {
         initComponents();
@@ -130,7 +132,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
             this.jTable1.setModel(model);
 
         } catch (Exception ex) {
-            Logger.getLogger(BinaryDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -149,7 +151,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
             paramsTextArea1.setFactory( new BinaryDataSourceFactory(), new ArrayList<String>() );
             
         } catch (IOException ex) {
-            Logger.getLogger(BinaryDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
