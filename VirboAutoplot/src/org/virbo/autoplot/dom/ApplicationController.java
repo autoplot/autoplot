@@ -104,11 +104,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                     String description= (String) evt.getOldValue();
                     if ( description==null ) {
                         System.err.println("description is null"); // debugging observed 7/23/2012
-                    }
-                    if ( description.length()>0 ) {
-                        fireActionEvent( new ActionEvent(this,0,"label: "+description ) );
                     } else {
-                        fireActionEvent( new ActionEvent(this,0,"ready") );
+                        if ( description.length()>0 ) {
+                            fireActionEvent( new ActionEvent(this,0,"label: "+description ) );
+                        } else {
+                            fireActionEvent( new ActionEvent(this,0,"ready") );
+                        }
                     }
                 }
             }
