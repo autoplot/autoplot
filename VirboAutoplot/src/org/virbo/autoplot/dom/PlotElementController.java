@@ -254,14 +254,15 @@ public class PlotElementController extends DomNodeController {
                 }
                 if ( newv.startsWith("|") ) dom.getOptions().setDataVisible(true);
                 if ( changesSupport==null ) {
-                    System.err.println("changesSupport is null!!!");
-                    System.err.println("this is a sad, leftover PlotElementController that should have been GC'd");
+                    logger.severe("changesSupport is null!!!");
+                    logger.severe("this is a sad, leftover PlotElementController that should have been GC'd");
                     return;
                 }
                 Runnable run= new Runnable() {
                     public void run() {
                         if ( changesSupport==null ) {
-                           System.err.println("changesSupport is null!!!");
+                            logger.severe("changesSupport is null!!!");
+                            return;
                         }
                         // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
                         // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
