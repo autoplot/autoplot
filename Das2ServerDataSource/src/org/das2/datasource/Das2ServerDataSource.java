@@ -10,14 +10,12 @@ import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.stream.StreamDescriptor;
 import org.das2.stream.StreamException;
 import org.das2.stream.StreamTool;
 import org.das2.util.DasProgressMonitorInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -36,8 +34,6 @@ import org.das2.dataset.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
-import org.das2.datum.TimeUtil;
-import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -47,7 +43,6 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
-import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
  *
@@ -78,7 +73,7 @@ class Das2ServerDataSource extends AbstractDataSource {
     Map dsdfParams=null;
 
     @Override
-    public QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
+    public synchronized QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
