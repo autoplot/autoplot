@@ -75,7 +75,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
-    private final static Logger logger = org.virbo.autoplot.Util.logger;
+    private final static Logger logger = Logger.getLogger("autoplot.dom");
 
     private static AtomicInteger canvasIdNum = new AtomicInteger(0);
     private static AtomicInteger plotIdNum = new AtomicInteger(0);
@@ -103,7 +103,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==null ) { //put in state after atomtic operation
                     String description= (String) evt.getOldValue();
                     if ( description==null ) {
-                        System.err.println("description is null"); // debugging observed 7/23/2012
+                        logger.severe("description is null");  // debugging observed 7/23/2012
                     } else {
                         if ( description.length()>0 ) {
                             fireActionEvent( new ActionEvent(this,0,"label: "+description ) );
