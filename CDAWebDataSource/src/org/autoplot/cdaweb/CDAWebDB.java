@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -545,8 +546,8 @@ public class CDAWebDB {
         
         Map<String,String> ids= db.getServiceProviderIds( );
 
-        for ( String s: ids.keySet() ) {
-            System.err.println(s + ":\t" + ids.get(s) ); //logger ok
+        for ( Entry<String,String> e: ids.entrySet() ) {
+            System.err.println( e.getKey() + ":\t" + e.getValue() ); //logger ok
         }
         System.err.println( ids.size() ); //logger ok
         System.err.println( db.getNaming( "AC_H0_MFI" )  ); //logger ok
