@@ -808,28 +808,28 @@ public class PlotController extends DomNodeController {
         checkRenderType();
     }
 
-    private static String getCommonPart( String wordA, String wordB ) {
-        StringBuilder common= new StringBuilder();
-        StringBuilder commonTest= new StringBuilder();
-        for(int i=0;i<wordA.length();i++){
-            for(int j=0;j<wordB.length();j++){
-                if( i<wordA.length() && wordA.charAt(i)==wordB.charAt(j)){
-                    commonTest.append( wordA.charAt(i) );
-                    i++;
-                }  else {
-                    if ( commonTest.length()>common.length() ) {
-                        common= commonTest;
-                    }
-                    commonTest= new StringBuilder();
-                }
-            }
-        }
-        if ( commonTest.length()>common.length() ) {
-            common= commonTest;
-            commonTest= new StringBuilder();
-        }
-        return common.toString();
-    }
+//    private static String getCommonPart( String wordA, String wordB ) {
+//        StringBuilder common= new StringBuilder();
+//        StringBuilder commonTest= new StringBuilder();
+//        for(int i=0;i<wordA.length();i++){
+//            for(int j=0;j<wordB.length();j++){
+//                if( i<wordA.length() && wordA.charAt(i)==wordB.charAt(j)){
+//                    commonTest.append( wordA.charAt(i) );
+//                    i++;
+//                }  else {
+//                    if ( commonTest.length()>common.length() ) {
+//                        common= commonTest;
+//                    }
+//                    commonTest= new StringBuilder();
+//                }
+//            }
+//        }
+//        if ( commonTest.length()>common.length() ) {
+//            common= commonTest;
+//            commonTest= new StringBuilder();
+//        }
+//        return common.toString();
+//    }
 
     private Plot getPlotDefaultsOneFamily( List<PlotElement> pes ) {
         Plot result= null;
