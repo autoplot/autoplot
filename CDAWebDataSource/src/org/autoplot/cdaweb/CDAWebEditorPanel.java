@@ -551,11 +551,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( id==null ) id="";
         
         String timeRange= timeRangeTextField.getText();
-        if ( timeRange==null ) {
+        if ( timeRange==null ) { // TODO: I don't think this should ever be null.
             logger.warning("here the timeRange is null");
+            timeRange= "";
         }
-        timeRange= timeRange.replaceAll(" ", "+");
         
+        timeRange= timeRange.replaceAll(" ", "+");
+
         String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id;
         if ( filter.length()>0 ) {
             result+= "&filter="+filter;
