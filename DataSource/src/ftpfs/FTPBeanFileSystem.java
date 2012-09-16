@@ -207,35 +207,39 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         // open source taken from it.sauronsoftware.ftp4j.FTPClient.java
         // Is there any already successful parser?
-            if (parser != null) {
-                    // Yes, let's try with it.
-                    try {
-                            ret = parser.parse(list);
-                    } catch (FTPListParseException e) {
-                            // That parser doesn't work anymore.
-                            parser = null;
-                    }
-            }
-            // Is there an available result?
-            if (ret == null) {
-                    // Try to parse the list with every available parser.
-                    for (Iterator i = listParsers.iterator(); i.hasNext();) {
-                            FTPListParser aux = (FTPListParser) i.next();
-                            try {
-                                    // Let's try!
-                                    ret = aux.parse(list);
-                                    // This parser smells good!
-                                    parser = aux;
-                                    // Leave the loop.
-                                    break;
-                            } catch (FTPListParseException e) {
-                                    // Let's try the next one.
-                                    continue;
-                            }
-                    }
-            }
+        if (parser != null) {
+                // Yes, let's try with it.
+                try {
+                        ret = parser.parse(list);
+                } catch (FTPListParseException e) {
+                        // That parser doesn't work anymore.
+                        parser = null;
+                }
+        }
+        // Is there an available result?
+        if (ret == null) {
+                // Try to parse the list with every available parser.
+                for (Iterator i = listParsers.iterator(); i.hasNext();) {
+                        FTPListParser aux = (FTPListParser) i.next();
+                        try {
+                                // Let's try!
+                                ret = aux.parse(list);
+                                // This parser smells good!
+                                parser = aux;
+                                // Leave the loop.
+                                break;
+                        } catch (FTPListParseException e) {
+                                // Let's try the next one.
+                                continue;
+                        }
+                }
+        }
         // end  it.sauronsoftware.ftp4j.FTPClient.java portion
 
+        if ( ret==null ) {
+            throw new IOException("unable to parse FTP listing, because the format is not recognized");
+        }
+        
         DirectoryEntry[] result= new DirectoryEntry[ret.length];
         for ( int i=0; i<result.length; i++ ) {
             DirectoryEntry de1= new DirectoryEntry();
