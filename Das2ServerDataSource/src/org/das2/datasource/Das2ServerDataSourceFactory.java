@@ -28,6 +28,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
+    private static final Logger logger= Logger.getLogger("apdss.das2server");
+
     public DataSource getDataSource(URI uri) throws Exception {
         return new Das2ServerDataSource(uri);
     }
@@ -83,13 +85,13 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 }
                 datasetsList.put( surl, list );
             } catch (IOException ex) {
-                Logger.getLogger(Das2ServerDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 throw new RuntimeException(ex);
             } finally {
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(Das2ServerDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

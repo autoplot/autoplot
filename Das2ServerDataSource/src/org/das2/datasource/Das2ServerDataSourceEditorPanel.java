@@ -81,6 +81,8 @@ import org.xml.sax.SAXException;
  */
 public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= Logger.getLogger("apdss.das2server");
+
     private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
 
     //DANGER: NB gui code doesn't use this...
@@ -348,7 +350,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( examples.size()>0 ) {
                         for ( int i=0; i<examples.size(); i++ ) {
                             String s= examples.get(i);
-                            int j= s.indexOf("|");
+                            int j= s.indexOf( EXAMPLE_TIMERANGE_LABEL_DELIM );
                             if ( j>-1 ) {
                                 s= "<html>" + s.substring(0,j) + " <em><nbsp>"+s.substring(j+1).trim() + "</em>";
                             }
@@ -378,7 +380,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
                     }
                     } catch ( XPathExpressionException ex ) {
-                        Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             };
@@ -386,21 +388,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         } catch (SAXException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (MalformedURLException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
                 if ( in!=null ) in.close();
             } catch (IOException ex) {
-                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -429,7 +431,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                 });
             } catch ( MalformedURLException ex ) {
-                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 JOptionPane.showConfirmDialog( this, "Internal Error: "+ex.toString() ); // give a message
             }
         }
@@ -596,21 +598,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         } catch (XPathExpressionException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
-                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -642,7 +644,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     } );
                     
                 } catch ( MalformedURLException ex ) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     JOptionPane.showConfirmDialog( this, "Internal Error: "+ex.toString() ); // give a message
                 }
             }
@@ -769,7 +771,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         try {
             home = new URI("http://www-pw.physics.uiowa.edu/das/das2Server");
         } catch (URISyntaxException ex) {
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         URISplit split= URISplit.parse(uri);
@@ -781,7 +783,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         try {
             servers.add(new URI("http://cassini.physics.uiowa.edu/das/das2Server"));
         } catch (URISyntaxException ex) {
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         if ( !split.resourceUri.equals( home ) ) {
             servers.add( split.resourceUri );
@@ -867,13 +869,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     
                 } catch (DasException ex) {
 
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
 
                     javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss + ", \n" + ex );
                     jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
 
                 } catch (MalformedURLException ex) {
-                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
                 }
 
@@ -922,7 +924,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         try {
             timeRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
-            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         
         String dataSetId="";

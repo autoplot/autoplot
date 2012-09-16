@@ -7,6 +7,7 @@ package org.das2.datasource;
 
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -23,7 +24,7 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
     Datum resolution;
     String uri;
 
-    final static Logger logger= Logger.getLogger("das2serverDataSource");
+    private final static Logger logger= Logger.getLogger("apdss.das2server");
 
     public void setTimeRange(DatumRange dr) {
         timeRange= dr;
@@ -50,7 +51,10 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
 
         split.params= URISplit.formatParams(params);
 
-        return URISplit.format( split );
+        String suri= URISplit.format( split );
+        logger.log(Level.FINER, "tsb getURI->{0}", suri);
+        return suri;
+        
     }
 
     public DatumRange getTimeRange() {
@@ -62,6 +66,7 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
     }
 
     public void setURI(String suri) throws ParseException {
+        logger.log(Level.FINER, "tsb setURI {0}", suri);
         this.uri= suri;
         URISplit split= URISplit.parse(suri);
         Map<String,String> params= URISplit.parseParams(split.params);

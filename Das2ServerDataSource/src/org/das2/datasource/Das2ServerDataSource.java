@@ -63,7 +63,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         resolution= null;
     }
 
-    final static Logger logger= Logger.getLogger("das2serverDataSource");
+    private static final Logger logger= Logger.getLogger("apdss.das2server");
 
     DatumRange timeRange;
     Datum resolution;
