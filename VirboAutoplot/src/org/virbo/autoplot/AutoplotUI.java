@@ -3212,6 +3212,7 @@ APSplash.checkTime("init 220");
 
                     logger.fine("UI is visible");
                     APSplash.hideSplash();
+                    logger.removeHandler( APSplash.getInstance().getLogHandler() );
 
                     if ( alm.getValue("mode").equals("basic") ) {
                         app.setExpertMode(false);
