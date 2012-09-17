@@ -299,7 +299,7 @@ public class CanvasController extends DomNodeController {
         // normalize to per thousand.
         for (int i = 0; i < rows.size(); i++) {
             if ( totalWeight==0 ) {
-                System.err.println("here");
+                logger.severe("here total weights are zero");
             }
             weights[i] = 1000 * weights[i] / totalWeight;
         }
