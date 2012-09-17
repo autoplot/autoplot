@@ -226,6 +226,8 @@ public class LogConsole extends javax.swing.JPanel {
         return settingsDialog;
     }
 
+    private Handler handler;
+
     /**
      * create a handler that listens for log messages.  This handler is added
      * to the Loggers that should be displayed here.  Also, the log levels of
@@ -236,53 +238,59 @@ public class LogConsole extends javax.swing.JPanel {
      *         Logger.getLogger("virbo").addHandler(h);
      * @return handler for receiving messages.
      */
-    public Handler getHandler() {
-        Handler h = new Handler() {
-
-            public synchronized void publish(LogRecord rec) {
-                synchronized (LogConsole.this) {
-                    Object[] parms= rec.getParameters();
-
-                    String recMsg;
-                    if ( parms==null || parms.length==0 ) {
-                        recMsg = rec.getMessage();
-                    } else {
-                        recMsg = MessageFormat.format( rec.getMessage(), parms );
-                    }
-                    LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
-                    copy.setLoggerName(rec.getLoggerName());
-                    copy.setMillis(rec.getMillis());
-                    records.add(copy);
-                    timer2.restart();
-                    if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
-                        eventThreadId = rec.getThreadID();
-                    }
-                }
-                if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
-                    if (LogConsole.this.oldStdErr != null) {
-                        String recMsg;
-                        String msg= rec.getMessage();
+    public synchronized Handler getHandler() {
+        if ( handler==null ) {
+            handler = new Handler() {
+                public synchronized void publish(LogRecord rec) {
+                    synchronized (LogConsole.this) {
                         Object[] parms= rec.getParameters();
+
+                        String recMsg;
                         if ( parms==null || parms.length==0 ) {
-                            recMsg = msg;
+                            recMsg = rec.getMessage();
                         } else {
-                            recMsg = MessageFormat.format( msg, parms );
+                            recMsg = MessageFormat.format( rec.getMessage(), parms );
                         }
-                        LogConsole.this.oldStdErr.println( recMsg );
+                        LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
+                        copy.setLoggerName(rec.getLoggerName());
+                        copy.setMillis(rec.getMillis());
+                        records.add(copy);
+                        timer2.restart();
+                        if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
+                            eventThreadId = rec.getThreadID();
+                        }
+                    }
+                    if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
+                        if (LogConsole.this.oldStdErr != null) {
+                            String recMsg;
+                            String msg= rec.getMessage();
+                            Object[] parms= rec.getParameters();
+                            if ( parms==null || parms.length==0 ) {
+                                recMsg = msg;
+                            } else {
+                                recMsg = MessageFormat.format( msg, parms );
+                            }
+                            LogConsole.this.oldStdErr.println( recMsg );
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void flush() {
-            }
+                @Override
+                public void flush() {
+                }
 
-            @Override
-            public void close() throws SecurityException {
-            }
-        };
-        h.setLevel(Level.ALL);
-        return h;
+                @Override
+                public void close() throws SecurityException {
+                }
+
+                @Override
+                public String toString() {
+                    return "LogConsole.Handler";
+                }
+            };
+            handler.setLevel(Level.ALL);
+        }
+        return handler;
     }
     private static boolean alreadyLoggingStdout = false;
 
