@@ -33,6 +33,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
      * to the logger as a log record. 
      * @throws java.io.IOException in case of error 
      */
+    @Override
     public void flush() throws IOException {
 
         String record;
