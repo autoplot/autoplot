@@ -42,7 +42,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
-    private final static Logger logger= Logger.getLogger( "apdss" );
+    private final static Logger logger= Logger.getLogger( "apdss.cdfn" );
 
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfDataSourceEditorPanel() {
@@ -389,7 +389,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             DasExceptionHandler.handle( ex );
         } catch (IllegalArgumentException ex) {
             DasExceptionHandler.handle( ex );
-            Logger.getLogger(CdfDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }

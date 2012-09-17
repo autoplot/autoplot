@@ -51,7 +51,7 @@ import org.virbo.dsops.Ops;
 public class CdfUtil {
     private static final String VAR_TYPE_DATA = "data";
 
-    private final static Logger logger = Logger.getLogger("virbo.cdfdatasource");
+    private final static Logger logger = Logger.getLogger("apdss.cdfn");
 
     private static void flatten(double[][] data, double[] back, int offset, int nx, int ny) {
         for (int i = 0; i < nx; i++) {

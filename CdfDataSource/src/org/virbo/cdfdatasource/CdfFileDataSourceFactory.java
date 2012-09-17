@@ -36,7 +36,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfFileDataSourceFactory implements DataSourceFactory {
     
-    private static final Logger logger = Logger.getLogger("virbo.cdfdatasource");
+    private static final Logger logger = Logger.getLogger("apdss.cdfn");
     
     static {
         loadCdfLibraries();
@@ -191,7 +191,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 return ! result.containsKey(param);
             }
         } catch (CDFException ex) {
-            Logger.getLogger(CdfFileDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
             return false;

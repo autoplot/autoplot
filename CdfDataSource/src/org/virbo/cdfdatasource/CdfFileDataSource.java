@@ -64,7 +64,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     Map properties;
     Map<String, Object> attributes;
 
-    private final static Logger logger= Logger.getLogger(CdfFileDataSource.class.getName());
+    private final static Logger logger= Logger.getLogger("apdss.cdfn");
 
     /** Creates a new instance of CdfFileDataSource */
     public CdfFileDataSource(URI uri) {

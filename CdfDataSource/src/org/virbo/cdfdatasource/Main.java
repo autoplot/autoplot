@@ -89,7 +89,7 @@ public class Main {
 
         System.err.println("java.library.path=" + System.getProperty("java.library.path"));
 
-        Logger logger = Logger.getLogger("virbo.cdfdatasource");
+        Logger logger = Logger.getLogger("apdss.cdfn");
 
         String file;
         if (args.length == 0) {
