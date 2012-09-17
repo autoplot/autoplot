@@ -60,7 +60,7 @@ public class APSplash extends JFrame {
 
     }
 
-    public Handler getLogHandler() {
+    public synchronized Handler getLogHandler() {
         if ( handler==null ) {
             handler= createhandler();
         }
