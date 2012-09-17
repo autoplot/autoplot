@@ -298,8 +298,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 Map<String, Object> istpProps = model.properties(attr1);
                 CdfUtil.maybeAddValidRange(istpProps, result);
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
-                result.putProperty(QDataSet.LABEL, istpProps.get("FIELDNAM") );
-                result.putProperty(QDataSet.TITLE, istpProps.get("CATDESC" ) );
+                result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
+                result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
                 String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
                 if ( renderType!=null && renderType.equals( "time_series" ) ) {
                     // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
@@ -325,9 +325,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
                     if ( depds!=null && depProps!=null ) {
                         CdfUtil.maybeAddValidRange( depProps, depds );
-                        depds.putProperty(QDataSet.FILL_VALUE, depProps.get(QDataSet.FILL_VALUE));
-                        depds.putProperty(QDataSet.LABEL, depProps.get("FIELDNAM") );
-                        depds.putProperty(QDataSet.TITLE, depProps.get("CATDESC" ) );
+                        Map<String, Object> istpProps2 = model.properties(depProps);
+                        depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
+                        depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
+                        depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
                     }
                 }
             // apply properties.
