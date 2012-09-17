@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
@@ -31,6 +32,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  * @author jbf
  */
 public class CDAWebDataSourceFactory implements DataSourceFactory {
+
+    protected static final Logger logger= Logger.getLogger("apdss.cdaweb");
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new CDAWebDataSource(uri);

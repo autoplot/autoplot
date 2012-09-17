@@ -50,7 +50,7 @@ import org.virbo.metatree.IstpMetadataModel;
  */
 public class CDAWebDataSource extends AbstractDataSource {
 
-    protected static final Logger logger= Logger.getLogger("apdss");
+    protected static final Logger logger= Logger.getLogger("apdss.cdaweb");
 
     public static final String PARAM_ID= "id";
     public static final String PARAM_DS= "ds";
@@ -62,7 +62,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         try {
             tr = DatumRangeUtil.parseTimeRange(timerange);
         } catch (ParseException ex) {
-            Logger.getLogger(CDAWebDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new IllegalArgumentException(ex);
         }
         ds= getParam( "ds","ac_k0_epm" );

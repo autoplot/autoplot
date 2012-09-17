@@ -57,6 +57,8 @@ import org.xml.sax.SAXException;
  */
 public class CDAWebDB {
 
+    private static final Logger logger= Logger.getLogger("apdss.cdaweb");
+    
     private static CDAWebDB instance=null;
     private static String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
 
@@ -151,13 +153,13 @@ public class CDAWebDB {
                 mon.finished();
             }
         //} catch (XPathExpressionException ex) {
-        //    Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        //    logger.log(Level.SEVERE, null, ex);
         } catch (SAXException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }
@@ -206,13 +208,13 @@ public class CDAWebDB {
         } catch (IOException ex) {
             throw ex;
         } catch (SAXException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } catch (XPathExpressionException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         } finally {
             if ( ins!=null ) ins.close();
@@ -312,7 +314,7 @@ public class CDAWebDB {
                 }
 
             } catch (URISyntaxException ex) {
-                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 width= Units.hours.createDatum(24);
 
             }
@@ -366,7 +368,7 @@ public class CDAWebDB {
             try {
                 DataSetURI.getFile(new URI(master), p );
             } catch (URISyntaxException ex) {
-                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
 
         } catch ( IOException ex ) {
@@ -389,7 +391,7 @@ public class CDAWebDB {
             try {
                 dr = DatumRangeUtil.parseTimeRange(avail);
             } catch (ParseException ex1) {
-                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex1);
+                logger.log(Level.SEVERE, null, ex1);
                 master= fsm.getRepresentativeFile(p);
                 dr= fsm.getRangeFor(master);
             }

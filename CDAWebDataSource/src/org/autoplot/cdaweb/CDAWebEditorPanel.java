@@ -50,7 +50,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
-    private static final Logger logger= Logger.getLogger("apdss");
+    private static final Logger logger= Logger.getLogger("apdss.cdaweb");
     
     /** Creates new form CDAWebEditorPanel */
     public CDAWebEditorPanel() {
@@ -326,13 +326,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             logger.log( Level.FINE, "done in {0} millis\n", t0 );
             
         } catch (IOException ex) {
-            Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             dsidComboBox.setModel( new DefaultComboBoxModel( new String[] { "error in parsing history.txt" } ) );
         } finally {
             try {
                 if ( r!=null ) r.close();
             } catch (IOException ex) {
-                Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -518,7 +518,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             Thread.sleep(1000);
                         }
                     } catch (InterruptedException ex) {
-                       Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                       logger.log(Level.SEVERE, null, ex);
                     }
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
