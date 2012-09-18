@@ -327,8 +327,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         CdfUtil.maybeAddValidRange( depProps, depds );
                         Map<String, Object> istpProps2 = model.properties(depProps);
                         depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
-                        depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
-                        depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
+                        if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
+                            depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
+                            depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
+                        }
                     }
                 }
             // apply properties.
