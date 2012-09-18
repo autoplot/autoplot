@@ -102,6 +102,8 @@ public class CDAWebDB {
 
             String lookfor=  "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
             String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
+
+            logger.log( Level.FINE, "downloading file {0}", dbloc);
             File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ;
             FileInputStream fin=null;
             InputStream altin= null;
