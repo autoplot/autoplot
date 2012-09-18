@@ -289,18 +289,7 @@ public class IstpMetadataModel extends MetadataModel {
             boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
             if (isEpoch) {
                 units = Units.cdfEpoch;
-                properties.put(QDataSet.LABEL, "");
-            } else {
-                String label = (String) attrs.get("LABLAXIS");
-                if (label == null) {
-                    label = sunits;
-                } else {
-                    if (!sunits.equals("")) {
-                        label += " (" + sunits + ")";
-                    }
-                }
-                properties.put(QDataSet.LABEL, label);
-            }
+            } 
             properties.put(QDataSet.UNITS, units);
         }
 
