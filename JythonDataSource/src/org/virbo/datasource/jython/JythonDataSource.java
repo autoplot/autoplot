@@ -61,7 +61,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private final static String PARAM_SCRIPT= "script";
     private final static String PARAM_TIMERANGE= "timerange";
 
-    private static final Logger logger= Logger.getLogger("vap.jythondatasource");
+    private static final Logger logger= Logger.getLogger("apdss.jyds");
     private boolean notCheckedTsb= true;
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
@@ -79,10 +79,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     notCheckedTsb= false;
                 }
             } catch (ParseException ex) {
-                System.err.println(ex);
+                logger.severe( ex.toString() );
             } catch ( IOException ex ) {
-                System.err.println(ex);
-                // behave as before...
+                logger.severe( ex.toString() );
             }
         }
     }
@@ -95,7 +94,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             // getFile( resourceURI ) //TODO: since we don't getFile(resourceURI), we can't use filePollUpdating.  Also, why do we have local variable?
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
         } else {
-            resourceURI= null;
+            resourceURI= null; //TODO: huh?  resourceURI is local
             jythonScript= getFile(new NullProgressMonitor());
         }
         return jythonScript;
@@ -242,7 +241,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 } catch (PyException ex) {
                     if ( reader!=null ) {
                         //ex.lineno= ex.lineno+iline;
-                        System.err.println("debugging line number="+reader.getLineNumber());
+                        logger.log(Level.FINE, "debugging line number={0}", reader.getLineNumber());
                     }
                     causedBy = ex;
                     ex.printStackTrace();
@@ -259,7 +258,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     cacheUrl = cacheUrl(this.uri);
                 } 
             } else {
-                System.err.println("using existing interpreter to provide caching");
+                logger.fine("using existing interpreter to provide caching");
 
             }
 
@@ -533,7 +532,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 reader.close();
                 return tsb1;
             } else if ( line.contains("timerange") && line.contains("getParam") ) {
-                System.err.println("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
+                logger.warning("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
             }
             line= reader.readLine();
         }
