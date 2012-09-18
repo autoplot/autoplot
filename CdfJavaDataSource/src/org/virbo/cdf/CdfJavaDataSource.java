@@ -110,7 +110,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
             while ( dsCache.size()>DS_CACHE_SIZE_LIMIT ) {
                 Entry<String,MutablePropertyDataSet> first= dsCache.entrySet().iterator().next();
                 dsCache.remove(first.getKey());
-                logger.fine( "remove "+first.getKey() );
+                logger.log( Level.FINE, "remove {0}", first.getKey());
             }
         }
     }
