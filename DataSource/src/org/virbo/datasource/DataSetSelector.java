@@ -576,14 +576,16 @@ public class DataSetSelector extends javax.swing.JPanel {
                             // something has TSB, I need to a valid URI.  But I don't have a URI, that's why we are entering the editor.
                             // Let's kludge past this and add the capability to the editor...
                             DataSourceFactory dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
-                            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-                            if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
-                                tsb.setURI(surl);
-                                //DatumRange r= tsb.getTimeRange();
-                                //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
-                                DatumRange tr2=  quantizeTimeRange( timeRange );
-                                tsb.setTimeRange(tr2);
-                                surl= tsb.getURI();
+                            if ( dsf!=null ) {  //vap+internal:data_1,data_2
+                                TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                                if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
+                                    tsb.setURI(surl);
+                                    //DatumRange r= tsb.getTimeRange();
+                                    //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
+                                    DatumRange tr2=  quantizeTimeRange( timeRange );
+                                    tsb.setTimeRange(tr2);
+                                    surl= tsb.getURI();
+                                }
                             }
                         } catch (ParseException ex ){
                             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
