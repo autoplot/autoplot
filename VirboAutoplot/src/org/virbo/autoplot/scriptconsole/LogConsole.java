@@ -73,7 +73,7 @@ public class LogConsole extends javax.swing.JPanel {
     public static final int RECORD_SIZE_LIMIT = 1000;
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
-    int level = Level.INFO.intValue();
+    int level = Level.ALL.intValue(); // let each logger do the filtering now.
     boolean showLoggerId = false;
     boolean showTimeStamps = false;
     boolean showLevel = false;
