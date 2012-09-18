@@ -52,6 +52,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -72,6 +74,8 @@ import org.das2.jythoncompletion.support.CompletionDocumentation;
  *  @author  Martin Roskanin, Dusan Balek
  */
 public class DocumentationScrollPane extends JScrollPane {
+
+    private static final Logger logger= Logger.getLogger("jython.editor");
 
     private static final String BACK = "org/netbeans/modules/editor/completion/resources/back.png"; //NOI18N
     private static final String FORWARD = "org/netbeans/modules/editor/completion/resources/forward.png"; //NOI18N
@@ -258,7 +262,7 @@ public class DocumentationScrollPane extends JScrollPane {
             for (; iter.isValid(); iter.next()) {
                 AttributeSet a = iter.getAttributes();
                 String nm = (String) a.getAttribute(HTML.Attribute.NAME);
-                System.err.println("ref: "+nm);
+                logger.log(Level.FINE, "ref: {0}", nm);
                 if ((nm != null) && nm.equals(reference)) {
                     // found a matching reference in the document.
                     try {

@@ -49,6 +49,8 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class JythonCompletionTask implements CompletionTask {
 
+    private static final Logger logger= Logger.getLogger("jython.editor");
+    
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
     String context;
@@ -153,7 +155,7 @@ public class JythonCompletionTask implements CompletionTask {
                 try {
                     po = context.__getattr__(s);
                 } catch (PyException e) {
-                    System.err.println("PyException from \"" + ss + "\":");
+                    logger.fine("PyException from \"" + ss + "\":");
                     e.printStackTrace();
                     continue;
                 } catch ( IllegalArgumentException e ) {
@@ -254,7 +256,7 @@ public class JythonCompletionTask implements CompletionTask {
                         Method jm = getJavaMethod(m, 0);
                         signature = methodSignature(getJavaMethod(m, 0));
                     } else {
-                        System.err.println("");
+                        logger.fine("");
                     }
                 }
                 String link = null;
@@ -369,7 +371,7 @@ public class JythonCompletionTask implements CompletionTask {
         }
 
         String ss2= "def getDataSet( st, mon ):\n   return findgen(100)\n\ndef getDataSet( st ):\n   return findgen(100)\n\n";
-        System.err.println(ss2);
+        logger.fine(ss2);
         interp.exec( ss2  );
         
         interp.exec(eval);
@@ -413,7 +415,7 @@ public class JythonCompletionTask implements CompletionTask {
                         }
                     }
                 } else {
-                    System.err.println("");
+                    logger.fine("");
                 }
                 String link = null;
                 if (signature != null) {

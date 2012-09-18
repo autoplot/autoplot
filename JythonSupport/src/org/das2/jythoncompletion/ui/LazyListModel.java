@@ -42,6 +42,7 @@
 package org.das2.jythoncompletion.ui;
 
 import java.util.BitSet;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -61,6 +62,8 @@ implements ListModel, Runnable, javax.swing.event.ListDataListener {
     
     
     private boolean log;
+    private static final Logger logger= Logger.getLogger("jython.editor");
+
     private ListModel listModel;
     private Filter filter;
     /** the value to return when nothing else can be returned */
@@ -119,7 +122,7 @@ implements ListModel, Runnable, javax.swing.event.ListDataListener {
 
         markDirty = false;
         if (log) {
-            System.err.println("updateYourAssumeptions ();"); // NOI18N
+            logger.fine("updateYourAssumeptions ();"); // NOI18N
         }
         updateYourAssumeptions ();
     }
@@ -317,7 +320,7 @@ implements ListModel, Runnable, javax.swing.event.ListDataListener {
         initialize ();
         
         if (log) {
-            System.err.println("model.getElementAt (" + index + ");"); // NOI18N
+            logger.fine("model.getElementAt (" + index + ");"); // NOI18N
         }
         
         if (external[index] >= 0) {

@@ -24,6 +24,8 @@ import org.virbo.datasource.DataSetURI.CompletionResult;
  */
 public class DataSetUrlCompletionItem implements CompletionItem {
 
+    private static final Logger logger= Logger.getLogger("jython.editor");
+
     CompletionResult rs;
     
     DataSetUrlCompletionItem( CompletionResult rs ) {
@@ -51,7 +53,7 @@ public class DataSetUrlCompletionItem implements CompletionItem {
 
     public void defaultAction(JTextComponent jTextComponent) {
         try {
-            System.err.println("defaultAction of DataSetUrlCompletionItem");
+            logger.fine("defaultAction of DataSetUrlCompletionItem");
             int pos = jTextComponent.getCaretPosition();
             Document d = jTextComponent.getDocument();
 	    if ( rs.completion.startsWith(rs.completable) ) {
@@ -59,7 +61,7 @@ public class DataSetUrlCompletionItem implements CompletionItem {
                 int ii= txt.indexOf("'");
                 int jj= txt.indexOf("\n");
                 if ( ii>-1 && ii<jj ) {
-                    System.err.println("ii="+ii);
+                    logger.fine("ii="+ii);
                     d.remove( pos, ii );
                 }
 		d.insertString(pos, rs.completion.substring(rs.completable.length()), null);

@@ -89,7 +89,9 @@ import org.das2.jythoncompletion.support.LazyCompletionItem;
 
 public class CompletionImpl extends MouseAdapter implements DocumentListener,
 CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChangeListener {
-    
+
+    private static final Logger logger= Logger.getLogger("jython.editor");
+
     private static final boolean debug = Boolean.getBoolean("org.netbeans.modules.editor.completion.debug");
     private static final boolean alphaSort = Boolean.getBoolean("org.netbeans.modules.editor.completion.alphabeticalSort"); // [TODO] create an option
 
@@ -1024,7 +1026,7 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
                         sb.append('\n');
                     }
                 }
-                System.err.println(sb.toString());
+                logger.fine(sb.toString());
             }
             if (getActiveComponent() != null) {
                 getActiveComponent().removeCaretListener(this);
@@ -1060,7 +1062,7 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
                         sb.append('\n');
                     }
                 }
-                System.err.println(sb.toString());
+                logger.fine(sb.toString());
             }
            /* if (getActiveDocument() != null) {
                 DocumentUtilities.removeDocumentListener(getActiveDocument(), this, DocumentListenerPriority.AFTER_CARET_UPDATE);
@@ -1296,14 +1298,14 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
             CompletionResultSetImpl result = resultSets.get(i);
             if (!result.isFinished()) {
                 if (debug) {
-                    System.err.println("CompletionTask: " + result.getTask() // NOI18N
+                    logger.fine("CompletionTask: " + result.getTask() // NOI18N
                             + " not finished yet"); // NOI18N
                 }
                 return false;
             }
         }
         if (debug) {
-            System.err.println("----- All tasks finished -----");
+            logger.fine("----- All tasks finished -----");
         }
         return true;
     }

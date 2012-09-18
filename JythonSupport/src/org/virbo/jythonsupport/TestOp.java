@@ -5,8 +5,10 @@
 
 package org.virbo.jythonsupport;
 
+import java.util.logging.Level;
 import org.virbo.dsops.Ops;
 import java.util.Random;
+import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -14,6 +16,9 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public class TestOp {
+
+    private static final Logger logger= Logger.getLogger("jython");
+
     public static final int SIZE = 3000000;
     
     public static void main( String[] args ) {
@@ -32,7 +37,7 @@ public class TestOp {
             n.nextGaussian();
         }
         System.err.print("  ");
-        System.err.println(System.currentTimeMillis() - t0);
+        logger.log(Level.FINE, "{0}", (System.currentTimeMillis() - t0));
     }
     
     

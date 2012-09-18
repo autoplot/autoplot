@@ -42,6 +42,8 @@ import org.virbo.datasource.DataSetURI;
  */
 public class JythonUtil {
 
+    private static final Logger logger= Logger.getLogger("jython");
+
     /**
      * create an interpretter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
@@ -79,7 +81,7 @@ public class JythonUtil {
             }
             
         } else {
-            System.err.println("Not adding Lib stuff!!!  See https://sourceforge.net/tracker/index.php?func=detail&aid=3134982&group_id=199733&atid=970682");
+            logger.warning("Not adding Lib stuff!!!  See https://sourceforge.net/tracker/index.php?func=detail&aid=3134982&group_id=199733&atid=970682");
         }
 
         InteractiveInterpreter interp = new InteractiveInterpreter( null, pySys );
@@ -98,12 +100,12 @@ public class JythonUtil {
         File ff2= FileSystem.settings().getLocalCacheDir();
         File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" );
         if ( ! ff.exists() ) {
-            System.err.println("looking for "+ff+", but didn't find it.");
-            System.err.println("doesn't seem like we have the right file, downloading...");
+            logger.warning("looking for "+ff+", but didn't find it.");
+            logger.warning("doesn't seem like we have the right file, downloading...");
             File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
             ff= f;
         }
-        System.err.println("   ...done");
+        logger.fine("   ...done");
         return ff.toString();
     }
 

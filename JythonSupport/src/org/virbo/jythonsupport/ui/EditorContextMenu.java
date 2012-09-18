@@ -4,12 +4,8 @@
  */
 package org.virbo.jythonsupport.ui;
 
-import java.awt.Event;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,6 +28,8 @@ import org.virbo.datasource.DataSourceUtil;
  * @author jbf
  */
 public class EditorContextMenu {
+
+    private static final Logger logger= Logger.getLogger("jython.editor");
 
     private EditorTextPane editor;
     private JPopupMenu menu;
@@ -132,7 +130,7 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam()") {
                 public void actionPerformed(ActionEvent e) {
                     String var= editor.getSelectedText();
-                    System.err.println( "editor.getdoc: " + editor.getDocument() );
+                    logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
                         insertCode( "p1= getParam( 'p1', 0.0, 'parameter p1 (default=0.0)' )\n");
                     } else {

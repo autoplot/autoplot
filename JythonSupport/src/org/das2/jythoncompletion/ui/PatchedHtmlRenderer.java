@@ -56,6 +56,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -65,6 +66,8 @@ import javax.swing.UIManager;
  */
 public final class PatchedHtmlRenderer {
 
+    private static final Logger logger= Logger.getLogger("jython.editor");
+    
     /** Stack object used during HTML rendering to hold previous colors in
      * the case of nested color entries. */
     private static Stack<Color> colorStack = new Stack<Color>();
@@ -261,7 +264,7 @@ public final class PatchedHtmlRenderer {
             throw new IllegalArgumentException("Unknown rendering mode: " + style); //NOI18N
         }
 
-        //        System.err.println ("rps: " + y + " " + s);
+        //        logger.fine ("rps: " + y + " " + s);
         if (s.startsWith("<html") || s.startsWith("<HTML")) { //NOI18N
 
             return _renderHTML(s, 6, g, x, y, w, h, f, defaultColor, style, paint, null, false);
@@ -326,7 +329,7 @@ public final class PatchedHtmlRenderer {
         String s, int pos, Graphics g, int x, int y, int w, int h, Font f, Color defaultColor, int style, boolean paint,
         Color background, boolean disableColorChange
     ) {
-        //        System.err.println ("rhs: " + y + " " + s);
+        //        logger.fine ("rhs: " + y + " " + s);
         if (f == null) {
             f = UIManager.getFont("controlFont"); //NOI18N
 

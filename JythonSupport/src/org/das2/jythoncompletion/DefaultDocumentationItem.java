@@ -21,6 +21,8 @@ import org.das2.jythoncompletion.support.CompletionDocumentation;
  */
 public class DefaultDocumentationItem implements CompletionDocumentation {
 
+    private static final Logger logger= Logger.getLogger("jython.editor");
+
     String link;
     String text;
 
@@ -70,7 +72,7 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
 
     public URL getURL() {
         URL result= resolveURL(this.link);
-        System.err.println("getURL="+result);
+        logger.log(Level.FINE, "getURL={0}", result);
         return result;
     }
 
@@ -82,7 +84,7 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
             try {
                 return new URL(link);
             } catch (MalformedURLException ex) {
-                ex.printStackTrace();
+                logger.severe(ex.toString());
                 return null;
             }
         } else {
@@ -95,7 +97,7 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
                 try {
                     url = new URL(url, link.substring(i) );
                 } catch (MalformedURLException ex) {
-                    ex.printStackTrace(); // just ignore the hash part.
+                    logger.severe(ex.toString());
                 }
             }
             return url;

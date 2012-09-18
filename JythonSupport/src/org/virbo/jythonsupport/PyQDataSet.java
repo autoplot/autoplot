@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.das2.datum.DatumUtil;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
@@ -43,6 +44,8 @@ import org.virbo.dataset.WritableDataSet;
  * @author jbf
  */
 public class PyQDataSet extends PyJavaInstance {
+
+    private static final Logger logger= Logger.getLogger("jython");
 
     WritableDataSet ds;
     QDataSet rods; // read-only dataset
@@ -197,7 +200,7 @@ public class PyQDataSet extends PyJavaInstance {
 //
     private static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
-        binaryInfixMethods= new HashMap<String, PyReflectedFunction>();
+        binaryInfixMethods= new HashMap<String, PyReflectedFunction>(); //TODO: what is this?
         binaryInfixMethods.put( "gt", new PyReflectedFunction("gt") );
         
         for ( Method m: BinaryInfixOps.class.getMethods() ) {
@@ -649,7 +652,7 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
     public QDataSet gt( Object o ) {
-        System.err.println(o);
+        logger.fine(String.valueOf(o));
         return null;
     }
 
