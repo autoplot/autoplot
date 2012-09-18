@@ -189,7 +189,13 @@ public class IstpMetadataModel extends MetadataModel {
         return properties( meta, true );
     }
 
-    public Map<String, Object> properties(Map<String, Object> meta, boolean recurse ) {
+    /**
+     *
+     * @param meta ISTP metadata from CDF files.
+     * @param doRecurse if true, then allow recursion for other properties.
+     * @return
+     */
+    public Map<String, Object> properties(Map<String, Object> meta, boolean doRecurse ) {
 
         Map attrs;
         if ( meta==null ) {
@@ -293,6 +299,11 @@ public class IstpMetadataModel extends MetadataModel {
             properties.put(QDataSet.UNITS, units);
         }
 
+        if ( UnitsUtil.isTimeLocation(units) && !doRecurse && properties.containsKey(QDataSet.LABEL) ) {
+            properties.remove(QDataSet.LABEL);
+            properties.remove(QDataSet.TITLE);
+        }
+        
         try {
 
             DatumRange range = getRange(attrs, units);
@@ -335,7 +346,7 @@ public class IstpMetadataModel extends MetadataModel {
 
         }
 
-        if ( recurse ) {
+        if ( doRecurse ) {
             for (int i = 0; i < QDataSet.MAX_RANK; i++) {
                 String key = "DEPEND_" + i;
                 Object o= attrs.get(key);
