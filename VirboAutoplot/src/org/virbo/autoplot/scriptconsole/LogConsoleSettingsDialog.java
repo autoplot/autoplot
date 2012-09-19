@@ -53,6 +53,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         org.virbo.datasource.LogNames.APDSS_CDFJAVA,
         org.virbo.datasource.LogNames.APDSS_CDAWEB,
         org.virbo.datasource.LogNames.APDSS_ASCII,
+        org.virbo.datasource.LogNames.APDSS_JYDS,
         "jython",
         "console.stdout", "console.stderr", "qdataset.ascii" };
         GridBagConstraints c = new GridBagConstraints();
