@@ -53,6 +53,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
+import org.virbo.autoplot.LogNames;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
@@ -75,7 +76,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
-    private final static Logger logger = Logger.getLogger("autoplot.dom");
+    private final static Logger logger = Logger.getLogger(LogNames.AUTOPLOT_DOM);
 
     private static AtomicInteger canvasIdNum = new AtomicInteger(0);
     private static AtomicInteger plotIdNum = new AtomicInteger(0);

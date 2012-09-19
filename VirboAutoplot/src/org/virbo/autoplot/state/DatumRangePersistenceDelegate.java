@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
+import org.virbo.autoplot.LogNames;
 import org.virbo.dataset.SemanticOps;
 
 /**
@@ -30,7 +31,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     public DatumRangePersistenceDelegate()  {
     }
 
-    private static final Logger logger= Logger.getLogger( "autoplot.dom" );
+    private static final Logger logger= Logger.getLogger( LogNames.AUTOPLOT_DOM );
 
     private Datum abs( Datum w ) {
         return w.getUnits().createDatum( Math.abs(w.doubleValue(w.getUnits() )) );
