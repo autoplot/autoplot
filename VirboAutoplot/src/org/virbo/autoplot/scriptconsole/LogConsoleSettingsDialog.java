@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -30,24 +31,26 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     /** Creates new form LogConsoleSettingsDialog */
     public LogConsoleSettingsDialog(java.awt.Frame parent, boolean modal, LogConsole console ) {
         super(parent, modal);
+        setTitle("Log Console Settings");
         initComponents();
         initLogSettings();
         this.console= console;
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
     }
 
     private void initLogSettings() {
-        String[] loggers= new String[] { "das2", "das2.filesystem", "autoplot",
+        String[] sloggers= new String[] { "das2", "das2.filesystem", "autoplot",
         "autoplot.dom", "autoplot.bookmarks", "autoplot.pngwalk",
         "qdataset", "qstream",
         "datum", 
-        "apdss", "apdss.cdf", "apdss.cdfjava", "apdss.cdaweb", "apdss.ascii",
+        "apdss", "apdss.cdfn", "apdss.cdfjava", "apdss.cdaweb", "apdss.ascii",
         "jython",
         "console.stdout", "console.stderr", "qdataset.ascii" };
         GridBagConstraints c = new GridBagConstraints();
 
         c.gridy= 0;
-        for ( String logger: loggers ) {
-            JLabel l= new JLabel(logger);
+        for ( String slogger: sloggers ) {
+            JLabel l= new JLabel(slogger);
             c.weightx= 0.4;
             c.gridx= 0;
             verbosityPanel.add( l,c );
@@ -56,15 +59,23 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 Level.INFO.toString(),
                 Level.FINE.toString(),
                 Level.ALL.toString() } );
-            cb.setActionCommand( logger );
-            final String flogger= logger;
-            Level initLevel= Logger.getLogger(flogger).getLevel();
-            if ( initLevel==null ) initLevel= Level.WARNING;
+            cb.setActionCommand( slogger );
+            final String fslogger= slogger;
+            Logger logger= Logger.getLogger(fslogger);
+            Level initLevel= logger.getLevel();
+            while ( initLevel==null ) {
+                logger= logger.getParent();
+                if ( logger==null ) {
+                    initLevel= Level.WARNING; // this shouldn't happen.
+                    break;
+                }
+                initLevel= logger.getLevel();
+            }
             cb.setSelectedItem( initLevel.toString() );
             cb.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Level level= Level.parse((String)cb.getSelectedItem());
-                    Logger.getLogger(flogger).setLevel(level);
+                    Logger.getLogger(fslogger).setLevel(level);
                 }
             });
             c.gridx= 1;
@@ -96,6 +107,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         searchForTextField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         verbosityPanel = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -143,6 +155,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         verbosityPanel.setLayout(new java.awt.GridBagLayout());
         jScrollPane1.setViewportView(verbosityPanel);
 
+        jButton1.setText("Okay");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -163,7 +182,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     .add(layout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 113, Short.MAX_VALUE)
+                        .add(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -172,7 +193,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeStampsCheckBox)
@@ -181,7 +202,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
-                    .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1))
                 .addContainerGap())
         );
 
@@ -211,6 +233,10 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         updateSearchText();
     }//GEN-LAST:event_searchForTextFieldFocusLost
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -229,6 +255,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
