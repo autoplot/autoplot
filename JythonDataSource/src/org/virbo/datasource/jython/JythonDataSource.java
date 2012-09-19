@@ -186,6 +186,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         PyException causedBy = null;
         try {
             if ( interp == null ) { // caching might leave the interpretter open.  This needs to be tweaked--the TSB could set interp to null for example.
+
+                logger.log(Level.FINE, "running script {0}", jythonScript );
+
                 mon.started();
                 mon.setProgressMessage( "initialize Jython interpreter...");
                 interp = JythonUtil.createInterpreter(false);
