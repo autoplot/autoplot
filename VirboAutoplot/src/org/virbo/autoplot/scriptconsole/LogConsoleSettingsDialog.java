@@ -18,10 +18,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 
 /**
- *
+ * Settings GUI for the Log Console dialog.  The log console is more complex than it first seems, in that it
+ * is actually receiving messages from loggers, not just stdout and stderr.  (See http://docs.oracle.com/javase/1.4.2/docs/guide/util/logging/overview.html,
+ * but in short messages are sent to hierarchical named channels with verbosity levels.)  
  * @author jbf
  */
 public class LogConsoleSettingsDialog extends javax.swing.JDialog {
@@ -39,11 +40,19 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }
 
     private void initLogSettings() {
-        String[] sloggers= new String[] { "das2", "das2.filesystem", "autoplot",
-        "autoplot.dom", "autoplot.bookmarks", "autoplot.pngwalk",
+        String[] sloggers= new String[] { "das2", "das2.filesystem", 
+        org.virbo.autoplot.LogNames.AUTOPLOT,
+        org.virbo.autoplot.LogNames.AUTOPLOT_DOM,
+        org.virbo.autoplot.LogNames.AUTOPLOT_BOOKMARKS,
+        org.virbo.autoplot.LogNames.AUTOPLOT_PNGWALK,
+        org.virbo.autoplot.LogNames.AUTOPLOT_TSB,
         "qdataset", "qstream",
-        "datum", 
-        "apdss", "apdss.cdfn", "apdss.cdfjava", "apdss.cdaweb", "apdss.ascii",
+        "datum",
+        org.virbo.datasource.LogNames.APDSS,
+        org.virbo.datasource.LogNames.APDSS_CDFN,
+        org.virbo.datasource.LogNames.APDSS_CDFJAVA,
+        org.virbo.datasource.LogNames.APDSS_CDAWEB,
+        org.virbo.datasource.LogNames.APDSS_ASCII,
         "jython",
         "console.stdout", "console.stderr", "qdataset.ascii" };
         GridBagConstraints c = new GridBagConstraints();
