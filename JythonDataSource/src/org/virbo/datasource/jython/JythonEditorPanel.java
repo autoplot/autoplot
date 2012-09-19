@@ -54,6 +54,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.FileSystemUtil;
+import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
@@ -64,6 +65,8 @@ import org.virbo.jythonsupport.ui.ScriptPanelSupport;
  * @author jbf
  */
 public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+
+    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
 
     ScriptPanelSupport support;
     String suri;
@@ -237,12 +240,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
 
         } catch (IOException ex ) {
-            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             if ( reader!=null ) try {
                 reader.close();
             } catch (IOException ex) {
-                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         return hasDoc;
@@ -428,7 +431,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             paramsPanel.revalidate();
 
         } catch (IOException ex) {
-            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return hasVars;
 
@@ -513,7 +516,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         doc= doc.replaceAll(">", "&gt;");
                         esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
                     } catch (BadLocationException ex) {
-                        Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
 
@@ -522,7 +525,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
         } catch (IOException ex) {
-            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -623,7 +626,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 writer.write( textArea.getText() );
                 writer.close();
             } catch (IOException ex) {
-                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         return URISplit.format(split);

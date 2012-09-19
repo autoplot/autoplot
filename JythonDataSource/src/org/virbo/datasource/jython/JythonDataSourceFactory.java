@@ -35,6 +35,7 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
@@ -44,6 +45,8 @@ import org.virbo.jythonsupport.JythonUtil;
  * @author jbf
  */
 public class JythonDataSourceFactory extends AbstractDataSourceFactory {
+
+    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
@@ -200,7 +203,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 reader.close();
                 return !haveResult;
             } catch (IOException ex) {
-                Logger.getLogger(JythonDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return true;
             }
         }

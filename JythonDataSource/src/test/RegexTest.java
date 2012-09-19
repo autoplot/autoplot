@@ -5,7 +5,9 @@
 
 package test;
 
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.virbo.datasource.LogNames;
 
 /**
  *
@@ -13,11 +15,13 @@ import java.util.regex.Pattern;
  */
 public class RegexTest {
 
+    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
+
     private static void doTest( int num, String regex, String test ) {
 
         Pattern p= Pattern.compile(regex);
         String s= test;
-        System.err.println( String.format( "%03d: %5s %s",  num, p.matcher(s).matches(), regex ) );
+        logger.info( String.format( "%03d: %5s %s",  num, p.matcher(s).matches(), regex ) );
 
     }
 

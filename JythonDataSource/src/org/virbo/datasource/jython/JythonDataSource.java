@@ -42,6 +42,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -61,7 +62,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private final static String PARAM_SCRIPT= "script";
     private final static String PARAM_TIMERANGE= "timerange";
 
-    private static final Logger logger= Logger.getLogger("apdss.jyds");
+    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
     private boolean notCheckedTsb= true;
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
@@ -222,9 +223,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         String s = nextExec( reader, nextLine );
                         long t0= System.currentTimeMillis();
                         while (s != null) {
-                            Logger.getLogger("virbo.jythondatasource").log(Level.FINE, "{0}: {1}", new Object[]{reader.getLineNumber(), s});
+                            logger.log(Level.FINEST, "{0}: {1}", new Object[]{reader.getLineNumber(), s});
                             interp.exec(s);
-                            System.err.printf("line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s );
+                            logger.finest( String.format( "line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s ) );
                             if ( mon.isCancelled() ) break;
                             mon.setProgressMessage("exec line "+reader.getLineNumber() );
                             s = nextExec( reader, nextLine );
@@ -356,7 +357,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp = null;
                 cacheUrl = null;
                 cacheDate = null;
-                Logger.getLogger("virbo.jythonDataSouce").log(Level.WARNING, "exception in processing: {0}", causedBy);
+                logger.log(Level.WARNING, "exception in processing: {0}", causedBy);
                 throw causedBy;
             }
 
