@@ -17,6 +17,7 @@ import org.virbo.datasource.capability.Updating;
  */
 public class FilePollUpdating implements Updating {
 
+    private static final Logger logger= Logger.getLogger(LogNames.APDSS_UPDATING);
     File pollFile;
     long pollMtime;
     long pollMsize;
@@ -40,7 +41,7 @@ public class FilePollUpdating implements Updating {
         pollFile= file;
         Runnable run= new Runnable() {
             public void run() {
-                //System.err.println("start polling "+pollFile);
+                logger.log(Level.FINE, "start polling {0}", pollFile);
                 while ( pollFile!=null ) {
                     File lpollFile= pollFile; // make a local copy instead of synchronized block
                     if ( lpollFile==null ) continue;
@@ -63,7 +64,7 @@ public class FilePollUpdating implements Updating {
     }
 
     public void stopPolling() {
-        //System.err.println("stop polling "+pollFile);
+        logger.log(Level.FINE, "stop polling {0}", pollFile);
         pollFile= null;
     }
 
