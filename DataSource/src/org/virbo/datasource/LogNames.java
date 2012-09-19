@@ -13,10 +13,19 @@ package org.virbo.datasource;
  */
 public class LogNames {
 
+    /**
+     * generic data sources
+     */
     public static final String APDSS= "apdss";
 
+    /**
+     * updating capability
+     */
     public static final String APDSS_UPDATING= "apdss.updating";
 
+    /**
+     * cdaweb
+     */
     public static final String APDSS_CDAWEB= "apdss.cdaweb";
 
     /**
@@ -34,8 +43,14 @@ public class LogNames {
      */
     public static final String APDSS_HTML= "apdss.html";
 
+    /**
+     * ascii data source
+     */
     public static final String APDSS_ASCII= "apdss.ascii";
 
+    /**
+     * jython script data source
+     */
     public static final String APDSS_JYDS= "apdss.jyds";
 
     /**
@@ -48,6 +63,9 @@ public class LogNames {
      */
     public static final String APDSS_DSS= "apdss.dss";
 
+    /**
+     * URI handling
+     */
     public static final String APDSS_URI= "apdss.uri";
 
 
