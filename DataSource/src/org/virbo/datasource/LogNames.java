@@ -36,6 +36,8 @@ public class LogNames {
 
     public static final String APDSS_ASCII= "apdss.ascii";
 
+    public static final String APDSS_JYDS= "apdss.jyds";
+
     /**
      * Comma separated values reader.
      */
