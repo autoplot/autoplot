@@ -15,11 +15,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.LogNames;
 
 /**
  *
@@ -28,6 +31,8 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class IstpMetadataModel extends MetadataModel {
 
+    private static Logger logger= Logger.getLogger( LogNames.APDSS );
+    
     /**
      * Non-null, non-empty String if it is virtual.  The string will be like "compute_magnitude(B_xyz_gse)"
      */
@@ -199,7 +204,7 @@ public class IstpMetadataModel extends MetadataModel {
 
         Map attrs;
         if ( meta==null ) {
-            new Exception("null attributes").printStackTrace();
+            logger.fine("null attributes, not expected to be seen");
             attrs= Collections.emptyMap();
         } else {
             attrs= new HashMap(meta);
@@ -211,6 +216,7 @@ public class IstpMetadataModel extends MetadataModel {
 
         if (attrs.containsKey("LABLAXIS")) {
             properties.put(QDataSet.LABEL, String.valueOf( attrs.get("LABLAXIS") ));
+            //Note code below which may reset the label to LABEL(UNITS) below.
         }
 
         String title= " ";
@@ -295,7 +301,17 @@ public class IstpMetadataModel extends MetadataModel {
             boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
             if (isEpoch) {
                 units = Units.cdfEpoch;
-            } 
+            } else {
+                String label = (String) attrs.get("LABLAXIS");
+                if (label == null) {
+                    label = sunits;
+                } else {
+                    if (!sunits.equals("")) {
+                        label += " (" + sunits + ")";
+                    }
+                }
+                properties.put(QDataSet.LABEL, label);
+            }
             properties.put(QDataSet.UNITS, units);
         }
 
@@ -342,7 +358,7 @@ public class IstpMetadataModel extends MetadataModel {
 
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
 
         }
 
