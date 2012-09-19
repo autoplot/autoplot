@@ -12,6 +12,7 @@
 package org.virbo.datasource.jython;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -251,6 +252,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return hasDoc;
     }
 
+    private JComponent getSpacer() {
+        JComponent spacer= new JLabel("  ");
+        spacer.setSize( new Dimension(20,16) );
+        spacer.setMinimumSize( new Dimension(20,16) );
+        spacer.setPreferredSize( new Dimension(20,16) );
+        return spacer;
+    }
+
     private boolean doVariables( File f, Map<String,String> params ) {
 
         Map<String,JythonUtil.Param> parms;
@@ -290,15 +299,19 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     label= "<html>" + parm.name + ", <em>" + doc + "</em>"+colon+"</html>";
                 }      
                 
-
                 if ( !isBool ) {
-                   JLabel l= new JLabel( label );
-                   l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                   paramsPanel.add( l );
+                    JPanel labelPanel= new JPanel();
+                    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS ) );
+                    JLabel l= new JLabel( label );
+                    labelPanel.add( getSpacer() );
+                    labelPanel.add( l );
+                    labelPanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                    paramsPanel.add( labelPanel );
                 }
 
                 JPanel valuePanel= new JPanel(  );
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
+                if ( !isBool ) valuePanel.add( getSpacer() );
 
                 if ( parm.type=='R' ) {
 
@@ -409,8 +422,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 });
                 defaultButton.setToolTipText( ( parm.type == 'R' ) ? String.valueOf(parm.deft) : "Click to reset to default" );
                 valuePanel.add( defaultButton );
+                valuePanel.add( getSpacer() );
                 valuePanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                
+
                 paramsPanel.add( valuePanel );
                 tflist.add(ctf);
 
