@@ -936,13 +936,20 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
     List<String> actionCommands= new ArrayList<String>();
     List<JButton> actionButtons= new ArrayList<JButton>();
-    
-    void addFileAction( ActionEnabler match, String actionCommand, Action abstractAction ) {
+
+    /**
+     * Add a file action button to the GUI.
+     * @param match
+     * @param actionCommand
+     * @param abstractAction
+     */
+    public void addFileAction( ActionEnabler match, String actionCommand, Action abstractAction ) {
         this.actionEnablers.add( match );
         this.actionCommands.add( actionCommand );
         JButton b= new JButton( abstractAction );
         this.actionButtons.add( b );
         actionButtonsPanel.add( b );
+        this.revalidate();
     }
 
     /**
