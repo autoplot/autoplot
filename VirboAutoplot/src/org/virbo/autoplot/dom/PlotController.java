@@ -427,7 +427,7 @@ public class PlotController extends DomNodeController {
         boolean warnedAboutUnits= false;
         for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
-            if ( p.isActive() && plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
+            if ( plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
                 if (newSettings == null) {
                     newSettings = (Plot) plot1.copy();
                 } else {
