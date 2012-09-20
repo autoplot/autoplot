@@ -83,7 +83,7 @@ public abstract class Bookmark {
      */
     public static final int REMOTE_BOOKMARK_DEPTH_LIMIT = 5;
 
-    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
     public static List<Bookmark> parseBookmarks(String data) throws IOException, SAXException, BookmarksException  {
         return parseBookmarks(data,0);

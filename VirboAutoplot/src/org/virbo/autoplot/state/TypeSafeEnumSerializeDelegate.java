@@ -18,7 +18,7 @@ import org.virbo.qstream.SerializeDelegate;
  */
 public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
 
-    protected static final Logger logger= Logger.getLogger("autoplot.dom");
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
     
     public TypeSafeEnumSerializeDelegate() {
     }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.LogNames;
 
 /**
@@ -22,7 +23,7 @@ import org.virbo.autoplot.LogNames;
 public class ApplicationControllerSyncSupport {
     ApplicationController controller;
     Application application;
-    private static final Logger logger= Logger.getLogger(LogNames.AUTOPLOT_DOM);
+    private static final Logger logger= LoggerManager.getLogger(LogNames.AUTOPLOT_DOM);
     
     ApplicationControllerSyncSupport( ApplicationController controller ) {
         this.controller= controller;

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class LayoutUtil {
 
-    private static final Logger logger = Logger.getLogger("autoplot");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
     private static boolean ALLOW_EXCESS_SPACE = true;
 

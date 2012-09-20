@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  */
 public class BookmarksManagerModel {
 
-    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
     
     protected void doImport(Component c) {
         JFileChooser chooser = new JFileChooser();
@@ -109,11 +109,12 @@ public class BookmarksManagerModel {
                 
             } catch (IOException e) {
                 e.printStackTrace();
+                logger.log(Level.SEVERE, null, e);
             } finally {
                 if ( out!=null ) try {
                     out.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

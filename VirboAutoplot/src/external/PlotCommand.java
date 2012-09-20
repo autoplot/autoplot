@@ -40,7 +40,7 @@ import org.virbo.jythonsupport.Util;
  */
 public class PlotCommand extends PyObject {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);

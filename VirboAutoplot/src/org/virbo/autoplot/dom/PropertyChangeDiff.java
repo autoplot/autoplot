@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  */
 public class PropertyChangeDiff implements Diff {
 
-    private static final Logger logger= Logger.getLogger("autoplot.dom");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
 
     String propertyName;
     Object oldVal;

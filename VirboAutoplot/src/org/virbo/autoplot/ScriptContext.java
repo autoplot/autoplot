@@ -62,7 +62,7 @@ import org.virbo.qstream.StreamException;
  */
 public class ScriptContext extends PyJavaInstance {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     private static ApplicationModel model = null;
     private static Application dom= null;

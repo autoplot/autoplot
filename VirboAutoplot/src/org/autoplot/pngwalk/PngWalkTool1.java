@@ -115,7 +115,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     Pattern actionMatch=null;
     String actionCommand=null;
 
-    static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
     private static final String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
@@ -263,10 +263,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 try {
                     return WalkUtil.fileExists(productFile);
                 } catch (FileSystemOfflineException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     return false;
                 } catch (URISyntaxException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                     return false;
                 }
             }
@@ -336,7 +336,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                             }
                             raiseApWindowSoon(apWindow);
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 };

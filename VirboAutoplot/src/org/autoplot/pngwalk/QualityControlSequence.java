@@ -21,7 +21,7 @@ public class QualityControlSequence {
     WalkImageSequence walkImageSequence;
     URI qcFolder;
 
-    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
     
     QualityControlSequence( WalkImageSequence wis, URI qcFolder ) throws IOException {
         this.walkImageSequence= wis;
@@ -76,10 +76,10 @@ public class QualityControlSequence {
                 rec = QualityControlRecord.getRecord( imageURI, qcFolder);
             }
         } catch (UnknownHostException ex) {
-            Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             rec = null;
         } catch(IOException ex) {
-            Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             rec = null;
         }
         return rec;

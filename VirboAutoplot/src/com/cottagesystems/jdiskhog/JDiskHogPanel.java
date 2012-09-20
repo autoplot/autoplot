@@ -45,7 +45,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
     boolean goPressed= false;
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel(AutoplotUI model) {

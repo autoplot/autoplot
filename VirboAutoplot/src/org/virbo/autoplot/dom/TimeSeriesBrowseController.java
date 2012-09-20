@@ -44,7 +44,7 @@ public class TimeSeriesBrowseController {
     private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
     private static final String PENDING_TIMERANGE_DIRTY= "tsbTimerangeDirty";
 
-    private static final Logger logger = Logger.getLogger("autoplot.tsb");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.tsb");
     TickleTimer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
     private DomNode listenNode=null;

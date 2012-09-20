@@ -172,7 +172,7 @@ public class ApplicationModel {
         }
     }
 
-    static final Logger logger = Logger.getLogger("virbo.autoplot");
+    static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
     public static final String PREF_RECENT = "recent";
     public static final String PROPERTY_RECENT = PREF_RECENT;
@@ -617,15 +617,15 @@ public class ApplicationModel {
                 out3.close();
 
             } catch ( IOException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, surl, ex );
                 if ( out3!=null ) try {
                     out3.close();
                 } catch (IOException ex1) {
-                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, null, ex1);
                 }
             }
         } catch ( Exception ex ) {
-            ex.printStackTrace(); // we really don't want to have another exception here...
+            logger.log( Level.SEVERE, surl, ex );
 
         }
     }
@@ -704,7 +704,7 @@ public class ApplicationModel {
             if ( out3!=null ) try {
                 out3.close();
             } catch (IOException ex1) {
-                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex1);
+                logger.log(Level.SEVERE, null, ex1);
             }
         }
 

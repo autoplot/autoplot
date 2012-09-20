@@ -34,7 +34,7 @@ import org.virbo.jythonsupport.ui.EditorTextPane;
  */
 public class RunScriptPanel extends javax.swing.JPanel {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     org.virbo.jythonsupport.ui.EditorTextPane textArea;
 

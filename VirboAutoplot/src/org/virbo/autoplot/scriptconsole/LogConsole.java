@@ -68,7 +68,7 @@ import org.xml.sax.SAXException;
  */
 public class LogConsole extends javax.swing.JPanel {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     public static final int RECORD_SIZE_LIMIT = 1000;
     List<LogRecord> records = new LinkedList<LogRecord>();
@@ -313,12 +313,12 @@ public class LogConsole extends javax.swing.JPanel {
             alreadyLoggingStdout = true;
         }
 
-        logger = Logger.getLogger("console.stdout");
+        logger = org.das2.util.LoggerManager.getLogger("console.stdout");
         los = new LoggingOutputStream(logger, Level.INFO);
         oldStdOut = System.out;
         System.setOut(new PrintStream(los, true));
 
-        logger = Logger.getLogger("console.stderr");
+        logger = org.das2.util.LoggerManager.getLogger("console.stderr");
         los = new LoggingOutputStream(logger, Level.WARNING);
         oldStdErr = System.err;
         System.setErr(new PrintStream(los, true));

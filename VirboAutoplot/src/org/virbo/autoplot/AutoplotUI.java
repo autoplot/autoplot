@@ -179,7 +179,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
     };
     
-    private static final Logger logger = Logger.getLogger("autoplot");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
     private JythonScriptPanel scriptPanel;
     private DataPanel dataPanel;
     private LayoutPanel layoutPanel;

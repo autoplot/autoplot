@@ -26,7 +26,7 @@ import org.jdesktop.beansbinding.Converter;
  */
 public class BindingSupport {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     protected BindingSupport() {
         implBindingContexts = new HashMap();
         //sources= new HashMap();

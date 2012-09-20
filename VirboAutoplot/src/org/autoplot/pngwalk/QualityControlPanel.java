@@ -36,7 +36,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private QualityControlRecord qcRecord;
     public static final String KEY_QUALITY_CONTROL_URI = "QualityControlURI";
 
-    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
     
     /** Creates new form QualityControlPanel */
     public QualityControlPanel() {

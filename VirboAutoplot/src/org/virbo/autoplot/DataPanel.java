@@ -70,7 +70,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     PropertyChangeListener compListener; // listen to component property changes
     
-    private final static Logger logger = Logger.getLogger("autoplot");
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
     public DataPanel( Application dom ) {
         initComponents();

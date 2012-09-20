@@ -47,7 +47,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet nonMonoDs;
     QDataSet initialError;
 
-    static final Logger logger= Logger.getLogger( "autoplot" );
+    static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot" );
 
     public UriTcaSource( String uri ) throws Exception {
         logger.log(Level.FINE, "new tca source: {0}", uri);

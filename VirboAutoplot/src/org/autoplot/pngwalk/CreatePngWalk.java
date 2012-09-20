@@ -90,7 +90,7 @@ public class CreatePngWalk {
         public boolean update= false;
     }
 
-    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
 
     private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
         OutputStream out=null;

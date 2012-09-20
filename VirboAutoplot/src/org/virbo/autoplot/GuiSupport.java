@@ -113,7 +113,7 @@ import org.xml.sax.SAXException;
  */
 public class GuiSupport {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     AutoplotUI parent;
 

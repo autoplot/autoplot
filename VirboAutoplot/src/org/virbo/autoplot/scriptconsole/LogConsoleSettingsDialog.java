@@ -14,6 +14,12 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -56,6 +62,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         org.virbo.datasource.LogNames.APDSS_JYDS,
         "jython",
         "console.stdout", "console.stderr", "qdataset.ascii" };
+
+        List otherLoggers= new ArrayList( org.das2.util.LoggerManager.getLoggers() );
+        otherLoggers.addAll( Arrays.asList(sloggers) );
+        Collections.sort(otherLoggers);
+        sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
+
         GridBagConstraints c = new GridBagConstraints();
 
         c.gridy= 0;

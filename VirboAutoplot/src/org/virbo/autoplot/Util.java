@@ -29,7 +29,7 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class Util {
 
-    public static final Logger logger= Logger.getLogger("autoplot");
+    public static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     private static String tagName(String svnURL, Map<String, String> abbrevs) {
         if ( svnURL==null ) return "untagged";

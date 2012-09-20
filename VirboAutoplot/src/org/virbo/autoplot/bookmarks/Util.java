@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  */
 public class Util {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     /**
      * load and maintain recent entries in the context name.  This will also add
@@ -53,16 +53,12 @@ public class Util {
                 recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
                 setRecent(sel,recent);
             } catch (BookmarksException ex) {
-                ex.printStackTrace();
                 logger.log(Level.SEVERE, null, ex);
             } catch (SAXException ex) {
-                ex.printStackTrace();
                 logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                ex.printStackTrace();
                 logger.log(Level.SEVERE, null, ex);
             } catch (ParserConfigurationException ex) {
-                ex.printStackTrace();
                 logger.log(Level.SEVERE, null, ex);
             }
 
@@ -76,8 +72,7 @@ public class Util {
                     Bookmark.formatBooks(fout,getRecent(sel));
                     fout.close();
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, null, ex);
                 } finally {
                     if ( fout!=null ) fout.close();
                 }

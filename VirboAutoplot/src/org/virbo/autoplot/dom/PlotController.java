@@ -62,7 +62,7 @@ public class PlotController extends DomNodeController {
      */
     public List<PlotElement> pdListen= new LinkedList();
 
-    private static final Logger logger= Logger.getLogger( "autoplot.dom" );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
 
     public PlotController(Application dom, Plot domPlot, DasPlot dasPlot, DasColorBar colorbar) {
         this( dom, domPlot );

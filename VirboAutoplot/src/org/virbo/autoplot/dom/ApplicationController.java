@@ -43,6 +43,7 @@ import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.system.MonitorFactory;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -76,7 +77,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
-    private final static Logger logger = Logger.getLogger(LogNames.AUTOPLOT_DOM);
+    private final static Logger logger = LoggerManager.getLogger(LogNames.AUTOPLOT_DOM);
 
     private static AtomicInteger canvasIdNum = new AtomicInteger(0);
     private static AtomicInteger plotIdNum = new AtomicInteger(0);
@@ -445,7 +446,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             try {
                 Thread.sleep(30);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1572,9 +1573,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                         SwingUtilities.invokeAndWait(run);
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
 

@@ -1994,7 +1994,7 @@ public class PlotElementController extends DomNodeController {
                         peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                         peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                     } else {
-                        Logger.getLogger("autoplot.plotelementcontroller").warning("expected color plane_0");
+                        logger.warning("expected color plane_0");
                     }
                 }
                  
@@ -2157,7 +2157,7 @@ public class PlotElementController extends DomNodeController {
                     if ( plane0!=null ) {
                         zunits= Units.dimensionless; // NOT SUPPORTED
                     } else {
-                        Logger.getLogger("autoplot.plotelementcontroller").warning("expected color plane_0");
+                        logger.warning("expected color plane_0");
                     }
                 }
 

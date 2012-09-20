@@ -27,7 +27,7 @@ import org.virbo.autoplot.dom.ChangesSupport.DomLock;
  */
 public class DomNodeController {
 
-    protected static final Logger logger= Logger.getLogger( LogNames.AUTOPLOT_DOM );
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
     DomNode node;
 

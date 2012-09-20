@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class RequestListener {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     public RequestListener() {
     }

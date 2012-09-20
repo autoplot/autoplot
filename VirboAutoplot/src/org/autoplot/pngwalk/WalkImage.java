@@ -31,7 +31,7 @@ import org.virbo.datasource.URISplit;
  */
 public class WalkImage  {
 
-    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
 
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
     public static final String PROP_BADGE_CHANGE = "badgeChange";

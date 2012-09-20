@@ -22,7 +22,7 @@ import org.virbo.autoplot.LogNames;
  */
 public class ArrayNodeDiff implements Diff {
 
-    private static final Logger logger= Logger.getLogger(LogNames.AUTOPLOT_DOM);
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger(LogNames.AUTOPLOT_DOM);
 
     String propertyName;
     Object node;

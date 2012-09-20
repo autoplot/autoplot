@@ -76,7 +76,7 @@ import org.xml.sax.SAXException;
  */
 public class BookmarksManager extends javax.swing.JDialog {
 
-    private final static Logger logger= Logger.getLogger("autoplot.bookmarks");
+    private final static Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
     /**
      * return the index of the node in the tree, by comparing at toString of each node.

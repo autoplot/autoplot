@@ -37,7 +37,7 @@ import org.virbo.datasource.DataSetURI;
  * @author jbf
  */
 public class WalkUtil {
-    private static final Logger logger= Logger.getLogger("autoplot.pngwalk");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
     
     private static int firstIndexOf( String str, List<String> targets ) {
         int i0= Integer.MAX_VALUE;

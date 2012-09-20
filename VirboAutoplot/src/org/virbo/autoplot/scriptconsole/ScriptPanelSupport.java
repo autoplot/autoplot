@@ -58,7 +58,7 @@ import org.virbo.datasource.jython.JythonDataSourceFactory;
  */
 public class ScriptPanelSupport {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     File file;
     final ApplicationModel model;

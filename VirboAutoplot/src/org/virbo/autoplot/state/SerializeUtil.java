@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  */
 public class SerializeUtil {
 
-    private static final Logger logger = Logger.getLogger("autoplot.dom");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.dom");
 
     static {
         SerializeRegistry.register( BindingModel.class, new BindingModelSerializeDelegate() );

@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
  */
 public class BookmarksManagerTransferrable {
 
-    private static final Logger logger= Logger.getLogger("autoplot.bookmarks");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
     private BookmarksManagerModel model;
     private JTree jTree1;

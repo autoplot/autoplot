@@ -27,7 +27,7 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class JythonUtil {
 
-    private static final Logger logger= Logger.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     /**
      * create an interpreter object configured for Autoplot contexts:

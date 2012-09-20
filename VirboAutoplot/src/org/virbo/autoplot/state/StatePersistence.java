@@ -64,7 +64,7 @@ import org.virbo.autoplot.dom.Plot;
  */
 public class StatePersistence {
 
-    private static final Logger logger= Logger.getLogger("autoplot.dom");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
     
     private StatePersistence() {
     }

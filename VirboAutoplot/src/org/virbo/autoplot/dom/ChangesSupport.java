@@ -36,7 +36,7 @@ import org.virbo.autoplot.LogNames;
 public final class ChangesSupport {
     Map<Object,Object> changesPending;
     WeakReference<Object> parent;
-    private static final Logger logger= Logger.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to

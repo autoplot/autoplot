@@ -31,7 +31,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     public DatumRangePersistenceDelegate()  {
     }
 
-    private static final Logger logger= Logger.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
     private Datum abs( Datum w ) {
         return w.getUnits().createDatum( Math.abs(w.doubleValue(w.getUnits() )) );

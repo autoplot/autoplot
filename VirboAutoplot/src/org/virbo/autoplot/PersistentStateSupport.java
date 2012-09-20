@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
  */
 public class PersistentStateSupport {
 
-    private static final Logger logger= Logger.getLogger("autoplot.dom");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
 
     String ext;
     private String currentFile;

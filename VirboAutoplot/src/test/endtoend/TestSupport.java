@@ -25,7 +25,7 @@ import org.virbo.dsops.Ops;
  */
 public class TestSupport {
 
-    protected static final Logger logger= Logger.getLogger("autoplot.test");
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.test");
     /**
      * input vaps for testing.
      */
