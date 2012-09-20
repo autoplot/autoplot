@@ -781,7 +781,7 @@ public class AutoplotUtil {
                 int lastValid=wds.length()-1;
                 while ( lastValid>=0 && wds.value(lastValid)==0 ) lastValid--;
                 if ( ( lastValid-firstValid+1 ) == 0 ) {
-                    System.err.println("special case where monotonic dataset contains no valid data");
+                    logger.fine("special case where monotonic dataset contains no valid data");
                     if (UnitsUtil.isTimeLocation(u)) {
                         dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
                     } else {
@@ -1036,7 +1036,7 @@ public class AutoplotUtil {
                     logger.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
                     return result; // DANGER--EXIT POINT
                 } else {
-                    logger.fine("TYPICAL_MIN, TYPICAL_MAX from metadata rejected because it clipped or squished the data.");
+                    logger.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin, tmax, result.range});
                 }
             }
         }
