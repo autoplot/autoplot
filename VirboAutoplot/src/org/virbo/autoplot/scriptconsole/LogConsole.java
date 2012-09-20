@@ -77,7 +77,7 @@ public class LogConsole extends javax.swing.JPanel {
     boolean showLoggerId = false;
     boolean showTimeStamps = false;
     boolean showLevel = false;
-    LogConsoleSettingsDialog settingsDialog = null;
+
     NumberFormat nf = new DecimalFormat("00.000");
     private Timer timer2;
     PrintStream oldStdOut;
@@ -220,9 +220,7 @@ public class LogConsole extends javax.swing.JPanel {
     }
 
     private synchronized LogConsoleSettingsDialog getSettingsDialog() {
-        if (this.settingsDialog == null) {
-            settingsDialog = new LogConsoleSettingsDialog( GuiSupport.getFrameForComponent(this), false, this);
-        }
+        LogConsoleSettingsDialog settingsDialog = new LogConsoleSettingsDialog( GuiSupport.getFrameForComponent(this), true, this);
         return settingsDialog;
     }
 
