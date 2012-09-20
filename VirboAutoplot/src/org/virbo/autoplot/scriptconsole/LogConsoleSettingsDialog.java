@@ -14,12 +14,8 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -52,21 +48,17 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         org.virbo.autoplot.LogNames.AUTOPLOT_BOOKMARKS,
         org.virbo.autoplot.LogNames.AUTOPLOT_PNGWALK,
         org.virbo.autoplot.LogNames.AUTOPLOT_TSB,
-        "qdataset", "qstream",
-        "datum",
         org.virbo.datasource.LogNames.APDSS,
         org.virbo.datasource.LogNames.APDSS_CDFN,
         org.virbo.datasource.LogNames.APDSS_CDFJAVA,
         org.virbo.datasource.LogNames.APDSS_CDAWEB,
         org.virbo.datasource.LogNames.APDSS_ASCII,
-        org.virbo.datasource.LogNames.APDSS_JYDS,
-        "jython",
-        "console.stdout", "console.stderr", "qdataset.ascii" };
+        org.virbo.datasource.LogNames.APDSS_JYDS, };
 
-        List otherLoggers= new ArrayList( org.das2.util.LoggerManager.getLoggers() );
+        HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
         otherLoggers.addAll( Arrays.asList(sloggers) );
-        Collections.sort(otherLoggers);
         sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
+        Arrays.sort(sloggers);
 
         GridBagConstraints c = new GridBagConstraints();
 
@@ -75,12 +67,16 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             JLabel l= new JLabel(slogger);
             c.weightx= 0.4;
             c.gridx= 0;
+            l.setHorizontalAlignment(JLabel.RIGHT);
             verbosityPanel.add( l,c );
-            final JComboBox cb= new JComboBox( new String[] {
-                Level.WARNING.toString(),
-                Level.INFO.toString(),
-                Level.FINE.toString(),
-                Level.ALL.toString() } );
+            final JComboBox cb= new JComboBox( new Level[] {
+                Level.WARNING,
+                Level.INFO,
+                Level.CONFIG,
+                Level.FINE,
+                Level.FINER,
+                Level.FINEST,
+                Level.ALL } );
             cb.setActionCommand( slogger );
             final String fslogger= slogger;
             Logger logger= Logger.getLogger(fslogger);
@@ -96,7 +92,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             cb.setSelectedItem( initLevel.toString() );
             cb.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Level level= Level.parse((String)cb.getSelectedItem());
+                    Level level= (Level)cb.getSelectedItem();
                     Logger.getLogger(fslogger).setLevel(level);
                 }
             });
