@@ -214,11 +214,6 @@ public class IstpMetadataModel extends MetadataModel {
 
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
-        if (attrs.containsKey("LABLAXIS")) {
-            properties.put(QDataSet.LABEL, String.valueOf( attrs.get("LABLAXIS") ));
-            //Note code below which may reset the label to LABEL(UNITS) below.
-        }
-
         String title= " ";
         String s;
         s= (String)attrs.get("Source_name");
