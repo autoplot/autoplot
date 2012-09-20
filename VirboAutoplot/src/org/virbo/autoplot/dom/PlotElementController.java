@@ -392,7 +392,7 @@ public class PlotElementController extends DomNodeController {
         String label= null;
         c= c.trim();
         if ( c.length()>0 && c.startsWith("|slice1(31)|slice1(31)") ) {
-            System.err.println("something is horribly wrong...  See sftp://jbf@papco.org/home/jbf/uploads/rte_1760330581_20120815_113557_jbf.xml");
+            logger.fine("something is horribly wrong...  See sftp://jbf@papco.org/home/jbf/uploads/rte_1760330581_20120815_113557_jbf.xml");
         }
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
@@ -662,7 +662,7 @@ public class PlotElementController extends DomNodeController {
 
         public synchronized void propertyChange(PropertyChangeEvent evt) {
             if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
-                //TODO: find a way to fix this properly or don't call it a kludge! System.err.println("kludge pec446 cannot be removed");
+                //TODO: find a way to fix this properly or don't call it a kludge! logger.fine("kludge pec446 cannot be removed");
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             changesSupport.performingChange( this, PENDING_SET_DATASET );
@@ -715,7 +715,7 @@ public class PlotElementController extends DomNodeController {
                 if (resetPlotElement) {
                     if (plotElement.getComponent().equals("")) {
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
-                        //System.err.println(" fillDs:" + fillDs + "  renderType:"+ renderType );
+                        //logger.fine(" fillDs:" + fillDs + "  renderType:"+ renderType );
 
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs, renderType);
@@ -1109,7 +1109,7 @@ public class PlotElementController extends DomNodeController {
             QDataSet sliceDs= fillDs; // dataset after initial slicing
             String existingComponent= plotElement.getComponent();
 
-            //System.err.println("fillDs="+ fillDs + "  renderType="+renderType  + "  existingComponent="+existingComponent );
+            //logger.fine("fillDs="+ fillDs + "  renderType="+renderType  + "  existingComponent="+existingComponent );
 
             if ( shouldSlice && existingComponent.length()>0 ) {
                 try {
@@ -1189,7 +1189,7 @@ public class PlotElementController extends DomNodeController {
                 setSliceAutoranges( sliceShouldAutorange(fillDs, component) );
                 if ( !existingComponent.equals("") ) {
                     if ( component.equals(existingComponent) ) {
-                        System.err.println("here again...");
+                        logger.fine("here again...");
                     }
                     plotElement.setComponentAutomatically( existingComponent + component );
                 } else {
@@ -1455,7 +1455,7 @@ public class PlotElementController extends DomNodeController {
         ac.unbindImpl(((PlotElement)node).getStyle());
 
         if ( node!=plotElement ) {
-            System.err.println("node!=plotElement");
+            logger.fine("node!=plotElement");
         }
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
@@ -1492,8 +1492,9 @@ public class PlotElementController extends DomNodeController {
      *   listening plot may invoke its resetZoom method.
      */
     private synchronized void doResetRanges() {
-        logger.finest("doResetRanges...");
+
         setStatus("busy: do autorange");
+
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
         try {
@@ -1505,6 +1506,7 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
             DataSourceController dsc= getDataSourceFilter().getController();
+            logger.log(Level.FINE, "doResetRanges for {0}", dsc);
 
             QDataSet fillDs = dsc.getFillDataSet();
             Map props= dsc.getFillProperties();
@@ -1554,13 +1556,10 @@ public class PlotElementController extends DomNodeController {
                 //}
 
                 logger.fine("doAutoranging");
-                if ( fillDs.rank()>2 ) {
-                    System.err.println("fillDs.rank()>2");
-                }
-                long t0= System.currentTimeMillis();
+                //long t0= System.currentTimeMillis();
 
                 doAutoranging( peleCopy,props,fillDs, false );
-                //System.err.println("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
+                //logger.fine("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
 
                 //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
                 //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
@@ -1580,7 +1579,7 @@ public class PlotElementController extends DomNodeController {
                         if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
                             DatumRange tr= tsb.getTimeRange();
                             if ( tr==null ) {
-                                System.err.println("tsb contains no timerange");
+                                logger.fine( "tsb contains no timerange");
                             }
                             peleCopy.getPlotDefaults().getXaxis().setRange( tr );
                         }
@@ -1599,6 +1598,7 @@ public class PlotElementController extends DomNodeController {
 
             } else {
                 setStatus( "autoranging is disabled" );
+                logger.info( "autoranging is disabled" );
             }
 
             if ( plotElement.getComponent().equals("") && plotElement.isAutoLabel() ) plotElement.setLegendLabelAutomatically( peleCopy.getLegendLabel() );
@@ -1607,8 +1607,8 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
             peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
 
-            if ( logger.isLoggable(Level.FINEST) ) {
-                logger.finest( String.format( "done, autorange  x:%s, y:%s ",
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.finer( String.format( "done, autorange  x:%s, y:%s ",
                         peleCopy.getPlotDefaults().getXaxis().getRange().toString(),
                         peleCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
             }
@@ -1770,7 +1770,7 @@ public class PlotElementController extends DomNodeController {
         RenderType spec = peleCopy.getRenderType();
 
         if ( fillDs.rank()==0 ) {
-            //System.err.println("rank 0");
+            //logger.fine("rank 0");
             spec= RenderType.digital;
         }
 
@@ -1778,6 +1778,7 @@ public class PlotElementController extends DomNodeController {
             props = Collections.EMPTY_MAP;
         }
 
+        logger.log(Level.FINE, "doAutoranging for {0}", spec);
 
         if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
 
@@ -1857,7 +1858,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
-            System.err.println("xdesc.range="+xdesc.range );
+            logger.log(Level.FINE, "xdesc.range={0}", xdesc.range);
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
 
@@ -1872,7 +1873,7 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
 
-            System.err.println("xaxis.isAutoRange="+peleCopy.getPlotDefaults().getXaxis().isAutoRange() );
+            logger.log(Level.FINE, "xaxis.isAutoRange={0}", peleCopy.getPlotDefaults().getXaxis().isAutoRange());
             if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
                 peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
                 peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
@@ -2261,7 +2262,7 @@ public class PlotElementController extends DomNodeController {
     protected synchronized void maybeCreateDasPeer(){
         final Renderer oldRenderer = getRenderer();
 
-        //System.err.println( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
+        //logger.fine( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
         DasColorBar cb= null;
         if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
 
@@ -2278,7 +2279,7 @@ public class PlotElementController extends DomNodeController {
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             if ( oldRenderer != newRenderer ) {
                 setRenderer(newRenderer);
-                //System.err.println( "getRenderer= "+getRenderer() + "  plotElementController="+ this + " ("+this.hashCode()+")" );
+                //logger.fine( "getRenderer= "+getRenderer() + "  plotElementController="+ this + " ("+this.hashCode()+")" );
                 if ( oldRenderer!=null ) {
                     oldRenderer.setActive(false);
                     oldRenderer.setColorBar(null);
@@ -2289,7 +2290,7 @@ public class PlotElementController extends DomNodeController {
                 public void run() {
                     DasPlot plot = getDasPlot();
                     if ( plot==null ) {
-                        System.err.println("brace yourself for crash...");
+                        logger.fine("brace yourself for crash...");
                         plot = getDasPlot(); // for debugging  Spectrogram->Series
                         if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
 
@@ -2498,7 +2499,7 @@ public class PlotElementController extends DomNodeController {
                         title= insertString( title, "TIMERANGE",tr.toString() );
                     }
                 }
-                //System.err.println("<--"+value + "-->"+title );
+                //logger.fine("<--"+value + "-->"+title );
                 //see convertReverse, which must be done as well.
                 if ( title.contains("COMPONENT") ) {
                     String ss="";
