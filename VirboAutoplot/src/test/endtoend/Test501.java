@@ -5,6 +5,9 @@
 
 package test.endtoend;
 
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.File;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,7 +51,15 @@ public class Test501 {
         }
     }
 
-    private static void do1( String uri, int id, boolean doTest ) throws Exception {
+    /**
+     *
+     * @param uri the URI to load
+     * @param iid the index of the test.
+     * @param doTest if true, then expect a match, otherwise an ex prefix is used to indicate there should not be a match
+     * @return the ID of a product to test against a reference.
+     * @throws Exception
+     */
+    private static String do1( String uri, int iid, boolean doTest ) throws Exception {
         
         long t0= System.currentTimeMillis();
         QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri );
@@ -57,7 +68,7 @@ public class Test501 {
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
         hist.putProperty( QDataSet.TITLE, uri );
 
-        String label= String.format( "test%03d_%03d", testid, id );
+        String label= String.format( "test%03d_%03d", testid, iid );
         hist.putProperty( QDataSet.LABEL, label );
         formatDataSet( hist, label+".qds");
 
@@ -84,16 +95,24 @@ public class Test501 {
             fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
         }
 
+        String result= null;
+
         setTitle(fileUri);
         String name;
         if ( doTest ) {
-            name= String.format( "test%03d_%03d.png", testid, id );
+            String id= String.format( "%016d",Math.abs(uri.hashCode()));
+            name= String.format( "test%03d_%s.png", testid, id );
+            result= name;
         } else {
-            name= String.format( "ex_test%03d_%03d.png", testid, id );
+            name= String.format( "ex_test%03d_%03d.png", testid, iid );
+            result= null;
         }
         writeToPng( name );
+        System.err.printf( "wrote to file: "+name );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
+
+        return result;
     }
 
     public static void main( String[] args ) throws Exception {
@@ -105,8 +124,7 @@ public class Test501 {
         getDocumentModel().getOptions().setAutolayout(false);
         getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-        int itest= 0;
-
+        int iid= 0;
 
         DasServer[] dsss= new DasServer[] { DasServer.plasmaWaveGroup,
             DasServer.create(new URL("http://emfisis.physics.uiowa.edu/das/das2Server")) };
@@ -149,11 +167,11 @@ public class Test501 {
             System.err.println( "Skipping the tests: " + skip );
 
             int iis= 0; // index of element from this server.
+            // iid index within the test
 
-            int iid=itest;
             for ( String id: ids ) {
 
-                System.err.println( String.format( "==== test %d of %d (%d) ========================================================", iis, count, iid ) );
+                System.err.println( String.format( "==== test %03d of %d (%03d) ========================================================", iis, count, iid ) );
 
                 if ( id.contains("/testing/") ) {
                     System.err.println( "ids containing /testing/ are automatically skipped: " + id );
@@ -204,7 +222,14 @@ public class Test501 {
                         System.err.println("id: "+id );
                         System.err.println("uri: "+uri);
 
-                        do1( uri, iid, true );
+                        String result= do1( uri, iid, true );
+
+                        // write a file that shows the mapping from hashcode to id.
+                        File f= new File( "map_"+result+"__"+iid );
+
+                        FileOutputStream fi= new FileOutputStream(f);
+                        fi.write( uri.getBytes() );
+                        fi.close();
 
                     }
                 } catch ( Exception ex ) {
@@ -214,7 +239,6 @@ public class Test501 {
                 iis++;
                 iid++;
             }
-            itest+= iis;
         }
 
         System.err.println("DONE...");
@@ -223,7 +247,7 @@ public class Test501 {
         if ( failures.size()>0 ) {
             System.err.println( String.format( "found %d failures:", failures.size() ) );
             for ( int i: failures.keySet() ) {
-                System.err.println( String.format( "%3d: %s", i, failures.get(i) ) );
+                System.err.println( String.format( "%03d: %s", i, failures.get(i) ) );
             }
             System.exit(1);
         } else {
