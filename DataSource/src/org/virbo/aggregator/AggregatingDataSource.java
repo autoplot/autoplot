@@ -343,10 +343,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
         }
 
     }
+
+    private static DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "1970-01-01" );
     /**
      * Holds value of property viewRange.
      */
-    private DatumRange viewRange = DatumRangeUtil.parseTimeRangeValid("2006-07-03 to 2006-07-05");
+    private DatumRange viewRange = DEFAULT_TIME_RANGE; // this should not be used!
 
     /**
      * resolution.  Only used if the delegates have a TimeSeriesBrowse.
