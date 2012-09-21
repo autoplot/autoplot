@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.channels.Channels;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.TableUtil;
@@ -29,6 +31,7 @@ import org.das2.datum.Units;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -53,7 +56,11 @@ import org.virbo.qstream.SimpleStreamFormatter;
  */
 public class AutoplotDataServer {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.server");
+
     public AutoplotDataServer() {
+        logger.setLevel(Level.ALL);
+        LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
     }
 
     private static void formatD2S(QDataSet data, OutputStream fo) {
@@ -131,10 +138,10 @@ public class AutoplotDataServer {
         if (!cache.equals("")) {
             File fcache = new File(cache);
             if ( !fcache.exists() && !fcache.mkdirs()) {
-                System.err.println("unable to make dirs for cache=" + fcache);
+                logger.fine("unable to make dirs for cache=" + fcache);
             }
             if (!fcache.canWrite()) {
-                System.err.println("unable to write to cache=" + fcache);
+                logger.fine("unable to write to cache=" + fcache);
             }
 
             File ff= new File( fcache, "testCache.empty" );
@@ -143,14 +150,14 @@ public class AutoplotDataServer {
             fo.close();
 
             FileSystem.settings().setLocalCacheDir(new File(cache));
-            System.err.println("using cache dir " + FileSystem.settings().getLocalCacheDir());
+            logger.fine("using cache dir " + FileSystem.settings().getLocalCacheDir());
         } else {
-            System.err.println("using default cache dir " + FileSystem.settings().getLocalCacheDir() );
+            logger.fine("using default cache dir " + FileSystem.settings().getLocalCacheDir() );
         }
 
         if (suri.equals("")) {
             alm.printUsage();
-            System.err.println("uri must be specified.");
+            logger.fine("uri must be specified.");
             System.exit(-1);
         }
 
@@ -201,7 +208,7 @@ public class AutoplotDataServer {
         };
 
         if ( !format.equals("d2s") ) {
-            System.err.println("no progress available because output is not d2s stream");
+            logger.fine("no progress available because output is not d2s stream");
             mon= new NullProgressMonitor();
         }
 
@@ -209,10 +216,10 @@ public class AutoplotDataServer {
 
         boolean someValid= false;
 
-        System.err.println( "time read args and prep=" + (( System.currentTimeMillis()-t0 ) ) );
+        logger.fine( "time read args and prep=" + (( System.currentTimeMillis()-t0 ) ) );
 
         if (!timeRange.equals("")) {
-            System.err.println("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
+            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
             System.err.printf("   suri=%s\n", suri);
             System.err.printf("   timeRange=%s\n", timeRange);
 
@@ -232,16 +239,16 @@ public class AutoplotDataServer {
 
                 //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
                 //TODO: find a way to test for this and give a good error message.
-                System.err.println( String.format( "getDataSet('%s','%s')", suri, dr ) );
+                logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 if ( ds1!=null ) {
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
-                        System.err.println("loaded ds="+ds1 + "  bounds: "+xrange );
+                        logger.fine("loaded ds="+ds1 + "  bounds: "+xrange );
                         System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
                     } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
                         QDataSet range= DataSetOps.dependBounds( ds1 );
-                        System.err.println("loaded ds="+ds1 + "  bounds: "+range );
+                        logger.fine("loaded ds="+ds1 + "  bounds: "+range );
                         System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
                     }
                     writeData( format, out, ds1 );
@@ -255,11 +262,12 @@ public class AutoplotDataServer {
             mon.finished();
 
         } else {
-            System.err.println("org.virbo.jythonsupport.Util.getDataSet( suri ):");
+            // TODO: consider the virtue of allowing this, where a timerange is not specified.
+            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
             System.err.printf("   suri=%s\n", suri);
 
             ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
-            System.err.println("loaded ds="+ds );
+            logger.fine("loaded ds="+ds );
             
             if ( ds!=null ) {
                 writeData( format, out, ds );
