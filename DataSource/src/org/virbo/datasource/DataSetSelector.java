@@ -1282,10 +1282,6 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         }
 
-        if ( context.trim().length()==0 ) {
-            context= "file:///";
-        }
-
         if ( enableDataSource && ( context.trim().length()==0 || context.trim().equals("vap+") ) ) {
             showCompletions();
 
