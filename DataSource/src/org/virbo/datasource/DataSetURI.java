@@ -1416,8 +1416,17 @@ public class DataSetURI {
         return completions;
     }
 
+    /**
+     * return a list of completions showing discovery plugins, and the list of supported filesystem types.
+     * @param surl
+     * @param carotpos
+     * @param mon
+     * @return
+     * @throws Exception
+     */
     public static List<CompletionResult> getTypesCompletions( String surl, int carotpos, ProgressMonitor mon) throws Exception {
 
+        List<String> dexts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
         List<CompletionContext> exts= DataSourceRegistry.getPlugins();
 
         List<CompletionResult> completions = new ArrayList();
@@ -1428,13 +1437,16 @@ public class DataSetURI {
             suffix= surl.substring( 4 );
         }
 
-        for ( CompletionContext cc: exts ) {
-            if ( cc.completable.startsWith(prefix) ) {
-                completions.add( new CompletionResult( cc.completable + suffix, cc.completable, null, cc.completable, false ) );
+        for ( String ext: dexts ) {
+            String vapext= "vap+"+ext.substring(1);
+            if ( vapext.startsWith(prefix) ) {
+                completions.add( new CompletionResult( vapext + ":", DataSourceRegistry.getDescriptionFor( vapext ), true ) );
             }
         }
 
-        String labelPrefix= "";
+        if ( "http://".startsWith(prefix) ) completions.add( new CompletionResult( "http://", null, true ) );
+        if ( "ftp://".startsWith(prefix) ) completions.add( new CompletionResult( "ftp://", null, true ) );
+        if ( "file://".startsWith(prefix) ) completions.add( new CompletionResult( "file:///", null, true ) );
 
         return completions;
     }
