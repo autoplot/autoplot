@@ -426,6 +426,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void firePlotDataSetURL() {
         List<String> r = new ArrayList<String>(getRecent());
         String value = getValue();
+        lastValue= value;
         if (r.contains(value)) {
             r.remove(value); // move to top of the list by remove then add.
         }
@@ -1383,7 +1384,19 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     // End of variables declaration//GEN-END:variables
 
     /**
+     * this returns the value of the datasetselector, rather than what is pending in the editor.  The problem is pending
+     * operations in the text editor will cause the value to be clobbered.
+     * @return
+     */
+    protected String getLastValue() {
+        return lastValue;
+    }
+
+    private String lastValue= null;
+
+    /**
      * Getter for property value.
+     * TODO: this should really be redone, returning the value property.
      * @return Value of property value.
      */
     public String getValue() {
@@ -1403,6 +1416,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public void setValue(String value) {
         //String oldvalue= this.editor.getText();
+        this.lastValue= value;
         if (value == null) {
             value="";
         }

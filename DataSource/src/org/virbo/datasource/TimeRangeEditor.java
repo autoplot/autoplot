@@ -321,8 +321,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         if ( peer!=null ) {
-            String surl = ((String) peer.getEditor().getText()).trim();//TODO:check
-
+            String surl = (String) peer.getLastValue().trim();//TODO:check
+            peer.setValue(surl);
             boolean wasRejected= false;
             DataSourceEditorPanel edit = null;
             try {
@@ -339,7 +339,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 edit= null;
             }
             if ( edit==null ) {
-                JOptionPane.showMessageDialog( prevButton, "this type has no editor", "no editor", JOptionPane.OK_OPTION );
+                JOptionPane.showMessageDialog( prevButton, "<html>The selected plot element has no editor:<br>"+surl, "no editor", JOptionPane.OK_OPTION );
             } else {
                 peer.browseSourceType();
             }
