@@ -398,8 +398,7 @@ public class SimpleServlet extends HttpServlet {
                 appmodel.canvas.writeToGraphicsOutput(out, go);
                 logit("done with write to output", t0, uniq, debug);
             } else {
-                throw new IllegalArgumentException("format must be image/png, application/pdf, or image/svg+xml");
-
+                throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
             }
 
 
@@ -407,8 +406,8 @@ public class SimpleServlet extends HttpServlet {
             logit("done with request", t0, uniq, debug);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            logger.log( Level.WARNING, null, e );
+            throw new ServletException(e);
         }
 
 
