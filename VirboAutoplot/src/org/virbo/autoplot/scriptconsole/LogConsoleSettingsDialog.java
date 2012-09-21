@@ -57,6 +57,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
         HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
         otherLoggers.addAll( Arrays.asList(sloggers) );
+        otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
         sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
         Arrays.sort(sloggers);
 
@@ -67,7 +68,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             JLabel l= new JLabel(slogger);
             c.weightx= 0.4;
             c.gridx= 0;
-            l.setHorizontalAlignment(JLabel.RIGHT);
+            c.anchor= GridBagConstraints.EAST;
             verbosityPanel.add( l,c );
             final JComboBox cb= new JComboBox( new Level[] {
                 Level.WARNING,
@@ -89,7 +90,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 }
                 initLevel= logger.getLevel();
             }
-            cb.setSelectedItem( initLevel.toString() );
+            cb.setSelectedItem( initLevel );
             cb.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Level level= (Level)cb.getSelectedItem();
@@ -98,6 +99,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             });
             c.gridx= 1;
             c.weightx= 0.6;
+            c.anchor= GridBagConstraints.WEST;
             verbosityPanel.add( cb,c );
             c.gridy++;
         }
