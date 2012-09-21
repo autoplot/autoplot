@@ -53,6 +53,8 @@ import org.virbo.dsops.Ops;
  */
 public class SimpleServlet extends HttpServlet {
 
+    private static final Logger logger= Logger.getLogger("autoplot.servlet" );
+
     static FileHandler handler;
 
     private static void addHandlers(long requestId) {
@@ -80,16 +82,15 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.err.println("v20120530.1505");
+        logger.fine("v20120921.0954");
 
-        System.err.println("=======================");
+        logger.fine("=======================");
 
         //register java cdf as .cdf handler
         if ( DataSourceRegistry.getInstance().getSource("cdf")==null ) {
             DataSourceRegistry.getInstance().registerExtension( "org.virbo.cdf.CdfJavaDataSourceFactory", "cdf", "cdf files read by the Java CDF reader" );
         }
 
-        //System.err.println( "requestMethod="+request.getMethod() );
         long t0 = System.currentTimeMillis();
         String suniq = request.getParameter("requestId");
         long uniq;
@@ -140,7 +141,7 @@ public class SimpleServlet extends HttpServlet {
             if (debug != null && !debug.equals("false")) {
                 for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
                     String n = (String) en.nextElement();
-                    System.err.println("" + n + ": " + Arrays.asList(request.getParameterValues(n)));
+                    logger.log( Level.FINER, "{0}: {1}", new Object[]{n, Arrays.asList(request.getParameterValues(n))});
                 }
             }
 
@@ -161,7 +162,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version=20100821_0644<br></html>";
+                s = s + "<br><br>servlet version=20120921_0954<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
@@ -360,8 +361,8 @@ public class SimpleServlet extends HttpServlet {
 
             dom.getController().waitUntilIdle();
 
-            System.err.println( "getDataSet: "+ dom.getPlotElements(0).getController().getRenderer().getDataSet() );
-            System.err.println( "bounds: " +dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds() );
+            logger.log( Level.FINER, "getDataSet: {0}", dom.getPlotElements(0).getController().getRenderer().getDataSet());
+            logger.log( Level.FINER, "bounds: {0}", dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds());
 
             if (format.equals("image/png")) {
                 logit("waiting for image", t0, uniq, debug);
@@ -442,7 +443,6 @@ public class SimpleServlet extends HttpServlet {
     }// </editor-fold>
 
     private void logit(String string, long t0, long id, String debug) {
-        if (debug != null && !debug.equals("false"))
-            System.err.printf("##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0));
+        logger.log( ( ( debug!=null && !debug.equals("false") ) ? Level.INFO : Level.FINER ), String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
     }
 }
