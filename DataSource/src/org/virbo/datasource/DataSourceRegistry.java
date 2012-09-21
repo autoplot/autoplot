@@ -35,6 +35,7 @@ public class DataSourceRegistry {
     private static final Logger logger= Logger.getLogger("apdss.uri");
 
     private static DataSourceRegistry instance;
+
     HashMap<String,Object> dataSourcesByExt;
     HashMap<String,Object> dataSourcesByMime;
     HashMap<String,Object> dataSourceFormatByExt;
@@ -676,6 +677,22 @@ public class DataSourceRegistry {
             result.add( new CompletionContext( CompletionContext.CONTEXT_AUTOPLOT_SCHEME, "vap+"+k.toString().substring(1)+":" ) );
         }
         return result;
+    }
+
+    
+    /**
+     * return a description of the data source, if available.
+     * @param vapext
+     * @return
+     */
+    public static String getDescriptionFor(String vapext) {
+        if ( vapext.startsWith("vap+cdaweb") ) {
+            return "CDAWeb database at NASA/SPDF";
+        } else if ( vapext.startsWith("vap+das2server") ) {
+            return "Das2Server";
+        } else {
+            return null;
+        }
     }
 
 }
