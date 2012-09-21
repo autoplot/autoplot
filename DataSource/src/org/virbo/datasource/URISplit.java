@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.LoggerManager;
 
 /**
  * Class for containing the elemental parts of a URI, and utility
@@ -41,6 +42,8 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class URISplit {
 
+    private static final Logger logger= LoggerManager.getLogger( LogNames.APDSS_URI );
+    
     /**
      * The following are suggestions for parameter names to encourage consistency between implementations.
      * See http://autoplot.org/developer.URI_syntax
@@ -89,12 +92,14 @@ public class URISplit {
      * @return "vap+cdf:file:///tmp/x.cdf"
      */
     public static String makeCanonical(String suri) {
+        logger.log(Level.FINEST, "makeCanonical {0}", suri);
         if ( suri==null ) return null;
         URISplit split= URISplit.parse(suri);
         suri= URISplit.format(split); // make canonical
         if ( !suri.startsWith("vap+") && split.ext!=null && split.ext.length()>1 ) {
             suri= "vap+"+split.ext.substring(1)+":"+suri;
         }
+        logger.log(Level.FINEST, "makeCanonical results in {0}", suri);
         return suri;
     }
 
@@ -105,6 +110,7 @@ public class URISplit {
      * @return
      */
     public static String makeColloquial(String suri) {
+        logger.log(Level.FINEST, "makeColloquial {0}", suri);
         if ( suri==null ) return null;
         if ( suri.trim().equals("") ) return "";
         URISplit split= URISplit.parse(suri);
@@ -115,8 +121,10 @@ public class URISplit {
         }
         String result= URISplit.format(split);
         if ( result.endsWith("file:///") && suri.endsWith(":") ) { // kludge around "file:/// that is added to "vap+cdaweb:"
+            logger.log(Level.FINEST, "makeColloquial results in {0}", suri);
             return suri;
         }
+        logger.log(Level.FINEST, "makeColloquial results in {0}", result);
         return result;
     }
 
@@ -424,7 +432,7 @@ public class URISplit {
 
     /**
      * interpret the scheme part to vapScheme and scheme.  If the resource URI is
-     * valid, then this will be set as well.  surl may be modified.
+     * valid, then this will be set as well.  result.surl may be modified.
      * @param result
      */
     private static void parseScheme(URISplit result, boolean normalize) throws URISyntaxException {
@@ -448,6 +456,7 @@ public class URISplit {
             }
         } else {
             if (scheme.contains(".")) {
+                logger.log( Level.FINE, "URI scheme contains .: {0} converting from vap.xxx to vap+xxx", surl);
                 int j = scheme.indexOf(".");
                 result.vapScheme = "vap+" + scheme.substring(0, j);
                 result.surl = result.surl.substring(j + 1);
@@ -455,7 +464,7 @@ public class URISplit {
                 result.formatCarotPos = result.resourceUriCarotPos + result.vapScheme.length() + 1;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
                 int iq= result.surl.indexOf("?");
-                if ( iq==-1 ) iq= surl.length();
+                if ( iq==-1 ) iq= result.surl.length();
                 try {
                     result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
                     result.scheme = result.resourceUri.getScheme();
@@ -500,7 +509,7 @@ public class URISplit {
      */
     public static URISplit parse( String surl, int caretPos , boolean normalize) {
 
-        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"{0}\",{1},{2})", new Object[]{ surl, caretPos, normalize });
+        logger.log( Level.FINE, "URISplit.parse(\"{0}\",{1},{2})", new Object[]{ surl, caretPos, normalize });
 
         if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CARET> on Windows.
             if ( caretPos==surl.length() ) caretPos++;
