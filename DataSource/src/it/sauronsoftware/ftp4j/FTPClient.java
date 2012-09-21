@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -651,7 +652,7 @@ public class FTPClient {
 				try {
 					communication.changeCharset(pickCharset());
 				} catch (IOException e) {
-					e.printStackTrace();
+                                    logger.log( Level.SEVERE, null, e );
 				}
 			}
 		}

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -67,7 +68,7 @@ public class DataSourceRegistry {
             Object result = constructor.newInstance(new Object[]{});
             return result;
         } catch ( Exception e ) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, null, e );
             return null;
         }
     }
@@ -143,21 +144,21 @@ public class DataSourceRegistry {
                                 extensions = (List<String>) m.invoke(f, new Object[0]);
                             } catch (NoSuchMethodException ex) {
                             } catch (InvocationTargetException ex) {
-                                ex.printStackTrace();
+                                logger.log( Level.SEVERE, null, ex );
                             }
                             try {
                                 Method m = c.getMethod("mimeTypes", new Class[0]);
                                 mimeTypes = (List<String>) m.invoke(f, new Object[0]);
                             } catch (NoSuchMethodException ex) {
                             } catch (InvocationTargetException ex) {
-                                ex.printStackTrace();
+                                logger.log( Level.SEVERE, null, ex );
                             }
                         } catch (ClassNotFoundException ex) {
-                            ex.printStackTrace();
+                            logger.log( Level.SEVERE, null, ex );
                         } catch (InstantiationException ex) {
-                            ex.printStackTrace();
+                            logger.log( Level.SEVERE, null, ex );
                         } catch (IllegalAccessException ex) {
-                            ex.printStackTrace();
+                            logger.log( Level.SEVERE, null, ex );
                         }
 
                         if (extensions != null) {
@@ -177,7 +178,7 @@ public class DataSourceRegistry {
                 reader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, null, e );
         }
     }
 
@@ -357,7 +358,7 @@ public class DataSourceRegistry {
                 reader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, null, e );
         }
 
     }

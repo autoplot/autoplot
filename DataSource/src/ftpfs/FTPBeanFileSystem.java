@@ -25,6 +25,7 @@ import it.sauronsoftware.ftp4j.listparsers.MLSDListParser;
 import it.sauronsoftware.ftp4j.listparsers.NetWareListParser;
 import it.sauronsoftware.ftp4j.listparsers.UnixListParser;
 import java.io.BufferedReader;
+import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -58,6 +59,8 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class FTPBeanFileSystem extends WebFileSystem {
 
+    private static final Logger logger= Logger.getLogger("das2.filesystem.ftp");
+    
     FTPBeanFileSystem(URI root) throws FileSystemOfflineException {
         super(root, userLocalRoot(root) );
         if ( FileSystem.settings().isOffline() ) {
@@ -67,7 +70,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             this.listDirectory("/"); // list the root to see if it is offline.
         } catch (IOException ex) {
             //TODO: how to distinguish UnknownHostException to be offline?  avoid firing an event until I come up with a way.
-            ex.printStackTrace();
+            logger.log(Level.INFO,"exception when listing the first time, going offline",ex);
             //throw new FileSystemOfflineException(ex);
             this.offline= true;
         }
@@ -315,7 +318,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         try {
                             item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
                         } catch ( NumberFormatException ex2 ) {
-                            ex.printStackTrace();
+                            logger.log( Level.WARNING, "unable to parse size in "+aline+" at "+sizePos,ex2 );
                             item.size = 1; // don't RTE
                         }
                     }
@@ -401,7 +404,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
 
                 } catch (NullPointerException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "Unable to make connection to " + getRootURL().getHost(), ex );
                     IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost()); // TODO: Java 1.6 will fix this
                     ex2.initCause(ex);
                     throw ex2;
@@ -522,7 +525,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
             bean.close();
 
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
+
+            logger.log( Level.SEVERE, null, ex );
             if (ex.getCause() instanceof IOException) {
                 throw (IOException) ex.getCause();
             } else {
@@ -616,7 +620,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     done= true;
                     
                 } catch (RuntimeException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, null, ex );
                     if (ex.getCause() instanceof IOException) {
                         throw (IOException) ex.getCause();
                     } else {

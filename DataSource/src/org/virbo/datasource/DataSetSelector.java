@@ -347,12 +347,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 } catch ( ParseException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
-                                    ex.printStackTrace();
+                                    logger.log( Level.SEVERE, "", ex );
                                     return;
                                 } catch ( IllegalArgumentException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
-                                    ex.printStackTrace();
+                                    logger.log( Level.SEVERE, "", ex );
                                     return;
                                 }
                             }
@@ -373,19 +373,19 @@ public class DataSetSelector extends javax.swing.JPanel {
                     showCompletions(surl, carotpos);
                 } catch (IllegalArgumentException ex) {
                     setMessage(ex.getMessage());
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     firePlotDataSetURL();
                 } catch (URISyntaxException ex) {
                     setMessage(ex.getMessage());
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     firePlotDataSetURL();
                 }
             }
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
             setMessage(ex.getMessage());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
             setMessage(ex.getMessage());
         }
 
@@ -545,7 +545,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     Method m= edit.getClass().getDeclaredMethod( "setExpertMode", boolean.class );
                     m.invoke( edit, this.isExpertMode() );
                 } catch ( NoSuchMethodException ex ) {
-                    //ex.printStackTrace(); //okay
+                    //logger.log( Level.SEVERE, "", ex ); //okay
                 }
             } else {
 
@@ -817,7 +817,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     completionsRunnable = null;
                     
                 } catch (NullPointerException ex) {
-                    ex.printStackTrace(); // TODO: look into this
+                    logger.log( Level.SEVERE, "", ex ); // TODO: look into this
 
                 }
             }
@@ -923,17 +923,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions = DataSetURI.getFileSystemCompletions( surl, carotpos, suggestFsAgg, suggestFiles, acceptRegex, mon);
                 } catch (UnknownHostException ex ) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -979,17 +979,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                         completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
                     }
                 } catch (UnknownHostException ex ) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -1019,7 +1019,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage("done getting completions");
                 } catch (Exception ex ) {
                     if ( !maybeHandleException(ex) ) {
-                        ex.printStackTrace();
+                        logger.log( Level.SEVERE, "", ex );
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
                     }
                     return;

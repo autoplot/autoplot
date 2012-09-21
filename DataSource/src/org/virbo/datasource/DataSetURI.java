@@ -682,7 +682,7 @@ public class DataSetURI {
         } catch ( URIException ex ) {
             throw new IOException(ex.getMessage()); //Java1.6 will change this
         } catch ( IllegalArgumentException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {

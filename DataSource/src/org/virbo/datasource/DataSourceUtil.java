@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.LoggerManager;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
@@ -49,6 +50,8 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class DataSourceUtil {
+
+    private static final Logger logger= LoggerManager.getLogger("apdss.util");
 
     /**
      * remove escape sequences like %20 to create a human-editable string
@@ -195,7 +198,7 @@ public class DataSourceUtil {
             } catch (ParseException ex) {
                 continue;
             } catch ( IllegalArgumentException ex ) {
-                ex.printStackTrace(); 
+                logger.log( Level.SEVERE, null, ex );
                 continue; // bad format code "N" from "file:///c:/WINDOWS/$NtUninstallKB2079403$/"
             }
             dr = tp.getTimeRange();

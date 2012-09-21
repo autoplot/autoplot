@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Updating;
@@ -79,7 +80,6 @@ public abstract class AbstractDataSource implements DataSource {
             return getExt(url.toURI());
         } catch (URISyntaxException e) {
             logger.fine("Failed to convert URL to URI.");
-            e.printStackTrace();
             return "";
         }
         /*String s = url.getFile();
@@ -211,7 +211,7 @@ public abstract class AbstractDataSource implements DataSource {
             Map<String, Object> meta = getMetadata(new NullProgressMonitor());
             return getMetadataModel().properties(meta);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, "exception in getProperties", e );
             return Collections.singletonMap("Exception", (Object) e);
         }
     }

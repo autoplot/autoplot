@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -38,6 +39,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     public static final String PROB_NO_TIMERANGE_PROVIDED = "no timerange provided";
     public static final String PROB_PARSE_ERROR_IN_TIMERANGE = "parse error in timeRange";
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.agg");
+    
     private DataSourceFactory delegateFactory=null;
 
     /** Creates a new instance of AggregatingDataSourceFactory */
@@ -264,10 +267,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             return delegateFactory.reject( delegateSurl, problems, mon );
             
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, surl, e );
             return false;
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, surl, e );
             return true;
         }
     }
