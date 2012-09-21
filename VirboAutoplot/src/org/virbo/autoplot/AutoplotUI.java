@@ -132,7 +132,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- *
+ * The Autoplot application GUI.  This is the entry point for the application, wrapping the internal
+ * application model with conveniences like bookmarks, time range editors and history.
+ * 
  * @author  jbf
  */
 public class AutoplotUI extends javax.swing.JFrame {
@@ -1123,7 +1125,7 @@ APSplash.checkTime("init 52");
         expertItems.add(mi);
         fileMenu.add(mi);
 
-        mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
+        mi= new JMenuItem( new AbstractAction( "Open URI History..." ) {
               public void actionPerformed( ActionEvent e ) {
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
                   dia.setExpertMode( isExpertMode() );
@@ -1139,6 +1141,8 @@ APSplash.checkTime("init 52");
               }
         } );
         mi.setToolTipText("Open URI history dialog");
+        mi.setIcon( new ImageIcon( getClass().getResource("/resources/history.png") ) );
+
         fileMenu.add( mi );
 
         mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
