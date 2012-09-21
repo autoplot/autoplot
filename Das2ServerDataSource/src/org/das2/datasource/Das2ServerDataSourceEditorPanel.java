@@ -473,8 +473,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             return result;
                 
         } catch ( Exception ex ) {
-            ex.printStackTrace();
-            System.err.println( "resulted in listPeers error:"+ uri );
+            logger.log( Level.FINE, "resulted in listPeers error:"+ uri, ex);
             return new ArrayList();
         }
     }
@@ -483,20 +482,20 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
      * add the default known servers, plus the ones we know about.
      */
     private List<String> listDas2Servers() {
-        List<String> d2ss= new ArrayList( );
-        d2ss.add( "http://www-pw.physics.uiowa.edu/das/das2Server" );
+        List<String> d2ss1= new ArrayList( );
+        d2ss1.add( "http://www-pw.physics.uiowa.edu/das/das2Server" );
 
         if ( serverURL.length()==0 ) {
-            d2ss.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+            d2ss1.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
         } else {
-            d2ss.addAll( listPeers(serverURL) );
+            d2ss1.addAll( listPeers(serverURL) );
         }
 
         File home = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         File book = new File(home, "bookmarks");
         File hist = new File(book, "history.txt");
-        //long t0= System.currentTimeMillis();
-        System.err.println("reading recent datasources from " + hist.toString() );
+        long t0= System.currentTimeMillis();
+        logger.log( Level.FINE, "reading recent datasources from {0}", hist.toString());
 
         if ( hist.exists() ) {
             try {
@@ -517,18 +516,22 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     s = r.readLine();
                 }
 
-                d2ss.removeAll(dss);  // remove whatever we have already
+                d2ss1.removeAll(dss);  // remove whatever we have already
                 List<String> d2ssDiscoveryList= new ArrayList(dss);
                 Collections.reverse( d2ssDiscoveryList );
-                d2ssDiscoveryList.addAll(d2ss);
-                d2ss= d2ssDiscoveryList; // put the most recently used ones at the front of the list
-                //System.err.printf("read extra das2servers in %d millis\n",(System.currentTimeMillis()-t0) );
-
+                d2ssDiscoveryList.addAll(d2ss1);
+                d2ss1= d2ssDiscoveryList; // put the most recently used ones at the front of the list
+                
+                logger.log( Level.FINE, "read extra das2servers in {0} millis\n", (System.currentTimeMillis()-t0) );
             } catch ( IOException ex ) {
+                logger.log( Level.FINE, "IOException when reading in {0}", hist );
                 JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
+
             }
+        } else {
+            logger.log( Level.FINE, "no history file found: {0}", hist );
         }
-        return d2ss;
+        return d2ss1;
 
     }
 
