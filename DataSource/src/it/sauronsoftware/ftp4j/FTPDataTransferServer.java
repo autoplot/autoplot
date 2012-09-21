@@ -24,6 +24,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 /**
  * This class implements a local server to make data transfer with the remote
@@ -34,6 +35,8 @@ import java.util.StringTokenizer;
 class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 		Runnable {
 
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("das2.filesystem.ftp");
+    
 	/**
 	 * The ServerSocket object waiting for the incoming connection.
 	 */
@@ -92,7 +95,7 @@ class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 			}
 			if (!valid) {
 				// warning to the developer
-				System.err.println("WARNING: invalid value \"" + aux
+				logger.warning("WARNING: invalid value \"" + aux
 						+ "\" for the " + FTPKeys.ACTIVE_DT_PORT_RANGE
 						+ " system property. The value should "
 						+ "be in the start-stop form, with "
@@ -166,7 +169,7 @@ class FTPDataTransferServer implements FTPDataTransferConnectionProvider,
 			}
 			if (!valid) {
 				// warning to the developer
-				System.err.println("WARNING: invalid value \"" + aux
+				logger.warning("WARNING: invalid value \"" + aux
 						+ "\" for the " + FTPKeys.ACTIVE_DT_ACCEPT_TIMEOUT
 						+ " system property. The value should "
 						+ "be an integer greater or equal to 0.");

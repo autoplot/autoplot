@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -54,7 +51,7 @@ public class ZipFileSystem extends FileSystem {
     }
 
     private void addZipEntry(String name, ZipEntry entry) {
-        //System.err.println("addZipEntry: " + name);
+        logger.log(Level.FINE, "addZipEntry: {0}", name);
         String parentName = name.substring(0, name.lastIndexOf("/", name.length()-2)+1);
         // recursively back up until we find a path we've already added.
         if (!filemap.containsKey(parentName)) addZipEntry(parentName, null);

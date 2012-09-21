@@ -683,7 +683,7 @@ public class URISplit {
 
         params = URISplit.uriDecode(params);
 //        if ( params.contains("+") && params.contains(" ") ) {  // this may be a problem.  We know spaces are not encoded as pluses.
-//            System.err.println("params appear to be decoded already");
+//            System.err.println("params appear to be decoded already"); // logger okay
 //        } else {
 //            if ( params.contains("+") && !params.contains("%20") ) { // legacy
 //               params = params.replaceAll("+", " " );

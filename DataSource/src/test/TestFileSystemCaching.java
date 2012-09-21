@@ -21,27 +21,27 @@ public class TestFileSystemCaching {
         
         FileSystem fs= FileSystem.create( "ftp://jbf@localhost/tmp/testData/");
         FileObject fo= fs.getFileObject( "data_2010_03_02_v1.00.qds" );
-        System.err.println( fo.getClass() );
-        System.err.println( fo.lastModified() );
-        System.err.println( fo.getSize() );
+        System.err.println( fo.getClass() ); // logger okay
+        System.err.println( fo.lastModified() ); // logger okay
+        System.err.println( fo.getSize() ); // logger okay
 
        //KeyChain.getDefault().writeKeysFile();
 
         fs.listDirectory("/a");
         fo= fs.getFileObject("/a/afile.txt");
-        System.err.println( fo.lastModified() );
-        System.err.println( fo.getSize() );
+        System.err.println( fo.lastModified() ); // logger okay
+        System.err.println( fo.getSize() ); // logger okay
 
         fs.listDirectory("/a");
         fo= fs.getFileObject("/a/afile.txt");
-        System.err.println( fo.lastModified() );
-        System.err.println( fo.getSize() );
+        System.err.println( fo.lastModified() ); // logger okay
+        System.err.println( fo.getSize() ); // logger okay
 
         fs= FileSystem.create( "http://autoplot.org/data/");
         fo= fs.getFileObject( "autoplot.cdf" );
-        System.err.println( fo.getClass() );
-        System.err.println( fo.lastModified() );
-        System.err.println( fo.getSize() );
+        System.err.println( fo.getClass() ); // logger okay
+        System.err.println( fo.lastModified() ); // logger okay
+        System.err.println( fo.getSize() ); // logger okay
 
 
     }

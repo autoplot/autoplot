@@ -185,6 +185,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
      */
     protected DirectoryEntry[] parseLslNew( String dir, File listing ) throws IOException {
 
+        logger.log(Level.FINE, "parseLslNew {0}", dir);
+
         InputStream in = new FileInputStream(listing);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -197,11 +199,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
             aline = reader.readLine();
         }
         String[] list= llist.toArray( new String[llist.size()] );
-
-        if ( dir!=null && dir.length()>1 ) {
-            System.err.println("herehere");
-        }
-
 
         FTPFile[] ret=null;
 
@@ -283,7 +280,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         int modifiedPos= 42;
 
         while (!done) {
-            //System.err.println(""+lineNum+": "+ aline);
+            //logger.log(Level.FINEST, "{0}: {1}", new Object[]{lineNum, aline});
             bytesRead = bytesRead + aline.length() + 1;
 
             aline = aline.trim();
@@ -645,7 +642,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
 
             if ( copyFile(partFile, targetFile) ) {
-                System.err.println( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
+                logger.fine( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
                 synchronized ( FTPBeanFileSystem.class ) {
                     if ( partFile.exists() && ! partFile.delete() ) {
                         throw new IllegalArgumentException("unable to delete file "+partFile );
@@ -655,7 +652,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         } catch (IOException e) {
             synchronized ( FTPBeanFileSystem.class ) {
-                System.err.println( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
+                logger.fine( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
                 if ( partFile.exists() && !partFile.delete() ) {
                     throw new IllegalArgumentException("unable to delete file "+partFile);
                 }
@@ -676,7 +673,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         try {
             result= maybeUpdateDirectoryEntry( filename, false );
         } catch ( IOException ex ) {
-            ex.printStackTrace(); // shouldn't happen when force=false.
+            logger.log(Level.SEVERE,null,ex);// shouldn't happen when force=false.
         }
         if ( result==null && this.isOffline() ) {
             File localfile= new File( getLocalRoot(), filename );

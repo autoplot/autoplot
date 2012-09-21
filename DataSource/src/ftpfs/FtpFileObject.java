@@ -28,7 +28,9 @@ import org.das2.util.monitor.ProgressMonitor;
  * @author jbf
  */
 public class FtpFileObject extends WebFileObject {
-    
+
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("das2.filesystem");
+
     FTPBeanFileSystem ftpfs;
 
     protected FtpFileObject( WebFileSystem wfs, String pathname, Date modifiedDate ) {
@@ -50,7 +52,7 @@ public class FtpFileObject extends WebFileObject {
                     if (list[i].name.equals(lookFor) ) {
                         return list[i].size;
                     } else if ( tinyGzFib && list[i].name.equals(lookForGz) ) {
-                        System.err.println("approximating size of gzipped file "+list[i].name+ "when it is uncompressed");
+                        logger.fine("approximating size of gzipped file "+list[i].name+ "when it is uncompressed");
                         return 2000*Math.round(list[i].size/2000.) * 5; // approx
                     }
                 }

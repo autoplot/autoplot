@@ -351,7 +351,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         p.addPropertyChangeListener( p.PROP_RANGE, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println(evt.getOldValue()+" -> "+ evt.getNewValue() );
+                System.err.println(evt.getOldValue()+" -> "+ evt.getNewValue() ); // logger okay
             }
 
         } );

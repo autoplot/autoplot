@@ -22,7 +22,7 @@ public class TestFtpProxy {
 
         //fs= FileSystem.create( new URI( "http://jbf@foo:@sarahandjeremy.net/~jbf/lanl/vap/") );
         //ss= fs.listDirectory("/");
-        //System.err.println(Arrays.asList(ss));
+        //System.err.println(Arrays.asList(ss)); // logger okay
 
         FileSystem.registerFileSystemFactory( "ftp", new FTPBeanFileSystemFactory() );
         fs= FileSystem.create( new URI( "ftp://jbf@foo:@192.168.0.205/temp/") );

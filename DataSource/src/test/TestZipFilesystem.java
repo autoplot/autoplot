@@ -23,7 +23,7 @@ public class TestZipFilesystem {
         String ff= "ftp://ftp.virbo.org/obrien/scatha/cdf/scatha_high_res/shr79037v01.cdf.zip/";
         FileSystem fs= FileSystem.create( new URI( ff ) );
         String[] ss= fs.listDirectory("/");
-        System.err.println(""+ss);
+        System.err.println(""+ss); // logger okay
 
     }
 }

@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
@@ -73,7 +74,7 @@ import javax.net.ssl.SSLSocketFactory;
  * @version 1.7.1
  */
 public class FTPClient {
-
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("das2.filesystem");
 	/**
 	 * The constant for the FTP security level.
 	 * 
@@ -3781,7 +3782,7 @@ public class FTPClient {
 			}
 			if (!valid) {
 				// warning to the developer
-				System.err.println("WARNING: invalid value \"" + aux
+				logger.warning("WARNING: invalid value \"" + aux
 						+ "\" for the " + FTPKeys.ACTIVE_DT_HOST_ADDRESS
 						+ " system property. The value should "
 						+ "be in the x.x.x.x form.");
