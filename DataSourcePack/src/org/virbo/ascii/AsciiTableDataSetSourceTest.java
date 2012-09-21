@@ -9,7 +9,6 @@
 
 package org.virbo.ascii;
 
-import java.net.URI;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -32,13 +31,13 @@ public class AsciiTableDataSetSourceTest {
         ds= new AsciiTableDataSourceFactory().getDataSource( DataSetURI.toUri(url) );
         d= ds.getDataSet( new NullProgressMonitor() );
 
-        System.err.println(d);
+        System.err.println(d); //logger okay
 
         url= "vap+dat:file:///media/mini/data.backup/examples/dat/sarah/rawdata10010.raw";
         ds= new AsciiTableDataSourceFactory().getDataSource( DataSetURI.toUri(url) );
         d= ds.getDataSet( new NullProgressMonitor() );
         
-        System.err.println(d);
+        System.err.println(d); //logger okay
 
         /*String url= "file:///T:/timer.dat?skip=1&time=field0&column=field1";
         DataSource ds= DataSetURL.getDataSource(new URL(url));
@@ -50,7 +49,7 @@ public class AsciiTableDataSetSourceTest {
         ds= new AsciiTableDataSourceFactory().getDataSource( DataSetURI.toUri(url) );
         d= ds.getDataSet( new NullProgressMonitor() );
         
-        System.err.println(d);
+        System.err.println(d); //logger okay
     }
     
 }
