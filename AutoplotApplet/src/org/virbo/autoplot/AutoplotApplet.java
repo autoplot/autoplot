@@ -84,7 +84,7 @@ public class AutoplotApplet extends JApplet {
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20110317.1";
+    public static final String VERSION = "20120921.1036";
     private Image splashImage;
     private JCheckBoxMenuItem overviewMenuItem = null;
 
@@ -286,13 +286,12 @@ public class AutoplotApplet extends JApplet {
 
         model = new ApplicationModel();
         model.setExceptionHandler(new ExceptionHandler() {
-
             public void handle(Throwable t) {
-                t.printStackTrace();
+                logger.log(Level.SEVERE, null, t);
             }
 
             public void handleUncaught(Throwable t) {
-                t.printStackTrace();
+                logger.log(Level.SEVERE, null, t);
             }
         });
 
@@ -476,7 +475,7 @@ public class AutoplotApplet extends JApplet {
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, null,ex );
                 dsource = null;
             }
 
@@ -610,7 +609,7 @@ public class AutoplotApplet extends JApplet {
                 RenderType renderType = RenderType.valueOf(srenderType);
                 dom.getController().getPlotElement().setRenderType(renderType);
             } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -826,14 +825,14 @@ public class AutoplotApplet extends JApplet {
                             return;
 
                         } catch (IOException iOException) {
-                            iOException.printStackTrace();
+                            logger.log(Level.SEVERE, null, iOException );
                         }
                     }
                     model.setDataSourceURL(surl);
                 }
             });
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, null, ex);
         }
     }
     protected String timeRange;
@@ -853,7 +852,7 @@ public class AutoplotApplet extends JApplet {
                     //dom.setTimeRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
                     firePropertyChange(PROP_TIMERANGE, oldv, timeRange);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, null, e);
                 }
             }
         };
@@ -876,7 +875,7 @@ public class AutoplotApplet extends JApplet {
                     model.getCanvas().repaint();
                     firePropertyChange(PROP_FONT, oldFont, font);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, null, e);
                 }
             }
         };
@@ -904,9 +903,9 @@ public class AutoplotApplet extends JApplet {
             public void run() {
                 try {
                     Object o = DomUtil.getPropertyValue(dom, node);
-                    logger.fine("dom." + node + "=" + o);
+                    logger.log(Level.FINE, "dom.{0}={1}", new Object[]{node, o});
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         };
@@ -925,18 +924,18 @@ public class AutoplotApplet extends JApplet {
 
                     SerializeDelegate sd = SerializeRegistry.getDelegate(c);
                     if (sd == null) {
-                        logger.fine("unable to find serialize delegate for " + c.getCanonicalName());
+                        logger.log(Level.FINE, "unable to find serialize delegate for {0}", c.getCanonicalName());
                         return;
                     }
                     Object val = sd.parse(sd.typeId(c), sval);
 
                     DomUtil.setPropertyValue(dom, node, val);
                     getAppletContext().showStatus("dom." + node + "=" + DomUtil.getPropertyValue(dom, node) );
-                    logger.fine("dom." + node + "=" + DomUtil.getPropertyValue(dom, node));
+                    logger.log(Level.FINE, "dom.{0}={1}", new Object[]{node, DomUtil.getPropertyValue(dom, node)});
                 } catch (ParseException ex) {
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         };
