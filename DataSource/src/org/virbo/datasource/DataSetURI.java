@@ -377,7 +377,7 @@ public class DataSetURI {
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
-        if (factory == null && (resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https"))) { // get the mime type
+        if (factory == null && ( resourceUri.getScheme()!=null && resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https"))) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
             mon.started();
