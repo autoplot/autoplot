@@ -38,8 +38,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.autoplot.csv.CsvDataSourceFactory;
-import org.autoplot.csv.CsvDataSourceFormat;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -60,7 +58,6 @@ import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
-import org.virbo.das2Stream.Das2StreamDataSourceFormat;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -114,7 +111,7 @@ public class AutoplotApplet extends JApplet {
             try {
                 getAppletContext().showDocument(new URL("javascript:" + statusCallback + "(\"" + val + "\")"));
             } catch (MalformedURLException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -124,7 +121,7 @@ public class AutoplotApplet extends JApplet {
             try {
                 getAppletContext().showDocument(new URL("javascript:" + timeCallback + "(\"" + val + "\")"));
             } catch (MalformedURLException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -137,7 +134,7 @@ public class AutoplotApplet extends JApplet {
             String jscall = String.format("%s('%s','%s','%s',%d,%d,%d )", clickCallback, plotid, xdatum, ydatum, e.getX(), e.getY(), e.getID());
             getAppletContext().showDocument(new URL("javascript:" + jscall));
         } catch (MalformedURLException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -169,7 +166,7 @@ public class AutoplotApplet extends JApplet {
 
         @Override
         protected void paintComponent(Graphics g1) {
-            //System.err.println( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
+            //logger.fine( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
             //        ""+ this.dom.getController().getCanvas().getController().getDasCanvas().getBackground() );
 
             Graphics2D g = (Graphics2D) g1;
@@ -233,13 +230,13 @@ public class AutoplotApplet extends JApplet {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         String fontParam = getParameter("font");
@@ -261,9 +258,9 @@ public class AutoplotApplet extends JApplet {
         getContentPane().add(progressComponent);
         validate();
 
-        System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
-        System.err.println("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
         repaint();
 
@@ -276,7 +273,7 @@ public class AutoplotApplet extends JApplet {
 
     @Override
     public void stop() {
-        System.err.println("stop AutoplotApplet" + VERSION);
+        logger.fine("stop AutoplotApplet" + VERSION);
         remove(model.getCanvas());
         this.model = null;
         this.dom = null;
@@ -284,7 +281,7 @@ public class AutoplotApplet extends JApplet {
 
     @Override
     public void start() {
-        System.err.println("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
         super.start();
 
         model = new ApplicationModel();
@@ -302,16 +299,16 @@ public class AutoplotApplet extends JApplet {
         model.setApplet(true);
         model.dom.getOptions().setAutolayout(false);
 
-        System.err.println("ApplicationModel created @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("ApplicationModel created @ " + (System.currentTimeMillis() - t0) + " msec");
 
         model.addDasPeersToApp();
 
-        System.err.println("done addDasPeersToApp @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done addDasPeersToApp @ " + (System.currentTimeMillis() - t0) + " msec");
 
         try {
-            System.err.println("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
+            logger.fine("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
         } catch (Exception ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         ApplicationModel appmodel = model;
@@ -356,7 +353,7 @@ public class AutoplotApplet extends JApplet {
         }
 
         setInitializationStatus("readParameters");
-        System.err.println("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
         String vap = getParameter("vap");
         if (vap != null) {
@@ -364,31 +361,31 @@ public class AutoplotApplet extends JApplet {
             try {
 
                 URL url= new URL(vap);
-                System.err.println("load vap "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.fine("load vap "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
 
                 in = url.openStream();
 
-                System.err.println("open vap stream "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.fine("open vap stream "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
 
                 appmodel.doOpen(in, null);
-                System.err.println("done open vap @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.fine("done open vap @ " + (System.currentTimeMillis() - t0) + " msec");
                 
                 appmodel.waitUntilIdle(false);
-                System.err.println("done load vap and waitUntilIdle @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.fine("done load vap and waitUntilIdle @ " + (System.currentTimeMillis() - t0) + " msec");
                 Canvas cc= appmodel.getDocumentModel().getCanvases(0);
-                System.err.println("vap height, width= " + cc.getHeight() + ","+ cc.getWidth() );
+                logger.fine("vap height, width= " + cc.getHeight() + ","+ cc.getWidth() );
                 width= getIntParameter( "width", cc.getWidth() );
                 height= getIntParameter( "height", cc.getHeight() );
-                System.err.println("output height, width= " + width + ","+ height );
+                logger.fine("output height, width= " + width + ","+ height );
             } catch ( InterruptedException ex ) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } catch ( IOException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     in.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -456,7 +453,7 @@ public class AutoplotApplet extends JApplet {
 
         getContentPane().setLayout(new BorderLayout());
 
-        System.err.println("done set parameters @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done set parameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
         // createAppletTester();
         //Logger.getLogger("").setLevel( Level.WARNING );
@@ -473,9 +470,9 @@ public class AutoplotApplet extends JApplet {
             DataSource dsource;
             try {
                 dsource = DataSetURI.getDataSource(surl);
-                System.err.println("get dsource for " + surl +" @ " + (System.currentTimeMillis() - t0) + " msec");
-                System.err.println("  got dsource="+dsource );
-                System.err.println("  dsource.getClass()="+dsource.getClass() );
+                logger.fine("get dsource for " + surl +" @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.fine("  got dsource="+dsource );
+                logger.fine("  dsource.getClass()="+dsource.getClass() );
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
@@ -488,9 +485,9 @@ public class AutoplotApplet extends JApplet {
                 timeRange1 = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                 TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                 if (tsb != null) {
-                    System.err.println("do tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
+                    logger.fine("do tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
                     tsb.setTimeRange(timeRange1);
-                    System.err.println("done tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
+                    logger.fine("done tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
                 }
             }
 
@@ -499,37 +496,37 @@ public class AutoplotApplet extends JApplet {
                 TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                 if (tsb == null) {
                     try {
-                        System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
-                        System.err.println("  dsource="+dsource );
-                        System.err.println("  dsource.getClass()="+dsource.getClass() ) ;
-                        if ( dsource.getClass().toString().contains("CsvDataSource") ) System.err.println( " WHY IS THIS CsvDataSource!?!?" );
+                        logger.fine("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
+                        logger.fine("  dsource="+dsource );
+                        logger.fine("  dsource.getClass()="+dsource.getClass() ) ;
+                        if ( dsource.getClass().toString().contains("CsvDataSource") ) logger.fine( " WHY IS THIS CsvDataSource!?!?" );
 
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
                         for ( int i=0; i<Math.min(12,ds.length()); i++ ) {
                             System.err.printf("ds[%d]=%s\n",i,ds.slice(i));
                         }
-                        System.err.println("loaded ds: "+ds );
-                        System.err.println("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
+                        logger.fine("loaded ds: "+ds );
+                        logger.fine("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
                 }
             }
 
-            System.err.println("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
+            logger.fine("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
 
             appmodel.setDataSource(dsource);
-            System.err.println("done setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
+            logger.fine("done setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
 
             setInitializationStatus("dataSourceSet");
 
             if (stimeRange != null && !stimeRange.equals("")) {
                 try {
-                    System.err.println("wait for idle @ " + (System.currentTimeMillis() - t0) + " msec (due to stimeRange)");
+                    logger.fine("wait for idle @ " + (System.currentTimeMillis() - t0) + " msec (due to stimeRange)");
                     appmodel.waitUntilIdle(true);
-                    System.err.println("done wait for idle @ " + (System.currentTimeMillis() - t0) + " msec");
+                    logger.fine("done wait for idle @ " + (System.currentTimeMillis() - t0) + " msec");
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
                     dom.setTimeRange(timeRange1);
@@ -538,7 +535,7 @@ public class AutoplotApplet extends JApplet {
             setInitializationStatus("dataSetLoaded");
         }
 
-        System.err.println("done dataSetLoaded @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done dataSetLoaded @ " + (System.currentTimeMillis() - t0) + " msec");
 
         // axis settings
         Plot p = dom.getController().getPlot();
@@ -557,7 +554,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(xrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         if (!xlog.equals("")) {
@@ -577,7 +574,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(yrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         if (!ylog.equals("")) {
@@ -597,7 +594,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(zrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         if (!zlog.equals("")) {
@@ -617,13 +614,13 @@ public class AutoplotApplet extends JApplet {
             }
         }
 
-        System.err.println("done setRenderType @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done setRenderType @ " + (System.currentTimeMillis() - t0) + " msec");
 
         if (!scolor.equals("")) {
             try {
                 dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolor));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "scolor", ex );
             }
         }
 
@@ -631,21 +628,21 @@ public class AutoplotApplet extends JApplet {
             try {
                 dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "sfillColor", ex );
             }
         }
         if (!sforegroundColor.equals("")) {
             try {
                 dom.getOptions().setForeground(Color.decode(sforegroundColor));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "sforegroundColor", ex );
             }
         }
         if (!sbackgroundColor.equals("")) {
             try {
                 dom.getOptions().setBackground(Color.decode(sbackgroundColor));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "sbackgroundColor", ex );
             }
         }
 
@@ -662,18 +659,18 @@ public class AutoplotApplet extends JApplet {
         getContentPane().add(model.getCanvas());
 
 
-        System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
 
         validate();
 
-        System.err.println("done applet.validate @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done applet.validate @ " + (System.currentTimeMillis() - t0) + " msec");
 
         repaint();
         appmodel.getCanvas().setVisible(true);
         initializing = false;
 
         repaint();
-        System.err.println("ready @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("ready @ " + (System.currentTimeMillis() - t0) + " msec");
         setInitializationStatus("ready");
 
         dom.getController().getPlot().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
@@ -732,7 +729,7 @@ public class AutoplotApplet extends JApplet {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                     dom.getController().waitUntilIdle();
                     doSetOverview(true);
@@ -741,7 +738,7 @@ public class AutoplotApplet extends JApplet {
             new Thread(run).start();
         }
 
-        System.err.println("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.fine("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
     }
 
     private void createAppletTester() {
@@ -776,13 +773,13 @@ public class AutoplotApplet extends JApplet {
 //
 //            String s = r.readLine();
 //            while (s != null) {
-//                System.err.println(s);
+//                logger.fine(s);
 //                s = r.readLine();
 //            }
 //        } catch (URISyntaxException ex) {
-//            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+//            logger.log(Level.SEVERE, null, ex);
 //        } catch (IOException ex) {
-//            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+//            logger.log(Level.SEVERE, null, ex);
 //        }
 //
 //
@@ -792,7 +789,7 @@ public class AutoplotApplet extends JApplet {
     public void setDataSetURL(final String surl) {
         try {
             logger.info(surl);
-            System.err.println("***************");
+            logger.fine("***************");
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -907,7 +904,7 @@ public class AutoplotApplet extends JApplet {
             public void run() {
                 try {
                     Object o = DomUtil.getPropertyValue(dom, node);
-                    System.err.println("dom." + node + "=" + o);
+                    logger.fine("dom." + node + "=" + o);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -928,14 +925,14 @@ public class AutoplotApplet extends JApplet {
 
                     SerializeDelegate sd = SerializeRegistry.getDelegate(c);
                     if (sd == null) {
-                        System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
+                        logger.fine("unable to find serialize delegate for " + c.getCanonicalName());
                         return;
                     }
                     Object val = sd.parse(sd.typeId(c), sval);
 
                     DomUtil.setPropertyValue(dom, node, val);
                     getAppletContext().showStatus("dom." + node + "=" + DomUtil.getPropertyValue(dom, node) );
-                    System.err.println("dom." + node + "=" + DomUtil.getPropertyValue(dom, node));
+                    logger.fine("dom." + node + "=" + DomUtil.getPropertyValue(dom, node));
                 } catch (ParseException ex) {
                     ex.printStackTrace();
                 } catch (Exception ex) {
@@ -1017,7 +1014,7 @@ public class AutoplotApplet extends JApplet {
                     y.putProperty(QDataSet.DEPEND_0, DataSetOps.slice1(data, 0));
                     model.setDataSet(y);
                 } catch (IOException ex) {
-                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
             }
