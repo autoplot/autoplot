@@ -194,6 +194,8 @@ public class EditorContextMenu {
 
             fragmentsMenu.add( createInsertMenuItem( "raise exception", "if ( ds.length()==0 ):\n  raise Exception('Dataset is empty')") );
 
+            fragmentsMenu.add( createInsertMenuItem( "documentation block", "# title: the one-line title\n# label: terse label") );
+
             insertCodeMenu.add(fragmentsMenu);
             
             a= new AbstractAction("getDataSet()") {
