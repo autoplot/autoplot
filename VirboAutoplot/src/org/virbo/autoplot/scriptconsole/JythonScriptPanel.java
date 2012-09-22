@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -38,6 +39,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 
 /**
@@ -142,6 +144,28 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("makePngWalk.jy") {
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/scripts/pngwalk/makePngWalk.jy" );
+            }
+        });
+        menu.addExampleAction( new AbstractAction("addDigitizer.jy") {
+            public void actionPerformed(ActionEvent e) {
+                loadExample( "/scripts/addDigitizer.jy" );
+            }
+        });
+        menu.addExampleAction( new AbstractAction("splineDemo.jy") {
+            public void actionPerformed(ActionEvent e) {
+                loadExample( "/scripts/splineDemo.jy" );
+            }
+        });
+
+        menu.addExampleAction( new AbstractAction("More Jython Scripts...") {
+            public void actionPerformed(ActionEvent e) {
+                DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/" );
+            }
+        });
+
+        menu.addExampleAction( new AbstractAction("More Jython Data Source Scripts...") {
+            public void actionPerformed(ActionEvent e) {
+                DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonDataSource/src/" );
             }
         });
 
