@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.channels.Channels;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.TableDataSet;
@@ -102,8 +104,10 @@ public class AutoplotDataServer {
 
     private static class D2SMonitor extends AbstractProgressMonitor {
         PrintStream out;
-        D2SMonitor( OutputStream out ) {
+        Set outEmpty;
+        D2SMonitor( OutputStream out, Set outEmpty ) {
             this.out= new PrintStream(out);
+            this.outEmpty= outEmpty;
         }
         long lastUpdateTime= -1;
         @Override
@@ -127,8 +131,11 @@ public class AutoplotDataServer {
      */
     private static class QStreamMonitor extends AbstractProgressMonitor {
         PrintStream out;
-        QStreamMonitor( OutputStream out ) {
+        Set outEmpty; // if this is empty then out is empty.
+
+        QStreamMonitor( OutputStream out, Set outEmpty ) {
             this.out= new PrintStream(out);
+            this.outEmpty= outEmpty;
         }
         long lastUpdateTime= -1;
         @Override
@@ -144,6 +151,7 @@ public class AutoplotDataServer {
             //TODO: check that \n on windows doesn't put out 10-13.
             String comment= String.format( "<comment type='taskProgress' message='%d of %d'>\n", getTaskProgress(), getTaskSize() );
             String msg= String.format(  "[xx]%06d%s", comment.length(), comment );
+            if ( outEmpty.isEmpty() ) return;
             out.print( msg );
         }
     }
@@ -151,6 +159,8 @@ public class AutoplotDataServer {
     public static void main(String[] args) throws Exception {
 
         long t0= System.currentTimeMillis();
+
+     //logger.setLevel(Level.ALL);
 
         System.err.println("org.virbo.autoplot.AutoplotDataServer 20120922 " + APSplash.getVersion() );
 
@@ -165,6 +175,8 @@ public class AutoplotDataServer {
 
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
+
+        alm.logPrefsSettings( logger );
 
         String suri = alm.getValue("uri");
 
@@ -238,6 +250,7 @@ public class AutoplotDataServer {
         ProgressMonitor mon= new NullProgressMonitor();
 
         final PrintStream out;
+        Set outEmpty= new HashSet<Object>(); // nasty kludge to prevent logger from writing first.  This is a bug: qstreams at least should support this.
 
         if ( outfile.equals(DEFT_OUTFILE) ) {
              out= System.out;
@@ -246,9 +259,9 @@ public class AutoplotDataServer {
         }
 
         if ( format.equals(FORM_D2S) ) {
-            mon= new D2SMonitor(out);
+            mon= new D2SMonitor(out,outEmpty);
         } else if ( format.equals(FORM_QDS) ) {
-            mon= new QStreamMonitor(out);
+            mon= new QStreamMonitor(out,outEmpty);
         } else {
             logger.fine("no progress available because output is not d2s stream");
         }
@@ -282,7 +295,7 @@ public class AutoplotDataServer {
 
             mon.setTaskProgress( 5 );
             for ( DatumRange dr: drs ) {
-                logger.log( Level.FINER, "time read start read of {0}= {1}", new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
+                logger.log( Level.FINER, "time at read start read of {0}= {1}", new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
 
                 //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
                 //TODO: find a way to test for this and give a good error message.
@@ -292,18 +305,19 @@ public class AutoplotDataServer {
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
                         logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, xrange});
-                        System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
                     } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
                         QDataSet range= DataSetOps.dependBounds( ds1 );
                         logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
-                        System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
                     }
                     writeData( format, out, ds1, ascii );
+                    outEmpty.add("out is no longer empty");
                     someValid= true;
                 }
                 i++;
                 mon.setTaskProgress(i*10);
-                logger.log( Level.FINER, "time write to output channel {0}= {1}\n",  new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
+                logger.log( Level.FINER, "time at write to output channel {0}= {1}\n",  new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
 
             }
             mon.finished();
@@ -322,7 +336,7 @@ public class AutoplotDataServer {
             }
         }
 
-        System.err.printf( "time done read all= %d\n", System.currentTimeMillis()-t0 );
+        logger.log( Level.FINE, "time done read all= {0}", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
              if ( format.equals(FORM_D2S) ) {
