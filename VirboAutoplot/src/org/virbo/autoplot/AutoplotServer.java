@@ -1,11 +1,3 @@
-/*
- * JythonLauncher.java
- *
- * Created on November 1, 2007, 3:04 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
@@ -18,18 +10,17 @@ import org.virbo.autoplot.dom.Application;
 
 
 /**
- *
+ * Server for producing images from Autoplot URIs, first requested by U. Michigan.
  * @author jbf
  */
 public class AutoplotServer {
     
-    /** Creates a new instance of JythonLauncher */
     public AutoplotServer() {
     }
         
     public static void main(String[] args) throws Exception {
 
-        System.err.println("org.virbo.autoplot.AutoplotServer 20111116");
+        System.err.println("org.virbo.autoplot.AutoplotServer 20120922");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
