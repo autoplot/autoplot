@@ -138,10 +138,10 @@ public class AutoplotDataServer {
         if (!cache.equals("")) {
             File fcache = new File(cache);
             if ( !fcache.exists() && !fcache.mkdirs()) {
-                logger.fine("unable to make dirs for cache=" + fcache);
+                logger.log(Level.FINE, "unable to make dirs for cache={0}", fcache);
             }
             if (!fcache.canWrite()) {
-                logger.fine("unable to write to cache=" + fcache);
+                logger.log(Level.FINE, "unable to write to cache={0}", fcache);
             }
 
             File ff= new File( fcache, "testCache.empty" );
@@ -150,9 +150,9 @@ public class AutoplotDataServer {
             fo.close();
 
             FileSystem.settings().setLocalCacheDir(new File(cache));
-            logger.fine("using cache dir " + FileSystem.settings().getLocalCacheDir());
+            logger.log(Level.FINE, "using cache dir {0}", FileSystem.settings().getLocalCacheDir());
         } else {
-            logger.fine("using default cache dir " + FileSystem.settings().getLocalCacheDir() );
+            logger.log(Level.FINE, "using default cache dir {0}", FileSystem.settings().getLocalCacheDir());
         }
 
         if (suri.equals("")) {
@@ -216,7 +216,7 @@ public class AutoplotDataServer {
 
         boolean someValid= false;
 
-        logger.fine( "time read args and prep=" + (( System.currentTimeMillis()-t0 ) ) );
+        logger.log( Level.FINE, "time read args and prep={0}", ((System.currentTimeMillis() - t0)));
 
         if (!timeRange.equals("")) {
             logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
@@ -244,11 +244,11 @@ public class AutoplotDataServer {
                 if ( ds1!=null ) {
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
-                        logger.fine("loaded ds="+ds1 + "  bounds: "+xrange );
+                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, xrange});
                         System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
                     } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
                         QDataSet range= DataSetOps.dependBounds( ds1 );
-                        logger.fine("loaded ds="+ds1 + "  bounds: "+range );
+                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
                         System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
                     }
                     writeData( format, out, ds1 );
@@ -267,7 +267,7 @@ public class AutoplotDataServer {
             System.err.printf("   suri=%s\n", suri);
 
             ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
-            logger.fine("loaded ds="+ds );
+            logger.log(Level.FINE, "loaded ds={0}", ds);
             
             if ( ds!=null ) {
                 writeData( format, out, ds );
