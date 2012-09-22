@@ -149,7 +149,7 @@ public class AutoplotDataServer {
             if ( this.getTaskProgress()==position && ( tnow-lastUpdateTime < 1000 ) ) return;
             lastUpdateTime= tnow;
             //TODO: check that \n on windows doesn't put out 10-13.
-            String comment= String.format( "<comment type='taskProgress' message='%d of %d'>\n", getTaskProgress(), getTaskSize() );
+            String comment= String.format( "<comment type='taskProgress' message='%d of %d'/>\n", getTaskProgress(), getTaskSize() );
             String msg= String.format(  "[xx]%06d%s", comment.length(), comment );
             if ( outEmpty.isEmpty() ) return;
             out.print( msg );
