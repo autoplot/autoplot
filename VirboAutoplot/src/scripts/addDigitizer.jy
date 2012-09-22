@@ -1,4 +1,6 @@
-## the events recorder #####
+# title: Add Events Digitizer
+# label: Digitizer
+
 from org.das2.components import DataPointRecorder
 dpr= DataPointRecorder()
 
@@ -10,7 +12,7 @@ plot= dom.plots[0].controller.dasPlot
 
 from org.das2.event import BoxSelectorMouseModule
 
-mm= BoxSelectorMouseModule.create( plot, 'events tool' )
+mm= BoxSelectorMouseModule.create( plot, 'digitizer' )
 
 from java.lang import Runtime
 
@@ -25,3 +27,6 @@ def boxSelected(event):
 mm.BoxSelected=boxSelected
 
 plot.dasMouseInputAdapter.primaryModule= mm
+
+import javax
+javax.swing.JOptionPane.showMessageDialog(None,'Draw a box, and it will be recorded on the digitizer tab')
