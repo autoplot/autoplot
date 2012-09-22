@@ -548,10 +548,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                     //logger.log( Level.SEVERE, "", ex ); //okay
                 }
             } else {
-
-                if ( true ) {
+                URISplit split= URISplit.parse(surl);
+                if ( !".vap".equals(split.ext) ) {
                     //experiment with GUI based on completions.
                     edit= new CompletionsDataSourceEditor();
+                } else {
+                    JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect with .vap files" );
                 }
             }
             
