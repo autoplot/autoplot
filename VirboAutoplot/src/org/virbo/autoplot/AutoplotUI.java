@@ -3560,7 +3560,11 @@ APSplash.checkTime("init 240");
                     while (s != null) {
                         if ( s.startsWith("#") ) {
                             if ( s.startsWith("# label:" ) ) {
-                               toolLabel= s.substring(9).trim();
+                               toolLabel= s.substring(8).trim();
+                            } else if ( s.startsWith("# LABEL:" ) ) {
+                               toolLabel= s.substring(8).trim();
+                            } else if ( s.startsWith("#LABEL:" ) ) {
+                               toolLabel= s.substring(7).trim();
                             }
                         } else {
                             break;
