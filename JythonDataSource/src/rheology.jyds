@@ -2,6 +2,8 @@
 # Jeremy's wife and perspective Autoplot user.  The machine (Malvern Gemini Control-Stress 
 # Rhemometer) produces these ".raw" files  which can be parsed and analyzed easily with Autoplot.
 
+# This must be run in the "Data Source Context", meaning it only loads data.
+
 raw= getDataSet( 'vap+dat:http://sarahandjeremy.net/~jbf/data.backup/examples/dat/sarah/2490lintest90005.raw?skip=31&column=field1' )
 freq= 15.47436
 nperiod= 1
