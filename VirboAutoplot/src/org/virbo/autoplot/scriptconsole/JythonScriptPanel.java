@@ -163,6 +163,18 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        menu.addExampleAction( new AbstractAction("mashup.jyds") {
+            public void actionPerformed(ActionEvent e) {
+                loadExample( "/mashup.jyds" );
+            }
+        });
+
+        menu.addExampleAction( new AbstractAction("rheology.jyds") {
+            public void actionPerformed(ActionEvent e) {
+                loadExample( "/rheology.jyds" );
+            }
+        });
+
         menu.addExampleAction( new AbstractAction("More Jython Data Source Scripts...") {
             public void actionPerformed(ActionEvent e) {
                 DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonDataSource/src/" );
