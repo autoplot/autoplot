@@ -1,11 +1,4 @@
-/*
- * JythonLauncher.java
- *
- * Created on November 1, 2007, 3:04 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
 import java.io.File;
@@ -14,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.channels.Channels;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,15 +40,16 @@ import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
- * Provide simple services to support command-line servers.
- * This has the following uses:
- *   1. image server to convert Autoplot URIs into images (U. Michigan)
- *   2. data server for (U. Iowa P.W. Group) converts URIs into streams of data
- *        (qstream or older das2stream).
- * 
+ * Data server for U. Iowa P.W. Group converts URIs into streams of data.  These would typically
+ * be qstream or older das2stream format, but the code (apparently) supports .xls, .dat, and .bin as well.
+ *
+ * See also AutoplotServer, which serves images.
  * @author jbf
  */
 public class AutoplotDataServer {
+    private static final String DEFT_OUTFILE = "-";
+    private static final String FORM_D2S = "d2s";
+    private static final String FORM_QDS = "qds";
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
@@ -63,8 +58,8 @@ public class AutoplotDataServer {
         LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
     }
 
-    private static void formatD2S(QDataSet data, OutputStream fo) {
-        boolean binary = true;
+    private static void formatD2S( QDataSet data, OutputStream fo, boolean ascii) {
+        boolean binary = !ascii;
         if (data.rank() == 3) {
             TableDataSet tds = TableDataSetAdapter.create(data);
             if (binary) {
@@ -89,11 +84,11 @@ public class AutoplotDataServer {
         }
     }
 
-    private static void writeData( String format, OutputStream out, QDataSet ds ) throws Exception {
-        if ( format.equals("d2s") ) {
-            formatD2S( ds, out );
-        } else if ( format.equals("qds") ) {
-            new SimpleStreamFormatter().format(ds, out, true );
+    private static void writeData( String format, OutputStream out, QDataSet ds, boolean ascii ) throws Exception {
+        if ( format.equals(FORM_D2S) ) {
+            formatD2S( ds, out, ascii );
+        } else if ( format.equals(FORM_QDS) ) {
+            new SimpleStreamFormatter().format(ds, out, ascii );
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile( "autoplotDataServer", "."+format );
             formatDataSet( ds, file.toString() );
@@ -105,20 +100,68 @@ public class AutoplotDataServer {
     }
 
 
+    private static class D2SMonitor extends AbstractProgressMonitor {
+        PrintStream out;
+        D2SMonitor( OutputStream out ) {
+            this.out= new PrintStream(out);
+        }
+        long lastUpdateTime= -1;
+        @Override
+        public void setTaskSize(long taskSize) {
+            String msg2= String.format( "[00]000056<stream><properties int:taskSize=\"%08d\" /></stream>\n", taskSize );
+            out.print( msg2 );
+        }
+        @Override
+        public void setTaskProgress(long position) throws IllegalArgumentException {
+            long tnow= System.currentTimeMillis();
+            if ( this.getTaskProgress()==position && ( tnow-lastUpdateTime < 10000 ) ) return;
+            lastUpdateTime= tnow;
+            super.setTaskProgress(position);
+            String msg= String.format(  "[xx]000059<comment type=\"taskProgress\" value=\"%08d\" source=\"\" />\n", position );
+            out.print( msg );
+        }
+    }
+
+    /**
+     * put a comment onto the stream no more often then once per second.
+     */
+    private static class QStreamMonitor extends AbstractProgressMonitor {
+        PrintStream out;
+        QStreamMonitor( OutputStream out ) {
+            this.out= new PrintStream(out);
+        }
+        long lastUpdateTime= -1;
+        @Override
+        public void setTaskSize(long taskSize) {
+            super.setTaskSize(taskSize);
+        }
+        @Override
+        public void setTaskProgress(long position) throws IllegalArgumentException {
+            long tnow= System.currentTimeMillis();
+            super.setTaskProgress(position);
+            if ( this.getTaskProgress()==position && ( tnow-lastUpdateTime < 1000 ) ) return;
+            lastUpdateTime= tnow;
+            //TODO: check that \n on windows doesn't put out 10-13.
+            String comment= String.format( "<comment type='taskProgress' message='%d of %d'>\n", getTaskProgress(), getTaskSize() );
+            String msg= String.format(  "[xx]%06d%s", comment.length(), comment );
+            out.print( msg );
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 
         long t0= System.currentTimeMillis();
 
-        System.err.println("org.virbo.autoplot.AutoplotDataServer " + APSplash.getVersion() + " 20110902");
+        System.err.println("org.virbo.autoplot.AutoplotDataServer 20120922 " + APSplash.getVersion() );
 
-        ArgumentList alm = new ArgumentList("AutoplotServer");
-        alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
+        ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
-        alm.addOptionalSwitchArgument("format", "f", "format", "d2s", "output format qds, d2s (dflt=d2s)");
-        alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
+        alm.addOptionalSwitchArgument("format", "f", "format", "", "output format qds, d2s (default=d2s if no filename)");
+        alm.addOptionalSwitchArgument("outfile", "o", "outfile", DEFT_OUTFILE, "output filename or -");
         alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources");
         alm.addOptionalSwitchArgument("timeStep", "s", "timeStep", "86400s", "atom step size for loading and sending, default is 86400s");
         alm.addOptionalSwitchArgument("cache", "c", "cache", "", "location where files are downloaded, default is $HOME/autoplot_data/cache");
+        alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
 
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
@@ -128,6 +171,8 @@ public class AutoplotDataServer {
         String timeRange = alm.getValue("timeRange");
 
         String step = alm.getValue("timeStep");
+
+        boolean ascii= alm.getBooleanValue("ascii");
 
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
@@ -164,10 +209,16 @@ public class AutoplotDataServer {
         String format = alm.getValue("format");
         String outfile = alm.getValue("outfile");
 
+        if ( format.length()>0 && !outfile.equals(DEFT_OUTFILE) ) {
+            if ( !outfile.endsWith(format) ) {
+                System.err.println("format="+format+" doesn't match outfile extension. outfile="+outfile );
+                System.exit(-2);
+            }
+        }
         if (outfile.endsWith(".qds")) {
-            format = "qds";
+            format = FORM_QDS;
         } else if (outfile.endsWith(".d2s")) {
-            format = "d2s";
+            format = FORM_D2S;
         } else if ( outfile.contains(".") ) {
             URISplit split= URISplit.parse(outfile);
             format= split.ext;
@@ -175,6 +226,9 @@ public class AutoplotDataServer {
                 split= URISplit.parse("file:///"+outfile);
                 format= split.ext;
             }
+        }
+        if ( format.length()==0 ) { // implement default.
+            format= FORM_D2S;
         }
 
         if ( format.startsWith(".") ) {
@@ -185,33 +239,20 @@ public class AutoplotDataServer {
 
         final PrintStream out;
 
-        if ( outfile.equals("-") ) {
+        if ( outfile.equals(DEFT_OUTFILE) ) {
              out= System.out;
         } else {
              out = new PrintStream(outfile);
         }
 
-        mon= new AbstractProgressMonitor() {
-            long lastUpdateTime= -1;
-            public void setTaskSize(long taskSize) {
-                String msg2= String.format( "[00]000056<stream><properties int:taskSize=\"%08d\" /></stream>\n", taskSize );
-                out.print( msg2 );
-            }
-            public void setTaskProgress(long position) throws IllegalArgumentException {
-                long tnow= System.currentTimeMillis();
-                if ( this.getTaskProgress()==position && ( tnow-lastUpdateTime < 10000 ) ) return;
-                lastUpdateTime= tnow;
-                super.setTaskProgress(position);
-                String msg= String.format(  "[xx]000059<comment type=\"taskProgress\" value=\"%08d\" source=\"\" />\n", position );
-                out.print( msg );
-            }
-        };
-
-        if ( !format.equals("d2s") ) {
+        if ( format.equals(FORM_D2S) ) {
+            mon= new D2SMonitor(out);
+        } else if ( format.equals(FORM_QDS) ) {
+            mon= new QStreamMonitor(out);
+        } else {
             logger.fine("no progress available because output is not d2s stream");
-            mon= new NullProgressMonitor();
         }
-
+        
         QDataSet ds = null;
 
         boolean someValid= false;
@@ -228,14 +269,20 @@ public class AutoplotDataServer {
             Datum first= TimeUtil.prevMidnight( outer.min() );
             Datum next= first.add( Units.seconds.parse(step) );
 
-            List<DatumRange> drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
+            List<DatumRange> drs;
+            if ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) {
+                drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
+            } else {
+                // dat xls cannot stream...
+                drs= Collections.singletonList(outer);
+            }
 
             int i=0;
             mon.setTaskSize(10*drs.size());
 
             mon.setTaskProgress( 5 );
             for ( DatumRange dr: drs ) {
-                System.err.printf( "time read start read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                logger.log( Level.FINER, "time read start read of {0}= {1}", new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
 
                 //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
                 //TODO: find a way to test for this and give a good error message.
@@ -251,12 +298,12 @@ public class AutoplotDataServer {
                         logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
                         System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
                     }
-                    writeData( format, out, ds1 );
+                    writeData( format, out, ds1, ascii );
                     someValid= true;
                 }
                 i++;
                 mon.setTaskProgress(i*10);
-                System.err.printf( "time write to output channel %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+                logger.log( Level.FINER, "time write to output channel {0}= {1}\n",  new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
 
             }
             mon.finished();
@@ -264,13 +311,13 @@ public class AutoplotDataServer {
         } else {
             // TODO: consider the virtue of allowing this, where a timerange is not specified.
             logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
-            System.err.printf("   suri=%s\n", suri);
+            logger.log( Level.FINE, "   suri={0}\n", suri );
 
             ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
             logger.log(Level.FINE, "loaded ds={0}", ds);
             
             if ( ds!=null ) {
-                writeData( format, out, ds );
+                writeData( format, out, ds, false );
                 someValid= true;
             }
         }
@@ -278,8 +325,8 @@ public class AutoplotDataServer {
         System.err.printf( "time done read all= %d\n", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
-             if ( format.equals("d2s") ) {
-                 System.out.printf("[00]%06d<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
+             if ( format.equals(FORM_D2S) ) {
+                 out.printf("[00]%06d<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
              }
         }
 
