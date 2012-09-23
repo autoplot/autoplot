@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -1462,8 +1464,12 @@ public class DataSetURI {
         for ( String ext: exts ) {
             String uri= "vap+" + ext.substring(1) + ":";
             try {
-                DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getEditorByExt( ext );
-                if ( ! p.reject(uri) ) {
+                Object o = DataSourceRegistry.getInstance().dataSourceEditorByExt.get(ext);
+                Class clas = Class.forName((String) o);
+                Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
+                Object result1 =  constructor.newInstance(new Object[]{});
+                Method m= result1.getClass().getMethod( "reject", String.class );
+                if ( Boolean.FALSE.equals( m.invoke( result1, uri ) ) ) {
                     result.add( ext );
                 }
             } catch (Exception ex) {
