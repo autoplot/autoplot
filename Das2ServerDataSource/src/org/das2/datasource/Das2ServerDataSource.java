@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import org.das2.client.Authenticator;
 import org.das2.client.DasServer;
 import org.das2.client.Key;
-import org.das2.dataset.CacheTag;
+import org.das2.datum.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
@@ -44,6 +44,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
  *
@@ -204,6 +205,11 @@ class Das2ServerDataSource extends AbstractDataSource {
                 org.virbo.qstream.StreamTool.readStream( channel,eh );
 
                 result1= eh.getDataSet();
+
+                // check if we can flatten rank 2 join that comes from aggregation
+                if ( QDataSetStreamHandler.isFlattenableJoin(result1) ) {
+                    result1= eh.flattenJoin(result1);
+                }
 
             } catch ( org.virbo.qstream.StreamException ex ) {
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
