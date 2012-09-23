@@ -1072,7 +1072,7 @@ APSplash.checkTime("init 270");
      * called off the event thread, and will fill the addDataFromMenu.
      */
     private void fillAddDataFromMenu() {
-        final List<String> exts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
+        final List<String> exts= DataSetURI.getDiscoverableExtensions();
         Runnable run= new Runnable() {
             public void run() {
                 fillAddDataFromMenuImmediately(exts);
