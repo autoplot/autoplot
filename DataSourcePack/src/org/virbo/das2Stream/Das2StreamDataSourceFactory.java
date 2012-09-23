@@ -37,6 +37,10 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         if ( cc.context==cc.CONTEXT_PARAMETER_NAME ) {
             if ( DataSetURI.fromUri( cc.resourceURI ).endsWith(".qds") ) {
+                result.add( new CompletionContext(
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        "", this, "arg_0",
+                        "", "default dataset", true ) );
                 List<String> params= getNames( cc, mon );
                 for ( String s: params ) {
                     //result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s ) );
