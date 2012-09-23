@@ -1456,6 +1456,8 @@ public class DataSetURI {
     /**
      * return a list of the extensions we were can immediately enter the editor,
      * so new users can plot things without knowing how to start a URI.
+     * Since rev 10581, this uses introspection to call the reject method to support
+     * compiling the applet.
      * @return
      */
     public static List<String> getDiscoverableExtensions() {
