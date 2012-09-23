@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
@@ -28,7 +29,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
-    private static final Logger logger= Logger.getLogger("apdss.das2server");
+    private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new Das2ServerDataSource(uri);

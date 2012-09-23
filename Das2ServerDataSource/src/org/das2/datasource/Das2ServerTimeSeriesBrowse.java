@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -24,7 +25,7 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
     Datum resolution;
     String uri;
 
-    private final static Logger logger= Logger.getLogger("apdss.das2server");
+    private final static Logger logger= LoggerManager.getLogger("apdss.das2server");
 
     public void setTimeRange(DatumRange dr) {
         timeRange= dr;

@@ -34,6 +34,7 @@ import org.das2.dataset.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -63,7 +64,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         resolution= null;
     }
 
-    private static final Logger logger= Logger.getLogger("apdss.das2server");
+    private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
 
     DatumRange timeRange;
     Datum resolution;

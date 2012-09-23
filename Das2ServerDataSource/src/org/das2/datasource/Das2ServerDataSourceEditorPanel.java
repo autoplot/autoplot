@@ -64,6 +64,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
@@ -81,7 +82,7 @@ import org.xml.sax.SAXException;
  */
 public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
-    private static final Logger logger= Logger.getLogger("apdss.das2server");
+    private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
 
     private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
 
