@@ -53,11 +53,20 @@ public class Das2StreamDataSource extends AbstractDataSource {
                 QDataSetStreamHandler h= new QDataSetStreamHandler();
                 org.virbo.qstream.StreamTool.readStream(channel, h);
 
+                QDataSet result;
                 if ( params.get("arg_0")!=null ) {
-                    return h.getDataSet(params.get("arg_0"));
+                    result= h.getDataSet(params.get("arg_0"));
                 } else {
-                    return h.getDataSet();
+                    result= h.getDataSet();
                 }
+
+                // check if we can flatten rank 2 join that comes from aggregation
+                if ( QDataSetStreamHandler.isFlattenableJoin(result) ) {
+                    result= h.flattenJoin(result);
+                }
+
+                return result;
+                
             } catch ( org.virbo.qstream.StreamException se ) {
                 if ( se.toString().contains( "Expecting stream descriptor header" ) ) {
                     int i= se.toString().indexOf("beginning \n'");
