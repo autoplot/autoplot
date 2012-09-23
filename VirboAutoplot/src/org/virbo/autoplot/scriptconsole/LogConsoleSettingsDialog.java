@@ -16,10 +16,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  * Settings GUI for the Log Console dialog.  The log console is more complex than it first seems, in that it
@@ -95,6 +97,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 public void actionPerformed(ActionEvent e) {
                     Level level= (Level)cb.getSelectedItem();
                     Logger.getLogger(fslogger).setLevel(level);
+                    if ( Logger.getLogger(fslogger).getHandlers().length==0 ) {
+                        JOptionPane.showMessageDialog( LogConsoleSettingsDialog.this,"no handlers found, using autoplot handlers");
+                        Handler[] hh= Logger.getLogger("autoplot").getHandlers();
+                        for ( Handler h: hh ) {
+                             Logger.getLogger(fslogger).addHandler(h);
+                        }
+                    }
                 }
             });
             c.gridx= 1;
