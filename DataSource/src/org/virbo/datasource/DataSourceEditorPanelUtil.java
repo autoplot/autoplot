@@ -66,26 +66,5 @@ public class DataSourceEditorPanelUtil {
         return result;
     }
 
-    /**
-     * return a list of the extensions we were can immediately enter the editor,
-     * so new users can plot things without knowing how to start a URI.
-     * @return
-     */
-    public static List<String> getDiscoverableExtensions() {
-        List<String> exts= DataSourceRegistry.getInstance().getSourceEditorExtensions();
-        List<String> result= new ArrayList<String>();
-        for ( String ext: exts ) {
-            String uri= "vap+" + ext.substring(1) + ":";
-            try {
-                DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getEditorByExt( ext );
-                if ( ! p.reject(uri) ) {
-                    result.add( ext );
-                }
-            } catch (Exception ex) {
-                //this happens often, but we'll work to make it never.
-            }
-        }
-        return result;
-    }
 
 }

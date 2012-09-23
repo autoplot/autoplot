@@ -1426,7 +1426,7 @@ public class DataSetURI {
      */
     public static List<CompletionResult> getTypesCompletions( String surl, int carotpos, ProgressMonitor mon) throws Exception {
 
-        List<String> dexts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
+        List<String> dexts= getDiscoverableExtensions();
         List<CompletionContext> exts= DataSourceRegistry.getPlugins();
 
         List<CompletionResult> completions = new ArrayList();
@@ -1449,6 +1449,28 @@ public class DataSetURI {
         if ( "file://".startsWith(prefix) ) completions.add( new CompletionResult( "file:///", null, true ) );
 
         return completions;
+    }
+
+    /**
+     * return a list of the extensions we were can immediately enter the editor,
+     * so new users can plot things without knowing how to start a URI.
+     * @return
+     */
+    public static List<String> getDiscoverableExtensions() {
+        List<String> exts= DataSourceRegistry.getInstance().getSourceEditorExtensions();
+        List<String> result= new ArrayList<String>();
+        for ( String ext: exts ) {
+            String uri= "vap+" + ext.substring(1) + ":";
+            try {
+                DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getEditorByExt( ext );
+                if ( ! p.reject(uri) ) {
+                    result.add( ext );
+                }
+            } catch (Exception ex) {
+                //this happens often, but we'll work to make it never.
+            }
+        }
+        return result;
     }
 
     public static List<CompletionResult> getFactoryCompletions(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
