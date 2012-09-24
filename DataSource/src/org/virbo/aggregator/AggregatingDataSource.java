@@ -9,7 +9,7 @@
 package org.virbo.aggregator;
 
 import java.io.FileNotFoundException;
-import org.das2.dataset.CacheTag;
+import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
