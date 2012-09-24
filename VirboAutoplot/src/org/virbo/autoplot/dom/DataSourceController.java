@@ -112,10 +112,10 @@ public class DataSourceController extends DomNodeController {
             } else {
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
-                    System.err.println("!!! someone is changing: "+whoIsChanging +" !!!  ignoring event."); // we probably need to do something with this.
-                    System.err.println(" !! "+e.getPropertyName() );
-                    System.err.println(" !! "+e.getNewValue() );
-                    System.err.println(" !! "+e.getOldValue() );
+                    logger.warning("!!! someone is changing: "+whoIsChanging +" !!!  ignoring event."); // we probably need to do something with this.
+                    logger.warning(" !! "+e.getPropertyName() );
+                    logger.warning(" !! "+e.getNewValue() );
+                    logger.warning(" !! "+e.getOldValue() );
                     return;
                 }
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
@@ -359,23 +359,23 @@ public class DataSourceController extends DomNodeController {
                 if ( !UnitsUtil.isTimeLocation( this.dom.getTimeRange().getUnits() ) ) {
                     List<BindingModel> bms= this.dom.getController().findBindings( this.dom, Application.PROP_TIMERANGE, null, null );
                     if ( bms==null || bms.size()==0 ) {
-                        System.err.println("claiming dom timerange for TSB: "+this.dsf.getUri() );
+                        logger.log(Level.FINE, "claiming dom timerange for TSB: {0}", this.dsf.getUri());
                         p.setContext( getTsb().getTimeRange() );
                         this.dom.setTimeRange( getTsb().getTimeRange() );
-                        System.err.println("about to setup Gen for "+this);
+                        logger.log(Level.FINE, "about to setup Gen for {0}", this);
                         timeSeriesBrowseController.setupGen( node1, propertyName );
                         if ( node1!=dom ) {
                             dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                         }
                         update( );
                     } else {
-                        System.err.println("unable to use timerange as guide");
+                        logger.fine("unable to use timerange as guide");
                         p.setContext( getTsb().getTimeRange() );
                         timeSeriesBrowseController.setupGen( node1, propertyName );
                         update( );
                     }
                 } else {
-                    System.err.println("using plot context for TSB: "+this.dsf.getUri() );
+                    logger.log(Level.FINE, "using plot context for TSB: {0}", this.dsf.getUri());
                     timeSeriesBrowseController.setupGen( node1, propertyName );
                     if ( node1!=dom ) {
                         dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
@@ -432,7 +432,7 @@ public class DataSourceController extends DomNodeController {
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
             StringBuilder message = new StringBuilder("data set is invalid:\n");
-            new Exception("data set is invalid").printStackTrace();
+            logger.log( Level.SEVERE, null, new Exception("data set is invalid") );
             for (String s : problems) {
                 message.append(s).append("\n");
             }
@@ -575,13 +575,13 @@ public class DataSourceController extends DomNodeController {
                     if (intTsb == null) {
                         intTsb = new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
                     }
-                    System.err.println( "adding to internal tsb: "+ parentTsb );
+                    logger.warning( "adding to internal tsb: "+ parentTsb );
                     intTsb.addTimeSeriesBrowse(parentTsb);
                 }
             } else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 if ( parentSources==null ) {
-                    System.err.println("strange case where parent sources is not resolved."); //TODO: looks like we can get here by adding scatter plot of two tsbs, then replace with demo 1.
+                    logger.warning("strange case where parent sources is not resolved."); //TODO: looks like we can get here by adding scatter plot of two tsbs, then replace with demo 1.
                     return; //https://sourceforge.net/tracker/?func=detail&aid=3516161&group_id=199733&atid=970682
                 }
                 parentSources[i] = null;
@@ -595,7 +595,7 @@ public class DataSourceController extends DomNodeController {
             if ( p!=null ) {
                 this.timeSeriesBrowseController.setupGen( p, Plot.PROP_CONTEXT );
             } else {
-                System.err.println("check into this case, shouldn't happen");
+                logger.warning("check into this case, shouldn't happen");
             }
         }
         haveCheckedInternalTsb= true;
@@ -666,7 +666,7 @@ public class DataSourceController extends DomNodeController {
         if ( dsf.getUri().length()==0 ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri()); 
         if ( !dsf.getUri().startsWith("vap+internal:") ) {
-            System.err.println("unbinding because this doesn't have parents.");
+            logger.fine("unbinding because this doesn't have parents.");
             unbind();
             return;
         }
@@ -785,7 +785,7 @@ public class DataSourceController extends DomNodeController {
                         if ( idx0==idx1 ) {
                             setDataSetInternal(null);
                         } else if ( idx0>idx1 ) {
-                            System.err.println("non mono error?");
+                            logger.warning("non mono error?");
                             setDataSetInternal(null);
                         } else {
                             QDataSet trim= ds.trim( idx0, idx1 );
@@ -980,7 +980,7 @@ public class DataSourceController extends DomNodeController {
 
                 QDataSet ds;
                 if ( DataSetOps.isProcessAsync(filters) ) {
-                    System.err.println("asynchronous processes not supported here");
+                    logger.warning("asynchronous processes not supported here");
                     setReduceDataSetString(null);
                     ds= getDataSet();
                 } else {
@@ -1034,7 +1034,7 @@ public class DataSourceController extends DomNodeController {
                 vmax = vminMaxFill[1];
                 fill = vminMaxFill[2];
             } catch (ParseException ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "", ex );
             }
             // check the dataset for fill data, inserting canonical fill values.
             AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
@@ -1070,7 +1070,7 @@ public class DataSourceController extends DomNodeController {
                 if ( dataSet!=null ) {
                     setStatus("done loading dataset");
                     if ( dsf.getUri().length()==0 ) {
-                        System.err.println("dsf.getUri was null");
+                        logger.warning("dsf.getUri was null");
                         return;
                     }
                 } else {
@@ -1082,13 +1082,13 @@ public class DataSourceController extends DomNodeController {
                 } else {
                     String prob= checkParents();
                     if ( prob!=null ) {
-                        System.err.println(prob);
+                        logger.warning(prob);
                     }
                 }
             }
             if ( dataSet!=null ) setStatus("ready");
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
             setStatus("error: " + ex);
             model.getExceptionHandler().handleUncaught(ex);
         }
@@ -1167,7 +1167,7 @@ public class DataSourceController extends DomNodeController {
             // this code will never be invoked because this is synchronous.  See cancel().
             logger.fine("invoke later do load");
             if (mon != null) {
-                System.err.println("double load!");
+                logger.warning("double load!");
                 if (mon != null) {
                     mon.cancel();
                 }
@@ -1472,7 +1472,7 @@ public class DataSourceController extends DomNodeController {
                 model.showMessage( ex.getMessage(), title, JOptionPane.WARNING_MESSAGE );
             } else if ( ex.getMessage()==null  ) {
                 setException(ex);
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
                 setDataSet(null);
                 setStatus("error: " + ex.getClass() );
                 handleException(ex);
@@ -1486,7 +1486,7 @@ public class DataSourceController extends DomNodeController {
         } catch (Exception ex) {
             setException(ex);
             setDataSet(null);
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
             setStatus("error: " + ex.getMessage());
             handleException(ex);
             if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
@@ -1496,7 +1496,7 @@ public class DataSourceController extends DomNodeController {
             if (mymon == this.mon) {
                 this.mon = null;
             } else {
-                System.err.println("not my mon, somebody better delete it!");
+                logger.warning("not my mon, somebody better delete it!");
             }
         }
         return result;
@@ -1545,8 +1545,8 @@ public class DataSourceController extends DomNodeController {
         Caching cache1 = getCaching();
 
         if ( dom.getController().isValueAdjusting() ) {
-            System.err.println( "return of bug first demoed by test033: where the adjusting property is breifly cleared. " + dom.getController().changesSupport.isValueAdjusting() );
-            System.err.println( "See https://sourceforge.net/tracker/?func=detail&aid=3409414&group_id=199733&atid=970682");
+            logger.warning( "return of bug first demoed by test033: where the adjusting property is breifly cleared. " + dom.getController().changesSupport.isValueAdjusting() );
+            logger.warning( "See https://sourceforge.net/tracker/?func=detail&aid=3409414&group_id=199733&atid=970682");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -1599,7 +1599,7 @@ public class DataSourceController extends DomNodeController {
                 mon.setProgressMessage("done getting data source");
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log( Level.WARNING, null, e );
                 throw new RuntimeException(e);
             } finally {
                 mon.finished();
@@ -1689,11 +1689,11 @@ public class DataSourceController extends DomNodeController {
 
     private void handleException(Exception e) {
         if ( model.getExceptionHandler()==null ) {
-            e.printStackTrace();
+            logger.log( Level.WARNING, null, e );
         } else if ( e.getMessage()!=null && e.getMessage().contains("nsupported protocol") ) { //unsupport protocol
             model.showMessage( e.getMessage(), "Unsupported Protocol", JOptionPane.ERROR_MESSAGE );
         } else {
-            System.err.println("model.getExceptionHandler: "+ model.getExceptionHandler());
+            logger.log(Level.WARNING, "model.getExceptionHandler: {0}", model.getExceptionHandler());
             model.getExceptionHandler().handle(e);
         }
     }
