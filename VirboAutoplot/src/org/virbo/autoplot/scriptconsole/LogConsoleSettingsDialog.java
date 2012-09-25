@@ -11,6 +11,7 @@
 
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -20,8 +21,7 @@ import java.util.HashSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.JOptionPane;
 
 /**
@@ -33,6 +33,99 @@ import javax.swing.JOptionPane;
 public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     LogConsole console;
+
+	/**
+	 * Just a list of all the log levels defined in {@link Level}
+	 */
+	private static final Level[] LOG_LEVELS = {
+		Level.OFF,
+		Level.SEVERE,
+		Level.WARNING,
+		Level.INFO,
+		Level.CONFIG,
+		Level.FINE,
+		Level.FINER,
+		Level.FINEST,
+		Level.ALL,
+		null,
+	};
+
+	private static class LogLevelComboBoxModel implements ComboBoxModel {
+		private Logger logger;
+		private LogLevelComboBoxModel(Logger logger) {
+			if (logger == null) {
+				throw new NullPointerException("logger must be non-null");
+			}
+			this.logger = logger;
+		}
+
+		public void setSelectedItem(Object anItem) {
+			Level level = (Level)anItem;
+			logger.setLevel(level);
+		}
+
+		public Object getSelectedItem() {
+			return logger.getLevel();
+		}
+
+		public int getSize() {
+			return LOG_LEVELS.length;
+		}
+
+		public Object getElementAt(int index) {
+			return LOG_LEVELS[index];
+		}
+
+		public void addListDataListener(javax.swing.event.ListDataListener l) {
+			//No need to implement for a static model
+		}
+
+		public void removeListDataListener(javax.swing.event.ListDataListener l) {
+			//No need to implement for a static model
+		}
+	}
+
+	private static class LogLevelCellRenderer implements ListCellRenderer {
+		private Logger logger;
+		private ListCellRenderer delegate;
+		private JComponent component;
+
+		private LogLevelCellRenderer(ListCellRenderer delegate, Logger logger) {
+			this.delegate = delegate;
+			this.logger = logger;
+			if (delegate instanceof JComponent)
+				this.component = (JComponent)delegate;
+		}
+
+		public Component getListCellRendererComponent(
+				JList list, Object value, int index,
+				boolean isSelected, boolean cellHasFocus)
+		{
+			//We just need to handle null as a special case
+			if (value == null) {
+				Logger anscestor = logger;
+				do {
+					anscestor = anscestor.getParent();
+					value = anscestor.getLevel();
+				} while (value == null);
+				value = "INHERITED(" + value + ")";
+
+
+				if (component != null) {
+					String name = anscestor.getName();
+					if (name.equals(""))
+						name = "<anonymous>";
+					component.setToolTipText("inherited from " + name);
+				}
+			}
+			else {
+				((JComponent)delegate).setToolTipText(null);
+			}
+			return delegate.getListCellRendererComponent(
+					list, value, index, isSelected, cellHasFocus);
+		}
+		
+	}
 
     /** Creates new form LogConsoleSettingsDialog */
     public LogConsoleSettingsDialog(java.awt.Frame parent, boolean modal, LogConsole console ) {
@@ -69,48 +162,17 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         c.gridy= 0;
         c.insets= new Insets(0,10,0,10);
         for ( String slogger: sloggers ) {
+            Logger logger= Logger.getLogger(slogger);
             JLabel l= new JLabel(slogger);
             c.weightx= 0.4;
             c.gridx= 0;
-            c.anchor= GridBagConstraints.EAST;
+			c.fill = GridBagConstraints.NONE;
             verbosityPanel.add( l,c );
-            final JComboBox cb= new JComboBox( new Level[] {
-                Level.WARNING,
-                Level.INFO,
-                Level.CONFIG,
-                Level.FINE,
-                Level.FINER,
-                Level.FINEST,
-                Level.ALL } );
-            cb.setActionCommand( slogger );
-            final String fslogger= slogger;
-            Logger logger= Logger.getLogger(fslogger);
-            Level initLevel= logger.getLevel();
-            while ( initLevel==null ) {
-                logger= logger.getParent();
-                if ( logger==null ) {
-                    initLevel= Level.WARNING; // this shouldn't happen.
-                    break;
-                }
-                initLevel= logger.getLevel();
-            }
-            cb.setSelectedItem( initLevel );
-            cb.addActionListener( new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Level level= (Level)cb.getSelectedItem();
-                    Logger.getLogger(fslogger).setLevel(level);
-                    if ( Logger.getLogger(fslogger).getHandlers().length==0 ) {
-                        JOptionPane.showMessageDialog( LogConsoleSettingsDialog.this,"no handlers found, using autoplot handlers");
-                        Handler[] hh= Logger.getLogger("autoplot").getHandlers();
-                        for ( Handler h: hh ) {
-                             Logger.getLogger(fslogger).addHandler(h);
-                        }
-                    }
-                }
-            });
+            JComboBox cb= new JComboBox( new LogLevelComboBoxModel(logger) );
+			cb.setRenderer(new LogLevelCellRenderer(cb.getRenderer(),logger));
             c.gridx= 1;
             c.weightx= 0.6;
-            c.anchor= GridBagConstraints.WEST;
+			c.fill = GridBagConstraints.HORIZONTAL;
             verbosityPanel.add( cb,c );
             c.gridy++;
         }
