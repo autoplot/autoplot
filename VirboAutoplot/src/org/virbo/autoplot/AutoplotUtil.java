@@ -375,9 +375,9 @@ public class AutoplotUtil {
             c.gridx= 1;
             c.anchor= GridBagConstraints.EAST;
             if ( fs instanceof LocalFileSystem ) {
-                p.add( new JLabel( "local" ), c );
+                p.add( new JLabel( "" ), c );
             } else if ( fs instanceof WebFileSystem ) {
-                p.add( new JLabel( ((WebFileSystem)fs).isOffline() ? "offline" : "online" ), c );
+                p.add( new JLabel( ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ), c );
             }
             c.gridy++;
         }
