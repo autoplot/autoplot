@@ -553,7 +553,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     //experiment with GUI based on completions.
                     edit= new CompletionsDataSourceEditor();
                 } else {
-                    JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect with .vap files" );
+                    JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect .vap files" );
                 }
             }
             
