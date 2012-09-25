@@ -437,7 +437,8 @@ public class PlotElementController extends DomNodeController {
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
                 synchronized (this) {
-                    if ( c.equals(this.procressStr) && this.processDataSet!=null ) {
+                    if ( c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
+                        logger.log(Level.FINE, "using cached dataset for {0}", procressStr);
                         fillDs= this.processDataSet;
                     } else {
                         this.processDataSet= null;
@@ -671,6 +672,8 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
                 if ( resetComponent ) {
                     plotElement.setComponentAutomatically("");
+                    processDataSet= null;
+                    procressStr= null;
                     setResetComponent(false);
                 }
                 updateDataSet();
