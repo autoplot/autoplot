@@ -42,10 +42,13 @@ import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -60,6 +63,7 @@ import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.batik.ext.swing.GridBagConstants;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
@@ -85,6 +89,9 @@ import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.LocalFileSystem;
+import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
@@ -347,6 +354,35 @@ public class AutoplotUtil {
             };
             new Thread(run).start();
         }
+    }
+
+    /**
+     * show a list of the filesystems
+     * @param aThis
+     */
+    protected static void doManageFilesystems(AutoplotUI aThis) {
+        FileSystem[] fss= FileSystem.peekInstances();
+        JPanel p= new JPanel();
+        p.setLayout( new GridBagLayout() );
+        GridBagConstraints c= new GridBagConstraints();
+        c.gridy=0;
+        for ( FileSystem fs: fss ) {
+            c.weightx= 0.8;
+            c.gridx= 0;
+            c.anchor= GridBagConstraints.WEST;
+            p.add( new JLabel( fs.toString() ), c );
+            c.weightx= 0.2;
+            c.gridx= 1;
+            c.anchor= GridBagConstraints.EAST;
+            if ( fs instanceof LocalFileSystem ) {
+                p.add( new JLabel( "local" ), c );
+            } else if ( fs instanceof WebFileSystem ) {
+                p.add( new JLabel( ((WebFileSystem)fs).isOffline() ? "offline" : "online" ), c );
+            }
+            c.gridy++;
+        }
+        JOptionPane.showConfirmDialog( aThis, new JScrollPane(p), "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
+
     }
 
     public static class AutoRangeDescriptor {
