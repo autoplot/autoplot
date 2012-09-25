@@ -1118,7 +1118,6 @@ public class PlotElementController extends DomNodeController {
                 try {
                     sliceDs = DataSetOps.sprocess( existingComponent, fillDs, new NullProgressMonitor() );
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
