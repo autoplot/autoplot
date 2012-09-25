@@ -1709,6 +1709,7 @@ APSplash.checkTime("init 52");
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         workOfflineCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        manageFilesystemsMI = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
@@ -2112,7 +2113,7 @@ APSplash.checkTime("init 52");
 
         cacheMenu.setText("Cache");
 
-        jMenuItem3.setText("Manage Files...");
+        jMenuItem3.setText("Manage Cached Files...");
         jMenuItem3.setToolTipText("Manage cache of downloaded data files.");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2147,6 +2148,14 @@ APSplash.checkTime("init 52");
             }
         });
         cacheMenu.add(workOfflineCheckBoxMenuItem);
+
+        manageFilesystemsMI.setText("Manage Filesystems");
+        manageFilesystemsMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manageFilesystemsMIActionPerformed(evt);
+            }
+        });
+        cacheMenu.add(manageFilesystemsMI);
 
         toolsMenu.add(cacheMenu);
         toolsMenu.add(jSeparator3);
@@ -2805,6 +2814,10 @@ private void searchToolTipsMenuItemActionPerformed(java.awt.event.ActionEvent ev
     AutoplotUtil.doSearchToolTips(this);
 }//GEN-LAST:event_searchToolTipsMenuItemActionPerformed
 
+private void manageFilesystemsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageFilesystemsMIActionPerformed
+    AutoplotUtil.doManageFilesystems(this);
+}//GEN-LAST:event_manageFilesystemsMIActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -3410,6 +3423,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
+    private javax.swing.JMenuItem manageFilesystemsMI;
     private javax.swing.JCheckBoxMenuItem nnCb;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;

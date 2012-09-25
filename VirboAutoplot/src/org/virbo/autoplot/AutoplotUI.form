@@ -448,7 +448,7 @@
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem3">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Manage Files..."/>
+                    <Property name="text" type="java.lang.String" value="Manage Cached Files..."/>
                     <Property name="toolTipText" type="java.lang.String" value="Manage cache of downloaded data files."/>
                   </Properties>
                   <Events>
@@ -480,6 +480,14 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="workOfflineCheckBoxMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="manageFilesystemsMI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Manage Filesystems"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="manageFilesystemsMIActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>
