@@ -1,5 +1,5 @@
 # demo pitch angle dist
-ds= getDataSet('vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/polar/timas_h0/1996/po_h0_tim_19961121_v03.cdf?Flux_H')
+ds= getDataSet('vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/timas_h0/1996/po_h0_tim_19961121_v03.cdf?Flux_H',monitor)
 
 dep1= ds.property( QDataSet.DEPEND_1 )
 dep1= sqrt(dep1)  # E= 0.5 * m * v**2  -> v= sqrt( E/m )
@@ -20,5 +20,4 @@ ds.putProperty( QDataSet.DEPEND_2, deg )
 plot( ds )
 
 # you have to mess with this a bit to get a redraw.
-
 
