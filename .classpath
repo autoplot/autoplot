@@ -60,5 +60,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/opendap-2.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.1.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
