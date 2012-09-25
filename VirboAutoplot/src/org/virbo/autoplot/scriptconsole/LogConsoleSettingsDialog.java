@@ -12,6 +12,7 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -66,6 +67,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         GridBagConstraints c = new GridBagConstraints();
 
         c.gridy= 0;
+        c.insets= new Insets(0,10,0,10);
         for ( String slogger: sloggers ) {
             JLabel l= new JLabel(slogger);
             c.weightx= 0.4;
