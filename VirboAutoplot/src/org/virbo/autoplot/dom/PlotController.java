@@ -259,14 +259,15 @@ public class PlotController extends DomNodeController {
         //dasPlot1.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(dasPlot1) ) ;
 
         MouseModuleType m= dom.getOptions().getMouseModule();
+        MouseModule mm= null;
         if ( m==MouseModuleType.boxZoom ) {
             // do nothing
         } else if ( m==MouseModuleType.crosshairDigitizer ) {
-            dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+            mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
         } else if ( m==MouseModuleType.zoomX ) {
-            dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+            mm= dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
         }
-
+        if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
 
