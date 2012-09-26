@@ -14,7 +14,7 @@
             displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
         </p>
 
-        <p>This is the Autoplot2012 branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2012b branch.  This is an update to the production version containing bugfixes and minor new features.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
@@ -22,6 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix: ReduceFilter needs to update the cacheTag of the result. </li>
+            <li>added jsyntaxpane jar file to the Eclipse class path.  Thanks Jon!</li>
+            <li>the operations cache was not being reset when a new dataset would come in, possibly resulting in a completely incorrect result!</li>
+            <li>VALID_MAX and CACHE_TAG properties handled in append</li>
+            <li>rte_1830229334: inspect button on vap file yielded NullPointerException</li>
             <li>qstreams clean up to support aggregation and reduction</li>
             <li>completions and inspect icon show discovery sources and filesystem types when address bar is empty</li>
             <li>small round of findbugs cleanup</li>
@@ -64,7 +69,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>dialog to indicate the active filesystems and their status</li>
+            <li>Tools->Cache->Manage FileSystems dialog to indicate the active filesystems and their status</li>
             <li>add a few shorter example scripts to jython editor</li>
             <li>progress messages supported in qstreams</li>
             <li>add icon to encourage use of convenient history dialog</li>
