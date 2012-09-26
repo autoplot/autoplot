@@ -37,6 +37,7 @@ import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
@@ -85,7 +86,26 @@ public class PlotController extends DomNodeController {
                 updateAxisFormatter(update);
             }
         });
-
+        dom.options.addPropertyChangeListener( Options.PROP_MOUSEMODULE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                DasPlot p= dasPlot;
+                MouseModuleType mm= (MouseModuleType) evt.getNewValue();
+                MouseModule m= null;
+                String l= null;
+                if ( mm==MouseModuleType.boxZoom ) {
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
+                } else if ( mm==MouseModuleType.crosshairDigitizer ) {
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+                } else if ( mm==MouseModuleType.zoomX ) {
+                    m= p.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+                }
+                if ( m!=null ) {
+                    p.getDasMouseInputAdapter().setPrimaryModule( m );
+                } else {
+                    logger.log( Level.WARNING, "logger note recognized: "+mm );
+                }
+            }
+        });
         plot.controller= this;
     }
 
@@ -237,6 +257,16 @@ public class PlotController extends DomNodeController {
         dasPlot1.getDasMouseInputAdapter().setPrimaryModule(boxmm);
 
         //dasPlot1.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(dasPlot1) ) ;
+
+        MouseModuleType m= dom.getOptions().getMouseModule();
+        if ( m==MouseModuleType.boxZoom ) {
+            // do nothing
+        } else if ( m==MouseModuleType.crosshairDigitizer ) {
+            dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+        } else if ( m==MouseModuleType.zoomX ) {
+            dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+        }
+
 
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
 

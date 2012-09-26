@@ -8,8 +8,13 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.das2.util.LoggerManager;
+import org.virbo.autoplot.LogNames;
+import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.util.TickleTimer;
 
 /**
@@ -20,6 +25,8 @@ public class OptionsPrefsController {
 
     Preferences prefs;
     Options options;
+
+    private static final Logger logger= LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
     TickleTimer flushTimer= new TickleTimer( 100, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -39,6 +46,8 @@ public class OptionsPrefsController {
                 prefs.putBoolean( evt.getPropertyName(), (Boolean)evt.getNewValue() );
             } else if ( evt.getNewValue() instanceof Color ) {
                 prefs.put( evt.getPropertyName(), DomUtil.encodeColor((Color)evt.getNewValue() ) );
+            } else if ( evt.getNewValue() instanceof Enum ) {
+                prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
@@ -90,6 +99,11 @@ public class OptionsPrefsController {
         options.setTextAntiAlias ( prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias) );
         options.setDayOfYear( prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear) );
         options.setNearestNeighbor( prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor) );
+        try {
+            options.setMouseModule( MouseModuleType.valueOf( prefs.get(Options.PROP_MOUSEMODULE, options.mouseModule.toString() ) ) );
+        } catch ( IllegalArgumentException ex ) {
+            logger.log( Level.SEVERE, null, ex );
+        }
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
 
@@ -129,6 +143,11 @@ public class OptionsPrefsController {
         options.textAntiAlias = prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias);
         options.dayOfYear= prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear);
         options.nearestNeighbor= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor);
+        try {
+            options.setMouseModule( MouseModuleType.valueOf( prefs.get(Options.PROP_MOUSEMODULE, options.mouseModule.toString() ) ) );
+        } catch ( IllegalArgumentException ex ) {
+            logger.log( Level.SEVERE, null, ex );
+        }
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
     }

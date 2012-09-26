@@ -216,6 +216,7 @@ public class ApplicationModel {
     public void addDasPeersToApp() {
         if ( !applet ) {
             BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
+            BeansUtil.registerEditor(MouseModuleType.class, EnumerationEditor.class);
         }
 
         new ApplicationController(this, dom);

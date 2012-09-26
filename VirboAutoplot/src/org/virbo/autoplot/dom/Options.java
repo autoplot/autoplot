@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import org.virbo.autoplot.MouseModuleType;
 
 /**
  * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.
@@ -396,7 +397,21 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_NEARESTNEIGHBOR, old, nearestNeighbor );
     }
 
+    /**
+     * the preference for mouse module.
+     */
+    protected MouseModuleType mouseModule = MouseModuleType.boxZoom;
+    public static final String PROP_MOUSEMODULE = "mouseModule";
 
+    public MouseModuleType getMouseModule() {
+        return mouseModule;
+    }
+
+    public void setMouseModule( MouseModuleType mouseModule) {
+        MouseModuleType oldMouseModule = this.mouseModule;
+        this.mouseModule = mouseModule;
+        propertyChangeSupport.firePropertyChange(PROP_MOUSEMODULE, oldMouseModule, mouseModule);
+    }
 
     // Note these are weird: I'm not sure if I've just forgotten items or this was intensional.
     // I suspect that it is intensional that a subset of the options are treated this way.  Seems like

@@ -27,6 +27,7 @@ import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.DasLogger;
+import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.qstream.SerializeDelegate;
 import org.virbo.qstream.SerializeRegistry;
@@ -61,6 +62,7 @@ public class SerializeUtil {
         SerializeRegistry.register( PsymConnector.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( SpectrogramRenderer.RebinnerEnum.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( RenderType.class, new TypeSafeEnumSerializeDelegate() );
+        SerializeRegistry.register( MouseModuleType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( PlotSymbol.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( LegendPosition.class, new TypeSafeEnumSerializeDelegate() );
     }
