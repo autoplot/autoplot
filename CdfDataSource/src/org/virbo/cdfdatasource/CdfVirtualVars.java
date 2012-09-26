@@ -127,7 +127,13 @@ public class CdfVirtualVars {
      * @return
      */
     public static QDataSet execute(  Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) {
-        if ( function.equalsIgnoreCase("compute_magnitude") ) {
+        if ( function.equalsIgnoreCase("sum_values" ) ) {
+            QDataSet sum= args.get(0);
+            for ( int i=1; i<args.size(); i++ ) {
+                sum= Ops.add( sum, args.get(i) );
+            }
+            return sum;
+        } else if ( function.equalsIgnoreCase("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
         } else if (function.equalsIgnoreCase("convert_log10")) {
             return convertLog10( args.get(0) );
@@ -253,7 +259,9 @@ public class CdfVirtualVars {
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftPowerDelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag" );
+                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
+                "sum_values" );
+
         return functions.contains(function);
     }
 }
