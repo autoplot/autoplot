@@ -14,15 +14,11 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
-import javax.swing.JOptionPane;
 
 /**
  * Settings GUI for the Log Console dialog.  The log console is more complex than it first seems, in that it
@@ -138,21 +134,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }
 
     private void initLogSettings() {
-        String[] sloggers= new String[] { "das2", "das2.filesystem", 
-        org.virbo.autoplot.LogNames.AUTOPLOT,
-        org.virbo.autoplot.LogNames.AUTOPLOT_DOM,
-        org.virbo.autoplot.LogNames.AUTOPLOT_BOOKMARKS,
-        org.virbo.autoplot.LogNames.AUTOPLOT_PNGWALK,
-        org.virbo.autoplot.LogNames.AUTOPLOT_TSB,
-        org.virbo.datasource.LogNames.APDSS,
-        org.virbo.datasource.LogNames.APDSS_CDFN,
-        org.virbo.datasource.LogNames.APDSS_CDFJAVA,
-        org.virbo.datasource.LogNames.APDSS_CDAWEB,
-        org.virbo.datasource.LogNames.APDSS_ASCII,
-        org.virbo.datasource.LogNames.APDSS_JYDS, };
+        String[] sloggers;
 
         HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
-        otherLoggers.addAll( Arrays.asList(sloggers) );
         otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
         sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
         Arrays.sort(sloggers);
