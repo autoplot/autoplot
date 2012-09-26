@@ -108,7 +108,6 @@ public class BookmarksManagerModel {
                 Bookmark.formatBooks( out, list );
                 
             } catch (IOException e) {
-                e.printStackTrace();
                 logger.log(Level.SEVERE, null, e);
             } finally {
                 if ( out!=null ) try {
@@ -135,7 +134,7 @@ public class BookmarksManagerModel {
     public void setList(List<Bookmark> list) {
         logger.log(Level.FINE, "setting list to {0}", list);
         //if ( list==null ) {
-        //    new Exception("set list to null").printStackTrace();
+        //    logger.log( Level.SEVERE, null, new Exception("set list to null") );
         //}
         //List<Bookmark> oldList = this.list;
         //BookmarksManager.printBooks( list, "" );
@@ -491,7 +490,7 @@ public class BookmarksManagerModel {
         }
 
         if ( remote.remoteRemote==true ) {
-            System.err.println("remote bookmarks found...");
+            logger.fine("remote bookmarks found in remote bookmarks...");
         }
         List<Bookmark> newList= new ArrayList(this.list.size());
         for ( int i=0; i<this.list.size(); i++ ) {

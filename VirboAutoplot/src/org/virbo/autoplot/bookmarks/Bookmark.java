@@ -195,12 +195,12 @@ public abstract class Bookmark {
                 URI ruri= rurl.toURI();
                 URI parentUri= null; // FileSystemUtil.isCacheable( ruri );
                 if ( parentUri!=null ) {
-                    System.err.println("Using isCacheable route");
+                    logger.fine("Using isCacheable route");
                     FileSystem fd= FileSystem.create(parentUri);
                     if ( fd instanceof WebFileSystem ) {
                         offline= ((WebFileSystem)fd).isOffline();
                     }
-                    System.err.println("  offline: "+offline );
+                    logger.fine("  offline: "+offline );
                     FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
                     if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
                         fo= fd.getFileObject( fo.getNameExt()+".gz" );
@@ -212,17 +212,17 @@ public abstract class Bookmark {
                             in= fo.getInputStream();
                         }
                     }
-                    System.err.println("remoteUrl="+remoteUrl);
+                    logger.fine("remoteUrl="+remoteUrl);
 
                 } else {
-                    System.err.println("Using downloadResourceAsTempFile route"+rurl);
+                    logger.fine("Using downloadResourceAsTempFile route"+rurl);
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
-                    System.err.println("  got it...");
+                    logger.fine("  got it...");
                 }
             } catch ( URISyntaxException ex ) {
-                System.err.println("fall back to Using downloadResourceAsTempFile route"+rurl);
+                logger.fine("fall back to Using downloadResourceAsTempFile route"+rurl);
                 in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
-                System.err.println("  got it...");
+                logger.fine("  got it...");
             }
 
             ByteArrayOutputStream boas=new ByteArrayOutputStream();
@@ -235,7 +235,7 @@ public abstract class Bookmark {
             String sin= new String( boas.toByteArray() );
 
             if ( !sin.startsWith("<book") && !sin.startsWith("<?xml") ) {
-                System.err.println("not a bookmark xml file: "+rurl );
+                logger.warning("not a bookmark xml file: "+rurl );
                 throw new IllegalArgumentException("not a bookmark xml file: "+rurl );
             }
 
@@ -301,7 +301,7 @@ public abstract class Bookmark {
             try {
                 err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/warning-icon.png" ) ) ) );
             } catch (IOException ex2) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, null, ex2 );
             }
             result.statusMsg= ex.toString();
             contents.add( err );
@@ -312,7 +312,7 @@ public abstract class Bookmark {
                 try {
                     in.close();
                 } catch ( IOException ex ) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, null, ex );
                 }
             }
         }
@@ -392,7 +392,7 @@ public abstract class Bookmark {
                 if ( uri==null ) {
                     title= "(untitled)";
                 } else {
-                    //System.err.println("Using URI for title because title is empty: "+uri );
+                    //logger.fine("Using URI for title because title is empty: "+uri );
                     title= uri;
                 }
             } else {
@@ -491,13 +491,13 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
-                        System.err.println("get remote bookmarks: "+remoteUrl );
+                        logger.fine("get remote bookmarks: "+remoteUrl );
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
-                        System.err.println("   got remote bookmarks "+remoteUrl );
+                        logger.fine("   got remote bookmarks "+remoteUrl );
 
                         if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
-                            System.err.println("unable to parse bookmarks at "+remoteUrl);
-                            System.err.println("Maybe using local copy");
+                            logger.warning("unable to parse bookmarks at "+remoteUrl);
+                            logger.fine("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
                             remoteStatusMsg= contents.get(0).getDescription();
                         } else {
@@ -607,9 +607,9 @@ public abstract class Bookmark {
                 } catch (IOException ex1) {
                     logger.log(Level.SEVERE, null, ex1);
                 }
-                System.err.println("## bookmark number=" + i);
-                ex.printStackTrace();
-                System.err.println("last bookmark parsed:"+lastBook);
+                logger.log(Level.FINE, "## bookmark number={0}", i);
+                logger.log( Level.SEVERE, null, ex );
+                logger.log(Level.FINE, "last bookmark parsed:{0}", lastBook);
                 //continue;
                 throw new BookmarksException(ex);
             }
@@ -685,8 +685,8 @@ public abstract class Bookmark {
                 // Ed's nice trick for finding the implementation
                 //String name = serializer.getClass().getSimpleName();
                 //java.net.URL u = serializer.getClass().getResource(name+".class");
-                //System.err.println(u);
-                error.printStackTrace();
+                //logger.fine(u);
+                logger.log( Level.SEVERE, null, error );
             }
             serializer.write(doc, output);
 
@@ -850,9 +850,9 @@ public abstract class Bookmark {
 
         List<Bookmark> bs= parseBookmarks(document.getDocumentElement());
         for ( Bookmark b: bs ) {
-            System.err.println("bookmark: "+ b);
+            System.err.println("bookmark: "+ b); // logger
             if ( b instanceof Bookmark.Folder ) {
-                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks());
+                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks()); // logger
             } else {
 
             }

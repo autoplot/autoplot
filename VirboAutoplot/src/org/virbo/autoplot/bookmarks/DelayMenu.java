@@ -7,6 +7,8 @@ package org.virbo.autoplot.bookmarks;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JMenu;
@@ -18,10 +20,13 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
 
 /**
- *
+ * JMenu that delays creating children until the folder is exposed.  Otherwise we would have thousands of
+ * JMenuItems created at once, which showed to be slow.
  * @author jbf
  */
 public class DelayMenu extends JMenu {
+
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
     final static int MAX_TITLE_LEN = 50; // bookmark item description length
     final static int MAX_LABEL_LEN = 30; // folder item description length
@@ -122,7 +127,7 @@ public class DelayMenu extends JMenu {
         addMenuListener( new MenuListener() {
 
             public void menuSelected(MenuEvent e) {
-                //System.err.println("resolving menu "+label+"...");
+                logger.log(Level.FINE, "resolving menu {0}...", label);
                 DelayMenu.this.removeAll();
                 calculateMenu( DelayMenu.this, bookmarks, treeDepth, sel );
             }

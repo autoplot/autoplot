@@ -307,22 +307,22 @@ public class BookmarksManager extends javax.swing.JDialog {
             Component p= SwingUtilities.getRoot(this);
             if ( p==null ) {
                 if ( messageType==JOptionPane.WARNING_MESSAGE ) {
-                    System.err.println( "WARNING: "+ title + ": " + message  );
+                    logger.log( Level.WARNING, "{0}: {1}", new Object[]{title, message});
                 } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
-                    System.err.println( "INFO: "+ title + ": " + message  );
+                    logger.log( Level.INFO, "{0}: {1}", new Object[]{title, message});
                 } else {
-                    System.err.println( title + ": " + message  );
+                    logger.log( Level.FINE, "{0}: {1}", new Object[]{title, message});
                 }
             } else {
                 JOptionPane.showMessageDialog( p, message, title, messageType );
             }
         } else {
             if ( messageType==JOptionPane.WARNING_MESSAGE ) {
-                System.err.println( "WARNING: "+ title + ": " + message  );
+                logger.log( Level.WARNING, "{0}: {1}", new Object[]{title, message});
             } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
-                System.err.println( "INFO: "+ title + ": " + message  );
+                logger.log( Level.INFO, "{0}: {1}", new Object[]{title, message});
             } else {
-                System.err.println( title + ": " + message  );
+                logger.log( Level.FINE, "{0}: {1}", new Object[]{title, message});
             }
         }
     }
@@ -1295,7 +1295,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
     
     public static void printBooks( Bookmark book, String indent ) {
-        System.err.println( indent + book.getTitle() );
+        System.err.println( indent + book.getTitle() ); // logger okay
         if ( book instanceof Bookmark.Folder ) {
             Bookmark.Folder bf= (Bookmark.Folder)book;
             for ( Bookmark b: bf.getBookmarks() ) {
@@ -1319,11 +1319,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     int depthLimit= Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT;
                     if ( checkUnresolved(book) && depthf<depthLimit ) {
                         Runnable run= loadBooksRunnable( start, depthLimit );
-                        //System.err.printf( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 );
+                        logger.finer( String.format( " invokeLater( loadBooksRunnable( start, %d )\n", depthf+1 ) );
                         RequestProcessor.invokeLater(run);
                     } else {
                         if ( checkUnresolved(book) && depthf>=depthLimit ) {
-                            System.err.println("remote bookmarks depth limit met");
+                            logger.fine("remote bookmarks depth limit met");
                         }
                     }
                     if ( checkUnresolved(book)==false ) {
@@ -1402,7 +1402,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 if ( unresolved ) {
                     final String start= buff.toString();
                     Runnable run= loadBooksRunnable( start, Bookmark.REMOTE_BOOKMARK_DEPTH_LIMIT );
-                    //System.err.printf( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 );
+                    logger.finer( String.format( "invokeLater( loadBooksRunnable( start, %d )\n", depth+1 ) );
                     RequestProcessor.invokeLater(run);
                 }
 
@@ -1415,15 +1415,12 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             } );
             
         } catch (BookmarksException ex) {
-            logger.log(Level.SEVERE, null, ex);
             showMessage( "Semantic error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
             model.setList(new ArrayList());
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
             showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
             model.setList(new ArrayList());
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
             showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
             model.setList(new ArrayList());
         } finally {
@@ -1472,7 +1469,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             try {
                 if ( out!=null ) out.close();
             } catch ( IOException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, null, ex );
             }
         }
     }
@@ -1563,7 +1560,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, null, ex );
             }
         } else {
             // should already have a listener

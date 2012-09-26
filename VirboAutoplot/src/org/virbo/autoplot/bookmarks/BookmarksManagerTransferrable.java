@@ -101,16 +101,12 @@ public class BookmarksManagerTransferrable {
 
                 } catch (UnsupportedFlavorException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
                 } catch (BookmarksException ex ) {
-                    ex.printStackTrace();
-
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
                 } catch (SAXException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
                 }
 
             }
