@@ -58,7 +58,25 @@ public class CompletionSettings {
         }
         CompletionImpl.get().setTabIsCompletion(tabIsCompletion);
     }
-    
+
+    protected boolean safeCompletions = true;
+    public static final String PROP_SAFE_COMPLETIONS = "safeCompletions";
+
+    public boolean isSafeCompletions() {
+        return safeCompletions;
+    }
+
+    public void setSafeCompletions(boolean safeCompletions) {
+        boolean old = safeCompletions;
+        this.safeCompletions = safeCompletions;
+        propertyChangeSupport.firePropertyChange(PROP_SAFE_COMPLETIONS, old, safeCompletions);
+        prefs.putBoolean( PROP_SAFE_COMPLETIONS, safeCompletions );
+        try {
+            prefs.flush();
+        } catch ( BackingStoreException ex ) {
+            ex.printStackTrace();
+        }
+    }
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
