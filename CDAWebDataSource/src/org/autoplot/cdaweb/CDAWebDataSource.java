@@ -20,6 +20,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -50,7 +51,7 @@ import org.virbo.metatree.IstpMetadataModel;
  */
 public class CDAWebDataSource extends AbstractDataSource {
 
-    protected static final Logger logger= Logger.getLogger("apdss.cdaweb");
+    protected static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
 
     public static final String PARAM_ID= "id";
     public static final String PARAM_DS= "ds";

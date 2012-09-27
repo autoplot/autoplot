@@ -39,6 +39,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -57,7 +58,7 @@ import org.xml.sax.SAXException;
  */
 public class CDAWebDB {
 
-    private static final Logger logger= Logger.getLogger("apdss.cdaweb");
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
     
     private static CDAWebDB instance=null;
     private static String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";

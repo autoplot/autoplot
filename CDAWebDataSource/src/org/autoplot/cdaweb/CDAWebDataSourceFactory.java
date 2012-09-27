@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
@@ -33,7 +34,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class CDAWebDataSourceFactory implements DataSourceFactory {
 
-    protected static final Logger logger= Logger.getLogger("apdss.cdaweb");
+    protected static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new CDAWebDataSource(uri);

@@ -37,6 +37,7 @@ import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
@@ -50,7 +51,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
-    private static final Logger logger= Logger.getLogger("apdss.cdaweb");
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
     
     /** Creates new form CDAWebEditorPanel */
     public CDAWebEditorPanel() {
