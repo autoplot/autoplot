@@ -850,9 +850,9 @@ public abstract class Bookmark {
 
         List<Bookmark> bs= parseBookmarks(document.getDocumentElement());
         for ( Bookmark b: bs ) {
-            System.err.println("bookmark: "+ b); // logger
+            System.err.println("bookmark: "+ b); // logger okay
             if ( b instanceof Bookmark.Folder ) {
-                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks()); // logger
+                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks()); // logger okay
             } else {
 
             }
