@@ -10,6 +10,9 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
+import org.virbo.autoplot.LogNames;
 
 /**
  * Autoplot's state is stored in a tree of nodes, with Java types constraining to particular abstractions.  Each node
@@ -40,6 +43,8 @@ import java.util.List;
  * @author jbf
  */
 public abstract class DomNode implements Cloneable {
+
+    protected static final Logger logger= LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
     /**
      * returns a deep copy of the node.
      * @return

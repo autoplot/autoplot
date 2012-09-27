@@ -56,7 +56,7 @@ import org.virbo.datasource.capability.Updating;
 import org.virbo.dsutil.AutoHistogram;
 
 /**
- *
+ * Controller node manages a DataSourceFilter node.
  * @author jbf
  */
 public class DataSourceController extends DomNodeController {
@@ -112,10 +112,10 @@ public class DataSourceController extends DomNodeController {
             } else {
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
-                    logger.warning("!!! someone is changing: "+whoIsChanging +" !!!  ignoring event."); // we probably need to do something with this.
-                    logger.warning(" !! "+e.getPropertyName() );
-                    logger.warning(" !! "+e.getNewValue() );
-                    logger.warning(" !! "+e.getOldValue() );
+                    logger.log(Level.WARNING, "!!! someone is changing: {0} !!!  ignoring event.", whoIsChanging); // we probably need to do something with this.
+                    logger.log(Level.WARNING, " !! {0}", e.getPropertyName());
+                    logger.log(Level.WARNING, " !! {0}", e.getNewValue());
+                    logger.log(Level.WARNING, " !! {0}", e.getOldValue());
                     return;
                 }
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );

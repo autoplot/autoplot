@@ -6,11 +6,12 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 
 /**
- *
+ * The state of an axis, X, Y, or a Z axis colorbar.
  * @author jbf
  */
 public class Axis extends DomNode {
@@ -36,8 +37,7 @@ public class Axis extends DomNode {
      */
     public void setRange(DatumRange range) {
         if ( range==null ) {
-            System.err.println("range set to null!");
-            new Exception().printStackTrace();
+            logger.log( Level.WARNING, "range set to null!");
         }
         DatumRange oldRange = this.range;
         this.range= range;

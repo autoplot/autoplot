@@ -712,7 +712,7 @@ public class CanvasController extends DomNodeController {
             public void paint(Graphics2D g) {
                 // note it's non-trivial to apply transforms as the plot moves.
                 if ( dasCanvas.lisPaintingForPrint() ) {
-                    System.err.println("not painting select");
+                    logger.fine("not painting select");
                     return;
                 }
                 g.setColor( new Color( 255, 255, 0, 100 ) );
