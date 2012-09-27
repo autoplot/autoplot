@@ -18,7 +18,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 
 /**
@@ -120,7 +119,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
             DatumRange dr;
             if (panAxisV.isLog()) {
                 if ( UnitsUtil.isTimeLocation( panAxisV.getUnits()) ) {
-                    System.err.println("log of time axis--shouldn't happen");
+                    logger.fine("log of time axis--shouldn't happen");
                     return;
                 }
                 Datum delta = oppositeAxisV.invTransform(p0.getY()).divide(oppositeAxisV.invTransform(p2.getY()));
