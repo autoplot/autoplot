@@ -301,6 +301,7 @@ public class AutoplotDataServer {
                 //TODO: find a way to test for this and give a good error message.
                 logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
