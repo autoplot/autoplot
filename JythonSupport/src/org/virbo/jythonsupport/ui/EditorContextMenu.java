@@ -4,6 +4,8 @@
  */
 package org.virbo.jythonsupport.ui;
 
+import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -272,7 +274,9 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
+
             menu.add( actionsMenu );
+
             JMenu settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {
                 public void actionPerformed(ActionEvent e) {
@@ -283,6 +287,21 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText( "Settings for the editor" );
             settingsMenu.add( mi );
+
+            mi= new JMenuItem( new AbstractAction("Pick Font...") {
+                public void actionPerformed(ActionEvent e) {
+                    JFontChooser chooser = new JFontChooser( null );
+
+                    chooser.setExampleText("ds= getDataSet('http://autoplot.org/data/data.dat')");
+                    chooser.setFont( editor.getFont() );
+                    if (chooser.showDialog() == JFontChooser.OK_OPTION) {
+                       editor.setFont(chooser.getFont());
+                    }
+                }
+            } );
+            mi.setToolTipText("Pick Font for editor");
+            settingsMenu.add( mi );
+
             menu.add( settingsMenu );
 
             menu.addSeparator();
