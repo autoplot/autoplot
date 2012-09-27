@@ -7,9 +7,12 @@ package org.das2.jythoncompletion;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.util.LoggerManager;
 
 /**
  *
@@ -17,6 +20,7 @@ import org.das2.jythoncompletion.ui.CompletionImpl;
  */
 public class CompletionSettings {
 
+    private static final Logger logger= LoggerManager.getLogger( "jython.editor" );
     Preferences prefs= Preferences.userNodeForPackage( CompletionSettings.class );
 
     protected String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/";
@@ -34,7 +38,7 @@ public class CompletionSettings {
         try {
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
         }
     }
 
@@ -54,7 +58,7 @@ public class CompletionSettings {
             prefs.putBoolean( PROP_TAB_IS_COMPLETION, tabIsCompletion );
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
         }
         CompletionImpl.get().setTabIsCompletion(tabIsCompletion);
     }
@@ -74,7 +78,7 @@ public class CompletionSettings {
         try {
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
         }
     }
 
