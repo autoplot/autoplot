@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Aggregation of QStreams and reduce filter cleaned up for production use.</small></p>
+        <p><small>Twelve million points are rendered visualized interactively with the new waveform QDataSet scheme.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,7 @@
         <p>Bugfixes:</p>
         <ul>
             <li>bugfix: ReduceFilter needs to update the cacheTag of the result. </li>
+            <li>bugfix in CdfJava plugin where subsampling would not work with new TT2000 datasets.</li>
             <li>added jsyntaxpane jar file to the Eclipse class path.  Thanks Jon!</li>
             <li>the operations cache was not being reset when a new dataset would come in, possibly resulting in a completely incorrect result!</li>
             <li>VALID_MAX and CACHE_TAG properties handled in append</li>
@@ -69,6 +70,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>support rank2 "waveform" datasets in QDataSet with the huge scatter mode this gets us up to about 12M points.</li>
             <li>add sum_values virtual function to CDF</li>
             <li>log console uses x scroll bar to avoid wrapping lines.
             <li>add user option for default mouse action: box zoom, crosshair digitizer, zoom x</li>
