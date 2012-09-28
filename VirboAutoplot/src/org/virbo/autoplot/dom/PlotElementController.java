@@ -501,7 +501,7 @@ public class PlotElementController extends DomNodeController {
             if ( fillDs.rank()==1 ) {
                 return true;
             } else if ( fillDs.rank()==2 ) {
-                return SemanticOps.isBundle(fillDs);
+                return SemanticOps.isBundle(fillDs) ||  SemanticOps.isRank2Waveform(fillDs);
             } else {
                 return false;
             }
@@ -1122,8 +1122,21 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            
-            boolean shouldHaveChildren= fillDs.rank() == 2
+
+            boolean isWaveform= false;
+            if ( renderType==RenderType.hugeScatter && fillDs.rank()==2 ) {
+                QDataSet dep0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                QDataSet dep1= (QDataSet) fillDs.property(QDataSet.DEPEND_1);
+                if ( dep0!=null && dep1!=null ) {
+                    Units dep0units= SemanticOps.getUnits( dep0 );
+                    Units dep1units= SemanticOps.getUnits( dep1 );
+                    if ( dep0units!=Units.dimensionless && dep1units.isConvertableTo( dep0units.getOffsetUnits() ) ) {
+                        isWaveform= true;
+                    }
+                }
+            }
+
+            boolean shouldHaveChildren= fillDs.rank() == 2 && !isWaveform
                     &&  ( renderType == RenderType.hugeScatter || renderType==RenderType.series || renderType==RenderType.scatter || renderType==RenderType.stairSteps );
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
@@ -1933,6 +1946,15 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }       
+        } else if ( spec==RenderType.hugeScatter ) {
+            QDataSet qube= ImageVectorDataSetRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
+
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
