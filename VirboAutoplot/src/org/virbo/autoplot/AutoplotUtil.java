@@ -1421,6 +1421,9 @@ public class AutoplotUtil {
                     spec = RenderType.series;
                 }
                 return spec;
+            } else if ( srenderType.equals("waveform" ) ) {
+                spec = RenderType.hugeScatter;
+                return spec;
             }
             try {
                 spec = RenderType.valueOf(srenderType);
@@ -1456,6 +1459,16 @@ public class AutoplotUtil {
             dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1,0);
             plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0,0);
             bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1,0);
+        }
+
+        if ( fillds.rank()==2 ) {
+            QDataSet xds= (QDataSet) fillds.property(QDataSet.DEPEND_0);
+            Units xunits= SemanticOps.getUnits(xds);
+            QDataSet xoffsets= (QDataSet) fillds.property(QDataSet.DEPEND_1);
+            Units xoffsetunits= SemanticOps.getUnits(xoffsets);
+            if ( xoffsets!=Units.dimensionless && xoffsetunits.isConvertableTo(xunits.getOffsetUnits()) ) {
+                return RenderType.hugeScatter;
+            }
         }
 
         if (fillds.rank() >= 2) {
