@@ -4,7 +4,12 @@ import java.nio.*;
 import java.util.*;
 import java.util.zip.*;
 import java.lang.reflect.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Extractor {
+
+    private static final Logger logger= Logger.getLogger( "apdss.cdfjava" );
     static int MAX_ARRAY = 3;
     static String[] functions = new String[] {"Series" , "Element",
            "Point" , "Range" , "Elements", "RangeForElements",
@@ -1657,6 +1662,9 @@ public class Extractor {
     static void do1D(ByteBuffer bv, int type, Object temp, Object result,
        int offset, int number, boolean preserve) throws IllegalAccessException,
        InvocationTargetException {
+
+        logger.log( Level.FINE, "do1D(buf.position={0},type={1},offset={2},number={3},preserve={4})", new Object[] { bv.position(), type, offset, number, preserve } );
+
         Method method;
         double[] data = null;
         if (DataTypes.typeCategory[type] != DataTypes.LONG) {
@@ -1805,11 +1813,26 @@ public class Extractor {
         if (offset == 0) return null;
         return data;
     }
+    /**
+     * extract the data into a 1-D double array.
+     * @param bv the buffer containing the data, positioned at the first point desired
+     * @param type the CDF variable type (21 is float,etc)
+     * @param tf
+     * @param data the output array that is populated
+     * @param offset
+     * @param count
+     * @param elements
+     * @param _stride
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws Throwable
+     */
     // bv is positioned at the first point desired
     static void do1D(ByteBuffer bv, int type, float[] tf, double[] data,
        int offset, int count, int elements, int _stride) throws
        IllegalAccessException, InvocationTargetException, Throwable {
         Method method;
+        logger.log( Level.FINE, "do1D(buf.position={0},type={1},offset={2},count={3})", new Object[] { bv.position(), type, offset, count } );
         int span = _stride*elements;
         int pos = bv.position();
         switch (DataTypes.typeCategory[type]) {
@@ -1856,6 +1879,9 @@ public class Extractor {
                 }
             }
             break;
+        case 5:
+           throw new IllegalArgumentException("type catagory 5, long, not supported");
+           
         default:
             throw new Throwable("Unsupported data type for this " +
                 "context");
