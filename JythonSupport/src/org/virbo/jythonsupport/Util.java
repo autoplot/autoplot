@@ -103,6 +103,7 @@ public class Util {
         logger.log( Level.FINE, "getDataSet({0})", surl );
         URI uri = DataSetURI.getURIValid(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        if ( factory==null ) throw new IllegalArgumentException("unsupported extension: "+surl);
         DataSource result = factory.getDataSource( uri );
         if (mon == null) {
             mon = new NullProgressMonitor();
@@ -293,5 +294,12 @@ public class Util {
         }
         Arrays.sort(result);
         return result;
+    }
+
+    public static void main( String[] args ) throws Exception {
+        DataSetURI.init();
+        String uri= "file:///Users/jbf/data/rbsp-a_WFR-spectral-matrix_emfisis-Quick-Look_20120911_v1.2.6.cdf?BuBu[::40]";
+        QDataSet ds= Util.getDataSet(uri);
+        System.err.println(ds);
     }
 }
