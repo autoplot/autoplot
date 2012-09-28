@@ -357,7 +357,12 @@ public class JythonCompletionTask implements CompletionTask {
 
         PythonInterpreter interp = getInterpreter();
 
-        String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        String eval;
+        if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
+            eval= "";
+        } else {
+            eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        }
 
         try {
             Map<String,String> locals= JythonUtil.getLocals( new BufferedReader( new StringReader( eval ) ) );
