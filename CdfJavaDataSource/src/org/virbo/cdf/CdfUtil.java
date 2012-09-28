@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
@@ -46,7 +47,7 @@ import org.virbo.dsops.Ops;
  */
 public class CdfUtil {
 
-    private final static Logger logger = Logger.getLogger("apdss.cdfjava");
+    private final static Logger logger= LoggerManager.getLogger("apdss.cdfjava");
 
     /**
      * Creates a new instance of CdfUtil
@@ -162,6 +163,14 @@ public class CdfUtil {
 
     }
 
+    /**
+     * returns the size of the variable in bytes.
+     * @param dims number of dimensions in each record
+     * @param dimSizes dimensions of each record
+     * @param itype type of data, such as CDFConstants.CDF_FLOAT
+     * @param rc number of records (rec count)
+     * @return the size the variable in bytes 
+     */
     private static long sizeOf( int dims, int[] dimSizes, long itype, long rc ) {
         long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
         long sizeBytes;
@@ -182,9 +191,31 @@ public class CdfUtil {
         return size;
     }
 
+    /**
+     * subsample the array in-situ to save memory.  Be careful, this clobbers
+     * the old array to save memory!  (Note Java5 doesn't save memory, but it will in Java6.)
+     * Note too that this is a kludge, and the CDF library must be changed to support subsampling non-double arrays.
+     * @param array the input array, which is clobbered
+     * @param recStart
+     * @param recCount
+     * @param recInterval
+     * @return
+     */
+    private static long[] subsampleTT2000( long[] array, int recStart, int recCount, int recInterval ) {
+        int n= recCount;
+        for ( int i=0; i<n; i++ ) {
+            array[i]= array[ i*recInterval + recStart ];
+        }
+        //long[] result= Arrays.copyOfRange( array, 0, n ); //TODO: Java6
+        long[] result= new long[n];
+        System.arraycopy( array, 0, result, 0, n );
+        return result;
+    }
+
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
-
+        logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { variable.getName(), String.valueOf(recStart), // no commas in {1}
+                 ""+(recCount+recStart), recInterval } );
         {
             String cdfFile;
             synchronized ( CdfJavaDataSource.lock ) {
@@ -250,7 +281,7 @@ public class CdfUtil {
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
 
-        logger.log( Level.FINEST, "size of {0}: {1}  type: {2}", new Object[]{variable.getName(), sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
+        logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{variable.getName(), sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
 
         try {
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
@@ -277,10 +308,15 @@ public class CdfUtil {
                     odata= cdf.get1D( variable.getName(), true );
                 }
             } else {
-                int[] stride= new int[dims+1];
-                for ( int i=0; i<dims+1; i++ ) stride[i]= 1;
-                stride[0]= (int)recInterval;
-                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+rc*recInterval), stride ); 
+                if ( variable.getType()==CDFConstants.CDF_TT2000 ) { //TODO: other types like Long64?
+                    odata= cdf.get1D( variable.getName(), true );
+                    odata= subsampleTT2000( (long[])odata, (int)recStart, (int)recCount, (int)recInterval );
+                } else {
+                    int[] stride= new int[dims+1];
+                    for ( int i=0; i<dims+1; i++ ) stride[i]= 1;
+                    stride[0]= (int)recInterval;
+                    odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+rc*recInterval), stride );
+                }
 //                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+(rc-1)*recInterval), stride ); //TODO: I think an extra record is extracted.  Try this with stride sometime.
             }
         } catch ( Throwable ex ) {
