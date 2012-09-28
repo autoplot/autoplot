@@ -56,8 +56,7 @@ public class AutoplotDataServer {
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
     public AutoplotDataServer() {
-        logger.setLevel(Level.ALL);
-        LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
+        throw new IllegalArgumentException("AutoplotDataServer should not be instantiated");
     }
 
     private static void formatD2S( QDataSet data, OutputStream fo, boolean ascii) {
@@ -159,8 +158,6 @@ public class AutoplotDataServer {
     public static void main(String[] args) throws Exception {
 
         long t0= System.currentTimeMillis();
-
-     //logger.setLevel(Level.ALL);
 
         System.err.println("org.virbo.autoplot.AutoplotDataServer 20120922 " + APSplash.getVersion() );
 
