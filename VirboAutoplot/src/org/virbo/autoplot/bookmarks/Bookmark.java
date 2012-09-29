@@ -200,7 +200,7 @@ public abstract class Bookmark {
                     if ( fd instanceof WebFileSystem ) {
                         offline= ((WebFileSystem)fd).isOffline();
                     }
-                    logger.fine("  offline: "+offline );
+                    logger.log(Level.FINE, "  offline: {0}", offline);
                     FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
                     if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
                         fo= fd.getFileObject( fo.getNameExt()+".gz" );
@@ -212,15 +212,15 @@ public abstract class Bookmark {
                             in= fo.getInputStream();
                         }
                     }
-                    logger.fine("remoteUrl="+remoteUrl);
+                    logger.log(Level.FINE, "remoteUrl={0}", remoteUrl);
 
                 } else {
-                    logger.fine("Using downloadResourceAsTempFile route"+rurl);
+                    logger.log(Level.FINE, "Using downloadResourceAsTempFile route: {0}", rurl);
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
                     logger.fine("  got it...");
                 }
             } catch ( URISyntaxException ex ) {
-                logger.fine("fall back to Using downloadResourceAsTempFile route"+rurl);
+                logger.log(Level.FINE, "fall back to Using downloadResourceAsTempFile route: {0}", rurl);
                 in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
                 logger.fine("  got it...");
             }
@@ -235,7 +235,7 @@ public abstract class Bookmark {
             String sin= new String( boas.toByteArray() );
 
             if ( !sin.startsWith("<book") && !sin.startsWith("<?xml") ) {
-                logger.warning("not a bookmark xml file: "+rurl );
+                logger.log(Level.WARNING, "not a bookmark xml file: {0}", rurl);
                 throw new IllegalArgumentException("not a bookmark xml file: "+rurl );
             }
 
@@ -491,12 +491,12 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
-                        logger.fine("get remote bookmarks: "+remoteUrl );
+                        logger.log(Level.FINE, "get remote bookmarks: {0}", remoteUrl);
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
-                        logger.fine("   got remote bookmarks "+remoteUrl );
+                        logger.log(Level.FINE, "   got remote bookmarks {0}", remoteUrl);
 
                         if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
-                            logger.warning("unable to parse bookmarks at "+remoteUrl);
+                            logger.log(Level.WARNING, "unable to parse bookmarks at {0}", remoteUrl);
                             logger.fine("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
                             remoteStatusMsg= contents.get(0).getDescription();
