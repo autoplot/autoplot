@@ -1462,11 +1462,7 @@ public class AutoplotUtil {
         }
 
         if ( fillds.rank()==2 ) {
-            QDataSet xds= (QDataSet) fillds.property(QDataSet.DEPEND_0);
-            Units xunits= SemanticOps.getUnits(xds);
-            QDataSet xoffsets= (QDataSet) fillds.property(QDataSet.DEPEND_1);
-            Units xoffsetunits= SemanticOps.getUnits(xoffsets);
-            if ( xoffsets!=Units.dimensionless && xoffsetunits.isConvertableTo(xunits.getOffsetUnits()) ) {
+            if ( SemanticOps.isRank2Waveform(fillds) ) {
                 return RenderType.hugeScatter;
             }
         }
