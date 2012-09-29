@@ -183,7 +183,9 @@ public abstract class Bookmark {
         boolean offline= false;
 
         RemoteStatus result= new RemoteStatus();
-        
+        logger.log(Level.FINE, "getRemoteBookmarks({0},...)", remoteUrl);
+        logger.log(Level.FINEST, "  remoteLevel={0}  startAtRoot={1}", new Object[] { remoteLevel, startAtRoot } );
+
         try {
             URL rurl= new URL(remoteUrl);
   
@@ -207,17 +209,18 @@ public abstract class Bookmark {
                         in= new GZIPInputStream( fo.getInputStream() );
                     } else {
                         if ( remoteUrl.endsWith(".gz" ) ) {
+                            logger.fine("bookmarks stream is uncompressed because of .gz");
                             in= new GZIPInputStream( fo.getInputStream() );
                         } else {
                             in= fo.getInputStream();
                         }
                     }
-                    logger.log(Level.FINE, "remoteUrl={0}", remoteUrl);
 
                 } else {
-                    logger.log(Level.FINE, "Using downloadResourceAsTempFile route: {0}", rurl);
+                    logger.log(Level.FINE, "Using downloadResourceAsTempFile route.  Files are cached for up to 3600 seconds" );
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
                     if (  remoteUrl.endsWith(".gz" ) ) {
+                        logger.fine("bookmarks stream is uncompressed because of .gz");
                         in= new GZIPInputStream( in );
                     }
                     logger.fine("  got it...");
@@ -324,6 +327,8 @@ public abstract class Bookmark {
         result.depth= remoteLevel;
         result.remoteRemote= remoteRemote;
         result.status= offline ? Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL : Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+
+        logger.log( Level.FINE, "{0}", result);
         return result;
     }
 
@@ -494,10 +499,8 @@ public abstract class Bookmark {
 
                         contents= new ArrayList();
 
-                        logger.log(Level.FINE, "get remote bookmarks: {0}", remoteUrl);
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
-                        logger.log(Level.FINE, "   got remote bookmarks {0}", remoteUrl);
-
+                        
                         if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
                             logger.log(Level.WARNING, "unable to parse bookmarks at {0}", remoteUrl);
                             logger.fine("Maybe using local copy");
