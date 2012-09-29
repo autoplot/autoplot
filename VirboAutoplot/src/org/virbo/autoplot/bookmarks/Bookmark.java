@@ -217,6 +217,9 @@ public abstract class Bookmark {
                 } else {
                     logger.log(Level.FINE, "Using downloadResourceAsTempFile route: {0}", rurl);
                     in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
+                    if (  remoteUrl.endsWith(".gz" ) ) {
+                        in= new GZIPInputStream( in );
+                    }
                     logger.fine("  got it...");
                 }
             } catch ( URISyntaxException ex ) {
