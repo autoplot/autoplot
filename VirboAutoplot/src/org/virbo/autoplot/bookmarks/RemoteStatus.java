@@ -15,4 +15,8 @@ public class RemoteStatus {
     int status;  // Bookmark.Folder.REMOTE_STATUS_*
     String statusMsg="";
     boolean remoteRemote; // true indicates there are more remote bookmarks to load in.
+    @Override
+    public String toString() {
+        return String.format( "status=%d %s", status, remoteRemote ? "unresolvedRemote":"resolvedRemote" );
+    }
 }
