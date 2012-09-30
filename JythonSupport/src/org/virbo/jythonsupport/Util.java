@@ -20,6 +20,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -40,7 +41,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class Util {
 
-    private static final Logger logger= Logger.getLogger("jython");
+    private static final Logger logger= LoggerManager.getLogger("jython");
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
