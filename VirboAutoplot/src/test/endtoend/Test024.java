@@ -234,7 +234,7 @@ public class Test024 {
             test6();
             test7();
             checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
-            checkAPDS( "vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
+            checkAPDS( "vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
 
             testGuessNameFor();
 

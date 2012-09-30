@@ -133,9 +133,9 @@ public class Test018 {
         System.err.println("=== test018 test5 ===");
         reset();
         Application dom = getDocumentModel();
-        plot( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
+        plot( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
         dom.getController().getPlot().getXaxis().setRange( dom.getController().getPlot().getXaxis().getRange().next() );
-        plot( 1, "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000110" );
+        plot( 1, "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000110" );
         dom.getController().getPlot().getXaxis().setRange( dom.getController().getPlot().getXaxis().getRange().next() ); // are they bound?
         writeToPng(testId + "_005.png");
     }

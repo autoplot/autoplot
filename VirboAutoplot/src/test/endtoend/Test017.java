@@ -118,7 +118,7 @@ public class Test017 {
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
         "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
         //No data is drawn:
-        "011 vap:ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
+        "011 ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
         "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
         //Suspect problem identifying valid data: "" +
@@ -134,7 +134,7 @@ public class Test017 {
         //This is described in bug https://sourceforge.net/tracker2/index.php?func=detail&aid=2620088&group_id=199733&atid=970682",
 
         //No data is displayed:
-        "016 vap:ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
+        "016 ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
 
         //Vectors plotted as spectrogram:
         "017 ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
@@ -180,7 +180,7 @@ public class Test017 {
         "029 http://wind.nasa.gov/swe_apbimax/wi_swe_fc_apbimax.2001017.txt?column=field2&comment=;&time=field0&timeFormat=$Y+$j",
         //"Value must not be negative". No feedback on line number:
 
-        "030 vap:http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S",
+        "030 http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S",
         //From VHO:
 
         "031 ftp://nis-ftp.lanl.gov/pub/projects/genesis/3dmom/gim-3dl2-2002-01_v02.txt?skip=68&time=field0&timeFormat=$Y+$j+$H+$M+$S&column=field8&fill=-9999.0",
@@ -220,7 +220,7 @@ public class Test017 {
 
         //The Time parameter is irregular:
 
-        "041 vap:file:///media/mini/data.backup/examples/xls/2008-lion%20and%20tiger%20summary.xls?sheet=Samantha+tiger+lp+lofreq&column=Elastic_Modulus&firstRow=53&depend0=Time",
+        "041 file:///media/mini/data.backup/examples/xls/2008-lion%20and%20tiger%20summary.xls?sheet=Samantha+tiger+lp+lofreq&column=Elastic_Modulus&firstRow=53&depend0=Time",
         //[edit] 12 Issues with URIs
 
         //It would be nice to support plus notation with excel spreadsheets. Also, this shows an issue with the excel data source which
@@ -246,9 +246,9 @@ public class Test017 {
         //"046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
 
         //vaps with modifiers and recent ISO8601 parsing.
-        "050 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
-        "051 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
-        "052 vap:file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
+        "050 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
+        "051 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
+        "052 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
 
         // these are known to cause faults
         "100 file:///home/jbf/ct/hudson/data/csv/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1

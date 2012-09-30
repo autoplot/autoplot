@@ -126,7 +126,7 @@ public class Test014 {
             ds= (QDataSet) ds.property( QDataSet.DEPEND_1 );
             doTest( 6, "depend 1 of vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds );
 
-            ds= Util.getDataSet( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX" );
+            ds= Util.getDataSet( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX" );
             ds= DataSetOps.slice0(ds, 10);
             doTest( 4, "slice of Hydra DEF", ds );
 
@@ -134,8 +134,8 @@ public class Test014 {
             QDataSet ant= Util.getDataSet( "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?ANTENNA[::1090]" );
             QDataSet r= Ops.where( Ops.eq( ant, DataSetUtil.asDataSet(2) ) );
             ds= DataSetOps.applyIndex( ds, 0, r, true );
-            doTest( 0, "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]", ds );
-            doTest( 1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?F1_Average_B_15s", null );
+            doTest( 0, "file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]", ds );
+            doTest( 1, "file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?F1_Average_B_15s", null );
             doTest( 2, "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency", null );
             doTest( 3, "file:/home/jbf/ct/hudson/data.backup/dat/cl_ttag_study.dat?column=field0", null );
             doTest( 5, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt", null );

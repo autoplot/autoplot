@@ -55,21 +55,21 @@ public class Test002 {
 
     private static void testVaps() throws Exception {
         String[] uris = new String[]{
-            "000 file:///home/jbf/ct/hudson/vap/lon/thb_l2_esa_20080907_electrons_less.vap",
-            "001 file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap",
-            "002 file:///home/jbf/ct/autoplot/demos/cdaweb/ISS_DOSANL_TEPC_2_burst.vap",
-            "003 file:///home/jbf/ct/hudson/vap/hydra4.vap",
-            "004 file:///home/jbf/ct/hudson/vap/autoSlice.vap", // legacy vap shows adapt slice
-            "005 file:///home/jbf/ct/hudson/vap/jon-test_v1_07.vap",
-            "006 file:///home/jbf/ct/hudson/vap/omni_1978_v1_07.vap",
-            //mem "007 file:///home/jbf/ct/hudson/vap/Cluster1_HEEA_slices.vap",
-            "008 file:///home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
-            "009 file:///home/jbf/ct/hudson/vap/ninePanels.vap",
+            "000 file:///Users/jbf/ct/hudson/vap/lon/thb_l2_esa_20080907_electrons_less.vap",
+            "001 file:///Users/jbf/ct/hudson/vap/energyCompareHydra.vap",
+            ///"002 file:///home/jbf/ct/autoplot/demos/cdaweb/ISS_DOSANL_TEPC_2_burst.vap",
+            "003 file:///Users/jbf/ct/hudson/vap/hydra4.vap",
+            "004 file:///Users/jbf/ct/hudson/vap/autoSlice.vap", // legacy vap shows adapt slice
+            "005 file:///Users/jbf/ct/hudson/vap/jon-test_v1_07.vap",
+            "006 file:///Users/jbf/ct/hudson/vap/omni_1978_v1_07.vap",
+            //mem "007 file:///Users/jbf/ct/hudsonvap/Cluster1_HEEA_slices.vap",
+            "008 file:///Users/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
+            "009 file:///Users/jbf/ct/hudson/vap/ninePanels.vap",
             "010 http://autoplot.org/data/autoplot-applet.vap",
             "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.v1_07.vap",
             "012 file:///home/jbf/ct/hudson/vap/cassini_kp.vap", // das2Server
             "013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
-         //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudson/vap/garageTemps_v1_07.vap",
+         //TODO: why does this rerange?   "014 file:///Users/jbf/ct/hudsonvap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
             "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
             "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
@@ -109,7 +109,7 @@ public class Test002 {
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
 
-        QDataSet ds = Util.getDataSet("file:///home/jbf/ct/hudson/data.backup/wav/fireworks.wav");
+        QDataSet ds = Util.getDataSet("file:///Users/jbf/ct/hudson/data.backup/wav/fireworks.wav");
         final Application dom = ScriptContext.getDocumentModel();
         dom.getCanvases(0).setFitted(false);
         ScriptContext.setCanvasSize(400, 800);

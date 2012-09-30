@@ -47,7 +47,7 @@ public class Test005 {
             xxx("demo1");
 
             {
-                plot("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
+                plot("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
                 Axis axis = getDocumentModel().getPlots(0).getXaxis();
                 axis.setRange(DatumRangeUtil.rescale(axis.getRange(), -1, 2));
                 writeToPng("test005_demo2.png");

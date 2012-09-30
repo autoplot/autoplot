@@ -60,7 +60,7 @@ public class Test003 {
             //ScriptContext.writeToPng( "test003_007.png" );
             
             ScriptContext.reset();
-            ScriptContext.load( "http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/mea/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15" );
+            ScriptContext.load( "http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/particle_mea/mea_h0_cdaweb/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15" );
             ScriptContext.writeToPng( "test003_008.png" );
 
             if ( headless ) System.exit(0);

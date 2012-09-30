@@ -4,7 +4,6 @@
  */
 package test.endtoend;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -56,14 +55,14 @@ public class Test025 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            doTest( 0, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds1" );
-            doTest( 1, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds2" );
+            doTest( 0, "file:///Users/jbf/ct/hudson/jyds/test025_000.jyds?ds1" );
+            doTest( 1, "file:///Users/jbf/ct/hudson/jyds/test025_000.jyds?ds2" );
             setCanvasSize(500,500);
-            doTest( 2, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?yy" );
-            doTest( 3, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?zz" );
-            doTest( 4, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?zz2" );
+            doTest( 2, "file:///Users/jbf/ct/hudson/jyds/lambda.jyds?yy" );
+            doTest( 3, "file:///Users/jbf/ct/hudson/jyds/lambda.jyds?zz" );
+            doTest( 4, "file:///Users/jbf/ct/hudson/jyds/lambda.jyds?zz2" );
             doTest( 5, "http://autoplot.org/data/imageDiff.jyds" );
-            doTest( 6, "file:///home/jbf/ct/hudson/jyds/test025_001.jyds?ds2");
+            doTest( 6, "file:///Users/jbf/ct/hudson/jyds/test025_001.jyds?ds2");
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();

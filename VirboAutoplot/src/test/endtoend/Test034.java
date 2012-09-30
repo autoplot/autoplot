@@ -6,11 +6,6 @@
 package test.endtoend;
 
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.dom.PlotController;
-import java.util.logging.Logger;
-import java.beans.PropertyChangeEvent;
-import org.virbo.autoplot.dom.Axis;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.logging.Level;
 import org.das2.datum.DatumRangeUtil;
@@ -26,8 +21,8 @@ import static org.virbo.autoplot.ScriptContext.*;
  */
 public class Test034 {
 
-    private final static String tsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109";
-    private final static String noTsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
+    private final static String tsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109";
+    private final static String noTsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
 
     private static void test001() throws Exception {
         reset();
