@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
@@ -29,9 +30,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
-import org.python.core.PyTuple;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetURI;
@@ -42,7 +41,7 @@ import org.virbo.datasource.DataSetURI;
  */
 public class JythonUtil {
 
-    private static final Logger logger= Logger.getLogger("jython");
+    private static final Logger logger= LoggerManager.getLogger("jython");
 
     /**
      * create an interpretter object configured for Autoplot contexts:
