@@ -30,6 +30,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import org.das2.util.DasExceptionHandler;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
@@ -42,6 +43,8 @@ import org.virbo.datasource.FileSystemUtil;
  */
 public class ScriptPanelSupport {
 
+    private static final Logger logger= LoggerManager.getLogger("jython.editor");
+    
     private EditorTextPane editor;
     private final EditorAnnotationsSupport annotationsSupport;
     private JLabel fileNameLabel;
@@ -136,6 +139,7 @@ public class ScriptPanelSupport {
     }
 
     public void loadFile(File file) throws IOException, FileNotFoundException {
+        logger.log(Level.FINE, "loadFile({0})", file);
         InputStream r= new FileInputStream(file);
         loadInputStream( r );
         setFile(file);
@@ -184,12 +188,12 @@ public class ScriptPanelSupport {
      */
     private void annotateError(PyException ex, int offset) throws BadLocationException {
         if (ex instanceof PySyntaxError) {
-            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString());
         } else {
-            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString());
         }
     }

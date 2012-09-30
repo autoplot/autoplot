@@ -22,6 +22,8 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
@@ -32,6 +34,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import org.das2.util.LoggerManager;
 import org.python.core.PyObject;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
@@ -41,7 +44,11 @@ import org.virbo.qstream.StreamException;
  * @author jbf
  */
 public class EditorTextPane extends JEditorPane {
-    
+
+    private static final Logger logger= LoggerManager.getLogger("jython.editor");
+
+    private static final String PROP_FONT= "font";
+
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
     public EditorTextPane() {
@@ -84,6 +91,11 @@ public class EditorTextPane extends JEditorPane {
                setFont( f.deriveFont( Math.max( 4, size - step ) ) );
             }
         } );
+
+        Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
+
+        String sfont= prefs.get( PROP_FONT, "monospaced" );
+        setFont( Font.decode(sfont) );
 
         Toolkit tk= Toolkit.getDefaultToolkit();
 
@@ -140,13 +152,13 @@ public class EditorTextPane extends JEditorPane {
                     out.write( ( cmd + "\n").getBytes() );
                     out.close();
                 } catch (StreamException ex) {
-                    Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     if ( ex instanceof ConnectException ) {
                         JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
                         return;
                     }
-                    Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
 
             } else {
@@ -185,4 +197,18 @@ public class EditorTextPane extends JEditorPane {
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public void setFont(Font font) {
+        super.setFont(font);
+        Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
+        prefs.put( PROP_FONT, font.getFontName() );
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+    }
+
 }
