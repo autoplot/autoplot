@@ -126,6 +126,7 @@ public class EditorAnnotationsSupport {
 
     /**
      * highlite the line by setting the background to color.  null clears the highlite.
+     * TODO: with JythonSyntaxPane, this prevents selections from being seen.  Fix this.
      * @param line, the line number to highlite.  1 is the first line.
      * @param name, the name of the style, including "error" and "programCounter"
      * @param text, annotation to display when hovering. Currently ignored.
@@ -158,8 +159,6 @@ public class EditorAnnotationsSupport {
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-
-                Document doc = editorPanel.getDocument();
 
                 SimpleMarker mark;
                 if ( name.equals(ANNO_WARNING) ) {
