@@ -40,7 +40,9 @@ import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
 
 /**
- *
+ * Special editor for Jython scripts, adding undo and redo actions, bigger/smaller
+ * keystrokes and the action "plot."  A property "font" is managed as well, which
+ * was introduced when the jython mode in the jsyntaxpane editor was using a poor choice.
  * @author jbf
  */
 public class EditorTextPane extends JEditorPane {
