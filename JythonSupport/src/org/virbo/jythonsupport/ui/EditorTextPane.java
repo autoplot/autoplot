@@ -47,7 +47,7 @@ public class EditorTextPane extends JEditorPane {
 
     private static final Logger logger= LoggerManager.getLogger("jython.editor");
 
-    private static final String PROP_FONT= "font";
+    protected static final String PROP_FONT= "font";
 
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
@@ -94,9 +94,6 @@ public class EditorTextPane extends JEditorPane {
 
         Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
 
-        String sfont= prefs.get( PROP_FONT, "monospaced" );
-        setFont( Font.decode(sfont) );
-
         Toolkit tk= Toolkit.getDefaultToolkit();
 
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
@@ -112,8 +109,11 @@ public class EditorTextPane extends JEditorPane {
         getDocument().addUndoableEditListener(undo);
         if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
         
+        String sf= prefs.get( PROP_FONT, "monospaced" );
+        setFont( Font.decode(sf) );
         
             }
+
         };
         SwingUtilities.invokeLater(run);
 
@@ -201,14 +201,6 @@ public class EditorTextPane extends JEditorPane {
     @Override
     public void setFont(Font font) {
         super.setFont(font);
-        Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
-        prefs.put( PROP_FONT, font.getFontName() );
-        try {
-            prefs.flush();
-        } catch (BackingStoreException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-
     }
 
 }
