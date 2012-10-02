@@ -217,14 +217,18 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         AudioFormat outDataFormat;
         if ( data.rank()==1 ) {
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, (int) 1, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
         } else if ( data.rank()==2 ) {
-            fieldsPerFrame= (int) data.length(0);
-            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, fieldsPerFrame, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+            if ( SemanticOps.isRank2Waveform(data) ) {
+            } else {
+                fieldsPerFrame= (int) data.length(0);
+            }
         } else {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
         
+        outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, fieldsPerFrame, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+
+
         ByteBuffer buf;
         if ( data.rank()==1 ) {
             buf= formatRank1(data, new NullProgressMonitor(), params2);
