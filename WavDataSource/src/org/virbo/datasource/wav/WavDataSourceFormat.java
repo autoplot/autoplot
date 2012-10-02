@@ -75,6 +75,50 @@ public class WavDataSourceFormat implements DataSourceFormat {
         return result;
     }
 
+    private ByteBuffer formatRank2Waveform(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
+
+        String type = params.get("type");
+
+        if ( !DataSetUtil.isQube(data) ) {
+            throw new IllegalArgumentException("data must be qube");
+        }
+        QDataSet extent= Ops.extent(data);
+        int dep0Len = 0; //(dep0 == null ? 0 : 1);
+        int typeSize = BufferDataSet.byteCount(type);
+        int recSize = typeSize * (dep0Len + 1);
+        int size = data.length() * data.length(0) * recSize;
+
+        ByteBuffer result = ByteBuffer.allocate(size);
+        result.order("big".equals(params.get("byteOrder")) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+
+        BufferDataSet ddata = BufferDataSet.makeDataSet(1,
+                recSize, dep0Len * typeSize,
+                data.length() * data.length(0), 1, 1, 1,
+                result, type);
+
+        double shift= 0;
+        int limit= type.equals("short") ? 32768 : 65536;
+        if ( extent.value(1)>limit ) {
+            if ( ( extent.value(1)-extent.value(0) ) < 65536 ) {
+                if ( extent.value(0)>0 ) {
+                    shift= 32768;
+                } else {
+                    shift= ( extent.value(1)+extent.value(0) ) / 2;
+                }
+            } else {
+                throw new IllegalArgumentException("data extent is too great: "+extent);
+            }
+        }
+
+        QubeDataSetIterator it = new QubeDataSetIterator(data);
+        while (it.hasNext()) {
+            it.next();
+            it.putValue(ddata, it.getValue(data)-shift );
+        }
+
+        return result;
+    }
+
     /**
      * @param data
      * @param mon
@@ -183,7 +227,11 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( data.rank()==1 ) {
             buf= formatRank1(data, new NullProgressMonitor(), params2);
         } else if ( data.rank()==2 ) {
-            buf= formatRank2(data, new NullProgressMonitor(), params2);
+            if ( SemanticOps.isRank2Waveform(data) ) {
+                buf= formatRank2Waveform( data, new NullProgressMonitor(), params2 );
+            } else {
+                buf= formatRank2(data, new NullProgressMonitor(), params2);
+            }
         } else {
             throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
