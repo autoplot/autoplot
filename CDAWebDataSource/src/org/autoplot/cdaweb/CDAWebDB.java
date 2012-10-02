@@ -362,7 +362,7 @@ public class CDAWebDB {
     }
 
     public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
-        String master= "http://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
+        String master= "http://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
         //DasProgressPanel p= DasProgressPanel.createFramed("loading master cdf");
         p.setProgressMessage("loading master cdf");
