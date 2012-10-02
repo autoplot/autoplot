@@ -437,8 +437,13 @@ public class PlotElementController extends DomNodeController {
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
                 synchronized (this) {
-                    if ( c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
-                        logger.log(Level.FINE, "using cached dataset for {0}", procressStr);
+                    // Bug 3573900: turn off caching for now.
+                    if ( false && c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
+                        if ( logger.isLoggable( Level.FINE ) ) {
+                            QDataSet bounds= DataSetOps.dependBounds(fillDs);
+                            logger.log(Level.FINE, "using cached dataset for {0} bounds:{1}", new Object[] { procressStr, bounds.slice(0) } );
+                        }
+                        
                         fillDs= this.processDataSet;
                     } else {
                         this.processDataSet= null;
