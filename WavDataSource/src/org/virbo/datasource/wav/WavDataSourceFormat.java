@@ -111,9 +111,11 @@ public class WavDataSourceFormat implements DataSourceFormat {
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
+        QubeDataSetIterator it2= new QubeDataSetIterator(ddata);
         while (it.hasNext()) {
             it.next();
-            it.putValue(ddata, it.getValue(data)-shift );
+            it2.next();
+            it2.putValue(ddata, it.getValue(data)-shift );
         }
 
         return result;
