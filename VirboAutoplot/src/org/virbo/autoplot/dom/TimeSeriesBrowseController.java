@@ -173,7 +173,9 @@ public class TimeSeriesBrowseController {
                     } else {
                         this.plot.getXAxis().resetRange(tr);
                     }
-                    this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( dsf.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
+                    if ( !this.plot.getXAxis().getLabel().contains("%{RANGE}") ) {
+                        this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( dsf.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
+                    }
                     this.domPlot.getXaxis().setAutoRange(true); // need to turn it back on because resetRange
                     this.plot.getXAxis().setScanRange(null);
                 }
