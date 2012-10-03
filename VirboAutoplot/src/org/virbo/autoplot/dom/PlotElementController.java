@@ -72,6 +72,8 @@ import org.virbo.metatree.MetadataUtil;
  */
 public class PlotElementController extends DomNodeController {
 
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.pec" );
+
     private static final String PENDING_RESET_RANGE = "resetRanges";
     private static final String PENDING_SET_DATASET= "setDataSet";
     private static final String PENDING_COMPONENT_OP= "componentOp";
@@ -391,9 +393,6 @@ public class PlotElementController extends DomNodeController {
     private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, Exception {
         String label= null;
         c= c.trim();
-        if ( c.length()>0 && c.startsWith("|slice1(31)|slice1(31)") ) {
-            logger.fine("something is horribly wrong...  See sftp://jbf@papco.org/home/jbf/uploads/rte_1760330581_20120815_113557_jbf.xml");
-        }
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
             if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
                 String[] labels = SemanticOps.getComponentNames(fillDs);
@@ -437,10 +436,9 @@ public class PlotElementController extends DomNodeController {
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
                 synchronized (this) {
-                    // Bug 3573900: turn off caching for now.
-                    if ( false && c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
+                    if ( c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
                         if ( logger.isLoggable( Level.FINE ) ) {
-                            QDataSet bounds= DataSetOps.dependBounds(fillDs);
+                            QDataSet bounds= DataSetOps.dependBounds( this.processDataSet );
                             logger.log(Level.FINE, "using cached dataset for {0} bounds:{1}", new Object[] { procressStr, bounds.slice(0) } );
                         }
                         
@@ -680,6 +678,8 @@ public class PlotElementController extends DomNodeController {
                     processDataSet= null;
                     procressStr= null;
                     setResetComponent(false);
+                } else {
+                    processDataSet= null;
                 }
                 updateDataSet();
             } finally {
