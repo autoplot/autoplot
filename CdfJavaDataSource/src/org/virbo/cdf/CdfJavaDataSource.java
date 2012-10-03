@@ -258,9 +258,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
 
             MutablePropertyDataSet result;
-            if ( attr1!=null && attr1.containsKey("VIRTUAL") && attr1.containsKey("FUNCTION") ) {
+            if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
                 List<QDataSet> attr= new ArrayList();
                 String function= (String)attr1.get("FUNCTION");
+                if ( function==null ) function= (String)attr1.get("FUNCT");
                 if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, mon ) );
                 if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, mon ) );
                 if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, mon ) );
@@ -438,8 +439,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
         if ( mon==null ) mon= new NullProgressMonitor();
 
         if (numRec == 0) {
-            if (thisAttributes.containsKey("COMPONENT_0")) {
-                String funct= (String)thisAttributes.get("FUNCT");
+            String funct= (String)thisAttributes.get("FUNCT");
+            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.equals("comp_themis_epoch" )) {
                 // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
                 // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
                 // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
