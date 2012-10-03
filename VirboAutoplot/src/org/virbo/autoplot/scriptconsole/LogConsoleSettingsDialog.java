@@ -100,19 +100,26 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 			//We just need to handle null as a special case
 			if (value == null) {
 				Logger anscestor = logger;
-				do {
-					anscestor = anscestor.getParent();
-					value = anscestor.getLevel();
-				} while (value == null);
-				value = "INHERITED(" + value + ")";
+                                if ( logger.getParent()==null ) { // root logger.
+                                    value= logger.getLevel();
+                                } else {
+                                    do {
+                                            anscestor = anscestor.getParent();
+                                            if ( anscestor==null ) {
+                                                System.err.println("here");
+                                            }
+                                            value = anscestor.getLevel();
+                                    } while (value == null);
+                                    value = "INHERITED(" + value + ")";
 
 
-				if (component != null) {
-					String name = anscestor.getName();
-					if (name.equals(""))
-						name = "<anonymous>";
-					component.setToolTipText("inherited from " + name);
-				}
+                                    if (component != null) {
+                                            String name = anscestor.getName();
+                                            if (name.equals(""))
+                                                    name = "<anonymous>";
+                                            component.setToolTipText("inherited from " + name);
+                                    }
+                                }
 			}
 			else {
 				((JComponent)delegate).setToolTipText(null);
@@ -129,6 +136,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         setTitle("Log Console Settings");
         initComponents();
         initLogSettings();
+        verbosityPanel.validate();
         this.console= console;
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
     }
