@@ -250,7 +250,6 @@ public class PlotElementController extends DomNodeController {
                     if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
                 }
                 if ( sliceAutoranges ) {
-                    setResetPlotElement(true);
                     setResetRanges(true);
                     if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
                 }
@@ -1379,6 +1378,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     public void setResetPlotElement(boolean resetPlotElement) {
+        logger.log(Level.FINEST, "setResetPlotElement({0})", resetPlotElement);
         boolean old = this.resetPlotElement;
         this.resetPlotElement = resetPlotElement;
         propertyChangeSupport.firePropertyChange(PROP_RESETPLOTELEMENT, old, resetPlotElement);
