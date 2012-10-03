@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import org.virbo.datasource.AutoplotSettings;
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +23,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
@@ -60,6 +62,7 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
+import org.das2.event.DasUpdateEvent;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
@@ -890,6 +893,16 @@ public class ApplicationModel {
 
         if ( getCanvas().getWidth()==0 ) {
             return null;
+        }
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            throw new IllegalStateException( "must not be called on the EventQueue");
+        }
+
+        AWTEvent ev= Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent(DasUpdateEvent.DAS_UPDATE_EVENT_ID);
+        if ( ev!=null ) {
+            logger.fine("bug 3574147: not getting thumbnail, because it would cause hang.");
+            return null; // bug 3574147
         }
 
         BufferedImage im= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
