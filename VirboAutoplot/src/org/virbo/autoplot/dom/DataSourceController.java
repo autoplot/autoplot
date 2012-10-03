@@ -61,6 +61,8 @@ import org.virbo.dsutil.AutoHistogram;
  */
 public class DataSourceController extends DomNodeController {
 
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.dsc" );
+
     DataSourceFilter dsf;
     private ApplicationModel model;
     private Application dom;
