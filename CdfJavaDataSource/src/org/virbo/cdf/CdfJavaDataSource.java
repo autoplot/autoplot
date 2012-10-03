@@ -440,12 +440,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         if (numRec == 0) {
             String funct= (String)thisAttributes.get("FUNCT");
-            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.equals("comp_themis_epoch" )) {
+            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" )) {
                 // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
                 // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
                 // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
                 QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false, null );
-                if ( funct!=null && funct.equals("comp_themis_epoch") && thisAttributes.containsKey("COMPONENT_1")) {
+                if ( thisAttributes.containsKey("COMPONENT_1")) {
                     QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false, null );
                     if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
                         c0 = DataSetOps.slice0(c0, 0);
