@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -115,7 +116,12 @@ public class JythonCompletionTask implements CompletionTask {
 
         interp = getInterpreter();
 
-        String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        String eval;
+        if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
+            eval= sanitizeLeaveImports( editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition())) );
+        } else {
+            eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        }
 
         //kludge to handle increase in indent level
         if (eval.endsWith(":\n")) {
@@ -346,6 +352,33 @@ public class JythonCompletionTask implements CompletionTask {
 
     }
 
+    /**
+     * return the imports for the python script.
+     * @param src
+     * @return
+     */
+    private static String sanitizeLeaveImports( String src ) {
+        StringBuilder buf= new StringBuilder();
+        BufferedReader read= new BufferedReader( new StringReader(src) );
+        try {
+            String s= read.readLine();
+            while ( s!=null ) {
+                if ( s.startsWith("from ") || s.startsWith("import ") ) {
+                    buf.append(s).append("\n");
+                }
+                s= read.readLine();
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.SEVERE, "", ex );
+        } finally {
+            try {
+                if ( read!=null ) read.close();
+            } catch ( IOException ex2 ) {
+            }
+        }
+        return buf.toString();
+    }
+
     private void queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
 
         String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
@@ -359,7 +392,7 @@ public class JythonCompletionTask implements CompletionTask {
 
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
-            eval= "";
+            eval= sanitizeLeaveImports( editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition())) );
         } else {
             eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         }
