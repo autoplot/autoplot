@@ -2976,13 +2976,13 @@ private void updateFrameTitle() {
                         String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                                 msg,
                                 "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
-                                new String[] { "New Window", "Replace", "Inspect" }, "Inspect" );
+                                new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                         if ( action!=null ) {
                             if (action.equals("Replace")) {
                                 app.dataSetSelector.setValue(url);
                                 app.dataSetSelector.maybePlot(false); // allow for completions
                                 raise= true;
-                            } else if (action.equals("Inspect")) {
+                            } else if (action.equals("Add Plot")) {
                                 app.dataSetSelector.setValue(url);
                                 app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
                                 raise= true;
