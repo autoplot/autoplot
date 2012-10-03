@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Twelve million points are rendered interactively with the new waveform QDataSet scheme.</small></p>
+        <p><small>Length mouse module picks off the period of this signal.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +22,10 @@
 
         <p>Bugfixes:</p>
         <ul>
-            <li>3573900: procedure shows bug in processed dataset caching. (Turn off caching for now.)</li>
+            <li>hugeScatter rank2 waveform handling assumed DEPEND_1 was set.  Use SemanticOps.isRank2Waveform instead.</li>
+            <li>3573900: procedure shows bug in processed dataset caching. (replaces earlier quick fix with correct fix.)</li>
+            <li>Ops.copy command would incorrectly create a qube from a non-qube.</li>
+            <li>3574147: avoid deadlock by checking for DasUpdateEvents in getThumbnail.</li>
             <li>skeleton files moved with the CDAWeb changes, causing problems for Bob's script.</li>
             <li>new jython editor was resetting the font to a poor choice on Jeremy's mac, this is now a configurable property</li>
             <li>gzipped remote bookmarks are loading again after code change for direct download.  Thanks Bob for pointing this out!</li>
