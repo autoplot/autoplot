@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>TimeDate xaxis labeller used when loading vap with emphemeris.</li>
+            <li>old kludgy code in CDF readers that would bring in themis timetags was messing up RBSP/EMFISIS virtual variables</li>
             <li>hugeScatter rank2 waveform handling assumed DEPEND_1 was set.  Use SemanticOps.isRank2Waveform instead.</li>
             <li>3573900: procedure shows bug in processed dataset caching. (replaces earlier quick fix with correct fix.)</li>
             <li>Ops.copy command would incorrectly create a qube from a non-qube.</li>
