@@ -379,7 +379,12 @@ public class DataSetURI {
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
-        if (factory == null && ( resourceUri.getScheme()!=null && resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https"))) { // get the mime type
+        if ( resourceUri==null ) {
+            // rte_1512402504_20121004_002144_sandberg.xml  I don't see how he was able to get here.
+            throw new NullPointerException("URI caused null pointer exception: "+uri );
+        }
+
+        if (factory == null && ( resourceUri.getScheme()!=null && ( resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https") ) ) ) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
             mon.started();
