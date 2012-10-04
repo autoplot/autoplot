@@ -44,15 +44,18 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
         if ( dep0!=null ) {
             Units dep0u= SemanticOps.getUnits(dep0);
+            Units targetUnits= SemanticOps.lookupUnits(su.replaceAll("_"," ").replaceAll("\\+"," "));
             UnitsConverter uc= UnitsConverter.IDENTITY;
             if ( UnitsUtil.isTimeLocation(dep0u) ) {
-                uc= UnitsConverter.getConverter(dep0u,SemanticOps.lookupUnits(su.replaceAll("_"," ")));
+                uc= UnitsConverter.getConverter(dep0u,targetUnits);
             }
             double[] dep0dd= new double[dep0.length()];
             for ( int i=0; i<dep0dd.length; i++ ) {
                 dep0dd[i]= uc.convert( dep0.value(i) );
             }
-            write.addVariable( Ops.guessName(dep0,"dep0"), dep0dd );
+            String dep0name= Ops.guessName(dep0,"dep0");
+            write.addVariable( dep0name, dep0dd );
+            //write.addVariable( dep0name+"__units", ""+targetUnits );
         }
 
 
