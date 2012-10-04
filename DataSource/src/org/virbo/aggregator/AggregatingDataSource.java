@@ -25,10 +25,13 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -42,6 +45,7 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsutil.DataSetBuilder;
 
 /**
  *
@@ -49,6 +53,11 @@ import org.virbo.datasource.capability.Updating;
  * @author jbf
  */
 public final class AggregatingDataSource extends AbstractDataSource {
+
+    private static final Logger logger= LoggerManager.getLogger("apdss.agg");
+
+    public static final String MSG_NO_FILES_FOUND = "No files in interval";
+
 
     private FileStorageModelNew fsm;
     DataSourceFactory delegateDataSourceFactory;
@@ -169,7 +178,38 @@ public final class AggregatingDataSource extends AbstractDataSource {
         
         String[] ss = getFsm().getBestNamesFor( viewRange, new NullProgressMonitor() );
 
-        Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, viewRange});
+        boolean avail= !getParam( "avail", "F" ).equals("F");
+
+        if ( avail ) {
+            logger.log(Level.FINE, "availablility {0} ", new Object[]{ viewRange});
+            DataSetBuilder build= new DataSetBuilder(2,ss.length,4);
+            Units u= Units.us2000;
+            EnumerationUnits eu= new EnumerationUnits("default");
+            for ( String s: ss ) {
+                DatumRange dr= getFsm().getRangeFor(s);
+                build.putValues( -1, DDataSet.wrap( new double[] { dr.min().doubleValue(u), dr.max().doubleValue(u), 0x80FF80, eu.createDatum(s).doubleValue(eu) } ), 4 );
+                build.nextRecord();
+            }
+            DDataSet result= build.getDataSet();
+
+            DDataSet bds= DDataSet.createRank2( 4, 0 );
+            bds.putProperty( "NAME__0", "StartTime" );
+            bds.putProperty( "UNITS__0", u );
+            bds.putProperty( "NAME__1", "StopTime" );
+            bds.putProperty( "UNITS__1", u );
+            bds.putProperty( "NAME__2", "Color" );
+            bds.putProperty( "NAME__3", "Filename" );
+            bds.putProperty( "UNITS__3", eu );
+
+            result.putProperty( QDataSet.BUNDLE_1, bds );
+
+            result.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
+
+            return result;
+            
+        }
+        
+        logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, viewRange});
 
         ArrayDataSet result = null;
         JoinDataSet altResult= null; // used when JoinDataSets are found
@@ -178,7 +218,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
                 throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
             } else {
-                throw new FileNotFoundException("No files in interval "+viewRange );
+                throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+viewRange );
             }
         }
         if (ss.length > 1) {
