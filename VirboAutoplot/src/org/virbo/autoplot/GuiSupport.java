@@ -42,6 +42,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -355,6 +356,7 @@ public class GuiSupport {
                 }
 //TODO: check extension.
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
+                Collections.sort(exts);
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
                 String currentFileString = prefs.get("ExportDataCurrentFile", "");
@@ -383,17 +385,16 @@ public class GuiSupport {
                         String name= edp.getFilenameTF().getText();
                         String ext = (String)edp.getFormatDL().getSelectedItem();
 
+                        if ( name.startsWith("file://") ) {
+                            name= name.substring(7);
+                        }
                         if ( name.startsWith("file:") ) {
                             name= name.substring(5);
                         }
-                        
-                        // mimic JChooser logic.
-                        File ff= new File(name);
-                        name= ff.getAbsolutePath();
 
-                        String s=  name;
-
-                        if ( !s.endsWith(ext) ) {
+                        URISplit split= URISplit.parse(name);
+                        if ( !split.file.endsWith(ext) ) {
+                            String s=  split.file;
                             boolean addExt= true;
                             for ( int i=0; i<exts.size(); i++  ) {
                                 if ( s.endsWith(exts.get(i)) ) {
@@ -402,9 +403,15 @@ public class GuiSupport {
                                 }
                             }
                             if ( addExt ) {
-                                s= s+ext;
+                                split.file= s+ext;
                             }
+                            name= URISplit.format(split);
                         }
+
+                        // mimic JChooser logic.
+                        File ff= new File(split.file);
+                        name= ff.getAbsolutePath();
+
 
                         if (ext == null) {
                             ext = "";
@@ -415,6 +422,8 @@ public class GuiSupport {
                             JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
                             return;
                         }
+                        
+                        String s= URISplit.format(split);
 
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
                         if ( opts!=null ) {
