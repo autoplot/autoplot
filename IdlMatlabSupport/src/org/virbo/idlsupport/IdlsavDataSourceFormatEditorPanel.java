@@ -41,11 +41,14 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
 
         jLabel1 = new javax.swing.JLabel();
         typeComboBox = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
 
         jLabel1.setText("Time Units:");
 
         typeComboBox.setEditable(true);
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "t1970", "t2000", "cdfTT2000", "seconds since 2010-02-03T00:00" }));
+
+        jLabel2.setText("Presently only 1-D data can be exported to IDLSav files.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -53,25 +56,31 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(typeComboBox, 0, 292, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(typeComboBox, 0, 292, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                .add(jLabel2)
+                .add(7, 7, 7)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addContainerGap(237, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 
