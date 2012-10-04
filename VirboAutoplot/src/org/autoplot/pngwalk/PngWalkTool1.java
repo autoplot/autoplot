@@ -760,66 +760,85 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                         seq.gotoSubrange(pendingGoto);
                         pendingGoto= null;
                     }
-                    
-                    List<String> urls = new ArrayList<String>();
-                    List<String> recent = dataSetSelector1.getRecent();
-                    recent.removeAll( Collections.singleton( seq.getTemplate() ) );
-                    for (String b : recent) {
-                        urls.add( b );
-                    }
-                    urls.add( seq.getTemplate() );
-                    dataSetSelector1.setRecent(urls);
 
-                    useRangeCheckBox.setEnabled(seq.getTimeSpan() != null);
-
-                    // always clear subrange on new sequence
-                    useRangeCheckBox.setSelected(false);
-                    editRangeButton.setEnabled(false);
-                    timeFilterTextField.setEnabled(false);
-                    timeFilterTextField.setText("");
-
-                    DatumRange tr=seq.currentImage().getDatumRange();
-                    if ( tr!=null ) setTimeRange( tr );
-                    
-                    showMissingCheckBox.setEnabled(seq.getTimeSpan() != null);
-                    if (seq.getTimeSpan() == null) {
-                        //Can't identify missing images if there's no date info in template
-                        showMissingCheckBox.setEnabled(false);
-                        showMissingCheckBox.setSelected(false);
-                    } else {
-                        seq.setShowMissing(showMissingCheckBox.isSelected());
-                    }
-                    for (PngWalkView v : views) {
-                        v.setSequence(seq);
-                    }
-                    if ( seq.size()==0 ) {
-                        setStatus("warning: Done listing "+seq.getTemplate()+", and no files were found");
-                    } else {
-                        indexListener.propertyChange( null );
-                        if (qcPanel != null ) {
-                            qcPanel.setWalkImageSequece(seq);
-                            if ( seq.getIndex()<seq.size() ) {
-                                if ( seq.getQualityControlSequence()!=null ) {
-                                    QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
-                                    qcPanel.displayRecord(rec);
-                                    int n[] = seq.getQualityControlSequence().getQCTotals();
-                                    qcPanel.setStatus(n[0], n[1], n[2], n[3]);
-                                }
-                            } else {
-                                qcPanel.setStatus(0,0,0,0);
-                            }
-                        }
-                    }
                 } catch (java.io.IOException e) {
                     // This probably means the template was invalid. Don't set new sequence.
                     if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
                     throw new RuntimeException(e);
                 }
+
+                SwingUtilities.invokeLater( new Runnable() {
+                    public void run() {
+                        updateInitialGui();
+                    }
+                });
+                
             }
+
         };
 
         new Thread(run).start();
 
+    }
+
+    /**
+     * initial settings to be performed on the event thread.
+     */
+    private void updateInitialGui() {
+        List<String> urls = new ArrayList<String>();
+        List<String> recent = dataSetSelector1.getRecent();
+        recent.removeAll( Collections.singleton( seq.getTemplate() ) );
+        for (String b : recent) {
+            urls.add( b );
+        }
+        urls.add( seq.getTemplate() );
+        dataSetSelector1.setRecent(urls);
+
+        useRangeCheckBox.setEnabled(seq.getTimeSpan() != null);
+
+        // always clear subrange on new sequence
+        useRangeCheckBox.setSelected(false);
+        editRangeButton.setEnabled(false);
+        timeFilterTextField.setEnabled(false);
+        timeFilterTextField.setText("");
+
+        if ( seq.size()==0 ) {
+            JOptionPane.showMessageDialog( this, "<html>Unable to find any images in sequence:<br>"+ seq.getTemplate() );
+            return;
+        }
+        
+        DatumRange tr=seq.currentImage().getDatumRange();
+        if ( tr!=null ) setTimeRange( tr );
+
+        showMissingCheckBox.setEnabled(seq.getTimeSpan() != null);
+        if (seq.getTimeSpan() == null) {
+            //Can't identify missing images if there's no date info in template
+            showMissingCheckBox.setEnabled(false);
+            showMissingCheckBox.setSelected(false);
+        } else {
+            seq.setShowMissing(showMissingCheckBox.isSelected());
+        }
+        for (PngWalkView v : views) {
+            v.setSequence(seq);
+        }
+        if ( seq.size()==0 ) {
+            setStatus("warning: Done listing "+seq.getTemplate()+", and no files were found");
+        } else {
+            indexListener.propertyChange( null );
+            if (qcPanel != null ) {
+                qcPanel.setWalkImageSequece(seq);
+                if ( seq.getIndex()<seq.size() ) {
+                    if ( seq.getQualityControlSequence()!=null ) {
+                        QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
+                        qcPanel.displayRecord(rec);
+                        int n[] = seq.getQualityControlSequence().getQCTotals();
+                        qcPanel.setStatus(n[0], n[1], n[2], n[3]);
+                    }
+                } else {
+                    qcPanel.setStatus(0,0,0,0);
+                }
+            }
+        }
     }
 
     public String getTemplate() {
