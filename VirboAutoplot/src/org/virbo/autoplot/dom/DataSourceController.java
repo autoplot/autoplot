@@ -1469,7 +1469,11 @@ public class DataSourceController extends DomNodeController {
                 setDataSet(null);
                 setStatus("warning: " + message);
                 String title= ex.getMessage().contains("No such file") ? "File not found" : ex.getMessage();
-                model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
+                if ( message.contains( org.virbo.aggregator.AggregatingDataSource.MSG_NO_FILES_FOUND ) ) {
+                    // this implies that there are files in other intervals, so don't have popup
+                } else {
+                    model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
+                }
             } else if ( ex.getMessage()!=null && ex.getMessage().contains("root does not exist") ) {  // bugfix 3053225
                 setException(ex);
                 setDataSet(null);
