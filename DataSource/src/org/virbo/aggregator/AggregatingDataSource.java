@@ -204,6 +204,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.BUNDLE_1, bds );
 
             result.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
+            result.putProperty( QDataSet.LABEL, "Availability");
+
+            URISplit split= URISplit.parse(getURI() );
+            result.putProperty( QDataSet.TITLE, split.file );
 
             return result;
             
