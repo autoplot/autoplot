@@ -2860,27 +2860,32 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
 };
 
 private void updateFrameTitle() {
-    String suri= applicationModel.getVapFile();
-    String title0= "Autoplot";
-    String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
+    final String suri= applicationModel.getVapFile();
+    final String title0= "Autoplot";
+    final String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
 
+    final String theTitle;
     if ( suri==null ) {
-        setTitle( title0 + isoffline );
+        theTitle=  title0 + isoffline;
     } else {
-
         URISplit split= URISplit.parse(suri);
 
         boolean dirty= undoRedoSupport.getDepth()>1;
         if ( split.path!=null && split.file!=null ) {
             String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
-            setTitle( titleStr + " - " + title0 + isoffline );
+            theTitle= titleStr + " - " + title0 + isoffline;
         } else {
             //I was seeing null pointer exceptions here--see rte_1590234331_20110328_153705_wsk.xml.  I suspect this is Windows.
-            System.err.println("Unable to get path from: "+suri );
-            setTitle( "???" + " - " + title0 + isoffline );
+            logger.log(Level.WARNING, "Unable to get path from: {0}", suri);
+            theTitle= "???" + " - " + title0 + isoffline;
         }
     }
-
+    Runnable run= new Runnable() {
+        public void run() {
+            setTitle( theTitle );
+        }
+    };
+    SwingUtilities.invokeLater(run);
 }
 
     /**
