@@ -380,10 +380,11 @@ public class DataSetURI {
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
         if ( resourceUri==null ) {
-            // rte_1512402504_20121004_002144_sandberg.xml  I don't see how he was able to get here.
+            // rte_1512402504_20121004_002144.xml  I don't see how he was able to get here.
             throw new NullPointerException("URI caused null pointer exception: "+uri );
         }
 
+        // rte_1512402504_20121004_002144.xml: actually I think it was the parens on the next expression.
         if (factory == null && ( resourceUri.getScheme()!=null && ( resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https") ) ) ) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
