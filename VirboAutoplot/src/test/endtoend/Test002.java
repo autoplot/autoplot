@@ -75,7 +75,7 @@ public class Test002 {
             "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
             "021 file:///home/jbf/ct/hudson/vap/auto4.v1_07.vap",
             "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
-
+            "023 file:///home/jbf/ct/hudson/vap/seth/multiScheme.vap ",
         };
 
 
