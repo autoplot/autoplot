@@ -8,6 +8,7 @@
  */
 package ftpfs;
 
+import java.net.SocketException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +61,18 @@ import org.virbo.datasource.DataSourceUtil;
 public class FTPBeanFileSystem extends WebFileSystem {
 
     private static final Logger logger= Logger.getLogger("das2.filesystem.ftp");
-    
+
+    protected FtpBean getFtpBean() {
+        FtpBean bean = new FtpBean();
+        try {
+            bean.setSocketTimeout(FileSystem.settings().getConnectTimeoutMs());
+        } catch (SocketException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        bean.setPassiveModeTransfer(true);
+        return bean;
+    }
+
     FTPBeanFileSystem(URI root) throws FileSystemOfflineException {
         super(root, userLocalRoot(root) );
         if ( FileSystem.settings().isOffline() ) {
@@ -385,8 +397,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 File listing = new File(localRoot, directory + ".listing");
                 File listingt = new File(localRoot, directory + ".listing.temp");
 
-                FtpBean bean = new FtpBean();
-                bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                FtpBean bean = getFtpBean();
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
@@ -465,8 +476,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
         String[] ss = FileSystem.splitUrl(url.toString());
 
         try {
-            FtpBean bean = new FtpBean();
-            bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
+            FtpBean bean = getFtpBean();
+
             String fname= ss[2].substring(ss[1].length()); // the name within the filesystem
 
             String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
@@ -562,8 +573,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
             boolean done= false;
             while ( !done ) {
                 try {
-                    final FtpBean bean = new FtpBean();
-                    bean.setSocketTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                    final FtpBean bean = getFtpBean();
+
                     userInfo= KeyChain.getDefault().getUserInfo(url);
                     if ( userInfo!=null ) {
                         String[] userHostArr= userInfo.split(":");
@@ -695,7 +706,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     boolean delete(FtpFileObject aThis) throws IOException {
-        FtpBean bean = new FtpBean();
+        FtpBean bean = getFtpBean();
 
         String userInfo;
         try {
