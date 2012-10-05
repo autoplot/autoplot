@@ -123,29 +123,31 @@ public class CDAWebDB {
                 mon.setTaskProgress(2);
                 mon.setProgressMessage("reading IDs");
 
-                altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
-                if ( altin==null ) {
-                    throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
-                }
-                BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
-                String ss= rr.readLine();
-                while ( ss!=null ) {
-                    int i= ss.indexOf("#");
-                    if ( i>-1 ) ss= ss.substring(0,i);
-                    if ( ss.trim().length()>0 ) {
-                        String[] sss= ss.split("\\s+");
-                        if ( sss[1].startsWith(lookfor) ) {
-                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length()); //TODO: this location will change eventually
-                        }
-                        if ( sss[1].startsWith(lookfor2) ) {
-                            sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor2.length());
-                        }
-                        bases.put( sss[0], sss[1] );
-                        tmpls.put( sss[0], sss[2] );
+                if ( false ) {
+                    altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
+                    if ( altin==null ) {
+                        throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
                     }
-                    ss= rr.readLine();
+                    BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
+                    String ss= rr.readLine();
+                    while ( ss!=null ) {
+                        int i= ss.indexOf("#");
+                        if ( i>-1 ) ss= ss.substring(0,i);
+                        if ( ss.trim().length()>0 ) {
+                            String[] sss= ss.split("\\s+");
+                            if ( sss[1].startsWith(lookfor) ) {
+                                sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length()); //TODO: this location will change eventually
+                            }
+                            if ( sss[1].startsWith(lookfor2) ) {
+                                sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor2.length());
+                            }
+                            bases.put( sss[0], sss[1] );
+                            tmpls.put( sss[0], sss[2] );
+                        }
+                        ss= rr.readLine();
+                    }
+                    rr.close();
                 }
-                rr.close();
 
                 refreshServiceProviderIds();
                 mon.setTaskProgress(3);
@@ -224,6 +226,13 @@ public class CDAWebDB {
         }
     }
 
+    /**
+     * returns the filename convention for spid, found in all.xml at /sites/datasite/dataset[@serviceprovider_ID='%s']/access
+     * For AC_H2_CRIS, this combines the subdividedby and filenaming properties to get %Y/ac_h2_cris_%Y%m%d_?%v.cdf
+     * @param spid the id like "AC_H2_CRIS"
+     * @return URI template like "%Y/ac_h2_cris_%Y%m%d_?%v.cdf"
+     * @throws IOException
+     */
     public String getNaming( String spid ) throws IOException {
         if ( document==null ) {
             throw new IllegalArgumentException("document has not been read, refresh must be called first");
@@ -250,6 +259,14 @@ public class CDAWebDB {
         }
     }
 
+    /**
+     * returns the base URL.  FTP urls in the all.xml file are converted to HTTP by replacing
+     * "ftp://cdaweb.gsfc.nasa.gov/pub/istp/" with  "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"
+     * @param spid the id like "AC_H2_CRIS"
+     * @return the base URL like http://cdaweb.gsfc.nasa.gov/sp_phys/data/ace/cris/level_2_cdaweb/cris_h2
+
+     * @throws IOException
+     */
     public String getBaseUrl( String spid ) throws IOException {
         if ( document==null ) {
             throw new IllegalArgumentException("document has not been read, refresh must be called first");
@@ -272,13 +289,9 @@ public class CDAWebDB {
             if ( url.startsWith("/tower3/private/cdaw_data/cluster_private/st") ) {  //get all the cluster stuff
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/private/".length() );
             }
-            String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
+            String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/";
             if ( url.startsWith(lookfor) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor.length());
-            }
-            String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
-            if ( url.startsWith(lookfor2) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor2.length());
+                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/" + url.substring(lookfor.length());
             }
             return url;
 
@@ -535,6 +548,9 @@ public class CDAWebDB {
         long t0= System.currentTimeMillis();
 
         db.refresh( DasProgressPanel.createFramed("refreshing database") );
+
+        System.err.println( db.getBaseUrl("AC_H3_CRIS") );
+        System.err.println( db.getNaming("AC_H3_CRIS") );
 
         db.getSampleTime("I1_AV_OTT"); // empty trailing folder 1984 caused problem before 20120525.
         db.getSampleTime("IA_K0_ENF"); // no files...
