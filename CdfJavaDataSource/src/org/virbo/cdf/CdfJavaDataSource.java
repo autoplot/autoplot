@@ -306,8 +306,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
                     // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
                     if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
+                        logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
                         renderType=null;
                     }
+                }
+                if ( renderType !=null && renderType.equals("image") ) {
+                    logger.fine("renderType=image not supported in CDF files");
+                    renderType= null;
                 }
                 result.putProperty(QDataSet.RENDER_TYPE, renderType );
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
