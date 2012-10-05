@@ -41,7 +41,7 @@ public class Test005 {
 
             xxx("init");
 
-            plot("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
+            plot("http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
             writeToPng("test005_demo1.png");
 
             xxx("demo1");
