@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Length mouse module picks off the period of this signal.</small></p>
+        <p><small>&amp;avail=T can be added to an aggregation URI and the availability is shown instead.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Recent change broke the spectrogram when a dataset was both a rank 2 table and a bundle, as with Seth's data</li>
             <li>frame title is set on the event thread after seeing hang on Ubuntu 12.04</li>
             <li>empty pngwalk sequence would produce runtime error</li>
             <li>TimeDate xaxis labeller used when loading vap with emphemeris.</li>
