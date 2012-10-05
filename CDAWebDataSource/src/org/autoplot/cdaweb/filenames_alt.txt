@@ -1,3 +1,5 @@
+# This table of conversions is no longer needed.
+#
 # generated with the python script /home/jbf/ct/autoplot/script/cdaweb/listAll.jy
 AC_H3_CRIS ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/cris_h3 %Y/ac_h3_cris_%Y0101_?%v.cdf
 #AC_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/or_ssc ac_or_ssc_%Y%m%d_?%v.cdf
