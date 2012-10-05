@@ -123,31 +123,22 @@ public class CDAWebDB {
                 mon.setTaskProgress(2);
                 mon.setProgressMessage("reading IDs");
 
-                if ( false ) {
-                    altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
-                    if ( altin==null ) {
-                        throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
-                    }
-                    BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
-                    String ss= rr.readLine();
-                    while ( ss!=null ) {
-                        int i= ss.indexOf("#");
-                        if ( i>-1 ) ss= ss.substring(0,i);
-                        if ( ss.trim().length()>0 ) {
-                            String[] sss= ss.split("\\s+");
-                            if ( sss[1].startsWith(lookfor) ) {
-                                sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor.length()); //TODO: this location will change eventually
-                            }
-                            if ( sss[1].startsWith(lookfor2) ) {
-                                sss[1]= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + sss[1].substring(lookfor2.length());
-                            }
-                            bases.put( sss[0], sss[1] );
-                            tmpls.put( sss[0], sss[2] );
-                        }
-                        ss= rr.readLine();
-                    }
-                    rr.close();
+                altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
+                if ( altin==null ) {
+                    throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
                 }
+                BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
+                String ss= rr.readLine();
+                while ( ss!=null ) {
+                    int i= ss.indexOf("#");
+                    if ( i>-1 ) ss= ss.substring(0,i);
+                    if ( ss.trim().length()>0 ) {
+                        String[] sss= ss.split("\\s+");
+                        tmpls.put( sss[0], sss[2] );
+                    }
+                    ss= rr.readLine();
+                }
+                rr.close();
 
                 refreshServiceProviderIds();
                 mon.setTaskProgress(3);
@@ -175,7 +166,7 @@ public class CDAWebDB {
      * @param tr
      * @return  <filename>|<startTime>|<endTime>
      */
-    String[] getFilesAndRanges(String spid, DatumRange tr) throws IOException {
+    String[] getFilesAndRangesFromWebService(String spid, DatumRange tr) throws IOException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
         String tstart= tp.format(tr.min(),tr.min());
         String tstop= tp.format(tr.max(),tr.max());
@@ -411,7 +402,7 @@ public class CDAWebDB {
                 master= fsm.getRepresentativeFile(p);
                 dr= fsm.getRangeFor(master);
             }
-            //String[] files1= getFilesAndRanges( ds, dr );
+            //String[] files1= getFilesAndRangesFromWebService( ds, dr );
 
             String[] files= fsm.getBestNamesFor( dr, p );
             if ( files.length==0 ) {
@@ -547,21 +538,28 @@ public class CDAWebDB {
 
         long t0= System.currentTimeMillis();
 
+        String[] files;
+
         db.refresh( DasProgressPanel.createFramed("refreshing database") );
 
         System.err.println( db.getBaseUrl("AC_H3_CRIS") );
         System.err.println( db.getNaming("AC_H3_CRIS") );
-
-        db.getSampleTime("I1_AV_OTT"); // empty trailing folder 1984 caused problem before 20120525.
-        db.getSampleTime("IA_K0_ENF"); // no files...
-
-        String[] files= db.getFilesAndRanges( "AC_H0_MFI", DatumRangeUtil.parseTimeRange( "20010101T000000Z-20010131T000000Z" ) );
+        FileStorageModelNew fsm= FileStorageModelNew.create( FileSystem.create(db.getBaseUrl("AC_H3_CRIS")), db.getNaming("AC_H3_CRIS") );
+        files= fsm.getBestNamesFor( DatumRangeUtil.parseTimeRange( "20110601-20110701" ), new NullProgressMonitor() );
         for ( String s: files ) {
             System.err.println(s); //logger ok
         }
 
-        String[] files2= db.getFilesAndRanges( "TIMED_L1B_SABER", DatumRangeUtil.parseTimeRange( "2002-01-26" ) );
-        for ( String s: files2 ) {
+        db.getSampleTime("I1_AV_OTT"); // empty trailing folder 1984 caused problem before 20120525.
+        db.getSampleTime("IA_K0_ENF"); // no files...
+
+        files= db.getFilesAndRangesFromWebService( "AC_H0_MFI", DatumRangeUtil.parseTimeRange( "20010101T000000Z-20010131T000000Z" ) );
+        for ( String s: files ) {
+            System.err.println(s); //logger ok
+        }
+
+        files= db.getFilesAndRangesFromWebService( "TIMED_L1B_SABER", DatumRangeUtil.parseTimeRange( "2002-01-26" ) );
+        for ( String s: files ) {
             System.err.println(s); //logger ok
         }
         

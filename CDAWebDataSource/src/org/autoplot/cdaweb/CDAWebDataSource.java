@@ -131,7 +131,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
 
             if ( webService ) {
-                files= db.getFilesAndRanges( ds.toUpperCase(), tr );
+                files= db.getFilesAndRangesFromWebService( ds.toUpperCase(), tr );
             } else {
                 files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
             }
