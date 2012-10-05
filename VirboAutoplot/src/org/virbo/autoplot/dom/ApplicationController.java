@@ -194,7 +194,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
             if ( logger.isLoggable(Level.FINEST) ) logger.log(Level.FINEST, "controller change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             //if( evt.getPropertyName().equals("resetDimensions") && evt.getNewValue().equals(Boolean.TRUE) ) {
-            //    System.err.println("here here here");
+            //    logger.warning("here here here");
             //}
         }
 
@@ -295,7 +295,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             super.focusGained(e);
 
             if ( e.getComponent() instanceof ColumnColumnConnector ) {
-                //System.err.println( "focus on column column connector");
+                //logger.fine( "focus on column column connector");
 
             }
             Plot domPlot = getPlotFor(e.getComponent());
@@ -509,7 +509,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
                 if ( noOneListening ) {
-                    System.err.println("resetting application to default time range");
+                    logger.fine("resetting application to default time range");
                     application.setTimeRange( Application.DEFAULT_TIME_RANGE );
                 }
             }
@@ -566,7 +566,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.lock("Delete Plot Element");
         int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
-            System.err.println("deletePlotElement but plot element isn't part of application, ignoring");
+            logger.warning("deletePlotElement but plot element isn't part of application, ignoring");
             lock.unlock();
             return;
         }
@@ -843,7 +843,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     setPlotElement(p);
                 }
             } catch ( IllegalArgumentException ex ) {
-                System.err.println("unable to find the plot element, assuming transitional state...");
+                logger.fine("unable to find the plot element, assuming transitional state...");
             }
 
         }
@@ -867,7 +867,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public synchronized Plot addPlot( final Plot focus, Object direction ) {
 
         if ( !SwingUtilities.isEventDispatchThread() ) {
-            System.err.println("SF Bug 3516412: addPlot is called off the event thread!!!");
+            logger.fine("SF Bug 3516412: addPlot is called off the event thread!!!");
         }
 
         logger.fine("enter addPlot");
@@ -1288,7 +1288,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         unbind(domPlot.getZaxis());
 
         if ( domPlot.controller==null ) {
-            System.err.println("domPlot.controller is null, this shouldn't happen");
+            logger.warning("domPlot.controller is null, this shouldn't happen");
         } else {
             final DasPlot p = domPlot.controller.getDasPlot();
             final DasColorBar cb = domPlot.controller.getDasColorBar();
@@ -1419,14 +1419,14 @@ public class ApplicationController extends DomNodeController implements RunLater
      * resets the dom to the initial state by deleting added plotElements, plots and data sources.
      */
     public void reset() {
-        System.err.println("Resetting application...");
+        logger.fine("Resetting application...");
         
         synchronized (this) {
             DomLock lock= mutatorLock();
             lock.lock("Reset");
             Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
             canvasLock.lock();
-            System.err.println("got locks to reset application...");
+            logger.fine("got locks to reset application...");
 
             try {
 
@@ -1586,10 +1586,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             ArrayList problems= new ArrayList();
             if ( !DomUtil.validateDom(application, problems ) ) {
-                System.err.println(problems);
+                logger.warning( problems.toString() );
             }
         }
-        System.err.println("done..");
+        logger.fine("done..");
     }
 
 
