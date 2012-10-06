@@ -62,6 +62,7 @@ import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
@@ -505,6 +506,13 @@ public class AutoplotUI extends javax.swing.JFrame {
                 if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
                     ScriptContext.close();
                 }
+                final Preferences prefs= Preferences.userNodeForPackage(ApplicationModel.class);
+                long x= AutoplotUI.this.getLocation().x;
+                long y= AutoplotUI.this.getLocation().y;
+                logger.log( Level.FINE, "saving last location {0} {1}", new Object[]{x, y});
+                prefs.putInt( "locationx", AutoplotUI.this.getLocation().x );
+                prefs.putInt( "locationy", AutoplotUI.this.getLocation().y );
+                prefs.putInt( "locationscreenwidth", java.awt.Toolkit.getDefaultToolkit().getScreenSize().width );
             }
         }) );
         
@@ -3177,6 +3185,15 @@ APSplash.checkTime("init -70");
 
                     app.createDropTargetListener( app.dataSetSelector );
 
+                    Preferences prefs= Preferences.userNodeForPackage( AutoplotUI.class );
+                    int posx= prefs.getInt( "locationx", app.getLocation().x );
+                    int posy= prefs.getInt( "locationy", app.getLocation().y );
+                    if ( posx!= app.getLocation().x || posy!=app.getLocation().y ) {
+                        boolean scncheck= java.awt.Toolkit.getDefaultToolkit().getScreenSize().width==prefs.getInt( "locationscreenwidth", 0 );
+                        if ( scncheck ) { // don't position if the screen size changes.
+                            app.setLocation( posx, posy );
+                        }
+                    }
 APSplash.checkTime("init 200");
                     boolean addSingleInstanceListener= true;
                     if ( addSingleInstanceListener ) {
