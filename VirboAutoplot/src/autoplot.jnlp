@@ -40,12 +40,12 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <!-- <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />-->
-        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120831.jar" /> 
+        <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
+        <!--<jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120831.jar" /> -->
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-        <!-- <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" > -->
-           <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" >
+           <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
+        <!--<extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" >-->
         </extension>
         
     </resources> 
