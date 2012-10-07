@@ -357,9 +357,9 @@ public class AutoplotUtil {
 
     /**
      * show a list of the filesystems
-     * @param aThis
+     * @param parent
      */
-    protected static void doManageFilesystems(AutoplotUI aThis) {
+    protected static void doManageFilesystems( Component parent ) {
         FileSystem[] fss= FileSystem.peekInstances();
         JPanel p= new JPanel();
         p.setLayout( new GridBagLayout() );
@@ -380,7 +380,7 @@ public class AutoplotUtil {
             }
             c.gridy++;
         }
-        JOptionPane.showConfirmDialog( aThis, new JScrollPane(p), "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
+        JOptionPane.showConfirmDialog( parent , new JScrollPane(p), "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
 
     }
 
