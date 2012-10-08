@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -63,7 +64,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     Map properties;
     Map<String, Object> attributes;
 
-    private final static Logger logger= Logger.getLogger("apdss.cdfn");
+    private final static Logger logger= LoggerManager.getLogger("apdss.cdfn");
 
     /** Creates a new instance of CdfFileDataSource */
     public CdfFileDataSource(URI uri) {

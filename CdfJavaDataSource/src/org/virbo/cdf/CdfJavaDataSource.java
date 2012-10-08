@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -56,7 +57,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_SLICE1 = "slice1";
 
-    static final Logger logger= Logger.getLogger("apdss.cdfjava");
+    static final Logger logger= LoggerManager.getLogger("apdss.cdfjava");
     Map<String, Object> attributes;
 
     CdfJavaDataSource( URI uri ) {
