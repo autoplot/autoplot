@@ -354,6 +354,8 @@ public class CreatePngWalk {
     }
 
     public static void main( String[] args ) throws InterruptedException, ParseException, IOException {
+        
+        System.err.println("CreatePngWalk 20121008");
         final ArgumentList alm = new ArgumentList("CreatePngWalk");
         alm.addOptionalSwitchArgument( "timeFormat", "f", "timeFormat", "$Y$m$d", "timeformat for png files, e.g. $Y is year, $j is day of year");
         alm.addSwitchArgument( "timeRange", "r", "timeRange", "time range to cover, e.g. 2011 through 2012" );
