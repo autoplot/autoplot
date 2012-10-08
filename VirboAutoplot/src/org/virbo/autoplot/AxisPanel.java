@@ -555,12 +555,25 @@ public class AxisPanel extends javax.swing.JPanel {
         return result;
     }
 
+    private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, final String label, String doc ) {
+        JMenuItem result= new JMenuItem( new AbstractAction( label ) {
+            public void actionPerformed(ActionEvent e) {
+                String v= componentTextField.getText();
+                int i= componentTextField.getCaretPosition();
+                componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );
+            }
+        });
+        result.setToolTipText(doc);
+        return result;
+    }
+
     JPopupMenu initLabelMenu( JTextField tf ) {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{COMPONENT}", "Component property from the plot element" ) );
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
         processMenu.add( createMenuItem( tf, "%{TIMERANGE}", "Special timerange property from the plot element controller" ) );
+        processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         return processMenu;
     }
 
@@ -573,6 +586,7 @@ public class AxisPanel extends javax.swing.JPanel {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
+        processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         return processMenu;
     }
 
@@ -587,6 +601,7 @@ public class AxisPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( tf, "%{UNITS}", "Units of the axis" ) );
         processMenu.add( createMenuItem( tf, "%{RANGE}", "Range of the axis" ) );
         processMenu.add( createMenuItem( tf, "%{SCAN_RANGE}", "Range of the axis scan buttons" ) );
+        processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         return processMenu;
     }
 
