@@ -136,6 +136,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         setTitle("Log Console Settings");
         initComponents();
         initLogSettings();
+        setLocationRelativeTo(parent);
+        
         verbosityPanel.validate();
         this.console= console;
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
@@ -220,7 +222,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Verbosity:");
+        jLabel1.setText("Verbosity of the log channels:");
+        jLabel1.setToolTipText("<html>Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers.");
 
         jLabel2.setText("Highlite Lines Matching:");
         jLabel2.setToolTipText("Enter a regular expression.  Lines containing this will be highlited.");
@@ -256,7 +259,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE))
                     .add(jLabel1)
                     .add(layout.createSequentialGroup()
                         .add(loggerIDCheckBox)

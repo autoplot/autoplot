@@ -103,7 +103,8 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Verbosity:"/>
+        <Property name="text" type="java.lang.String" value="Verbosity of the log channels:"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
