@@ -376,7 +376,20 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         } else {
                             JComboBox jcb= new JComboBox(parm.enums.toArray());
                             jcb.setEditable(false);
-                            jcb.setSelectedItem(val);
+                            Object oval=null;
+                            if ( parm.deft instanceof Long ) {
+                                oval = Long.valueOf(val);
+                            } else if ( parm.deft instanceof Integer ) {
+                                oval = Integer.valueOf(val);
+                            } else if ( parm.deft instanceof Double ) {
+                                oval = Double.valueOf(val);
+                            } else if ( parm.deft instanceof Float ) {
+                                oval = Float.valueOf(val);
+                            } else {
+                                oval = val;
+                            }
+                            jcb.setSelectedItem(oval);
+                            
                             ctf= jcb;
                             Dimension x= ctf.getPreferredSize();
                             x.width= Integer.MAX_VALUE;
