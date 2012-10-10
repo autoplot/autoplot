@@ -76,7 +76,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
     protected static final Object dslock= new Object();
 
     private static void cdfCacheUnload( String fileName, boolean unloadDs ) {
-        synchronized (lock) {
+        synchronized (lock) {logger.log(Level.FINER, "cdfCacheUnload cdf file {0} from cache: unloadDs={1}", new Object[] { fileName, unloadDs } );
             CDF cdf= openFiles.remove(fileName);
             openFilesRev.remove(cdf);
             openFilesFresh.remove(fileName);
@@ -100,18 +100,18 @@ public class CdfJavaDataSource extends AbstractDataSource {
     /**
      * put the dataset into the cache, probably removing the least valuable entry from the cache.
      * @param uri
-     * @param result
+     * @param ds
      */
-    protected static void dsCachePut( String uri, MutablePropertyDataSet result ) {
-        synchronized ( dslock ) {
+    protected static void dsCachePut( String uri, MutablePropertyDataSet ds ) {
+        synchronized ( dslock ) { logger.log(Level.FINER, "dsCachePut uri={0} ds={1}", new Object[] { uri, ds } );
             dsCache.remove( uri ); // freshen by moving to front of the list.
-            dsCache.put( uri, result );
+            dsCache.put( uri, ds );
             dsCacheFresh.put( uri, System.currentTimeMillis() );
 
             while ( dsCache.size()>DS_CACHE_SIZE_LIMIT ) {
                 Entry<String,MutablePropertyDataSet> first= dsCache.entrySet().iterator().next();
                 dsCache.remove(first.getKey());
-                logger.log( Level.FINE, "remove {0}", first.getKey());
+                logger.log( Level.FINER, "remove {0}", first.getKey());
             }
         }
     }
@@ -120,7 +120,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         CDF cdf;
         try {
             synchronized ( lock ) {
-                cdf= openFiles.get(fileName);
+                cdf= openFiles.get(fileName); logger.log(Level.FINER, "cdf open files cache contained: {0}", cdf);
             }
             if ( cdf==null ) {
                 synchronized (lock) {
@@ -130,7 +130,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     cdf = CDFFactory.getCDF(fileName);
                     openFiles.put(fileName, cdf);
                     openFilesRev.put(cdf, fileName);
-                    openFilesFresh.put(fileName,System.currentTimeMillis());
+                    openFilesFresh.put(fileName,System.currentTimeMillis()); logger.log(Level.FINER, "added cdf file {0} to cache: {1}", new Object[] { fileName, cdf } );
                     if ( openFiles.size()>FILE_CACHE_SIZE_LIMIT ) {
                         String oldest= openFiles.entrySet().iterator().next().getKey();
                         cdfCacheUnload(oldest,true);
@@ -171,7 +171,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         
         Map map = getParams();
         
-        CDF cdf= getCdfFile(fileName);
+        CDF cdf= getCdfFile(fileName);        logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
         
         String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
