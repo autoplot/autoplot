@@ -921,6 +921,23 @@ public class CdfUtil {
     }
 
     /**
+     * quick way to get an attribute value.
+     * @param cdf
+     * @param var
+     * @param attName
+     * @return
+     */
+    private static Object getAttribute( CDF cdf, Variable var, String attName ) {
+        try {
+            Attribute attr= cdf.getAttribute(attName);
+            Entry entry= attr.getEntry(var);
+            return entry.getData();
+        } catch ( CDFException e ) {
+            return null;
+        }
+    }
+
+    /**
      * keys are the names of the variables. values are descriptions.
      * @param cdf
      * @param dataOnly
@@ -1063,20 +1080,80 @@ public class CdfUtil {
                 long xMaxRec = -1;
                 String scatDesc = null;
                 String svarNotes = null;
+                String vdescr=null;
 
                 try {
                     if ( virtual!=null ) {
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{virtual.getName(), var.getName()});
                         Entry entry = virtual.getEntry(var);
-                        if ( String.valueOf(entry.getData()).equals("TRUE") ) {
+                        String satt= String.valueOf(entry.getData());
+                        if ( satt.equals("TRUE") ) {
                             if ( !isVirtual ) { // maybe some virtual functions are not supported.
                                 continue;
+                            } else {
+                                logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
+                                String funct= (String)getAttribute( cdf, var, "FUNCTION" );
+                                if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                                if ( !CdfVirtualVars.isSupported(funct) ) {
+                                    if ( !funct.startsWith("comp_themis") ) {
+                                        logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                                    }
+                                    continue;
+                                } else {
+                                    vdescr= funct + "( ";
+                                    int icomp=0;
+                                    String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                    if ( comp!=null ) {
+                                        vdescr= vdescr + comp;
+                                        icomp++;
+                                    }
+                                    for ( ; icomp<5; icomp++ ) {
+                                        comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                        if ( comp!=null ) {
+                                            vdescr= vdescr+", "+comp;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    vdescr= vdescr+" )";
+                                }
+                            }
+                        }
+                        Object att= getAttribute( cdf, var, "VIRTUAL" );
+                        if ( att!=null ) {
+                            logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
+                            if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
+                                String funct= (String)getAttribute( cdf, var, "FUNCTION" );
+                                if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                                if ( !CdfVirtualVars.isSupported(funct) ) {
+                                    if ( !funct.startsWith("comp_themis") ) {
+                                        logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                                    }
+                                    continue;
+                                } else {
+                                    vdescr= funct + "( ";
+                                    int icomp=0;
+                                    String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                    if ( comp!=null ) {
+                                        vdescr= vdescr + comp;
+                                        icomp++;
+                                    }
+                                    for ( ; icomp<5; icomp++ ) {
+                                        comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                        if ( comp!=null ) {
+                                            vdescr= vdescr+", "+comp;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    vdescr= vdescr+" )";
+                                }
                             }
                         }
                     }
-                } catch (CDFException e) {
-                    //e.printStackTrace();
+                } catch (Exception e) {
+                    logger.log( Level.SEVERE, "", e );
                 }
+
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_0
                         logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{aAttr.getName(), var.getName()});
@@ -1146,7 +1223,7 @@ public class CdfUtil {
                 }
                 if ( hasEntry( virtual, var ) ) {
                     if ( "true".equalsIgnoreCase( String.valueOf( virtual.getEntry(var).getData() ) ) ) {
-                        desc += " (Virtual)";
+                        desc += " (virtual function "+vdescr+")";
                     }
                 }
 

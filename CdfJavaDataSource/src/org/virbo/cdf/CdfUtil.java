@@ -890,7 +890,7 @@ public class CdfUtil {
                 Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
                 if ( att!=null ) {
                     if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
-                        desc += " (Virtual)";
+                        desc += " (virtual function "+vdescr+")";
                     }
                 }
 
