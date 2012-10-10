@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>&amp;avail=T can be added to an aggregation URI and the availability is shown instead.</small></p>
+        <p><small>Loose code in the Java CDF library would result in runtime errors about "Map failed."  This should be fixed now.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>remove unnecessary synchronized block in DasAxis</li>
+            <li>rte_1627148566: Pure-java CDF didn't close files propertly, causing RTEs on Windows.</li>
+            <li>enumeration of integers didn't set the editor GUI properly: http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect_lvt.jyds</li>
             <li>Recent CDAWeb move broke code that handled exceptional file naming, as with ace/cris/level_2_cdaweb/cris_h3</li>
             <li>Recent change broke the spectrogram when a dataset was both a rank 2 table and a bundle, as with Seth's data</li>
             <li>frame title is set on the event thread after seeing hang on Ubuntu 12.04</li>
@@ -83,6 +86,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>progress monitors use M and K to limit number of digits to 5 decimal places.</li>
             <li>don't have no files found popup when using aggregation.</li>
             <li>add avail=T to aggregation so you can see when granules are available.</li>
             <li>support rank2 "waveform" datasets in QDataSet with the huge scatter mode this gets us up to about 12M points.</li>
