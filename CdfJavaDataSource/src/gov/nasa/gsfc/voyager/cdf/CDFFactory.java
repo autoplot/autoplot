@@ -3,6 +3,7 @@ import java.nio.*;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.*;
 /**
@@ -77,13 +78,16 @@ public class CDFFactory {
      * creates  CDF object from a file.
      */
     public static CDF getCDF(String fname) throws Throwable {
+        logger.log(Level.FINE,"getCDF: opening ({0})",fname);
         File file = new File(fname);
         if ( file.length()>=Integer.MAX_VALUE ) {
             throw new IllegalArgumentException("file is too large: "+fname+", it's length is > "+Integer.MAX_VALUE );
         }
         FileInputStream fis = new FileInputStream(file);
         FileChannel ch = fis.getChannel();
-        ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
+        ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());  
+        fis.close();
+        logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
         return getVersion(buf);
     }
     /**
