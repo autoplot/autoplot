@@ -1663,7 +1663,7 @@ public class Extractor {
        int offset, int number, boolean preserve) throws IllegalAccessException,
        InvocationTargetException {
 
-        logger.log( Level.FINE, "do1D(buf.position={0},type={1},offset={2},number={3},preserve={4})", new Object[] { bv.position(), type, offset, number, preserve } );
+        logger.log( Level.FINEST, "do1D(buf.position={0},type={1},offset={2},number={3},preserve={4})", new Object[] { bv.position(), type, offset, number, preserve } );
 
         Method method;
         double[] data = null;
@@ -1832,7 +1832,7 @@ public class Extractor {
        int offset, int count, int elements, int _stride) throws
        IllegalAccessException, InvocationTargetException, Throwable {
         Method method;
-        logger.log( Level.FINE, "do1D(buf.position={0},type={1},offset={2},count={3})", new Object[] { bv.position(), type, offset, count } );
+        logger.log( Level.FINEST, "do1D(buf.position={0},type={1},offset={2},count={3})", new Object[] { bv.position(), type, offset, count } );
         int span = _stride*elements;
         int pos = bv.position();
         switch (DataTypes.typeCategory[type]) {
