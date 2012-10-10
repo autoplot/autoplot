@@ -84,7 +84,7 @@ public class CDFFactory {
             throw new IllegalArgumentException("file is too large: "+fname+", it's length is > "+Integer.MAX_VALUE );
         }
         FileInputStream fis = new FileInputStream(file);
-        FileChannel ch = fis.getChannel();
+          FileChannel ch = fis.getChannel();
         ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());  
         fis.close();
         logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
