@@ -8,7 +8,6 @@ package org.das2.jythoncompletion;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionResultSet;
@@ -16,8 +15,6 @@ import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
-import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -62,15 +59,8 @@ class DataSetUrlCompletionTask implements CompletionTask {
             }
             String surl1 = line.substring(i0, i1);
             int carotPos = ipos - i0;
-            
-            List<CompletionResult> rs;
-             
-            URISplit split = URISplit.parse(surl1);
-            if ( surl1.contains("?") || DataSourceRegistry.getInstance().hasSourceByExt(split.ext) ) {
-                rs= DataSetURI.getFactoryCompletions( surl1, carotPos,  new NullProgressMonitor() );
-            } else {
-                rs= DataSetURI.getFileSystemCompletions(surl1, carotPos, true, true, null, new NullProgressMonitor() );
-            }
+
+            List<CompletionResult> rs= DataSetURI.getCompletions( surl1, carotPos, new NullProgressMonitor() );
             
             for ( CompletionResult rs1:rs ) {
                 arg0.addItem( new DataSetUrlCompletionItem(rs1) );
