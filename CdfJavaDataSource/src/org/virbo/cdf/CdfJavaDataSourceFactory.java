@@ -60,7 +60,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 
             CDF cdf;
             try {
-                cdf = CDFFactory.getCDF(fileName);
+                cdf = CdfJavaDataSource.getCdfFile(fileName);
             } catch (Throwable ex) {
                 throw new Exception(ex);
             }
@@ -95,7 +95,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 
                 CDF cdf;
                 try {
-                    cdf = CDFFactory.getCDF(fileName);
+                    cdf = CdfJavaDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
@@ -146,7 +146,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             } else {
                 CDF cdf;
                 try {
-                    cdf= CDFFactory.getCDF( file.getPath() );
+                    cdf = CdfJavaDataSource.getCdfFile( file.getPath() );
                 } catch ( Throwable ex ) {
                     throw new RuntimeException(ex);
                 }

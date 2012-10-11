@@ -116,7 +116,17 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
     }
 
-    public CDF getCdfFile( String fileName ) {
+    /**
+     * get the abstract access object to the given CDF file.  This provides read-only access to the file, and a cache
+     * is used to limit the number of references managed.
+     * See bug https://sourceforge.net/tracker/index.php?func=detail&aid=3576013&group_id=199733&atid=970682
+     *
+     * The result returns a CDF object which contains a read-only memory-mapped byte buffer.
+     * 
+     * @param fileName
+     * @return the CDF reference used to access the file
+     */
+    public static CDF getCdfFile( String fileName ) {
         CDF cdf;
         try {
             synchronized ( lock ) {
@@ -685,7 +695,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     return null;
                 }
                 CDF cdf;
-                cdf = CDFFactory.getCDF(fileName);
+                cdf = getCdfFile( fileName );
                 String svariable = (String) map.get("id");
                 if (svariable == null) {
                     svariable = (String) map.get("arg_0");

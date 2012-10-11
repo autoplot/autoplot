@@ -68,7 +68,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="selectVariableLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="188" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="196" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>

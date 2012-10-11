@@ -300,7 +300,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         DataSetURI.checkLength(cdfFile);
 
         try {
-            cdf = CDFFactory.getCDF(cdfFile.toString());
+            cdf = cdf = CdfJavaDataSource.getCdfFile(cdfFile.toString());
         } catch ( Exception ex ) {
             throw ex;
         } catch ( Throwable ex ) {
@@ -323,7 +323,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.log(Level.FINE, "opening cdf file {0}", fileName);
             if ( cdf==null ) {
                 try {
-                    cdf = CDFFactory.getCDF(fileName);
+                    cdf = CdfJavaDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
