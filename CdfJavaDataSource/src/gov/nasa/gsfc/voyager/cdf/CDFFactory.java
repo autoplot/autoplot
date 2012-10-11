@@ -74,6 +74,21 @@ public class CDFFactory {
         }
         return null;
     }
+
+    /**
+     * clone the byte buffer so it is in Java memory .  For Windows.
+     * @param original
+     * @return
+     */
+    public static ByteBuffer clone(ByteBuffer original) {
+       ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+       original.rewind();//copy from the beginning
+       clone.put(original);
+       original.rewind();
+       clone.flip();
+       return clone;
+}
+
     /**
      * creates  CDF object from a file.
      */
@@ -85,7 +100,7 @@ public class CDFFactory {
         }
         FileInputStream fis = new FileInputStream(file);
           FileChannel ch = fis.getChannel();
-        ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());  
+        ByteBuffer buf = clone( ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size()) );
         fis.close();
         logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
         return getVersion(buf);
