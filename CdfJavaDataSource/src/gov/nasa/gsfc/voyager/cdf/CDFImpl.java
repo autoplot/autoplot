@@ -3,12 +3,15 @@ import java.io.*;
 import java.nio.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.*;
 public abstract class CDFImpl implements java.io.Serializable {
     static final double JANUARY_1_1970;
     static final double JANUARY_1_1970_TT;
     static final double JANUARY_1_1970_SECONDS;
-    
+
+    private static final Logger logger= Logger.getLogger( "apdss.cdfjava" );
     static {
         int offset = 0;
         for (int year=0; year < 1970; year++) {
@@ -691,7 +694,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 int rtype = bb.getInt(offset_RECORD_TYPE);
                 if (rtype != vrtype) {
                     if (compressed) {
-                        System.err.println("setting record type to " +
+                        logger.fine("setting record type to " +
                         "uncompressed");
                         compressed = false;
                     }
@@ -769,7 +772,7 @@ public abstract class CDFImpl implements java.io.Serializable {
     ByteBuffer getValueBuffer(int offset, int size, int number) {
         ByteBuffer bv = getRecord(offset);
         if (bv.getInt(offset_RECORD_TYPE) == VVR_RECORD_TYPE) {
-            System.err.println("Encountered uncompressed instead of " +
+            logger.fine("Encountered uncompressed instead of " +
             " compressed at offset " + offset);
             bv.position(offset_RECORDS);
             return bv;
@@ -792,8 +795,8 @@ public abstract class CDFImpl implements java.io.Serializable {
                 toRead -= n;
             }
         } catch (IOException ex) {
-            System.err.println(ex.toString() + " at offset " + offset);
-            System.err.println("Trying to get data as uncompressed");
+            logger.log(Level.INFO, "{0} at offset {1}", new Object[]{ex.toString(), offset});
+            logger.info("Trying to get data as uncompressed");
             return getValueBuffer(offset);
         }
         if (n < 0) return null;
@@ -1091,8 +1094,8 @@ public abstract class CDFImpl implements java.io.Serializable {
                 }
             }
         } catch(Exception ex) {
-            System.err.println("getNumberAttribute: " + vbuf);
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, "getNumberAttribute: {0}", vbuf);
+            logger.log( Level.SEVERE, null, ex );
             return null;
         }
 
