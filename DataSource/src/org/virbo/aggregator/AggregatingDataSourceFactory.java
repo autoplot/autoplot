@@ -105,7 +105,41 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return fsm;
     }
 
-    public static CompletionContext getDelegateDataSourceCompletionContext(CompletionContext cc) throws IOException {
+    /**
+     * get a representative file, using one from the timerange in the surl if available.  This will help
+     * users to work around problems where the first folder (2012) doesn't contain a representative (2012/20120212.dat)
+     * but the second (2013) does.
+     * @param fsm
+     * @param surl
+     * @return
+     * @throws IOException
+     */
+    private static String getRepresentativeFile( FileStorageModelNew fsm, String surl ) throws IOException {
+        URISplit split = URISplit.parse(surl);
+        Map<String,String> params= URISplit.parseParams(split.params);
+
+        String delegateFile = null;
+        String stimeRange= params.get( "timerange" );
+        DatumRange tdr= null;
+        try {
+            tdr= DatumRangeUtil.parseTimeRange(stimeRange);
+        } catch ( ParseException ex ) {
+            logger.finer("unable to parse timerange, just use default delegate");
+        }
+        if ( tdr!=null ) {
+            String[] names= fsm.getBestNamesFor( tdr, new NullProgressMonitor() );
+            if ( names.length>0 ) {
+                delegateFile= names[0];
+            } else {
+                delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+            }
+        } else {
+            delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+        }
+        return delegateFile;
+    }
+
+    private static CompletionContext getDelegateDataSourceCompletionContext(CompletionContext cc) throws IOException {
 
         String surl = cc.surl;
         int carotPos = cc.surlpos;
@@ -113,8 +147,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         surl= surl.replaceAll("%25","%");
         FileStorageModelNew fsm = getFileStorageModel(surl);
-
-        String delegateFile = fsm.getRepresentativeFile(new NullProgressMonitor());
+        
+        String delegateFile= getRepresentativeFile( fsm, surl );
 
         if (delegateFile == null) {
             throw new IllegalArgumentException("unable to find any files");
@@ -156,7 +190,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     /**
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
-    public static String getDelegateDataSourceFactoryUri(String suri) throws IOException, IllegalArgumentException {
+    protected static String getDelegateDataSourceFactoryUri(String suri) throws IOException, IllegalArgumentException {
 
         URISplit split= URISplit.parse(suri);
 
@@ -182,7 +216,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
 
         if ( file==null ) {
-            file = fsm.getRepresentativeFile(new NullProgressMonitor());
+            file = getRepresentativeFile( fsm, suri );
         }
 
         if (file == null) {
