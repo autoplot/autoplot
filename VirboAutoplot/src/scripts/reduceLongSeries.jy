@@ -1,0 +1,31 @@
+# title: hourly averages demo shows how to take hourly averages over a long interval
+# label: hourly averages
+
+uri= 'http://sarahandjeremy.net/~jbf/1wire/data/$Y/$m/$d/610008002FE00410.$Y$m$d.d2s?timerange=%s'
+dr= DatumRangeUtil.parseTimeRange('2012-09-01')     
+endt= DatumRangeUtil.parseTimeRange('2012-09-26' )  
+targetRes= dataset('10 min') # '1 days' '3600 s' '1 hr' '1 min'
+
+from org.virbo.dsutil.Reduction import reducex
+
+exceptions= java.util.LinkedHashMap()
+
+monitor.started()
+dsall= None
+while ( dr.min().lt( endt.max() ) ):
+   monitor.progressMessage= "%s until %s" % ( dr, endt )
+   uri1= uri % dr.toString()
+   try:
+      ds= getDataSet( uri1 )
+      ds= reducex( ds, targetRes )
+      dsall= concatenate( dsall, ds )  # TODO: this probably won't scale, replace with dataset builder.
+   except java.lang.Exception,ex:
+      exceptions.put( uri1, ex )
+   dr= dr.next()
+
+formatDataSet( dsall, '/tmp/reduced1Hr.qds' )
+
+print 'Exceptions encountered:'
+for ex in exceptions.entrySet():
+  print '== %s ==' % ex.getKey()
+  print ex.getValue()
