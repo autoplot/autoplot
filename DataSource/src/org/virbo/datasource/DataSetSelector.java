@@ -771,7 +771,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void calcAndShowCompletions( Runnable run ) {
-        if (completionsRunnable != null) {
+                if (completionsRunnable != null) {
             completionsMonitor.cancel();
             completionsRunnable = null;
         }
@@ -1009,6 +1009,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
+    /**
+     * get the completions from the plug-in factory..
+     */
     private void showFactoryCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
