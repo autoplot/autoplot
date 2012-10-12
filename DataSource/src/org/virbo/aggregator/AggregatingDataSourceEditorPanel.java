@@ -51,6 +51,7 @@ import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  *
@@ -601,20 +602,20 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     public void markProblems(List<String> problems) {
         List<String> p= new ArrayList(problems);
-        if ( p.contains(AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED ) ) {
-            p.remove(AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED );
+        if ( p.contains( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ) ) {
+            p.remove( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
             timeRangeTextField.setBackground( Color.YELLOW );
             jLabel1.setBackground( Color.YELLOW );
             jLabel1.setForeground( Color.RED );
-            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><b>"+AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED  );
-            timeRangeTextField.setToolTipText( AggregatingDataSourceFactory.PROB_NO_TIMERANGE_PROVIDED );
-        } else if ( p.contains(AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE ) ) {
-            p.remove(AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE );
+            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><b>"+TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED  );
+            timeRangeTextField.setToolTipText( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
+        } else if ( p.contains(TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE ) ) {
+            p.remove(TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE );
             timeRangeTextField.setBackground( Color.YELLOW );
             jLabel1.setBackground( Color.YELLOW );
             jLabel1.setForeground( Color.RED );
-            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><br><b>"+AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE  );
-            timeRangeTextField.setToolTipText( AggregatingDataSourceFactory.PROB_PARSE_ERROR_IN_TIMERANGE );
+            jLabel1.setToolTipText( jLabel1.getToolTipText() + "<br><br><b>"+TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE  );
+            timeRangeTextField.setToolTipText( TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE );
         }
 
         //if ( p.size()==0 && problems.size()>0 ) {

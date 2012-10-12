@@ -67,4 +67,13 @@ public interface TimeSeriesBrowse {
      */
     public void setURI( String suri ) throws ParseException ;
 
+    /**
+     * problem message to use in reject when the timerange was not provided in the URI.
+     */
+    public static final String PROB_NO_TIMERANGE_PROVIDED = "no timerange provided";
+
+    /**
+     * problem message to use in reject when the timerange does not parse properly.
+     */
+    public static final String PROB_PARSE_ERROR_IN_TIMERANGE = "parse error in timeRange";
 }
