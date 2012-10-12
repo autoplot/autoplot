@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Loose code in the Java CDF library would result in runtime errors about "Map failed."  This should be fixed now.</small></p>
+        <p><small>New NOTES property is finally introduced into QDataSet, allowing AggregatingDataSource to continue processing when there is an exception.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -86,6 +86,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
             <li>new LSpec.rebin produces data on fixed cadence</li>
             <li>progress monitors use M and K to limit number of digits to 5 decimal places.</li>
             <li>don't have no files found popup when using aggregation.</li>
