@@ -45,6 +45,7 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsutil.BundleBuilder;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -232,6 +233,17 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
         DatumRange cacheRange1 = null;
 
+        EnumerationUnits exunits= EnumerationUnits.create("notes");
+        DataSetBuilder notesBuilder= new DataSetBuilder( 2, ss.length/2, 3 );  // container for messages will be an events list.
+        BundleBuilder bds= new BundleBuilder(3);
+        bds.putProperty( QDataSet.NAME, 0, "startTime" );
+        bds.putProperty( QDataSet.NAME, 1, "stopTime" );
+        bds.putProperty( QDataSet.NAME, 2, "note" );
+        bds.putProperty( QDataSet.UNITS, 0, Units.us2000 );
+        bds.putProperty( QDataSet.UNITS, 1, Units.us2000 );
+        bds.putProperty( QDataSet.UNITS, 2, exunits );
+        notesBuilder.putProperty( QDataSet.BUNDLE_1, bds.getDataSet() );
+        
         for (int i = 0; i < ss.length; i++) {
             String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
             if (!sparams.equals("")) {
@@ -270,10 +282,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( mon1.isCancelled() ) break;
             }
 
+            DatumRange drex= null; // in case there is an exception, where did it occur?
             try {
-                QDataSet ds1 = delegateDataSource.getDataSet(mon1);
-
                 DatumRange dr1 = getFsm().getRangeFor(ss[i]);
+                drex= dr1;
+
+                QDataSet ds1 = delegateDataSource.getDataSet(mon1);
 
                 if (result == null && altResult==null ) {
                     if ( ds1 instanceof JoinDataSet ) {
@@ -320,9 +334,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 } else if ( ss.length==1 ) {
                     throw ex;
                 } else {
-                    //ex.printStackTrace(); //TODO: it would be nice to be able to attach the error to the result.
-                    throw ex;
-                    //do nothing
+                    notesBuilder.putValue(-1,0,drex.min().doubleValue(Units.us2000));
+                    notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
+                    notesBuilder.putValue(-1,2,exunits.createDatum(ex.getMessage()).doubleValue(exunits) );
+                    notesBuilder.nextRecord();
                 }
             }
             if (ss.length > 1) {
@@ -352,6 +367,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
             }
 
+            QDataSet notes= notesBuilder.getDataSet();
+            if ( notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
             return altResult;
             
         } else {
@@ -363,6 +380,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
             }
 
+            QDataSet notes= notesBuilder.getDataSet();
+            if ( notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
             return result;
         }
 
