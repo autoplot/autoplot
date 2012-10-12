@@ -120,16 +120,20 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         String delegateFile = null;
         String stimeRange= params.get( "timerange" );
-        DatumRange tdr= null;
-        try {
-            tdr= DatumRangeUtil.parseTimeRange(stimeRange);
-        } catch ( ParseException ex ) {
-            logger.finer("unable to parse timerange, just use default delegate");
-        }
-        if ( tdr!=null ) {
-            String[] names= fsm.getBestNamesFor( tdr, new NullProgressMonitor() );
-            if ( names.length>0 ) {
-                delegateFile= names[0];
+        if ( stimeRange!=null ) {
+            DatumRange tdr= null;
+            try {
+                tdr= DatumRangeUtil.parseTimeRange(stimeRange);
+            } catch ( ParseException ex ) {
+                logger.finer("unable to parse timerange, just use default delegate");
+            }
+            if ( tdr!=null ) {
+                String[] names= fsm.getBestNamesFor( tdr, new NullProgressMonitor() );
+                if ( names.length>0 ) {
+                    delegateFile= names[0];
+                } else {
+                    delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+                }
             } else {
                 delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
             }
