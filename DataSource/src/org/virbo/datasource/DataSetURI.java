@@ -1487,6 +1487,14 @@ public class DataSetURI {
         return result;
     }
 
+    /**
+     * get the completions from the plug-in factory..
+     * @param surl1
+     * @param carotPos
+     * @param mon
+     * @return
+     * @throws Exception
+     */
     public static List<CompletionResult> getFactoryCompletions(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
 
