@@ -75,6 +75,8 @@ import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.aggregator.AggregatingDataSource;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
@@ -336,6 +338,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     tsb.setURI(surl1);
                                     tsb.setTimeRange(timeRange);
                                     String suri= tsb.getURI();
+                                    problems.remove( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ); 
                                     if ( !f.reject( suri, new ArrayList<String>(), mon) ) {
                                         setMessage("accepted uri after setting timerange");
                                         int modifiers= this.keyModifiers;
