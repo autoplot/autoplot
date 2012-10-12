@@ -591,6 +591,15 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     DatumRange tr2=  quantizeTimeRange( timeRange );
                                     tsb.setTimeRange(tr2);
                                     surl= tsb.getURI();
+                                } else {
+                                    //TODO nasty kludge to get JythonDataSource
+                                    if ( dsf.getClass().toString().contains("JythonDataSourceFactory") ) {
+                                        URISplit split= URISplit.parse(surl);
+                                        Map<String,String> parms= URISplit.parseParams( split.params );
+                                        parms.put( "timerange", timeRange.toString() );
+                                        split.params= URISplit.formatParams(parms);
+                                        surl= URISplit.format(split);
+                                    }
                                 }
                             }
                         } catch (ParseException ex ){
