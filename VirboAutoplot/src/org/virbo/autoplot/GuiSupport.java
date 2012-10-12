@@ -620,7 +620,11 @@ public class GuiSupport {
             public void run() {
                 model.addDasPeersToApp();
                 AutoplotUI view = new AutoplotUI(model);
+                view.setLocationRelativeTo(GuiSupport.this.parent);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                java.awt.Point p= view.getLocation();
+                p.translate( 20,20 );
+                view.setLocation( p );
                 view.setVisible(true);
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
@@ -653,7 +657,11 @@ public class GuiSupport {
                 model.dom.getOptions().setDataVisible( parent.applicationModel.dom.getOptions().isDataVisible() ); // options has funny sync code and these must be set before AutoplotUI is constructed.
                 model.dom.getOptions().setLayoutVisible( parent.applicationModel.dom.getOptions().isLayoutVisible() );
                 AutoplotUI view = new AutoplotUI(model);
+                view.setLocationRelativeTo(GuiSupport.this.parent);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                java.awt.Point p= view.getLocation();
+                p.translate( 20,20 );
+                view.setLocation( p );
                 view.setVisible(true);
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
