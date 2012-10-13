@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>old code in cdf readers would cause problem when displayType was spectrogram and their were <6 channels.</li>
+            <li>3576060: jython data source doesn't have timerange set before going into editor, causing jumps to default time</li>
+            <li>3575260: keep track of last location, because Ubuntu 12.04 opens windows up in odd places (off screen with 2 displays)</li>
             <li>remove unnecessary synchronized block in DasAxis</li>
             <li>rte_1627148566: Pure-java CDF didn't close files propertly, causing RTEs on Windows.</li>
             <li>enumeration of integers didn't set the editor GUI properly: http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect_lvt.jyds</li>
@@ -41,6 +44,9 @@
             <li>bugfix: ReduceFilter needs to update the cacheTag of the result. </li>
             <li>bugfix in CdfJava plugin where subsampling would not work with new TT2000 datasets.</li>
             <li>added jsyntaxpane jar file to the Eclipse class path.  Thanks Jon!</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>the operations cache was not being reset when a new dataset would come in, possibly resulting in a completely incorrect result!</li>
             <li>VALID_MAX and CACHE_TAG properties handled in append</li>
             <li>rte_1830229334: inspect button on vap file yielded NullPointerException</li>
@@ -65,27 +71,10 @@
             <li>total, smooth, and collapse properly propagate metadata.</li>
             <li>PDF fonts are painted in Java itext library, resulting in a closer screen representation, but text is no longer editable for post-processing</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>new code that forced series to be used when CDF indicated the type needs to detect implicit waveform type</li>
-            <li>further investigation into making sure that offline means http is really offline.</li>
-            <li>contoursRender is properly bound to color and line thick.</li>
-            <li>bugfixes in export to wav file</li>
-            <li>preserve render_type=spectrogram property through rank 3 to rank 2 slice.</li>
-            <li>pngwalk now has show missing off by default.</li>
-            <li>rte_0409055860: tooltip html was not properly escaped with &amp;lt; which resulted in a runtime error.</li>
-            <li>rte 0449679029: look for ") " instead of just " " because of reducex needs it</li>
-            <li>running flag prevented TimeSeriesBrowse from retickling the tickle timer and left unfinished operations pending.</li>
-            <li>remove "import graph" from Jython scripts, which was causing problems and was not necessary.</li>
-            <li>add makeChildPlotElement so that this is more of an atomic operation</li>
-            <li>restore --bookmarks= command line switch, which was probably broken with remote bookmarks loading.</li>
-            <li>guessSlice didn't consider existing slice, causing problems with high-rank datasets.</li>
-            <li>bugfix 3440253: add test for http lastModified</li>
-            <li>ascii parser error messages limited to once per file, to support batch processing</li>
-            <li>report a warning when "open=bookmarks:...." is used instead of "--open=bookmarks..."</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
+            <li>delegate granule in aggregation is based on timerange, if available</li>
             <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
             <li>new LSpec.rebin produces data on fixed cadence</li>
             <li>progress monitors use M and K to limit number of digits to 5 decimal places.</li>
@@ -96,6 +85,9 @@
             <li>log console uses x scroll bar to avoid wrapping lines.
             <li>add user option for default mouse action: box zoom, crosshair digitizer, zoom x</li>
             <li>Tools->Cache->Manage FileSystems dialog to indicate the active filesystems and their status</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>add a few shorter example scripts to jython editor</li>
             <li>progress messages supported in qstreams</li>
             <li>add icon to encourage use of convenient history dialog</li>
@@ -113,22 +105,6 @@
             <li>ascii parser now detects non-ascii files and displays appropriate error.</li>
             <li>title now has checkbox and can be turned off without erasing useful context. (Craig)</li>
             <li>clicking on background selects hidden parent plot element.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>pngs have metadata indicating plot coordinates to support thin-client mouse operations</li>
-            <li>syntax-aware editor is used for the Jython Scripts</li>
-            <li>JythonMain passes in command-line parameters into getParam area.  Thanks jsyntaxpane!</li>
-            <li>add actions/"indent block" and actions/"dedent block" to the popup menu.</li>
-            <li>timeRange property added to PngWalkTool, so several can be bound together.</li>
-            <li>support HDF5 URIs like vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_W[0]</li>
-            <li>HDF5 source flags old matlab save files which are not actually HDF5 files.</li>
-            <li>use automatic completions-based GUI instead of quite confusing data set selector droplist completions</li>
-            <li>keep track of reasons why a URI was rejected, and editors can visually hint at what is wrong</li>
-            <li>remote filesystems can have pointer to local copy, since data providers are often data consumers.</li>
-            <li>"keychain.txt" file can contain passwords to support batch processing.</li>
-            <li>reset zoom is now ctrl+shift+A, reset zoom X is ctrl+shift+X, reset zoom Y is ctrl+shift+Y, reset zoom Z is ctrl+shift+Z.</li>
-            <li>reset zoom now calls resetZoomX, resetZoomY, and resetZoomY so that we get a more precise zoom.</li>
         </ul>
 
         <p>Known issues:</p>
@@ -149,6 +125,8 @@
             <li>Excel spread sheets (.xls)</li>
             <li>das2Streams (.d2s or .das2Stream)</li>
             <li>ViRBO's TSDS server</li>
+            <li>CDAWeb data server (vap+cdaweb:)</li>
+            <li>das2servers (vap+das2server:)</li>
             <li>QStreams (.qds), QDataSet on a das2Stream
             <li>Plasma Wave Group das2 Server</li>
             <li>NetCDF files (.nc,.ncml)</li>
@@ -157,7 +135,7 @@
             <li>Cluster Exchange Format files (.cef)</li>
             <li>Fits Format Files</li>
             <li>Images (.jpg, .png, .gif)</li>
-            <li>Wav audio files</li>
+            <li>Wav audio files (.wav)</li>
         </ul>
 
     <p>This is not complete, and limitations include:</p>
