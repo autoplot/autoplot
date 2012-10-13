@@ -13,20 +13,30 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Diff;
+import org.virbo.datasource.AutoplotSettings;
 
 /**
  *
@@ -362,6 +372,30 @@ public class UndoRedoSupport {
 
             removeOldStates();
         }
+
+        if ( saveStateDepth>0 ) {
+            long t0= System.currentTimeMillis();
+            File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "state/" );
+            if ( !f2.exists() ) {
+                boolean ok= f2.mkdirs();
+                if ( !ok ) {
+                    throw new RuntimeException("unable to create folder "+ f2 );
+                }
+            }
+            File f3= new File( f2, TimeParser.create( "state_$Y$m$d_$H$M$S.vap.gz" ).format( TimeUtil.now(), null ) );
+            try {
+                OutputStream out= new GZIPOutputStream( new FileOutputStream(f3) );
+                StatePersistence.saveState( out, state, "");
+                out.close();
+            } catch (IOException ex) {
+                Logger.getLogger(UndoRedoSupport.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            System.err.println( String.format( "saved state file in %d ms", ( System.currentTimeMillis()-t0 ) ) );
+            
+        }
+
+
         propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, stateStackPos);
 
     }
@@ -438,6 +472,20 @@ public class UndoRedoSupport {
 
     public int getDepth() {
         return stateStackPos;
+    }
+
+    /**
+     * the number of states to keep in the states folder.  Presently this is only implemented so that 0 disables the feature.
+     */
+    public static final String PROP_SAVE_STATE_DEPTH= "saveStateDepth";
+    private int saveStateDepth= 0;
+
+    public int getSaveStateDepth() {
+        return saveStateDepth;
+    }
+
+    public void setSaveStateDepth( int depth ) {
+        this.saveStateDepth= depth;
     }
 
     /**
