@@ -287,7 +287,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
             } else { // typical route
                 result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, mon );
-
+                logger.log(Level.FINE, "got {0}", result);
             }
 
             boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
