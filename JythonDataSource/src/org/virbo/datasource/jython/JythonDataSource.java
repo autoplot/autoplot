@@ -59,8 +59,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     ExceptionListener listener;
     private Map<String, Object> metadata;
-    private final static String PARAM_SCRIPT= "script";
-    private final static String PARAM_TIMERANGE= "timerange";
+    protected final static String PARAM_SCRIPT= "script";
+    protected final static String PARAM_TIMERANGE= "timerange";
 
     private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
     private boolean notCheckedTsb= true;
