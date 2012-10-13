@@ -551,8 +551,18 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
+
+                MutablePropertyDataSet lablDs= null;
+                if ( labl!=null ) {
+                    try {
+                        lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                    } catch ( Exception ex ) {
+                        //label is not actally in the file.
+                    }
+                }
+
                 logger.log(Level.FINER, "displayType={0}", displayType);
-                if ( dep != null &&  ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) {
+                if ( dep != null &&   ( lablDs==null || ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) ) {
                     try {
                         String depName= (String)dep.get("NAME");
 

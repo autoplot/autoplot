@@ -347,8 +347,18 @@ public class CdfFileDataSource extends AbstractDataSource {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
+
+                MutablePropertyDataSet lablDs= null;
+                if ( labl!=null ) {
+                    try {
+                        lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                    } catch ( CDFException ex ) {
+                        //label is not actally in the file.
+                    }
+                }
+
                 logger.log(Level.FINER, "displayType={0}", displayType);
-                if ( dep != null &&  ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) {
+                if ( dep != null &&  ( lablDs==null || ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) ) {
                     try {
                         boolean reformDep= idep > 0;
                         if ( reformDep && cdf.getVariable( (String)dep.get("NAME") ).getRecVariance() ) {
@@ -406,7 +416,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 } else {
                     if (labl != null) {
                         try {
-                            MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                            MutablePropertyDataSet depDs = lablDs;
                             result.putProperty("DEPEND_" + idep, depDs);
                         } catch (Exception e) {
                             e.printStackTrace(); // to support lanl.
