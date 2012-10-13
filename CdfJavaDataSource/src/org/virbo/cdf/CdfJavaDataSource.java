@@ -549,7 +549,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
-                if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
+                if (dep != null ) {
                     try {
                         String depName= (String)dep.get("NAME");
 

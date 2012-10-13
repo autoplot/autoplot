@@ -263,6 +263,8 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         if ( mon==null ) mon= new NullProgressMonitor();
 
+        String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
+
         if (numRec == 0) {
             String funct= (String)thisAttributes.get("FUNCT");
             if ( thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" ) ) {
@@ -345,7 +347,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
-                if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
+                if (dep != null ) {
                     try {
                         boolean reformDep= idep > 0;
                         if ( reformDep && cdf.getVariable( (String)dep.get("NAME") ).getRecVariance() ) {
