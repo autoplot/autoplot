@@ -37,6 +37,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
@@ -270,6 +271,15 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     
     public void addExeceptionListener( ExceptionListener listener ) {
         this.listener= listener;
+    }
+
+    @Override
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==TimeSeriesBrowse.class ) {
+            return (T)new JythonDataSourceTimeSeriesBrowse("file:///");
+        } else {
+            return super.getCapability(clazz);
+        }
     }
 
 

@@ -4,10 +4,20 @@
  */
 package org.virbo.datasource.jython;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -17,6 +27,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
 
+    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
+    
     DatumRange timeRange;
     String uri;
     JythonDataSource jds;
@@ -67,5 +79,38 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         if (tr != null) {
             this.timeRange = tr;
         }
+    }
+
+    /**
+     * allow scripts to implement TimeSeriesBrowse if they check for the parameter "timerange"
+     * @param jythonScript
+     */
+    protected static JythonDataSourceTimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
+        BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
+
+        String line= reader.readLine();
+        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-zA-Z:/]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+        JythonDataSourceTimeSeriesBrowse tsb1=null;
+        while ( line!=null ) {
+            Matcher m= s.matcher(line);
+            if ( m.matches() ) {
+                tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
+                String str= m.group(1);
+                URISplit split= URISplit.parse(uri);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String stimerange= params.get( JythonDataSource.PARAM_TIMERANGE );
+                if ( stimerange!=null && stimerange.length()>0 ) {
+                    str= params.get( JythonDataSource.PARAM_TIMERANGE );
+                }
+                DatumRange tr= DatumRangeUtil.parseTimeRange(str);
+                tsb1.setTimeRange(tr);
+            } else if ( line.contains("timerange") && line.contains("getParam") ) {
+                logger.warning("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
+            }
+            line= reader.readLine();
+        }
+        reader.close();
+        return tsb1;
+
     }
 }
