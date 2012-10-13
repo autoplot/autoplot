@@ -948,7 +948,7 @@ public class PlotElementController extends DomNodeController {
                 lon = i;
             } else if (n.contains("time") ) {
                 slicePref.set( i,1 );
-            } else if (n.contains("epoch") ) {
+            } else if (n.contains("epoch") || UnitsUtil.isTimeLocation(u) ) {
                 slicePref.set( i,1 );
             } else if (n.contains("angle")) {
                 slicePref.set( i,4 );
