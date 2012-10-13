@@ -19,6 +19,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
@@ -31,6 +32,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -277,6 +279,21 @@ public class CDAWebDataSource extends AbstractDataSource {
             }
         } finally {
             mon.finished();
+        }
+
+        String displayType= (String) result.property( QDataSet.RENDER_TYPE );
+        if ( displayType!=null && displayType.equals("spectrogram") ) {
+            int rank= result.rank();
+            int nphys= 0;
+            for ( int i=1; i<rank; i++ ) {
+                QDataSet dep1= (QDataSet) result.property(QDataSet.DEPEND_1);
+                if ( !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
+            }
+            if ( nphys==0 ) {
+                logger.fine("removing display type becuayse of ordinal units");
+                result.putProperty( QDataSet.RENDER_TYPE,null );
+            }
+
         }
 
         if ( result!=null ) {
