@@ -368,7 +368,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
 
             QDataSet notes= notesBuilder.getDataSet();
-            if ( notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
+            if ( altResult!=null && notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
             return altResult;
             
         } else {
@@ -381,7 +381,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
 
             QDataSet notes= notesBuilder.getDataSet();
-            if ( notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
+            if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
             return result;
         }
 
