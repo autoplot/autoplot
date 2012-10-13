@@ -559,6 +559,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     } catch ( Exception ex ) {
                         //label is not actally in the file.
                     }
+                    if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
+                        logger.log(Level.FINER, "setting null displayType to time_series", displayType);
+                        displayType= "time_series";
+                    }
                 }
 
                 logger.log(Level.FINER, "displayType={0}", displayType);
