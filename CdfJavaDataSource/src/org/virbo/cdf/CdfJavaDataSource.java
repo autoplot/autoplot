@@ -454,6 +454,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         if ( mon==null ) mon= new NullProgressMonitor();
 
+        String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
+
         if (numRec == 0) {
             String funct= (String)thisAttributes.get("FUNCT");
             if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" )) {
@@ -549,7 +551,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
-                if (dep != null ) {
+                logger.log(Level.FINER, "displayType={0}", displayType);
+                if ( dep != null &&  ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) {
                     try {
                         String depName= (String)dep.get("NAME");
 
