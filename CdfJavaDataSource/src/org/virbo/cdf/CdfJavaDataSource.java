@@ -675,10 +675,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
             result.putProperty(QDataSet.DEPEND_2, dep1);
             result.putProperty(QDataSet.DEPEND_1, dep2);
 
-            Object att1 = attributes.get(QDataSet.DEPEND_1);
-            Object att2 = attributes.get(QDataSet.DEPEND_2);
-            attributes.put(QDataSet.DEPEND_1, att2);
-            attributes.put(QDataSet.DEPEND_2, att1);
+            Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
+            Object att2 = thisAttributes.get(QDataSet.DEPEND_2);
+            thisAttributes.put(QDataSet.DEPEND_1, att2);
+            thisAttributes.put(QDataSet.DEPEND_2, att1);
         }
 
         if (swapHack && slice && result.rank() == 2) { // need to swap for rank 3.
@@ -687,10 +687,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
             result.putProperty(QDataSet.DEPEND_1, dep0);
             result.putProperty(QDataSet.DEPEND_0, dep1);
 
-            Object att0 = attributes.get(QDataSet.DEPEND_0);
-            Object att1 = attributes.get(QDataSet.DEPEND_1);
-            attributes.put(QDataSet.DEPEND_0, att1);
-            attributes.put(QDataSet.DEPEND_1, att0);
+            Object att0 = thisAttributes.get(QDataSet.DEPEND_0);
+            Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
+            thisAttributes.put(QDataSet.DEPEND_0, att1);
+            thisAttributes.put(QDataSet.DEPEND_1, att0);
         }
         return result;
     }
