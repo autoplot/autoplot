@@ -287,7 +287,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             int nphys= 0;
             for ( int i=1; i<rank; i++ ) {
                 QDataSet dep1= (QDataSet) result.property(QDataSet.DEPEND_1);
-                if ( !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
+                if ( dep1==null || !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
             }
             if ( nphys==0 ) {
                 logger.fine("removing display type becuayse of ordinal units");
