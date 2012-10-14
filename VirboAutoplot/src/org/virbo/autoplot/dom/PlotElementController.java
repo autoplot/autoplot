@@ -958,7 +958,7 @@ public class PlotElementController extends DomNodeController {
                 slicePref.set( i,4 );
             } else if ( u instanceof EnumerationUnits ) {
                 slicePref.set( i,5 );
-            } else if ( fillDs.property( "BUNDLE_"+i )!=null ) {
+            } else if ( fillDs.property( "BUNDLE_"+i )!=null && fillDs.property("DEPEND_"+i)==null ) {
                 slicePref.set( i,5 );
             }
 
