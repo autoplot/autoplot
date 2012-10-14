@@ -193,9 +193,12 @@ public class MetadataUtil {
                      int st= s.nextInt();
                      int en= s.nextInt();
                 }
-            } else if ( cmd.startsWith("|total") ) {
+            } else if ( cmd.startsWith("|total") && cmd.length()==7 ) {
                 int dim= cmd.charAt(6)-'0';
                 properties= sliceProperties( properties, dim ); 
+            } else if ( cmd.startsWith("|total") && cmd.length()==6 ) {
+                int dim= s.nextInt();
+                properties= sliceProperties( properties, dim );
             } else if ( cmd.equals("|autoHistogram") ) {
                 Map<String,Object> newproperties= new HashMap<String,Object>();
                 newproperties.put( QDataSet.DEPEND_0, properties );
