@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>old "|slice(2)" was mis-handled in metadata sprocess, causing RTE</li>
             <li>old code in cdf readers would cause problem when displayType was spectrogram and their were <6 channels.</li>
             <li>3576060: jython data source doesn't have timerange set before going into editor, causing jumps to default time</li>
             <li>3575260: keep track of last location, because Ubuntu 12.04 opens windows up in odd places (off screen with 2 displays)</li>
