@@ -419,7 +419,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         result.putProperty("DEPEND_" + idep, depDs);
                 }
 
-                if ( labl!=null && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                if ( labl!=null && ( depDs==null || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                         QDataSet bundleDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
                         result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
                 }
