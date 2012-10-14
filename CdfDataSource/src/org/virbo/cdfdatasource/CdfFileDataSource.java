@@ -362,25 +362,27 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
 
                 logger.log(Level.FINER, "displayType={0}", displayType);
-                if ( dep != null &&  ( lablDs==null || ( idep==0 || !"time_series".equals(displayType) || labl==null ) ) ) {
-                    try {
+
+                MutablePropertyDataSet  depDs=null;
+
+                if ( dep != null ) {
+
+                        String depName= (String)dep.get("NAME");
+
+                        Variable depVar= cdf.getVariable( depName );
+                        if ( depVar==null ) {
+                            logger.fine("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
+                            continue;
+                        }
+
                         boolean reformDep= idep > 0;
-                        if ( reformDep && cdf.getVariable( (String)dep.get("NAME") ).getRecVariance() ) {
+
+                        if ( reformDep && cdf.getVariable( depName ).getRecVariance() ) {
                             reformDep= false;
                         }
-                        //if ( "ion_en".equals( (String) dep.get("NAME") ) ) reformDep= false;
-                        MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, reformDep, false, null);
 
-                        if ( labl!=null && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
-                            boolean lanlKludge= true;
-                            for ( int jj=0; jj<depDs.length(); jj++ ) {
-                                if ( depDs.value(jj)!=jj ) lanlKludge=false;
-                            }
-                            if ( lanlKludge ) {
-                                QDataSet bundleDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
-                                result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
-                            }
-                        }
+                        //if ( "ion_en".equals( (String) dep.get("NAME") ) ) reformDep= false;
+                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
@@ -391,6 +393,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                                 continue;
                             }
                         }
+
                         //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
                         if (depDs.rank() == 2 && depDs.length(0) == 2) {
                             MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
@@ -414,18 +417,11 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
 
                         result.putProperty("DEPEND_" + idep, depDs);
-                    } catch (RuntimeException e) {
-                        e.printStackTrace(); // to support lanl.
-                    }
-                } else {
-                    if (labl != null) {
-                        try {
-                            MutablePropertyDataSet depDs = lablDs;
-                            result.putProperty("DEPEND_" + idep, depDs);
-                        } catch (Exception e) {
-                            e.printStackTrace(); // to support lanl.
-                        }
-                    }
+                }
+
+                if ( labl!=null && depDs.rank()==1 && depDs.length()<100 ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                        QDataSet bundleDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, true, false, null);
+                        result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
                 }
             }
         }
