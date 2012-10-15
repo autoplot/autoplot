@@ -201,6 +201,10 @@ public class Test501 {
                     }
 
                     DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
+                    if ( tr.width().gt( org.das2.datum.Units.days.createDatum(30) ) ) {
+                        throw new IllegalArgumentException("exampleRange parameter is too large, limit is 30 days");
+                    }
+
                     uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
                     System.err.println("id: "+id );
