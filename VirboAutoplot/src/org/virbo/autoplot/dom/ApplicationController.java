@@ -2317,4 +2317,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         return false;
     }
 
+    /**
+     * return true if the axis is bound to any other property, such as another axis or the application timerange.
+     * @param a an axis or the colorbar.
+     * @return true if it is bound.
+     */
+    protected boolean isBoundAxis( Axis a ) {
+        BindingModel[] bms= getBindingsFor(a);
+        return bms.length>0;
+    }
+
 }
