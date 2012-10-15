@@ -719,18 +719,18 @@ public class PlotElementController extends DomNodeController {
         try {
             QDataSet fillDs = dsf.controller.getFillDataSet();
             if (fillDs != null) {
+                final String comp= plotElement.getComponent();
                 if (resetPlotElement) {
-                    if (plotElement.getComponent().equals("")) {
+                    if (comp.equals("")) {
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
                         //logger.fine(" fillDs:" + fillDs + "  renderType:"+ renderType );
 
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs, renderType);
                         setResetPlotElement(false);
-                    } else if ( plotElement.getComponent().startsWith("|") ) {
+                    } else if ( comp.startsWith("|") ) {
                         try {
                             QDataSet fillDs2 = fillDs;
-                            String comp= plotElement.getComponent();
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
                             RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
