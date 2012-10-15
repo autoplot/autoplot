@@ -1894,10 +1894,11 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
 
             logger.log(Level.FINE, "xaxis.isAutoRange={0}", peleCopy.getPlotDefaults().getXaxis().isAutoRange());
-            if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
-                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
+                logger.warning("20121015: I was thinking autorange would always be true");
             }
+            peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+            peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
             peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
             peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             
@@ -2000,15 +2001,17 @@ public class PlotElementController extends DomNodeController {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
 
-            if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
-
-                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
-                if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
-                    xdesc.range= DatumRangeUtil.newDimensionless( xdesc.range.min().doubleValue(xdesc.range.getUnits() ), xdesc.range.max().doubleValue(xdesc.range.getUnits()) );
-                }
-                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
+                logger.warning("20121015: I was thinking autorange would always be true");
             }
+            
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+
+            peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+            if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
+                xdesc.range= DatumRangeUtil.newDimensionless( xdesc.range.min().doubleValue(xdesc.range.getUnits() ), xdesc.range.max().doubleValue(xdesc.range.getUnits()) );
+            }
+            peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
             if (spec == RenderType.colorScatter) {
                 AutoplotUtil.AutoRangeDescriptor zdesc;
