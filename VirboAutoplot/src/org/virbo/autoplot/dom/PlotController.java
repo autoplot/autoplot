@@ -567,7 +567,12 @@ public class PlotController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             String contextStr;
             String shortContextStr;
+            if ( plotElement==null ) {
+                System.err.println("whoops, getting there");
+                return;
+            }
             QDataSet pds= plotElement.getController().getDataSet();
+            logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null ) {
                 contextStr= DataSetUtil.contextAsString(pds);
                 shortContextStr= contextStr;
@@ -746,6 +751,14 @@ public class PlotController extends DomNodeController {
 
         if ( !dom.controller.isValueAdjusting() ) {
             doPlotElementDefaultsChange(p);
+        } else {
+            //TODO: there's a copy of this code in doPlotElementDefaultsChange
+            if ( this.plotElement!=null ) {
+                this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            }
+            this.plotElement= p;
+            // this used to happen in doPlotElementDefaultsChange
+            p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
         }
         if ( !pdListen.contains(p) ) {
             p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
