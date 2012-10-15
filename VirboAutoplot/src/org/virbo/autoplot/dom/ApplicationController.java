@@ -2319,6 +2319,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * return true if the axis is bound to any other property, such as another axis or the application timerange.
+     * //TODO: ignore label bindings 
      * @param a an axis or the colorbar.
      * @return true if it is bound.
      */
