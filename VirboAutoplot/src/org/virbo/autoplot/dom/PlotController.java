@@ -510,6 +510,9 @@ public class PlotController extends DomNodeController {
         if ( x ) {
             logCheck(newSettings.getXaxis());
             plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
+            if ( newSettings.getXaxis().getRange().toString().equals("1984-01-17") ) {
+                System.err.println("here");
+            }
             plot.getXaxis().setRange(newSettings.getXaxis().getRange());
             plot.getXaxis().setAutoRange(true);
 
@@ -743,21 +746,6 @@ public class PlotController extends DomNodeController {
 
         if ( !dom.controller.isValueAdjusting() ) {
             doPlotElementDefaultsChange(p);
-        } else {
-            final PlotElement fp= p;
-            final String parent= fp.getParent().length()==0 ? fp.getId() : fp.getParent();
-            if ( ! pendingDefaultsChanges.containsKey(parent) ) { // call just once please
-                pendingDefaultsChanges.put( parent, fp.getId() );
-                new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
-                    @Override
-                    public void run() {
-                        doPlotElementDefaultsChange(fp);
-                        pendingDefaultsChanges.remove(parent);
-                    }
-                };
-            } else {
-                //System.err.println("already accounted for: "+fp);
-            }
         }
         if ( !pdListen.contains(p) ) {
             p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
@@ -892,16 +880,20 @@ public class PlotController extends DomNodeController {
             Plot defaults= getPlotDefaultsOneFamily(pes);
             PlotElement p= pes.get(0);
 
-            if ( !this.dom.getController().isBoundAxis(plot.getXaxis()) ) {
-                plot.getXaxis().setAutoRange(true);
-            }
+            if ( !plot.controller.getApplication().getController().isValueAdjusting() ) {
+                if ( !this.dom.getController().isBoundAxis(plot.getXaxis()) ) {
+                    plot.getXaxis().setAutoRange(true);
+                }
 
-            if ( !this.dom.getController().isBoundAxis(plot.getYaxis()) ) {
-                plot.getYaxis().setAutoRange(true);
-            }
+                if ( !this.dom.getController().isBoundAxis(plot.getYaxis()) ) {
+                    plot.getYaxis().setAutoRange(true);
+                }
 
-            if ( !this.dom.getController().isBoundAxis(plot.getZaxis()) ) {
-                plot.getZaxis().setAutoRange(true);
+                if ( !this.dom.getController().isBoundAxis(plot.getZaxis()) ) {
+                    plot.getZaxis().setAutoRange(true);
+                }
+            } else {
+                logger.warning("value is adjusting, no reset autorange");
             }
 
             if ( this.plotElement!=null ) {
