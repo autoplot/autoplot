@@ -892,6 +892,18 @@ public class PlotController extends DomNodeController {
             Plot defaults= getPlotDefaultsOneFamily(pes);
             PlotElement p= pes.get(0);
 
+            if ( !this.dom.getController().isBoundAxis(plot.getXaxis()) ) {
+                plot.getXaxis().setAutoRange(true);
+            }
+
+            if ( !this.dom.getController().isBoundAxis(plot.getYaxis()) ) {
+                plot.getYaxis().setAutoRange(true);
+            }
+
+            if ( !this.dom.getController().isBoundAxis(plot.getZaxis()) ) {
+                plot.getZaxis().setAutoRange(true);
+            }
+
             if ( this.plotElement!=null ) {
                 this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
             }
