@@ -159,6 +159,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 return ! result.containsKey(param);
             }
         } catch (Exception ex) {
+            logger.log( Level.SEVERE, surl, ex );
             return false;
         }
     }
