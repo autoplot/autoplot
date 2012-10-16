@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New NOTES property is finally introduced into QDataSet, allowing AggregatingDataSource to continue processing when there is an exception.</small></p>
+        <p><small>Bug in qds reader corrected, and a das2server can now send events data.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>reduce the number of processor threads (for now) in hopes to reduce load on Dan's server, which sometimes drops plots</li>
+            <li>events data set in qdataset didn't render properly because under-implemented copy method dropped properties.</li>
             <li>fixes for bugs found in CDAWeb source discovered by Bob's plot everything script.</li>
             <li>old "|slice(2)" was mis-handled in metadata sprocess, causing RTE</li>
             <li>old code in cdf readers would cause problem when displayType was spectrogram and their were <6 channels.</li>
