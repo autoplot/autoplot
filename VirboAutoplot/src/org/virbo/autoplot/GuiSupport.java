@@ -409,7 +409,15 @@ public class GuiSupport {
                         }
 
                         // mimic JChooser logic.
-                        File ff= new File(split.file);
+                        String s1= split.file;
+                        if ( s1.startsWith("file://") ) {
+                            s1= s1.substring(7);
+                        }
+                        if ( s1.startsWith("file:") ) {
+                            s1= s1.substring(5);
+                        }
+
+                        File ff= new File(s1);
                         name= ff.getAbsolutePath();
 
 
