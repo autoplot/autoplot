@@ -188,18 +188,36 @@ public class WavDataSourceFormat implements DataSourceFormat {
         float samplesPerSecond= 8000.0f;
 
 
-        if ( dep0!=null && dep0.length()>0 ) {
-            Units u= (Units) dep0.property( QDataSet.UNITS ) ;
+        if ( SemanticOps.isRank2Waveform(data) ) {
+            QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
+            if ( dep1==null || dep1.length()<2 ) {
+                throw new IllegalArgumentException("dep1 length must be at least 2");
+            }
+            Units u= (Units) dep1.property( QDataSet.UNITS ) ;
             if ( u==null ) {
                 u= Units.dimensionless;
-            } else {
-                u= u.getOffsetUnits();  // allow for datasets with timetags.
             }
-
             UnitsConverter uc= u.getConverter( Units.seconds );
-            double periodSeconds= uc.convert( dep0.value(1) - dep0.value(0) );
+            double periodSeconds= uc.convert( dep1.value(1) - dep1.value(0) );
 
-            samplesPerSecond= (float) Math.round( 1 / periodSeconds );
+            samplesPerSecond= (float) Math.round( 1/periodSeconds );
+
+        } else {
+            if ( dep0!=null && dep0.length()>1 ) {
+                Units u= (Units) dep0.property( QDataSet.UNITS ) ;
+                if ( u==null ) {
+                    u= Units.dimensionless;
+                } else {
+                    u= u.getOffsetUnits();  // allow for datasets with timetags.
+                }
+
+                UnitsConverter uc= u.getConverter( Units.seconds );
+                double periodSeconds= uc.convert( dep0.value(1) - dep0.value(0) );
+
+                samplesPerSecond= (float) Math.round( 1 / periodSeconds );
+            } else {
+                throw new IllegalArgumentException("dep0 length must be at least 2");
+            }
         }
 
         Map<String, String> params2 = new HashMap<String, String>();
