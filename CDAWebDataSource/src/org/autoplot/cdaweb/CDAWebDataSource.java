@@ -281,22 +281,22 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.finished();
         }
 
-        String displayType= (String) result.property( QDataSet.RENDER_TYPE );
-        if ( displayType!=null && displayType.equals("spectrogram") ) {
-            int rank= result.rank();
-            int nphys= 0;
-            for ( int i=1; i<rank; i++ ) {
-                QDataSet dep1= (QDataSet) result.property(QDataSet.DEPEND_1);
-                if ( dep1==null || !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
-            }
-            if ( nphys==0 ) {
-                logger.fine("removing display type becuayse of ordinal units");
-                result.putProperty( QDataSet.RENDER_TYPE,null );
-            }
-
-        }
-
         if ( result!=null ) {
+            String displayType= (String) result.property( QDataSet.RENDER_TYPE );
+            if ( displayType!=null && displayType.equals("spectrogram") ) {
+                int rank= result.rank();
+                int nphys= 0;
+                for ( int i=1; i<rank; i++ ) {
+                    QDataSet dep1= (QDataSet) result.property(QDataSet.DEPEND_1);
+                    if ( dep1==null || !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
+                }
+                if ( nphys==0 ) {
+                    logger.fine("removing display type becuayse of ordinal units");
+                    result.putProperty( QDataSet.RENDER_TYPE,null );
+                }
+
+            }
+
             List<String> problems= new ArrayList();
             if ( ! DataSetUtil.validate(result,problems) ) {
                 throw new Exception("calculated dataset is not well-formed: "+uri + ". " + problems );
