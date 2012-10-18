@@ -667,23 +667,32 @@ public class DataSetURI {
                 tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
                 if ( !allowHtml && tfile.exists() && url!=null ) checkNonHtml( tfile, url );
             } else {
-                FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
-                if ( foz.exists() ) {
-                    File fz= foz.getFile(mon);
-                    if ( !allowHtml && fz.exists() && url!=null ) checkNonHtml( fz, url );
-                    File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
-                    tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
-                    org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
-                    if ( tfile.exists() ) {
-                        if ( ! tfile.delete() ) {
-                            throw new IllegalArgumentException("unable to delete "+tfile );
+                synchronized ( DataSetURI.class ) { // all this needs review, because often Apache servers will also unpack files.
+                    FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
+                    if ( foz.exists() ) {
+                        logger.log(Level.FINE, "getting file from compressed version: {0}", foz);
+                        File fz= foz.getFile(mon);
+                        if ( !allowHtml && fz.exists() && url!=null ) checkNonHtml( fz, url );
+                        File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
+                        tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
+                        if ( !tfile.exists() ) { // another thread already unpacked it.
+                            org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
+                            if ( tfile.exists() ) {
+                                if ( ! tfile.delete() ) {
+                                    throw new IllegalArgumentException("unable to delete "+tfile );
+                                }
+                            } // it shouldn't, but to be safe...
+                            if ( ! tfile1.renameTo(tfile) ) {
+                                if ( !tfile.exists() ) {
+                                    throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
+                                }
+                            }
+                        } else {
+                            logger.log(Level.FINE, "another thread appears to have already prepared {0}", tfile);
                         }
-                    } // it shouldn't, but to be safe...
-                    if ( ! tfile1.renameTo(tfile) ) {
-                        throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
+                    } else {
+                        throw new FileNotFoundException("File not found: "+ split.resourceUri );
                     }
-                } else {
-                    throw new FileNotFoundException("File not found: "+ split.resourceUri );
                 }
             }
             return tfile;
