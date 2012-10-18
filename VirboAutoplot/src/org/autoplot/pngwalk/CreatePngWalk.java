@@ -232,8 +232,8 @@ public class CreatePngWalk {
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-            mon.setProgressMessage( String.format("skipping %s", filename ) );
-            logger.log( Level.FINE, String.format("skipping %s", filename ) );
+            mon.setProgressMessage( String.format("write %s", filename ) );
+            logger.log( Level.FINE, String.format("write %s", filename ) );
 
             appmodel.waitUntilIdle(false);
             if ( params.autorange ) {
