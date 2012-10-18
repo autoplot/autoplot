@@ -624,6 +624,10 @@ public class DataSetURI {
                         throw new IllegalArgumentException("unable to rename "+tfile1 + " to "+ tfile );
                     }
                 } else {
+                    //repeated code lurking, line 698
+                    if ( split.path.endsWith("/tmp/") ) { // try to download the file directly.
+                        return downloadResourceAsTempFile(url, mon);
+                    }
                     throw new FileNotFoundException("File not found: "+url );
                 }
             }
@@ -691,6 +695,10 @@ public class DataSetURI {
                             logger.log(Level.FINE, "another thread appears to have already prepared {0}", tfile);
                         }
                     } else {
+                        // there is repeated code lurking.  See line 616.
+                        if ( split.path.endsWith("/tmp/") ) { // try to download the file directly.
+                           return downloadResourceAsTempFile(url, mon);
+                        }
                         throw new FileNotFoundException("File not found: "+ split.resourceUri );
                     }
                 }
