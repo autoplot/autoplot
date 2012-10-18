@@ -88,6 +88,12 @@ public class CreatePngWalk {
          * if true, skip over products that appear to be created already.
          */
         public boolean update= false;
+
+        @Override
+        public String toString() {
+            return String.format( "outputFolder=%s\ntimeRange=%s\nrescalex=%s\nautorange=%s\nversion=%s\nproduct=%s\ntimeFormat=%s\ncreateThumbs=%s\nupdate=%s\n",
+                    outputFolder, timeRangeStr, rescalex, autorange, version, product, timeFormat, createThumbs, update  );
+        }
     }
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
