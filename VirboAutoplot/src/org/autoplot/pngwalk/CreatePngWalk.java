@@ -159,6 +159,7 @@ public class CreatePngWalk {
         dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") );
 
         mon.setProgressMessage("write " + params.product + ".vap");
+        logger.log(Level.FINE, "write {0}.vap", params.product);
 
 
         int thumbSize = 400;
@@ -214,7 +215,8 @@ public class CreatePngWalk {
             if ( params.update ) {
                 File out= new File( filename );
                 if ( out.exists() ) {
-                    mon.setProgressMessage(String.format("skipping " + params.product + "_%s%s.png", i, vers ));
+                    mon.setProgressMessage( String.format("skipping %s", filename ) );
+                    logger.log( Level.FINE, String.format("skipping %s", filename ) );
                     continue;
                 }
             }
@@ -230,8 +232,8 @@ public class CreatePngWalk {
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-            mon.setProgressMessage(String.format("write " + params.product + "_%s%s.png", i, vers ));
-            logger.log( Level.FINE, "write {0}_%s.png", params.product);
+            mon.setProgressMessage( String.format("skipping %s", filename ) );
+            logger.log( Level.FINE, String.format("skipping %s", filename ) );
 
             appmodel.waitUntilIdle(false);
             if ( params.autorange ) {
