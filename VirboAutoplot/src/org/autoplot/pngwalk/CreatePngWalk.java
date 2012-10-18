@@ -117,6 +117,7 @@ public class CreatePngWalk {
 
     public static void doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
 
+        logger.log( Level.CONFIG, "CreatePngWalk.doBatch with params {0}", params);
         if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
             params.outputFolder= params.outputFolder + "/";
         }
