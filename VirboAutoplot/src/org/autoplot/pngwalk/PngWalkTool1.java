@@ -822,7 +822,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             v.setSequence(seq);
         }
         if ( seq.size()==0 ) {
-            setStatus("warning: Done listing "+seq.getTemplate()+", and no files were found");
+            setStatus("warning: no files found in "+seq.getTemplate() );
         } else {
             indexListener.propertyChange( null );
             if (qcPanel != null ) {
