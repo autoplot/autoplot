@@ -169,7 +169,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         dialog.setModal(false);
         dialog.setResizable(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        final JTextArea messageArea = new JTextArea(12, 40);
+        final JTextArea messageArea = new JTextArea(12, 60);
         messageArea.setLineWrap(true);
         messageArea.setWrapStyleWord(true);
         messageArea.setEditable(false);
@@ -194,7 +194,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
 
-        final JTextArea traceArea = new JTextArea(10, 40);
+        final JTextArea traceArea = new JTextArea(10, 60);
         traceArea.setLineWrap(false);
         traceArea.setEditable(false);
         traceArea.setTabSize(4);
