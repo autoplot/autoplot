@@ -291,7 +291,9 @@ public class RowPngWalkView extends PngWalkView {
                     paintQualityControlIcon( i, g2, imgX, imgY, true );
                 }
                 int ds=6;
-                if ( drs!=null && i<seq.size()-1 && wimage.getDatumRange()!=null && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                if ( drs!=null && i<seq.size()-1 
+                        && wimage.getDatumRange()!=null && seq.imageAt(i+1).getDatumRange()!=null
+                        && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
                     g2.setColor(Color.GRAY);
                     int cx = i*cellSize + ( cellSize ) - ds;
                     int cy = ( cellSize ) - fm.getHeight() - 3;
@@ -300,7 +302,9 @@ public class RowPngWalkView extends PngWalkView {
                     g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
                     g2.setClip(oldClip);
                 }
-                if ( drs!=null && i>0 && wimage.getDatumRange()!=null  && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
+                if ( drs!=null && i>0 
+                        && wimage.getDatumRange()!=null  && seq.imageAt(i+1).getDatumRange()!=null
+                        && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
                     g2.setColor(Color.GRAY);
                     int cx = i*cellSize;
                     int cy = ( cellSize ) - fm.getHeight() - 3;
