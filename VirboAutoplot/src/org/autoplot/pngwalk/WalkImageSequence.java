@@ -93,7 +93,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 if ( uris.size()>0 ) {
                     setStatus( "Done listing "+template );
                 } else {
-                    setStatus( "warning: Done listing "+template+", and no files were found" );
+                    setStatus( "warning: no files found in "+template );
                 }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
