@@ -336,7 +336,8 @@ public class CreatePngWalk {
                     }
 
                     if (ScriptContext.getViewWindow() != null) {
-                        final String st= url + params.product + "_" + params.timeFormat + ".png";
+                        String vers= params.version!=null ? "_"+params.version : "";
+                        final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
                                 PngWalkTool1.start( st, ScriptContext.getViewWindow() );
