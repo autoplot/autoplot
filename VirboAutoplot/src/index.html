@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug in qds reader corrected, and a das2server can now send events data.</small></p>
+        <p><small>Files with unreadable parents can be read again, and a jython script to check this will run in the nightly tests.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3574831: code clean up broke forgotten feature where an http file could be plotted even if it wasn't part of http filesystem. Thanks Tami and Darren!</li>
+            <li>3578229: orbit 00003 and 3 were not recognized as equivalent as other codes see it, so pngwalks would fail.</li>
+            <li>3577939: orbit files must have at least one valid orbit because mediawiki doesn't provide file-not-found code</li>
+            <li>make pngwalk would fail to show pngwalk when version was used</li>
+            <li>3578898: improve feedback in spectograms when all timetags appear to be fill.</li>
             <li>reduce the number of processor threads (for now) in hopes to reduce load on Dan's server, which sometimes drops plots</li>
             <li>events data set in qdataset didn't render properly because under-implemented copy method dropped properties.</li>
             <li>fixes for bugs found in CDAWeb source discovered by Bob's plot everything script.</li>
@@ -77,6 +82,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>stack of lineplots view when CDF Y Tags are rank 2</li>
             <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
             <li>delegate granule in aggregation is based on timerange, if available</li>
             <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
