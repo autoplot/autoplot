@@ -36,6 +36,7 @@
         </j2se>
         
         <property name="jnlp.packEnabled" value="true"/>
+        <property name="deployment.security.authenticator" value="false"/>
 
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
