@@ -166,7 +166,7 @@ public class DataSetSelectorSupport {
     }
 
     public Action openLocalAction() {
-        return new AbstractAction("Add Data from Local File...") {
+        return new AbstractAction("Add Plot from Local File...") {
 
             public void actionPerformed(ActionEvent e) {
                 String result= browseLocal(ui);
