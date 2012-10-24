@@ -266,7 +266,8 @@ public class CdfFileDataSource extends AbstractDataSource {
         String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
 
         if (numRec == 0) {
-            String funct= (String)thisAttributes.get("FUNCT");
+            String funct= (String)thisAttributes.get("FUNCTION");
+            if ( funct==null ) funct= (String)thisAttributes.get("FUNCT");
             if ( thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" ) ) {
                 // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
                 // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
