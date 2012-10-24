@@ -35,6 +35,7 @@ import static org.virbo.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test501 {
+    private static final int READ_SIZE_LIMIT_DAYS = 400; // chris has /voyager2/pws/SpecAnalyzer-Distogram.dsdf which is about a year, intentionally.
 
     private static final int testid=501;
 
@@ -201,8 +202,8 @@ public class Test501 {
                     }
 
                     DatumRange tr= DatumRangeUtil.parseTimeRangeValid(exampleRange);
-                    if ( tr.width().gt( org.das2.datum.Units.days.createDatum(30) ) ) {
-                        throw new IllegalArgumentException("exampleRange parameter is too large, limit is 30 days");
+                    if ( tr.width().gt( org.das2.datum.Units.days.createDatum(READ_SIZE_LIMIT_DAYS) ) ) {
+                        throw new IllegalArgumentException("exampleRange parameter is too large, limit is "+READ_SIZE_LIMIT_DAYS+" days");
                     }
 
                     uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
