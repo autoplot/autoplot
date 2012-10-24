@@ -379,7 +379,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
     /**
      * returns the rank 2 dataset produced by the ascii table reader.
-     * @param mon
+     * @param mon note monitor is used twice, so the progress bar jumps back.
      * @return
      * @throws java.lang.NumberFormatException
      * @throws java.io.IOException
@@ -764,8 +764,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             buff.position( tailCount<tailNum ? 0 : ipos+1 );
             InputStream in= new ByteBufferInputStream(buff);
+            mon.setProgressMessage("reading "+file);
             ds1 = (DDataSet) parser.readStream( new InputStreamReader(in), mon); //DANGER
         } else {
+            mon.setProgressMessage("reading "+file);
             ds1 = (DDataSet) parser.readFile(file.toString(), mon); //DANGER
         }
 
