@@ -193,8 +193,8 @@ public class CreatePngWalk {
         if ( params.autorange ) {
             ff.println( "autorange="+ params.autorange );
         }
-        if ( params.version!=null ) {
-            ff.println( "version="+ params.autorange );
+        if ( params.version!=null && params.version.trim().length()>0 ) {
+            ff.println( "version="+ params.version );
         }
         ff.close();
         
@@ -207,7 +207,7 @@ public class CreatePngWalk {
         long t0 = java.lang.System.currentTimeMillis();
         int count = 0;
 
-        String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version;
+        String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
 
         for ( String i : times ) {
 
@@ -336,7 +336,7 @@ public class CreatePngWalk {
                     }
 
                     if (ScriptContext.getViewWindow() != null) {
-                        String vers= params.version!=null ? "_"+params.version : "";
+                        String vers= ( params.version!=null || params.version.trim().length()==0 ) ? "_"+params.version.trim() : "";
                         final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
