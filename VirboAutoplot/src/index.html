@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Files with unreadable parents can be read again, and a jython script to check this will run in the nightly tests.</small></p>
+        <p><small>Another round of improvements with the LSpec routine so that it can now deal with missing data.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>tweak menu labels in the file menu</li>
+            <li>3579786: LSpec routine handles fill more gracefully</li>
             <li>3574831: code clean up broke forgotten feature where an http file could be plotted even if it wasn't part of http filesystem. Thanks Tami and Darren!</li>
             <li>3578229: orbit 00003 and 3 were not recognized as equivalent as other codes see it, so pngwalks would fail.</li>
             <li>3577939: orbit files must have at least one valid orbit because mediawiki doesn't provide file-not-found code</li>
