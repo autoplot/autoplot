@@ -251,7 +251,7 @@ public class Test501 {
         if ( failures.size()>0 ) {
             System.err.println( String.format( "found %d failures:", failures.size() ) );
             for ( int i: failures.keySet() ) {
-                System.err.println( String.format( "%03d: %s", i, failures.get(i) ) );
+                System.err.println( String.format( "(%03d): %s", i, failures.get(i) ) );
             }
             System.exit(1);
         } else {
