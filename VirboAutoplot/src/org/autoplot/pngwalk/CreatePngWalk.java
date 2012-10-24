@@ -336,7 +336,9 @@ public class CreatePngWalk {
                     }
 
                     if (ScriptContext.getViewWindow() != null) {
-                        String vers= ( params.version!=null || params.version.trim().length()==0 ) ? "_"+params.version.trim() : "";
+                        logger.log(Level.FINE, "version=\"{0}\"", String.valueOf(params.version));
+
+                        String vers= ( params.version!=null || params.version.trim().length()==0 ) ? ( "_"+params.version.trim() ) : "";
                         final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
