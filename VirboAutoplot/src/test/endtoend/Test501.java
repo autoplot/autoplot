@@ -61,7 +61,9 @@ public class Test501 {
      * @throws Exception
      */
     private static String do1( String uri, int iid, boolean doTest ) throws Exception {
-        
+
+        System.err.printf( "uri: %s\n", uri );
+
         long t0= System.currentTimeMillis();
         QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri );
 
@@ -109,7 +111,7 @@ public class Test501 {
             result= null;
         }
         writeToPng( name );
-        System.err.printf( "wrote to file: "+name );
+        System.err.printf( "wrote to file: %s\n", name );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
 
@@ -193,9 +195,16 @@ public class Test501 {
 
                 String uri= "";
                 try {
+                    System.err.println( String.format( "uri: vap+das2server:%s?dataset=%s", dss.getURL(), id  ) );
 
                     StreamDescriptor dsdf= dss.getStreamDescriptor( dss.getURL(id) );
                     String exampleRange= (String) dsdf.getProperty("exampleRange"); // discovery properties have this, just make sure something comes back.
+
+                    if ( exampleRange==null ) {
+                        iis++;
+                        System.err.println( "test that should have had exampleRange did not: " + id );
+                        continue;
+                    }
                     int ic= exampleRange.indexOf("|");
                     if ( ic>-1 ) {
                         exampleRange= exampleRange.substring(0,ic);
@@ -208,7 +217,6 @@ public class Test501 {
 
                     uri= "vap+das2server:"+dss.getURL() + "?dataset="+id + "&start_time="+tr.min() + "&end_time=" + tr.max();
 
-                    System.err.println("id: "+id );
                     System.err.println("uri: "+uri);
 
                     do1( uri, iid, false );
