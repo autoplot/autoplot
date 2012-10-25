@@ -6,6 +6,7 @@
 package org.virbo.autoplot;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class AppManager {
     public void closeApplication( Object app ) {
         this.apps.remove(app);
         if ( this.apps.isEmpty() ) {
-            System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+            quit();
         }
     }
 
@@ -46,7 +47,11 @@ public class AppManager {
     }
 
     public void quit(  ) {
-        System.exit(0);
+        for ( ActionListener c: closeCallbacks ) {
+            ActionEvent e= new ActionEvent(this,0,"");
+            c.actionPerformed(e);
+        }
+        System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
     }
 
     public WindowListener getWindowListener( final Object app, final Action closeAction ) {
@@ -91,5 +96,12 @@ public class AppManager {
      */
     public int getApplicationCount() {
         return apps.size();
+    }
+
+    List<ActionListener> closeCallbacks= new ArrayList<ActionListener>();
+
+    public synchronized void addCloseCallback( ActionListener c ) {
+        if ( closeCallbacks.contains(c) ) closeCallbacks.remove(c); // make sure there's only one.
+        closeCallbacks.add(c);
     }
 }
