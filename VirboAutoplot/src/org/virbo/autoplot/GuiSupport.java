@@ -1107,16 +1107,6 @@ public class GuiSupport {
 
         mouseAdapter.addMenuItem(bindingMenu);
 
-        item = new JMenuItem(new AbstractAction("Remove Bindings") {
-            public void actionPerformed(ActionEvent e) {
-                BindingModel[] bms= controller.getBindingsFor(axis);
-                controller.unbind(axis);  // TODO: check for application timerange
-                controller.setStatus("removed "+bms.length+" bindings");
-            }
-        });
-        item.setToolTipText("remove any plot and plot element property bindings");
-        bindingMenu.add(item);
-
         if (axis == plot.getXaxis()) {
             item = new JMenuItem(new AbstractAction("Add Binding to Application Time Range") {
 
@@ -1179,6 +1169,17 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+            public void actionPerformed(ActionEvent e) {
+                BindingModel[] bms= controller.getBindingsFor(axis);
+                controller.unbind(axis);  // TODO: check for application timerange
+                controller.setStatus("removed "+bms.length+" bindings");
+            }
+        });
+        item.setToolTipText("remove any plot and plot element property bindings");
+        bindingMenu.add(item);
+
         expertMenuItems.add(bindingMenu);
 
         JMenu connectorMenu = new JMenu("Connector");
