@@ -1253,8 +1253,10 @@ APSplash.checkTime("init 52");
 
         fileMenu.add( new AbstractAction( "Quit" ) {
             public void actionPerformed( ActionEvent ev ) {
-                AutoplotUI.this.dispose();
-                AppManager.getInstance().quit();
+                if ( AppManager.getInstance().requestQuit() ) {
+                    AutoplotUI.this.dispose();
+                    AppManager.getInstance().quit();
+                }
             }
         });
 
