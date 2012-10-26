@@ -12,6 +12,8 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  * Count the number of open applications and call exit when there are zero.
@@ -47,11 +49,20 @@ public class AppManager {
     }
 
     public void quit(  ) {
-        for ( ActionListener c: closeCallbacks ) {
-            ActionEvent e= new ActionEvent(this,0,"");
-            c.actionPerformed(e);
-        }
         System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+    }
+
+    /**
+     * returns true if quit can be called, exiting the program.
+     * @return
+     */
+    public boolean requestQuit() {
+        System.err.println("request quit");
+        boolean okay= true;
+        for ( CloseCallback c: closeCallbacks ) {
+            okay= okay && c.checkClose();
+        }
+        return okay;
     }
 
     public WindowListener getWindowListener( final Object app, final Action closeAction ) {
@@ -61,6 +72,13 @@ public class AppManager {
             }
 
             public void windowClosing(WindowEvent e) {
+                boolean okay= true;
+                for ( CloseCallback c: closeCallbacks ) {
+                    okay= okay && c.checkClose();
+                }
+                if ( !okay ) {
+                    return;
+                }
                 if ( closeAction!=null ) {
                     closeAction.actionPerformed( new ActionEvent(this,e.getID(),"close") );
                 }
@@ -98,9 +116,20 @@ public class AppManager {
         return apps.size();
     }
 
-    List<ActionListener> closeCallbacks= new ArrayList<ActionListener>();
+    /**
+     * anything that wants an opportunity to cancel the close request should register here.
+     */
+    public interface CloseCallback {
+        /**
+         * return true if the callback okays the close.
+         * @return
+         */
+        boolean checkClose();
+    }
 
-    public synchronized void addCloseCallback( ActionListener c ) {
+    List<CloseCallback> closeCallbacks= new ArrayList();
+
+    public synchronized void addCloseCallback( CloseCallback c ) {
         if ( closeCallbacks.contains(c) ) closeCallbacks.remove(c); // make sure there's only one.
         closeCallbacks.add(c);
     }
