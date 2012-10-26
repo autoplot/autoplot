@@ -426,8 +426,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         fileMenu.add( new AbstractAction( "Quit" ) {
             public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                AppManager.getInstance().quit();
+                if ( AppManager.getInstance().requestQuit() ) {
+                    frame.dispose();
+                    AppManager.getInstance().quit();
+                }
             }
         } );
 
