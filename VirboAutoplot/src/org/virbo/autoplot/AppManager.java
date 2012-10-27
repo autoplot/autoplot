@@ -5,14 +5,17 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import javax.swing.Action;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -35,12 +38,24 @@ public class AppManager {
 
     public void addApplication( Object app ) {
         this.apps.add(app);
+        if ( app instanceof JFrame ) {
+            ((JFrame)app).setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE );
+        }
     }
 
     public void closeApplication( Object app ) {
-        this.apps.remove(app);
-        if ( this.apps.isEmpty() ) {
-            quit();
+        if ( app instanceof AutoplotUI ) { // there's a bug here--we need to associate just with autoplot app.
+            if ( requestQuit() ) {
+                this.apps.remove(app);
+                if ( this.apps.isEmpty() ) {
+                    quit();
+                }
+            }
+        } else {
+            this.apps.remove(app);
+            if ( this.apps.isEmpty() ) {
+                quit();
+            }
         }
     }
 
@@ -53,14 +68,23 @@ public class AppManager {
     }
 
     /**
-     * returns true if quit can be called, exiting the program.
+     * returns true if quit can be called, exiting the program.  If the callback throws an exception, then a warning is displayed.  I expect
+     * this will often occur in scripts.
      * @return
      */
     public boolean requestQuit() {
         System.err.println("request quit");
         boolean okay= true;
-        for ( CloseCallback c: closeCallbacks ) {
-            okay= okay && c.checkClose();
+        for ( Entry<String,CloseCallback> ent: closeCallbacks.entrySet() ) {
+            try {
+                okay= okay && ent.getValue().checkClose();
+            } catch ( Exception e ) {
+                Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
+                if ( ! ( parent instanceof Component ) ) {
+                    parent=null;
+                }
+                JOptionPane.showMessageDialog( (Component)parent, String.format( "<html>Unable to call closeCallback id=\"%s\",<br>because of exception:<br>%s", ent.getKey(), e ) );
+            }
         }
         return okay;
     }
@@ -72,10 +96,7 @@ public class AppManager {
             }
 
             public void windowClosing(WindowEvent e) {
-                boolean okay= true;
-                for ( CloseCallback c: closeCallbacks ) {
-                    okay= okay && c.checkClose();
-                }
+                boolean okay= requestQuit();
                 if ( !okay ) {
                     return;
                 }
@@ -127,10 +148,10 @@ public class AppManager {
         boolean checkClose();
     }
 
-    List<CloseCallback> closeCallbacks= new ArrayList();
+    HashMap<String,CloseCallback> closeCallbacks= new LinkedHashMap();
 
-    public synchronized void addCloseCallback( CloseCallback c ) {
-        if ( closeCallbacks.contains(c) ) closeCallbacks.remove(c); // make sure there's only one.
-        closeCallbacks.add(c);
+    public synchronized void addCloseCallback( String id, CloseCallback c ) {
+        closeCallbacks.remove(id);
+        closeCallbacks.put(id,c);
     }
 }
