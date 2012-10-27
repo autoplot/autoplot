@@ -14,6 +14,8 @@ package org.virbo.datasource;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -367,7 +369,15 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange(getRange().toString());
-        JDialog dia= new JDialog(SwingUtilities.getWindowAncestor(this));
+        Window parent= SwingUtilities.getWindowAncestor(this);
+        JDialog dia;
+        if ( parent instanceof JFrame ) { //JAVA6 will clean this up.
+            dia= new JDialog((JFrame)parent);
+        } else if ( parent instanceof Dialog ) {
+            dia= new JDialog((Dialog)parent);
+        } else {
+            dia= new JDialog();
+        }
         dia.add( t );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
