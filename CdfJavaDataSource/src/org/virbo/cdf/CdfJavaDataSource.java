@@ -522,7 +522,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     units= u;
                 }
             } else {
-                units= Units.dimensionless;
+                units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
             }
         } else {
             // doFill must not be true for this branch.
