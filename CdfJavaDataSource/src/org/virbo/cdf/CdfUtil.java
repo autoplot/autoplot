@@ -37,6 +37,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
+import org.virbo.dataset.WeightsDataSet;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
@@ -131,7 +132,7 @@ public class CdfUtil {
         double dmin=Double.NEGATIVE_INFINITY;
         double dmax=Double.POSITIVE_INFINITY;
         if ( ds.rank()==1 ) {
-            QDataSet range= Ops.extent(ds);
+            QDataSet range= Ops.extent(ds,null,null);
             dmin= uc.convert(range.value(0));
             dmax= uc.convert(range.value(1));
         }
