@@ -504,7 +504,7 @@ public class CdfUtil {
         }
 
 //logger.fine( "jvmMemory (MB): "+jvmMemory(result)/1024/1024 );
-        if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 ) {
+        if ( varType==CDFConstants.CDF_EPOCH || varType==CDFConstants.CDF_EPOCH16 || varType==CDFConstants.CDF_TT2000 ) {
             String cdfFile;
             synchronized ( CdfJavaDataSource.lock ) {
                 cdfFile= CdfJavaDataSource.openFilesRev.get(cdf);
@@ -522,9 +522,11 @@ public class CdfUtil {
     
 
     /**
-     * returns the amount of JVM memory occupied by the dataset. (Approx.)
-     * @param ds
-     * @return
+     * returns the amount of JVM memory in bytes occupied by the dataset. This is an approximation,
+     * calculated by taking the element type size (e.g. float=4 bytes) times the number of elements for
+     * the dataset.
+     * @param ds the ArrayDataSet, or TrArrayDataSet.
+     * @return the approximate memory consumption in bytes
      */
     public static int jvmMemory( QDataSet ds ) {
         if ( ds instanceof ArrayDataSet ) {
