@@ -116,6 +116,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
     }
 
+    public static void printCacheReport() {
+        synchronized ( dslock ) {
+            for ( Entry<String,MutablePropertyDataSet> entry: dsCache.entrySet() ) {
+                int mem= CdfUtil.jvmMemory(entry.getValue());
+                System.err.println( String.format( "%9d %s %s", mem, entry.getKey(), entry.getValue() ) );
+            }
+        }
+    }
+
     /**
      * get the abstract access object to the given CDF file.  This provides read-only access to the file, and a cache
      * is used to limit the number of references managed.
