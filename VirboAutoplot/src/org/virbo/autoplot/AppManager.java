@@ -73,7 +73,6 @@ public class AppManager {
      * @return
      */
     public boolean requestQuit() {
-        System.err.println("request quit");
         boolean okay= true;
         for ( Entry<String,CloseCallback> ent: closeCallbacks.entrySet() ) {
             try {
