@@ -1238,6 +1238,11 @@ APSplash.checkTime("init 52");
                             "Quit application?", "Quit Autoplot", JOptionPane.YES_NO_CANCEL_OPTION );
                     if ( opt==JOptionPane.YES_OPTION ) {
                         //normal route
+                        if ( AppManager.getInstance().requestQuit() ) {
+                            
+                        } else {
+                            return;
+                        }
                     } else if ( opt==JOptionPane.NO_OPTION ) {
                         AutoplotUI.this.dom.getController().reset();
                         return;
