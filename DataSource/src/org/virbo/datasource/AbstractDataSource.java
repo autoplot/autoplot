@@ -206,10 +206,22 @@ public abstract class AbstractDataSource implements DataSource {
         return MetadataModel.createNullModel();
     }
 
+    /**
+     * return metadata in canonical form using the metadata model.  If there
+     * are no properties or a null model, then an empty map is returned.
+     * Note, getMetadataModel should return non-null, and getMetadata should return non-null,
+     * but this guards against the mistake.
+     * @return
+     */
     public Map<String, Object> getProperties() {
         try {
             Map<String, Object> meta = getMetadata(new NullProgressMonitor());
-            return getMetadataModel().properties(meta);
+            if ( meta==null || getMetadataModel()==null ) {
+                logger.log( Level.INFO, "handling case where metadata or metadataModel is null: {0}, but this should be fixed.", this);
+                return Collections.emptyMap();
+            } else {
+                return getMetadataModel().properties(meta);
+            }
         } catch (Exception e) {
             logger.log( Level.SEVERE, "exception in getProperties", e );
             return Collections.singletonMap("Exception", (Object) e);
