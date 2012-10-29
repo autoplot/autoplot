@@ -92,7 +92,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        delegateFileLabel = new javax.swing.JLabel();
+        delegateTextField = new javax.swing.JTextField();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
@@ -144,9 +144,10 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
         });
 
-        delegateFileLabel.setFont(new java.awt.Font("SansSerif", 0, 10));
-        delegateFileLabel.setText("example file used for editing goes here");
-        delegateFileLabel.setToolTipText("Aggregation works by automatically generating a set of \"delegate uris\" that are read and combined into one dataset.  This editor works by picking a delegate and providing an editor for the delegate as well.\n");
+        delegateTextField.setEditable(false);
+        delegateTextField.setFont(delegateTextField.getFont().deriveFont(delegateTextField.getFont().getSize()-4f));
+        delegateTextField.setText("example file used for editing goes here.");
+        delegateTextField.setToolTipText("this only indicates the delegate file used to edit the rest of the URI above");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -156,7 +157,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 212, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 117, Short.MAX_VALUE)
                 .add(jButton3))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(7, 7, 7)
@@ -167,13 +168,15 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(206, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(111, Short.MAX_VALUE))
+            .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, delegateFileLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
-                    .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE))
-                .add(26, 26, 26))
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                        .add(125, 125, 125)))
+                .addContainerGap())
         );
 
         jPanel1Layout.linkSize(new java.awt.Component[] {monthsComboBox, yearsComboBox}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
@@ -194,21 +197,21 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(delegateFileLabel)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .add(delegateTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -253,8 +256,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox daysComboBox;
-    private javax.swing.JLabel delegateFileLabel;
     private javax.swing.JPanel delegatePanel;
+    private javax.swing.JTextField delegateTextField;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -411,9 +414,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         Pattern p= Pattern.compile("(vap(\\+[a-z]+)?\\:)?([^\\?]*)(\\?.*)");
         Matcher m= p.matcher(delegateUrl);
         if ( m.matches() ) {
-            delegateFileLabel.setText( "editing example URI "+ m.group(3) + " above");
+            delegateTextField.setText( "editing example URI "+ m.group(3) + " above");
         } else {
-            delegateFileLabel.setText( "editing example URI  "+ delegateUrl + " above");
+            delegateTextField.setText( "editing example URI "+ delegateUrl + " above");
         }
         
         if (delegateEditorPanel == null) {
