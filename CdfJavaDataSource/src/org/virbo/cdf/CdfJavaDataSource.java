@@ -545,8 +545,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty(QDataSet.FILL_VALUE, dv );
             }
             DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
-            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+            if ( vrange!=null ) {
+                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+            }
         }
         
         int[] qubeDims= DataSetUtil.qubeDims(result);
