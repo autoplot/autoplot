@@ -23,6 +23,8 @@ public interface DataSource {
      * retrieve the dataset.  This allowed to be sub-interactive or batch time scale, and will block
      * until the dataset is produced.
      *
+     * //TODO: I believe this this may return null when no data is available.
+     *
      * If the user cancelled the operation, then java.io.InterrupedIOExcaption or
      * better yet org.das2.CancelledOperationException should be called.  These will
      * simply display "cancelled" (or similar) on the status bar.
@@ -45,8 +47,8 @@ public interface DataSource {
     MetadataModel getMetadataModel();
     
     /**
-     * Return arbitary metadata for the dataset.  This is a map of String to Objects,
-     * and to form a tree structure, property name may map to another Map<String,Object>.
+     * Return arbitrary metadata for the dataset.  This is a map of String to Objects,
+     * and to form a tree structure, property name may map to another Map&lt;String,Object&gt;.
      * Note the order of the properties may be controlled by using LinkedHashMap for the
      * implementation.  Even though this takes a monitor, it will be called after getDataSet,
      * and the monitor may be safely ignored.
