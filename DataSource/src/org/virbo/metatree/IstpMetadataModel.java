@@ -124,7 +124,7 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     /**
-     * Return the range from VALIDMIN to VALIDMAX.
+     * Return the range from VALIDMIN to VALIDMAX.  If the unit is an ordinal unit (see LABL_PTR_1), then return null.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
     public static DatumRange getValidRange(Map attrs, Units units) {
@@ -137,7 +137,12 @@ public class IstpMetadataModel extends MetadataModel {
             if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
             if ( vrange.min().doubleValue(units)>max ) max= vrange.max().doubleValue(units); //vap+cdaweb:ds=IM_HK_FSW&id=BF_DramMbeCnt&timerange=2005-12-18
         }
-        return DatumRange.newDatumRange(min, max, units);
+        if ( UnitsUtil.isNominalMeasurement(units) ) {
+            logger.fine("valid range not used for ordinal units");
+            return null;
+        } else {
+            return DatumRange.newDatumRange(min, max, units);
+        }
     }
 
     /**
@@ -323,8 +328,10 @@ public class IstpMetadataModel extends MetadataModel {
                 if ( range!=null ) properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
 
                 range = getValidRange(attrs, units);
-                properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
-                properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
+                if ( range!=null ) {
+                    properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
+                    properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
+                }
 
                 Object ofv= attrs.get( "FILLVAL" );
                 if ( ofv!=null && ofv instanceof Number ) {
