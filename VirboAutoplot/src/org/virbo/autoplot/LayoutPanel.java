@@ -21,10 +21,10 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
@@ -58,7 +58,6 @@ import org.virbo.autoplot.dom.PlotElementStyle;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
-import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 
 /**
@@ -66,6 +65,8 @@ import org.virbo.autoplot.util.CanvasLayoutPanel;
  * @author jbf
  */
 public class LayoutPanel extends javax.swing.JPanel {
+
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -311,7 +312,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
             Runnable run= new Runnable() {
                 public void run() {
-                    System.err.println("plotListener");
+                    logger.finer("enter plotListener");
                     panelListComponent.setSelectedIndices(iindices);
                     updateSelected();
                 }
