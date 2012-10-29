@@ -2966,6 +2966,13 @@ private void updateFrameTitle() {
                     url = null;
                 }
 
+                if ( url.startsWith("pngwalk:") ) {
+                    //TODO: check other prefixes...
+                    PngWalkTool1.start( url, app );
+                    app.applicationModel.addRecent(app.dataSetSelector.getValue());
+                    return;
+                }
+
                 String pos= alm.getValue("position");
 
                 if ( pos!=null ) {
