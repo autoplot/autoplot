@@ -215,11 +215,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     /** Creates new form AutoPlotMatisse */
     public AutoplotUI(ApplicationModel model) {
         
-        try {
-            setIconImage(ImageIO.read(this.getClass().getResource("/logo64x64.png")));
-        } catch (IOException ex) {
-            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setIconImage( AutoplotUtil.getAutoplotIcon() );
         
         APSplash.checkTime("init 0");
 
