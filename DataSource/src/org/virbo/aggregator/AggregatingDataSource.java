@@ -288,6 +288,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 drex= dr1;
 
                 QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                if ( ds1==null ) {
+                    logger.warning("delegate returned null");
+                    ds1 = delegateDataSource.getDataSet(mon1);
+                    continue;
+                }
 
                 if (result == null && altResult==null ) {
                     if ( ds1 instanceof JoinDataSet ) {
