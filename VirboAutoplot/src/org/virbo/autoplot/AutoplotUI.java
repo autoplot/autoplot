@@ -64,6 +64,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.help.CSH;
+import javax.imageio.ImageIO;
 import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -213,7 +214,13 @@ public class AutoplotUI extends javax.swing.JFrame {
     
     /** Creates new form AutoPlotMatisse */
     public AutoplotUI(ApplicationModel model) {
-
+        
+        try {
+            setIconImage(ImageIO.read(this.getClass().getResource("/logo64x64.png")));
+        } catch (IOException ex) {
+            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         APSplash.checkTime("init 0");
 
         // Initialize help system now so it's ready for components to register IDs with
