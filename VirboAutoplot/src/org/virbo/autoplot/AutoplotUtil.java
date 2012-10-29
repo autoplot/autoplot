@@ -1751,7 +1751,7 @@ public class AutoplotUtil {
     }
 
     public static Image getAutoplotIcon() {
-        return new ImageIcon(AutoplotUtil.class.getResource("logoA16x16.png")).getImage();
+        return new ImageIcon(AutoplotUtil.class.getResource("/logo64x64.png")).getImage();
     }
 
     public static Icon cancelIcon() {
