@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>singleInstanceListener detects "pngwalk:" and does this automatically in a new pngwalk.</li>
+            <li>in aggregation dialog, use a JTextField so long URIs don't mess up the GUI.</li>
             <li>tweak menu labels in the file menu</li>
             <li>fix one place in CDF codes where FUNCTION wasn't support were FUNCT was.  FUNCT is the new word.</li>
             <li>IndexOutOfBounds RTE in Pngwalk filmstrip view</li>
@@ -91,7 +93,7 @@
         <p>Features:</p>
         <ul>
             <li>introduce GUI for picking timeranges, look for the "calendar" icon on the time range editor.</li>
-            <li>allow scripts like the digitizer application, to register a hook that prevents exiting and loosing work.</li>
+            <li>allow scripts, like the digitizer application, to register a hook that prevents exiting and loosing work.</li>
             <li>stack of lineplots view when CDF Y Tags are rank 2</li>
             <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
             <li>delegate granule in aggregation is based on timerange, if available</li>
