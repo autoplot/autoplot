@@ -181,7 +181,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             File local= FileSystemUtil.doDownload( split.file, new NullProgressMonitor() );
             in= new FileInputStream( local );
             p.load( in );
-            String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") + ".png";
+            String vers= p.getProperty("version");
+            if ( vers==null || vers.trim().length()==0 ) vers=""; else vers="_"+vers;
+            String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
             template= t;
         } catch (FileSystemOfflineException ex) {
             logger.log(Level.SEVERE, null, ex);
