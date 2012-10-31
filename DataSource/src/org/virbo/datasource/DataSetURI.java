@@ -1257,6 +1257,22 @@ public class DataSetURI {
      * @throws URISyntaxException
      */
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+        return getFileSystemCompletions( surl, carotpos, inclAgg, inclFiles ? null : new ArrayList(), acceptPattern, mon );
+    }
+
+    /**
+     *
+     * @param surl
+     * @param carotpos
+     * @param inclAgg include aggregations it sees.  These are a guess.
+     * @param inclFiles if null, list files, but is non-null, then only include files in the list of regex.
+     * @param acceptPattern  if non-null, files and aggregations much match this.
+     * @param mon
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, List<String> inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
@@ -1413,7 +1429,19 @@ public class DataSetURI {
                     // Hack for .zip archives:
                     if (s[j].endsWith(".zip") || s[j].endsWith(".ZIP") ) s[j] = s[j] + "/";
 
-                    if ( ! ( inclFiles || s[j].endsWith("/") ) ) continue;
+                    boolean haveMatch= true;
+                    if ( ! s[j].endsWith("/") ) {
+                        if ( inclFiles!=null ) {
+                            haveMatch= false;
+                            for ( String regex: inclFiles ) {
+                                if ( Pattern.matches( regex, s[j] ) ) {
+                                    haveMatch= true;
+                                }
+                            }
+                        }
+                    }
+                    if ( !haveMatch ) continue;
+                    //if ( ! ( inclFiles || s[j].endsWith("/") ) ) continue;
 
                     String completion = surlDir + s[j];
                     completion = DataSetURI.newUri(surl, completion);
