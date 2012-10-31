@@ -538,8 +538,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     public PngWalkTool1() {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
-        dataSetSelector1.setAcceptPattern("(?i).*(\\.gif|\\.png|\\.jpg)");
+        dataSetSelector1.setAcceptPattern("(?i).*(\\.gif|\\.png|\\.jpg|\\.pngwalk)");
         dataSetSelector1.setSuggestFiles(false); // only aggs.
+        dataSetSelector1.addSuggestFile(".*\\.pngwalk");
         dataSetSelector1.registerActionTrigger( ".*\\.pngwalk", new AbstractAction("pngwalk") {
             public void actionPerformed( ActionEvent ev ) {
                 String template= dataSetSelector1.getValue();
