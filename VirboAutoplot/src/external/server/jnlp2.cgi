@@ -52,11 +52,11 @@ $url =~ s/(.*)open\=.*/$1/; # Strip off URI to pass to Autoplot
 $uri =~ s/.*open\=(.*)/$1/; # Extract URI to pass to Autoplot
 #print "uri-->". $uri . "\n";
 
-$tmptext = "<argument>--nativeLAF</argument>";
-
 $uri = URLDecode($uri);
 # URLDecode will change vap+cdf:http:// etc to vap cdf:http://
 $uri =~ s/(.*)\s(.*):(.*)/$1+$2:$3/;
+
+$tmptext = "<argument>--nativeLAF</argument>";
 
 if ($uri) {
     if ($url =~ m/\.pngwalk\./) {
@@ -70,7 +70,7 @@ if ($uri) {
 foreach $pair (@pairs) {
     ($name, $value) = split(/=/, $pair);
     $FORM{$name} = $value;
-    if ( ($name !~ "main-class") && ($name !~ "version") ) {
+    if ( ($name !~ "main-class") && ($name !~ "version") && ($name !~ "max-heap-size") ) {
 	$tmptext = $tmptext . "<argument>--$name=$value</argument>";
     }
 }
@@ -97,8 +97,12 @@ open( GFH, $file) or die "Error opening autoplot.jnlp for read.\n";
 $text = <GFH>;
 close(GFH);
 
+if ($dir =~ m/hudson/) {
+#    $text =~ s# <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" /># <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/hudson.xml" />#;
+}
+
 if (!$icon) {
-    $text =~ s#<shortcut online="true">#<shortcut online="false">#;;
+    $text =~ s#<shortcut online="true">#<shortcut online="false">#;
 }
 
 # Create <application-desc> block
@@ -127,9 +131,16 @@ $text =~ s#href=\"autoplot.jnlp\"##;
 # Change vendor string
 $text =~ s#VxOware#http://virbo.org/#;
 
+# change max allowed memory.  Note Windows has a limit on allowed memory of 1G.
+if ( $FORM{"max-heap-size"} ) {
+   $text =~ s#1024m#$FORM{"max-heap-size"}#;
+}
+
 print header( -TYPE        => "application/x-java-jnlp-file",
-	      -Content_Disposition => "attachement;filename=\"autoplot.jnlp\"",
+	      -Content_Disposition => "attachment;filename=\"autoplot.jnlp\"",
 	      -cache_control=>"no-cache, no-store, must-revalidate");
+
+
 
 print $text;
 
