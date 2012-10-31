@@ -974,14 +974,22 @@ public class DataSetSelector extends javax.swing.JPanel {
                     if ( atrigger!=null ) {
                         surll= surl.substring(atrigger.length()+1);
                         carotposl= carotposl-atrigger.length()-1;
-                        completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                        if ( suggestFile.size()>0 ) {
+                            completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
+                        } else {
+                            completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                        }
                         for ( int i=0; i<completions.size(); i++ ) {
                             completions.get(i).completable= atrigger + ":" + completions.get(i).completable;
                             completions.get(i).completion= atrigger + ":" + completions.get(i).completion;
                             completions.get(i).maybePlot= false;
                         }
                     } else {
-                        completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                        if ( suggestFile.size()>0 ) {
+                            completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
+                        } else {
+                            completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                        }
                     }
                 } catch (UnknownHostException ex ) {
                     logger.log( Level.SEVERE, "", ex );
@@ -1681,6 +1689,17 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         boolean oldSuggestFiles = this.suggestFiles;
         this.suggestFiles = suggestFiles;
         firePropertyChange(PROP_SUGGESTFILES, oldSuggestFiles, suggestFiles);
+    }
+
+
+    private List<String> suggestFile= new ArrayList();
+
+    /**
+     * show completions for this regex.
+     * @param template
+     */
+    public void addSuggestFile( String template ) {
+        suggestFile.add(template);
     }
 
 
