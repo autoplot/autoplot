@@ -187,6 +187,7 @@ public class CreatePngWalk {
         PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
         ff.println( "product=" + params.product );
         ff.println( "timeFormat=" + params.timeFormat );
+        ff.println( "timeRange=" + params.timeRangeStr );
         if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
             ff.println( "rescalex="+ params.rescalex );
         }
