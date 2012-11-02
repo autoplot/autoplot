@@ -5,6 +5,7 @@
 
 package org.virbo.cdf;
 
+import com.sun.corba.se.spi.oa.OADefault;
 import java.util.logging.Level;
 import org.das2.datum.Units;
 import org.virbo.metatree.IstpMetadataModel;
@@ -602,9 +603,22 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
-                        if ( idep==0 ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
-                            if ( depDs.length()!=result.length() && result.length()==1 ) {
-                                continue;
+
+                        if ( idep==0 ) { //TODO: check for spareness property.  
+                            if ( variable.getNumberOfValues()==1 && depDs.length()>1 ) {
+                                MutablePropertyDataSet nresult;
+                                if ( result.rank()==2 ) {
+                                    //vap+cdfj:http://tau.physics.uiowa.edu/rocket/charm_40025/autoplot/40025_eepaa2_test.cdf?PA_bin
+                                    nresult= (MutablePropertyDataSet)Ops.outerProduct( Ops.ones(depDs.length()), result.slice(0) );
+                                } else if ( result.rank()==1 ) {
+                                    //vap+cdfj:http://cdaweb.gsfc.nasa.gov/sp_phys/data/messenger/rtn/2011/messenger_mag_rtn_20110518_v01.cdf?Quality_Flag
+                                    nresult= (MutablePropertyDataSet)Ops.multiply( Ops.ones(depDs.length()), result.slice(0) );
+                                } else {
+                                    // TODO: not implemented for high-rank, fall back to old behavior.
+                                    nresult= result;
+                                }
+                                DataSetUtil.putProperties( DataSetUtil.getProperties(result), nresult );
+                                result= nresult;
                             }
                         }
 
