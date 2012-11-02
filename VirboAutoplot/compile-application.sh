@@ -58,7 +58,7 @@ if [ "" = "$CODEBASE" ]; then
 fi
 
 if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="http://apps-pw.physics.uiowa.edu:8080/hudson"
+    HUDSON_URL="http://apps-pw.physics.uiowa.edu/hudson"
 fi
 
 if [ "" = "$WGET" ]; then
@@ -160,6 +160,12 @@ for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
+
+mkdir -p ../temp-volatile-classes/orbits
+for i in $( find orbits -type f ); do               # copy in orbits files
+   cp $i ../temp-volatile-classes/$i
+done
+
 cd ..
 echo "done copy resources."
 
