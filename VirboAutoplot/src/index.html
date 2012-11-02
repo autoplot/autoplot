@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Messenger CDF variable used sparse records.</li>
             <li>pngwalk tool supports .pngwalk files from within the tool, before they wouldn't show up in completions.</li>
             <li>.pngwalk files work properly when versioning is used.</li>
             <li>singleInstanceListener detects "pngwalk:" and does this automatically in a new pngwalk.</li>
@@ -43,6 +44,9 @@
             <li>events data set in qdataset didn't render properly because under-implemented copy method dropped properties.</li>
             <li>fixes for bugs found in CDAWeb source discovered by Bob's plot everything script.</li>
             <li>old "|slice(2)" was mis-handled in metadata sprocess, causing RTE</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>3577068: old code in cdf readers would cause problem when displayType was spectrogram and their were <6 channels.</li>
             <li>3576060: jython data source doesn't have timerange set before going into editor, causing jumps to default time</li>
             <li>3575260: keep track of last location, because Ubuntu 12.04 opens windows up in odd places (off screen with 2 displays)</li>
@@ -66,38 +70,16 @@
             <li>bugfix in CdfJava plugin where subsampling would not work with new TT2000 datasets.</li>
             <li>added jsyntaxpane jar file to the Eclipse class path.  Thanks Jon!</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>the operations cache was not being reset when a new dataset would come in, possibly resulting in a completely incorrect result!</li>
-            <li>VALID_MAX and CACHE_TAG properties handled in append</li>
-            <li>rte_1830229334: inspect button on vap file yielded NullPointerException</li>
-            <li>qstreams clean up to support aggregation and reduction</li>
-            <li>completions and inspect icon show discovery sources and filesystem types when address bar is empty</li>
-            <li>small round of findbugs cleanup</li>
-            <li>limit resolution of timerange reported with %{RANGE}</li>
-            <li>uncaught runtime exception when orbit file cannot be read is removed from the timerange history.</li>
-            <li>reduce the effect of make taller/make shorter</li>
-            <li>JythonMain reimplemented to mimic AutoplotUI --script, since it was not showing problem </li>
-            <li>3566288: single tick with short plots.</li>
-            <li>remove "sqrt()" label change from sqrt</li>
-            <li>split-plot function showed where there was code that didn't check for null</li>
-            <li>qstream serialize of Y(X) where Y(T) and X(T) would fail because of leftover reference to T. </li>
-            <li>operations selector tool uses scrollpane to support small screens</li>
-            <li>java cdf printed messages to stdout instead of stderr, preventing use with AutoplotDataServer</li>
-            <li>axis visible=false now works nicely with fix layout.</li>
-            <li>timestamps in FTP still prevented updates from happening. </li>
-            <li>automatic labelling when stack-of-lineplots used</li>
-            <li>jyds time series browse wouldn't work because of botched bugfix from 2012/8/16.</li>
-            <li>jyds has scroll pane when there are lots of parameters.</li>
-            <li>total, smooth, and collapse properly propagate metadata.</li>
-            <li>PDF fonts are painted in Java itext library, resulting in a closer screen representation, but text is no longer editable for post-processing</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>RBSP orbits come from one of three servers for robustness, and embedded within jar for offline use.</li>
             <li>introduce GUI for picking timeranges, look for the "calendar" icon on the time range editor.</li>
             <li>allow scripts, like the digitizer application, to register a hook that prevents exiting and loosing work.</li>
             <li>stack of lineplots view when CDF Y Tags are rank 2</li>
             <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>delegate granule in aggregation is based on timerange, if available</li>
             <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
             <li>new LSpec.rebin produces data on fixed cadence</li>
@@ -109,26 +91,6 @@
             <li>log console uses x scroll bar to avoid wrapping lines.
             <li>add user option for default mouse action: box zoom, crosshair digitizer, zoom x</li>
             <li>Tools->Cache->Manage FileSystems dialog to indicate the active filesystems and their status</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add a few shorter example scripts to jython editor</li>
-            <li>progress messages supported in qstreams</li>
-            <li>add icon to encourage use of convenient history dialog</li>
-            <li>logger cleanup, get rid of stderr noise, console settings GUI discovers loggers</li>
-            <li>eventsRenderer uses control for showLabels, allowing use with orbit files.</li>
-            <li>clean up x-axis menu</li>
-            <li>PngWalkTool has right-click "save local copy" (Reiner)</li>
-            <li>addPlots dialog in layout panel allows the current plot to be replaced by a row of plots. (Seth)</li>
-            <li>Check indicates current plot type (RenderType)</li>
-            <li>Plot Style indicates current plot style.  Plot Style moved up. (Craig)</li>
-            <li>aggregation GUI has a button to show wildcard codes (Craig)</li>
-            <li>aggregation throws FileNotFound instead of just showing no data</li>
-            <li>--autolayout=F command line option because autolayout was triggering with Chris' vap. (Chris)</li>
-            <li>ctrl-S is bound to save (Bob,Chris)</li>
-            <li>ascii parser now detects non-ascii files and displays appropriate error.</li>
-            <li>title now has checkbox and can be turned off without erasing useful context. (Craig)</li>
-            <li>clicking on background selects hidden parent plot element.</li>
         </ul>
 
         <p>Known issues:</p>
