@@ -186,13 +186,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         File cdfFile;
         cdfFile = getFile(mon);
-        
+
+        logger.fine("getDataSet ("+String.valueOf(cdfFile)+")");
+
         String fileName = cdfFile.toString();
         
         Map map = getParams();
 
-        logger.fine("getCdfFile("+fileName+")");
-        CDF cdf= getCdfFile(fileName);        logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
+        CDF cdf= getCdfFile(fileName);
+        logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
         
         String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
