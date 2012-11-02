@@ -44,6 +44,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -73,6 +74,28 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
+
+        boolean useReferenceCache= false;
+
+        ReferenceCache.ReferenceCacheEntry rcent=null;
+        if ( useReferenceCache ) {
+            rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
+            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+                try {
+                    return rcent.park( mon );
+                } catch ( IOException ex ) {
+                    throw (IOException)ex;
+                } catch ( CDFException ex ) {
+                    throw (CDFException)ex;
+                } catch ( ParseException ex ) {
+                    throw (ParseException)ex;
+                } catch ( Exception ex ) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+
+            }
+        }
 
         mon.started();
         cdfFile = getFile(mon);
@@ -223,12 +246,17 @@ public class CdfFileDataSource extends AbstractDataSource {
                 result= DataSetOps.slice1(result,is);
                 this.attributes= null; // they aren't relevant now.
             }
-            
+
+            if ( rcent!=null ) rcent.finished(result);
             return result;
+
         } catch (CDFException ex) {
+            if ( rcent!=null ) rcent.exception(ex);
             throw new IllegalArgumentException("no such variable: " + svariable);
+
         } finally {
             mon.finished();
+            
         }
 
     }
