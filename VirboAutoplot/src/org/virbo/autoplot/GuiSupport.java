@@ -399,6 +399,10 @@ public class GuiSupport {
                         if ( name.startsWith("file:") ) {
                             name= name.substring(5);
                         }
+                        String osName =System.getProperty("os.name", "applet" );
+                        if ( osName.startsWith("Windows") && name.startsWith("/") && name.length()>3 && name.charAt(2)==':' ) {
+                            name= name.substring(1); // windows gets file:///c:/foo.wav
+                        }
 
                         URISplit split= URISplit.parse(name);
                         if ( !split.file.endsWith(ext) ) {
