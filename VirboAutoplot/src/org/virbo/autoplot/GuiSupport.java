@@ -290,6 +290,8 @@ public class GuiSupport {
 
     private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, String dscontrol  ) throws IOException {
 
+        logger.fine("exporting data to "+uriOut + " using format "+format );
+
         ProgressMonitor mon=null;
         try {
             QDataSet ds= fds;
