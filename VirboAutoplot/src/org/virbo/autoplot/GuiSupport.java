@@ -334,10 +334,16 @@ public class GuiSupport {
             parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
         } catch ( IllegalArgumentException ex ) {
             parent.applicationModel.getExceptionHandler().handle(ex);
+            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.SEVERE, uriOut, ex );
         } catch (RuntimeException ex ) {
             parent.applicationModel.getExceptionHandler().handleUncaught(ex);
+            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.SEVERE, uriOut, ex );
         } catch (Exception ex) {
             parent.applicationModel.getExceptionHandler().handle(ex);
+            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.SEVERE, uriOut, ex );
         }
         if ( mon!=null ) mon.finished();
     }
