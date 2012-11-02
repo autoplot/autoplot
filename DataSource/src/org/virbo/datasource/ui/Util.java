@@ -68,4 +68,16 @@ public class Util
 			}
 		}
 	}
+
+        /**
+         * make JTextField look like a JLabel.  We don't use JLabels because they don't size nicely, and they don't
+         * allow user to select text.  Note on Linux, this still doesn't quite get it, but at least this provides one
+         * place to set the configuration.
+         * @param tf
+         */
+       public static void makeJTextFieldLookLikeJLabel( JTextField tf ) {
+           tf.setEditable(false);
+           tf.setOpaque(false);
+           tf.setBorder(null );
+       }
 }
