@@ -89,8 +89,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         support.addFileLabel(fileNameLabel);
         support.setReadOnly();
 
-        jScrollPane1.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
-
+        scriptScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
+        paramsScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
     }
 
     /** This method is called from within the constructor to
@@ -108,10 +108,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         scriptPanel = new javax.swing.JPanel();
         caretPositionLabel = new javax.swing.JLabel();
         fileNameLabel = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scriptScrollPane = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        paramsScrollPane = new javax.swing.JScrollPane();
         paramsPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
@@ -127,22 +127,22 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         jPanel1.setLayout(new java.awt.BorderLayout());
         jPanel1.add(textArea, java.awt.BorderLayout.CENTER);
 
-        jScrollPane1.setViewportView(jPanel1);
+        scriptScrollPane.setViewportView(jPanel1);
 
         org.jdesktop.layout.GroupLayout scriptPanelLayout = new org.jdesktop.layout.GroupLayout(scriptPanel);
         scriptPanel.setLayout(scriptPanelLayout);
         scriptPanelLayout.setHorizontalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
+            .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -152,9 +152,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         tearoffTabbedPane1.addTab("script", scriptPanel);
 
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
-        jScrollPane2.setViewportView(paramsPanel);
+        paramsScrollPane.setViewportView(paramsPanel);
 
-        tearoffTabbedPane1.addTab("params", jScrollPane2);
+        tearoffTabbedPane1.addTab("params", paramsScrollPane);
 
         jLabel2.setText("Select from the variables calculated by the script, 'data' or 'result' is used by default:");
 
@@ -165,8 +165,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 451, Short.MAX_VALUE))
-            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 474, Short.MAX_VALUE))
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(jLabel2)
                 .addContainerGap())
@@ -191,10 +191,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel paramsPanel;
+    private javax.swing.JScrollPane paramsScrollPane;
     private javax.swing.JPanel scriptPanel;
+    private javax.swing.JScrollPane scriptScrollPane;
     private org.das2.components.TearoffTabbedPane tearoffTabbedPane1;
     private org.virbo.jythonsupport.ui.EditorTextPane textArea;
     private javax.swing.JComboBox variableComboBox;
