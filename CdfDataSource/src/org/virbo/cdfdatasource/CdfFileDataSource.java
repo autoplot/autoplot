@@ -290,6 +290,22 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         long numRec = variable.getMaxWrittenRecord()+1;
 
+        if ( variable.getSparseRecords()==CDF.PREV_SPARSERECORDS ) {
+            Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
+            if ( dep0map==null ) {
+                logger.fine("sparse record needs DEPEND_0");
+            } else {
+                String dep0name= (String) dep0map.get("NAME");
+                if ( dep0name==null ) {
+                    logger.fine("sparse record needs DEPEND_0 with name");
+                } else {
+                    Variable v= cdf.getVariable( dep0name );
+                    numRec= v.getMaxWrittenRecord()+1;
+                }
+            }
+        }
+        
+
         if ( mon==null ) mon= new NullProgressMonitor();
 
         String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
@@ -401,7 +417,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
                         Variable depVar= cdf.getVariable( depName );
                         if ( depVar==null ) {
-                            logger.fine("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
+                            logger.log(Level.FINE, "unable to find variable \"{0}\" for DEPEND_{1} of {2}", new Object[]{depName, sidep, variable});
                             continue;
                         }
 
@@ -417,24 +433,6 @@ public class CdfFileDataSource extends AbstractDataSource {
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
-                        }
-
-                        if ( idep==0 ) { //TODO: check for spareness property.
-                            if ( variable.getSparseRecords()==CDF.PREV_SPARSERECORDS ) {
-                                MutablePropertyDataSet nresult;
-                                if ( result.rank()==2 ) {
-                                    //vap+cdfj:http://tau.physics.uiowa.edu/rocket/charm_40025/autoplot/40025_eepaa2_test.cdf?PA_bin
-                                    nresult= (MutablePropertyDataSet)Ops.outerProduct( Ops.ones(depDs.length()), result.slice(0) );
-                                } else if ( result.rank()==1 ) {
-                                    //vap+cdfj:http://cdaweb.gsfc.nasa.gov/sp_phys/data/messenger/rtn/2011/messenger_mag_rtn_20110518_v01.cdf?Quality_Flag
-                                    nresult= (MutablePropertyDataSet)Ops.multiply( Ops.ones(depDs.length()), result.slice(0) );
-                                } else {
-                                    // TODO: not implemented for high-rank, fall back to old behavior.
-                                    nresult= result;
-                                }
-                                DataSetUtil.putProperties( DataSetUtil.getProperties(result), nresult );
-                                result= nresult;
-                            }
                         }
 
                         if ( idep==0 ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
