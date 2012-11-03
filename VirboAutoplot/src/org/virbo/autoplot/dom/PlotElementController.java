@@ -1895,7 +1895,7 @@ public class PlotElementController extends DomNodeController {
 
             logger.log(Level.FINE, "xaxis.isAutoRange={0}", peleCopy.getPlotDefaults().getXaxis().isAutoRange());
             if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                logger.warning("20121015: I was thinking autorange would always be true");
+                logger.fine("20121015: I was thinking autorange would always be true");
             }
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
