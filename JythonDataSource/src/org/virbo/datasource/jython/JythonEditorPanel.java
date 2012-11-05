@@ -157,6 +157,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         tearoffTabbedPane1.addTab("params", paramsScrollPane);
 
         jLabel2.setText("Select from the variables calculated by the script, 'data' or 'result' is used by default:");
+        jLabel2.setMinimumSize(new java.awt.Dimension(200, 17));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -168,7 +169,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .add(variableComboBox, 0, 474, Short.MAX_VALUE))
             .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(jLabel2)
+                .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -176,7 +177,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                 .add(2, 2, 2)
-                .add(jLabel2)
+                .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -329,7 +330,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     sel.setHidePlayButton(true);
                     sel.setSuggestFiles(true);
 
-                    final JTextField tf= new JTextField(50);
+                    final JTextField tf= new JTextField();
                     Dimension x= tf.getPreferredSize();
                     x.width= Integer.MAX_VALUE;
                     tf.setMaximumSize(x);
@@ -398,7 +399,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         }
 
                     } else {
-                        JTextField tf= new JTextField(50);
+                        JTextField tf= new JTextField();
                         Dimension x= tf.getPreferredSize();
                         x.width= Integer.MAX_VALUE;
                         tf.setMaximumSize(x);
