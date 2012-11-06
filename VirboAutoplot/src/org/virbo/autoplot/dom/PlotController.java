@@ -349,6 +349,8 @@ public class PlotController extends DomNodeController {
             dasPlot.setDropTarget(dropTarget);
         }
 
+        updateAxisFormatter( dasPlot1.getXAxis() );
+
     }
 
 
