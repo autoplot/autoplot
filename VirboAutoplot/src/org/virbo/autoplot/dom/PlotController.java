@@ -63,7 +63,7 @@ public class PlotController extends DomNodeController {
      */
     public List<PlotElement> pdListen= new LinkedList();
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.plotcontroller" );
 
     public PlotController(Application dom, Plot domPlot, DasPlot dasPlot, DasColorBar colorbar) {
         this( dom, domPlot );
@@ -102,7 +102,7 @@ public class PlotController extends DomNodeController {
                 if ( m!=null ) {
                     p.getDasMouseInputAdapter().setPrimaryModule( m );
                 } else {
-                    logger.log( Level.WARNING, "logger note recognized: "+mm );
+                    logger.log( Level.WARNING, "logger note recognized: {0}", mm);
                 }
             }
         });
@@ -187,6 +187,7 @@ public class PlotController extends DomNodeController {
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
                 if ( ((String)evt.getNewValue()).length()>0 ) {
+                    logger.log(Level.FINE, "prop_ticks_uri={0}", evt.getNewValue());
                     String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
                     //TODO: check for time series browse here and set to time axis.
                     plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
@@ -321,6 +322,7 @@ public class PlotController extends DomNodeController {
         dasPlot1.getYAxis().addPropertyChangeListener(listener);
         
         if ( plot.getTicksURI().length()>0 ) { //TODO: understand this better.  We don't have to set titles, right?  Maybe it's because implementation is handled here instead of in das2.
+            logger.fine("setLabel(%{RANGE})");
             String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + plot.getTicksURI();
             dasPlot1.getXAxis().setDataPath(dasAddress);
             dasPlot1.getXAxis().setDrawTca(true);
@@ -369,12 +371,12 @@ public class PlotController extends DomNodeController {
     }
 
     private void updateAxisFormatter( DasAxis axis ) {
+        logger.fine("updateAxisFormatter()");
         if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
             axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
             axis.setUserDatumFormatter(null);
         }
-
     }
 
     private PropertyChangeListener listener = new PropertyChangeListener() {
