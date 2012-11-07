@@ -159,7 +159,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     JTextField editor;
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
-    static final Logger logger = Logger.getLogger("virbo.dataset.ui");
+    static final Logger logger = Logger.getLogger("apdss.gui.dss");
     MonitorFactory monitorFactory = null;
     Timer maybePlotTimer;
     int keyModifiers = 0;

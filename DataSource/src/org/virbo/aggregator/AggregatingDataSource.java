@@ -88,7 +88,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return result;
             }
         } catch (IOException ex) {
-            Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
             return timeRange;
         }
@@ -131,12 +131,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
         public void setTimeRange(DatumRange dr) {
             viewRange = quantize(dr);
-            Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "set timerange={0}", viewRange);
+            logger.log(Level.FINE, "set timerange={0}", viewRange);
         }
 
         public void setTimeResolution(Datum d) {
             resolution= d;
-            Logger.getLogger("virbo.datasource.agg").log(Level.FINE, "set resolution={0}", d);
+            logger.log(Level.FINE, "set resolution={0}", d);
         }
 
         public String getURI() {

@@ -42,6 +42,7 @@ import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsUtil;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 
@@ -51,6 +52,7 @@ import org.virbo.datasource.ui.PromptComboBoxEditor;
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.gui");
     public TimeRangeEditor() {
         initComponents();
         recentComboBox.setPreferenceNode("timerange");
@@ -352,10 +354,10 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                     wasRejected= true;
                 }
             } catch (URISyntaxException ex) {
-                Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 edit= null;
             } catch ( Exception ex ) {
-                Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 edit= null;
             }
             if ( edit==null ) {

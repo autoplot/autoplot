@@ -294,7 +294,7 @@ public class DataSourceUtil {
                     dr = DatumRangeUtil.union(dr, tp.getTimeRange());
                 } catch (ParseException ex) {
                     okay= false;
-                    Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
             if ( okay==false ) {
@@ -304,7 +304,7 @@ public class DataSourceUtil {
             }
             
         } catch (ParseException ex) {
-            Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return surl;
         }
 

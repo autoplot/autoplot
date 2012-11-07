@@ -63,7 +63,7 @@ public class DataSetURI {
     private static final Object ACTION_DOWNLOAD = "DOWNLOAD";
     private static final Object ACTION_USE_CACHE = "USE_CACHE";
 
-    private static final Logger logger = Logger.getLogger("virbo.datasource");
+    private static final Logger logger = Logger.getLogger("apdss.uri");
 
 
     static {
@@ -566,12 +566,12 @@ public class DataSetURI {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
                 if ( fi!=null ) fi.close();
             } catch (IOException ex) {
-                Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
         if ( ex2!=null ) throw ex2;
@@ -920,7 +920,7 @@ public class DataSetURI {
                             throw new InterruptedIOException("cancel pressed");
                         }
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             } finally {
