@@ -39,7 +39,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.gui");
     
-    String orbit=null; // save the orbit so it isn't clobbered by the GUI.
+    String orbit=""; // save the orbit so it isn't clobbered by the GUI.
 
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
