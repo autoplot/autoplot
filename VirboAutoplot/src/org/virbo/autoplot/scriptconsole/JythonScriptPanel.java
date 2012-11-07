@@ -296,7 +296,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("Execute");
-        savePlotButton.setToolTipText("Execute script.  Ctrl modifier attempts to trace program location.  ");
+        savePlotButton.setToolTipText("Execute script.  Alt modifier enters editor GUI.  Ctrl modifier attempts to trace program location.  ");
         savePlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 savePlotButtonActionPerformed(evt);
@@ -329,7 +329,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         caretPositionLabel.setText("1,1");
 
-        textArea.setFont(new java.awt.Font("Monospaced", 0, 13));
         textArea.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 textAreaFocusGained(evt);
@@ -373,13 +372,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(openButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(newScriptButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 44, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 60, Short.MAX_VALUE)
                 .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 81, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+            .add(jScrollPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -410,11 +409,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 
             }
         }
-        if ( ( evt.getModifiers() & Event.CTRL_MASK ) ==Event.CTRL_MASK ) {
-            support.executeScript(true);
-        } else {
-            support.executeScript();
-        }
+        support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_savePlotButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
@@ -448,7 +443,6 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JComboBox contextSelector;
     private javax.swing.JTextField fileNameTextField;
     private javax.swing.JButton interruptButton;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
