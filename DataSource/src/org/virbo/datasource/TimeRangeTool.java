@@ -18,34 +18,34 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.DatumUtil;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.Orbits;
 import org.das2.datum.TimeUtil;
-import org.das2.datum.Units;
 import org.das2.datum.format.TimeDatumFormatter;
 
 /**
- *
+ * GUI for creating valid time ranges by calendar times, orbit, or NRT
  * @author jbf
  */
 public class TimeRangeTool extends javax.swing.JPanel {
+
+    private static final Logger logger= LoggerManager.getLogger("apdss.gui");
+    
+    String orbit=null; // save the orbit so it isn't clobbered by the GUI.
 
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
         initComponents();
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
         scComboBox.setSelectedItem( "rbspb-pp" );
-        scComboBox.setSelectedItem( "rbspa-pp" );
         timeRangeTextField.addPropertyChangeListener( "text", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
@@ -75,7 +75,6 @@ public class TimeRangeTool extends javax.swing.JPanel {
     public void setSelectedRange( String s ) {
         if ( s.startsWith("orbit:") ) {
             String[] ss= s.split(":",2);
-            String orbit= "";
             if ( ss[1].startsWith("http://") || ss[1].startsWith("https://") || ss[1].startsWith("ftp://") ) {
                 int i= ss[1].indexOf(":",6);
                 if ( i==-1 ) {
@@ -93,9 +92,14 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     orbit= ss[1].substring(i+1);
                 }
             }
-            if ( orbit.length()>0 ) {
-                orbitComboBox.setSelectedItem(orbit);
-            }
+            final String forbit= orbit;
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    if ( forbit.length()>0 ) {
+                        orbitComboBox.setSelectedItem(forbit);
+                    }
+                }
+            });
             DatumRange dr;
             try {
                 dr= DatumRangeUtil.parseTimeRange(s);
@@ -152,21 +156,23 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private void resetSpacecraft( final String sc ) {
+        logger.log(Level.FINE, "resetSpacecraft({0})", sc);
+
         final Orbits o= Orbits.getOrbitsFor(sc);
         final List<String> ss= new ArrayList();
-        String orbit= o.first();
+        String orb= o.first();
         int count=1;
-        while ( orbit!=null && count<10 ) {
-            ss.add(orbit);
-            orbit= o.next(orbit);
+        while ( orb!=null && count<10 ) {
+            ss.add(orb);
+            orb= o.next(orb);
             count++;
         }
-        if ( orbit!=null ) {
-            orbit= o.last();
+        if ( orb!=null ) {
+            orb= o.last();
             List<String> lastOrbits= new ArrayList();
-            while ( orbit!=null && !orbit.equals(ss.get(ss.size()-1) ) && count<50 ) {
-                lastOrbits.add( 0, orbit );
-                orbit= o.prev(orbit);
+            while ( orb!=null && !orb.equals(ss.get(ss.size()-1) ) && count<50 ) {
+                lastOrbits.add( 0, orb );
+                orb= o.prev(orb);
                 count++;
             }
             if ( lastOrbits.size()>0 ) {
@@ -178,8 +184,16 @@ public class TimeRangeTool extends javax.swing.JPanel {
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
                 orbitComboBox.setModel( new DefaultComboBoxModel(ss.toArray(new String[ss.size()]) ) );
-                orbitComboBox.setSelectedItem(o.next(o.first()));
-                orbitComboBox.setSelectedItem(o.first());
+                if ( orbit.length()>0 ) {
+                    try { // is enterred orbit legal orbit
+                        o.getDatumRange(orbit);
+                        orbitComboBox.setSelectedItem(orbit);
+                    } catch ( ParseException ex ) {
+                        // orbit wasn't found for this spacecraft
+                    }
+                } else {
+                    orbitComboBox.setSelectedItem(o.first());
+                }
                 if ( sc.contains(":") ) {
                     scFeedbackTF.setText( "orbits from "+sc );
                 } else {
@@ -445,8 +459,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
         try {
             DatumRange dr = o.getDatumRange((String) orbitComboBox.getSelectedItem());
             orbitFeedbackLabel.setText( dr.toString() ); // note result is not an orbit datum range.
+            if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+                orbit= (String) orbitComboBox.getSelectedItem();
+            }
         } catch (ParseException ex) {
-            Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             orbitFeedbackLabel.setText("No such orbit found: "+ orbitComboBox.getSelectedItem());
         }
 
