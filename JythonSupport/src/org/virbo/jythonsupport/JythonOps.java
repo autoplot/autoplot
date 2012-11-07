@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
+import org.das2.datum.Units;
 import org.python.core.Py;
 import org.python.core.PyArray;
 import org.virbo.dataset.QubeDataSetIterator;
@@ -120,6 +121,31 @@ public class JythonOps {
             throw Py.TypeError("unable to coerce "+arg0+" to QDataSet");
         }
         
+    }
+
+    public static Datum datum( PyObject arg0 ) {
+        if ( arg0 instanceof PyQDataSet ) {
+            QDataSet ds= ((PyQDataSet)arg0).rods;
+            if ( ds.rank()>0 ) {
+                throw new IllegalArgumentException("QDataSet is not rank zero and cannot be converted to datum");
+            } else {
+                return DataSetUtil.asDatum(ds);
+            }
+        } else if ( arg0 instanceof PyInteger ) {
+            return Units.dimensionless.createDatum(((PyInteger)arg0).getValue());
+        } else if ( arg0 instanceof PyFloat ) {
+            return Units.dimensionless.createDatum(((PyFloat)arg0).getValue());
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
+            return (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class);
+        } else if ( arg0 instanceof PyString ) {
+            try {
+               return DataSetUtil.asDatum( DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())) ); //TODO: someone is going to want lookupUnits that will allocate new units.
+            } catch (ParseException ex) {
+               throw Py.SyntaxError( "unable to parse string: "+arg0 );
+            }
+        } else {
+            throw Py.TypeError("unable to coerce "+arg0+" to Datum");
+        }
     }
     
     /**
