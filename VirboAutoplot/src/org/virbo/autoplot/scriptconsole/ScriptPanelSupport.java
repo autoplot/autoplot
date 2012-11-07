@@ -257,10 +257,22 @@ public class ScriptPanelSupport {
     }
 
     protected void executeScript() {
-        executeScript(false);
+        executeScript(0);
     }
 
+    /**
+     * allow execute with trace.  This never worked effectively.
+     * @param trace
+     */
     protected void executeScript(final boolean trace) {
+        executeScript( trace ? java.awt.Event.CTRL_MASK : 0 );
+    }
+
+    /**
+     * Execute the script.  For context data source, this means putting the URI in the data set selector and telling it to plot.
+     * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK is enter editor.
+     */
+    protected void executeScript(final int mode) {
 
         try {
             if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
@@ -311,7 +323,7 @@ public class ScriptPanelSupport {
                     }
 
                     annotationsSupport.clearAnnotations();
-                    selector.maybePlot(false);
+                    selector.maybePlot(mode);
 
                     if ( updateSurl ) {
                         panel.setFilename(file.toString());
@@ -342,7 +354,7 @@ public class ScriptPanelSupport {
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
-                                if (trace) {
+                                if ( mode==2 ) { // trace
                                     String text = panel.getEditorPanel().getText();
                                     int i0 = 0;
                                     while (i0 < text.length()) {
