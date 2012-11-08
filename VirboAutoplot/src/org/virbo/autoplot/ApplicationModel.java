@@ -1045,8 +1045,11 @@ public class ApplicationModel {
 
     }
 
+    /**
+     * listen for requests to change the size.  w,h is the new size.
+     */
     public static interface ResizeRequestListener {
-        void resize( int w, int h );
+        double resize( int w, int h );
     }
 
     ResizeRequestListener resizeRequestListener=null;
@@ -1135,7 +1138,13 @@ public class ApplicationModel {
         }
 
         if ( this.resizeRequestListener!=null ) {
-            resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
+            double scale= resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
+            //TODO: scale font...
+            Font f= Font.decode( state.getCanvases(0).getFont() );
+            Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
+            logger.fine("shrinking font to "+newFont.toString());
+            GuiSupport.setFont( this, newFont );
+            state.getCanvases(0).setFont( DomUtil.encodeFont(newFont) );
             state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
             state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
             state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
