@@ -238,8 +238,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
 
         model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
-            public void resize(int w,int h) {
-                resizeForCanvasSize(w, h);
+            public double resize(int w,int h) {
+                return resizeForCanvasSize(w, h);
             }
         });
 
@@ -1464,8 +1464,9 @@ APSplash.checkTime("init 52");
      * 
      * @param w
      * @param h
+     * @return nominal scale factor
      */
-    public void resizeForCanvasSize( int w, int h ) {
+    public double resizeForCanvasSize( int w, int h ) {
         
         Component parentToAdjust;
         if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
@@ -1479,9 +1480,11 @@ APSplash.checkTime("init 52");
         dout.width= dout.width + (  w - din.width );
         dout.height= dout.height + ( h - din.height );
 
-        GraphicsConfiguration gc= getGraphicsConfiguration();
+        //GraphicsConfiguration gc= getGraphicsConfiguration();
         //Dimension screenSize = gc.getBounds().getSize();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        double scale= 1.0;
 
         if ( w<640 || h<480 ) {
             this.applicationModel.dom.getCanvases(0).setFitted(false);
@@ -1506,9 +1509,7 @@ APSplash.checkTime("init 52");
                         nh= ( screenSize.height-controlsHeight ); // accommodate GUI controls
                         nw= (int)( nh / aspect );
                     }
-                    //TODO: scale font...
-                    //Font f= Font.decode( this.applicationModel.dom.getCanvases(0).getFont() );
-                    //float scale= (float)nw/w;
+                    scale= (double)nw/w;
                     //Font newFont= f.deriveFont( f.getSize2D() * scale );
                     //this.applicationModel.dom.getCanvases(0).setFont(newFont.toString());
                     parentToAdjust.setSize( nw + (  w - din.width ) , nh + ( h - din.height ) );
@@ -1530,7 +1531,7 @@ APSplash.checkTime("init 52");
                 this.applicationModel.dom.getCanvases(0).setWidth(w);
             }
         }
-        
+        return scale;
     }
 
     public void setStatus(String message) {
