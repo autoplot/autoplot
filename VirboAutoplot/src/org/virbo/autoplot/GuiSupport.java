@@ -1566,15 +1566,24 @@ public class GuiSupport {
         chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
         chooser.setFont(app.getCanvas().getBaseFont());
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-            app.getCanvas().setBaseFont(chooser.getFont());
-            Font f = app.getCanvas().getFont();
-            app.getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f) );
-            return f;
+            return setFont( app, chooser.getFont() );
         } else {
             return null;
         }
     }
 
+    /**
+     * encapsulates the goofy logic about setting the font.
+     * @param app
+     * @param nf
+     * @return the Font actually used.
+     */
+    public static Font setFont( ApplicationModel app, Font nf ) {
+        app.getCanvas().setBaseFont(nf);
+        Font f = app.getCanvas().getFont();
+        app.getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f) );
+        return f;
+    }
     /**
      * raise the application window
      * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
