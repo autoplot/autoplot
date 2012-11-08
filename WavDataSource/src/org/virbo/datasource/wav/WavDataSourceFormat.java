@@ -66,10 +66,16 @@ public class WavDataSourceFormat implements DataSourceFormat {
             }
         }
 
+        double scale= 1.0;
+        if ( "T".equals( params.get("scale") ) ) {
+            shift= ( extent.value(1)+extent.value(0) ) / 2;
+            scale= 65536 / ( extent.value(1)-extent.value(0) );
+        }
+
         QubeDataSetIterator it = new QubeDataSetIterator(data);
         while (it.hasNext()) {
             it.next();
-            it.putValue(ddata, it.getValue(data)-shift );
+            it.putValue(ddata, scale * ( it.getValue(data)-shift ) );
         }
 
         return result;
@@ -110,12 +116,18 @@ public class WavDataSourceFormat implements DataSourceFormat {
             }
         }
 
+        double scale= 1.0;
+        if ( "T".equals( params.get("scale") ) ) {
+            shift= ( extent.value(1)+extent.value(0) ) / 2;
+            scale= 65536 / ( extent.value(1)-extent.value(0) );
+        }
+
         QubeDataSetIterator it = new QubeDataSetIterator(data);
         QubeDataSetIterator it2= new QubeDataSetIterator(ddata);
         while (it.hasNext()) {
             it.next();
             it2.next();
-            it2.putValue(ddata, it.getValue(data)-shift );
+            it2.putValue(ddata, scale * ( it.getValue(data)-shift ) );
         }
 
         return result;
@@ -131,6 +143,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         String type = params.get("type");
 
+        QDataSet extent= Ops.extent(data);
         int dep0Len = 0;
         int typeSize = BufferDataSet.byteCount(type);
         int recSize = typeSize * (dep0Len + 1);
@@ -147,9 +160,16 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
 
+        double scale= 1.0;
+        double shift= 0;
+        if ( "T".equals( params.get("scale") ) ) {
+            shift= 0;
+            scale= 65536 / ( extent.value(1)-extent.value(0) );
+        }
+
         while (it.hasNext()) {
             it.next();
-            it.putValue(ddata, it.getValue(data));
+            it.putValue(ddata,  scale * ( it.getValue(data)-shift ) );
         }
 
         return result;
