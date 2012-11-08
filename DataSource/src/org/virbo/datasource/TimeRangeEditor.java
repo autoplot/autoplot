@@ -370,17 +370,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         TimeRangeTool t=new TimeRangeTool();
-        t.setSelectedRange(getRange().toString());
-        Window parent= SwingUtilities.getWindowAncestor(this);
-        JDialog dia;
-        if ( parent instanceof JFrame ) { //JAVA6 will clean this up.
-            dia= new JDialog((JFrame)parent);
-        } else if ( parent instanceof Dialog ) {
-            dia= new JDialog((Dialog)parent);
-        } else {
-            dia= new JDialog();
-        }
-        dia.add( t );
+        t.setSelectedRange(getRange().toString());//TODO: goofy
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
             setRange( DatumRangeUtil.parseTimeRangeValid(str) );
