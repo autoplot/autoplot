@@ -76,21 +76,13 @@ public class CDFFactory {
     }
 
     /**
-     * clone the byte buffer so it is in Java memory .  For Windows.
-     * @param original
-     * @return
-     */
-    public static ByteBuffer clone(ByteBuffer original) {
-       ByteBuffer clone = ByteBuffer.allocateDirect(original.capacity());
-       original.rewind();//copy from the beginning
-       clone.put(original);
-       original.rewind();
-       clone.flip();
-       return clone;
-}
-
-    /**
-     * creates  CDF object from a file.
+     * creates  CDF object from a file.  Originally, with Nand's code this would map the file
+     * into memory outside of the JVM, and then map pieces of it into the JVM's memory.
+     * To address problems on Windows where the maps would not be released, this is no longer
+     * done and the data is read directly into JVM memory.
+     * See also:
+     *   https://sourceforge.net/tracker/?func=detail&aid=3576013&group_id=199733&atid=970682
+     *   https://sourceforge.net/tracker/?func=detail&aid=3585373&group_id=199733&atid=970682
      */
     public static CDF getCDF(String fname) throws Throwable {
         logger.log(Level.FINE,"getCDF: opening ({0})",fname);
@@ -99,8 +91,10 @@ public class CDFFactory {
             throw new IllegalArgumentException("file is too large: "+fname+", it's length is > "+Integer.MAX_VALUE );
         }
         FileInputStream fis = new FileInputStream(file);
-          FileChannel ch = fis.getChannel();
-        ByteBuffer buf = clone( ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size()) );
+        ByteBuffer buf= ByteBuffer.allocate((int)file.length());
+        FileChannel ch = fis.getChannel();
+        ch.read(buf);
+        buf.flip();
         fis.close();
         logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
         return getVersion(buf);
