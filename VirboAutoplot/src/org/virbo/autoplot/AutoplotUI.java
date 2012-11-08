@@ -31,6 +31,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
 import java.awt.dnd.DropTarget;
@@ -1505,6 +1506,11 @@ APSplash.checkTime("init 52");
                         nh= ( screenSize.height-controlsHeight ); // accommodate GUI controls
                         nw= (int)( nh / aspect );
                     }
+                    //TODO: scale font...
+                    //Font f= Font.decode( this.applicationModel.dom.getCanvases(0).getFont() );
+                    //float scale= (float)nw/w;
+                    //Font newFont= f.deriveFont( f.getSize2D() * scale );
+                    //this.applicationModel.dom.getCanvases(0).setFont(newFont.toString());
                     parentToAdjust.setSize( nw + (  w - din.width ) , nh + ( h - din.height ) );
 
                 } else if ( i==1 ) {
