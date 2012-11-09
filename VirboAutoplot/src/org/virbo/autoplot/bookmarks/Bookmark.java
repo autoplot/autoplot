@@ -878,7 +878,7 @@ public abstract class Bookmark {
     /**
      * Holds value of property title.
      */
-    private String title;
+    private String title="";
     /**
      * Utility field used by bound properties.
      */
@@ -924,7 +924,7 @@ public abstract class Bookmark {
     }
 
 
-    protected String description;
+    protected String description="";
 
     public String getDescription() {
         return description;
@@ -938,6 +938,10 @@ public abstract class Bookmark {
 
     protected URL descriptionUrl=null;
 
+    /**
+     * returns the URL, or null if one is not available.
+     * @return
+     */
     public URL getDescriptionUrl() {
         return descriptionUrl;
     }
