@@ -22,6 +22,15 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3585373: CDF Java fails immediately with out of memory</li>
+            <li>hugeScatter handles incorrect units like the scatter mode, putting up warning but plotting data anyway.</li>
+            <li>TCAs (Emphemeris) in vap files are handled properly, so the date label is turned of when load a vap with emphemeris</li>
+            <li>time range editor doesn't forget orbit number</li>
+            <li>jython editor scroll increment set properly when editor has lots of arguments.</li>
+            <li>sparse variables in Native CDF supported.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte_0686841638: [] in qstream comments are now okay</li>
             <li>rte_0018238427: URI is not absolute, when exporting on Windows</li>
             <li>Messenger CDF variable uses sparse records.  Implement sparse records for native library, Java needs work.</li>
@@ -47,52 +56,20 @@
             <li>fixes for bugs found in CDAWeb source discovered by Bob's plot everything script.</li>
             <li>old "|slice(2)" was mis-handled in metadata sprocess, causing RTE</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3577068: old code in cdf readers would cause problem when displayType was spectrogram and their were <6 channels.</li>
-            <li>3576060: jython data source doesn't have timerange set before going into editor, causing jumps to default time</li>
-            <li>3575260: keep track of last location, because Ubuntu 12.04 opens windows up in odd places (off screen with 2 displays)</li>
-            <li>remove unnecessary synchronized block in DasAxis</li>
-            <li>rte_1627148566: Pure-java CDF didn't close files propertly, causing RTEs on Windows.</li>
-            <li>enumeration of integers didn't set the editor GUI properly: http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect_lvt.jyds</li>
-            <li>Recent CDAWeb move broke code that handled exceptional file naming, as with ace/cris/level_2_cdaweb/cris_h3</li>
-            <li>Recent change broke the spectrogram when a dataset was both a rank 2 table and a bundle, as with Seth's data</li>
-            <li>frame title is set on the event thread after seeing hang on Ubuntu 12.04</li>
-            <li>empty pngwalk sequence would produce runtime error</li>
-            <li>TimeDate xaxis labeller used when loading vap with emphemeris.</li>
-            <li>old kludgy code in CDF readers that would bring in themis timetags was messing up RBSP/EMFISIS virtual variables</li>
-            <li>hugeScatter rank2 waveform handling assumed DEPEND_1 was set.  Use SemanticOps.isRank2Waveform instead.</li>
-            <li>3573900: procedure shows bug in processed dataset caching. (replaces earlier quick fix with correct fix.)</li>
-            <li>Ops.copy command would incorrectly create a qube from a non-qube.</li>
-            <li>3574147: avoid deadlock by checking for DasUpdateEvents in getThumbnail.</li>
-            <li>skeleton files moved with the CDAWeb changes, causing problems for Bob's script.</li>
-            <li>new jython editor was resetting the font to a poor choice on Jeremy's mac, this is now a configurable property</li>
-            <li>gzipped remote bookmarks are loading again after code change for direct download.  Thanks Bob for pointing this out!</li>
-            <li>bugfix: ReduceFilter needs to update the cacheTag of the result. </li>
-            <li>bugfix in CdfJava plugin where subsampling would not work with new TT2000 datasets.</li>
-            <li>added jsyntaxpane jar file to the Eclipse class path.  Thanks Jon!</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>allow jump into jyds editor from built-in editor.</li>
             <li>RBSP orbits come from one of three servers for robustness, and embedded within jar for offline use.</li>
             <li>introduce GUI for picking timeranges, look for the "calendar" icon on the time range editor.</li>
             <li>allow scripts, like the digitizer application, to register a hook that prevents exiting and loosing work.</li>
-            <li>stack of lineplots view when CDF Y Tags are rank 2</li>
-            <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
         </ul>
         <p>Less recent features:</p>
         <ul>
+            <li>stack of lineplots view when CDF Y Tags are rank 2</li>
+            <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
             <li>delegate granule in aggregation is based on timerange, if available</li>
             <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
             <li>new LSpec.rebin produces data on fixed cadence</li>
-            <li>progress monitors use M and K to limit number of digits to 5 decimal places.</li>
-            <li>don't have no files found popup when using aggregation.</li>
-            <li>add avail=T to aggregation so you can see when granules are available.</li>
-            <li>support rank2 "waveform" datasets in QDataSet with the huge scatter mode this gets us up to about 12M points.</li>
-            <li>add sum_values virtual function to CDF</li>
-            <li>log console uses x scroll bar to avoid wrapping lines.
-            <li>add user option for default mouse action: box zoom, crosshair digitizer, zoom x</li>
-            <li>Tools->Cache->Manage FileSystems dialog to indicate the active filesystems and their status</li>
         </ul>
 
         <p>Known issues:</p>
