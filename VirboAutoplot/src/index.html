@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Introduction of the TimeRangeTool helps to compose orbit ranges.</small></p>
+        <p><small>Bug where 1-record CDFs could not be aggregated is fixed, and new scale=T option for export to wav allows
+                calibrated data to be played.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +23,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>George's problem where aggregation didn't work because of bug with reading 1-record CDFs</li>
             <li>3585373: CDF Java fails immediately with out of memory</li>
             <li>hugeScatter handles incorrect units like the scatter mode, putting up warning but plotting data anyway.</li>
             <li>TCAs (Emphemeris) in vap files are handled properly, so the date label is turned of when load a vap with emphemeris</li>
@@ -58,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>scale=T added to export to wav, GUI added as well.</li>
             <li>allow jump into jyds editor from built-in editor.</li>
             <li>RBSP orbits come from one of three servers for robustness, and embedded within jar for offline use.</li>
             <li>introduce GUI for picking timeranges, look for the "calendar" icon on the time range editor.</li>
