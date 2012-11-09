@@ -322,23 +322,16 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         timeRangeEditor = new TimeRangeEditor();
 
-        System.err.println("here1: "+getTimeRangeEditor().getMinimumSize() );
-
         Dimension d= timeRangeEditor.getMinimumSize();
         timeRangePanel.add( timeRangeEditor, "card1" );
-System.err.println("here12: "+getTimeRangeEditor().getMinimumSize() );
         timeRangeEditor.setMinimumSize( d );
         timeRangePanel.setMinimumSize( d );
         timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
         timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
         dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
-System.err.println("here13a: "+getTimeRangeEditor().getMinimumSize() );
-System.err.println("here13b: "+timeRangePanel.getMinimumSize() );
-timeRangeEditor.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
-        timeRangeEditor.setRange( Application.DEFAULT_TIME_RANGE );
 
-        System.err.println("here2: "+getTimeRangeEditor().getMinimumSize() );
-        System.err.println("here2: "+getTimeRangeEditor().getMinimumSize() );
+        timeRangeEditor.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
+        timeRangeEditor.setRange( Application.DEFAULT_TIME_RANGE );
 
         dom.getController().addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, timeRangeEditor.getUriFocusListener() );
         
