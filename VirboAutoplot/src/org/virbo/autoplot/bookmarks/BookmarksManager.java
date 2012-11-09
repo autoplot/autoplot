@@ -1002,7 +1002,7 @@ private void descriptionTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN
     // we have to do more here because of the View/Edit button
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     if ( b!=null ) {
-        if ( b.getDescription().equals(descriptionTextField.getText() ) ) {
+        if ( b.getDescription()==null || b.getDescription().equals(descriptionTextField.getText() ) ) {
             dirtyBookmark= b;
         }
     }
