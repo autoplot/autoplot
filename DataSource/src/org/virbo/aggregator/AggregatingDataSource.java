@@ -301,6 +301,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( !DataSetUtil.validate(ds1, problems) ) {
                     for ( String p: problems ) {
                         System.err.println("problem with aggregation element "+ss[i]+": "+p);
+                        logger.warning("problem with aggregation element "+ss[i]+": "+p);
                     }
                 }
 
@@ -366,6 +367,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( !DataSetUtil.validate( result, problems) ) {
                     for ( String p: problems ) {
                         System.err.println("problem in aggregation: "+p);
+                        logger.warning("problem in aggregation: "+p);
                     }
                 }
             }
