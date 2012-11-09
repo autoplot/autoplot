@@ -46,7 +46,7 @@ public class DemoColMajority {
         if (  cdf.getMajority()==CDF.COLUMN_MAJOR ) System.err.println( "Majority: COLUMN_MAJOR"  );
         Variable v= cdf.getVariable("rank3float");
 
-        long[] dimSizes = v.getDimSizes();
+        long[] dimSizes = v.getDimSizes(); // getDimSizes can return null, but this is just for testing.
 
         boolean swapDimSizesTest= false;
         if ( swapDimSizesTest && cdf.getMajority()==CDF.COLUMN_MAJOR ) {
