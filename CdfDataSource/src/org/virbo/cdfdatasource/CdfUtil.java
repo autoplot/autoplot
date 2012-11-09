@@ -479,7 +479,7 @@ public class CdfUtil {
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
 
-        long[] dimSizes = variable.getDimSizes();
+        long[] dimSizes = variable.getDimSizes(); // may be null
         int dims;
         if (dimSizes == null) {
             dims = 0;
@@ -675,7 +675,7 @@ public class CdfUtil {
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
 
-        long[] dimSizes = variable.getDimSizes();
+        long[] dimSizes = variable.getDimSizes(); // may be null
         int dims;
         if (dimSizes == null) {
             dims = 0;
@@ -874,10 +874,10 @@ public class CdfUtil {
                 Entry yEntry = bAttr.getEntry(var);
                 result.dep = cdf.getVariable(String.valueOf(yEntry.getData()));
                 result.nrec = result.dep.getMaxWrittenRecord()+1;
-                if (result.nrec == 1) {
+                if (result.nrec == 1 && result.labl.getDimSizes()!=null ) {
                     result.nrec = result.dep.getDimSizes()[0];
                 }
-                if ( result.dep.getDimSizes().length>0 && result.dep.getMaxWrittenRecord()>0 && result.dep.getRecVariance() ) {
+                if ( result.dep.getDimSizes()!=null && result.dep.getDimSizes().length>0 && result.dep.getMaxWrittenRecord()>0 && result.dep.getRecVariance() ) {
                             result.rank2= true;
                             result.nrec = result.dep.getDimSizes()[0];
                             warn.add( "NOTE: " + result.dep.getName() + " is record varying" );
@@ -903,7 +903,7 @@ public class CdfUtil {
                 Entry yEntry = blAttr.getEntry(var);
                 result.labl = cdf.getVariable(String.valueOf(yEntry.getData()));
                 result.nrec = result.labl.getMaxWrittenRecord()+1;
-                if (result.nrec == 1) {
+                if (result.nrec == 1 && result.labl.getDimSizes()!=null ) {
                     result.nrec = result.labl.getDimSizes()[0];
                 }
                 if ( result.labl.getRecVariance() ) {
