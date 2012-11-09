@@ -90,11 +90,24 @@ public class CDFFactory {
         if ( file.length()>=Integer.MAX_VALUE ) {
             throw new IllegalArgumentException("file is too large: "+fname+", it's length is > "+Integer.MAX_VALUE );
         }
+
+        ByteBuffer buf;  // this will be preferrably memory-mapped but we will also map it into java memory if this is unsuccessful.
         FileInputStream fis = new FileInputStream(file);
-        ByteBuffer buf= ByteBuffer.allocate((int)file.length());
         FileChannel ch = fis.getChannel();
-        ch.read(buf);
-        buf.flip();
+        try {
+            logger.log(Level.FINER,"attempting to map the file into memory: {0}",fname);
+            buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
+            fis.close();
+            logger.log(Level.FINER,"successfully mapped the file into memory: {0}",fname);
+        } catch ( IOException ex ) {
+            logger.log(Level.FINER,"exception occurred, attempting to read into JVM memory: {0}",fname);
+            logger.log(Level.FINER,"  exception= {0}",ex.toString());
+            buf= ByteBuffer.allocate((int)file.length());
+            ch.read(buf);
+            buf.flip();
+            logger.log(Level.FINER,"successfully read into JVM memory: {0}",fname);
+        }
+        
         fis.close();
         logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
         return getVersion(buf);
