@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.dataset.NoDataInIntervalException;
@@ -33,6 +35,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -293,6 +296,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     ds1 = delegateDataSource.getDataSet(mon1);
                     continue;
                 }
+                
+                List<String> problems= new ArrayList();
+                if ( !DataSetUtil.validate(ds1, problems) ) {
+                    for ( String p: problems ) {
+                        System.err.println("problem with aggregation element "+ss[i]+": "+p);
+                    }
+                }
 
                 if (result == null && altResult==null ) {
                     if ( ds1 instanceof JoinDataSet ) {
@@ -350,6 +360,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     break;
                 }
             }
+
+            if ( result!=null ) {
+                List<String> problems= new ArrayList();
+                if ( !DataSetUtil.validate( result, problems) ) {
+                    for ( String p: problems ) {
+                        System.err.println("problem in aggregation: "+p);
+                    }
+                }
+            }
+
         }
         cacheRange = cacheRange1;
 
