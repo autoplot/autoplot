@@ -874,7 +874,7 @@ public class CdfUtil {
                 Entry yEntry = bAttr.getEntry(var);
                 result.dep = cdf.getVariable(String.valueOf(yEntry.getData()));
                 result.nrec = result.dep.getMaxWrittenRecord()+1;
-                if (result.nrec == 1 && result.labl.getDimSizes()!=null ) {
+                if (result.nrec == 1 && result.dep.getDimSizes()!=null ) {
                     result.nrec = result.dep.getDimSizes()[0];
                 }
                 if ( result.dep.getDimSizes()!=null && result.dep.getDimSizes().length>0 && result.dep.getMaxWrittenRecord()>0 && result.dep.getRecVariance() ) {
