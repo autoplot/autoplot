@@ -31,8 +31,8 @@
     </security>
     
     <resources> 
-        <j2se version="1.5+" initial-heap-size="96m" max-heap-size="1024m"
-              href="http://java.sun.com/products/autodl/j2se" > 
+        <j2se version="1.5+" initial-heap-size="96m" max-heap-size="1024m" java-vm-args="-Dsun.java2d.d3d=false"
+              href="http://java.sun.com/products/autodl/j2se" >
         </j2se>
         
         <property name="jnlp.packEnabled" value="true"/>
