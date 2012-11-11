@@ -33,7 +33,6 @@ import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
@@ -53,7 +52,7 @@ import org.virbo.dsutil.DataSetBuilder;
 
 /**
  *
- * http://www.papco.org:8080/opendap/cdf/polar/hyd_h0/%Y/po_h0_hyd_%Y%m%d_v...cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
+ * http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109
  * @author jbf
  */
 public final class AggregatingDataSource extends AbstractDataSource {
@@ -179,13 +178,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        
-        String[] ss = getFsm().getBestNamesFor( viewRange, new NullProgressMonitor() );
+
+        DatumRange lviewRange= viewRange;
+        Datum lresolution= resolution;
+
+        String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
 
         boolean avail= !getParam( "avail", "F" ).equals("F");
 
         if ( avail ) {
-            logger.log(Level.FINE, "availablility {0} ", new Object[]{ viewRange});
+            logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
             DataSetBuilder build= new DataSetBuilder(2,ss.length,4);
             Units u= Units.us2000;
             EnumerationUnits eu= new EnumerationUnits("default");
@@ -217,7 +219,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             
         }
         
-        logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, viewRange});
+        logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, lviewRange});
 
         ArrayDataSet result = null;
         JoinDataSet altResult= null; // used when JoinDataSets are found
@@ -226,7 +228,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
                 throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
             } else {
-                throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+viewRange );
+                throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
             }
         }
         if (ss.length > 1) {
@@ -259,11 +261,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             if ( delegateDataSource.getCapability( TimeSeriesBrowse.class )!=null ) {
                 TimeSeriesBrowse delegateTsb= delegateDataSource.getCapability( TimeSeriesBrowse.class );
-                delegateTsb.setTimeRange(viewRange);
-                delegateTsb.setTimeResolution(resolution);
+                delegateTsb.setTimeRange(lviewRange);
+                delegateTsb.setTimeResolution(lresolution);
                 setResolution( delegateTsb.getTimeResolution() );
             } else {
-                resolution= null;
+                // resolution= null; TODO: verify there's no reason to do this.
             }
             
             metadataModel = delegateDataSource.getMetadataModel();
@@ -390,8 +392,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
                 dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
-                dep0.putProperty(QDataSet.TYPICAL_MIN, viewRange.min().doubleValue(dep0units) );
-                dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
             }
 
             QDataSet notes= notesBuilder.getDataSet();
@@ -403,8 +405,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
             Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
                 dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
-                dep0.putProperty(QDataSet.TYPICAL_MIN, viewRange.min().doubleValue(dep0units) );
-                dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
             }
 
             QDataSet notes= notesBuilder.getDataSet();
