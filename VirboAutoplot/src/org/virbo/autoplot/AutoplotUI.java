@@ -3414,9 +3414,13 @@ APSplash.checkTime("init 240");
 
         SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
             public void run() {
-                statusLabel.setIcon( ficon );
-                statusTextField.setText(fmyMess);
-                statusTextField.setToolTipText(fmessage);
+                try {
+                    statusLabel.setIcon( ficon );
+                    statusTextField.setText(fmyMess);
+                    statusTextField.setToolTipText(fmessage);
+                } catch ( Exception e ) {
+                    logger.log( Level.SEVERE, "", e ); // rte_0759798375_20121111_205149_*.xml
+                }
             }
         });
     }
