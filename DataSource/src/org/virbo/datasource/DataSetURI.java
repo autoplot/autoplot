@@ -646,7 +646,7 @@ public class DataSetURI {
      */
     private static boolean isUrl( URI uri ) {
         String s= uri.getScheme();
-        return s.equals("http") || s.equals("https") || s.equals("ftp");
+        return s.equals("http") || s.equals("https") || s.equals("ftp") || s.equals("file");
     }
 
     /**
@@ -696,8 +696,8 @@ public class DataSetURI {
                         }
                     } else {
                         // there is repeated code lurking.  See line 616.
-                        if ( split.path.endsWith("/tmp/") ) { // try to download the file directly.
-                           return downloadResourceAsTempFile(url, mon);
+                        if ( split.path.endsWith("/tmp/") && url!=null ) { // try to download the file directly.
+                           return downloadResourceAsTempFile(  url, mon);
                         }
                         throw new FileNotFoundException("File not found: "+ split.resourceUri );
                     }
