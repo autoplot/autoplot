@@ -23,6 +23,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bugfix local paths with /tmp in the path would fail.</li>
+            <li>hugeScatter repaints properly, finally...</li>
+            <li>cdf-java attempts to read to memory outside JVM, then falls back to JVM memory</li>
             <li>3586029: progress monitor cancel enabled for setTaskSize 1 of 3 (CDAWeb)</li>
             <li>rte_0818219940: null pointing when editing bookmarks</li>
             <li>3586030: one record of waveform data didn't autorange properly</li>
@@ -68,6 +71,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>events renderer mouse show multiple events for overlaps</li>
             <li>scale=T added to export to wav, GUI added as well.</li>
             <li>allow jump into jyds editor from built-in editor.</li>
             <li>RBSP orbits come from one of three servers for robustness, and embedded within jar for offline use.</li>
