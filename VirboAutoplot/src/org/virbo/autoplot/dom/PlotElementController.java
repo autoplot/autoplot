@@ -719,7 +719,7 @@ public class PlotElementController extends DomNodeController {
         try {
             QDataSet fillDs = dsf.controller.getFillDataSet();
             if (fillDs != null) {
-                final String comp= plotElement.getComponent();
+                final String comp= plotElement.getComponent().trim();
                 if (resetPlotElement) {
                     if (comp.equals("")) {
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
@@ -791,7 +791,7 @@ public class PlotElementController extends DomNodeController {
                     try {
                          updateDataSetImmediately();
                     } catch ( Exception ex ) {
-                        throw new IllegalArgumentException(ex);
+                         throw new IllegalArgumentException(ex);
                     }
                 }
             };
