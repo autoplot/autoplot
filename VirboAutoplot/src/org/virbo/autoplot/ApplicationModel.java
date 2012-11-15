@@ -1142,8 +1142,11 @@ public class ApplicationModel {
             //TODO: scale font...
             Font f= Font.decode( state.getCanvases(0).getFont() );
             Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
-            logger.fine("shrinking font to "+newFont.toString());
-            GuiSupport.setFont( this, newFont );
+            logger.log(Level.FINE, "shrinking font to {0}", newFont.toString());
+            // GuiSupport.setFont( this, newFont );  // this is in-lined to support AutoplotApplet.
+            getCanvas().setBaseFont(newFont);
+            Font f2 = getCanvas().getFont();
+            getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
             state.getCanvases(0).setFont( DomUtil.encodeFont(newFont) );
             state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
             state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
