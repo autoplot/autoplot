@@ -47,6 +47,8 @@ rm org/virbo/autoplot/scriptconsole/*
 find . -name '*EditorPanel.java' -exec rm {} \;
 rm org/virbo/autoplot/TcaElementDialog.java
 rm org/virbo/autoplot/bookmarks/BookmarksManager.java
+rm org/virbo/autoplot/GuiSupport.java
+rm org/virbo/autoplot/AddPlotElementDialog.java
 #rm -rf org/das2/stream/*
 rm -rf org/das2/dasml/*
 
