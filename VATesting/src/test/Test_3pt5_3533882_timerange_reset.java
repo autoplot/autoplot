@@ -54,6 +54,8 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
+            waitUntilIdle();
+            
             // delete this plotElement, then 
             dom.getController().setPlotElement( dom.getPlotElements(4) ); //cheat
 
