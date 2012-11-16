@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasPlot;
-import org.netbeans.jemmy.drivers.input.MouseEventDriver;
 import org.virbo.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
@@ -61,6 +60,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
                     && dr1.width().value()==100.0
                     && dr1.width().value()==100.0
                     && close( dr2.width().value(), 163.93 ) ) {
+                System.err.println( "failed because of: !close( "+dr2.width().value()+" , 163.93 )");
                 return 0;
             } else {
                 return 1;
