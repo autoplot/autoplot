@@ -411,9 +411,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     
                     valuePanel.add( ctf );
                 }
-                
 
-                final String fdeft= parm.type=='R' ? "default" : String.valueOf(parm.deft);
+                boolean shortLabel= ( parm.type=='R' || String.valueOf(parm.deft).length()>22 ) ;
+                final String fdeft= shortLabel ? "default" : String.valueOf(parm.deft);
                 final String fvalue= String.valueOf(parm.deft);
                 final JComponent ftf= ctf;
                 JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
@@ -434,7 +434,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         }
                     }
                 });
-                defaultButton.setToolTipText( ( parm.type == 'R' ) ? String.valueOf(parm.deft) : "Click to reset to default" );
+                defaultButton.setToolTipText( shortLabel ? String.valueOf(parm.deft) : "Click to reset to default" );
                 valuePanel.add( defaultButton );
                 valuePanel.add( getSpacer() );
                 valuePanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
