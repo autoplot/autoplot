@@ -49,6 +49,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsutil.BundleBuilder;
 import org.virbo.dsutil.DataSetBuilder;
+import org.virbo.dsutil.Reduction;
 
 /**
  *
@@ -185,6 +186,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
 
         boolean avail= !getParam( "avail", "F" ).equals("F");
+        boolean reduce= getParam( "reduce", "F" ).equals("T");
 
         if ( avail ) {
             logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
@@ -307,6 +309,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
                 }
 
+                if ( reduce && lresolution!=null && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
+                    ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
+                }
+
                 if (result == null && altResult==null ) {
                     if ( ds1 instanceof JoinDataSet ) {
                         altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
@@ -391,7 +397,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 dep0.putProperty(QDataSet.UNITS, dep0units );
             }
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
-                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
+                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1,reduce?lresolution:null));
                 dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
                 dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
             }
@@ -404,7 +410,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
             Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
-                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
+                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, reduce?lresolution:null));
                 dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
                 dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
             }
