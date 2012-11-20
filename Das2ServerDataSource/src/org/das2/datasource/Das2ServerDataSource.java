@@ -114,6 +114,17 @@ class Das2ServerDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("timeRange is null");
         }
 
+        // optional explicit resolution
+        String sresolution= params.get("_res");
+
+        if ( sresolution!=null ) {
+            if ( sresolution.trim().length()==0 || sresolution.equals("0") ) {
+                resolution= null;
+            } else {
+                resolution= Units.seconds.parse(sresolution);
+            }
+        }
+
         if ( resolution!=null ) {
             params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
         }
