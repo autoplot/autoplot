@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>multiple events are now shown when there are overlaps.</small></p>
+        <p><small>Aggregation now provides reduction.  The top panel has the data reduced with reduce=T in the URI, here we've zoomed in and it is reloading to get higher resolution data.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>long parameters in JythonDataSource dialog just have "default" for the button label</li>
+            <li>put a space in jnlp title so it inserts linebreaks nicely on desktops</li>
+            <li>CDF Rank2 BUNDLE properties read in when DEPEND_1 is Rank 2.</li>
             <li>add logging to aggregation to figure out why Dan's seeing inconsistent behavior</li>
             <li>local paths with /tmp in the path would fail.</li>
             <li>hugeScatter repaints properly, finally...</li>
@@ -71,6 +74,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add 2-D rebin function for going from X,Y,Z bundles to Z(X,Y) spectrogram to support scripting.</li>
+            <li>3588938: introduce reduction in aggregation, add &amp;reduce=T to try this out.</li>
+            <li>aggregation joinProperties handles DELTA_PLUS, DELTA_MINUS and WEIGHTS_PLANE</li>
+            <li>SemanticOps.isTimeSeries is canonical check for datasets of this type.</li>
             <li>events renderer mouse show multiple events for overlaps</li>
             <li>scale=T added to export to wav, GUI added as well.</li>
             <li>allow jump into jyds editor from built-in editor.</li>
