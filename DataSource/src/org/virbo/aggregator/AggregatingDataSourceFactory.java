@@ -202,6 +202,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         String timeRange= ((String) parms.remove("timerange"));
         if ( timeRange!=null ) timeRange= timeRange.replaceAll("\\+", " ");
 
+        parms.remove("reduce");
+        
         split.params = URISplit.formatParams(parms);
 
         FileStorageModelNew fsm = getFileStorageModel( DataSetURI.fromUri(split.resourceUri) );

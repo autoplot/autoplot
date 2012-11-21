@@ -16,14 +16,14 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="delegatePanel" alignment="0" pref="554" max="32767" attributes="0"/>
+          <Component id="delegatePanel" alignment="0" pref="573" max="32767" attributes="0"/>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="delegatePanel" pref="263" max="32767" attributes="0"/>
+              <Component id="delegatePanel" pref="257" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -63,15 +63,16 @@
                   <Component id="daysComboBox" min="-2" pref="72" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="111" max="32767" attributes="0"/>
+                  <EmptySpace pref="116" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="delegateTextField" alignment="0" pref="526" max="32767" attributes="0"/>
+                      <Component id="delegateTextField" alignment="0" pref="545" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="outerRangeTextField" pref="401" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="125" max="-2" attributes="0"/>
+                          <Component id="outerRangeTextField" pref="452" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                          <Component id="reduceCB" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -87,7 +88,10 @@
                       <Component id="jButton3" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="outerRangeTextField" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="outerRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="reduceCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="yearsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -198,6 +202,12 @@
             </Property>
             <Property name="text" type="java.lang.String" value="example file used for editing goes here."/>
             <Property name="toolTipText" type="java.lang.String" value="this only indicates the delegate file used to edit the rest of the URI above"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="reduceCB">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="reduce"/>
+            <Property name="toolTipText" type="java.lang.String" value="Reduce the data as it is loaded to save memory"/>
           </Properties>
         </Component>
       </SubComponents>
