@@ -186,7 +186,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         File cdfFile;
         cdfFile = getFile(mon);
 
-        logger.fine("getDataSet ("+String.valueOf(cdfFile)+")");
+        logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
 
         String fileName = cdfFile.toString();
         
@@ -419,7 +419,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         newVal.put("NAME", name); // tuck it away, we'll need it later.
                         props.put(vv[i], newVal);
                     } else {
-                        logger.fine( "No such variable: "+ name + " in CDF " );
+                        logger.log( Level.FINE, "No such variable: {0} in CDF ", name);
                     }
 
                 } else if ( ipass==1 && !isDep ) {
@@ -589,7 +589,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                         Variable depVar= cdf.getVariable( depName );
                         if ( depVar==null ) {
-                            logger.fine("unable to find variable \""+depName+"\" for DEPEND_"+sidep + " of "+ variable );
+                            logger.log(Level.FINE, "unable to find variable \"{0}\" for DEPEND_{1} of {2}", new Object[]{depName, sidep, variable});
                             continue;
                         }
 
@@ -649,7 +649,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         result.putProperty("DEPEND_" + idep, depDs);
                 }
 
-                if ( lablDs!=null && ( depDs==null || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                         QDataSet bundleDs= lablDs;
                         result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
                 }

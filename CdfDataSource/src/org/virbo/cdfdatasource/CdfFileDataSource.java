@@ -466,7 +466,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         result.putProperty("DEPEND_" + idep, depDs);
                 }
 
-                if ( lablDs!=null && ( depDs==null || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                         QDataSet bundleDs= lablDs;
                         result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
                 }
