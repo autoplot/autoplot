@@ -281,7 +281,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             } else if ( ss.length==1 ) {
                 mon1 = mon;
                 if ( mon1.isCancelled() ) break;
-                mon1.setLabel("loading " + ss[0] );
+                mon1.setProgressMessage("getting " + ss[0] );
                 mon1.started();
                 mon1.setTaskProgress(0);
             } else {
@@ -305,11 +305,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( !DataSetUtil.validate(ds1, problems) ) {
                     for ( String p: problems ) {
                         System.err.println("problem with aggregation element "+ss[i]+": "+p);
-                        logger.warning("problem with aggregation element "+ss[i]+": "+p);
+                        logger.log(Level.WARNING, "problem with aggregation element {0}: {1}", new Object[]{ss[i], p});
                     }
                 }
 
                 if ( reduce && lresolution!=null && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
+                    logger.info("reducing resolution to save memory");
+                    mon1.setProgressMessage("reducing resolution");
                     ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
                 }
 
