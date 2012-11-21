@@ -100,7 +100,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         mon.started();
         cdfFile = getFile(mon);
         logger.log(Level.FINE, "reading {0}", resourceURI);
-        logger.fine("getDataSet ("+String.valueOf(cdfFile)+")");
+        logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
         
         mon.setProgressMessage("retrieving file...");
         String fileName = cdfFile.toString();
