@@ -7,7 +7,7 @@
     href="autoplot_two_jar.jnlp">
     
     <information> 
-        <title>Autoplot(#{tag})</title> 
+        <title>Autoplot (#{tag})</title>
         <vendor>http://virbo.org/</vendor>
         <description>plots data from various sources, such as ascii tables, opendap, cdf, and netcdf using das2</description>
         <description kind="short">data plotter and more</description>

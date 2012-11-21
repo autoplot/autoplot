@@ -7,7 +7,7 @@
     href="pngwalk_two_jar.jnlp">
     
     <information> 
-        <title>Autoplot PNG Walk(#{tag})</title>
+        <title>Autoplot PNG Walk (#{tag})</title>
         <vendor>http://virbo.org/</vendor>
         <description>Tool for rapidly browsing pre-rendered plot images, which can launch Autoplot for deeper inspection</description>
         <description kind="short">PNG Walk tool for pre-rendered plot images.</description>

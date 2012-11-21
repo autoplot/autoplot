@@ -8,7 +8,7 @@
     <!-- codebase="http://autoplot.org/jnlp/#{tag}/" -->
    
     <information> 
-        <title>Autoplot(#{tag})</title> 
+        <title>Autoplot (#{tag})</title>
         <vendor>http://virbo.org/</vendor>
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
@@ -41,8 +41,9 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
-        <!--<jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120831.jar" /> -->
+        <!--uncomment the following when there are changes to the stable files-->
+        <!--<jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />-->
+        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20120831.jar" /> 
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
            <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
