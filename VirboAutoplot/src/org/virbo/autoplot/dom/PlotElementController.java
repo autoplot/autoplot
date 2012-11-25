@@ -2002,7 +2002,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                logger.warning("20121015: I was thinking autorange would always be true");
+                logger.fine("20121015: I was thinking autorange would always be true");
             }
             
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
