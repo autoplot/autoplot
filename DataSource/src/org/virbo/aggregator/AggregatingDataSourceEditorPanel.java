@@ -93,7 +93,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         delegateTextField = new javax.swing.JTextField();
-        reduceCB = new javax.swing.JCheckBox();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
@@ -104,7 +103,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
+        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10));
         outerRangeTextField.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/aggregator/spinner_16.gif"))); // NOI18N
         outerRangeTextField.setText("listing to get available time ranges...");
 
@@ -150,9 +149,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegateTextField.setText("example file used for editing goes here.");
         delegateTextField.setToolTipText("this only indicates the delegate file used to edit the rest of the URI above");
 
-        reduceCB.setText("reduce");
-        reduceCB.setToolTipText("Reduce the data as it is loaded to save memory");
-
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -161,7 +157,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 117, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 143, Short.MAX_VALUE)
                 .add(jButton3))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(7, 7, 7)
@@ -176,11 +172,10 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
-                        .add(19, 19, 19)
-                        .add(reduceCB)))
+                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
+                        .add(93, 93, 93)))
                 .addContainerGap())
         );
 
@@ -194,9 +189,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jButton3))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(outerRangeTextField)
-                    .add(reduceCB))
+                .add(outerRangeTextField)
                 .add(9, 9, 9)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(yearsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -212,13 +205,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -272,7 +265,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private javax.swing.JPanel jPanel1;
     private javax.swing.JComboBox monthsComboBox;
     private javax.swing.JLabel outerRangeTextField;
-    private javax.swing.JCheckBox reduceCB;
     private javax.swing.JTextField timeRangeTextField;
     private javax.swing.JComboBox yearsComboBox;
     // End of variables declaration//GEN-END:variables
@@ -486,8 +478,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
             timeRangeTextField.setText(timeRange);
 
-            String reduce= params.get("reduce");
-            reduceCB.setSelected( "T".equals(reduce) );
+            //String reduce= params.get("reduce");
+            //reduceCB.setSelected( "T".equals(reduce) );
 
             String delegateUrl = null;
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url);
@@ -607,11 +599,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         String tr = timeRangeTextField.getText();
         tr= tr.replaceAll(" ","+");
         allParams.put("timerange", tr);
-        if ( reduceCB.isSelected() ) {
-            allParams.put("reduce","T"); // warning--this is going to become the default.
-        } else {
-            allParams.remove("reduce");
-        }
+        //if ( reduceCB.isSelected() ) {
+        //    allParams.put("reduce","T"); // warning--this is going to become the default.
+        //} else {
+        //    allParams.remove("reduce");
+        //}
         split.params = URISplit.formatParams(allParams);
         if ( vapScheme==null ) {
             split.vapScheme= dsplit.vapScheme;
