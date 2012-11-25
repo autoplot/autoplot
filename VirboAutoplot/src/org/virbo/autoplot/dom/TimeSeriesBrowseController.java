@@ -60,7 +60,7 @@ public class TimeSeriesBrowseController {
                     updateTsbTimer.tickle();
                     return;
                 } else {
-                    if ( p!=null && p.getController().getDataSourceFilter().getController().getTsb() == null ) {
+                    if ( p!=null && ( p.getController().getDataSourceFilter()==null || p.getController().getDataSourceFilter().getController().getTsb() == null ) ) {
                         // leftover event doesn't need any special handling since TSB has been removed.
                         // System.err.println("entering that strange branch that probably isn't needed ");
                         return;
