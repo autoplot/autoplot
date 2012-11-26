@@ -127,7 +127,7 @@ public class JythonOps {
         if ( arg0 instanceof PyQDataSet ) {
             QDataSet ds= ((PyQDataSet)arg0).rods;
             if ( ds.rank()>0 ) {
-                throw new IllegalArgumentException("QDataSet is not rank zero and cannot be converted to datum");
+                throw new IllegalArgumentException("QDataSet is not rank zero and cannot be converted to datum: "+ds);
             } else {
                 return DataSetUtil.asDatum(ds);
             }
