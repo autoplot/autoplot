@@ -34,6 +34,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -240,6 +241,24 @@ public class CdfFileDataSource extends AbstractDataSource {
 
             result.putProperty( QDataSet.METADATA, attributes );
             result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+
+            if (  attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
+                QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
+                if ( dep1!=null ) {
+                    Units dep1units= SemanticOps.getUnits(dep1);
+                    if ( Units.ns!=dep1units ) {
+                        ArrayDataSet dep1_= ArrayDataSet.copy(dep1);
+                        dep1_.putProperty( QDataSet.VALID_MIN, null );
+                        dep1_.putProperty( QDataSet.VALID_MAX, null );
+                        dep1_.putProperty( QDataSet.FILL_VALUE, null );
+                        while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
+                        if ( dep1_.value()>1e6 ) {
+                            logger.warning("offset units do not appear to be in "+dep1units+", using ns");
+                            ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
+                        }
+                    }
+                }
+            }
 
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
