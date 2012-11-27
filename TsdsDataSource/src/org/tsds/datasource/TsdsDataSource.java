@@ -424,7 +424,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
         try {
-            DDataSet result = (DDataSet) ArrayDataSet.copy( double.class, Ops.timegen(String.valueOf(t0_1), String.valueOf(cadence), points));
+            DDataSet result = (DDataSet) ArrayDataSet.copy( double.class, Ops.timegen(String.valueOf(t0_1), cadence.getFormatter().format(cadence), points));
             DatumRange timeRange_1 = new DatumRange(startTime, endTime);
             result.putProperty(QDataSet.CACHE_TAG, new CacheTag(timeRange_1, cadence));
             return result;
