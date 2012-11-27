@@ -405,6 +405,13 @@ public class AutoplotUI extends javax.swing.JFrame {
                 applicationModel.addRecent(dataSetSelector.getValue());
             }
         });
+
+        dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+            public void actionPerformed( ActionEvent ev ) {
+                runScript( dataSetSelector.getValue() );
+            }
+        });
+
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
@@ -412,39 +419,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 } else {
-                    try {
-                        File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
-                        RunScriptPanel pp = new RunScriptPanel();
-                        pp.loadFile(ff);
-                        int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
-                        if ( r==JOptionPane.OK_OPTION ) {
-                            if ( pp.getToolsCB().isSelected() ) {
-                                File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                                File cpTo= new File( tools,ff.getName() );
-                                if ( !ff.equals(cpTo ) ) {
-                                    if ( !Util.copyFile( ff, cpTo ) ) {
-                                        setStatus("warning: unable to copy file");
-                                    } else {
-                                        setStatus("copied file to "+cpTo );
-                                        reloadTools();
-                                    }
-                                } else {
-                                    setStatus("warning: file is already in tools");
-                                }
-                            }
-                            if ( scriptPanel!=null ) {
-                                if ( ! scriptPanel.isDirty() ) {
-                                    scriptPanel.loadFile(ff);
-                                }
-                            }
-                            applicationModel.addRecent(dataSetSelector.getValue());
-                            RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
-                        }
-                    } catch (URISyntaxException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
+                    runScript( script );
                 }
             }
         });
@@ -3757,4 +3732,41 @@ APSplash.checkTime("init 240");
             applicationModel.getExceptionHandler().handleUncaught(ex);
         }
     }
+    
+    private void runScript( String script ) {
+        try {
+            File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
+            RunScriptPanel pp = new RunScriptPanel();
+            pp.loadFile(ff);
+            int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+            if ( r==JOptionPane.OK_OPTION ) {
+                if ( pp.getToolsCB().isSelected() ) {
+                    File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                    File cpTo= new File( tools,ff.getName() );
+                    if ( !ff.equals(cpTo ) ) {
+                        if ( !Util.copyFile( ff, cpTo ) ) {
+                            setStatus("warning: unable to copy file");
+                        } else {
+                            setStatus("copied file to "+cpTo );
+                            reloadTools();
+                        }
+                    } else {
+                        setStatus("warning: file is already in tools");
+                    }
+                }
+                if ( scriptPanel!=null ) {
+                    if ( ! scriptPanel.isDirty() ) {
+                        scriptPanel.loadFile(ff);
+                    }
+                }
+                applicationModel.addRecent(dataSetSelector.getValue());
+                RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
+            }
+        } catch (URISyntaxException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
 }
