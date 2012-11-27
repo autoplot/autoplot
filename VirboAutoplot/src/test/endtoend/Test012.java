@@ -117,7 +117,7 @@ public class Test012 {
             doTest( testid, 17, "file:///home/jbf/ct/hudson/data.backup/cdf/virbo/poes_n17_20041228.cdf?P1_90[0:300]" );
 
             // this has a non-varying second dimension that is automatically removed.
-            doTest( testid, 18, "ftp://cdaweb.gsfc.nasa.gov/pub/istp/canopus/asi/1999/cn_k0_asi_19991230_v01.cdf?Image" );
+            doTest( testid, 18, "file:///home/jbf/ct/hudson/data.backup/cdf/cn_k0_asi_19991230_v01.cdf?Image" );
 
             // this is a hugeScatter.
             doTest( testid, 19, "file:///home/jbf/ct/hudson/data.backup/cdf/pw/rbsp/rbsp-a_magnetometer_emfisis-L1_20120904_v1.2.2.cdf?Mag_UVW[0:100000]" );
