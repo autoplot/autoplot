@@ -163,7 +163,12 @@ public class TimeRangeTool extends javax.swing.JPanel {
         String orb= o.first();
         int count=1;
         while ( orb!=null && count<10 ) {
-            ss.add(orb);
+            try {
+                String str = String.valueOf(o.getDatumRange(orb));
+                ss.add(orb+": "+str);
+            } catch (ParseException ex) { // this won't happen
+                logger.log(Level.SEVERE, null, ex);
+            }
             orb= o.next(orb);
             count++;
         }
@@ -171,7 +176,13 @@ public class TimeRangeTool extends javax.swing.JPanel {
             orb= o.last();
             List<String> lastOrbits= new ArrayList();
             while ( orb!=null && !orb.equals(ss.get(ss.size()-1) ) && count<50 ) {
-                lastOrbits.add( 0, orb );
+                try {
+                    String str = String.valueOf(o.getDatumRange(orb));
+                    lastOrbits.add( 0, orb+": "+str );
+                } catch (ParseException ex) { // this won't happen
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                
                 orb= o.prev(orb);
                 count++;
             }
@@ -194,6 +205,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 } else {
                     orbitComboBox.setSelectedItem(o.first());
                 }
+                showOrbit( (String)orbitComboBox.getSelectedItem() );
                 if ( sc.contains(":") ) {
                     scFeedbackTF.setText( "orbits from "+sc );
                 } else {
@@ -256,13 +268,13 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE))
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE))
                     .add(jLabel7))
                 .addContainerGap())
             .add(jPanel1Layout.createSequentialGroup()
@@ -276,8 +288,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                             .add(jLabel9))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
-                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE))))
+                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -298,7 +310,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel9)
                     .add(stopTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(69, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Calendar", jPanel1);
@@ -341,29 +353,29 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(orbitFeedbackLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE))
+                        .add(orbitFeedbackLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel5)
                         .add(80, 80, 80)
-                        .add(orbitComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 102, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(orbitComboBox, 0, 333, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(scComboBox, 0, 338, Short.MAX_VALUE)))
+                        .add(scComboBox, 0, 334, Short.MAX_VALUE)))
                 .addContainerGap())
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
+                .add(jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
                 .addContainerGap())
             .add(jPanel2Layout.createSequentialGroup()
                 .add(24, 24, 24)
-                .add(scFeedbackTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+                .add(scFeedbackTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -384,7 +396,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(orbitComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(orbitFeedbackLabel)
-                .addContainerGap(122, Short.MAX_VALUE))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Orbits", jPanel2);
@@ -398,10 +410,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
             .add(jPanel3Layout.createSequentialGroup()
                 .add(12, 12, 12)
-                .add(nrtComboBox, 0, 457, Short.MAX_VALUE)
+                .add(nrtComboBox, 0, 453, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -410,7 +422,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nrtComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(212, Short.MAX_VALUE))
+                .addContainerGap(203, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NRT", jPanel3);
@@ -456,19 +468,31 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 return;
             }
         }
-        try {
-            DatumRange dr = o.getDatumRange((String) orbitComboBox.getSelectedItem());
-            orbitFeedbackLabel.setText( dr.toString() ); // note result is not an orbit datum range.
-            if ( evt.getStateChange()==ItemEvent.SELECTED ) {
-                orbit= (String) orbitComboBox.getSelectedItem();
-            }
-        } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            orbitFeedbackLabel.setText("No such orbit found: "+ orbitComboBox.getSelectedItem());
-        }
+        String sorbit= (String) orbitComboBox.getSelectedItem();
+        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            orbit= showOrbit(sorbit);
 
+        }
     }//GEN-LAST:event_orbitComboBoxItemStateChanged
 
+    /**
+     * shows the orbit timerange, clipping off text past the first colon.
+     * @param sorbit like "172: 2012-11-02 07:00 to 11:20"
+     * @return canonical orbit string like "172"
+     */
+    private String showOrbit( String sorbit ) {
+        Orbits o= Orbits.getOrbitsFor((String)scComboBox.getSelectedItem());
+        int i= sorbit.indexOf(":");
+        if ( i>-1 ) sorbit= sorbit.substring(0,i);
+        DatumRange dr;
+        try {
+            dr = o.getDatumRange(sorbit);
+            orbitFeedbackLabel.setText( dr.toString() ); // note result is not an orbit datum range.
+        } catch (ParseException ex) {
+            orbitFeedbackLabel.setText("No such orbit found: "+ sorbit);
+        }
+        return sorbit;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
