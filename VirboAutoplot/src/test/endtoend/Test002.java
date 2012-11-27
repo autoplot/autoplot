@@ -76,7 +76,8 @@ public class Test002 {
             "021 file:///home/jbf/ct/hudson/vap/auto4.v1_07.vap",
             "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
             "023 file:///home/jbf/ct/hudson/vap/seth/multiScheme.vap",
-            "024 file:///home/jbf/ct/hudson/vap/demos/eventsBarForAvailability3.vap"
+            "024 file:///home/jbf/ct/hudson/vap/demos/eventsBarForAvailability3.vap",
+            "025 file:///home/jbf/ct/hudson/vap/seth/mageis_rank2_labels.vap"
         };
 
 
