@@ -119,10 +119,18 @@ echo "repeat normalize/sign (workaround for known bug with large files...)"
 echo $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
-echo $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass \"$STOREPASS\"  dist/AutoplotStable.jar \"$ALIAS\"
-if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
-   echo "Failed to sign resources!"
-   exit 1
+if [ "$STORETYPE" = "pkcs12" ]; then
+   #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
+   if [ ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS" ]; then
+      echo "Fail to sign resources!"
+      exit 1
+   fi
+else
+   echo ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
+   if [ ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS" ]; then
+      echo "Fail to sign resources!"
+      exit 1
+   fi
 fi
 
 echo "pack the jar file..."
