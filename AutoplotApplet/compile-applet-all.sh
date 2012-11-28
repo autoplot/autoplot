@@ -103,8 +103,9 @@ for i in `ls ../VirboAutoplot/src/org/virbo/autoplot/state/*.xsl` ; do
    cp $i temp-classes/org/virbo/autoplot/state
 done
 
-mkdir temp-classes/images/
-cp -r temp-src/images/cancel*.png temp-classes/images/
+mkdir temp-classes/images
+mkdir temp-classes/images/icons
+cp -r temp-src/images/icons/cancel*.png temp-classes/images/icons
 
 cd temp-classes
 
