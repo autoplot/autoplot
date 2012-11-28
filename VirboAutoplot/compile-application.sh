@@ -73,9 +73,6 @@ if [ "" = "$AWK" ]; then
     AWK=awk
 fi
 
-if [ "$STORETYPE" = "pkcs12" ]; then
-   echo ${JAVA5_HOME}bin/jarsigner -storetype $STORETYPE -keystore $KEYSTORE -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS > /home/jbf/tmp/foo.txt
-fi
 
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
@@ -269,25 +266,20 @@ mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
 if [ "$STORETYPE" = "pkcs12" ]; then
-   #echo ${JAVA5_HOME}bin/jarsigner -storetype $STORETYPE -keystore $KEYSTORE -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
-   if ! ${JAVA5_HOME}bin/jarsigner -storetype $STORETYPE -keystore $KEYSTORE -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
+   #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
+   if [ ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS" ]; then
       echo "Fail to sign resources!"
       exit 1
    fi
 else
-   echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
-   if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
+   echo ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
+   if [ ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS" ]; then
       echo "Fail to sign resources!"
       exit 1
    fi
 fi
 
 
-echo ${JAVA5_HOME}bin/jarsigner -storetype -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
-if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
-   echo "Fail to sign resources!"
-   exit 1
-fi
 
 echo "=== verify the jar file..."
 ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
