@@ -248,6 +248,9 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
+echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
+cp src/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
+
 echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
