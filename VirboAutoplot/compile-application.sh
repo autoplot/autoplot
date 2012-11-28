@@ -267,13 +267,13 @@ rm dist/AutoplotVolatile1.jar
 
 if [ "$STORETYPE" = "pkcs12" ]; then
    #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
-   if [ ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS" ]; then
+   if ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"; then
       echo "Fail to sign resources!"
       exit 1
    fi
 else
    echo ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
-   if [ ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS" ]; then
+   if ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"; then
       echo "Fail to sign resources!"
       exit 1
    fi
