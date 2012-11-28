@@ -250,7 +250,7 @@ fi
 
 echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
 mkdir temp-volatile-classes/JNLP-INF
-cp src/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
+cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
 
 echo "=== make jumbo jar files..."
 mkdir -p dist/
