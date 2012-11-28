@@ -73,6 +73,10 @@ if [ "" = "$AWK" ]; then
     AWK=awk
 fi
 
+if [ "$STORETYPE" = "pkcs12" ]; then
+   echo ${JAVA5_HOME}bin/jarsigner -storetype $STORETYPE -keystore $KEYSTORE -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS > /home/jbf/tmp/foo.txt
+fi
+
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
