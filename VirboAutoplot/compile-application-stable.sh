@@ -114,6 +114,8 @@ echo "normalize jar file for signing..."
 $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 echo "sign the jar files..."
 
+echo "STORETYPE=$STORETYPE"
+
 if [ "$STORETYPE" = "pkcs12" ]; then
    #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
    if ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
