@@ -116,13 +116,13 @@ echo "sign the jar files..."
 
 if [ "$STORETYPE" = "pkcs12" ]; then
    #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
-   if [ ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS" ]; then
+   if ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
       echo "Fail to sign resources!"
       exit 1
    fi
 else
    echo ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
-   if [ ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS" ]; then
+   if ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
       echo "Fail to sign resources!"
       exit 1
    fi
