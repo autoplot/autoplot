@@ -33,6 +33,7 @@ import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -89,6 +90,11 @@ public class AutoplotDataServer {
         if ( format.equals(FORM_D2S) ) {
             formatD2S( ds, out, ascii );
         } else if ( format.equals(FORM_QDS) ) {
+            if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
+                logger.info("dropping BUNDLE_1 when DEPEND_1 is present");
+                ds= ArrayDataSet.maybeCopy(ds);
+                ((ArrayDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
+            }
             new SimpleStreamFormatter().format(ds, out, ascii );
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile( "autoplotDataServer", "."+format );
