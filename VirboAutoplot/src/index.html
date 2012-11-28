@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Aggregation now provides reduction.  The top panel has the data reduced with reduce=T in the URI, here we've zoomed in and it is reloading to get higher resolution data.</small></p>
+        <p><small>A bug in QStream handling showed where the das2server didn't handle new CDF data properly, and this is corrected.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,12 +22,18 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3590689: bugfixes with aggregation of qstreams when reducing CDF data with BUNDLE_1</li>
             <li>digitizer output .dat file is formatted so that Autoplot gets the column labels and units</li>
+            <li>add kludge for Seth's data with rank2 DEPEND_1 to restore old labeling before AGU.</li>
             <li>add kludge for waveform display type where nT units are incorrectly labeled as seconds</li>
+            <li>joinProperties handled DELTA_PLUS, DELTA_MINUS and WEIGHTS_PLANE</li>
             <li>long parameters in JythonDataSource dialog just have "default" for the button label</li>
             <li>put a space in jnlp title so it inserts linebreaks nicely on desktops</li>
             <li>CDF Rank2 BUNDLE properties read in when DEPEND_1 is Rank 2.</li>
             <li>add logging to aggregation to figure out why Dan's seeing inconsistent behavior</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>local paths with /tmp in the path would fail.</li>
             <li>hugeScatter repaints properly, finally...</li>
             <li>cdf-java attempts to read to memory outside JVM, then falls back to JVM memory</li>
@@ -47,35 +53,10 @@
             <li>jython editor scroll increment set properly when editor has lots of arguments.</li>
             <li>sparse variables in Native CDF supported.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_0686841638: [] in qstream comments are now okay</li>
-            <li>rte_0018238427: URI is not absolute, when exporting on Windows</li>
-            <li>Messenger CDF variable uses sparse records.  Implement sparse records for native library, Java needs work.</li>
-            <li>pngwalk tool supports .pngwalk files from within the tool, before they wouldn't show up in completions.</li>
-            <li>.pngwalk files work properly when versioning is used.</li>
-            <li>singleInstanceListener detects "pngwalk:" and does this automatically in a new pngwalk.</li>
-            <li>in aggregation dialog, use a JTextField so long URIs don't mess up the GUI.</li>
-            <li>tweak menu labels in the file menu</li>
-            <li>fix one place in CDF codes where FUNCTION wasn't support were FUNCT was.  FUNCT is the new word.</li>
-            <li>IndexOutOfBounds RTE in Pngwalk filmstrip view</li>
-            <li>Jython negative indeces were supported for ranges (ds[-3:-1]) but not for single indexes (ds[-3]) or lists (ds[[-3,-2,-1]]</li>
-            <li>3579786: LSpec routine handles fill more gracefully</li>
-            <li>LSpec would shift result one bin</li>
-            <li>3578171: code clean up broke forgotten feature where an http file could be plotted even if it wasn't part of http filesystem. Thanks Tami and Darren!</li>
-            <li>3578229: orbit 00003 and 3 were not recognized as equivalent as other codes see it, so pngwalks would fail.</li>
-            <li>3577939: orbit files must have at least one valid orbit because mediawiki doesn't provide file-not-found code</li>
-            <li>make pngwalk would fail to show pngwalk when version was used.  Thanks Matt!</li>
-            <li>3578898: improve feedback in spectograms when all timetags appear to be fill.</li>
-            <li>rte_1710483042: check for RENDER_TYPE assumed that the result was non-null.</li>
-            <li>rank 2 depend_1 can switch back and forth between stack of line plots and spectrogram</li>
-            <li>reduce the number of processor threads (for now) in hopes to reduce load on Dan's server, which sometimes drops plots</li>
-            <li>events data set in qdataset didn't render properly because under-implemented copy method dropped properties.</li>
-            <li>fixes for bugs found in CDAWeb source discovered by Bob's plot everything script.</li>
-            <li>old "|slice(2)" was mis-handled in metadata sprocess, causing RTE</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>.jy extension is automatically handled as a script.</li>
+            <li>datum.toString() finally returns times in order-one time offset units to improve readability</li>
             <li>add 2-D rebin function for going from X,Y,Z bundles to Z(X,Y) spectrogram to support scripting.</li>
             <li>3588938: introduce reduction in aggregation, add &amp;reduce=T to try this out.</li>
             <li>aggregation joinProperties handles DELTA_PLUS, DELTA_MINUS and WEIGHTS_PLANE</li>
