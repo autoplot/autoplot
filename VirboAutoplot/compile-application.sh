@@ -73,15 +73,14 @@ if [ "" = "$AWK" ]; then
     AWK=awk
 fi
 
-
 rm -r -f temp-volatile-src/
 mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
 echo "copy jar file classes..."
-${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
-${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
+${WGET} -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
+${WGET} -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
 #TODO: check exit status, and stop if it fails.
 if [ $? -ne 0 ]; then
    echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
@@ -248,11 +247,6 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
-echo "the jnlp file is not signed for now"
-#echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
-#mkdir temp-volatile-classes/JNLP-INF
-#cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
-
 echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
@@ -270,21 +264,12 @@ ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolati
 mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
-if [ "$STORETYPE" = "pkcs12" ]; then
-   #echo ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
-   if ! ${JAVA5_HOME}bin/jarsigner -storetype "$STORETYPE" -keystore "$KEYSTORE" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"; then
-      echo "Fail to sign resources!"
-      exit 1
-   fi
-else
-   echo ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"
-   if ! ${JAVA5_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotVolatile.jar "$ALIAS"; then
-      echo "Fail to sign resources!"
-      exit 1
-   fi
+echo "=== sign and pack the jar file..."
+echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
+if ! ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
+   echo "Fail to sign resources!"
+   exit 1
 fi
-
-
 
 echo "=== verify the jar file..."
 ${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
