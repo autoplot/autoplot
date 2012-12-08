@@ -767,6 +767,7 @@ public class AutoplotUtil {
 
         // the autoranging will be in log space only if the data are not time locations.
         boolean isLog= "log".equals(ds.property(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u);
+        boolean isLin= "linear".equals(ds.property(QDataSet.SCALE_TYPE)) || UnitsUtil.isTimeLocation(u);
 
         if ( !ignoreDsProps ) {
             Number typicalMin= (Number)ds.property(QDataSet.TYPICAL_MIN);
@@ -959,7 +960,7 @@ public class AutoplotUtil {
             if (clin > 1.0) {
                 clin = 1 / clin;
             }
-            if ( result.median>0 && !org.das2.datum.UnitsUtil.isTimeLocation(u) ) {
+            if ( !isLin && result.median>0 && !org.das2.datum.UnitsUtil.isTimeLocation(u) ) {
                 double clog = (nomMax / result.median) / Math.abs(result.median / nomMin);
                 if (clog > 1.0) {
                     clog = 1 / clog;
@@ -970,7 +971,7 @@ public class AutoplotUtil {
                 }
             }
 
-            if ( !isHist && result.median==0 && nomMin==0 && nomMax/positiveMin>1e3 ) {  // this is where they are bunched up at zero.
+            if ( !isLin && !isHist && result.median==0 && nomMin==0 && nomMax/positiveMin>1e3 ) {  // this is where they are bunched up at zero.
                 isLog= true;
                 result.robustMin= positiveMin/10;
             }
