@@ -90,11 +90,12 @@ public class BindingSupport {
                             System.err.println("oldValue is null!!!");
                         }
                         if ( oldValue!=null && oldValue.equals(evt.getNewValue() ) ) return;
-                        setter.invoke(p, evt.getNewValue());
                         if ( new Exception().getStackTrace().length > 300 ) {
                             System.err.println("setter: "+setter);
                             System.err.println("old:" + evt.getOldValue() + "  new:"+evt.getNewValue() );
-                            System.err.println("this is that bad state!");
+                            System.err.println("this is that bad state, where bindings get us into a infinite loop!");
+                        } else {
+                            setter.invoke(p, evt.getNewValue());
                         }
                     } else {
                         if ( Thread.currentThread().getStackTrace().length>100 ) {
