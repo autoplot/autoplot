@@ -771,7 +771,7 @@ public class AutoplotUtil {
         if ( !ignoreDsProps ) {
             Number typicalMin= (Number)ds.property(QDataSet.TYPICAL_MIN);
             Number typicalMax= (Number)ds.property(QDataSet.TYPICAL_MAX);
-            if ( typicalMin!=null ) {
+            if ( typicalMin!=null && typicalMax!=null ) { // TODO: support just typicalMin or typicalMax...
                 typical= new AutoRangeDescriptor();
                 typical.range= new DatumRange( typicalMin.doubleValue(), typicalMax.doubleValue(), u );
                 typical.log= isLog;
