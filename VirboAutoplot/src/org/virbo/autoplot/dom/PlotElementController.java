@@ -791,6 +791,7 @@ public class PlotElementController extends DomNodeController {
                     try {
                          updateDataSetImmediately();
                     } catch ( Exception ex ) {
+                        ex.printStackTrace(); // wrapping somehow didn't show original exception.
                          throw new IllegalArgumentException(ex);
                     }
                 }
