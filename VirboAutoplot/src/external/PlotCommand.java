@@ -238,6 +238,9 @@ public class PlotCommand extends PyObject {
                     DatumRange dr= plot.getYaxis().getRange();
                     Units u= dr.getUnits();
                     PyList plval= (PyList)val;
+                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                        plot.getYaxis().setLog(false);
+                    }
                     plot.getYaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
                            ((Number)plval.get(1)).doubleValue(), u ) );
                 } else if ( kw.equals("ylog") ) {
@@ -248,6 +251,9 @@ public class PlotCommand extends PyObject {
                     DatumRange dr= plot.getXaxis().getRange();
                     Units u= dr.getUnits();
                     PyList plval= (PyList)val;
+                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                        plot.getXaxis().setLog(false);
+                    }
                     plot.getXaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
                            ((Number)plval.get(1)).doubleValue(), u ) );
                 } else if ( kw.equals("xlog") ) {
@@ -258,6 +264,9 @@ public class PlotCommand extends PyObject {
                     DatumRange dr= plot.getZaxis().getRange();
                     Units u= dr.getUnits();
                     PyList plval= (PyList)val;
+                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                        plot.getZaxis().setLog(false);
+                    }
                     plot.getZaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
                            ((Number)plval.get(1)).doubleValue(), u ) );
                 } else if ( kw.equals("zlog") ) {
