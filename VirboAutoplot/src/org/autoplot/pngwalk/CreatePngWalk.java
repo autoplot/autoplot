@@ -183,21 +183,36 @@ public class CreatePngWalk {
         // Write out the vap file to product.vap
         StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
 
+        String vap= new java.io.File( outputFolder, params.product + ".vap").toString();
+        StringBuilder build= new StringBuilder();
+        build.append( String.format( "JAVA -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk " ) );
+
         // Write out the parameters used to create this pngwalk in product.pngwalk
         PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
+
+        build.append("--vap=").append(vap).append( " ");
+        build.append("--outputFolder=").append(params.outputFolder).append( " ");
         ff.println( "product=" + params.product );
+        build.append("--product=").append(params.product).append( " ");
         ff.println( "timeFormat=" + params.timeFormat );
+        build.append("--timeFormat='").append(params.timeFormat).append( "' ");
         ff.println( "timeRange=" + params.timeRangeStr );
+        build.append("--timeRange=").append(params.timeRangeStr).append( " ");
         if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
             ff.println( "rescalex="+ params.rescalex );
+            build.append("--rescalex=").append(params.rescalex).append( " ");
         }
         if ( params.autorange ) {
             ff.println( "autorange="+ params.autorange );
+            build.append("--autorange=").append(params.autorange).append( " ");
         }
         if ( params.version!=null && params.version.trim().length()>0 ) {
             ff.println( "version="+ params.version );
+            build.append("--version=").append( params.version);
         }
         ff.close();
+         
+        System.err.println( build.toString() );
         
         dom2.getController().waitUntilIdle();
 
