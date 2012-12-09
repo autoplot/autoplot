@@ -93,12 +93,14 @@ public class CefMetadataModel extends MetadataModel {
         }
     }
 
-    private String getScaleType( Map attrs) {
-        String type = "linear";
+    private String getScaleType( Map attrs ) {
         if (attrs.containsKey("SCALETYP")) {
-            type = (String) attrs.get("SCALETYP");
+            String type = (String) attrs.get("SCALETYP");
+            return type.toLowerCase();
+        } else {
+            return null;
         }
-        return type.toLowerCase();
+        
     }
 
     public Map<String, Object> properties( Map<String,Object> attrs ) {
