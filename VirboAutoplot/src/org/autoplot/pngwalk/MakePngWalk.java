@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.datasource.DataSetURI;
@@ -23,6 +22,7 @@ import org.virbo.datasource.DataSetURI;
  * Old class to make pngwalks in headless environment.  This uses the old Jython script to make the
  * pngwalk, and should not be used.  Instead, use CreatePngWalk in this same package.
  * @author jbf
+ * @deprecated use CreatePngwalk
  */
 public class MakePngWalk {
 
