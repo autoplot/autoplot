@@ -73,6 +73,6 @@ public class PropertyChangeDiff implements Diff {
     }
 
     public String getDescription() {
-        return this.propertyName + " " + oldVal + " --> " + newVal;
+        return this.propertyName + " " + oldVal + " \u2192 " + newVal;
     }
 }
