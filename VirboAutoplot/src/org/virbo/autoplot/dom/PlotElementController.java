@@ -2323,10 +2323,13 @@ public class PlotElementController extends DomNodeController {
                 public void run() {
                     DasPlot plot = getDasPlot();
                     if ( plot==null ) {
-                        logger.fine("brace yourself for crash...");
+                        System.err.println("pec2326: brace yourself for crash, plot is null!");
                         plot = getDasPlot(); // for debugging  Spectrogram->Series
                         if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
 
+                        }
+                        if ( plot==null ) {
+                            throw new IllegalStateException("getDasPlot() result was null.");
                         }
                     }
 
@@ -2341,9 +2344,6 @@ public class PlotElementController extends DomNodeController {
                             if ( newRenderer instanceof SpectrogramRenderer ) {
                                 plot.addRenderer(0,newRenderer);
                             } else {
-                                if ( plot==null ) {
-                                    throw new IllegalStateException("plot cannot be null");
-                                }
                                 Renderer[] rends= plot.getRenderers();
                                 int best=-1;
                                 int myPos= -1;
