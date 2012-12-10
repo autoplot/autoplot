@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -35,7 +37,10 @@ import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Diff;
+import org.virbo.autoplot.dom.DomNode;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -200,6 +205,24 @@ public class UndoRedoSupport {
         pushState(ev,null);
     }
 
+    private static List<Diff> removeTimeRangeBindings( Application dom, List<Diff> diffs ) {
+        diffs= new ArrayList( diffs );
+        List<Diff> timeRangeBound= new ArrayList();
+        for (Diff s : diffs) {
+            Pattern pattern= Pattern.compile("plots\\[(\\d+)\\].xaxis.range");
+            Matcher m= pattern.matcher(s.propertyName());
+            if ( m.matches() ) {
+                Plot p= dom.getPlots( Integer.parseInt(m.group(1) ) );
+                BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
+                if ( bm!=null ) {
+                    timeRangeBound.add(s);
+                }
+            }
+        }
+        diffs.removeAll(timeRangeBound);
+        return diffs;
+    }
+
     /**
      * provide a human-readable description of the given diffs.
      * @param diffs list of differences to describe.
@@ -218,6 +241,8 @@ public class UndoRedoSupport {
         boolean axisAuto = false;
         boolean timeRange= false;
         String focus=null;
+
+        diffs= removeTimeRangeBindings( this.applicationModel.getDocumentModel(), diffs );
 
         for (Diff s : diffs) {
             if (s.getDescription().contains("plotDefaults")) {
