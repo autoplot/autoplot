@@ -208,7 +208,7 @@ public class DomUtil {
                 return "scan"; // + ( init.min().lt(fin.min() ) ? "right" : "left" );
             }
         } else {
-            return "" + round(init) + " -> " + round(fin);
+            return "" + round(init) + " \u2192 " + round(fin);
         }
 
 
