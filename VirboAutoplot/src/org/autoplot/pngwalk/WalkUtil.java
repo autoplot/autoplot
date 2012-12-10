@@ -107,8 +107,8 @@ public class WalkUtil {
         if ( fsm!=null ) {
             ss= fsm.getNamesFor(dr);
         } else {
-            if ( spec.length()>0 && spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
-            ss= fs.listDirectory( "/", spec );
+            //if ( spec.length()>0 && spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
+            ss= fs.listDirectoryDeep( "/", spec );
             Arrays.sort(ss);
         }
         
@@ -125,7 +125,11 @@ public class WalkUtil {
                     //File f= fs.getFileObject(ss[i]).getFile();
                     result.add( new URI( DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ) ); // make file:/// match template. // bug 3055130 suspect
                 } else {
-                    result.add( fs.getRootURI().resolve(ss[i]) );
+                    if ( ss[i].startsWith("/") ) {
+                        result.add( fs.getRootURI().resolve(ss[i].substring(1)) );
+                    } else {
+                        result.add( fs.getRootURI().resolve(ss[i]) );
+                    }
                 }
                 timeRanges.add(dr2);
             }
