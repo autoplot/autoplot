@@ -1273,7 +1273,7 @@ public class PlotElementController extends DomNodeController {
                         ele.setComponentAutomatically(s);
                         ele.setActive(false); // setComponentAutomatically resets this
                         ele.setDisplayLegend(true);
-                        if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(label1);
+                        ele.setLegendLabelAutomatically(label1);
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
                         ele.controller.maybeCreateDasPeer();
                         //ele.controller.setDataSet(fillDs, false);
