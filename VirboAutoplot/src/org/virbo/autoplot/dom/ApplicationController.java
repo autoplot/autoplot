@@ -1421,173 +1421,171 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void reset() {
         logger.fine("Resetting application...");
         
-        synchronized (this) {
-            DomLock lock= mutatorLock();
-            lock.lock("Reset");
-            Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
-            canvasLock.lock();
-            logger.fine("got locks to reset application...");
+        DomLock lock= mutatorLock();
+        lock.lock("Reset");
+        Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
+        canvasLock.lock();
+        logger.fine("got locks to reset application...");
 
-            try {
+        try {
 
-                Plot p0= getPlotFor(application.getPlotElements(0) );
+            Plot p0= getPlotFor(application.getPlotElements(0) );
 
-                for ( int i=application.getPlots().length-1; i>0; i-- ) {
-                    deletePlot( application.getPlots(i) );
-                }
+            for ( int i=application.getPlots().length-1; i>0; i-- ) {
+                deletePlot( application.getPlots(i) );
+            }
 
-                for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
-                    deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
-                }
+            for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
+                deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
+            }
 
-                application.getDataSourceFilters(0).setId( "data_0" );//TODO: this should also reset the listening plotElement
-                application.getPlotElements(0).setDataSourceFilterId("data_0");
+            application.getDataSourceFilters(0).setId( "data_0" );//TODO: this should also reset the listening plotElement
+            application.getPlotElements(0).setDataSourceFilterId("data_0");
 
-                if ( p0!=application.getPlots(0) ) {
-                    movePlotElement(application.getPlotElements(0),p0,application.getPlots(0));
-                }
-                application.getPlots(0).setId("plot_0");//TODO: this should also reset the listening plotElement
-                application.getPlotElements(0).setPlotId("plot_0");
+            if ( p0!=application.getPlots(0) ) {
+                movePlotElement(application.getPlotElements(0),p0,application.getPlots(0));
+            }
+            application.getPlots(0).setId("plot_0");//TODO: this should also reset the listening plotElement
+            application.getPlotElements(0).setPlotId("plot_0");
 
-                for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
-                    deleteDataSourceFilter( application.getDataSourceFilters(i) );
-                }
+            for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
+                deleteDataSourceFilter( application.getDataSourceFilters(i) );
+            }
 
-                application.getPlotElements(0).setId("plotElement_0");
+            application.getPlotElements(0).setId("plotElement_0");
 
-                application.getPlots(0).getXaxis().setLog(false); // TODO kludge
-                application.getPlots(0).getYaxis().setLog(false); // TODO kludge
-                application.getPlots(0).getZaxis().setLog(false); // TODO kludge
-                application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
-                application.getPlots(0).getXaxis().setAutoRange(true);
-                application.getPlots(0).getYaxis().setAutoRange(true);
-                application.getPlots(0).getZaxis().setAutoRange(true);
+            application.getPlots(0).getXaxis().setLog(false); // TODO kludge
+            application.getPlots(0).getYaxis().setLog(false); // TODO kludge
+            application.getPlots(0).getZaxis().setLog(false); // TODO kludge
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+            application.getPlots(0).getXaxis().setAutoRange(true);
+            application.getPlots(0).getYaxis().setAutoRange(true);
+            application.getPlots(0).getZaxis().setAutoRange(true);
 
-                for ( int i=application.getBindings().length-1; i>=0; i-- ) {
-                    deleteBinding( application.getBindings(i) );
-                }
+            for ( int i=application.getBindings().length-1; i>=0; i-- ) {
+                deleteBinding( application.getBindings(i) );
+            }
 
-                // return canvas to ground state.  This is margin row, margin column, and
-                // one row within.
-                Canvas c= application.getCanvases(0);
+            // return canvas to ground state.  This is margin row, margin column, and
+            // one row within.
+            Canvas c= application.getCanvases(0);
 
-                application.getPlots(0).setColumnId( c.getMarginColumn().getId() );
-                application.getPlots(0).setRowId( c.getRows(0).getId() );
+            application.getPlots(0).setColumnId( c.getMarginColumn().getId() );
+            application.getPlots(0).setRowId( c.getRows(0).getId() );
 
-                for ( int i=c.getRows().length-1; i>=1; i-- ) {
-                    c.getController().deleteRow(c.getRows(i));
-                }
+            for ( int i=c.getRows().length-1; i>=1; i-- ) {
+                c.getController().deleteRow(c.getRows(i));
+            }
 
-                if ( c.getRows().length>0 ) {
-                    c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM, Row.PROP_PARENT ) );
-                    c.getRows(0).setTop("+2em");
-                    c.getRows(0).setBottom("+100%-2em");
-                }
+            if ( c.getRows().length>0 ) {
+                c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM, Row.PROP_PARENT ) );
+                c.getRows(0).setTop("+2em");
+                c.getRows(0).setBottom("+100%-2em");
+            }
 
-                c.getMarginRow().setTop("2em");
-                c.getMarginRow().setBottom("100%-3em");
-                c.getMarginColumn().setLeft("+7.0em");
-                c.getMarginColumn().setRight("100%-7.0em");
+            c.getMarginRow().setTop("2em");
+            c.getMarginRow().setBottom("100%-3em");
+            c.getMarginColumn().setLeft("+7.0em");
+            c.getMarginColumn().setRight("100%-7.0em");
 
-                for ( int i=c.getColumns().length-1; i>=0; i-- ) {
-                    c.getController().deleteColumn(c.getColumns(i));
-                }
+            for ( int i=c.getColumns().length-1; i>=0; i-- ) {
+                c.getController().deleteColumn(c.getColumns(i));
+            }
 
-                c.setFitted(true);
+            c.setFitted(true);
 
-                application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
-                application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
-                application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-                application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID,PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE ) );
-                application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-                application.getPlots(0).setAutoLabel(true);
-                application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID ) );
-                application.getPlotElements(0).setAutoLabel(true);
-                application.getPlotElements(0).getPlotDefaults().setId("plot_defaults_0");
-                application.getPlotElements(0).getStyle().setId("style_0");
-                application.getPlotElements(0).getStyle().setFillColor( Color.decode("#404040") );
-                application.getPlotElements(0).getStyle().setColor( application.getOptions().getColor() );
-                if ( !application.getCanvases(0).getController().getDasCanvas().getBackground().equals( application.getOptions().getBackground() ) ) { // I think they are bound, so this really isn't necessary.
-                    application.getCanvases(0).getController().getDasCanvas().setBackground( application.getOptions().getBackground() );
-                }
-                application.getPlots(0).getXaxis().setAutoLabel(true);
-                application.getPlots(0).getYaxis().setAutoLabel(true);
-                application.getPlots(0).getZaxis().setAutoLabel(true);
-                application.getPlots(0).getXaxis().setAutoRange(true);
-                application.getPlots(0).getYaxis().setAutoRange(true);
-                application.getPlots(0).getZaxis().setAutoRange(true);
-                application.getPlotElements(0).controller.setDsfReset(true);
-                application.getPlots(0).getZaxis().setVisible(false);
+            application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
+            application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID,PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE ) );
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            application.getPlots(0).setAutoLabel(true);
+            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID ) );
+            application.getPlotElements(0).setAutoLabel(true);
+            application.getPlotElements(0).getPlotDefaults().setId("plot_defaults_0");
+            application.getPlotElements(0).getStyle().setId("style_0");
+            application.getPlotElements(0).getStyle().setFillColor( Color.decode("#404040") );
+            application.getPlotElements(0).getStyle().setColor( application.getOptions().getColor() );
+            if ( !application.getCanvases(0).getController().getDasCanvas().getBackground().equals( application.getOptions().getBackground() ) ) { // I think they are bound, so this really isn't necessary.
+                application.getCanvases(0).getController().getDasCanvas().setBackground( application.getOptions().getBackground() );
+            }
+            application.getPlots(0).getXaxis().setAutoLabel(true);
+            application.getPlots(0).getYaxis().setAutoLabel(true);
+            application.getPlots(0).getZaxis().setAutoLabel(true);
+            application.getPlots(0).getXaxis().setAutoRange(true);
+            application.getPlots(0).getYaxis().setAutoRange(true);
+            application.getPlots(0).getZaxis().setAutoRange(true);
+            application.getPlotElements(0).controller.setDsfReset(true);
+            application.getPlots(0).getZaxis().setVisible(false);
 
-                application.setTimeRange( Application.DEFAULT_TIME_RANGE );
-                application.getPlots(0).setTicksURI("");
-                application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() ); //TODO: this will be a timerange soon
+            application.setTimeRange( Application.DEFAULT_TIME_RANGE );
+            application.getPlots(0).setTicksURI("");
+            application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() ); //TODO: this will be a timerange soon
 
-                resetIdSequenceNumbers();
+            resetIdSequenceNumbers();
 
-                //clean up controllers after seeing the junk left behind in the profiler.
-                for ( PlotElement pe :application.getPlotElements() ) {
-                    pe.getController().dataSet=null;
-                }
-                for ( DataSourceFilter dsf :application.getDataSourceFilters() ) {
-                    dsf.getController().dataSet=null;
-                    dsf.getController().fillDataSet=null;
-                    dsf.getController().histogram=null;
-                }
+            //clean up controllers after seeing the junk left behind in the profiler.
+            for ( PlotElement pe :application.getPlotElements() ) {
+                pe.getController().dataSet=null;
+            }
+            for ( DataSourceFilter dsf :application.getDataSourceFilters() ) {
+                dsf.getController().dataSet=null;
+                dsf.getController().fillDataSet=null;
+                dsf.getController().histogram=null;
+            }
 
-                // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
-                Runnable run= new Runnable() {
-                    public void run() {
-                        //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
-                        DasCanvasComponent[] dccs= canvas.controller.getDasCanvas().getCanvasComponents();
-                        for ( int i=0; i<dccs.length; i++ ) {
-                            if ( dccs[i] instanceof DasPlot ) {
-                                DasPlot p= (DasPlot)dccs[i];
-                                boolean okay=false;
-                                for ( Plot pp: application.getPlots() ) {
-                                    if ( pp.getController().getDasPlot()==p ) okay=true;
-                                }
-                                if ( !okay ) {
-                                    canvas.controller.getDasCanvas().remove(p);
-                                } else {
-                                    Renderer[] rr= p.getRenderers();
-                                    for ( int j=0; j<rr.length; j++ ) {
-                                        okay= false;
-                                        for ( PlotElement pes: application.getPlotElements() ) {
-                                           if ( pes.getController().getRenderer()==rr[j] ) okay=true;
-                                        }
-                                        if ( !okay ) {
-                                            p.removeRenderer(rr[j]);
-                                        }
+            // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
+            Runnable run= new Runnable() {
+                public void run() {
+                    //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
+                    DasCanvasComponent[] dccs= canvas.controller.getDasCanvas().getCanvasComponents();
+                    for ( int i=0; i<dccs.length; i++ ) {
+                        if ( dccs[i] instanceof DasPlot ) {
+                            DasPlot p= (DasPlot)dccs[i];
+                            boolean okay=false;
+                            for ( Plot pp: application.getPlots() ) {
+                                if ( pp.getController().getDasPlot()==p ) okay=true;
+                            }
+                            if ( !okay ) {
+                                canvas.controller.getDasCanvas().remove(p);
+                            } else {
+                                Renderer[] rr= p.getRenderers();
+                                for ( int j=0; j<rr.length; j++ ) {
+                                    okay= false;
+                                    for ( PlotElement pes: application.getPlotElements() ) {
+                                       if ( pes.getController().getRenderer()==rr[j] ) okay=true;
+                                    }
+                                    if ( !okay ) {
+                                        p.removeRenderer(rr[j]);
                                     }
                                 }
                             }
                         }
                     }
-                };
-
-                try {
-                    if ( SwingUtilities.isEventDispatchThread() ) {
-                        run.run();
-                    } else {
-                        SwingUtilities.invokeAndWait(run);
-                    }
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
                 }
+            };
 
-
-            } finally {
-                canvasLock.unlock();
-                lock.unlock();
+            try {
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeAndWait(run);
+                }
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
 
-            ArrayList problems= new ArrayList();
-            if ( !DomUtil.validateDom(application, problems ) ) {
-                logger.warning( problems.toString() );
-            }
+
+        } finally {
+            canvasLock.unlock();
+            lock.unlock();
+        }
+
+        ArrayList problems= new ArrayList();
+        if ( !DomUtil.validateDom(application, problems ) ) {
+            logger.warning( problems.toString() );
         }
         logger.fine("done..");
     }
