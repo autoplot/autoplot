@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A bug in QStream handling showed where the das2server didn't handle new CDF data properly, and this is corrected.</small></p>
+        <p><small>ECT vap allows switching back and forth between spectrogram and stack of line plots.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>reset method is no longer synchronized, since Java6 would sometimes get hung up in there</li>
+            <li>specifying TYPICAL_MIN but not TYPICAL_MAX would cause NullPointerException in autoranging.</li>
+            <li>CEF explicitly set SCALE_TYPE=linear if log was not specified.  Sometimes the data should be used to decide.</li>
+            <li>autorange code has code to prevent use of log when SCALE_TYPE=linear.</li>
+            <li>labels would not reset when switching from spec->series->spec->series.</li>
             <li>3590689: bugfixes with aggregation of qstreams when reducing CDF data with BUNDLE_1</li>
             <li>digitizer output .dat file is formatted so that Autoplot gets the column labels and units</li>
             <li>add kludge for Seth's data with rank2 DEPEND_1 to restore old labeling before AGU.</li>
@@ -55,6 +60,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>undo list uses unicode arrow instead of ->, bindings to timerange are subsumed.</li>
+            <li>pngwalks support in-line wildcards like http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-test500/10*/artifact/diffs.test500_009.png</li>
             <li>.jy extension is automatically handled as a script.</li>
             <li>datum.toString() finally returns times in order-one time offset units to improve readability</li>
             <li>add 2-D rebin function for going from X,Y,Z bundles to Z(X,Y) spectrogram to support scripting.</li>
