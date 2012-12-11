@@ -22,6 +22,7 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3594789: poor feedback when component unbundles are incorrect</li>
             <li>reset method is no longer synchronized, since Java6 would sometimes get hung up in there</li>
             <li>specifying TYPICAL_MIN but not TYPICAL_MAX would cause NullPointerException in autoranging.</li>
             <li>CEF explicitly set SCALE_TYPE=linear if log was not specified.  Sometimes the data should be used to decide.</li>
