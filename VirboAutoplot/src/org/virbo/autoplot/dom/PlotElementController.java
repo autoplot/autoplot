@@ -665,7 +665,7 @@ public class PlotElementController extends DomNodeController {
                     setResetComponent(false);
                 }
                 renderer.setDataSet(null);
-                renderer.setException(ex);
+                renderer.setException(ex); 
             } finally {
                 changesSupport.changePerformed( this, PENDING_SET_DATASET );
             }
