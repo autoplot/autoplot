@@ -380,6 +380,24 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * pop off to the root cause of the problem, since exceptions are wrapped again and again.
+     * @param exception
+     * @return
+     */
+    private Exception getRootCause( Exception exception ) {
+        Throwable cause= exception.getCause();
+        while ( cause!=null && cause!=exception && cause instanceof Exception ) { // TODO: review this, I will probably regret...
+            exception= (Exception)cause;
+            cause= exception.getCause();
+        }
+        if ( cause!=null && cause instanceof Exception ) {
+            return (Exception)cause;
+        } else {
+            return exception;
+        }
+
+    }
+    /**
      * apply process to the data.  In general these can be done on the same thread (like
      * slice1), but some are slow (like fftPower).
      * 
@@ -576,16 +594,16 @@ public class PlotElementController extends DomNodeController {
             setDataSetInternal(fillDs);
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
-                getRenderer().setException(ex);
                 getRenderer().setDataSet(null);
+                getRenderer().setException(getRootCause(ex));
                 setDataSetInternal(null);
             } else {
                 throw ex;
             }
             return;
         } catch ( Exception ex ) {
-            getRenderer().setException(ex);
             getRenderer().setDataSet(null);
+            getRenderer().setException(getRootCause(ex));
             setDataSetInternal(null);
             return;
         }
@@ -646,9 +664,8 @@ public class PlotElementController extends DomNodeController {
                     //}
                     setResetComponent(false);
                 }
-                renderer.setException(ex);
                 renderer.setDataSet(null);
-                
+                renderer.setException(ex);
             } finally {
                 changesSupport.changePerformed( this, PENDING_SET_DATASET );
             }
@@ -718,6 +735,7 @@ public class PlotElementController extends DomNodeController {
         performingChange( this, PENDING_UPDATE_DATASET );
         try {
             QDataSet fillDs = dsf.controller.getFillDataSet();
+            Exception renderException= null;
             if (fillDs != null) {
                 final String comp= plotElement.getComponent().trim();
                 if (resetPlotElement) {
@@ -738,8 +756,8 @@ public class PlotElementController extends DomNodeController {
                             setResetPlotElement(false);
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
-                            //getRenderer().setException(ex);
-                            throw ex;
+                            getRenderer().setException(getRootCause(ex));
+                            renderException= ex;
                         } finally {
                             changePerformed( this, PENDING_UPDATE_DATASET );
                         }
@@ -750,8 +768,8 @@ public class PlotElementController extends DomNodeController {
                             setResetPlotElement(false);
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
-                            //getRenderer().setException(ex);
-                            throw ex;
+                            getRenderer().setException(getRootCause(ex));
+                            renderException= ex;
                         } finally {
                             changePerformed( this, PENDING_UPDATE_DATASET );
                         }
@@ -770,7 +788,9 @@ public class PlotElementController extends DomNodeController {
                 }
                 setDataSet(null, false);
             } else {
-                setDataSet(fillDs, true);
+                if ( renderException==null ) {
+                    setDataSet(fillDs, true);
+                }
             }
         } finally {
             changePerformed( this, PENDING_UPDATE_DATASET );
