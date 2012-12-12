@@ -115,6 +115,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         } else {
             o= ds.property(prop);
         }
+        if ( prop.equals(QDataSet.START_INDEX) ) {
+            prop= "START_COLUMN";
+        }
         if ( o!=null ) {
             if ( o instanceof QDataSet ) {
                 jo1.put( prop, o.toString() );
@@ -129,9 +132,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
-    private void formatBundleDesc(PrintWriter out, QDataSet bds ) throws JSONException {
-        QDataSet bundleDesc= (QDataSet) bds.property( QDataSet.BUNDLE_1 );
-        QDataSet dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
+    private void formatBundleDesc(PrintWriter out, QDataSet bds, QDataSet bundleDesc ) throws JSONException {
+        QDataSet dep0=null;
+        if ( bds!=null ) {
+            dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
+        }
 
         JSONObject jo= new JSONObject();
         JSONObject jo1= new JSONObject();
@@ -151,7 +156,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
             jo1= new JSONObject();
             jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
-            if ( !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
+            if ( bds!=null && !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
                 jsonProp( jo1, bds, QDataSet.UNITS, -1 );
             }
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
@@ -192,7 +197,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         boolean haveRich= false;
         if ( bundleDesc!=null && "rich".equals( head ) ) {
             try {
-                formatBundleDesc( out, data );
+                formatBundleDesc( out, data, bundleDesc );
                 haveRich= true;
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
@@ -360,7 +365,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.START_INDEX, 1 );
                 ds.putProperty( "DIMENSION", data.length(0) );
                 bds.bundle( ds );
-                formatBundleDesc( out, bds );
+                formatBundleDesc( out, null, bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
@@ -464,7 +469,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.VALID_MAX, data.property(QDataSet.VALID_MAX) );
                 ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
                 ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
-                formatBundleDesc( out,bds );
+                formatBundleDesc( out,data,bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
