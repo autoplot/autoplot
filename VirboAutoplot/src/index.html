@@ -22,7 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
-            <li>3594789: poor feedback when component unbundles are incorrect</li>
+            <li>undo/redo bug where "unidentified change" would break things</li>
+            <li>history dialog doesn't use data loading thread, minor bugfixes.</li>
+            <li>TCA (empheris) progress wheel showed where the data loading thread needed to be synchronized because of double loads.</li>
+            <li>3594789: poor feedback when component unbundles are incorrect.  setException must be called after setDataSet(null)</li>
+            <li>series->spec->series showed where legend label wasn't set because of incorrect check for auto, which was not set properly</li>
             <li>reset method is no longer synchronized, since Java6 would sometimes get hung up in there</li>
             <li>specifying TYPICAL_MIN but not TYPICAL_MAX would cause NullPointerException in autoranging.</li>
             <li>CEF explicitly set SCALE_TYPE=linear if log was not specified.  Sometimes the data should be used to decide.</li>
@@ -61,8 +65,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>orbitMode=T and fontSize=2em added to events bar renderer controls which allows clear display of orbit number.</li>
             <li>undo list uses unicode arrow instead of ->, bindings to timerange are subsumed.</li>
             <li>pngwalks support in-line wildcards like http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-test500/10*/artifact/diffs.test500_009.png</li>
+            <li>makePngWalk command line arguments are echoed to stderr.</li>
+            <li>in experimental plotx, yrange=[0,1000] implies that ylog=False</li>
             <li>.jy extension is automatically handled as a script.</li>
             <li>datum.toString() finally returns times in order-one time offset units to improve readability</li>
             <li>add 2-D rebin function for going from X,Y,Z bundles to Z(X,Y) spectrogram to support scripting.</li>
