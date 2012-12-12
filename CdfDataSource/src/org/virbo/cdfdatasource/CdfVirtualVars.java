@@ -17,6 +17,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.FFTUtil;
 
 /**
  *
@@ -140,8 +141,12 @@ public class CdfVirtualVars {
         } else if (function.equalsIgnoreCase("fftPower512")) {
             return Ops.fftPower(args.get(0), 512, mon );
         } else if (function.equalsIgnoreCase("fftPower")) {
+            mon.setProgressMessage("apply Hann window");
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
+            mon.setProgressMessage("apply FFT power");
             return Ops.fftPower(hanningSet, (int) args.get(1).value(), mon );
+            //QDataSet hann= FFTUtil.getWindowHanning( (int) args.get(1).value() );
+            //return Ops.fftPower( args.get(0), hann, mon );
         } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
