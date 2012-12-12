@@ -29,6 +29,7 @@ import org.virbo.datasource.AbstractDataSourceFormat;
 import org.das2.datum.format.FormatStringFormatter;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  * Format the QDataSet into Ascii tables.  
@@ -107,8 +108,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
-    private void jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
-        Object o= ds.property(prop,i);
+    private boolean jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
+        Object o;
+        if ( i>-1 ) {
+            o= ds.property(prop,i);
+        } else {
+            o= ds.property(prop);
+        }
         if ( o!=null ) {
             if ( o instanceof QDataSet ) {
                 jo1.put( prop, o.toString() );
@@ -117,20 +123,37 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             } else {
                 jo1.put( prop, String.valueOf(o) );
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
-    private void formatBundleDesc(PrintWriter out, QDataSet bundleDesc) throws JSONException {
+    private void formatBundleDesc(PrintWriter out, QDataSet bds ) throws JSONException {
+        QDataSet bundleDesc= (QDataSet) bds.property( QDataSet.BUNDLE_1 );
+        QDataSet dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
+
         JSONObject jo= new JSONObject();
+        JSONObject jo1= new JSONObject();
+        
+        String name;
+        if ( dep0!=null ) {
+            name= (String) Ops.guessName(dep0);
+            jsonProp( jo1, dep0, QDataSet.LABEL, -1 );
+            jo.put( name, jo1 );
+        }
+
         for ( int i=0; i<bundleDesc.length(); i++ ) {
-            String name= (String) bundleDesc.property( QDataSet.NAME,i );
+            name= (String) bundleDesc.property( QDataSet.NAME,i );
             if ( name==null ) {
                 logger.info("unnamed dataset!");
                 name= "field"+i;
             }
-            JSONObject jo1= new JSONObject();
+            jo1= new JSONObject();
             jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
-            jsonProp( jo1, bundleDesc, QDataSet.UNITS, i );
+            if ( !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
+                jsonProp( jo1, bds, QDataSet.UNITS, -1 );
+            }
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
             jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
@@ -166,9 +189,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         String head= getParam( "header", "" ); // could be "rich"
 
+        boolean haveRich= false;
         if ( bundleDesc!=null && "rich".equals( head ) ) {
             try {
-                formatBundleDesc( out, bundleDesc );
+                formatBundleDesc( out, data );
+                haveRich= true;
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
@@ -221,12 +246,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         
         if (bundleDesc != null) {
             if (dep0 != null) {
-                String l = (String) dep0.property(QDataSet.LABEL);
+                String l = (String) Ops.guessName(dep0);
                 if ( l==null ) {
                     if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
                         l= "time(UTC)";
                     } else {
                         l= "dep0";
+                    }
+                } else {
+                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                        l= l+" (UTC)";
                     }
                 }
                 out.print(" " + l + ", ");
@@ -234,7 +263,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
             int i;
             for (  i = 0; i < bundleDesc.length(); i++) {
-                String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+                String l1=null;
+                if ( haveRich ) {
+                    l1= (String) bundleDesc.property(QDataSet.NAME,i);
+                } else {
+                    l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+                }
                 if ( l1==null ) {
                     l1= (String) bundleDesc.property(QDataSet.NAME,i);
                     if ( l1==null ) {
@@ -326,7 +360,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.START_INDEX, 1 );
                 ds.putProperty( "DIMENSION", data.length(0) );
                 bds.bundle( ds );
-                formatBundleDesc( out, (QDataSet) bds.property(QDataSet.BUNDLE_1));
+                formatBundleDesc( out, bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
@@ -430,7 +464,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.VALID_MAX, data.property(QDataSet.VALID_MAX) );
                 ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
                 ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
-                formatBundleDesc( out, (QDataSet) bds.property(QDataSet.BUNDLE_1));
+                formatBundleDesc( out,bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
