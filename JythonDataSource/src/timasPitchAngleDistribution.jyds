@@ -1,5 +1,5 @@
 # demo pitch angle dist
-ds= getDataSet('vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/polar/timas_h0/1996/po_h0_tim_19961121_v03.cdf?Flux_H')
+ds= getDataSet('vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/polar/timas/timas_h0/1996/po_h0_tim_19961121_v03.cdf?Flux_H',monitor)
 
 ds.putProperty( QDataSet.DEPEND_1, linspace( 1., 5., 28 ) )
 
