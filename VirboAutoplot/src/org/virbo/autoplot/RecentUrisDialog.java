@@ -51,6 +51,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                 }
             }
         } );
+        recentUrisGUI1.setFilter("");
     }
 
     public void setFilter( String filter ) {

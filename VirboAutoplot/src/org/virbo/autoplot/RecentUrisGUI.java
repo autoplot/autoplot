@@ -43,7 +43,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.system.RequestProcessor;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -55,20 +54,15 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     String selectedURI=null;
     boolean empty= false;
 
-    TreeModel def= new DefaultTreeModel( new DefaultMutableTreeNode("moment...") );
+    DefaultTreeModel deftree= new DefaultTreeModel( new DefaultMutableTreeNode("") );
     MyTreeModel theModel=null;
 
     /** Creates new form RecentUrisGUI */
     public RecentUrisGUI() {
         initComponents();
-        jTree1.setModel( def );
 
-        RequestProcessor.invokeLater( new Runnable() {
-            public void run() {
-                update();
-                jTree1.setCellRenderer( new MyCellRenderer() );
-            }
-        } );
+        deftree.insertNodeInto( new DefaultMutableTreeNode("moment..."), (DefaultMutableTreeNode)deftree.getRoot(), 0 );
+        jTree1.setModel( deftree );
 
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
@@ -88,6 +82,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
     public static void main( String[] args ) {
         RecentUrisGUI t= new RecentUrisGUI();
+        t.setFilter("");
         int i= JOptionPane.showConfirmDialog( null, t );
         if ( i==JOptionPane.OK_OPTION ) {
             System.err.println( t.getSelectedURI() );
@@ -95,13 +90,21 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     }
 
     private String filter;
-    void setFilter(String filter) {
+
+    /**
+     * this should be called once with "" to initialize
+     * @param filter
+     */
+    public void setFilter(String filter) {
+        jTree1.setModel( deftree );
+        jTree1.setCellRenderer( new DefaultTreeCellRenderer() );
+        jTree1.repaint();
         this.filter= filter;
-        RequestProcessor.invokeLater( new Runnable() { 
+        new Thread( new Runnable() {
             public void run() {
                 update();
             }
-        });
+        }, "updateRecentUris").start();
     }
 
     private synchronized void update() {
@@ -110,7 +113,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             public void run() {
                 jTree1.setModel( theModel );
-
+                jTree1.setCellRenderer( new MyCellRenderer() );
+                
                 Object r= jTree1.getModel().getRoot();
 
                 // show >30 URIs if possible

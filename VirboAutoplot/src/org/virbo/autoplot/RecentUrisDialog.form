@@ -43,9 +43,9 @@
               <Component id="filterTextField" min="-2" pref="191" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="updateButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="466" max="32767" attributes="0"/>
+              <EmptySpace pref="481" max="32767" attributes="0"/>
           </Group>
-          <Component id="recentUrisGUI1" alignment="1" pref="781" max="32767" attributes="0"/>
+          <Component id="recentUrisGUI1" alignment="1" pref="805" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
