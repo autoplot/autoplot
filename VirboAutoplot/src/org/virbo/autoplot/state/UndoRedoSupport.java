@@ -138,7 +138,10 @@ public class UndoRedoSupport {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-
+    /**
+     * get the action to trigger undo.
+     * @return action that can be attached to button.
+     */
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
             public void actionPerformed(ActionEvent e) {
@@ -147,10 +150,17 @@ public class UndoRedoSupport {
         };
     }
 
+    /**
+     * undo the last state change.
+     */
     public void undo() {
         undo(1);
     }
 
+    /**
+     * reset the application to an old state from the state stack.
+     * @param level the number of states to undo (1 is jump to the last state).
+     */
     public synchronized void undo(int level) {
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
@@ -174,6 +184,10 @@ public class UndoRedoSupport {
 
     }
 
+    /**
+     * get the action to trigger redo.
+     * @return action that can be attached to button.
+     */
     public Action getRedoAction() {
         return new AbstractAction("redo") {
             public void actionPerformed(ActionEvent e) {
@@ -182,6 +196,9 @@ public class UndoRedoSupport {
         };
     }
 
+    /**
+     * redo the state change that was undone, popping up the state stack one position.
+     */
     public synchronized void redo() {
         String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
@@ -201,6 +218,10 @@ public class UndoRedoSupport {
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
     }
 
+    /**
+     * request that a state be pushed onto the state stack.
+     * @param ev
+     */
     public void pushState(PropertyChangeEvent ev) {
         pushState(ev,null);
     }
@@ -354,6 +375,11 @@ public class UndoRedoSupport {
         }
     }
 
+    /**
+     * push the current state of the application onto the stack.
+     * @param ev
+     * @param label
+     */
     public void pushState( PropertyChangeEvent ev, String label ) {
         if (ignoringUpdates) {
             return;
@@ -379,6 +405,7 @@ public class UndoRedoSupport {
 
             if (elephant != null) {
                 List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
+                if ( diffss.size()==0 ) return;
                 element= describeChanges( diffss, element );
                 if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
                     element.deltaDesc= label;
@@ -425,6 +452,10 @@ public class UndoRedoSupport {
 
     }
 
+    /**
+     * get the longer description for the action, intended to be used for the tooltip.
+     * @return
+     */
     public String getUndoDescription() {
         if (stateStackPos > 1) {
             return stateStack.get(stateStackPos - 1).docString;
@@ -444,6 +475,10 @@ public class UndoRedoSupport {
         }
     }
 
+    /**
+     * get the longer description for the action, intended to be used for the tooltip.
+     * @return
+     */
     public String getRedoDescription() {
         if (stateStackPos < stateStack.size()) {
             return stateStack.get(stateStackPos).docString;
@@ -465,6 +500,9 @@ public class UndoRedoSupport {
     }
 
 
+    /**
+     * reset the history, for example after a vap file is loaded.
+     */
     public void resetHistory() {
         int oldDepth= stateStackPos;
         stateStack = new LinkedList<StateStackElement>();
