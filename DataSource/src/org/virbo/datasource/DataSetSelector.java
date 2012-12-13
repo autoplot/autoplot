@@ -8,6 +8,7 @@ package org.virbo.datasource;
 import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
@@ -994,17 +995,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (UnknownHostException ex ) {
                     logger.log( Level.SEVERE, "", ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
-                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", JOptionPane.WARNING_MESSAGE);
+                    showUserExceptionDialog( DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (IOException ex) {
                     logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
-                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    showUserExceptionDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
                     logger.log( Level.SEVERE, "", ex );
                     setMessage(ex.toString());
-                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    showUserExceptionDialog( DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
@@ -1019,6 +1020,27 @@ public class DataSetSelector extends javax.swing.JPanel {
         } );
 
     }
+
+    /**
+     * show the message, assuming that it is something that it's something for the user to fix, but provide details button.
+     * @param parent
+     * @param msg
+     * @param title
+     * @param messageType
+     */
+    public void showUserExceptionDialog( Component parent, String msg, String title, final Exception ex, int messageType ) {
+        JPanel p= new JPanel();
+        p.add( new JLabel( msg ), BorderLayout.CENTER );
+        JPanel buttons= new JPanel( );
+        buttons.add( new JButton( new AbstractAction("Details...") {
+            public void actionPerformed( ActionEvent e ) {
+                FileSystem.getExceptionHandler().handle(ex);
+            }
+        } ), BorderLayout.EAST );
+        p.add( buttons, BorderLayout.SOUTH );
+        JOptionPane.showMessageDialog( parent, p, title, messageType );
+    }
+
 
     /**
      * get the completions from the plug-in factory..
