@@ -439,6 +439,7 @@ public class JythonCompletionTask implements CompletionTask {
 
                 } else if (po.isCallable()) {
                     label = ss + "() ";
+                    signature= "x"; // oh wow we don't use signature anymore...
                 } else if (po.isNumberType()) {
                     if ( po.getType().getFullName().equals("javaclass")  ) {
                         label = ss;
