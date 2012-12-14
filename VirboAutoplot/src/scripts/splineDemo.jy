@@ -11,7 +11,7 @@ y= dataset( [ 1,  3,  4,  3,  5,  3, ] )
 si= SplineInterpolator()
 psf= si.interpolate( x, y )
 
-xx= findgen(100)/50 + 2.
+xx= findgen(100)/20 + 2.
 yy= fltarr(100)
 for i in range(100):
    yy[i]= psf.value(xx[i].value())
