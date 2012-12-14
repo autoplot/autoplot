@@ -208,8 +208,8 @@ public class BookmarksManager extends javax.swing.JDialog {
     protected static String maybeGetRemoteBookmarkUrl(Bookmark b, BookmarksManagerModel model, TreeModel treeModel, TreePath ppath ) {
         // if it is a child of a remote bookmark, make sure it's not editable.
         String remoteUrl= "";
-        if ( ppath==null ) return remoteUrl;
         if ( b!=null && b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
+        if ( ppath==null ) return remoteUrl;
         while ( ppath.getPathCount()>1 ) {
             Bookmark book= model.getSelectedBookmark(treeModel,ppath);
             Bookmark.Folder f;
@@ -228,6 +228,23 @@ public class BookmarksManager extends javax.swing.JDialog {
         return remoteUrl;
     }
 
+    /**
+     * lookup the remote URL.
+     * @param book
+     * @return
+     */
+    protected static String maybeGetRemoteBookmarkUrl( Bookmark book ) {
+        String remoteUrl= "";
+        Bookmark.Folder p= book instanceof Bookmark.Folder ? ((Bookmark.Folder)book) : book.getParent();
+        while ( p!=null ) {
+            if ( p.remoteUrl!=null && !p.remoteUrl.equals("") ) {
+                remoteUrl= p.remoteUrl;
+                break;
+            }
+            p= p.getParent();
+        }
+        return remoteUrl;
+    }
     /**
      * remove the bookmarks from the list that come from a remote bookmarks file.  For example, these cannot be individually deleted.
      * The root node of a bookmarks file is left in there, so that it may be used to delete the folder.

@@ -361,7 +361,6 @@ public class BookmarksManagerModel {
 
     /**
      * remove the listed bookmarks.
-     * TODO: there is still a problem, where we do not check that the bookmark is part of a remoteBookmarks.
      * @param bookmarks
      */
     void removeBookmarks(List<Bookmark> bookmarks) {
@@ -376,8 +375,11 @@ public class BookmarksManagerModel {
                 int i=0;
                 for (Bookmark b2 : newList) {
                     if (b2 instanceof Bookmark.Folder) {
-                        b2= removeBookmarks( (Bookmark.Folder) b2, bookmark );
-                        newList.set( i, b2 );
+                        String remote= BookmarksManager.maybeGetRemoteBookmarkUrl( b2 );
+                        if ( remote.length()==0 ) {
+                            b2= removeBookmarks( (Bookmark.Folder) b2, bookmark );
+                            newList.set( i, b2 );
+                        }
                     } else {
                         newList.set( i, null );
                     }

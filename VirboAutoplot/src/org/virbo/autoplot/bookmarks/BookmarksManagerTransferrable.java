@@ -63,6 +63,11 @@ public class BookmarksManagerTransferrable {
 
             public void drop(DropTargetDropEvent dtde) {
                 try {
+                    boolean readonly= false; // only copy
+                    Transferable transferable= dtde.getTransferable();
+                    if ( transferable instanceof BookmarkTransferable ) {
+                        readonly= ((BookmarkTransferable)transferable).readonly;
+                    }
                     Bookmark item = null;
                     List<Bookmark> items = null;
                     if (dtde.isDataFlavorSupported(BOOKMARK_FLAVOR)) {
@@ -84,18 +89,17 @@ public class BookmarksManagerTransferrable {
                     TreePath tp = jTree1.getPathForLocation((int) dtde.getLocation().getX(), (int) dtde.getLocation().getY());
                     Bookmark context = model.getSelectedBookmark(jTree1.getModel(), tp);
 
-                    String remoteUrl= BookmarksManager.maybeGetRemoteBookmarkUrl( item, model, jTree1.getModel(), tp );
+                    String remoteUrl= BookmarksManager.maybeGetRemoteBookmarkUrl( context, model, jTree1.getModel(), tp );
                     if ( remoteUrl.length()>0 ) {
                         JOptionPane.showMessageDialog( jTree1, "Drop target is within remote bookmarks\n"+remoteUrl, "Remote Bookmark Move Item",JOptionPane.OK_OPTION );
                         return;
                     }
-                    //TODO: check that source is not remote bookmarks, and do not remove when it is.
                     if (item != null) {
                         if (item == context) return;
-                        model.removeBookmark(item);
+                        if ( !readonly ) model.removeBookmark(item);
                         model.insertBookmark(item, context);
                     } else if (items != null) {
-                        model.removeBookmarks(items);
+                        if ( !readonly ) model.removeBookmarks(items);
                         model.addBookmarks(items, context, true);
                     }
 
@@ -119,14 +123,19 @@ public class BookmarksManagerTransferrable {
             public void dragGestureRecognized(DragGestureEvent dge) {
 
                 if ( jTree1.getSelectionCount()==1 ) {
-                    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+                    TreePath tp= jTree1.getSelectionPath();
+                    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), tp );
+                    String remoteUrl= BookmarksManager.maybeGetRemoteBookmarkUrl( b, model, jTree1.getModel(), tp );
+                    if ( remoteUrl.length()>0 ) {
+                        System.err.println("Copy from remote bookmarks");
+                    }
                     //Toolkit tk= Toolkit.getDefaultToolkit();
                     if (b instanceof Bookmark.Item) {
                         //Cursor c= tk.createCustomCursor( b.getIcon().getImage(), new Point( 0,0), "bookmark");
-                        dge.startDrag(null, createBookmarkTransferrable((Bookmark.Item) b));
+                        dge.startDrag(null, new BookmarkTransferable((Bookmark.Item) b, remoteUrl.length()==0 ));
 
                     } else if (b instanceof Bookmark.Folder) {
-                        dge.startDrag(null, createBookmarkTransferrable((Bookmark.Folder) b));
+                        dge.startDrag(null, new BookmarkTransferable((Bookmark.Folder) b, remoteUrl.length()==0 ));
                     }
                 } else {
                     List<Bookmark> books= new ArrayList<Bookmark>();
@@ -146,50 +155,42 @@ public class BookmarksManagerTransferrable {
     public static DataFlavor BOOKMARK_FLAVOR = new DataFlavor(Bookmark.class, "Bookmark");
     public static DataFlavor BOOKMARK_LIST_FLAVOR = new DataFlavor(List.class, "BookmarkList");
 
-    Transferable createBookmarkTransferrable(final Bookmark.Item bookmark) {
-        return new Transferable() {
+    public static class BookmarkTransferable implements Transferable {
 
-            public DataFlavor[] getTransferDataFlavors() {
-                return new DataFlavor[]{
-                            DataFlavor.stringFlavor,
-                            BOOKMARK_FLAVOR
-                        };
+        Bookmark bookmark;
+        boolean readonly;
 
-            }
+        /**
+         * @param bookmark
+         * @param readonly  don't attempt delete from the source location.
+         */
+        public BookmarkTransferable( final Bookmark bookmark, boolean readOnly ) {
+            this.bookmark= bookmark;
+            this.readonly= readOnly;
+        }
 
-            public boolean isDataFlavorSupported(DataFlavor flavor) {
-                return flavor == DataFlavor.stringFlavor || flavor == BOOKMARK_FLAVOR;
-            }
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{
+                        DataFlavor.stringFlavor,
+                        BOOKMARK_FLAVOR
+                    };
 
-            public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        }
+
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return flavor == DataFlavor.stringFlavor || flavor == BOOKMARK_FLAVOR;
+        }
+
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            if ( bookmark instanceof Bookmark.Item ) {
                 if (flavor == DataFlavor.stringFlavor) {
-                    return bookmark.getUri();
+                    return ((Bookmark.Item)bookmark).getUri();
                 } else if (flavor == BOOKMARK_FLAVOR) {
                     return bookmark;
                 } else {
                     throw new UnsupportedFlavorException(flavor);
                 }
-            }
-        };
-
-    }
-
-    Transferable createBookmarkTransferrable(final Bookmark.Folder bookmark) {
-        return new Transferable() {
-
-            public DataFlavor[] getTransferDataFlavors() {
-                return new DataFlavor[]{
-                            DataFlavor.stringFlavor,
-                            BOOKMARK_FLAVOR
-                        };
-
-            }
-
-            public boolean isDataFlavorSupported(DataFlavor flavor) {
-                return flavor == DataFlavor.stringFlavor || flavor == BOOKMARK_FLAVOR;
-            }
-
-            public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            } else {
                 if (flavor == BOOKMARK_FLAVOR) {
                     return bookmark;
                 } else if (flavor == DataFlavor.stringFlavor) {
@@ -198,9 +199,9 @@ public class BookmarksManagerTransferrable {
                     throw new UnsupportedFlavorException(flavor);
                 }
             }
-        };
-
+        }
     }
+
 
     Transferable createBookmarkListTransferrable(final List<Bookmark> bookmarks) {
         return new Transferable() {
