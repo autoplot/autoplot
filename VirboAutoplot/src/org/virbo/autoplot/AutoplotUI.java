@@ -211,7 +211,19 @@ public class AutoplotUI extends javax.swing.JFrame {
     private TimeRangeEditor timeRangeEditor;
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
-        
+
+    /**
+     * utility for mucking around with the guis to figure out why it can't shrink.  It was because the JComboBox on the
+     * timerange panel had long timeranges.
+     */
+    //public List ohno() {
+    //    ArrayList l= new ArrayList();
+    //    l.add( tabbedPanelContainer );
+    //    l.add( statusLabel );
+    //    l.add( timeRangePanel );
+    //    l.add( tabs );
+    //    return l;
+    //}
     
     /** Creates new form AutoPlotMatisse */
     public AutoplotUI(ApplicationModel model) {
