@@ -1,4 +1,4 @@
-ds= getDataSet( 'http://cdaweb.gsfc.nasa.gov/istp_public/data/ace/mfi/2010/ac_k0_mfi_20100117_v01.cdf?BGSEc' )
+ds= getDataSet( 'http://cdaweb.gsfc.nasa.gov/data/ace/mag/level_2_cdaweb/mfi_k0/2011/ac_k0_mfi_20111117_v01.cdf?BGSEc' )
 result= magnitude( ds )
 
 dep1= ds.property( 'DEPEND_1' )

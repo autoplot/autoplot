@@ -4,7 +4,7 @@
 from org.virbo.dataset import ArrayDataSet
 from org.virbo.dataset.DataSetUtil import asDataSet
 
-data= getDataSet( 'http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density' )
+data= getDataSet( 'http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density' )
 data= ArrayDataSet.copy(data)   # convert to mutable dataset
 #r= where( data .lt( 3 ) )  # units conversion error
 
