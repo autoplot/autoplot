@@ -404,8 +404,22 @@ public final class CompletionLayout {
         private DocumentationScrollPane getDocumentationScrollPane() {
             return (DocumentationScrollPane)getContentComponent();
         }
-        
-        protected void show(CompletionDocumentation doc, int anchorOffset) {
+
+        private Runnable getUpdateRunnable( final int anchorOffset ) {
+            return new Runnable() {
+                public void run() {
+                    if (!isVisible()) { // do not check for size as it should remain the same
+                        // Set anchoring only if not displayed yet because completion
+                        // may have overriden the anchoring
+                        setAnchorOffset(anchorOffset);
+                        getLayout().updateLayout(DocPopup.this);
+                    } // otherwise leave present doc displayed
+
+                }
+            };
+        }
+
+        protected void show( final CompletionDocumentation doc, final int anchorOffset) {
 	    JTextComponent editorComponent = getEditorComponent();
 	    if (editorComponent == null) {
 		return;
@@ -414,15 +428,15 @@ public final class CompletionLayout {
             if (!isVisible()) { // documentation already visible
                 setContentComponent(new DocumentationScrollPane(editorComponent));
             }
+
+            Runnable run= new Runnable() {
+                public void run() {
+                    getDocumentationScrollPane().setData(doc);
+                    SwingUtilities.invokeLater(getUpdateRunnable(anchorOffset));
+                }
+            };
+            new Thread(run).start();
             
-            getDocumentationScrollPane().setData(doc);
-            
-            if (!isVisible()) { // do not check for size as it should remain the same
-                // Set anchoring only if not displayed yet because completion
-                // may have overriden the anchoring
-                setAnchorOffset(anchorOffset);
-                getLayout().updateLayout(this);
-            } // otherwise leave present doc displayed
         }
 
         public void processKeyEvent(KeyEvent evt) {
