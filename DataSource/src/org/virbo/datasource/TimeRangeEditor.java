@@ -14,8 +14,7 @@ package org.virbo.datasource;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Window;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -30,14 +29,12 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
@@ -55,6 +52,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private static final Logger logger= LoggerManager.getLogger("apdss.gui");
     public TimeRangeEditor() {
         initComponents();
+
+        recentComboBox.setMinimumSize( new Dimension( 200,30) ); // long items in history cause problems.
+        
         recentComboBox.setPreferenceNode("timerange");
         recentComboBox.setEditor( new PromptComboBoxEditor("Time range to view (e.g. 2010-01-01)") );
         recentComboBox.setToolTipText("Recently entered time ranges");
