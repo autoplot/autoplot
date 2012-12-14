@@ -211,7 +211,14 @@ public class BookmarksManager extends javax.swing.JDialog {
         if ( ppath==null ) return remoteUrl;
         if ( b!=null && b instanceof Bookmark.Item ) ppath= ppath.getParentPath();
         while ( ppath.getPathCount()>1 ) {
-            Bookmark.Folder f= (Folder) model.getSelectedBookmark(treeModel,ppath);
+            Bookmark book= model.getSelectedBookmark(treeModel,ppath);
+            Bookmark.Folder f;
+            if ( book instanceof Bookmark.Item ) {
+                f= book.getParent();
+            } else {
+                f= (Folder)book;
+            }
+            if ( f==null ) return "";
             if ( f.remoteUrl!=null && !f.remoteUrl.equals("") ) {
                 remoteUrl= f.remoteUrl;
                 break;
