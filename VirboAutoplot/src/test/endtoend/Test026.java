@@ -99,6 +99,8 @@ public class Test026 {
     public static void main(String[] args) {
         try {
 
+            // These tests check DatumRange parsing.
+            
             doTestDR( 70, "0 to 35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
             doTestDR( 71, "0to35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
             doTestDR( 72, "0 to 35 apples", DatumRange.newDatumRange(0,35,SemanticOps.lookupUnits("apples")) );
@@ -114,6 +116,8 @@ public class Test026 {
             mm.registerConverter( Units.meters, new UnitsConverter.ScaleOffset( 1./1000, 0 ) );
             doTestDR( 79, "0 to 100 mm", DatumRange.newDatumRange( 0, 10, cm ) );
             doTestDR( 80, "0 to 100 mm", DatumRange.newDatumRange( 0, .1, Units.meters ) );
+
+            // These tests show two equivalent strings
 
             //das2 times.  Note das2 likes to format things with through, not "to" as used in the tests.
             doTest(0, "2000-01-01T13:00Z to 2000-01-01T14:00",  "2000-01-01T13:00Z to 2000-01-01T14:00" );
