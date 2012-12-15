@@ -905,7 +905,7 @@ public class ApplicationModel {
             return null; // bug 3574147
         }
 
-        BufferedImage im= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
+        BufferedImage im= (BufferedImage) getCanvas().getImageNonPrint( getCanvas().getWidth(), getCanvas().getHeight() );
         if ( im==null ) return null;
 
         if ( im.getHeight() / height > 3 ) {

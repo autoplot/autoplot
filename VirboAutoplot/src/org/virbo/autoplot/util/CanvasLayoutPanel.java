@@ -181,7 +181,7 @@ public class CanvasLayoutPanel extends JLabel {
         Stroke normalStroke= new BasicStroke( 1.f );
 
         BufferedImage img= new BufferedImage( target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_ARGB );
-        ((DasCanvas)target).writeToImageImmediately(img);
+        ((DasCanvas)target).writeToImageImmediatelyNonPrint(img);
         img= ImageResize.getScaledInstance( img,
                                             (int)( target.getWidth() * scale ),
                                             (int)( target.getHeight() * scale ),
