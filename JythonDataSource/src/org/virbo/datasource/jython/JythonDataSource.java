@@ -8,6 +8,7 @@ import java.beans.ExceptionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
+import org.python.core.PyJavaClass;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -249,7 +251,14 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         logger.log(Level.FINE, "debugging line number={0}", reader.getLineNumber());
                     }
                     causedBy = ex;
-                    ex.printStackTrace();
+                    // since FileNotFoundException is a special exception where we don't want to interrupt the user with a popup, handle it specially.
+                    if ( ex.value.__tojava__(Exception.class) instanceof java.io.FileNotFoundException ) {
+                        Object javaClass= ex.value.__tojava__(Exception.class);
+                        if ( javaClass instanceof FileNotFoundException ) {
+                            throw (Exception)javaClass;
+                        }
+                    }
+                    logger.warning( ex.toString() );
                     if (listener != null) {
                         listener.exceptionThrown(ex);
                     }
