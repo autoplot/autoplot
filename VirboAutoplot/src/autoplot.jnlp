@@ -12,10 +12,10 @@
         <vendor>http://virbo.org/</vendor>
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
-        <icon href="logo16x16.png" width="16" height="16" />
-        <icon href="logo32x32.png" width="32" height="32" />
-        <icon href="logo64x64.png" width="64" height="64" />
-        <icon href="logo128x128.png" width="128" height="128" />
+        <icon href="logo16x16.gif" width="16" height="16" />
+        <icon href="logo32x32.gif" width="32" height="32" />
+        <icon href="logo64x64.gif" width="64" height="64" />
+        <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.png" kind="splash" />
         <shortcut online="true">
             <desktop />
