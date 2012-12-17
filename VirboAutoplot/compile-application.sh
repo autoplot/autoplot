@@ -295,6 +295,7 @@ cp src/autoplot.jnlp dist
 
 echo "=== copy branding for release, such as png icon images"
 cp src/*.png dist
+cp src/*.gif dist  # mac Java7 has a bug where it can't use pngs for icons, use .gif instead.
 cp src/index.html dist  #TODO: why?
 
 echo "=== modify jar files for this particular release"
