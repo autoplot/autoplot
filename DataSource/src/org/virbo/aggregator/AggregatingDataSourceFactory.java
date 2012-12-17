@@ -114,7 +114,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      * @return
      * @throws IOException
      */
-    private static String getRepresentativeFile( FileStorageModelNew fsm, String surl ) throws IOException {
+    private static String getRepresentativeFile( FileStorageModelNew fsm, String surl, ProgressMonitor mon ) throws IOException {
+
+        if ( mon==null ) {
+            mon= new NullProgressMonitor();
+        }
+
         URISplit split = URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
@@ -128,17 +133,17 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 logger.finer("unable to parse timerange, just use default delegate");
             }
             if ( tdr!=null ) {
-                String[] names= fsm.getBestNamesFor( tdr, new NullProgressMonitor() );
+                String[] names= fsm.getBestNamesFor( tdr, mon );
                 if ( names.length>0 ) {
                     delegateFile= names[0];
                 } else {
-                    delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+                    delegateFile= fsm.getRepresentativeFile( mon );
                 }
             } else {
-                delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+                delegateFile= fsm.getRepresentativeFile( mon );
             }
         } else {
-            delegateFile= fsm.getRepresentativeFile(new NullProgressMonitor());
+            delegateFile= fsm.getRepresentativeFile( mon );
         }
         return delegateFile;
     }
@@ -152,7 +157,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         surl= surl.replaceAll("%25","%");
         FileStorageModelNew fsm = getFileStorageModel(surl);
         
-        String delegateFile= getRepresentativeFile( fsm, surl );
+        String delegateFile= getRepresentativeFile( fsm, surl, null );
 
         if (delegateFile == null) {
             throw new IllegalArgumentException("unable to find any files");
@@ -194,7 +199,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     /**
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
-    protected static String getDelegateDataSourceFactoryUri(String suri) throws IOException, IllegalArgumentException {
+    protected static String getDelegateDataSourceFactoryUri(String suri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
         URISplit split= URISplit.parse(suri);
 
@@ -222,7 +227,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
 
         if ( file==null ) {
-            file = getRepresentativeFile( fsm, suri );
+            file = getRepresentativeFile( fsm, suri, mon );
         }
 
         if (file == null) {
@@ -242,7 +247,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
-        String delegateSurl = getDelegateDataSourceFactoryUri(surl);
+        String delegateSurl = getDelegateDataSourceFactoryUri(surl, new NullProgressMonitor() );
         URISplit split= URISplit.parse(surl);
         URISplit delegateSplit= URISplit.parse(delegateSurl);
         delegateSplit.vapScheme= split.vapScheme; // TODO: verify this
@@ -297,7 +302,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 return true;
             }
 
-            String delegateSurl = getDelegateDataSourceFactoryUri(surl);
+            String delegateSurl = getDelegateDataSourceFactoryUri(surl,mon);
             if ( delegateFactory==null ) {
                 delegateFactory= getDelegateDataSourceFactory(surl);
                 if ( delegateFactory==null ) {
