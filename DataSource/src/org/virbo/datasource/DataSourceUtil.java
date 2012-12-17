@@ -366,6 +366,7 @@ public class DataSourceUtil {
      * attempt to create an equivalent URL that uses an aggregation template
      * instead of the explicit filename.
      * For example, file:/tmp/20091102.dat -> file:/tmp/$Y$m$d.dat?timerange=20091102
+     * Also, look for version numbers.  If multiple periods are found, then use $(v,sep) otherwise use numeric $v.
      * @param surl
      * @return the string with aggregations ($Y.dat) instead of filename (1999.dat)
      */
@@ -379,7 +380,8 @@ public class DataSourceUtil {
         String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\-)\\d{2}(?!\\d)"; //"(\\d{8})";
 
-        //String version= "([Vv])\\d{2}";
+        String version= "([Vv])\\d{2}";                // $v
+        String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
         String result= surl;
 
@@ -412,12 +414,26 @@ public class DataSourceUtil {
         try {
             TimeParser tp= TimeParser.create(s);
             timeRange= tp.parse(surl).getTimeRange().toString();
-            //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.
-            result= s;
+            //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.  Why?
+
+            Matcher m;
+            m= Pattern.compile(vsep).matcher(s);
+            if ( m.find() ) {
+                s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$(v,sep)") );
+            }
+            m= Pattern.compile(version).matcher(s);
+            if ( s.indexOf(version)>-1 ) {
+                s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$v") );
+            }
             
-            return result
+            result= s;
+
+            if ( !result.contains("timerange=") ) {
+                result= result
                     + ( result.contains("?") ? "&" : "?" )
                     + "timerange="+timeRange;
+            }
+            return result;
         } catch ( IllegalArgumentException ex ) {
             return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
         } catch ( ParseException ex ) {
