@@ -76,7 +76,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
 
-        boolean useReferenceCache= true;
+        boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
         ReferenceCache.ReferenceCacheEntry rcent=null;
         if ( useReferenceCache ) {
