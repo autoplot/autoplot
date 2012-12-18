@@ -44,6 +44,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
@@ -73,6 +74,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     Map<String, Object> metadata;
     MetadataModel metadataModel;
 
+    TimeSeriesBrowse tsb;
+
     private DatumRange quantize(DatumRange timeRange) {
         try {
             String[] ss = fsm.getNamesFor(timeRange); // 3523483 there's a bug here when reading from a zip file, because we need to download it first.
@@ -101,7 +104,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
-        addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
+        tsb= createTimeSeriesBrowse();
+        addCability(TimeSeriesBrowse.class, tsb );
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
         if ( stimeRange!=null ) {
             if ( super.params.get("timeRange")!=null && stimeRange==null ) {
@@ -180,246 +184,271 @@ public final class AggregatingDataSource extends AbstractDataSource {
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        DatumRange lviewRange= viewRange;
-        Datum lresolution= resolution;
+        boolean useReferenceCache= true;
 
-        String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
-
-        boolean avail= !getParam( "avail", "F" ).equals("F");
-        boolean reduce= getParam( "reduce", "F" ).equals("T");
-
-        if ( avail ) {
-            logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
-            DataSetBuilder build= new DataSetBuilder(2,ss.length,4);
-            Units u= Units.us2000;
-            EnumerationUnits eu= new EnumerationUnits("default");
-            for ( String s: ss ) {
-                DatumRange dr= getFsm().getRangeFor(s);
-                build.putValues( -1, DDataSet.wrap( new double[] { dr.min().doubleValue(u), dr.max().doubleValue(u), 0x80FF80, eu.createDatum(s).doubleValue(eu) } ), 4 );
-                build.nextRecord();
-            }
-            DDataSet result= build.getDataSet();
-
-            DDataSet bds= DDataSet.createRank2( 4, 0 );
-            bds.putProperty( "NAME__0", "StartTime" );
-            bds.putProperty( "UNITS__0", u );
-            bds.putProperty( "NAME__1", "StopTime" );
-            bds.putProperty( "UNITS__1", u );
-            bds.putProperty( "NAME__2", "Color" );
-            bds.putProperty( "NAME__3", "Filename" );
-            bds.putProperty( "UNITS__3", eu );
-
-            result.putProperty( QDataSet.BUNDLE_1, bds );
-
-            result.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
-            result.putProperty( QDataSet.LABEL, "Availability");
-
-            URISplit split= URISplit.parse(getURI() );
-            result.putProperty( QDataSet.TITLE, split.file );
-
-            return result;
-            
-        }
-        
-        logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, lviewRange});
-
-        ArrayDataSet result = null;
-        JoinDataSet altResult= null; // used when JoinDataSets are found
-
-        if ( ss.length==0 ) {
-            if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
-                throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
+        ReferenceCache.ReferenceCacheEntry rcent=null;
+        if ( useReferenceCache ) {
+            rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
+            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+                try {
+                    QDataSet result= rcent.park( mon );
+                    System.err.println("Here "+result+ " " +getURI());
+                    return result;
+                } catch ( Exception ex ) {
+                    throw new Exception(ex);
+                }
             } else {
-                throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
+                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
             }
         }
-        if (ss.length > 1) {
-            mon.setTaskSize(ss.length * 10);
-            mon.started();
-        }
 
-        DatumRange cacheRange1 = null;
+        try {
+            DatumRange lviewRange= viewRange;
+            Datum lresolution= resolution;
 
-        EnumerationUnits exunits= EnumerationUnits.create("notes");
-        DataSetBuilder notesBuilder= new DataSetBuilder( 2, ss.length/2, 3 );  // container for messages will be an events list.
-        BundleBuilder bds= new BundleBuilder(3);
-        bds.putProperty( QDataSet.NAME, 0, "startTime" );
-        bds.putProperty( QDataSet.NAME, 1, "stopTime" );
-        bds.putProperty( QDataSet.NAME, 2, "note" );
-        bds.putProperty( QDataSet.UNITS, 0, Units.us2000 );
-        bds.putProperty( QDataSet.UNITS, 1, Units.us2000 );
-        bds.putProperty( QDataSet.UNITS, 2, exunits );
-        notesBuilder.putProperty( QDataSet.BUNDLE_1, bds.getDataSet() );
-        
-        for (int i = 0; i < ss.length; i++) {
-            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
-            if (!sparams.equals("")) {
-                scompUrl += "?" + sparams;
+            String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
+
+            boolean avail= !getParam( "avail", "F" ).equals("F");
+            boolean reduce= getParam( "reduce", "F" ).equals("T");
+
+            if ( avail ) {
+                logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
+                DataSetBuilder build= new DataSetBuilder(2,ss.length,4);
+                Units u= Units.us2000;
+                EnumerationUnits eu= new EnumerationUnits("default");
+                for ( String s: ss ) {
+                    DatumRange dr= getFsm().getRangeFor(s);
+                    build.putValues( -1, DDataSet.wrap( new double[] { dr.min().doubleValue(u), dr.max().doubleValue(u), 0x80FF80, eu.createDatum(s).doubleValue(eu) } ), 4 );
+                    build.nextRecord();
+                }
+                DDataSet result= build.getDataSet();
+
+                DDataSet bds= DDataSet.createRank2( 4, 0 );
+                bds.putProperty( "NAME__0", "StartTime" );
+                bds.putProperty( "UNITS__0", u );
+                bds.putProperty( "NAME__1", "StopTime" );
+                bds.putProperty( "UNITS__1", u );
+                bds.putProperty( "NAME__2", "Color" );
+                bds.putProperty( "NAME__3", "Filename" );
+                bds.putProperty( "UNITS__3", eu );
+
+                result.putProperty( QDataSet.BUNDLE_1, bds );
+
+                result.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
+                result.putProperty( QDataSet.LABEL, "Availability");
+
+                URISplit split= URISplit.parse(getURI() );
+                result.putProperty( QDataSet.TITLE, split.file );
+
+                return result;
+
             }
 
-            URI delegateUri= DataSetURI.getURIValid(scompUrl);
+            logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, lviewRange});
 
-            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
+            ArrayDataSet result = null;
+            JoinDataSet altResult= null; // used when JoinDataSets are found
 
-            if ( delegateDataSource.getCapability( TimeSeriesBrowse.class )!=null ) {
-                TimeSeriesBrowse delegateTsb= delegateDataSource.getCapability( TimeSeriesBrowse.class );
-                delegateTsb.setTimeRange(lviewRange);
-                delegateTsb.setTimeResolution(lresolution);
-                setResolution( delegateTsb.getTimeResolution() );
-            } else {
-                // resolution= null; TODO: verify there's no reason to do this.
-            }
-            
-            metadataModel = delegateDataSource.getMetadataModel();
-
-            ProgressMonitor mon1;
-            if (ss.length > 1) {
-                mon.setProgressMessage("getting " + ss[i]);
-                mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
-                if ( mon1.isCancelled() ) break;
-                mon1.setTaskProgress(0); // cause it to paint
-            } else if ( ss.length==1 ) {
-                mon1 = mon;
-                if ( mon1.isCancelled() ) break;
-                mon1.setProgressMessage("getting " + ss[0] );
-                mon1.started();
-                mon1.setTaskProgress(0);
-            } else {
-                mon1= mon;
-                if ( mon1.isCancelled() ) break;
-            }
-
-            DatumRange drex= null; // in case there is an exception, where did it occur?
-            try {
-                DatumRange dr1 = getFsm().getRangeFor(ss[i]);
-                drex= dr1;
-
-                QDataSet ds1 = delegateDataSource.getDataSet(mon1);
-                if ( ds1==null ) {
-                    logger.warning("delegate returned null");
-                    ds1 = delegateDataSource.getDataSet(mon1);
-                    continue;
-                }
-                
-                List<String> problems= new ArrayList();
-                if ( !DataSetUtil.validate(ds1, problems) ) {
-                    for ( String p: problems ) {
-                        System.err.println("problem with aggregation element "+ss[i]+": "+p);
-                        logger.log(Level.WARNING, "problem with aggregation element {0}: {1}", new Object[]{ss[i], p});
-                    }
-                }
-
-                if ( reduce && lresolution!=null && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
-                    logger.info("reducing resolution to save memory");
-                    mon1.setProgressMessage("reducing resolution");
-                    ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
-                }
-
-                if (result == null && altResult==null ) {
-                    if ( ds1 instanceof JoinDataSet ) {
-                        altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
-                        DDataSet mpds= DDataSet.create(new int[0]);
-                        altResult.putProperty(QDataSet.JOIN_0,mpds );
-                    } else {
-                        if ( ss.length==1 ) {
-                            result= ArrayDataSet.maybeCopy(ds1);
-                        } else {
-                            result = ArrayDataSet.maybeCopy(ds1);
-                            result.grow(result.length()*ss.length*11/10);  //110%
-                        }
-                    }
-                    this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
-                    cacheRange1 = dr1;
-
+            if ( ss.length==0 ) {
+                if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
+                    throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
                 } else {
-                    if ( ds1 instanceof JoinDataSet ) {
-                        altResult.joinAll( (JoinDataSet)ds1 );
-                    } else {
-                        ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
-                        try {
-                            if ( result.canAppend(ads1) ) {
-                                result.append( ads1 );
-                            } else {
-                                result.grow( result.length() + ads1.length() * (ss.length-i) );
-                                result.append( ads1 );
-                            }
-                        } catch ( IllegalArgumentException ex ) {
-                            throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
-                        }
-                    }
-
-                    //TODO: combine metadata.  We don't have a way of doing this.
-                    //this.metadata= null;
-                    //this.metadataModel= null;
-                    cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                    throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
                 }
-            } catch ( Exception ex ) {
-                if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
-                    logger.log(Level.FINE, "no data found in {0}", delegateUri);
-                    // do nothing
+            }
+            if (ss.length > 1) {
+                mon.setTaskSize(ss.length * 10);
+                mon.started();
+            }
+
+            DatumRange cacheRange1 = null;
+
+            EnumerationUnits exunits= EnumerationUnits.create("notes");
+            DataSetBuilder notesBuilder= new DataSetBuilder( 2, ss.length/2, 3 );  // container for messages will be an events list.
+            BundleBuilder bds= new BundleBuilder(3);
+            bds.putProperty( QDataSet.NAME, 0, "startTime" );
+            bds.putProperty( QDataSet.NAME, 1, "stopTime" );
+            bds.putProperty( QDataSet.NAME, 2, "note" );
+            bds.putProperty( QDataSet.UNITS, 0, Units.us2000 );
+            bds.putProperty( QDataSet.UNITS, 1, Units.us2000 );
+            bds.putProperty( QDataSet.UNITS, 2, exunits );
+            notesBuilder.putProperty( QDataSet.BUNDLE_1, bds.getDataSet() );
+
+            for (int i = 0; i < ss.length; i++) {
+                String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
+                if (!sparams.equals("")) {
+                    scompUrl += "?" + sparams;
+                }
+
+                URI delegateUri= DataSetURI.getURIValid(scompUrl);
+
+                DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
+
+                if ( delegateDataSource.getCapability( TimeSeriesBrowse.class )!=null ) {
+                    TimeSeriesBrowse delegateTsb= delegateDataSource.getCapability( TimeSeriesBrowse.class );
+                    delegateTsb.setTimeRange(lviewRange);
+                    delegateTsb.setTimeResolution(lresolution);
+                    setResolution( delegateTsb.getTimeResolution() );
+                } else {
+                    // resolution= null; TODO: verify there's no reason to do this.
+                }
+
+                metadataModel = delegateDataSource.getMetadataModel();
+
+                ProgressMonitor mon1;
+                if (ss.length > 1) {
+                    mon.setProgressMessage("getting " + ss[i]);
+                    mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
+                    if ( mon1.isCancelled() ) break;
+                    mon1.setTaskProgress(0); // cause it to paint
                 } else if ( ss.length==1 ) {
-                    throw ex;
+                    mon1 = mon;
+                    if ( mon1.isCancelled() ) break;
+                    mon1.setProgressMessage("getting " + ss[0] );
+                    mon1.started();
+                    mon1.setTaskProgress(0);
                 } else {
-                    notesBuilder.putValue(-1,0,drex.min().doubleValue(Units.us2000));
-                    notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
-                    notesBuilder.putValue(-1,2,exunits.createDatum(ex.getMessage()).doubleValue(exunits) );
-                    notesBuilder.nextRecord();
+                    mon1= mon;
+                    if ( mon1.isCancelled() ) break;
                 }
-            }
-            if (ss.length > 1) {
-                if (mon.isCancelled()) {
-                    break;
-                }
-            }
 
-            if ( result!=null ) {
-                List<String> problems= new ArrayList();
-                if ( !DataSetUtil.validate( result, problems) ) {
-                    for ( String p: problems ) {
-                        System.err.println("problem in aggregation: "+p);
-                        logger.warning("problem in aggregation: "+p);
+                DatumRange drex= null; // in case there is an exception, where did it occur?
+                try {
+                    DatumRange dr1 = getFsm().getRangeFor(ss[i]);
+                    drex= dr1;
+
+                    QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                    if ( ds1==null ) {
+                        logger.warning("delegate returned null");
+                        ds1 = delegateDataSource.getDataSet(mon1);
+                        continue;
+                    }
+
+                    List<String> problems= new ArrayList();
+                    if ( !DataSetUtil.validate(ds1, problems) ) {
+                        for ( String p: problems ) {
+                            System.err.println("problem with aggregation element "+ss[i]+": "+p);
+                            logger.log(Level.WARNING, "problem with aggregation element {0}: {1}", new Object[]{ss[i], p});
+                        }
+                    }
+
+                    if ( reduce && lresolution!=null && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
+                        logger.info("reducing resolution to save memory");
+                        mon1.setProgressMessage("reducing resolution");
+                        ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
+                    }
+
+                    if (result == null && altResult==null ) {
+                        if ( ds1 instanceof JoinDataSet ) {
+                            altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
+                            DDataSet mpds= DDataSet.create(new int[0]);
+                            altResult.putProperty(QDataSet.JOIN_0,mpds );
+                        } else {
+                            if ( ss.length==1 ) {
+                                result= ArrayDataSet.maybeCopy(ds1);
+                            } else {
+                                result = ArrayDataSet.copy(ds1);
+                                result.grow(result.length()*ss.length*11/10);  //110%
+                            }
+                        }
+                        this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
+                        cacheRange1 = dr1;
+
+                    } else {
+                        if ( ds1 instanceof JoinDataSet ) {
+                            altResult.joinAll( (JoinDataSet)ds1 );
+                        } else {
+                            ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                            try {
+                                if ( result.canAppend(ads1) ) {
+                                    result.append( ads1 );
+                                } else {
+                                    result.grow( result.length() + ads1.length() * (ss.length-i) );
+                                    result.append( ads1 );
+                                }
+                            } catch ( IllegalArgumentException ex ) {
+                                throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
+                            }
+                        }
+
+                        //TODO: combine metadata.  We don't have a way of doing this.
+                        //this.metadata= null;
+                        //this.metadataModel= null;
+                        cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                    }
+                } catch ( Exception ex ) {
+                    if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
+                        logger.log(Level.FINE, "no data found in {0}", delegateUri);
+                        // do nothing
+                    } else if ( ss.length==1 ) {
+                        throw ex;
+                    } else {
+                        notesBuilder.putValue(-1,0,drex.min().doubleValue(Units.us2000));
+                        notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
+                        notesBuilder.putValue(-1,2,exunits.createDatum(ex.getMessage()).doubleValue(exunits) );
+                        notesBuilder.nextRecord();
                     }
                 }
+                if (ss.length > 1) {
+                    if (mon.isCancelled()) {
+                        break;
+                    }
+                }
+
+                if ( result!=null ) {
+                    List<String> problems= new ArrayList();
+                    if ( !DataSetUtil.validate( result, problems) ) {
+                        for ( String p: problems ) {
+                            System.err.println("problem in aggregation: "+p);
+                            logger.warning("problem in aggregation: "+p);
+                        }
+                    }
+                }
+
             }
+            cacheRange = cacheRange1;
 
-        }
-        cacheRange = cacheRange1;
+            //if (ss.length > 1) {
+                mon.finished();
+            //}
 
-        //if (ss.length > 1) {
-            mon.finished();
-        //}
+            if ( altResult!=null ) {
+                ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
+                Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
+                if ( dep0==null ) {
+                    dep0= (ArrayDataSet) altResult.property(QDataSet.JOIN_0);
+                    QDataSet d= (QDataSet) altResult.property(QDataSet.DEPEND_0,0);
+                    if ( d!=null ) dep0units= SemanticOps.getUnits(d);
+                    dep0.putProperty(QDataSet.UNITS, dep0units );
+                }
+                if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                    dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1,reduce?lresolution:null));
+                    dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
+                    dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
+                }
 
-        if ( altResult!=null ) {
-            ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
-            Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
-            if ( dep0==null ) {
-                dep0= (ArrayDataSet) altResult.property(QDataSet.JOIN_0);
-                QDataSet d= (QDataSet) altResult.property(QDataSet.DEPEND_0,0);
-                if ( d!=null ) dep0units= SemanticOps.getUnits(d);
-                dep0.putProperty(QDataSet.UNITS, dep0units );
+                QDataSet notes= notesBuilder.getDataSet();
+                if ( altResult!=null && notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
+                if ( rcent!=null ) rcent.finished(altResult);
+                return altResult;
+
+            } else {
+                MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
+                Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
+                if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                    dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, reduce?lresolution:null));
+                    dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
+                    dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
+                }
+
+                QDataSet notes= notesBuilder.getDataSet();
+                if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
+                if ( rcent!=null ) rcent.finished(result);
+                return result;
             }
-            if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
-                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1,reduce?lresolution:null));
-                dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
-                dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
-            }
-
-            QDataSet notes= notesBuilder.getDataSet();
-            if ( altResult!=null && notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
-            return altResult;
-            
-        } else {
-            MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
-            Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
-            if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
-                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, reduce?lresolution:null));
-                dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
-                dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
-            }
-
-            QDataSet notes= notesBuilder.getDataSet();
-            if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
-            return result;
+        } catch ( Exception ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
         }
 
     }
