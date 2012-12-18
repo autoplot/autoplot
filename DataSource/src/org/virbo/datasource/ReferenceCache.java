@@ -111,7 +111,7 @@ public class ReferenceCache {
 
         @Override
         public String toString( ) {
-            QDataSet _qds= qds.get();
+            QDataSet _qds= qds==null ? null : qds.get();
             return String.format( "loadThread=%s\tmonitor=%s\tstatus=%s\turi=%s\tqds=%s", loadThread.getName(), monitor, status, uri, String.valueOf(_qds) );
         }
 
@@ -229,13 +229,13 @@ public class ReferenceCache {
         System.err.println("== uris ==");
         i=0;
         for ( Entry<String,ReferenceCacheEntry> ent : instance.uris.entrySet() ) {
-            System.err.printf( "%3d %s\n", ++i, ent.getValue() );
+            System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
         }
 
         System.err.println("== locks ==");
         i=0;
         for ( Entry<String,ProgressMonitor> ent : instance.locks.entrySet() ) {
-            System.err.printf( "%3d %s\n", ++i, ent.getValue() );
+            System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
         }
     }
 
