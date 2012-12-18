@@ -26,6 +26,8 @@ import org.virbo.dataset.QDataSet;
  */
 public class ReferenceCache {
 
+    public static final String PROP_ENABLE_REFERENCE_CACHE= "enableReferenceCache";
+
     private static final Logger logger= LoggerManager.getLogger("apdss.refcache");
 
     private static ReferenceCache instance;
