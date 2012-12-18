@@ -76,14 +76,15 @@ public class CdfFileDataSource extends AbstractDataSource {
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
 
-        boolean useReferenceCache= false;
+        boolean useReferenceCache= true;
 
         ReferenceCache.ReferenceCacheEntry rcent=null;
         if ( useReferenceCache ) {
             rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 try {
-                    return rcent.park( mon );
+                    QDataSet result= rcent.park( mon );
+                    return result;
                 } catch ( IOException ex ) {
                     throw (IOException)ex;
                 } catch ( CDFException ex ) {
@@ -94,7 +95,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     throw new RuntimeException(ex);
                 }
             } else {
-
+                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
             }
         }
 
