@@ -393,7 +393,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     public boolean reject(String uri) throws Exception {
         String delegateUrl = null;
-        delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(uri);
+        delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(uri, new NullProgressMonitor() );
 
         if (delegateEditorPanel == null) {
             delegateEditorPanel = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.toUri(delegateUrl) );
@@ -409,7 +409,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     public boolean prepare(String url, java.awt.Window parent, ProgressMonitor mon) throws IOException, URISyntaxException, Exception {
         String delegateUrl = null;
-        delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url);
+        delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, new NullProgressMonitor() );
 
         Pattern p= Pattern.compile("(vap(\\+[a-z]+)?\\:)?([^\\?]*)(\\?.*)");
         Matcher m= p.matcher(delegateUrl);
@@ -447,7 +447,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         // set the focus to the timerange if that's all we need.
         String delegateUrl = null;
         try {
-            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI() );
+            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI(), null );
             DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
             if ( !dsf.reject( delegateUrl, new ArrayList<String>() , new NullProgressMonitor()) ) {
                 if ( timeRangeTextField.getText().trim().length()==0 ) {
@@ -482,7 +482,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             //reduceCB.setSelected( "T".equals(reduce) );
 
             String delegateUrl = null;
-            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url);
+            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, null);
 
             if (delegateEditorPanel == null) {
                 delegateEditorPanel = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.toUri(delegateUrl) );
