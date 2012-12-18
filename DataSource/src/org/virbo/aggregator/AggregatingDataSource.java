@@ -184,7 +184,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        boolean useReferenceCache= true;
+        boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
         ReferenceCache.ReferenceCacheEntry rcent=null;
         if ( useReferenceCache ) {
