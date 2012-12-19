@@ -270,7 +270,7 @@ public class DomOps {
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 Rectangle plot= plots[j].getController().getDasPlot().getBounds();
                 Rectangle axis= plots[j].getXaxis().getController().getDasAxis().getBounds();
-                MaxDownJ= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 3 );
+                MaxDownJ= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + emToPixels );
                 MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
             }
         }
@@ -292,8 +292,10 @@ public class DomOps {
         }
 
         double[] NormalPlotHeight= new double[ nrow ];
+
+        double height= dom.getCanvases(0).getMarginRow().getController().getDasRow().getHeight();
         for ( int i=0; i<nrow; i++ ) {
-             NormalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / canvas.height;
+             NormalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
         }
 
         double position=0;
