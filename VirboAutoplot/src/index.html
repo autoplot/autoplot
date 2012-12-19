@@ -23,9 +23,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3578215: fix layout doesn't preserve relative heights</li>
             <li>Make aggregation finally handles versioning, looking for "vXX" or "vX.X.X"</li>
             <li>3596556: Jython scripts handling of FileNotFoundException</li>
             <li>3596098: canvas image on layout tab is always repainted, never cached</li>
+            <li>work around javaws bug where png files can't be used for icons on Macs.</li>
             <li>clean up of bookmarks, when bookmark is dragged to or from remote folder.</li>
             <li>minor clean-up of scripts that used old CDAWeb names.</li>
             <li>documentation lookup in script editor is done off the event thread</li>
@@ -72,6 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce secret feature for testing reference cache -DenableReferenceCache=true will enable the cache for CDF and aggregations.</li>
             <li>add collapse functions to scripting.  These were available in the processes but not by the same name in scripting.</li>
             <li>RBSP orbits updated to 2012-12-28</li>
             <li>orbitMode=T and fontSize=2em added to events bar renderer controls which allows clear display of orbit number.</li>
