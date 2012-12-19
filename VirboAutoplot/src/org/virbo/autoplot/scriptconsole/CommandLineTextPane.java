@@ -8,6 +8,7 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
@@ -30,6 +31,15 @@ public class CommandLineTextPane extends JTextPane {
     String pendingEntry;
     private static final int HIST_LENGTH=20;
 
+    private String packHistoryCommands( List<String> history ) {
+        StringBuilder build= new StringBuilder();
+        for ( int i=0; i<history.size(); i++ ) {
+            build.append(history.get(i));
+            build.append("\\n");
+        }
+        return build.toString();
+    }
+
     public CommandLineTextPane() {
         ActionMap map = getActionMap();
 
@@ -44,7 +54,7 @@ public class CommandLineTextPane extends JTextPane {
                 historyIndex= history.size();
                 pendingEntry= "";
                 Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
-                prefs.put( "lastCommand", history.get(historyIndex-1));
+                prefs.put( "lastCommands", packHistoryCommands( history.subList(0,historyIndex) ) );
                 try {
                     prefs.flush();
                 } catch ( BackingStoreException ex ) {
@@ -94,11 +104,16 @@ public class CommandLineTextPane extends JTextPane {
         loadFromPrefs();
     }
 
+    private List<String> unpackHistoryCommands( String history ) {
+        String[] hh= history.split("\\\\n");
+        return Arrays.asList( hh );
+    }
+
     private void loadFromPrefs() {
         Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
-        String last= prefs.get( "lastCommand", "" );
+        String last= prefs.get( "lastCommands", "" );
         if ( last.trim().length()>0 ) {
-            history.add( last );
+            history.addAll( unpackHistoryCommands(last) );
             historyIndex= history.size();
         }
     }
