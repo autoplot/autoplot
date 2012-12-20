@@ -109,6 +109,7 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
@@ -251,6 +252,7 @@ public class AutoplotUtil {
      * @param dom
      */
     public static void reloadAll( Application dom ) {
+        ReferenceCache.getInstance().reset();
         for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
             if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
                 final DataSourceFilter fdsf= dsf;
