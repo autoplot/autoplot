@@ -194,7 +194,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     QDataSet result= rcent.park( mon );
                     return result;
                 } catch ( Exception ex ) {
-                    throw new Exception(ex);
+                    throw ex;
                 }
             } else {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
