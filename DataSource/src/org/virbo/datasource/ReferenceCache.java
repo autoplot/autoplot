@@ -81,7 +81,11 @@ public class ReferenceCache {
          */
         public boolean shouldILoad( Thread t ) {
             logger.log( Level.FINE, "shouldILoad({0})= {1}", new Object[]{Thread.currentThread(), this.loadThread==t } );
-            return ( this.loadThread==t );
+            boolean result= ( this.loadThread==t && this.status!=ReferenceCacheEntryStatus.DONE && !wasGarbageCollected() );
+            if ( wasGarbageCollected() ) {
+                this.status= ReferenceCacheEntryStatus.LOADING;
+            }
+            return result;
         }
 
         /**
@@ -109,6 +113,14 @@ public class ReferenceCache {
             this.exception= ex;
             this.status= ReferenceCacheEntryStatus.DONE;
             return;
+        }
+
+        /**
+         * returns true if the entry was loaded, but now has been garbage collected.
+         * @return
+         */
+        public boolean wasGarbageCollected( ) {
+            return ReferenceCacheEntryStatus.DONE==this.status && ( this.qds==null || this.qds.get()==null );
         }
 
         @Override
@@ -139,13 +151,19 @@ public class ReferenceCache {
     }
 
     /**
-     * Either return the dataset or null as with getDataSet, but claim the lock if the client will be creating the dataset.
-     * The result will indicate the status, and the method shouldILoad will indicate if this thread should load.
+     * Get a ReferenceCacheEntry for the URI, which will indicate the thread which has been designated as the load thread.
+     *
+     * <tt>
+     * rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
+     * if ( !rcent.shouldILoad( Thread.currentThread() ) ) { 
+     *    QDataSet result= rcent.park( mon );
+     * }
+     * </tt>
      *
      * Be sure to use try/finally when using this cache!
      *
      * @param uri
-     * @return null if a lock has been set and the client should compute, or the QDataSet
+     * @return 
      */
     public ReferenceCacheEntry getDataSetOrLock( String uri, ProgressMonitor monitor ) {
         tidy();
@@ -154,18 +172,20 @@ public class ReferenceCache {
         synchronized (this) {
             result= uris.get(uri);
             if ( result!=null ) {
-                if ( ( result.qds==null || result.qds.get()==null ) && ReferenceCacheEntryStatus.DONE==result.status ) { // it was garbage collected.
+                if ( result.wasGarbageCollected() ) { // it was garbage collected.
                     result= new ReferenceCacheEntry(uri,monitor);
                     result.loadThread= Thread.currentThread();
                     uris.put( uri, result );
+                    logger.log( Level.FINEST, "this thread must reload garbage-collected uri" );
                 } else {
-
+                    logger.log( Level.FINEST, "wait for another thread which is loading uri" );
                 }
             } else {
                 result= new ReferenceCacheEntry(uri,monitor);
                 result.status= ReferenceCacheEntryStatus.LOADING;
                 result.loadThread= Thread.currentThread();
                 uris.put( uri, result );
+                logger.log( Level.FINEST, "this thread will load uri" );
             }
         }
         return result;
@@ -177,7 +197,7 @@ public class ReferenceCache {
      * @param monitor the monitor of the load.
      */
     public void park( ReferenceCacheEntry ent, ProgressMonitor monitor ) {
-        if ( ent.loadThread==Thread.currentThread() ) {
+        if ( ent.loadThread==Thread.currentThread() && ent.status!=ReferenceCacheEntryStatus.DONE ) {
             throw new IllegalStateException("This thread was supposed to load the data");
         }
         monitor.started();
@@ -206,13 +226,21 @@ public class ReferenceCache {
     }
 
     /**
+     * explicitly remove entries from the cache.
+     */
+    public synchronized void reset() {
+        uris.clear();
+        locks.clear();
+    }
+
+    /**
      * remove all the entries that have been garbage collected.
      */
     public synchronized void tidy() {
         List<String> rm= new ArrayList();
         for ( Entry<String,ReferenceCacheEntry> ent : instance.uris.entrySet() ) {
             ReferenceCacheEntry ent1= ent.getValue();
-            if ( ent1.status==ReferenceCacheEntryStatus.DONE && ent1.qds!=null && ent1.qds.get()==null ) {
+            if ( ent1.wasGarbageCollected() ) {
                 rm.add(ent1.uri);
             }
         }
