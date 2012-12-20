@@ -527,7 +527,7 @@ public class PersistentStateSupport {
      * @return
      */
     public String getCurrentFile() {
-        if ( currentFile.startsWith("file://") ) {
+        if ( currentFile.startsWith("file://") ) { 
             return currentFile.substring(7);
         } else if ( currentFile.startsWith("file:") ) {
             return currentFile.substring(5);
