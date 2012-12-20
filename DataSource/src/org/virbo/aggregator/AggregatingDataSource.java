@@ -192,7 +192,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 try {
                     QDataSet result= rcent.park( mon );
-                    System.err.println("Here "+result+ " " +getURI());
                     return result;
                 } catch ( Exception ex ) {
                     throw new Exception(ex);
