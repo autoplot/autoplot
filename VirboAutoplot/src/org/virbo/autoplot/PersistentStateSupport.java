@@ -522,10 +522,24 @@ public class PersistentStateSupport {
         propertyChangeSupport.firePropertyChange(PROP_DIRECTORY, oldDirectory, directory);
     }
 
+    /**
+     * return the current file, which will be a reference to the local file system.
+     * @return
+     */
     public String getCurrentFile() {
-        return currentFile;
+        if ( currentFile.startsWith("file://") ) {
+            return currentFile.substring(7);
+        } else if ( currentFile.startsWith("file:") ) {
+            return currentFile.substring(5);
+        } else {
+            return currentFile;
+        }
     }
 
+    /**
+     * set the current file, which could be file:///home/... or /home/...
+     * @param directory
+     */
     public void setCurrentFile(String currentFile) {
         String oldFile = this.currentFile;
         this.currentFile = currentFile;
