@@ -57,6 +57,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.XMLFormatter;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -79,6 +81,7 @@ import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.Base64;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
@@ -713,8 +716,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
             String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Submit" };
             Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
+            Icon icon= new ImageIcon( AutoplotUtil.getAutoplotIcon() );
             int option= JOptionPane.showOptionDialog( parent, form, "Submit Exception Report",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[3] )  ;
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, choices, choices[3] )  ;
             if ( option==2 ) {
                 return;
             } else if ( option==1 ) {
