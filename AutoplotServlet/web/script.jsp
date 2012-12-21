@@ -22,19 +22,23 @@
     precise specification of an image or access to the libraries it uses.</p>
 
     <p>
-    Caveat: this allows arbitrary code to be executed on the server, so this 
-    server should not be left on and should not be advertised.  We try to guard against attacks with
-    taint-checking (for example imports are not allowed) but this is not thorough.  Scripts are logged in /tmp/autoplotservlet.
-    The file /tmp/allowhosts can be used to restrict access to the service.  It is a list of
-    allowed clients IP, allowing *'s (globs or wildcards) to match multiple IPs.  Note too that the
-    /tmp/autoplotservlet location can be changed with the environment variable AUTOPLOT_SERVLET_HOME.
+    WARNING: This allows arbitrary code to be executed on the server, so this
+    should not be left on and should not be advertised.  We try to guard against attacks with
+    taint-checking (for example, imports are not allowed nor formatDataSet,
+    <a target="_blank" href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/AutoplotServlet/src/java/org/virbo/autoplot/ScriptServlet.java">etc</a>)
+    but this is not thorough.
+    Scripts are logged in /tmp/autoplotservlet or the location indicated in the environment variable AUTOPLOT_SERVLET_HOME.
+    The file AUTOPLOT_SERVLET_HOME/allowhosts can be used
+    to restrict access to the service, and by default only localhost is allowed.  It is a list of
+    allowed clients IP, allowing *'s (globs or wildcards) to match multiple IPs. 
     </p>
 
     <p>Note there are issues with the design right now, and this lacks abusive testing!</p>
 
+    Documentation:
     <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/virbo/autoplot/ScriptContext.html">Script Context</a>
     <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonSupport/src/org/virbo/jythonsupport/imports.py">Imported Codes</a>
-    <br>
+    <br><br>
     
     <form action="ScriptServlet" method="POST">
         Enter Script:<br>
@@ -50,13 +54,22 @@ out.close();
         <input type="submit" value="Execute" />
     </form>
 
-    <!--
+<!--    Here's another example script:
+setCanvasSize( 600, 400 )
+setDataSourceURL( 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080118.d2s' )
+setTitle( 'Garage 20080118' )
+response.setContentType('image/png')
+out = response.getOutputStream()
+writeToPng( out )
+-->
+
+<!--    This demos security.  (Security lacks a thorough study!  Please do not leave this server unattended!)
 response.setContentType("text/plain");
 out = response.getOutputStream();
 
 f= java.io.File( '/etc/passwd' )
 out.println( f.length() )
 out.close();
-    -->
+-->
     </body>
 </html>
