@@ -539,11 +539,15 @@ public class PersistentStateSupport {
 
     /**
      * set the current file, which could be file:///home/... or /home/...
+     * if null, then no file is currently opened.
      * @param directory
      */
     public void setCurrentFile(String currentFile) {
         String oldFile = this.currentFile;
         this.currentFile = currentFile;
+        if ( currentFile==null ) {
+            setCurrentFileOpened(false);
+        }
         propertyChangeSupport.firePropertyChange ( PROPERTY_CURRENT_FILE, oldFile, currentFile );
     }
 
