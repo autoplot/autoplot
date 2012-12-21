@@ -1420,7 +1420,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public void reset() {
         logger.fine("Resetting application...");
-        
+        setStatus("resetting...");
+
         DomLock lock= mutatorLock();
         lock.lock("Reset");
         Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
@@ -1588,6 +1589,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             logger.warning( problems.toString() );
         }
         logger.fine("done..");
+
+        setStatus("ready");
+
     }
 
 
