@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Craig discovered a nice bug, where repaints of the plots image on the layout tab was doing expensive redraws causing his
-            system to grind to a halt.</small></p>
+        <p><small>Happy Holidays!</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,7 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
-            <li>3578215: fix layout doesn't preserve relative heights</li>
+            <li>3597950: save as dialog kept forgetting last directory because of "file:/" prefix</li>
+            <li>3578215: fix layout doesn't preserve relative heights, correcting "make same height" action</li>
+            <li>double entries file:/*/*.vap and /*/*.vap are now subsumed in URI history</li>
             <li>Make aggregation finally handles versioning, looking for "vXX" or "vX.X.X"</li>
             <li>3596556: Jython scripts handling of FileNotFoundException</li>
             <li>3596098: canvas image on layout tab is always repainted, never cached</li>
@@ -35,6 +36,9 @@
             <li>history dialog doesn't use data loading thread, minor bugfixes.</li>
             <li>TCA (empheris) progress wheel showed where the data loading thread needed to be synchronized because of double loads.</li>
             <li>3594789: poor feedback when component unbundles are incorrect.  setException must be called after setDataSet(null)</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>series->spec->series showed where legend label wasn't set because of incorrect check for auto, which was not set properly</li>
             <li>reset method is no longer synchronized, since Java6 would sometimes get hung up in there</li>
             <li>specifying TYPICAL_MIN but not TYPICAL_MAX would cause NullPointerException in autoranging.</li>
@@ -51,57 +55,21 @@
             <li>CDF Rank2 BUNDLE properties read in when DEPEND_1 is Rank 2.</li>
             <li>add logging to aggregation to figure out why Dan's seeing inconsistent behavior</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>local paths with /tmp in the path would fail.</li>
-            <li>hugeScatter repaints properly, finally...</li>
-            <li>cdf-java attempts to read to memory outside JVM, then falls back to JVM memory</li>
-            <li>3586029: progress monitor cancel enabled for setTaskSize 1 of 3 (CDAWeb)</li>
-            <li>rte_0818219940: null pointing when editing bookmarks</li>
-            <li>3586030: one record of waveform data didn't autorange properly</li>
-            <li>polar_fnl_ceppad-HISTe-lsort-l3_19970101_v1.0.0.cdf shows null pointer because failed to check for dimSizes=null</li>
-            <li>3586034: multiple monitors on some Windows 7 locks up.  (Possible fix)</li>
-            <li>validate data as it is read into aggregations to improve feedback</li>
-            <li>George's problem where aggregation didn't work because of bug with reading 1-record CDFs</li>
-            <li>shrink-vap-to-fit now scales fonts (and ems for layout) as well.</li>
-            <li>3585373: CDF Java fails immediately with out of memory.  First attempt outside-JVM memory, then fall back to within JVM</li>
-            <li>first progress indicator for loading in Ephemeris</li>
-            <li>hugeScatter handles incorrect units like the scatter mode, putting up warning but plotting data anyway.</li>
-            <li>TCAs (Emphemeris) in vap files are handled properly, so the date label is turned of when load a vap with emphemeris</li>
-            <li>time range editor doesn't forget orbit number</li>
-            <li>jython editor scroll increment set properly when editor has lots of arguments.</li>
-            <li>sparse variables in Native CDF supported.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>command line on console tab keeps last 20 commands between sessions</li>
             <li>introduce secret feature for testing reference cache -DenableReferenceCache=true will enable the cache for CDF and aggregations.</li>
             <li>add collapse functions to scripting.  These were available in the processes but not by the same name in scripting.</li>
-            <li>RBSP orbits updated to 2012-12-28</li>
+            <li>RBSP orbits updated to 2012-01-08</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>orbitMode=T and fontSize=2em added to events bar renderer controls which allows clear display of orbit number.</li>
             <li>undo list uses unicode arrow instead of ->, bindings to timerange are subsumed.</li>
             <li>pngwalks support in-line wildcards like http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-test500/10*/artifact/diffs.test500_009.png</li>
             <li>makePngWalk command line arguments are echoed to stderr.</li>
             <li>in experimental plotx, yrange=[0,1000] implies that ylog=False</li>
             <li>.jy extension is automatically handled as a script.</li>
-            <li>datum.toString() finally returns times in order-one time offset units to improve readability</li>
-            <li>add 2-D rebin function for going from X,Y,Z bundles to Z(X,Y) spectrogram to support scripting.</li>
-            <li>3588938: introduce reduction in aggregation, add &amp;reduce=T to try this out.</li>
-            <li>aggregation joinProperties handles DELTA_PLUS, DELTA_MINUS and WEIGHTS_PLANE</li>
-            <li>SemanticOps.isTimeSeries is canonical check for datasets of this type.</li>
-            <li>events renderer mouse show multiple events for overlaps</li>
-            <li>scale=T added to export to wav, GUI added as well.</li>
-            <li>allow jump into jyds editor from built-in editor.</li>
-            <li>RBSP orbits come from one of three servers for robustness, and embedded within jar for offline use.</li>
-            <li>introduce GUI for picking timeranges, look for the "calendar" icon on the time range editor.</li>
-            <li>allow scripts, like the digitizer application, to register a hook that prevents exiting and loosing work.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>stack of lineplots view when CDF Y Tags are rank 2</li>
-            <li>hidden feature allows state files to be saved with each undo state.  See http://sarahandjeremy.net/~jbf/autoplot/script/enableStateSupport.jy</li>
-            <li>delegate granule in aggregation is based on timerange, if available</li>
-            <li>New QDataSet.NOTES allows datasets to be annotated, initially to document where AggregatingDataSource encounters exceptions in reads</li>
-            <li>new LSpec.rebin produces data on fixed cadence</li>
         </ul>
 
         <p>Known issues:</p>
