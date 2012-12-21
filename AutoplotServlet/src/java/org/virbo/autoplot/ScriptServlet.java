@@ -25,7 +25,10 @@ import org.virbo.autoplot.scriptconsole.LoggingOutputStream;
 
 /**
  * Allow the clients to run scripts on the server.
- * For now, these are logged for security reasons.
+ * For now, these are logged for security to the folder /tmp/autoplotservlet (or AUTOPLOT_SERVLET_HOME).
+ * AUTOPLOT_SERVLET_HOME/allowhosts contains a list of allowed clients.  
+ * See script.jsp for more information.
+ *
  * @author jbf
  */
 public class ScriptServlet extends HttpServlet {
@@ -72,7 +75,7 @@ public class ScriptServlet extends HttpServlet {
 
             home= new File(home).getCanonicalPath().toString();
 
-            home= home + "/"; // sorry Windows...
+            home= home + File.separator; 
 
             new File(home).mkdirs();
 
