@@ -1,0 +1,12 @@
+# This demonstrates that additional jars can be loaded at runtime.  I was surprised
+# when this worked, and I think there are security restrictions on the loaded jar.
+
+from org.virbo.datasource import DataSourceRegistry
+
+reg= DataSourceRegistry.getInstance()
+
+myurl= URL( 'file:/home/jbf/nbProjects2/autoplot/WavDataSource/dist/WavDataSource.jar' )
+
+reg.registerDataSourceJar('qqq', myurl)
+
+load( 'vap+qqq:file:///home/jbf/foo.wav' )
