@@ -334,7 +334,7 @@ public class PlotElement extends DomNode {
         }
 
         if ( that.autoRenderType!=this.autoRenderType ) {
-            result.add( new PropertyChangeDiff( PROP_AUTORENDERTYPE, that.autoLabel, this.autoLabel ) );
+            result.add( new PropertyChangeDiff( PROP_AUTORENDERTYPE, that.autoRenderType, this.autoRenderType ) );
         }
 
         if ( that.autoComponent!=this.autoComponent ) {
