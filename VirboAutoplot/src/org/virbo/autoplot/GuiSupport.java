@@ -1331,7 +1331,6 @@ public class GuiSupport {
             public void menuSelected(MenuEvent e) {
                 PlotElement pe= app.dom.getController().getPlotElement();
                 Map<String,RenderType> tt= getRenderTypeForString();
-                System.err.println( pe.getRenderType().toString() );
                 for ( int i=0; i<ezMenu.getItemCount(); i++ ) {
                     if ( ezMenu.getItem(i) instanceof JCheckBoxMenuItem ) {
                         if ( tt.get(ezMenu.getItem(i).getText()).equals(pe.getRenderType()) ) {
