@@ -42,8 +42,9 @@ public class ExcelUtil {
         }
         if (id.length() == 1) {
             return (short) (id.charAt(0) - 'A');
-        } else if (id.length() == 2) {
-            throw new IllegalArgumentException("unable to find column " + id + ", two-digits implicit IDs not supported");
+        } else if (id.length() == 2 && Character.isUpperCase(id.charAt(0)) && Character.isLetter(id.charAt(0)) 
+                && Character.isUpperCase(id.charAt(1)) && Character.isLetter(id.charAt(1)) ) {
+            return (short) ( (id.charAt(0) - 'A' + 1 ) * 26 + (id.charAt(1) - 'A') );
         } else {
             throw new IllegalArgumentException("unable to find column " + id);
         }
