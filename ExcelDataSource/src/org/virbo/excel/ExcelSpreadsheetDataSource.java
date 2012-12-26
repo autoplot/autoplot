@@ -80,7 +80,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
         int[] spec = parseDataSetSpec(d, firstRow, -1);
         
-        firstRow= spec[1];
+        firstRow= spec[2];
         
         boolean labels=true;
         HSSFRow row= sheet.getRow(firstRow);
@@ -98,17 +98,17 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         String recCountString= (String) params.get("recCount" ) ;
         if ( recCountString!=null ) {
             int recCount= Integer.parseInt(recCountString);
-            spec[2]= Math.min( spec[2], spec[1]+recCount );
+            spec[3]= Math.min( spec[3], spec[2]+recCount );
         }
         
-        data = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );        
+        data = new ExcelSpreadsheetDataSet( (short)spec[0], (short)spec[1], spec[2], spec[3], labels );
         if ( d.length()>1 ) data.putProperty( QDataSet.NAME, d );
 
         d = (String) params.get("depend0");
         if (d != null) {
             int[] spec2 = parseDataSetSpec(d, firstRow, -1);
             spec[0]= spec2[0];
-            ExcelSpreadsheetDataSet depend0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
+            ExcelSpreadsheetDataSet depend0 = new ExcelSpreadsheetDataSet( (short)spec[0], (short)spec[1], spec[2], spec[3], labels );
             if ( d.length()>1 ) depend0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.DEPEND_0, depend0);
             if ( data.getFirstRow()!=depend0.getFirstRow() ) {
@@ -120,7 +120,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         if (d != null) {
             int[] spec2 = parseDataSetSpec(d, firstRow, -1);
             spec[0]= spec2[0];
-            ExcelSpreadsheetDataSet p0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
+            ExcelSpreadsheetDataSet p0 = new ExcelSpreadsheetDataSet( (short)spec[0], (short)spec[1], spec[2], spec[3], labels );
             if ( d.length()>1 ) p0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.PLANE_0, p0);
             if ( data.getFirstRow()!=p0.getFirstRow() ) {
@@ -133,15 +133,21 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
     }
 
     /**
-     * Returns [ columnNumber, first, last ] 
+     * parse spec into [icstart,icend,jrstart,jrend]
+     * AC11:AC23
+     * A1:10
+     * A
+     * Returns [ columnNumber, lastColumnNumber, first, last ]
      * @param spec
      * @return
      */
-    private int[] parseDataSetSpec(String spec, int firstRow, int lastRow) {
-        Pattern p = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*)(\\[(\\d+):(\\d+)?\\])?");
+    private int[] parseDataSetSpec( String spec, int firstRow, int lastRow ) {
+        Pattern p = Pattern.compile("([a-zA-Z][a-zA-Z]*)(\\d+):([a-zA-Z][a-zA-Z]*)?(\\d+)?");
         Matcher m = p.matcher(spec);
 
+
         short columnNumber;
+        short columnNumber1;
 
         if (!m.matches()) {
             throw new IllegalArgumentException("bad spec!");
@@ -155,7 +161,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     lastRow = sheet.getLastRowNum();
                 }
             } else {
-                firstRow = Integer.parseInt(m.group(3));
+                firstRow = Integer.parseInt(m.group(2));
                 if (m.group(4) == null) {
                     if (lastRow == -1) {
                         lastRow = sheet.getLastRowNum();
@@ -164,8 +170,13 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     lastRow = Integer.parseInt(m.group(4));
                 }
             }
+            if ( m.group(3)!=null ) {
+                columnNumber1= getColumnNumber(m.group(3), firstRow);
+            } else {
+                columnNumber1= -1;
+            }
             columnNumber = getColumnNumber(col, firstRow);
-            return new int[]{columnNumber, firstRow, lastRow};
+            return new int[]{columnNumber, columnNumber1, firstRow, lastRow};
         }
     }
 
@@ -213,14 +224,18 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         short columnNumber;
         int firstRow;
         int length;
+        int length1;
         boolean isDate;
         Units units;
+        boolean transpose= false;
+        int rank;
         
         /**
+         * @param lastColumnNumber if not -1, then the rank 2 column number.
          * @param firstRow is the first row to read.  0 is the first row.
-         * @param lastRow is the last row number, exclusive.
+         * @param lastRow is the last row number, exclusive.  If -1, then rank 1 row.
          */
-        ExcelSpreadsheetDataSet( short columnNumber, int firstRow, int lastRow, boolean firstRowIsLabels ) {
+        ExcelSpreadsheetDataSet( short columnNumber, short lastColumnNumber, int firstRow, int lastRow, boolean firstRowIsLabels ) {
             
             if ( firstRowIsLabels ) {
                 firstRow= findFirstRow(sheet, firstRow);
@@ -228,7 +243,29 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
             this.columnNumber = columnNumber;
             this.firstRow = firstRow;
-            this.length = lastRow - firstRow;
+            if ( lastRow==-1 && lastColumnNumber!=-1 ) {
+                this.length = lastColumnNumber - columnNumber;
+                this.transpose= true;
+            } else {
+                this.length = lastRow - firstRow;
+            }
+            if ( lastRow>-1 && lastColumnNumber>-1 ) {
+                this.rank=2;
+                if ( this.transpose ) {
+                    this.length1= lastRow - firstRow;
+                } else {
+                    if ( this.length==0 ) {
+                        this.length= lastColumnNumber - columnNumber;
+                        this.rank=1;
+                        this.transpose= true;
+                    } else {
+                        this.length1= lastColumnNumber - columnNumber;
+                    }
+                }
+            } else {
+                this.rank=1;
+            }
+
             HSSFRow row= sheet.getRow(this.firstRow);
             HSSFCell cell = row.getCell(columnNumber);
             if ( cell==null ) {
@@ -272,15 +309,56 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         }
         
         public int rank() {
-            return 1;
+            return rank;
         }
 
         public double value(int i) {
             HSSFRow row = null;
             HSSFCell cell = null;
             try {
-                row = sheet.getRow(i + firstRow);
-                cell = row.getCell(columnNumber);
+                if ( transpose ) {
+                    row = sheet.getRow(firstRow);
+                    cell = row.getCell(columnNumber + i );
+                } else {
+                    row = sheet.getRow(i + firstRow);
+                    cell = row.getCell(columnNumber);
+                }
+                if (isDate) {
+                    Date d = cell.getDateCellValue();
+                    return d.getTime() / 1000.;
+                } else {
+                    if ( cell==null ) {
+                        return Double.NaN;
+                    } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_NUMERIC ) {
+                        double d = cell.getNumericCellValue();
+                        return d;
+                    } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_STRING ) {
+                        try {
+                            double d= units.parse(cell.getStringCellValue()).doubleValue(units);
+                            return d;
+                        } catch ( ParseException ex ) {
+                            return Double.NaN;
+                        }
+                    } else {
+                        return Double.NaN;
+                    }
+                }
+            } catch (RuntimeException e) {
+                return Double.NaN;
+            }
+        }
+
+        public double value(int i,int j) {
+            HSSFRow row = null;
+            HSSFCell cell = null;
+            try {
+                if ( transpose ) {
+                    row = sheet.getRow( j + firstRow );
+                    cell = row.getCell( i + columnNumber );
+                } else {
+                    row = sheet.getRow( i + firstRow );
+                    cell = row.getCell( j + columnNumber );
+                }
                 if (isDate) {
                     Date d = cell.getDateCellValue();
                     return d.getTime() / 1000.;
@@ -308,6 +386,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
         public int length() {
             return length;
+        }
+
+        public int length( int i ) {
+            return length1;
         }
 
     }
