@@ -8,7 +8,7 @@ import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-import com.drew.metadata.exif.ExifDirectory;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -223,9 +223,9 @@ class ImageDataSource extends AbstractDataSource {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        Directory exifDirectory = metadata.getDirectory(ExifDirectory.class);
+        Directory exifDirectory = metadata.getDirectory(ExifSubIFDDirectory.class);
 
-        for (Iterator i = exifDirectory.getTagIterator(); i.hasNext();) {
+        for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
             Tag t = (Tag) i.next();
 
             map.put(t.getTagName(), t.getDescription());
