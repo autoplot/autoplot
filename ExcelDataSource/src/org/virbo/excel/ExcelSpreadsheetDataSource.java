@@ -8,6 +8,7 @@
  */
 package org.virbo.excel;
 
+import java.util.logging.Level;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
@@ -68,7 +69,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             ssheet= DataSetURI.maybePlusToSpace(ssheet);
             sheet = wb.getSheet(ssheet);
             if ( sheet==null ) throw new IllegalArgumentException("no such sheet: "+ssheet);
-            logger.fine("found sheet "+ssheet+" with "+sheet.getLastRowNum() +" rows");
+            logger.log(Level.FINE, "found sheet {0} with {1} rows", new Object[]{ssheet, sheet.getLastRowNum()});
         }
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet not found: " + ssheet);
@@ -327,6 +328,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             return rank;
         }
 
+        @Override
         public double value(int i) {
             HSSFRow row = null;
             HSSFCell cell = null;
@@ -363,6 +365,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
 
+        @Override
         public double value(int i,int j) {
             HSSFRow row = null;
             HSSFCell cell = null;
@@ -399,10 +402,12 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
 
+        @Override
         public int length() {
             return length;
         }
 
+        @Override
         public int length( int i ) {
             return length1;
         }
