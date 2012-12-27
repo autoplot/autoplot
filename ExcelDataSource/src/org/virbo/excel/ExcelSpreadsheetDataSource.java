@@ -32,7 +32,9 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 
 /**
- *
+ * http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
+ * file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency
+ * http://www.icip.iastate.edu/sites/default/files/uploads/tables/agriculture/ag-land-hist.xls?column=C14:BM14
  * @author jbf
  */
 public class ExcelSpreadsheetDataSource extends AbstractDataSource {
@@ -78,7 +80,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         
         String d = (String) params.get("column");
 
-        int[] spec = parseDataSetSpec(d, firstRow, -1);
+        int[] spec = parseDataSetSpec(d, Math.max(0,firstRow), -1);
         
         firstRow= spec[2];
         
@@ -102,6 +104,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         }
         
         data = new ExcelSpreadsheetDataSet( (short)spec[0], (short)spec[1], spec[2], spec[3], labels );
+        if ( firstRow==0 && data.firstRow > 1 ) {//TODO stupid kludge for http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
+            firstRow= data.firstRow;
+        }
         if ( d.length()>1 ) data.putProperty( QDataSet.NAME, d );
 
         d = (String) params.get("depend0");
@@ -139,15 +144,25 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
      * A
      * Returns [ columnNumber, lastColumnNumber, first, last ]
      * @param spec
+     * @param firstRow
+     * @param lastRow
      * @return
      */
     private int[] parseDataSetSpec( String spec, int firstRow, int lastRow ) {
-        Pattern p = Pattern.compile("([a-zA-Z][a-zA-Z]*)(\\d+):([a-zA-Z][a-zA-Z]*)?(\\d+)?");
-        Matcher m = p.matcher(spec);
-
 
         short columnNumber;
         short columnNumber1;
+
+        Pattern pc= Pattern.compile("([a-zA-Z_\\d]*)");
+        Matcher m= pc.matcher(spec);
+        if ( m.matches() ) { // kludge for http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
+            columnNumber= getColumnNumber(m.group(1), firstRow);
+            return new int[] { columnNumber, -1, 0, sheet.getLastRowNum() };
+        }
+
+        Pattern p = Pattern.compile("([a-zA-Z_]*)((\\d+):([a-zA-Z_]*)?(\\d+)?)?");
+        m = p.matcher(spec);
+
 
         if (!m.matches()) {
             throw new IllegalArgumentException("bad spec!");
@@ -161,17 +176,17 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     lastRow = sheet.getLastRowNum();
                 }
             } else {
-                firstRow = Integer.parseInt(m.group(2));
-                if (m.group(4) == null) {
+                firstRow = Integer.parseInt(m.group(3));
+                if (m.group(5) == null) {
                     if (lastRow == -1) {
                         lastRow = sheet.getLastRowNum();
                     }
                 } else {
-                    lastRow = Integer.parseInt(m.group(4));
+                    lastRow = Integer.parseInt(m.group(5));
                 }
             }
-            if ( m.group(3)!=null ) {
-                columnNumber1= getColumnNumber(m.group(3), firstRow);
+            if ( m.group(4)!=null ) {
+                columnNumber1= getColumnNumber(m.group(4), firstRow);
             } else {
                 columnNumber1= -1;
             }
@@ -274,7 +289,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             while ( row==null && firstRow<lastRow ) {
                 firstRow++;
                 row= sheet.getRow(firstRow);
-                cell = row.getCell(columnNumber);
+                if ( row!=null ) cell = row.getCell(columnNumber);
                 if ( cell==null ) {
                     row= null;
                 }
