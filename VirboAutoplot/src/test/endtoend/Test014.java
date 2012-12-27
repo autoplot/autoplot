@@ -29,7 +29,9 @@ public class Test014 {
 
 
     public static void doTest( int id, String uri, QDataSet ds ) throws Exception {
-     
+
+        System.err.println( String.format("== doTest(%d,%s) ==",id,uri ) );
+        
         long t0= System.currentTimeMillis();
         String label= String.format( "test014_%03d", id );
         double t;
