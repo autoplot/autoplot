@@ -36,6 +36,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -58,6 +59,8 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
     boolean focusDepend0 = false;
     Map<String, String> params;
     URISplit split;
+
+    private static final Logger logger= LoggerManager.getLogger("apdss.csv");
 
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
@@ -373,7 +376,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             model.setRecParser(p);
             //parser.setRecordParser(  );
         } catch (IOException ex) {
-            Logger.getLogger(CsvDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }
@@ -383,31 +386,33 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             return;
         }
 
-        String uri= getURI();
-
         try {
             File ff= DataSetURI.getFile( DataSetURI.toUri(split.file), new NullProgressMonitor() );
 
             BufferedReader breader= new BufferedReader(new InputStreamReader( new FileInputStream(ff) ) );
             String skip= params.get("skip");
-            if ( skip!=null && skip.length()>0 ) {
+            if ( skip!=null && skip.length()>0 ) { try {
                 int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
                 for ( int i=0; i<iskip; i++ ) {
                     breader.readLine();
                 }
-            }
+            } catch ( Exception ex ) {
+                logger.log( Level.WARNING, "Exception", ex );
+            } }
 
             loadTable(breader,ff); // use the AsciiTableReader's parser
             breader.close();
 
             breader= new BufferedReader(new InputStreamReader( new FileInputStream(ff) ) );
             skip= params.get("skip");
-            if ( skip!=null && skip.length()>0 ) {
+            if ( skip!=null && skip.length()>0 ) { try {
                 int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
                 for ( int i=0; i<iskip; i++ ) {
                     breader.readLine();
                 }
-            }
+            } catch ( Exception ex ) {
+                logger.log( Level.WARNING, "Exception", ex );
+            } }
             CsvReader reader= new CsvReader( breader );
 
             reader.readHeaders();
@@ -456,7 +461,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             dtm.setValueAt( "no records found", 0, 0 );
             this.jTable1.setModel( dtm );
 
-            ex.printStackTrace();
+            logger.log( Level.WARNING, "IOException", ex );
         }
         
 
@@ -576,7 +581,7 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             resetTable();
             
         } catch (IOException ex) {
-            Logger.getLogger(CsvDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
     }
