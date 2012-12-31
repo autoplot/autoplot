@@ -5,6 +5,8 @@
 
 package test.endtoend;
 
+import java.util.logging.Level;
+
 /**
  * Mark this number as allocated to the Plasma Wave Group at U. Iowa.  They don't use this, but they have a test script.
  * See http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-test500/
@@ -12,6 +14,11 @@ package test.endtoend;
  */
 public class Test500 {
     public static void main( String[] args ) throws Exception {
+
+        org.das2.util.LoggerManager.getLogger( "autoplot.tca.uritcasource" ).setLevel(Level.ALL);
+
+        String[] args10= {  "--vap=/home/jbf/autoplot/test/test500_010.vap", "--outfile=/tmp/test500_010.png", "--noexit" };
+        org.virbo.autoplot.AutoplotServer.main( args10 );
 
         String[] args1= {  "--vap=/home/jbf/autoplot/test/test500_001.vap", "--outfile=/tmp/test500_001.png", "--noexit" };
         org.virbo.autoplot.AutoplotServer.main( args1 );
