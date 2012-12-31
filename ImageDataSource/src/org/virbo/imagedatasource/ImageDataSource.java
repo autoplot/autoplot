@@ -8,7 +8,9 @@ import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.exif.GpsDirectory;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -217,18 +219,43 @@ class ImageDataSource extends AbstractDataSource {
 
     }
 
+    /**
+     * read useful JPG metadata, such as the Orientation.  This also looks to see if GPS
+     * metadata is available.
+     * @param mon
+     * @return
+     * @throws Exception
+     */
     public Map<String, Object> getJpegExifMetaData(ProgressMonitor mon) throws Exception {
         InputStream in = DataSetURI.getInputStream(uri, mon);
         Metadata metadata = JpegMetadataReader.readMetadata(in);
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        Directory exifDirectory = metadata.getDirectory(ExifSubIFDDirectory.class);
+        Directory exifDirectory;
 
-        for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
-            Tag t = (Tag) i.next();
+        exifDirectory = metadata.getDirectory(ExifSubIFDDirectory.class);
+        if ( exifDirectory!=null ) {
+            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
+                Tag t = (Tag) i.next();
+                map.put(t.getTagName(), t.getDescription());
+            }
+        }
 
-            map.put(t.getTagName(), t.getDescription());
+        exifDirectory = metadata.getDirectory(ExifIFD0Directory.class);
+        if ( exifDirectory!=null ) {
+            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
+                Tag t = (Tag) i.next();
+                map.put(t.getTagName(), t.getDescription());
+            }
+        }
+
+        exifDirectory = metadata.getDirectory(GpsDirectory.class);
+        if ( exifDirectory!=null ) {
+            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
+                Tag t = (Tag) i.next();
+                map.put(t.getTagName(), t.getDescription());
+            }
         }
 
         return map;
