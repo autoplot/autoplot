@@ -19,6 +19,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
@@ -33,7 +34,7 @@ import org.virbo.dsutil.DataSetBuilder;
  * @author jbf
  */
 public class CsvDataSource extends AbstractDataSource {
-    private static final Logger logger= Logger.getLogger("apdss.csv");
+    private static final Logger logger= LoggerManager.getLogger("apdss.csv");
     public CsvDataSource(URI uri) {
         super(uri);
     }
@@ -49,7 +50,7 @@ public class CsvDataSource extends AbstractDataSource {
             try {
                 result.putValue(u.parse(sval).doubleValue(u));
             } catch (ParseException ex) {
-                Logger.getLogger(CsvDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             return result;
         } else {
