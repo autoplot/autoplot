@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * This allows colspan in a JTable.
  * @author jbf
  */
-class ColSpanTableCellRenderer extends DefaultTableCellRenderer {
+public class ColSpanTableCellRenderer extends DefaultTableCellRenderer {
 
     private int tableWidth;
     private int x;
