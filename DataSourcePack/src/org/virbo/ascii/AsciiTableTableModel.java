@@ -18,7 +18,18 @@ import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AsciiParser.RecordParser;
 
 /**
- *
+ * You will need to:
+ * <tt>
+ * model.setParser(parser);
+ * this.jTable1.setModel(model);
+ * model.setFile(file);
+ * jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
+ * AsciiParser.DelimParser p;
+ * try {
+ *    p = parser.setDelimParser(f, AsciiParser.DELIM_COMMA);
+ *    model.setRecParser(p);
+ * }
+ * </tt>
  * @author jbf
  */
 public class AsciiTableTableModel extends AbstractTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
@@ -35,7 +46,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     int fieldCount=12;
     private final static int LINE_BUFFER_COUNT=100;
 
-    AsciiTableTableModel() {
+    public AsciiTableTableModel() {
         lines = null;
         lineNumber = -1;
     }
