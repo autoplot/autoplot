@@ -6,6 +6,7 @@
 package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -84,7 +85,17 @@ public class CsvDataSource extends AbstractDataSource {
 
         InputStream in = DataSetURI.getInputStream(uri, mon);
 
-        CsvReader reader= new CsvReader( new InputStreamReader(in) );
+        BufferedReader breader= new BufferedReader(new InputStreamReader(in) );
+        String skip= getParam( "skip", "" );
+        if ( skip.length()>0 ) {
+            int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
+            for ( int i=0; i<iskip; i++ ) {
+                breader.readLine();
+            }
+        }
+
+
+        CsvReader reader= new CsvReader( breader );
 
         int ncol=-1;
 
