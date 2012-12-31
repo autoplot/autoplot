@@ -6,14 +6,20 @@
 package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
+import java.awt.Color;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,10 +39,13 @@ import javax.swing.table.DefaultTableModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.ascii.AsciiTableTableModel;
+import org.virbo.ascii.ColSpanTableCellRenderer;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.ui.TableRowHeader;
+import org.virbo.dsutil.AsciiParser;
 
 /**
  *
@@ -233,6 +242,8 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         columnsComboBox = new javax.swing.JComboBox();
         jToggleButton2 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
+        skipTextField = new javax.swing.JFormattedTextField();
 
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
@@ -276,6 +287,21 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         jToggleButton3.setText("Select");
         jToggleButton3.setToolTipText("Select the column containing the indepenent variable to plot against by pressing this button and then clicking on the table.\n");
 
+        jLabel1.setText("Skip:");
+        jLabel1.setToolTipText("Number of lines to skip before parsing");
+
+        skipTextField.setText("0");
+        skipTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                skipTextFieldActionPerformed(evt);
+            }
+        });
+        skipTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                skipTextFieldFocusLost(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -290,9 +316,14 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     .add(columnsComboBox, 0, 190, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jToggleButton2)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jToggleButton2)
+                        .add(18, 18, 18)
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(skipTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jToggleButton3))
-                .addContainerGap(507, Short.MAX_VALUE))
+                .addContainerGap(390, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -300,7 +331,9 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
                     .add(columnsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jToggleButton2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jToggleButton2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1)
+                    .add(skipTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
@@ -314,7 +347,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -327,6 +360,24 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
     }// </editor-fold>//GEN-END:initComponents
 
 
+    private void loadTable( Reader f, File file ) {
+        AsciiParser parser = new AsciiParser();
+        AsciiTableTableModel model = new AsciiTableTableModel();
+        model.setParser(parser);
+        this.jTable1.setModel(model);
+        model.setFile(file);
+        jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
+        AsciiParser.DelimParser p;
+        try {
+            p = parser.setDelimParser(f, AsciiParser.DELIM_COMMA);
+            model.setRecParser(p);
+            //parser.setRecordParser(  );
+        } catch (IOException ex) {
+            Logger.getLogger(CsvDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     private void resetTable( ) {
         if (file == null) {
             return;
@@ -334,13 +385,30 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         String uri= getURI();
 
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
-
         try {
             File ff= DataSetURI.getFile( DataSetURI.toUri(split.file), new NullProgressMonitor() );
 
-            CsvReader reader= new CsvReader( ff.toString() );
+            BufferedReader breader= new BufferedReader(new InputStreamReader( new FileInputStream(ff) ) );
+            String skip= params.get("skip");
+            if ( skip!=null && skip.length()>0 ) {
+                int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
+                for ( int i=0; i<iskip; i++ ) {
+                    breader.readLine();
+                }
+            }
+
+            loadTable(breader,ff); // use the AsciiTableReader's parser
+            breader.close();
+
+            breader= new BufferedReader(new InputStreamReader( new FileInputStream(ff) ) );
+            skip= params.get("skip");
+            if ( skip!=null && skip.length()>0 ) {
+                int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
+                for ( int i=0; i<iskip; i++ ) {
+                    breader.readLine();
+                }
+            }
+            CsvReader reader= new CsvReader( breader );
 
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
@@ -360,25 +428,12 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 }
             }
 
-            
-            DefaultTableModel tmodel= new DefaultTableModel( headers.toArray( new String[headers.size()] ), 20 );
-
-            int line=0;
-            while ( reader.readRecord() && line<20 ) {
-                for ( int j=0; j<ncol; j++ ) {
-                    tmodel.setValueAt( reader.get(j), line, j );
-                }
-                line++;
-            }
-
             columns= new HashMap<Integer, String>();
             for ( int i=0; i<ncol; i++ ) {
                 columns.put( i, headers.get(i) );
             }
 
             reader.close();
-
-            this.jTable1.setModel( tmodel );
 
             String[] hh= new String[headers.size()+1];
             hh[0]="";
@@ -437,6 +492,18 @@ private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
 }//GEN-LAST:event_columnsComboBoxFocusGained
+
+private void skipTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_skipTextFieldActionPerformed
+    params.put( "skip", skipTextField.getText() );
+    resetTable();
+}//GEN-LAST:event_skipTextFieldActionPerformed
+
+private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipTextFieldFocusLost
+    if ( !skipTextField.getText().equals(params.get("skip") ) ) {
+        params.put( "skip", skipTextField.getText() );
+        resetTable();
+    }
+}//GEN-LAST:event_skipTextFieldFocusLost
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -497,6 +564,15 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             if ( params.get(PROP_BUNDLE)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_BUNDLE) );
             if ( params.get(PROP_DEP0)!=null ) dep0Columns.setSelectedItem( params.get(PROP_DEP0) );
 
+            if ( params.get("skip")!=null ) {
+                try {
+                    skipTextField.setValue( Integer.parseInt(params.get("skip")) );
+                } catch ( NumberFormatException ex ) {
+                    skipTextField.setValue( params.get("skip") );
+                    skipTextField.setBackground( Color.YELLOW );
+                }
+            }
+            
             resetTable();
             
         } catch (IOException ex) {
@@ -515,6 +591,7 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;
     public javax.swing.JComboBox dep0Columns;
+    public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
     public javax.swing.JPanel jPanel1;
@@ -522,5 +599,6 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
     public javax.swing.JTable jTable1;
     public javax.swing.JToggleButton jToggleButton2;
     public javax.swing.JToggleButton jToggleButton3;
+    public javax.swing.JFormattedTextField skipTextField;
     // End of variables declaration//GEN-END:variables
 }
