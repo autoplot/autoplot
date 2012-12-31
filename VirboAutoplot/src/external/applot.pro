@@ -345,7 +345,7 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
    
    if np eq 3 then begin
       data= { x:xx, z:zz }
-      das2stream, data, tmpfile, ytags=y, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
+      das2stream, data, tmpfile, ytags=yy, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
    endif else if np eq 2 then begin
       data= { x:xx, y:yy }
       das2stream, data, tmpfile, ascii=0, xunits=xunits
