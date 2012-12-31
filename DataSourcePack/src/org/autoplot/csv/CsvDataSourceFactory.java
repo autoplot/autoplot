@@ -41,7 +41,7 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                     "values less than this value are treated as fill."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
                     "values greater than this value are treated as fill."));
-
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skip=", "skip this many lines before parsing"));
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
@@ -58,6 +58,10 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                 return result;
             } else if (paramName.equals("depend0")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
+                return result;
+            } else if (paramName.equals("skip")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of lines to skip"));
                 return result;
             } else {
                 return Collections.emptyList();
