@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -230,7 +231,7 @@ class ImageDataSource extends AbstractDataSource {
         InputStream in = DataSetURI.getInputStream(uri, mon);
         Metadata metadata = JpegMetadataReader.readMetadata(in);
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         Directory exifDirectory;
 
