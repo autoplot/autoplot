@@ -28,6 +28,7 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
     }
 
     // see usages elsewhere, this is sloppy.
+    // TODO: consider if [ DSA, DSB ] should append( DSA, DSB ) where DSA DSB are datasets.
     public static QDataSet adaptList( PyList p ) {
         double[] j= new double[ p.size() ];
         for ( int i=0; i<p.size(); i++ ) {
