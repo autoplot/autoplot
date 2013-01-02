@@ -69,8 +69,8 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="stopTextField" pref="385" max="32767" attributes="0"/>
-                                  <Component id="startTextField" alignment="0" pref="385" max="32767" attributes="0"/>
+                                  <Component id="stopTextField" pref="390" max="32767" attributes="0"/>
+                                  <Component id="startTextField" alignment="0" pref="390" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -98,7 +98,7 @@
                           <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="stopTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="69" max="32767" attributes="0"/>
+                      <EmptySpace pref="90" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -118,6 +118,10 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="jTextField1"/>
               </Properties>
+              <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeRangeTextFieldFocusGained"/>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeRangeTextFieldFocusLost"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel6">
               <Properties>
@@ -138,11 +142,17 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="jTextField2"/>
               </Properties>
+              <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="startTextFieldFocusGained"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="stopTextField">
               <Properties>
                 <Property name="text" type="java.lang.String" value="jTextField3"/>
               </Properties>
+              <Events>
+                <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="stopTextFieldFocusGained"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -169,7 +179,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
-                              <Component id="orbitComboBox" pref="333" max="32767" attributes="0"/>
+                              <Component id="orbitComboBox" pref="339" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel4" min="-2" pref="107" max="-2" attributes="0"/>
@@ -211,7 +221,7 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="orbitFeedbackLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="106" max="32767" attributes="0"/>
+                      <EmptySpace pref="130" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -327,7 +337,7 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="nrtComboBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="203" max="32767" attributes="0"/>
+                      <EmptySpace pref="212" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

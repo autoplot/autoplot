@@ -38,7 +38,12 @@ import org.das2.datum.format.TimeDatumFormatter;
 public class TimeRangeTool extends javax.swing.JPanel {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.gui");
-    
+
+    /**
+     * true when the last focus on the Calendar tab was the timeRange field.
+     */
+    boolean timeRangeFocus= true;
+
     String orbit=""; // save the orbit so it isn't clobbered by the GUI.
 
     /** Creates new form TimeRangeTool */
@@ -131,12 +136,17 @@ public class TimeRangeTool extends javax.swing.JPanel {
     public String getSelectedRange() {
         int idx= jTabbedPane1.getSelectedIndex();
         if ( idx==0 ) {
-            String min= startTextField.getText();
-            String max= stopTextField.getText();
             try {
-                Datum tmin= TimeUtil.create(min);
-                Datum tmax= TimeUtil.create(max);
-                return new DatumRange( tmin, tmax ).toString();
+                if ( timeRangeFocus ) {
+                    String txt= timeRangeTextField.getText();
+                    return DatumRangeUtil.parseTimeRange(txt).toString();
+                } else {
+                    String min= startTextField.getText();
+                    String max= stopTextField.getText();
+                    Datum tmin= TimeUtil.create(min);
+                    Datum tmax= TimeUtil.create(max);
+                    return new DatumRange( tmin, tmax ).toString();
+                }
             } catch ( ParseException ex ) {
                 return timeRangeTextField.getText();
             }
@@ -253,6 +263,14 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel7.setText("Enter Time Range:");
 
         timeRangeTextField.setText("jTextField1");
+        timeRangeTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                timeRangeTextFieldFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                timeRangeTextFieldFocusLost(evt);
+            }
+        });
 
         jLabel6.setText("Or Enter Separate Times (ISO8601):");
 
@@ -261,8 +279,18 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel9.setText("End:");
 
         startTextField.setText("jTextField2");
+        startTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                startTextFieldFocusGained(evt);
+            }
+        });
 
         stopTextField.setText("jTextField3");
+        stopTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                stopTextFieldFocusGained(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -288,8 +316,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                             .add(jLabel9))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
-                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))))
+                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -310,7 +338,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel9)
                     .add(stopTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(90, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Calendar", jPanel1);
@@ -363,7 +391,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel5)
                         .add(80, 80, 80)
-                        .add(orbitComboBox, 0, 333, Short.MAX_VALUE))
+                        .add(orbitComboBox, 0, 339, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -396,7 +424,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(orbitComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(orbitFeedbackLabel)
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(130, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Orbits", jPanel2);
@@ -422,7 +450,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nrtComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(203, Short.MAX_VALUE))
+                .addContainerGap(212, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NRT", jPanel3);
@@ -474,6 +502,28 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         }
     }//GEN-LAST:event_orbitComboBoxItemStateChanged
+
+    private void timeRangeTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusLost
+        try {
+            DatumRange dr= DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+            startTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.min() ) );
+            stopTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.max() ) );
+        }  catch ( ParseException ex ) {
+
+        }
+    }//GEN-LAST:event_timeRangeTextFieldFocusLost
+
+    private void timeRangeTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusGained
+        timeRangeFocus= true;
+    }//GEN-LAST:event_timeRangeTextFieldFocusGained
+
+    private void startTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_startTextFieldFocusGained
+        timeRangeFocus= false;
+    }//GEN-LAST:event_startTextFieldFocusGained
+
+    private void stopTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_stopTextFieldFocusGained
+        timeRangeFocus= false;
+    }//GEN-LAST:event_stopTextFieldFocusGained
 
     /**
      * shows the orbit timerange, clipping off text past the first colon.
