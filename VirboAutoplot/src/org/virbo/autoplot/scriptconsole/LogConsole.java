@@ -249,7 +249,7 @@ public class LogConsole extends javax.swing.JPanel {
                         } else {
                             recMsg = MessageFormat.format( rec.getMessage(), parms );
                         }
-                        if ( recMsg.length()==0 && rec.getThrown()!=null ) {
+                        if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
                             recMsg= rec.getThrown().toString();
                         } else {
                             // no message.  breakpoint here for debugging.
