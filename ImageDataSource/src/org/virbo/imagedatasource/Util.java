@@ -16,7 +16,7 @@ public class Util {
      * @return decimal version of string
      */
     public static double parseGPSString( String s ) {
-        double[] d= new double[4];
+        double[] d= new double[3];
         int i=0;
         int oldi= i;
         i= s.indexOf("°"); // degree symbol
@@ -24,7 +24,6 @@ public class Util {
             d[0]= Double.parseDouble( s.substring(oldi,i) );
             oldi=i+1;
         }
-
         i= s.indexOf("'"); // '
         if ( i>-1 ) {
             d[1]= Double.parseDouble( s.substring(oldi,i) );
@@ -33,6 +32,7 @@ public class Util {
         i= s.indexOf("\""); // "
         if ( i>-1 ) {
             d[2]= Double.parseDouble( s.substring(oldi,i) );
+            oldi=i+1;
         }
 
         return d[0] + d[1]/60 + d[2]/(60*60);
