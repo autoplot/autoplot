@@ -5,17 +5,15 @@
 
 package org.virbo.imagedatasource;
 
-import java.util.Scanner;
-
 /**
  *
  * @author jbf
  */
 public class Util {
     /**
-     * returns 45.5 from "45°30'"
-     * @param s
-     * @return
+     * returns 45.50833333333333 from 45°30'30"
+     * @param s a GPS coordinate with degrees minutes and seconds 
+     * @return decimal version of string
      */
     public static double parseGPSString( String s ) {
         double[] d= new double[4];
