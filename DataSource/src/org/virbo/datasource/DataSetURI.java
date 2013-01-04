@@ -1261,6 +1261,85 @@ public class DataSetURI {
     }
 
     /**
+     * gets completions based on cached folders.
+     * @param surl http://sarahandjeremy.net/
+     * @param carotpos
+     * @param inclAgg include aggregations it sees.  These are a guess.
+     * @param inclFiles include files as well as aggregations.
+     * @param acceptPattern  if non-null, files and aggregations much match this.
+     * @param mon
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static List<CompletionResult> getFileSystemCacheCompletions(final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+        URISplit split = URISplit.parse(surl.substring(0, carotpos));
+
+        String prefix;
+        String surlDir;
+        if (split.path == null) {
+            prefix = "";
+            surlDir = "";
+        } else {
+            prefix = split.file.substring(split.path.length());
+            surlDir = split.path;
+        }
+
+        mon.setLabel("getting list of cached folders");
+
+        String[] s;
+
+        if ( split.scheme==null ) {
+            throw new IllegalArgumentException("need scheme and hostname");
+        }
+            
+        File cacheF = new File(FileSystem.settings().getLocalCacheDir(), split.scheme + '/' + split.path.substring(split.scheme.length()+3) );
+
+        if (!cacheF.exists()) return Collections.emptyList();
+        s = cacheF.list();
+
+        boolean foldCase = true;
+        if (foldCase) {
+            prefix = prefix.toLowerCase();
+        }
+
+        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+        for (int j = 0; j < s.length; j++) {
+            String scomp = foldCase ? s[j].toLowerCase() : s[j];
+            if (scomp.startsWith(prefix) && !scomp.endsWith(".listing") ) {
+                File ff= new File(cacheF, scomp );
+                if ( ! ff.isDirectory() ) continue;
+                if ( ff.list().length==0 ) continue;
+
+                String result1 = s[j] + "/";
+                // drill down single entries, since often the root doesn't provide a list.
+                String[] s2 = new File(cacheF, result1).list();
+                if ( s2==null ) { // does not exist
+                    s2= new String[0];
+                }
+                while (s2.length == 1 && new File(cacheF, result1 + "/" + s2[0]).isDirectory()) {
+                    result1 += s2[0] + "/";
+                    s2 = new File(cacheF, result1).list();
+                    if ( s2==null ) { // does not exist
+                        s2= new String[0];
+                    }
+                }
+                completions.add(new DataSetURI.CompletionResult(surlDir + result1, result1, null, surl.substring(0, carotpos), true));
+            }
+        }
+
+        // check for single completion that is just a folder name with /.
+        if (completions.size() == 1) {
+            if ((completions.get(0).completion).equals(surlDir + prefix + "/")) {
+                // maybe we should do something special.
+            }
+        }
+
+        return completions;
+
+    }
+
+    /**
      *
      * @param surl
      * @param carotpos
