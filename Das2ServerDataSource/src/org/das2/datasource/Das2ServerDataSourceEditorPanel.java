@@ -808,10 +808,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String startTime= params.remove("start_time");
         String endTime= params.remove("end_time");
         if ( startTime!=null && endTime!=null ) {
-            Datum t1= TimeUtil.createValid( startTime );
-            Datum t2= TimeUtil.createValid( endTime );
-            DatumRange dr = new DatumRange( t1, t2 );
-            timeRangeTextField.setText(dr.toString());
+            try {
+                Datum t1= TimeUtil.create( startTime );
+                Datum t2= TimeUtil.create( endTime );
+                DatumRange dr = new DatumRange( t1, t2 );
+                timeRangeTextField.setText(dr.toString());
+            } catch ( ParseException ex ) {
+                timeRangeTextField.setText( DEFAULT_TIMERANGE );
+            }
         } else {
             timeRangeTextField.setText( DEFAULT_TIMERANGE );
         }
