@@ -82,7 +82,7 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        logger.fine("v20120921.0954");
+        logger.fine("v20130104.0905");
 
         logger.fine("=======================");
 
@@ -275,6 +275,9 @@ public class SimpleServlet extends HttpServlet {
 
             }
 
+            // To support load balancing, insert the actual host that resolved the request
+            response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+            
             // wait for autoranging, etc.
             dom.getController().waitUntilIdle();
             
