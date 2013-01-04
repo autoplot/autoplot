@@ -40,6 +40,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomNode;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.datasource.AutoplotSettings;
 
@@ -226,6 +227,12 @@ public class UndoRedoSupport {
         pushState(ev,null);
     }
 
+    /**
+     * remove extra xaxis differences that are redundant because of bindings to dom.timerange.
+     * @param dom the model, presumably containing the same plots and bindings.
+     * @param diffs
+     * @return
+     */
     private static List<Diff> removeTimeRangeBindings( Application dom, List<Diff> diffs ) {
         diffs= new ArrayList( diffs );
         List<Diff> timeRangeBound= new ArrayList();
@@ -234,7 +241,8 @@ public class UndoRedoSupport {
             Matcher m= pattern.matcher(s.propertyName());
             if ( m.matches() ) {
                 Plot p= dom.getPlots( Integer.parseInt(m.group(1) ) );
-                BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
+                BindingModel bm= DomUtil.findBinding( dom, p.getXaxis(), "range", dom, "timeRange" );
+                //BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
                 if ( bm!=null ) {
                     timeRangeBound.add(s);
                 }
@@ -568,7 +576,8 @@ public class UndoRedoSupport {
     public String getLongUndoDescription( int i ) {
         //if (  stateStack.get(i).deltaDesc.matches("(\\d+) changes") ) {
             List<Diff> diffss = stateStack.get(i).state.diffs(stateStack.get(i-1).state);
-            StringBuffer docBuf= new StringBuffer();
+            diffss= removeTimeRangeBindings( stateStack.get(i-1).state, diffss );
+            StringBuilder docBuf= new StringBuilder();
             for ( int j=0; j<diffss.size(); j++ ) {
                 Diff s= diffss.get(j);
                 if ( s.getDescription().contains("plotDefaults" ) ) continue;
