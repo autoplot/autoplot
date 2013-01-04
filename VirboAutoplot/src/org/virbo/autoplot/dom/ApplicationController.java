@@ -1786,12 +1786,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return the BindingModel or null if it doesn't exist.
      */
     public BindingModel findBinding(DomNode src, String srcProp, DomNode dst, String dstProp) {
-        List<BindingModel> results= findBindings( src,  srcProp, dst, dstProp );
-        if ( results.size()==0 ) {
-            return null;
-        } else {
-            return results.get(0);  // TODO: this should be a singleton.
-        }
+        return DomUtil.findBinding( application, src, srcProp, dst, dstProp );
     }
 
 
@@ -1802,11 +1797,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public List<BindingModel> findBindings( DomNode src, String srcProp ) {
-        List<BindingModel> bindings= findBindings( src, srcProp, null, null );
-        List<BindingModel> bindings2= findBindings( null, null, src, srcProp );
-        bindings2.removeAll(bindings);
-        bindings.addAll(bindings2);
-        return bindings;
+        return DomUtil.findBindings( application, src, srcProp );
     }
 
     /**
@@ -1819,26 +1810,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return the BindingModel or null if it doesn't exist.
      */
     public List<BindingModel> findBindings(DomNode src, String srcProp, DomNode dst, String dstProp) {
-        List<BindingModel> result= new ArrayList();
-        for (BindingModel b : application.getBindings()) {
-            try {
-                if (  ( src==null || b.getSrcId().equals(src.getId()) )
-                        && ( dst==null || b.getDstId().equals(dst.getId()) )
-                        && ( srcProp==null || b.getSrcProperty().equals(srcProp) )
-                        && ( dstProp==null || b.getDstProperty().equals(dstProp) ) ){
-                    result.add(b);
-                } else if ( ( dst==null || b.getSrcId().equals(dst.getId()) )
-                        && ( src==null || b.getDstId().equals(src.getId()) )
-                        && ( dstProp==null || b.getSrcProperty().equals(dstProp) )
-                        && ( srcProp==null || b.getDstProperty().equals(srcProp) ) ) {
-                    result.add(b);
-                }
-            } catch (NullPointerException ex) {
-                throw ex;
-            }
-
-        }
-        return result;
+        return DomUtil.findBindings( application, src, srcProp, dst, dstProp );
     }
 
     public BindingModel[] getBindingsFor(DomNode node) {
