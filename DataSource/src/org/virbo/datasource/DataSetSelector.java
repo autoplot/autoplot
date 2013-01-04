@@ -990,6 +990,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
                         } else {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                            if ( completions.size()==0 ) {
+                                completions = DataSetURI.getFileSystemCacheCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                            }
                         }
                     }
                 } catch (UnknownHostException ex ) {
