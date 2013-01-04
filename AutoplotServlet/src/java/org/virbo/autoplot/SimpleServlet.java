@@ -151,6 +151,9 @@ public class SimpleServlet extends HttpServlet {
 
             OutputStream out = response.getOutputStream();
 
+            // To support load balancing, insert the actual host that resolved the request
+            response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+            
             if (vap != null) {
                 response.setContentType(format);
             } else if (surl.equals("about:plugins")) {
@@ -275,9 +278,6 @@ public class SimpleServlet extends HttpServlet {
 
             }
 
-            // To support load balancing, insert the actual host that resolved the request
-            response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
-            
             // wait for autoranging, etc.
             dom.getController().waitUntilIdle();
             
