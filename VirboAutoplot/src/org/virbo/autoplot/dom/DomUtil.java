@@ -712,4 +712,72 @@ public class DomUtil {
         return template;
     }
 
+    /**
+     * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
+     * search.
+     * @param dom the dom tree
+     * @param src
+     * @param srcProp
+     * @param dst
+     * @param dstProp
+     * @return the BindingModel or null if it doesn't exist.
+     */
+    public static BindingModel findBinding( Application dom, DomNode src, String srcProp, DomNode dst, String dstProp) {
+        List<BindingModel> results= findBindings( dom, src, srcProp, dst, dstProp );
+        if ( results.size()==0 ) {
+            return null;
+        } else {
+            return results.get(0);  // TODO: this should be a singleton.
+        }
+    }
+
+
+    /**
+     * returns a list of bindings of the node for the property
+     * @param dom the dom tree
+     * @param src the node to which or from which a binding exists
+     * @param srcProp the property name of the binding.
+     * @return
+     */
+    public static List<BindingModel> findBindings( Application dom, DomNode src, String srcProp ) {
+        List<BindingModel> bindings= findBindings( dom, src, srcProp, null, null );
+        List<BindingModel> bindings2= findBindings( dom, null, null, src, srcProp );
+        bindings2.removeAll(bindings);
+        bindings.addAll(bindings2);
+        return bindings;
+    }
+
+    /**
+     * Find the bindings that match given constraints.  If a property name or node is null, then the
+     * search is unconstrained.
+     * @param dom the dom tree
+     * @param src
+     * @param srcProp
+     * @param dst
+     * @param dstProp
+     * @return the BindingModel or null if it doesn't exist.
+     */
+    public static List<BindingModel> findBindings( Application dom, DomNode src, String srcProp, DomNode dst, String dstProp) {
+        List<BindingModel> result= new ArrayList();
+        for (BindingModel b : dom.getBindings()) {
+            try {
+                if (  ( src==null || b.getSrcId().equals(src.getId()) )
+                        && ( dst==null || b.getDstId().equals(dst.getId()) )
+                        && ( srcProp==null || b.getSrcProperty().equals(srcProp) )
+                        && ( dstProp==null || b.getDstProperty().equals(dstProp) ) ){
+                    result.add(b);
+                } else if ( ( dst==null || b.getSrcId().equals(dst.getId()) )
+                        && ( src==null || b.getDstId().equals(src.getId()) )
+                        && ( dstProp==null || b.getSrcProperty().equals(dstProp) )
+                        && ( srcProp==null || b.getDstProperty().equals(srcProp) ) ) {
+                    result.add(b);
+                }
+            } catch (NullPointerException ex) {
+                throw ex;
+            }
+
+        }
+        return result;
+    }
+
 }
