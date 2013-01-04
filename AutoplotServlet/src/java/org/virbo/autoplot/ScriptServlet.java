@@ -134,6 +134,9 @@ public class ScriptServlet extends HttpServlet {
             
             interp.set( "response", response );
 
+            // To support load balancing, insert the actual host that resolved the request
+            response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+            
             //TODO: this limits to one user!
             ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
             
