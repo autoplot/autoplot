@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Happy Holidays!</small></p>
+        <p><small>Data in Excel spreadsheets can now be accessed by row.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -15,12 +15,20 @@
         </p>
 
         <p>This is the Autoplot2012b branch.  This is an update to the production version containing bugfixes and minor new features.
+            Java 6 is now required.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        <ul>
+            <li>Columns AA and up are plottable in Excel spreadsheet reader.</li>
+            <li>CSV editor uses parts of the ascii table GUI to make a more usable editor, before it would just show first 20 lines.</li>
+            <li>Dan upgraded the JPG metadata-extractor library to support Java 7.</li>
+            <li>Time Range Tool would not accept time ranger string unless enter was pressed before exiting the GUI<li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>3598146: undos of autoRenderType misreported as T->T</li>
             <li>3597950: save as dialog kept forgetting last directory because of "file:/" prefix</li>
@@ -38,39 +46,20 @@
             <li>TCA (empheris) progress wheel showed where the data loading thread needed to be synchronized because of double loads.</li>
             <li>3594789: poor feedback when component unbundles are incorrect.  setException must be called after setDataSet(null)</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>series->spec->series showed where legend label wasn't set because of incorrect check for auto, which was not set properly</li>
-            <li>reset method is no longer synchronized, since Java6 would sometimes get hung up in there</li>
-            <li>specifying TYPICAL_MIN but not TYPICAL_MAX would cause NullPointerException in autoranging.</li>
-            <li>CEF explicitly set SCALE_TYPE=linear if log was not specified.  Sometimes the data should be used to decide.</li>
-            <li>autorange code has code to prevent use of log when SCALE_TYPE=linear.</li>
-            <li>labels would not reset when switching from spec->series->spec->series.</li>
-            <li>3590689: bugfixes with aggregation of qstreams when reducing CDF data with BUNDLE_1</li>
-            <li>digitizer output .dat file is formatted so that Autoplot gets the column labels and units</li>
-            <li>add kludge for Seth's data with rank2 DEPEND_1 to restore old labeling before AGU.</li>
-            <li>add kludge for waveform display type where nT units are incorrectly labeled as seconds</li>
-            <li>joinProperties handled DELTA_PLUS, DELTA_MINUS and WEIGHTS_PLANE</li>
-            <li>long parameters in JythonDataSource dialog just have "default" for the button label</li>
-            <li>put a space in jnlp title so it inserts linebreaks nicely on desktops</li>
-            <li>CDF Rank2 BUNDLE properties read in when DEPEND_1 is Rank 2.</li>
-            <li>add logging to aggregation to figure out why Dan's seeing inconsistent behavior</li>
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>undo list and getLongUndoDescription now consider timerange bindings when reporting changes.</li>
+            <li>AutoplotServlet now reports host that served the data in response header, to support clusters of servers</li>
+            <li>Add skip parameter to csv file reader to support MyTracks app.</li>
+            <li>Rows are plottable in the Excel spreadsheet reader.</li>
+            <li>GPS metadata retrieved in (JPG) image viewer</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>command line on console tab keeps last 20 commands between sessions</li>
             <li>introduce secret feature for testing reference cache -DenableReferenceCache=true will enable the cache for CDF and aggregations.</li>
             <li>add collapse functions to scripting.  These were available in the processes but not by the same name in scripting.</li>
             <li>RBSP orbits updated to 2012-01-08</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>orbitMode=T and fontSize=2em added to events bar renderer controls which allows clear display of orbit number.</li>
-            <li>undo list uses unicode arrow instead of ->, bindings to timerange are subsumed.</li>
-            <li>pngwalks support in-line wildcards like http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-test500/10*/artifact/diffs.test500_009.png</li>
-            <li>makePngWalk command line arguments are echoed to stderr.</li>
-            <li>in experimental plotx, yrange=[0,1000] implies that ylog=False</li>
-            <li>.jy extension is automatically handled as a script.</li>
         </ul>
 
         <p>Known issues:</p>
@@ -82,7 +71,7 @@
             autoplot.org will run this version.
             <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
-        <p>data is input from:</p>
+        <p>Data is input from:</p>
         <ul>
             <li>ASCII files (.dat,.txt)</li>
             <li>CSV files (.csv)</li>
