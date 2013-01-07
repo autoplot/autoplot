@@ -223,7 +223,7 @@ public class CdfUtil {
             double[] data = (double[]) odata; // kludge for CAA, which returns [1,900]
             result = DDataSet.wrap(data);
 
-        } else if ( varType == Variable.CDF_UINT4 ) {
+        } else if ( varType == Variable.CDF_UINT4 || varType==Variable.CDF_INT8 ) {
             long[][] data = (long[][]) odata;
             int nx = data.length;
             int ny = data[0].length;
@@ -286,7 +286,7 @@ public class CdfUtil {
             float[] back = new float[nx * ny * nz];
             flatten(data, back, 0, nx, ny, nz);
             result = FDataSet.wrap(back, nx, ny, nz);
-        } else if ( varType == Variable.CDF_UINT4 ) {
+        } else if ( varType == Variable.CDF_UINT4|| varType==Variable.CDF_INT8 ) {
             long[][][] data = (long[][][]) odata;
             int nx = data.length;
             int ny = data[0].length;
@@ -345,7 +345,7 @@ public class CdfUtil {
             float[] back = new float[nx * ny * nz * nzz];
             flatten(data, back, 0, nx, ny, nz, nzz );
             result = FDataSet.wrap(back, new int[] { nx, ny, nz, nzz } );
-        } else if (varType ==  Variable.CDF_UINT4) {
+        } else if (varType ==  Variable.CDF_UINT4 || varType==Variable.CDF_INT8 ) {
             long[][][][] data = (long[][][][]) odata;
             int nx = data.length;
             int ny = data[0].length;
@@ -600,9 +600,9 @@ public class CdfUtil {
         } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
             result = DDataSet.wrap((double[]) odata, qube);
 
-        } else if (varType == Variable.CDF_UINT4 ) {
+        } else if (varType == Variable.CDF_INT8 || varType == Variable.CDF_UINT4 ) {
             result = LDataSet.wrap((long[]) odata, qube);
-        
+            
         } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT2) {
             result = IDataSet.wrap((int[]) odata, qube);
 
@@ -758,7 +758,7 @@ public class CdfUtil {
             } else if (varType == CDFConstants.CDF_REAL8 || varType == CDFConstants.CDF_DOUBLE) {
                 result = DDataSet.wrap((double[]) odata);
 
-            } else if (varType == CDFConstants.CDF_UINT4) {
+            } else if ( varType==CDFConstants.CDF_INT8 || varType == CDFConstants.CDF_UINT4 ) {
                 result = LDataSet.wrap((long[]) odata);
 
             } else if (varType == CDFConstants.CDF_INT4 || varType == CDFConstants.CDF_UINT2) {
