@@ -177,7 +177,7 @@ public class CdfUtil {
         long sizeBytes;
         if ( itype==CDFConstants.CDF_EPOCH16 ) {
             sizeBytes= 16;
-        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH || itype==CDFConstants.CDF_TT2000 ) {
+        } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH || itype==CDFConstants.CDF_TT2000 || itype==CDFConstants.CDF_INT8 ) {
             sizeBytes= 8;
         } else if( itype == CDFConstants.CDF_FLOAT || itype == CDFConstants.CDF_REAL4 || itype==CDFConstants.CDF_INT4 || itype==CDFConstants.CDF_UINT4 ) {
             sizeBytes=4; //sizeBytes= 4;
@@ -555,6 +555,7 @@ public class CdfUtil {
             case 1: return "CDF_INT1";
             case 2: return "CDF_INT2";
             case 4: return "CDF_INT4";
+            case 8: return "CDF_INT8";
             case 11: return "CDF_UINT1";
             case 12: return "CDF_UINT2";
             case 14: return "CDF_UINT4";

@@ -47,6 +47,8 @@ public interface CDFConstants {
     public static final long CDF_INT1   = 1;
     public static final long CDF_INT2   = 2;
     public static final long CDF_INT4   = 4;
+    public static final long CDF_INT8   = 8;
+
     public static final long CDF_UINT1  = 11;
     public static final long CDF_UINT2  = 12;
     public static final long CDF_UINT4  = 14;
