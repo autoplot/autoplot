@@ -473,6 +473,11 @@ public class CdfUtil {
 
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws CDFException {
+        return wrapCdfHyperDataHacked(variable, recStart, recCount, recInterval, -1, mon);
+    }
+
+    public static MutablePropertyDataSet wrapCdfHyperDataHacked(
+            Variable variable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon ) throws CDFException {
 
         if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
 
@@ -494,8 +499,17 @@ public class CdfUtil {
             dimCounts = new long[]{0};
             dimIntervals = new long[]{0};
         } else if (dims == 1) {
-            dimCounts = new long[]{dimSizes[0]};
-            dimIntervals = new long[]{1};
+            if ( slice1>-1 ) {
+                logger.finer("slice1 implemented at read to save space");
+                dimCounts = new long[]{1};
+                dimIntervals = new long[]{1};
+                dimIndeces= new long[] { slice1 };
+                dimSizes= new long[] { 1 };
+            } else {
+                dimCounts = new long[]{dimSizes[0]};
+                dimIntervals = new long[]{1};
+            }
+
         } else if (dims == 2) {
             dimIndeces = new long[]{0, 0};
             dimCounts = new long[]{dimSizes[0], dimSizes[1]};
@@ -512,6 +526,7 @@ public class CdfUtil {
                 dimIntervals = new long[]{1};
             }
         }
+
         int recSizeCount= 1;
         if ( dimSizes!=null ) {
             for ( int i=0; i<dimSizes.length; i++ ) {
@@ -587,13 +602,14 @@ public class CdfUtil {
                 qube[i]= (int)dimSizes[i];
             }
         } else {
-            qube= new int[ 1+ dimSizes.length ];
+            int n= ( slice1<0 ? 1 : 0 ) ;
+            qube= new int[ n + dimSizes.length ];
             for ( int i=0; i<dimSizes.length; i++ ) {
-                qube[1+i]= (int)dimSizes[i];
+                qube[n+i]= (int)dimSizes[i];
             }
             qube[0]= (int)recCount;
         }
-        
+
         if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
             result = FDataSet.wrap((float[]) odata, qube );
 
