@@ -163,8 +163,18 @@ public class CdfFileDataSource extends AbstractDataSource {
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
+                String os1= (String)map.get(PARAM_SLICE1);
+                if ( os1!=null && !os1.equals("") ) {
+                    throw new IllegalArgumentException("slice1 not supported for virtual variables");
+                }
             } else { // typical route
-                result= wrapDataSet(cdf, svariable, constraint, false, true, mon );
+                String os1= (String)map.get(PARAM_SLICE1);
+                if ( os1!=null && !os1.equals("") ) {
+                    int is= Integer.parseInt(os1);
+                    result= wrapDataSet( cdf, svariable, constraint, false, true, is, mon );
+                } else {
+                    result= wrapDataSet(cdf, svariable, constraint, false, true, -1, mon );
+                }
             }
 
             CdfFileDataSourceFactory.closeCDF(cdf);
@@ -292,6 +302,10 @@ public class CdfFileDataSource extends AbstractDataSource {
         return null;
     }
 
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon) throws CDFException, ParseException {
+        return wrapDataSet(  cdf, svariable, constraints, reform, depend, -1, mon );
+    }
+
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
      * @param cdf
@@ -299,11 +313,12 @@ public class CdfFileDataSource extends AbstractDataSource {
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      * @param depend if true, recurse to read variables this depends on.
+     * @param slice1 if >-1, then slice on the first dimension.  This is to support extracting components.
      * @return
      * @throws CDFException
      * @throws ParseException
      */
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon) throws CDFException, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, int slice1, ProgressMonitor mon ) throws CDFException, ParseException {
         Variable variable = cdf.getVariable(svariable);
 
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
@@ -372,7 +387,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfHyperDataHacked( variable, recs[0], recCount, recs[2], mon );
+            result = CdfUtil.wrapCdfHyperDataHacked( variable, recs[0], recCount, recs[2], slice1, mon );
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
@@ -448,7 +463,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
 
                         //if ( "ion_en".equals( (String) dep.get("NAME") ) ) reformDep= false;
-                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, null);
+                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, -1, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
@@ -483,7 +498,16 @@ public class CdfFileDataSource extends AbstractDataSource {
 //                            }
                         }
 
-                        result.putProperty("DEPEND_" + idep, depDs);
+                        if ( slice1>-1 ) {
+                            if ( idep>1 ) {
+                                result.putProperty("DEPEND_" + (idep-1), depDs);
+                            } else if ( idep<1 ) {
+                                result.putProperty( "DEPEND_"+(idep), depDs );
+                            }
+                        } else {
+                            result.putProperty("DEPEND_" + idep, depDs);
+                        }
+
                 }
 
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
@@ -494,7 +518,15 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
                     }
                     QDataSet bundleDs= lablDs;
-                    result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                    if ( slice1>-1 ) {
+                        if ( idep>1 ) {
+                            result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );
+                        } else if ( idep<1 ) {
+                            result.putProperty( "BUNDLE_"+(idep), DataSetUtil.toBundleDs(bundleDs) );
+                        }
+                    } else {
+                        result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                    }
                 }
             }
         }
