@@ -1726,6 +1726,7 @@ APSplash.checkTime("init 52");
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         workOfflineCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        resetMemoryCachesMI = new javax.swing.JMenuItem();
         manageFilesystemsMI = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
@@ -2165,6 +2166,14 @@ APSplash.checkTime("init 52");
             }
         });
         cacheMenu.add(workOfflineCheckBoxMenuItem);
+
+        resetMemoryCachesMI.setText("Reset Memory Caches");
+        resetMemoryCachesMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetMemoryCachesMIActionPerformed(evt);
+            }
+        });
+        cacheMenu.add(resetMemoryCachesMI);
 
         manageFilesystemsMI.setText("Manage Filesystems");
         manageFilesystemsMI.addActionListener(new java.awt.event.ActionListener() {
@@ -2835,6 +2844,12 @@ private void manageFilesystemsMIActionPerformed(java.awt.event.ActionEvent evt) 
     AutoplotUtil.doManageFilesystems(this);
 }//GEN-LAST:event_manageFilesystemsMIActionPerformed
 
+private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMemoryCachesMIActionPerformed
+    logger.fine("Resetting FileSystems...");
+    FileSystem.reset();
+    setMessage("FileSystem memory caches reset");
+}//GEN-LAST:event_resetMemoryCachesMIActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -3477,6 +3492,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem reloadAllMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem replaceFileMenuItem;
+    private javax.swing.JMenuItem resetMemoryCachesMI;
     private javax.swing.JMenuItem resetXMenuItem;
     private javax.swing.JMenuItem resetYMenuItem;
     private javax.swing.JMenuItem resetZMenuItem;
