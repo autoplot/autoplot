@@ -17,6 +17,7 @@ public class Test003 {
 
     public static void doit(int id, String uri) {
         try {
+            System.err.println("== "+uri+" ==");
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
         } catch (InterruptedException ex) {
