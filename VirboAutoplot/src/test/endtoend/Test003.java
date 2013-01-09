@@ -35,6 +35,9 @@ public class Test003 {
                 ScriptContext.createGui();
             }
 
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
             //these require a keychain.txt file.
             doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_pre_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
             doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_pre_ect-mageis-mr-elec-L1.vap");
@@ -65,8 +68,6 @@ public class Test003 {
             doit(25, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2-ion/rbspa_pre_ect-rept-sci-L2-ion.vap");
 
 
-            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
             ScriptContext.setCanvasSize(800, 600);
 
