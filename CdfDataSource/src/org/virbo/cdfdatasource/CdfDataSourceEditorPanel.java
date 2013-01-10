@@ -170,7 +170,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(noDep)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showAllVarTypeCB)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel3);
