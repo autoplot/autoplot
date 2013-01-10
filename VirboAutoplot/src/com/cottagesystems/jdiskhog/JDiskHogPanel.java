@@ -309,6 +309,8 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         jTree1 = new javax.swing.JTree();
         jButton1 = new javax.swing.JButton();
         goButton = new javax.swing.JButton();
+        sortCB = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
 
         jScrollPane2.setViewportView(jTree1);
 
@@ -327,13 +329,26 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             }
         });
 
+        sortCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "File Size", "Alpha" }));
+        sortCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortCBActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Sort By:");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(551, Short.MAX_VALUE)
+                .addContainerGap()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 374, Short.MAX_VALUE)
                 .add(goButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -345,7 +360,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jButton1)
-                    .add(goButton)))
+                    .add(goButton)
+                    .add(jLabel1)
+                    .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -358,10 +375,22 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         SwingUtilities.getWindowAncestor(this).setVisible(false);
     }//GEN-LAST:event_goButtonActionPerformed
 
+    private void sortCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortCBActionPerformed
+        FSTreeModel model= ((FSTreeModel)jTree1.getModel());
+        if ( sortCB.getSelectedIndex()==0 ) {
+            model.setComparator(model.fileSizeComparator);
+        } else if (  sortCB.getSelectedIndex()==1 ) {
+            model.setComparator(model.alphaComparator );
+        }
+
+    }//GEN-LAST:event_sortCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton goButton;
     public javax.swing.JButton jButton1;
+    public javax.swing.JLabel jLabel1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
+    public javax.swing.JComboBox sortCB;
     // End of variables declaration//GEN-END:variables
 }
