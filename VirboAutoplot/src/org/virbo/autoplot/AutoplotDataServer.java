@@ -174,6 +174,7 @@ public class AutoplotDataServer {
         alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources");
         alm.addOptionalSwitchArgument("timeStep", "s", "timeStep", "86400s", "atom step size for loading and sending, default is 86400s");
         alm.addOptionalSwitchArgument("cache", "c", "cache", "", "location where files are downloaded, default is $HOME/autoplot_data/cache");
+        alm.addBooleanSwitchArgument("nostream",  "", "nostream","disable streaming, as will Bill's dataset which is X and Y table");
         alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
 
         alm.requireOneOf(new String[]{"uri"});
@@ -188,6 +189,8 @@ public class AutoplotDataServer {
         String step = alm.getValue("timeStep");
 
         boolean ascii= alm.getBooleanValue("ascii");
+
+        boolean stream= ! alm.getBooleanValue("nostream");
 
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
@@ -286,7 +289,7 @@ public class AutoplotDataServer {
             Datum next= first.add( Units.seconds.parse(step) );
 
             List<DatumRange> drs;
-            if ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) {
+            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) ) {
                 drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
             } else {
                 // dat xls cannot stream...
