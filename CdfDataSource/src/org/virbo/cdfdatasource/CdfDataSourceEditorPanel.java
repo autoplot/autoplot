@@ -437,14 +437,18 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
-        Attribute attr= cdf.getAttribute("LABL_PTR_1");
+        Attribute attr= null;
+        try {
+            attr= cdf.getAttribute("LABL_PTR_1");
+        } catch ( CDFException ex ) {
+        }
 
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
             Variable v= cdf.getVariable(e.getKey());
             gsfc.nssdc.cdf.Entry lablPtr1=null;
             try {
-                lablPtr1= attr.getEntry(v);
+                if ( attr!=null ) lablPtr1= attr.getEntry(v);
             } catch ( CDFException ex ) {
             }
             if (lablPtr1!=null) {
