@@ -309,6 +309,13 @@ public class AutoplotDataServer {
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
+                    if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
+                        logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
+                        ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                        logger.log( Level.FINE, "  --> {0} )", ds1 );
+                        writeData( format, out, ds1, ascii );
+                        break;
+                    }
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
                         logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, xrange});
