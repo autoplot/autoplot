@@ -314,6 +314,7 @@ public class AutoplotDataServer {
                         ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                         logger.log( Level.FINE, "  --> {0} )", ds1 );
                         writeData( format, out, ds1, ascii );
+                        someValid= true;
                         break;
                     }
                     if ( ds1.rank()==1 ) {
