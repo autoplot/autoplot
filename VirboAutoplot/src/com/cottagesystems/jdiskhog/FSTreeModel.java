@@ -13,6 +13,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -25,6 +29,7 @@ import javax.swing.tree.TreePath;
 public class FSTreeModel implements TreeModel {
 
     DecimalFormat nf = new DecimalFormat();
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     class TreeNode {
 
@@ -87,7 +92,16 @@ public class FSTreeModel implements TreeModel {
     FSTreeModel( DiskUsageModel model, File root ) {
         this.model = model;
         this.root = root;
-        this.comparator= fileSizeComparator;
+        Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
+        String sort= prefs.get( "fsTreeSort", "size" );
+        if ( sort.equals("size") ) {
+            this.comparator= fileSizeComparator;
+        } else if ( sort.equals("alpha" ) ) {
+            this.comparator= alphaComparator;
+        } else {
+            System.err.println("bad fsTreeSort value: "+sort);
+            this.comparator= fileSizeComparator;
+        }
     }
     
     public void setComparator( Comparator c ) {
@@ -95,13 +109,23 @@ public class FSTreeModel implements TreeModel {
         Comparator old= this.comparator;
         this.comparator= c;
         if ( old!=c ) {
+            Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
+            prefs.put( "fsTreeSort", c==fileSizeComparator ? "size" : "alpha" );
+            try {
+                prefs.flush();
+            } catch ( BackingStoreException ex ) {
+                logger.log( Level.SEVERE, null, ex );
+            }
             System.err.println("reset comparator to "+c );
             listings = new HashMap<File, File[]>();
             fireTreeStructureChanged();
         }
-
     }
 
+    public Comparator getComparator() {
+        return this.comparator;
+    }
+    
     protected void fireTreeStructureChanged( ) {
         TreeModelEvent e = new TreeModelEvent(this,new Object[] {root});
         for (TreeModelListener tml : listeners ) {

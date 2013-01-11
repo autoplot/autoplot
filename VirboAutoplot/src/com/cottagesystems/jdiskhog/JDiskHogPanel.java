@@ -280,6 +280,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         DiskUsageModel dumodel = new DiskUsageModel();
         dumodel.search(root, 0, new NullProgressMonitor());
         final FSTreeModel model = new FSTreeModel(dumodel, root);
+        if ( model.getComparator()==model.alphaComparator ) {
+            sortCB.setSelectedIndex(1);
+        }
         model.setHideListingFile(true);
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
@@ -376,6 +379,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_goButtonActionPerformed
 
     private void sortCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortCBActionPerformed
+        if ( !( jTree1.getModel() instanceof FSTreeModel ) ) return;
         FSTreeModel model= ((FSTreeModel)jTree1.getModel());
         if ( sortCB.getSelectedIndex()==0 ) {
             model.setComparator(model.fileSizeComparator);
