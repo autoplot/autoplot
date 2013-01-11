@@ -165,7 +165,7 @@ public class AutoplotDataServer {
 
         long t0= System.currentTimeMillis();
 
-        System.err.println("org.virbo.autoplot.AutoplotDataServer 20120922 " + APSplash.getVersion() );
+        System.err.println("org.virbo.autoplot.AutoplotDataServer 20130110 (Autoplot version " + APSplash.getVersion() + ")" );
 
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
