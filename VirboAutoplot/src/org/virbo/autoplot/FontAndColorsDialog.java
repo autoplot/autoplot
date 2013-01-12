@@ -55,7 +55,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         foregroundColorButton.setIcon( GraphUtil.colorIcon( c.getForeground(), ICON_SIZE, ICON_SIZE ) );
         backgroundColorButton.setIcon( GraphUtil.colorIcon( c.getBackground(), ICON_SIZE, ICON_SIZE ) );
         
-
+        setLocationRelativeTo(parent);
+        
     }
 
 

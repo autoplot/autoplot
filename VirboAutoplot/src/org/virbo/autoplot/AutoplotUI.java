@@ -2614,6 +2614,7 @@ private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
         }
     });
+    dia.setLocationRelativeTo( this );
     dia.setVisible(true);
     if ( panel.isGoPressed() ) {
         panel.doPlotSelected();
