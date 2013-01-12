@@ -23,11 +23,12 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3600315: Some dialogs still weren't positioned relative to their parent.</li>
             <li>CDF INT8 type was never added.</li>
             <li>Columns AA and up are plottable in Excel spreadsheet reader.</li>
             <li>CSV editor uses parts of the ascii table GUI to make a more usable editor, before it would just show first 20 lines.</li>
             <li>Dan upgraded the JPG metadata-extractor library to support Java 7.</li>
-            <li>Time Range Tool would not accept time range string unless enter was pressed before exiting the GUI</li>
+            <li>3599237: Time Range Tool would not accept time range string unless enter was pressed before exiting the GUI</li>
             <li>RBSP-B orbits file had a bug in it, and orbits after 240 were incorrect.</li>
         </ul>
         <p>Older Bugfixes:</p>
@@ -50,7 +51,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>RFE: 3600323: AutoplotDataServer handles TSBs that do not product time series data</li>
+            <li>3598216: File cache can be organized by alpha as well as by size.</li>
+            <li>RFE 3600323: AutoplotDataServer handles TSBs that do not product time series data</li>
+            <li>local ro_cache.txt can now contain files that are not in the public http, to support data providers</li>
             <li>undo list and getLongUndoDescription now consider timerange bindings when reporting changes.</li>
             <li>AutoplotServlet now reports host that served the data in response header, to support clusters of servers</li>
             <li>Add skip parameter to csv file reader to support MyTracks app.</li>
