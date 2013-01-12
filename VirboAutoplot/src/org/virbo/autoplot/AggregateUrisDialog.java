@@ -79,6 +79,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         } else {
             dialog = new JDialog((Dialog)window, "Aggregate URIs", true);
         }
+        dialog.setLocationRelativeTo(window);
         dialog.getContentPane().setLayout( new BorderLayout() );
         dialog.add(this);
 
