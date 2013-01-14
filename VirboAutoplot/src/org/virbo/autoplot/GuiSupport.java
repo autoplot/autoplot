@@ -744,7 +744,7 @@ public class GuiSupport {
         Map<String,RenderType> tt= getRenderTypeForString();
 
         //tt.put( "Contour Plot", RenderType.contour );  //this has issues, hide for now.
-        tt.remove( "Pitch Angle Distribution" ); // this requires a specific scheme of data, hide for now.
+        tt.remove( "Pitch Angle Distribution" ); // this requires a specific scheme of data, hide for now (rte_1765139930_20130112_134531)
 
         for ( Entry<String,RenderType> ee: tt.entrySet() ) {
             final Entry<String,RenderType> fee= ee;
