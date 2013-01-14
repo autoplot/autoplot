@@ -541,11 +541,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public String getURI() {
         String id=null;
+        String slice1= "";
         if ( paramEditor!=null ) {
             id= paramEditor.getURI();
             URISplit split= URISplit.parse(id);
             Map<String,String> args= URISplit.parseParams(split.params);
             id= args.get("arg_0");
+            slice1= args.get("slice1");
         }
         if ( id!=null ) this.id= id;
         if ( id==null && this.id!=null ) id=this.id;
@@ -562,6 +564,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id;
         if ( filter.length()>0 ) {
             result+= "&filter="+filter;
+        }
+        if ( slice1.length()>0 ) {
+            result+= "&slice1="+slice1;
         }
         return result +"&timerange="+timeRange;
     }
