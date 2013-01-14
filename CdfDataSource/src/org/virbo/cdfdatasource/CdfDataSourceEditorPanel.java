@@ -451,7 +451,11 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 if ( attr!=null ) lablPtr1= attr.getEntry(v);
             } catch ( CDFException ex ) {
             }
-            if (lablPtr1!=null) {
+            boolean doComponents= lablPtr1!=null && v.getDimSizes().length==1;
+            if ( lablPtr1!=null && v.getDimSizes().length!=1 ) {
+                System.err.println("here");
+            }
+            if ( doComponents ) {
                 String s= (String) lablPtr1.getData();
                 Variable labl= cdf.getVariable(s);
                 DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
