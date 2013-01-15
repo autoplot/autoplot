@@ -565,7 +565,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( filter.length()>0 ) {
             result+= "&filter="+filter;
         }
-        if ( slice1.length()>0 ) {
+        if ( slice1!=null && slice1.length()>0 ) {
             result+= "&slice1="+slice1;
         }
         return result +"&timerange="+timeRange;
