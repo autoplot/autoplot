@@ -470,9 +470,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 Variable v= cdf.getVariable(e.getKey());
 
                 Object oattr= cdf.getAttribute( v.getName(), "LABL_PTR_1");
-
                 String lablPtr1=null;
-                if ( oattr!=null && oattr instanceof Vector ) lablPtr1= (String)((Vector)oattr).get(0);
+                if ( oattr!=null && oattr instanceof Vector ) {
+                    Vector voattr= (Vector)oattr;
+                    if ( voattr.size()>0 ) {
+                        lablPtr1= (String)((Vector)oattr).get(0);
+                    } else {
+                        oattr= null;
+                    }
+                }
 
                 boolean doComponents= oattr!=null && v.getDimensions().length==1;
                 if ( doComponents ) {
