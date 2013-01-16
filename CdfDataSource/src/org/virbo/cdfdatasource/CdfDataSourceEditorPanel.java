@@ -28,11 +28,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
@@ -49,6 +46,9 @@ import org.virbo.datasource.URISplit;
  * @author jbf
  */
 public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+
+    /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
+    private static final int MAX_SLICE1_OFFER = 12;
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfn" );
 
@@ -451,10 +451,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 if ( attr!=null ) lablPtr1= attr.getEntry(v);
             } catch ( CDFException ex ) {
             }
-            boolean doComponents= lablPtr1!=null && v.getDimSizes().length==1;
-            if ( lablPtr1!=null && v.getDimSizes().length!=1 ) {
-                System.err.println("here");
-            }
+            boolean doComponents= lablPtr1!=null && v.getDimSizes().length==1 && v.getDimSizes()[0]<=MAX_SLICE1_OFFER;
             if ( doComponents ) {
                 String s= (String) lablPtr1.getData();
                 Variable labl= cdf.getVariable(s);

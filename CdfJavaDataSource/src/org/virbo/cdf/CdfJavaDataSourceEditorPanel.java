@@ -11,9 +11,7 @@
 
 package org.virbo.cdf;
 
-import gov.nasa.gsfc.voyager.cdf.Attribute;
 import gov.nasa.gsfc.voyager.cdf.CDF;
-import gov.nasa.gsfc.voyager.cdf.CDFFactory;
 import gov.nasa.gsfc.voyager.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
@@ -30,11 +28,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
@@ -53,6 +48,9 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
     public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><em>No plottable parameters</em></html>";
+
+    /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
+    private static final int MAX_SLICE1_OFFER = 12;
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfj" );
 
@@ -480,7 +478,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     }
                 }
 
-                boolean doComponents= oattr!=null && v.getDimensions().length==1;
+                boolean doComponents= oattr!=null && v.getDimensions().length==1 && v.getDimensions()[0]<=MAX_SLICE1_OFFER;
                 if ( doComponents ) {
                     String s= lablPtr1;
                     DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
