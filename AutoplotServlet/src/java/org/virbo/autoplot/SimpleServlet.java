@@ -54,6 +54,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
+    private static final String version= "v20130125.1705";
 
     static FileHandler handler;
 
@@ -82,7 +83,7 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        logger.fine("v20130104.0905");
+        logger.fine( version );
 
         logger.fine("=======================");
 
@@ -153,7 +154,8 @@ public class SimpleServlet extends HttpServlet {
 
             // To support load balancing, insert the actual host that resolved the request
             response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
-            
+            response.setHeader( "X-Server-Version", version );
+
             if (vap != null) {
                 response.setContentType(format);
             } else if (surl.equals("about:plugins")) {
@@ -165,7 +167,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version=20120921_0954<br></html>";
+                s = s + "<br><br>servlet version="+version+"<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
