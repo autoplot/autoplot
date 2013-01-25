@@ -188,10 +188,16 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setAutolayout(true);
             } else {
                 dom.getOptions().setAutolayout(false);
-                if (!row.equals(""))
+                if (!row.equals("")) {
                     dom.getController().getCanvas().getController().setRow(row);
-                if (!column.equals(""))
+                } else {
+                    //dom.getController().getCanvas().getController().setRow(row);
+                }
+                if (!column.equals("")) {
                     dom.getController().getCanvas().getController().setColumn(column);
+                } else {
+                    dom.getController().getCanvas().getController().setColumn("10em,100%-10em");
+                }
                 dom.getCanvases(0).getRows(0).setTop("0%");
                 dom.getCanvases(0).getRows(0).setBottom("100%");
             }
