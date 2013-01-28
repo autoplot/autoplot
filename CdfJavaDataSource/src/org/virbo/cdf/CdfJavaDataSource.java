@@ -672,7 +672,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                         // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
                         if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
-                            if ( depDs.value(0,0)==depDs.value(depDs.length()-1,0) ) {
+                            QDataSet ex= Ops.extent( DataSetOps.slice1(depDs,0) );
+                            if ( ex.value(0)==ex.value(1) ) {
                                 lablDs= (MutablePropertyDataSet)depDs.slice(0);
                             }
                         }
