@@ -791,9 +791,9 @@ public class DataSetURI {
         }
 
         File local= FileSystem.settings().getLocalCacheDir();
-        FileSystem fs = FileSystem.create( toUri(split.path) );
+        //FileSystem fs = FileSystem.create( toUri(split.path) );
 
-        String id= fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+        String id= split.path.substring(split.scheme.length()+3); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
 
         File localCache= new File( local, "temp" );
         localCache= new File( localCache, id );
@@ -931,9 +931,9 @@ public class DataSetURI {
 
         } else {
             boolean fail= true;
+            InputStream in=null;
             try {
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
-                InputStream in;
                 logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
                 urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
@@ -947,12 +947,13 @@ public class DataSetURI {
                     tempfile.delete();
                     result.delete();
                 }
+                if ( in!=null ) in.close();
             }
         }
 
         result.deleteOnExit();
 
-        checkNonHtml( tempfile, url ); // until 9/22/2011 we didn't check this...
+        //checkNonHtml( tempfile, url ); // until 9/22/2011 we didn't check this...
 
         synchronized ( DataSetURI.class ) {
             if ( ! result.delete() ) { // on Windows, rename cannot clobber
