@@ -192,7 +192,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         });
 
         jLabel3.setText("Time Format:");
-        jLabel3.setToolTipText("Time format for each png, used to infer cadence of sequence");
+        jLabel3.setToolTipText("Time format for each png, used to infer cadence of sequence, such as $Y$m$d for daily.");
 
         jLabel4.setText("Time Range:");
         jLabel4.setToolTipText("Time span to cover");
