@@ -19,7 +19,9 @@ import java.util.prefs.Preferences;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import org.virbo.datasource.TimeRangeTool;
 
 /**
  * Provide dialog to control make pngwalk code.
@@ -162,6 +164,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         rescaleComboBox = new javax.swing.JComboBox();
         autorangeCB = new javax.swing.JCheckBox();
         timeFormatCB = new javax.swing.JComboBox();
+        timeRangeToolButton = new javax.swing.JButton();
 
         jLabel1.setText("Filename Root:");
         jLabel1.setToolTipText("Stem to identify result within folder.");
@@ -223,6 +226,14 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         timeFormatCB.setEditable(true);
         timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "$Y$m$d", "$Y", "$Y$(m,span=3)", "$Y$m", "$Y_$j", "$Y$m$d_$H", "$Y$m$d_$H$M", "$Y$m$d_$H$M$S", "$(o,id=rbspa-pp)", "$(o,id=http://das2.org/wiki/index.php/Orbits/crres)" }));
 
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setToolTipText("Use time range tool");
+        timeRangeToolButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeToolButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -244,33 +255,34 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 12, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                    .add(24, 24, 24)
-                                    .add(timeRangeTf))
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(jLabel1)
-                                        .add(jLabel3)
-                                        .add(layout.createSequentialGroup()
-                                            .add(12, 12, 12)
-                                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                                .add(org.jdesktop.layout.GroupLayout.LEADING, timeFormatCB, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .add(org.jdesktop.layout.GroupLayout.LEADING, flnRootTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))))))
+                            .add(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jLabel1)
+                                    .add(jLabel3)
+                                    .add(layout.createSequentialGroup()
+                                        .add(12, 12, 12)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                                            .add(org.jdesktop.layout.GroupLayout.LEADING, timeFormatCB, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .add(org.jdesktop.layout.GroupLayout.LEADING, flnRootTf, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)))))
                             .add(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .add(createThumbsCb))
                             .add(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .add(jLabel4)))
+                                .add(jLabel4))
+                            .add(layout.createSequentialGroup()
+                                .add(24, 24, 24)
+                                .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 306, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(timeRangeToolButton)))
                         .add(25, 25, 25)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
                                 .add(rescaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 174, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(updateCB)
-                            .add(autorangeCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                            .add(autorangeCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
                                 .add(versionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -308,13 +320,15 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel4)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
                         .add(autorangeCB)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(updateCB)))
+                        .add(updateCB))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel4)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(timeRangeToolButton))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(createThumbsCb)
                 .addContainerGap(46, Short.MAX_VALUE))
@@ -338,6 +352,16 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         checkExists();
     }//GEN-LAST:event_outputFolderTfKeyReleased
 
+    private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
+        TimeRangeTool t=new TimeRangeTool();
+        t.setSelectedRange( timeRangeTf.getText() );//TODO: goofy
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
+            String str= t.getSelectedRange();
+            timeRangeTf.setText(str);
+        }
+
+    }//GEN-LAST:event_timeRangeToolButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autorangeCB;
@@ -355,6 +379,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     private javax.swing.JComboBox rescaleComboBox;
     private javax.swing.JComboBox timeFormatCB;
     private javax.swing.JTextField timeRangeTf;
+    private javax.swing.JButton timeRangeToolButton;
     private javax.swing.JCheckBox updateCB;
     private javax.swing.JTextField versionTextField;
     // End of variables declaration//GEN-END:variables
