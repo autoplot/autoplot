@@ -56,7 +56,7 @@ public enum RenderType {
                 }
             } else if ( ds.rank()==1 ) {
                 Units u= SemanticOps.getUnits(ds);
-                return UnitsUtil.isRatiometric(u) || UnitsUtil.isTimeLocation(u);
+                return UnitsUtil.isIntervalOrRatioMeasurement( u );
             } else {
                 return false;
             }
