@@ -750,6 +750,7 @@ public class DataSourceController extends DomNodeController {
             }
             if (z.rank() == 1) {
                 ArrayDataSet yds = ArrayDataSet.copy(y);
+                yds.putProperty(QDataSet.RENDER_TYPE,null);
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yds.putProperty(QDataSet.PLANE_0, z);
                 yprops.put(QDataSet.DEPEND_0, xprops );
