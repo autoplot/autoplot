@@ -28,6 +28,9 @@ public enum RenderType {
      * return true if the render type can make a reasonable rendering of the data.
      * If the render type is not recognized, just return true.  This was introduced to
      * constrain the options of the user to valid entries.
+     *
+     * Note this is called on the event thread and must be implemented so that evaluation takes a trivial amount of time.
+     * 
      * @param rt
      * @param ds
      * @return
