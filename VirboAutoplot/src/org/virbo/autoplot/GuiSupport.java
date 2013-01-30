@@ -744,7 +744,7 @@ public class GuiSupport {
         Map<String,RenderType> tt= getRenderTypeForString();
 
         //tt.put( "Contour Plot", RenderType.contour );  //this has issues, hide for now.
-        tt.remove( "Pitch Angle Distribution" ); // this requires a specific scheme of data, hide for now (rte_1765139930_20130112_134531)
+        //tt.remove( "Pitch Angle Distribution" ); // this requires a specific scheme of data, hide for now (rte_1765139930_20130112_134531)
 
         for ( Entry<String,RenderType> ee: tt.entrySet() ) {
             final Entry<String,RenderType> fee= ee;
@@ -1331,13 +1331,25 @@ public class GuiSupport {
         ezMenu.addMenuListener( new MenuListener() {
             public void menuSelected(MenuEvent e) {
                 PlotElement pe= app.dom.getController().getPlotElement();
+                DataSourceFilter dsf= app.dom.getController().getDataSourceFilterFor(pe);
+                QDataSet ds= null;
+                if ( dsf!=null ) {
+                    ds= dsf.getController().getFillDataSet();
+                }
+
                 Map<String,RenderType> tt= getRenderTypeForString();
                 for ( int i=0; i<ezMenu.getItemCount(); i++ ) {
                     if ( ezMenu.getItem(i) instanceof JCheckBoxMenuItem ) {
-                        if ( tt.get(ezMenu.getItem(i).getText()).equals(pe.getRenderType()) ) {
-                            ((JCheckBoxMenuItem)ezMenu.getItem(i)).setSelected(true);
+                        JCheckBoxMenuItem mi= ((JCheckBoxMenuItem)ezMenu.getItem(i));
+                        if ( tt.get(mi.getText()).equals(pe.getRenderType()) ) {
+                            mi.setSelected(true);
                         } else {
-                            ((JCheckBoxMenuItem)ezMenu.getItem(i)).setSelected(false);
+                            mi.setSelected(false);
+                        }
+                        if ( ds==null || RenderType.acceptsData( tt.get( mi.getText() ), ds ) ) {
+                            mi.setEnabled(true);
+                        } else {
+                            mi.setEnabled(false);
                         }
                     }
                 }
@@ -1350,6 +1362,7 @@ public class GuiSupport {
             public void menuCanceled(MenuEvent e) {
                 
             }
+
         });
         plot.getDasMouseInputAdapter().addMenuItem(ezMenu);
         expertMenuItems.add(ezMenu);
