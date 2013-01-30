@@ -574,6 +574,12 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             final DataSourceEditorPanel fedit= edit;
             final String fsurl= surl;
+
+            if ( surl!=null && surl.startsWith("vap+internal:") ) {
+                JOptionPane.showMessageDialog( window, "Internal URI cannot be edited" );
+                return;
+            }
+            
             Runnable run= new Runnable() {
                 public void run() {
                     String surl= fsurl;
