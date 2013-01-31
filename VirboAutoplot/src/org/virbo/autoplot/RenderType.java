@@ -73,16 +73,12 @@ public enum RenderType {
             } else if ( ds.rank()==2 ) {
                 if ( ds.length()==0 ) return true;
                 if ( SemanticOps.isBundle(ds) ) {
-                    for ( int i=0; i<ds.length(0); i++ ) {
-                        QDataSet ds1= DataSetOps.unbundle(ds,i);
-                        if ( !UnitsUtil.isIntervalOrRatioMeasurement( SemanticOps.getUnits(ds1) ) ) {
-                            return false;
-                        }
-                    }
                     return true;
                 } else {
-                    return false;
+                    return true;
                 }
+            } else if ( ds.rank()==3 ) {
+                return true; // we can always slice repeatedly
             } else {
                 return false;
             }
