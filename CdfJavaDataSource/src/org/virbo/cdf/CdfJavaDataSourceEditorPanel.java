@@ -368,7 +368,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
             String slice1= params.remove("slice1");
 
-            fillTree( this.parameterTree, dataParameterInfo, cdf, param, slice1 );
+            fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
 
             logger.finest("close cdf");
             //cdf.close();
