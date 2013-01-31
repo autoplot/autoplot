@@ -1331,10 +1331,9 @@ public class GuiSupport {
         ezMenu.addMenuListener( new MenuListener() {
             public void menuSelected(MenuEvent e) {
                 PlotElement pe= app.dom.getController().getPlotElement();
-                DataSourceFilter dsf= app.dom.getController().getDataSourceFilterFor(pe);
-                QDataSet ds= null;
-                if ( dsf!=null ) {
-                    ds= dsf.getController().getFillDataSet();
+                QDataSet ds=null;
+                if ( pe!=null ) {
+                    ds= pe.getController().getDataSet();
                 }
 
                 Map<String,RenderType> tt= getRenderTypeForString();
