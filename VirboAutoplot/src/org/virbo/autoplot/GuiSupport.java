@@ -1335,17 +1335,17 @@ public class GuiSupport {
                 if ( pe!=null ) {
                     ds= pe.getController().getDataSet();
                 }
-
                 Map<String,RenderType> tt= getRenderTypeForString();
                 for ( int i=0; i<ezMenu.getItemCount(); i++ ) {
                     if ( ezMenu.getItem(i) instanceof JCheckBoxMenuItem ) {
                         JCheckBoxMenuItem mi= ((JCheckBoxMenuItem)ezMenu.getItem(i));
-                        if ( tt.get(mi.getText()).equals(pe.getRenderType()) ) {
+                        RenderType rt= tt.get( mi.getText() );
+                        if ( rt.equals(pe.getRenderType()) ) {
                             mi.setSelected(true);
                         } else {
                             mi.setSelected(false);
                         }
-                        if ( ds==null || RenderType.acceptsData( tt.get( mi.getText() ), ds ) ) {
+                        if ( ds==null || RenderType.acceptsData( rt, ds ) ) {
                             mi.setEnabled(true);
                         } else {
                             mi.setEnabled(false);
