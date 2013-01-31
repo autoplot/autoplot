@@ -1345,10 +1345,19 @@ public class GuiSupport {
                         } else {
                             mi.setSelected(false);
                         }
-                        if ( ds==null || RenderType.acceptsData( rt, ds ) ) {
-                            mi.setEnabled(true);
+                        if ( pe.getController().getParentPlotElement()!=null ) {
+                            ds= pe.getController().getParentPlotElement().getController().getDataSet();
+                            if ( ds==null || RenderType.acceptsData( rt, ds ) ) {
+                                mi.setEnabled(true);
+                            } else {
+                                mi.setEnabled(false);
+                            }
                         } else {
-                            mi.setEnabled(false);
+                            if ( ds==null || RenderType.acceptsData( rt, ds ) ) {
+                                mi.setEnabled(true);
+                            } else {
+                                mi.setEnabled(false);
+                            }
                         }
                     }
                 }
