@@ -2894,7 +2894,12 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
 
 private void updateFrameTitle() {
     final String suri= applicationModel.getVapFile();
-    final String title0= "Autoplot";
+
+    String v= APSplash.getVersion();
+    if ( v.equals("untagged_version") ) {
+        v= "(dev)";
+    }
+    final String title0= "Autoplot "+v;
     final String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
 
     final String theTitle;
