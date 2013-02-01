@@ -51,7 +51,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         }
     }
 
-    MultiFieldTimeParser( int firstColumn, String[] timeFormats, TimeParser parser, Units units ) {
+    public MultiFieldTimeParser( int firstColumn, String[] timeFormats, TimeParser parser, Units units ) {
         this.firstColumn= firstColumn;
         this.lastColumn= firstColumn + timeFormats.length - 1;
         StringBuilder timeFormat;
