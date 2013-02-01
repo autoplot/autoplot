@@ -48,7 +48,7 @@ import org.virbo.datasource.URISplit;
 public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
-    private static final int MAX_SLICE1_OFFER = 12;
+    private static final int MAX_SLICE1_OFFER = 32;
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfn" );
 

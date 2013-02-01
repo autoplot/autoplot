@@ -50,7 +50,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><em>No plottable parameters</em></html>";
 
     /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
-    private static final int MAX_SLICE1_OFFER = 12;
+    private static final int MAX_SLICE1_OFFER = 32;
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfj" );
 
