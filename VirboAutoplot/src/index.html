@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>CDF_INT8 is now accessible, allowing Barrel data to be viewed.</small></p>
+        <p><small>Filename-based availability used to show where burst data is found.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>rte_0644107226: null pointer exception when internal URIs (vap+internal:data_1,data_2) cannot be handled.</li>
+            <li>MultiFieldTimeParser made public so it can be used in scripts.</li>
+            <li>clear the RENDER_TYPE when make a (X,Y->Z) bundle with Add Plot... dialog.</li>
+            <li>bugfix with CDF editor since components were made selectable, non-data elements like Epoch are accessible again</li>
+            <li>remove unnecessary creation of das2 filesystem when downloadResourceAsTempFile is used, which prevented Bob's data from loading.</li>
             <li>RPWS Juno plugin allows waveforms to be viewed.</li>
             <li>downloadFileAsTempFile avoids creating das2 filesystem because it would hang for Bob's TSDS server</li>
             <li>3600315: Some dialogs still weren't positioned relative to their parent.</li>
@@ -53,7 +58,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Only useful Plot Styles are enabled</li>
             <li>3596086: CDF vector components selectable</li>
+            <li>add libraries for sending email, to be used in scripts</li>
+            <li>add button for creating time range strings in Create Pngwalk dialog</li>
             <li>3598216: File cache can be organized by alpha as well as by size.</li>
             <li>RFE 3600323: AutoplotDataServer handles TSBs that do not product time series data</li>
             <li>local ro_cache.txt can now contain files that are not in the public http, to support data providers</li>
