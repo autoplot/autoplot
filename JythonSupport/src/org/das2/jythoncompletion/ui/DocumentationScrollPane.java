@@ -135,8 +135,14 @@ public class DocumentationScrollPane extends JScrollPane {
         super.setPreferredSize(preferredSize);
     }
 
-    public void setData(CompletionDocumentation doc) {
-        setDocumentation(doc);
+    public void setData(final CompletionDocumentation doc) {
+        Runnable run = new Runnable() {
+            public void run() {
+                setDocumentation(doc);
+            }
+        };
+        //SwingUtilities.invokeLater( run ); //TODO: there's a deadlock that happens here
+        run.run();
         addToHistory(doc);
     }
 
