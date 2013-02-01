@@ -1314,7 +1314,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_plotItButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        String context = (String) dataSetSelector.getSelectedItem();
+        String context = ((String) dataSetSelector.getEditor().getItem()).trim();
         if ( context==null ) context= "";
         String ext = context==null ? "" : DataSetURI.getExt(context);
         final String fcontext= context;
@@ -1443,8 +1443,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return Value of property value.
      */
     public String getValue() {
-        //String s2= (String)this.dataSetSelector.getEditor().getItem(); //TODO why not use this if selectedItem is null?
-        String val= (String)this.dataSetSelector.getSelectedItem(); //TODO: check this vs getEditor().getItem() on different platforms
+        String val= (String)this.dataSetSelector.getEditor().getItem(); //TODO why not use this if selectedItem is null?
+        //String val= (String)this.dataSetSelector.getSelectedItem(); //TODO: check this vs getEditor().getItem() on different platforms
         if ( val==null ) {
             return "";
         } else {
