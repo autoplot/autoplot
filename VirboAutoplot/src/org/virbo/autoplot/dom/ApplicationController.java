@@ -1116,7 +1116,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
-
     /**
      * copy the plotElement and put it in domPlot.
      * @param srcElement the plotElement to copy.
