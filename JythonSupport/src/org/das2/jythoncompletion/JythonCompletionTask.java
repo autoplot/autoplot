@@ -323,8 +323,14 @@ public class JythonCompletionTask implements CompletionTask {
                 "if ( '__name__' in list ): list.remove('__name__')\n" +
                 "list.append('*')\n" +
                 "list";
-        interp.exec(eval);
-        PyList po2 = (PyList) interp.eval("list");
+        PyList po2;
+        try {
+            interp.exec(eval);
+        } catch ( PyException e ) {  // "no module called c" when c<TAB>
+            // empty list
+            return;
+        }
+        po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
