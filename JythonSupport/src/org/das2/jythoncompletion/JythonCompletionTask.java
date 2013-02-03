@@ -149,7 +149,7 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             po2= (PyList) context.__dir__();
         } catch ( PyException e ) {
-            e.printStackTrace();
+            logger.log( Level.SEVERE, "", e );
             return;
         }
         
@@ -161,12 +161,12 @@ public class JythonCompletionTask implements CompletionTask {
                 try {
                     po = context.__getattr__(s);
                 } catch (PyException e) {
-                    logger.fine("PyException from \"" + ss + "\":");
-                    e.printStackTrace();
+                    logger.log(Level.FINE, "PyException from \"{0}\":", ss);
+                    logger.log( Level.SEVERE, "", e );
                     continue;
                 } catch ( IllegalArgumentException e ) {
-                    e.printStackTrace();
-                    continue;
+                    logger.log( Level.SEVERE, "", e );
+            continue;
                 }
                 String label = ss;
                 String signature = null;
@@ -238,9 +238,9 @@ public class JythonCompletionTask implements CompletionTask {
                             try {
                                 f = dc.getField(label);
                             } catch (NoSuchFieldException ex) {
-                                logger.finest("NoSuchFieldException for item " + s);
+                                logger.log(Level.FINEST, "NoSuchFieldException for item {0}", s);
                             } catch (SecurityException ex) {
-                                logger.finest("SecurityException for item " + s);
+                                logger.log(Level.FINEST, "SecurityException for item {0}", s);
                             }
                             if (f == null) continue;
                             //TODO: don't include static fields in list.
@@ -346,10 +346,10 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     private static String join(List<String> list, String delim) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return "";
         } else {
-            StringBuffer result = new StringBuffer(list.get(0));
+            StringBuilder result = new StringBuilder(list.get(0));
             for (int i = 1; i < list.size(); i++) {
                 result.append(delim).append(list.get(i));
             }
@@ -481,7 +481,7 @@ public class JythonCompletionTask implements CompletionTask {
         String RPAREN = ")";
         String SPACE = " "; // "%20";
 
-        StringBuffer sig = new StringBuffer();
+        StringBuilder sig = new StringBuilder();
 
         sig.append(LPAREN);
         List<String> sargs = new ArrayList<String>();
@@ -506,14 +506,14 @@ public class JythonCompletionTask implements CompletionTask {
         }
         String javadocPath = join( n.split("\\."), "/") + ".html";
 
-        StringBuffer sig = new StringBuffer(javadocPath);
+        StringBuilder sig = new StringBuilder(javadocPath);
         //String LPAREN="%28";
         String LPAREN = "(";
         //String RPAREN="%29";
         String RPAREN = ")";
         String SPACE = " "; // "%20";
 
-        sig.append("#" + javaMethod.getName() + LPAREN);
+        sig.append("#").append(javaMethod.getName()).append(LPAREN);
         List<String> sargs = new ArrayList<String>();
 
 
@@ -528,9 +528,9 @@ public class JythonCompletionTask implements CompletionTask {
     private String fieldSignature(Field f) {
         String javadocPath = join(f.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
-        StringBuffer sig = new StringBuffer(javadocPath);
+        StringBuilder sig = new StringBuilder(javadocPath);
 
-        sig.append("#" + f.getName());
+        sig.append("#").append(f.getName());
         return sig.toString();
 
     }
@@ -538,10 +538,10 @@ public class JythonCompletionTask implements CompletionTask {
     private String constructorSignature( Constructor f ) {
         String javadocPath = join( f.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
-        StringBuffer sig = new StringBuffer(javadocPath);
+        StringBuilder sig = new StringBuilder(javadocPath);
 
         int i= f.getName().lastIndexOf(".");
-        sig.append("#" + f.getName().substring(i+1));
+        sig.append("#").append(f.getName().substring(i + 1));
         return sig.toString();
     }
 
