@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Filename-based availability used to show where burst data is found.</small></p>
+        <p><small>Copy Plot Elements Down no longer resets the ranges.  This was a bug.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3603173: copy plot elements down resets ranges</li>
+            <li>null pointer exception if inspect icon was pressed before entering a URI.</li>
+            <li>rte_0087414712: null pointer exception when hanning filter used on rank 2 dataset without dep0 and dep1.</li>
+            <li>contours renderer checks for rank 2 dataset</li>
+            <li>old deprecated addPanel and deletePanel methods removed.</li>
             <li>rte_0644107226: null pointer exception when internal URIs (vap+internal:data_1,data_2) cannot be handled.</li>
             <li>MultiFieldTimeParser made public so it can be used in scripts.</li>
             <li>clear the RENDER_TYPE when make a (X,Y->Z) bundle with Add Plot... dialog.</li>
