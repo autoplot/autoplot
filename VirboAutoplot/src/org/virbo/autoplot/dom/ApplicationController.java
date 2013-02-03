@@ -1058,13 +1058,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * @deprecated use copyPlotAndPlotElements instead
-     */
-    public Plot copyPlotAndPanels( Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
-        return copyPlotAndPlotElements( domPlot, dsf, bindx, bindy );
-    }
-
-    /**
      * copy doplot and plotElements into a new doplot.
      * @param domPlot
      * @param dsf
@@ -1123,17 +1116,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
-    /**
-     * @deprecated use copyPlotElement
-     * @param srcElement
-     * @param domPlot
-     * @param dsf
-     * @return
-     */
-    protected PlotElement copyPanel(PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
-        return copyPlotElement( srcElement, domPlot, dsf );
-    }
-
 
     /**
      * copy the plotElement and put it in domPlot.
@@ -1146,9 +1128,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.log( Level.FINER, "copyPlotElement({0},{1},{2})", new Object[]{srcElement, domPlot, dsf});
         PlotElement newp = addPlotElement(domPlot, dsf);
         newp.getController().setResetPlotElement(false);// don't add children, trigger autoRange, etc.
-        newp.getController().setDsfReset(false); // dont' reset when the dataset changes
+        newp.getController().setResetRanges(false);
+        newp.getController().setDsfReset(false); // don't reset when the dataset changes
         newp.syncTo(srcElement, Arrays.asList(DomNode.PROP_ID,PlotElement.PROP_PLOTID,
                 PlotElement.PROP_DATASOURCEFILTERID));
+        newp.getController().setResetRanges(false); // in case the renderType changed, we still don't need to reset.
         if (dsf == null) { // new DataSource, but with the same URI.
             DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
             DataSourceFilter dsfsrc = srcElement.controller.getDataSourceFilter();
