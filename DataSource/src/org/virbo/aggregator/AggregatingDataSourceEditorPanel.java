@@ -454,10 +454,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     timeRangeTextField.requestFocus();
                 }
             }
+        } catch ( URISyntaxException ex ) {
         } catch ( IOException ex ) {
-            
         } catch ( IllegalArgumentException ex ) {
-            
         }
     }
 

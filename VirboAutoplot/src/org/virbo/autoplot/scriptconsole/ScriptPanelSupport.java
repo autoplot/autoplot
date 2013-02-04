@@ -280,19 +280,20 @@ public class ScriptPanelSupport {
                     URI uri;
                     try {
                         uri = new URI("vap+jyds:" + file.toURI().toString()); // bug 3055130 okay
+                        JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
+                        if (factory != null) {
+                            factory.addExeceptionListener(new ExceptionListener() {
+
+                                public void exceptionThrown(Exception e) {
+                                    if (e instanceof PyException) {
+                                        annotateError((PyException) e, 0, null );
+                                    }
+                                }
+                            });
+                        }
+
                     } catch (URISyntaxException ex) {
                         throw new RuntimeException(ex);
-                    }
-                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
-                    if (factory != null) {
-                        factory.addExeceptionListener(new ExceptionListener() {
-
-                            public void exceptionThrown(Exception e) {
-                                if (e instanceof PyException) {
-                                    annotateError((PyException) e, 0, null );
-                                }
-                            }
-                        });
                     }
                 }
 

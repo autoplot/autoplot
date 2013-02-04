@@ -16,6 +16,7 @@ import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -246,7 +247,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return URISplit.format(split);
     }
 
-    public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
+    public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException, URISyntaxException {
         String delegateSurl = getDelegateDataSourceFactoryUri(surl, new NullProgressMonitor() );
         URISplit split= URISplit.parse(surl);
         URISplit delegateSplit= URISplit.parse(delegateSurl);
@@ -311,6 +312,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             }
             return delegateFactory.reject( delegateSurl, problems, mon );
             
+        } catch (URISyntaxException e) {
+            logger.log( Level.SEVERE, surl, e );
+            return false;
         } catch (IOException e) {
             logger.log( Level.SEVERE, surl, e );
             return false;

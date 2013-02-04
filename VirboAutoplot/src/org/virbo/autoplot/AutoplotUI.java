@@ -1345,6 +1345,15 @@ APSplash.checkTime("init 52");
                         throw new RuntimeException(ex);
                     } catch (URISyntaxException ex) {
                         logger.log(Level.SEVERE, null, ex);
+                        String s= "<li>scheme:arguments</li>"
+                                + "vap+cdaweb:ds=AC_H3_SWI&id=SW_type<br>"
+                                + "<li>scheme:URL?scheme-arguments</li>"
+                                + "vap+dat:http://autoplot.org/data/somedata.dat?column=field1<br>"
+                                + "<li>URL?scheme-arguments</li>"
+                                + "http://autoplot.org/data/somedata.dat?column=field1</br>";
+
+                        JOptionPane.showMessageDialog( this, "<html><p>URI Syntax Error found when parsing.</p>"+s, "URI Syntax Error", JOptionPane.OK_OPTION );
+                        return;
                     } catch ( IllegalArgumentException ex ) {
                         SourceTypesBrowser browser= new SourceTypesBrowser();
                         browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
