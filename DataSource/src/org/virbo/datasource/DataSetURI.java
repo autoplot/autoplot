@@ -340,9 +340,10 @@ public class DataSetURI {
 
     /**
      * get the datasource factory for the URL.
+     * @throws URISyntaxException if the schemeSpecficPart is not itself a URI.
      */
     public static DataSourceFactory getDataSourceFactory(
-            URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
+            URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException, URISyntaxException {
 
         String suri= DataSetURI.fromUri(uri);
         //suri= URISplit.makeCanonical(suri); //TODO: I was seeing an error and did this fix when playing with GUI testing.
@@ -358,19 +359,19 @@ public class DataSetURI {
             }
         }
 
+        // The user explicitly specified the source. E.g. vap+cdaweb:...
         String ext = DataSetURI.getExplicitExt( suri );
         if (ext != null && !suri.startsWith("vap+X:") ) {
             return DataSourceRegistry.getInstance().getSource(ext);
         }
 
         URI resourceUri;
-        try {
-            String resourceSuri = uri.getRawSchemeSpecificPart();
-            //resourceSuri= resourceSuri.replaceAll("%", "%25");
-            resourceUri = new URI(resourceSuri); //bug3055130 okay
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
+
+        // The scheme-specific part of the URI must itself be a URI, typically a URL pointing at the data.  URIs are used
+        // to support other protocols like sftp.
+        String resourceSuri = uri.getRawSchemeSpecificPart();
+        resourceUri = new URI(resourceSuri); //bug3055130 okay
+
         ext = DataSetURI.getExt(uri.toASCIIString());
         if (ext == null) ext = "";
 
