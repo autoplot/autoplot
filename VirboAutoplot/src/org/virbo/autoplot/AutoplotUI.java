@@ -48,6 +48,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.Socket;
@@ -442,6 +443,25 @@ public class AutoplotUI extends javax.swing.JFrame {
                 //do nothing
             }
         });
+
+        dataSetSelector.registerBrowseTrigger( "vapfile:(.*)", new AbstractAction( "vapfile") {
+            public void actionPerformed( ActionEvent ev ) {
+                DataSetSelector source= (DataSetSelector)ev.getSource();
+                source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(vap)|(vap\\.gz))$" );
+            }
+        });
+        dataSetSelector.registerActionTrigger( "vapfile:(.*)", new AbstractAction( "valfile") {
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                String vapfile= dataSetSelector.getValue().substring(8);
+                try {
+                    InputStream in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
+                    applicationModel.doOpen( in, null );
+                } catch ( IOException ex ) {
+                    JOptionPane.showConfirmDialog(AutoplotUI.this, "Unable to load: "+vapfile );
+                }
+            }
+        });
+
         URISplit.setOtherSchemes( Arrays.asList( "script","pngwalk", "bookmarks") );
 
         APSplash.checkTime("init 40");
