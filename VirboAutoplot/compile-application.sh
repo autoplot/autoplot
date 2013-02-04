@@ -213,6 +213,8 @@ if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../Autoplot
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/event/*.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/dataset/NoDataInIntervalException.java; then hasErrors=1; fi
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
+if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/TraceTool.java; then hasErrors=1; fi
+
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
@@ -246,6 +248,11 @@ if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
+
+#Don't do this, since we modify the jnlp file to make a release.
+#echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
+#mkdir temp-volatile-classes/JNLP-INF
+#cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
 
 echo "=== make jumbo jar files..."
 mkdir -p dist/
