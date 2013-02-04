@@ -1027,7 +1027,7 @@ public class ApplicationModel {
         }
     }
 
-    void doOpen( File f, LinkedHashMap<String, String> deltas) throws IOException {
+    public void doOpen( File f, LinkedHashMap<String, String> deltas) throws IOException {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
@@ -1066,7 +1066,7 @@ public class ApplicationModel {
      *   vap DOM after it's loaded.
      * @throws java.io.IOException
      */
-    void doOpen( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
+    public void doOpen( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
 
         Application state = (Application) StatePersistence.restoreState(in);
         makeValid( state );
