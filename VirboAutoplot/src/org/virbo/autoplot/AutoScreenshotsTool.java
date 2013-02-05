@@ -20,6 +20,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.PaintEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -55,6 +56,11 @@ public class AutoScreenshotsTool extends EventQueue {
 
     long t0 = 0;
     long tb = System.currentTimeMillis();
+    
+    /*
+     * block>0 means decrement.  block<0 means wait.
+     */
+    int block= 0;
 
     static BufferedImage pnt;
     int ptrXOffset= 7;
@@ -124,46 +130,54 @@ public class AutoScreenshotsTool extends EventQueue {
 
 
     @Override
-    public void postEvent(AWTEvent theEvent) {
+    public void dispatchEvent(AWTEvent theEvent) {
 
         long t1 = System.currentTimeMillis();
+        long dt= t1 - tb;
+        
+        String.format("%06d %5d %s\n", dt/100, theEvent.getID(), theEvent.getClass().getName() );
 
         boolean reject= false;
 
-        if ( theEvent instanceof java.awt.event.InvocationEvent ) {
-            reject= true;
-        }
+        //System.err.println( "event id= "+theEvent.getID() );
 
-        if ( !reject && ( (t1 - t0) > 200) ) {
-            t0 = t1;
+        if ( !( theEvent.getID()==PaintEvent.PAINT ) ) {
+            reject= false;
+        } else {
             
-            if (!outLocationFolder.exists()) {
-                outLocationFolder.mkdirs();
-            }
-            TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
-            long dt= t1 - tb;
-
-            final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + ".png" );
-            Runnable run = new Runnable() {
-
-                public void run() {
-                    try {
-
-                        final BufferedImage im = getScreenShot( );
-                        file.createNewFile();
-                        ScriptContext.getViewWindow();
-                        ImageIO.write(im, "png", file);
-
-                    } catch (IOException ex) {
-                        Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-            };
-
-            new Thread(run).start();
-
         }
-        super.postEvent(theEvent);
+
+        super.dispatchEvent(theEvent);
+
+        if (  !reject && ( (t1 - t0) > 200) ) {
+            t0= t1;
+            
+            boolean fail= false;
+            if (!outLocationFolder.exists()) {
+                fail= !outLocationFolder.mkdirs();
+            }
+
+            if ( !fail ) {
+                long processTime0= System.currentTimeMillis();
+
+                TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
+               
+                final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + ".png" );
+
+                final BufferedImage im = getScreenShot( );
+
+                try {
+                    file.createNewFile();
+                    ImageIO.write(im, "png", file);
+                    long processTime= ( System.currentTimeMillis() - processTime0 );
+
+                } catch ( Exception ex ) {
+                }
+
+            }
+            t0= System.currentTimeMillis();
+
+            //new Thread(run).start();
+        }
     }
 }
