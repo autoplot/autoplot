@@ -109,6 +109,8 @@ public class SimpleServlet extends HttpServlet {
         try {
 
             String surl = request.getParameter("url");
+            String suri = request.getParameter("uri");
+            if ( suri!=null ) surl= suri;
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
             String script = ServletUtil.getStringParameter(request, "script", "");
@@ -163,6 +165,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType(format);
             } else if ( surl==null ) {
                 response.setContentType("text/html");
+                response.setStatus(400);
                 out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
                 out.close();
                 return;
