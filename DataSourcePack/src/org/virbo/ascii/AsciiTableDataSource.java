@@ -670,6 +670,18 @@ public class AsciiTableDataSource extends AbstractDataSource {
             depend1Values = parseRangeStr(o, columnCount);
         }
 
+        // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
+        o= params.get("eventListColumn");
+        if ( o!=null ) {
+            parser.setUnits(0,Units.us2000); // enough of a guess that this will find a good record.
+            parser.setFieldParser(0, parser.UNITS_PARSER);
+            parser.setFieldParser(1, parser.UNITS_PARSER);
+            int icol = parser.getFieldIndex(o);
+            EnumerationUnits eu= EnumerationUnits.create("events");
+            parser.setUnits(icol,eu);
+            parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
+        }
+
         // check to see if the depend0 or data column appear to be times.  I Promise I won't open the file again until it's read in.
         if ( timeColumn == -1 ) {
             String s = parser.readFirstParseableRecord(file.toString());
@@ -728,17 +740,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 parser.setUnits(icol, u);
                 parser.setFieldParser(icol, parser.UNITS_PARSER);
             }
-        }
-
-        // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
-        o= params.get("eventListColumn");
-        if ( o!=null ) {
-            parser.setFieldParser(0, parser.UNITS_PARSER);
-            parser.setFieldParser(1, parser.UNITS_PARSER);
-            int icol = parser.getFieldIndex(o);
-            EnumerationUnits eu= EnumerationUnits.create("events");
-            parser.setUnits(icol,eu);
-            parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
         }
 
         // --- done configuration, now read ---
