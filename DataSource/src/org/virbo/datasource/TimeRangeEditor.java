@@ -374,6 +374,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
             setRange( DatumRangeUtil.parseTimeRangeValid(str) );
+            recentComboBox.actionPerformed( new ActionEvent(this,0,"triggerSaveRecent",0) );
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
