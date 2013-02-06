@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -194,9 +195,21 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
                 mon.started();
                 mon.setProgressMessage( "initialize Jython interpreter...");
+
                 interp = JythonUtil.createInterpreter(false);
+
                 mon.setProgressMessage( "done initializing Jython interpreter");
-                interp.set("monitor", mon);
+                try {
+                    interp.set("monitor", mon);
+                } catch ( ConcurrentModificationException ex ) {
+                    logger.warning("avoiding strange concurrent modification bug that occurs within Jython on the server...");
+                    try {
+                        Thread.sleep(100);
+                    } catch ( InterruptedException ex2 ) { }
+                    System.err.println( interp.get("monitor") );
+                    interp.set("monitor", mon);
+                    logger.warning("done.");
+                }
 
                 interp.exec("params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
@@ -241,7 +254,19 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
                     } else {
                         FileInputStream in = new FileInputStream( jythonScript );
-                        interp.execfile(in);
+                        try {
+                            interp.execfile(in);
+                        } catch ( PyException ex ) {
+                            if ( ex.toString().contains("checkForComodification") ) {
+                                in.close();
+                                in = new FileInputStream( jythonScript );
+                                logger.warning("avoiding second strange concurrent modification bug that occurs within Jython on the server.  Run the whole thing again.");
+                                Thread.sleep(200);
+                                interp.execfile(in);
+                            } else {
+                                throw ex; // caught 6 lines down
+                            }
+                        }
                         in.close();
                     }
                     mon.setProgressMessage( "done executing script");
