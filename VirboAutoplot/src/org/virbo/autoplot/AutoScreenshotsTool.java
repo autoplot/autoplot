@@ -191,6 +191,17 @@ public class AutoScreenshotsTool extends EventQueue {
 
         if ( skip.contains( theEvent.getID() ) ) {
             reject= true;
+            if ( theEvent.getID()==1200 ) {
+                if ( this.peekEvent(1200)==null ) {
+                    // we want to use this if it will cause repaint.
+                    String ps= ((java.awt.event.InvocationEvent)theEvent).paramString();
+                    if ( ps.contains("ComponentWorkRequest") ) { // nasty!
+                        reject= false;
+                    }
+                } else {
+                    System.err.println("other repaints are coming");
+                }
+            }
         } else {
             
         }
