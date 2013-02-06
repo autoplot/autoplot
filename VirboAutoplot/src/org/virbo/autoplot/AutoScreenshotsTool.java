@@ -8,6 +8,7 @@ import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.DisplayMode;
+import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.Graphics2D;
@@ -23,13 +24,20 @@ import java.awt.Window;
 import java.awt.event.PaintEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.virbo.autoplot.util.TickleTimer;
 
 /**
  * Jeremy's experiment that will create automatic documentation.
@@ -37,7 +45,7 @@ import org.das2.datum.TimeUtil;
  */
 public class AutoScreenshotsTool extends EventQueue {
 
-    public static void start( String outLocationFolder ) {
+    public static void start( String outLocationFolder ) throws IOException {
         try {
             pnt = ImageIO.read( AutoScreenshotsTool.class.getResource("/resources/pointer.png"));
         } catch (IOException ex) {
@@ -49,8 +57,22 @@ public class AutoScreenshotsTool extends EventQueue {
                 new AutoScreenshotsTool( outLocationFolder ));
     }
 
-    public AutoScreenshotsTool( String outLocationFolder ) {
+    public AutoScreenshotsTool( String outLocationFolder ) throws IOException {
         this.outLocationFolder= new File( outLocationFolder );
+        boolean fail= false;
+        if (!this.outLocationFolder.exists()) {
+            fail= !this.outLocationFolder.mkdirs();
+        }
+        if ( fail ) throw new IOException("output folder cannot be created");
+        logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
+
+        tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                long t1= System.currentTimeMillis();
+                doit( t1, t1-tb, 99999 );
+            }
+        } );
+
     }
 
 
@@ -66,6 +88,9 @@ public class AutoScreenshotsTool extends EventQueue {
     int ptrXOffset= 7;
     int ptrYOffset= 3;
     File outLocationFolder;
+    BufferedWriter logFile;
+    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
+    TickleTimer tickleTimer;
 
     //mask out parts of the desktop that are not autoplot...
     void filterBackground( Graphics2D g, Rectangle b ) {
@@ -128,56 +153,63 @@ public class AutoScreenshotsTool extends EventQueue {
         return screenshots[active];
     }
 
+    private void doit( long t1, long dt, int id ) {
+        t0= t1;
+
+        long processTime0= System.currentTimeMillis();
+
+        final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
+
+        final BufferedImage im = getScreenShot( );
+        System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
+
+        try {
+            file.createNewFile();
+            ImageIO.write(im, "png", file);
+            long processTime= ( System.currentTimeMillis() - processTime0 );
+            System.err.println(""+file+" created in "+processTime+"ms.");
+
+        } catch ( Exception ex ) {
+        }
+
+        t0= System.currentTimeMillis();
+
+    }
 
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
 
+        super.dispatchEvent(theEvent);
+
         long t1 = System.currentTimeMillis();
         long dt= t1 - tb;
         
-        String.format("%06d %5d %s\n", dt/100, theEvent.getID(), theEvent.getClass().getName() );
-
         boolean reject= false;
 
-        //System.err.println( "event id= "+theEvent.getID() );
+        List keep= Arrays.asList( Event.MOUSE_DRAG, Event.MOUSE_MOVE, PaintEvent.PAINT, PaintEvent.UPDATE, 204, 205 ); 
+        List skip= Arrays.asList( 1200 );
 
-        if ( !( theEvent.getID()==PaintEvent.PAINT ) ) {
-            reject= false;
+        if ( skip.contains( theEvent.getID() ) ) {
+            reject= true;
         } else {
             
         }
 
-        super.dispatchEvent(theEvent);
+        reject= reject || ( (t1 - t0) < 200);
 
-        if (  !reject && ( (t1 - t0) > 200) ) {
-            t0= t1;
-            
-            boolean fail= false;
-            if (!outLocationFolder.exists()) {
-                fail= !outLocationFolder.mkdirs();
-            }
+        try {
+            logFile.write(String.format("%06d %1d %5d %s\n", dt / 100, reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
+            logFile.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-            if ( !fail ) {
-                long processTime0= System.currentTimeMillis();
+        if (  !reject ) {
+            doit( t1, dt, theEvent.getID() );
+        }
 
-                TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
-               
-                final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + ".png" );
-
-                final BufferedImage im = getScreenShot( );
-
-                try {
-                    file.createNewFile();
-                    ImageIO.write(im, "png", file);
-                    long processTime= ( System.currentTimeMillis() - processTime0 );
-
-                } catch ( Exception ex ) {
-                }
-
-            }
-            t0= System.currentTimeMillis();
-
-            //new Thread(run).start();
+        if ( theEvent.getID()==Event.MOUSE_MOVE ) {
+            tickleTimer.tickle( String.valueOf(theEvent.getID()) );
         }
     }
 }
