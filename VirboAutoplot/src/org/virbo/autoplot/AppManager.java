@@ -53,6 +53,10 @@ public class AppManager {
             }
         } else {
             this.apps.remove(app);
+            if ( this.apps.size()==1 && this.apps.get(0) instanceof JFrame && ( (JFrame)this.apps.get(0) ).isVisible()==false ) {
+                // when the PngWalkTool is started first, AutoplotUI is also started but hidden.
+                this.apps.clear();
+            }
             if ( this.apps.isEmpty() ) {
                 quit();
             }
