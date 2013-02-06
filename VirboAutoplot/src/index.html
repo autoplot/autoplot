@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Copy Plot Elements Down no longer resets the ranges.  This was a bug.</small></p>
+        <p><small>A bug in the events files was corrected.  Also a tool for automatically generating a sequence of screenshots is used
+            to quickly generate the screenshot.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +24,14 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>ascii reader would mistakenly identify the 1001th line as a data line when it really was still the header.</li>
+            <li>eventListColumn in ascii reader works for short files.</li>
+            <li>length mouseModule bug corrected where the native offset unit would be skipped.</li>
+            <li>orbit range preserved in das2 history, the axis built-in history would loose identity.</li>
+            <li>3603591: Jython internal implementation would result in concurrency problems when thrashing AutoplotServer</li>
+            <li>TimeRangeTool defaults to RBSP-A orbit instead of RBSP-B.</li>
+            <li>3603563: pngwalk tool close doesn't exit when it is the only dialog</li>
+            <li>3603262: special error messages for malformed URIs</li>
             <li>3603173: copy plot elements down resets ranges</li>
             <li>null pointer exception if inspect icon was pressed before entering a URI.</li>
             <li>rte_0087414712: null pointer exception when hanning filter used on rank 2 dataset without dep0 and dep1.</li>
@@ -64,6 +73,7 @@
         <p>Features:</p>
         <ul>
             <li>experimental tool for recording GUI sequences added</li>
+            <li>add vapfile: prefix so that I can read in exception reports without changing file names</li>
             <li>version stamp finally added to the address bar</li>
             <li>Only useful Plot Styles are enabled</li>
             <li>3596086: CDF vector components selectable</li>
