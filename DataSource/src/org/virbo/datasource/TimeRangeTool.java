@@ -50,7 +50,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
     public TimeRangeTool() {
         initComponents();
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
-        scComboBox.setSelectedItem( "rbspb-pp" );
+        scComboBox.setSelectedItem( "rbspa-pp" );
+        resetSpacecraft("rbspa-pp");
         timeRangeTextField.addPropertyChangeListener( "text", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
