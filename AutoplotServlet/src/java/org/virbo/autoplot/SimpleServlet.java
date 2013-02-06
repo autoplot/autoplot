@@ -155,9 +155,17 @@ public class SimpleServlet extends HttpServlet {
             // To support load balancing, insert the actual host that resolved the request
             response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
             response.setHeader( "X-Server-Version", version );
+            if ( surl!=null ) {
+                response.setHeader( "X-Autoplot-URI", surl );
+            }
 
             if (vap != null) {
                 response.setContentType(format);
+            } else if ( surl==null ) {
+                response.setContentType("text/html");
+                out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
+                out.close();
+                return;
             } else if (surl.equals("about:plugins")) {
                 response.setContentType("text/html");
                 out.write(DataSetSelectorSupport.getPluginsText().getBytes());
