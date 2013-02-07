@@ -85,15 +85,15 @@ public class AutoScreenshotsTool extends EventQueue {
     int block= 0;
 
     static BufferedImage pnt;
-    int ptrXOffset= 7;
-    int ptrYOffset= 3;
+    static int ptrXOffset= 7;
+    static int ptrYOffset= 3;
     File outLocationFolder;
     BufferedWriter logFile;
     TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
     TickleTimer tickleTimer;
 
     //mask out parts of the desktop that are not autoplot...
-    void filterBackground( Graphics2D g, Rectangle b ) {
+    static void filterBackground( Graphics2D g, Rectangle b ) {
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
 
@@ -121,8 +121,9 @@ public class AutoScreenshotsTool extends EventQueue {
         g.fill(s);
         
     }
+    
 
-    BufferedImage getScreenShot( ) {
+    public static BufferedImage getScreenShot( ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
