@@ -21,11 +21,12 @@ import java.util.logging.Logger;
  */
 public class JarRelauncher {
     public static void main( String[] args ) {
+        //TODO: can a CDF file be dropped onto a jar file?
         String myPath= System.getProperty("pwd"); //TODO: check this
         if ( System.getProperty("os.family").equals("Windows") ) {
             String javaPath = System.getProperty("java.home") + "\\bin\\java.exe";
             try {
-                Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar ");
+                Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar org.virbo.autoplot.AutoplotUI");
             } catch (IOException ex) {
                 Logger.getLogger(JarRelauncher.class.getName()).log(Level.SEVERE, null, ex);
             }
