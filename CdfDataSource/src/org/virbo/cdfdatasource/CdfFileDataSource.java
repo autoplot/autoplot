@@ -169,7 +169,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             } else { // typical route
                 String os1= (String)map.get(PARAM_SLICE1);
-                if ( os1!=null && !os1.equals("") ) {
+                if ( os1!=null && !os1.equals("") && variable.getNumDims()>0 ) {
                     int is= Integer.parseInt(os1);
                     result= wrapDataSet( cdf, svariable, constraint, false, true, is, mon );
                 } else {
