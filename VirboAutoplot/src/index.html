@@ -24,9 +24,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>AsOrderOneUnits routine (used in Length mouse module) would skip a unit, so it would use minutes then days</li>
             <li>ascii reader would mistakenly identify the 1001th line as a data line when it really was still the header.</li>
             <li>eventListColumn in ascii reader works for short files.</li>
-            <li>length mouseModule bug corrected where the native offset unit would be skipped.</li>
             <li>orbit range preserved in das2 history, the axis built-in history would loose identity.</li>
             <li>3603591: Jython internal implementation would result in concurrency problems when thrashing AutoplotServer</li>
             <li>TimeRangeTool defaults to RBSP-A orbit instead of RBSP-B.</li>
