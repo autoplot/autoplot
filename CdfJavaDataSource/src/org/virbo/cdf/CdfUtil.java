@@ -294,7 +294,7 @@ public class CdfUtil {
                     ByteBuffer buff= variable.getBuffer();
 
                     buf= new ByteBuffer[intloc.length];
-                    // use to test: vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/cris_h2/2011/ac_h2_cris_20110802_v05.cdf?flux_B (158701 bytes)
+                    // use to test: vap+cdfj:vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/ace/cris/level_2_cdaweb/cris_h2/2011/ac_h2_cris_20110802_v06.cdf?flux_B (158701 bytes)
                     for ( int part=0; part<intloc.length; part++ ) {
                         int nrec= intloc[part][1]-intloc[part][0] + 1;
                         int reclen= variable.getDataItemSize();
