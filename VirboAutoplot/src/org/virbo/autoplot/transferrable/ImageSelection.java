@@ -1,6 +1,8 @@
 package org.virbo.autoplot.transferrable;
         
 import java.awt.Image;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -13,6 +15,18 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
 
+/**
+ * Transferable for Images.
+ * <code>
+ * ImageSelection imageSelection = new ImageSelection();
+ * DasCanvas c = parent.applicationModel.canvas;
+ * Image i = c.getImage(c.getWidth(), c.getHeight());
+ * imageSelection.setImage(i);
+ * Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+ * clipboard.setContents(imageSelection, ImageSelection.getNullClipboardOwner() )
+ * </code>
+ * @author jbf
+ */
 public class ImageSelection implements Transferable {
     
     private static final DataFlavor defaultFlavor = DataFlavor.imageFlavor;
@@ -38,7 +52,15 @@ public class ImageSelection implements Transferable {
         }
         return false;
     }
-    
+
+    public static ClipboardOwner getNullClipboardOwner() {
+        return new ClipboardOwner() {
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                // do nothing
+            }
+        };
+    }
+
     public Transferable createTransferable(JComponent  comp) {
 // Clear
         image = null;
