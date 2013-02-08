@@ -44,6 +44,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -67,7 +68,7 @@ public class AutoScreenshotsTool extends EventQueue {
     /**
      * start should be called from the event thread.
      */
-    public static void start(  ) {
+    public static void start( Window parent ) {
 
         Preferences prefs= Preferences.userNodeForPackage( AutoScreenshotsTool.class );
         String s= prefs.get( "outputFolder", System.getProperty("user.home") );
@@ -97,7 +98,7 @@ public class AutoScreenshotsTool extends EventQueue {
         }));
         p.add( folderPanel, BorderLayout.SOUTH );
 
-        int r= JOptionPane.showConfirmDialog( null, p,
+        int r= JOptionPane.showConfirmDialog( parent, p,
         "Record Screenshots",
         JOptionPane.OK_CANCEL_OPTION );
 
@@ -108,14 +109,14 @@ public class AutoScreenshotsTool extends EventQueue {
                     prefs.flush();
                 } catch ( BackingStoreException e ) {}
                 Toolkit.getDefaultToolkit().getSystemEventQueue().push(
-                    new AutoScreenshotsTool( tf.getText() ));
+                    new AutoScreenshotsTool( parent, tf.getText() ));
             } catch ( IOException ex ) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    public AutoScreenshotsTool( String outLocationFolder ) throws IOException {
+    public AutoScreenshotsTool( Window parent, String outLocationFolder ) throws IOException {
         this.outLocationFolder= new File( outLocationFolder );
         boolean fail= false;
         if (!this.outLocationFolder.exists()) {
@@ -123,6 +124,18 @@ public class AutoScreenshotsTool extends EventQueue {
         }
         if ( fail ) throw new IOException("output folder cannot be created");
         logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
+
+        if ( active==-1 ) {
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+            GraphicsDevice[] gs = ge.getScreenDevices();
+            GraphicsDevice target= parent.getGraphicsConfiguration().getDevice();
+
+            for(int i=0; i<gs.length; i++) {
+                if ( gs[i]==target ) active= i;
+            }
+
+        }
 
         tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -287,6 +300,7 @@ public class AutoScreenshotsTool extends EventQueue {
             monitor.setTaskProgress( i );
             if ( f.toString().endsWith(".png") ) {
                 BufferedImage im= ImageIO.read(f);
+                System.err.println( String.format("%4d: ", i) + im.getWidth() + "x" + im.getHeight() );
                 im= trim( im, r );
                 ImageIO.write( im, "png", f );
             }
@@ -296,7 +310,7 @@ public class AutoScreenshotsTool extends EventQueue {
         
     }
 
-    public static BufferedImage getScreenShot( ) {
+    public static BufferedImage getScreenShot( int active ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
@@ -305,7 +319,6 @@ public class AutoScreenshotsTool extends EventQueue {
         DisplayMode mode;
         Rectangle bounds;
 
-        int active=-1;
         for(int i=0; i<gs.length; i++) {
             mode = gs[i].getDisplayMode();
             bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
@@ -319,7 +332,6 @@ public class AutoScreenshotsTool extends EventQueue {
                 } catch (AWTException ex) {
                     Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                active= i;
                 screenshots[i].getGraphics().drawImage( pnt, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
                 filterBackground( (Graphics2D)screenshots[i].getGraphics(), b );
             }
@@ -328,6 +340,8 @@ public class AutoScreenshotsTool extends EventQueue {
         return screenshots[active];
     }
 
+    int active= -1;
+
     private void doit( long t1, long dt, int id ) {
         t0= t1;
 
@@ -335,7 +349,7 @@ public class AutoScreenshotsTool extends EventQueue {
 
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
-        final BufferedImage im = getScreenShot( );
+        final BufferedImage im = getScreenShot( active );
         //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
@@ -398,7 +412,7 @@ public class AutoScreenshotsTool extends EventQueue {
         }
 
         if (  !reject ) {
-            doit( t1, dt, theEvent.getID() );
+            doit( t1, dt, theEvent.getID() );   // Take a picture here
         }
 
         // 400 401 402 are Key events.
