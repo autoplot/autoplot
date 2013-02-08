@@ -525,6 +525,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 }
             }
         });
+        qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
 
         optionsMenu.add( qc );
         
