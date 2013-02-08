@@ -21,7 +21,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.PaintEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.virbo.autoplot.util.TickleTimer;
@@ -45,10 +48,25 @@ import org.virbo.autoplot.util.TickleTimer;
  */
 public class AutoScreenshotsTool extends EventQueue {
 
-    public static void start( String outLocationFolder ) throws IOException {
+    public static void start( final String outLocationFolder ) {
 
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(
-                new AutoScreenshotsTool( outLocationFolder ));
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                int r= JOptionPane.showConfirmDialog( null,
+                "<html>This will automatically take screenshots, recording them to "+outLocationFolder+".  Hold Ctrl and press Shift twice to stop recording.",
+                "Record Screenshots",
+                JOptionPane.OK_CANCEL_OPTION );
+
+                if ( r==JOptionPane.OK_OPTION ) {
+                    try {
+                        Toolkit.getDefaultToolkit().getSystemEventQueue().push(
+                            new AutoScreenshotsTool( outLocationFolder ));
+                    } catch ( IOException ex ) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+            } } );
     }
 
     public AutoScreenshotsTool( String outLocationFolder ) throws IOException {
@@ -175,14 +193,15 @@ public class AutoScreenshotsTool extends EventQueue {
             mode = gs[i].getDisplayMode();
             bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
             if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
+                // get the mouse info before grabbing the screenshot, which takes several hundred millis.
+                PointerInfo info= MouseInfo.getPointerInfo();
+                Point p= info.getLocation();
+                Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
                 try {
                     screenshots[i] = new Robot(gs[i]).createScreenCapture(bounds);
                 } catch (AWTException ex) {
                     Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                PointerInfo info= MouseInfo.getPointerInfo();
-                Point p= info.getLocation();
-                Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
                 active= i;
                 screenshots[i].getGraphics().drawImage( pnt, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
                 filterBackground( (Graphics2D)screenshots[i].getGraphics(), b );
@@ -200,13 +219,13 @@ public class AutoScreenshotsTool extends EventQueue {
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
         final BufferedImage im = getScreenShot( );
-        System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
+        //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
             file.createNewFile();
             ImageIO.write(im, "png", file);
             long processTime= ( System.currentTimeMillis() - processTime0 );
-            System.err.println(""+file+" created in "+processTime+"ms.");
+            //System.err.println(""+file+" created in "+processTime+"ms.");
 
         } catch ( Exception ex ) {
         }
@@ -214,6 +233,8 @@ public class AutoScreenshotsTool extends EventQueue {
         t0= System.currentTimeMillis();
 
     }
+
+    int keyEscape=0;
 
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
@@ -225,20 +246,25 @@ public class AutoScreenshotsTool extends EventQueue {
         
         boolean reject= false;
 
-        List keep= Arrays.asList( Event.MOUSE_DRAG, Event.MOUSE_MOVE, PaintEvent.PAINT, PaintEvent.UPDATE, 204, 205 ); 
-        List skip= Arrays.asList( 1200 );
+        //List keep= Arrays.asList( PaintEvent.PAINT, PaintEvent.UPDATE, 204, 205, 46288 );
+        // 507=MouseWheelEvent
+        // 46288=DasUpdateEvent
+        List skip= Arrays.asList( 1200, Event.MOUSE_MOVE, Event.MOUSE_DRAG, Event.MOUSE_DOWN, Event.MOUSE_UP, Event.MOUSE_ENTER, Event.MOUSE_EXIT, 507, 101, 1005, 400, 401, 402 );
 
         if ( skip.contains( theEvent.getID() ) ) {
             reject= true;
             if ( theEvent.getID()==1200 ) {
+                String ps= ((java.awt.event.InvocationEvent)theEvent).paramString();
                 if ( this.peekEvent(1200)==null ) {
                     // we want to use this if it will cause repaint.
-                    String ps= ((java.awt.event.InvocationEvent)theEvent).paramString();
                     if ( ps.contains("ComponentWorkRequest") ) { // nasty!
                         reject= false;
+                    } else if ( ps.contains("ProcessingRunnable") ) {
+                        reject= false;
                     }
+
                 } else {
-                    System.err.println("other repaints are coming");
+
                 }
             }
         } else {
@@ -248,7 +274,7 @@ public class AutoScreenshotsTool extends EventQueue {
         reject= reject || ( (t1 - t0) < 200);
 
         try {
-            logFile.write(String.format("%06d %1d %5d %s\n", dt / 100, reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
+            logFile.write(String.format("%08.1f %1d %5d %s\n", dt / 100., reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
             logFile.flush();
         } catch (IOException ex) {
             Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
@@ -258,8 +284,36 @@ public class AutoScreenshotsTool extends EventQueue {
             doit( t1, dt, theEvent.getID() );
         }
 
-        if ( theEvent.getID()==Event.MOUSE_MOVE ) {
+        // 400 401 402 are Key events.
+        if ( theEvent.getID()==Event.MOUSE_MOVE || theEvent.getID()==400 || theEvent.getID()==401 || theEvent.getID()==402 ) {
             tickleTimer.tickle( String.valueOf(theEvent.getID()) );
         }
+
+        if ( theEvent.getID()==401 ) {
+            if ( ( (KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_CONTROL ) {
+                keyEscape=2;
+            } else if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_SHIFT ) {
+                keyEscape--;
+                if ( keyEscape==0 ) {
+                    pop();
+                    if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( null,
+                        "<html>Screenshots have been recorded to "+outLocationFolder+".  Operation should now be normal.  <br>Enter Pngwalk?",
+                        "Record Screenshots",
+                        JOptionPane.YES_NO_OPTION ) ) {
+                        PngWalkTool1 tool= PngWalkTool1.start( "file:"+outLocationFolder+ "/*.png", null );
+                        if ( !tool.isQualityControlEnabled() ) {
+                            tool.startQC();
+                        }
+                    }
+                }
+            }
+        } else if ( theEvent.getID()==402 ) {
+            if ( ((KeyEvent)theEvent).getKeyCode()==KeyEvent.VK_SHIFT ) {
+                // do nothing
+            } else {
+                keyEscape= 0;
+            }
+        }
+
     }
 }
