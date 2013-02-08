@@ -6,10 +6,12 @@ package org.virbo.autoplot;
 
 import java.awt.AWTEvent;
 import java.awt.AWTException;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
@@ -21,6 +23,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
@@ -34,12 +37,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.autoplot.pngwalk.PngWalkTool1;
+import org.das2.components.DasProgressPanel;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.util.TickleTimer;
 
 /**
@@ -48,25 +64,55 @@ import org.virbo.autoplot.util.TickleTimer;
  */
 public class AutoScreenshotsTool extends EventQueue {
 
-    public static void start( final String outLocationFolder ) {
+    /**
+     * start should be called from the event thread.
+     */
+    public static void start(  ) {
 
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                int r= JOptionPane.showConfirmDialog( null,
-                "<html>This will automatically take screenshots, recording them to "+outLocationFolder+".  Hold Ctrl and press Shift twice to stop recording.",
-                "Record Screenshots",
-                JOptionPane.OK_CANCEL_OPTION );
+        Preferences prefs= Preferences.userNodeForPackage( AutoScreenshotsTool.class );
+        String s= prefs.get( "outputFolder", System.getProperty("user.home") );
 
-                if ( r==JOptionPane.OK_OPTION ) {
-                    try {
-                        Toolkit.getDefaultToolkit().getSystemEventQueue().push(
-                            new AutoScreenshotsTool( outLocationFolder ));
-                    } catch ( IOException ex ) {
-                        throw new RuntimeException(ex);
-                    }
+        JPanel p= new JPanel();
+        p.setLayout( new BorderLayout() );
+
+        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br>Hold Ctrl and press Shift twice to stop recording." ), BorderLayout.CENTER );
+
+        JPanel folderPanel= new JPanel();
+        folderPanel.setLayout( new FlowLayout() );
+        folderPanel.add( new JLabel( "Output Folder:" ) );
+        final JTextField tf= new JTextField(20);
+        tf.setText(s);
+        folderPanel.add( tf );
+
+        folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( AutoScreenshotsTool.class.getResource("/org/virbo/autoplot/file.png") ) ) {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser ch= new JFileChooser();
+                ch.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+                ch.setCurrentDirectory( new File( tf.getText() ).getParentFile() );
+                ch.setSelectedFile( new File( tf.getText() ) );
+                if ( ch.showOpenDialog(tf)==JFileChooser.APPROVE_OPTION ) {
+                    tf.setText(ch.getSelectedFile().toString());
                 }
+            }
+        }));
+        p.add( folderPanel, BorderLayout.SOUTH );
 
-            } } );
+        int r= JOptionPane.showConfirmDialog( null, p,
+        "Record Screenshots",
+        JOptionPane.OK_CANCEL_OPTION );
+
+        if ( r==JOptionPane.OK_OPTION ) {
+            try {
+                prefs.put( "outputFolder", tf.getText() );
+                try{
+                    prefs.flush();
+                } catch ( BackingStoreException e ) {}
+                Toolkit.getDefaultToolkit().getSystemEventQueue().push(
+                    new AutoScreenshotsTool( tf.getText() ));
+            } catch ( IOException ex ) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     public AutoScreenshotsTool( String outLocationFolder ) throws IOException {
@@ -142,6 +188,35 @@ public class AutoScreenshotsTool extends EventQueue {
     }
 
     /**
+     * return the common rectangle to all images in the directory.
+     * @param dir
+     * @return
+     * @throws IOException
+     */
+    public static Rectangle getTrim( File dir, ProgressMonitor monitor ) throws IOException {
+        File[] ff= dir.listFiles();
+        Rectangle result= null;
+        int c= ff.length;
+        int i= 1;
+        monitor.setTaskSize(c);
+        monitor.setProgressMessage( "find bounds for set");
+        for ( File f : ff ) {
+            monitor.setTaskProgress( i );
+            if ( f.toString().endsWith(".png") ) {
+                BufferedImage im= ImageIO.read(f);
+                Rectangle r1= getTrim( im );
+                if ( result==null ) {
+                    result= r1;
+                } else {
+                    result= result.union(r1);
+                }
+            }
+            i++;
+        }
+        return result;
+    }
+    
+    /**
      * return the rectangle containing the image.  
      * Thanks to http://stackoverflow.com/questions/10678015/how-to-auto-crop-an-image-white-border-in-java
      */
@@ -176,7 +251,49 @@ public class AutoScreenshotsTool extends EventQueue {
      */
     public static BufferedImage trim( BufferedImage image ) {
         Rectangle r= getTrim(image);
+        return trim( image, r );
+    }
+
+    /**
+     * trim off the excess white to make a smaller image
+     * @param image
+     * @return
+     */
+    public static BufferedImage trim( BufferedImage image, Rectangle r ) {
         return image.getSubimage( r.x, r.y, r.width, r.height );
+    }
+
+
+    public static void trimAll( File dir ) throws IOException {
+        trimAll( dir, new NullProgressMonitor() );
+    }
+    /**
+     * find the common trim bounding box and trim all the images in the directory.
+     * @param dir
+     * @throws IOException
+     */
+    public static void trimAll( File dir, ProgressMonitor monitor ) throws IOException {
+
+        File[] ff= dir.listFiles();
+
+        monitor.started();
+
+        Rectangle r= getTrim( dir, monitor );
+        monitor.setProgressMessage("trim images");
+        monitor.setTaskSize( ff.length );
+        int i=0;
+        for ( File f : ff ) {
+            i++;
+            monitor.setTaskProgress( i );
+            if ( f.toString().endsWith(".png") ) {
+                BufferedImage im= ImageIO.read(f);
+                im= trim( im, r );
+                ImageIO.write( im, "png", f );
+            }
+        }
+
+        monitor.finished();
+        
     }
 
     public static BufferedImage getScreenShot( ) {
@@ -296,15 +413,13 @@ public class AutoScreenshotsTool extends EventQueue {
                 keyEscape--;
                 if ( keyEscape==0 ) {
                     pop();
-                    if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( null,
-                        "<html>Screenshots have been recorded to "+outLocationFolder+".  Operation should now be normal.  <br>Enter Pngwalk?",
-                        "Record Screenshots",
-                        JOptionPane.YES_NO_OPTION ) ) {
-                        PngWalkTool1 tool= PngWalkTool1.start( "file:"+outLocationFolder+ "/*.png", null );
-                        if ( !tool.isQualityControlEnabled() ) {
-                            tool.startQC();
+
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            finishUp();
                         }
-                    }
+                    };
+                    new Thread(run).start();
                 }
             }
         } else if ( theEvent.getID()==402 ) {
@@ -315,5 +430,43 @@ public class AutoScreenshotsTool extends EventQueue {
             }
         }
 
+    }
+
+    /**
+     * this should not be run on the event thread.
+     */
+    private void finishUp() {
+
+        JPanel p= new JPanel();
+        p.setLayout( new BorderLayout() );
+        p.add( new JLabel( "<html>Screenshots have been recorded to "+outLocationFolder+
+                ".<br>Operation should now be normal.<br><br>Enter Pngwalk?" ), BorderLayout.CENTER );
+        JCheckBox cb= new JCheckBox( "first trim images" );
+        p.add( cb, BorderLayout.SOUTH );
+        if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( null,
+            p,
+            "Record Screenshots", JOptionPane.YES_NO_OPTION ) ) {
+            if ( cb.isSelected() ) {
+                try {
+                    DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(cb), "trimming images..." );
+                    trimAll( outLocationFolder, monitor );
+                } catch ( IOException ex ) {
+
+                }
+            }
+            PngWalkTool1 tool= PngWalkTool1.start( "file:"+outLocationFolder+ "/*.png", null );
+            if ( !tool.isQualityControlEnabled() ) {
+                tool.startQC();
+            }
+        } else {
+            if ( cb.isSelected() ) {
+                try {
+                    DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(cb), "trimming images..." );
+                    trimAll( outLocationFolder, monitor );
+                } catch ( IOException ex ) {
+
+                }
+            }
+        }
     }
 }
