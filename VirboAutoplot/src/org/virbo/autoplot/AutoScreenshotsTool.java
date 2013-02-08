@@ -46,12 +46,6 @@ import org.virbo.autoplot.util.TickleTimer;
 public class AutoScreenshotsTool extends EventQueue {
 
     public static void start( String outLocationFolder ) throws IOException {
-        try {
-            pnt = ImageIO.read( AutoScreenshotsTool.class.getResource("/resources/pointer.png"));
-        } catch (IOException ex) {
-            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
 
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(
                 new AutoScreenshotsTool( outLocationFolder ));
@@ -85,6 +79,13 @@ public class AutoScreenshotsTool extends EventQueue {
     int block= 0;
 
     static BufferedImage pnt;
+    static {
+        try {
+            pnt = ImageIO.read(AutoScreenshotsTool.class.getResource("/resources/pointer.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     static int ptrXOffset= 7;
     static int ptrYOffset= 3;
     File outLocationFolder;
@@ -136,12 +137,12 @@ public class AutoScreenshotsTool extends EventQueue {
         for(int i=0; i<gs.length; i++) {
             mode = gs[i].getDisplayMode();
             bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
-            try {
-                screenshots[i] = new Robot(gs[i]).createScreenCapture(bounds);
-            } catch (AWTException ex) {
-                Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
-            }
             if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
+                try {
+                    screenshots[i] = new Robot(gs[i]).createScreenCapture(bounds);
+                } catch (AWTException ex) {
+                    Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 PointerInfo info= MouseInfo.getPointerInfo();
                 Point p= info.getLocation();
                 Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
