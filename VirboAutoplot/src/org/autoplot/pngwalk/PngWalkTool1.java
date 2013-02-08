@@ -517,11 +517,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         final JMenuItem qc= new JMenuItem( new AbstractAction( "Start QC" ) {
             public void actionPerformed(ActionEvent e) {
                 if ( !tool.isQualityControlEnabled() ) {
-                    tool.qcPanel= new QualityControlPanel();
-                    tool.tabs.add( "Quality Control", tool.qcPanel );
-                    tool.qcPanel.setWalkImageSequece(tool.seq);
-                    tool.seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, tool.qcStatusListener);
-                    tool.ENABLE_QUALITY_CONTROL= true;
+                    tool.startQC();
                 }
             }
         });
@@ -961,6 +957,19 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         this.statusLabel.setIcon( icon );
         this.statusLabel.setText(myMess);
         this.statusLabel.setToolTipText(message);
+    }
+
+    public void startQC() {
+        if ( !isQualityControlEnabled() ) {
+            qcPanel= new QualityControlPanel();
+            tabs.add( "Quality Control", qcPanel );
+            qcPanel.setWalkImageSequece(seq);
+            seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
+            ENABLE_QUALITY_CONTROL= true;
+        } else {
+            throw new RuntimeException("Quality Control is already running.");
+        }
+
     }
 
     public static interface ActionEnabler {
