@@ -49,6 +49,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -512,6 +513,20 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             thumbsizeMenu.add( mi );
         }
         optionsMenu.add( thumbsizeMenu );
+
+        final JMenuItem qc= new JMenuItem( new AbstractAction( "Start QC" ) {
+            public void actionPerformed(ActionEvent e) {
+                if ( !tool.isQualityControlEnabled() ) {
+                    tool.qcPanel= new QualityControlPanel();
+                    tool.tabs.add( "Quality Control", tool.qcPanel );
+                    tool.qcPanel.setWalkImageSequece(tool.seq);
+                    tool.seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, tool.qcStatusListener);
+                    tool.ENABLE_QUALITY_CONTROL= true;
+                }
+            }
+        });
+
+        optionsMenu.add( qc );
         
         result.add( optionsMenu );
 
