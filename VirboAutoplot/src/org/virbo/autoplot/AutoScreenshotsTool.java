@@ -122,7 +122,44 @@ public class AutoScreenshotsTool extends EventQueue {
         g.fill(s);
         
     }
-    
+
+    /**
+     * return the rectangle containing the image.  
+     * Thanks to http://stackoverflow.com/questions/10678015/how-to-auto-crop-an-image-white-border-in-java
+     */
+    public static Rectangle getTrim( BufferedImage source ) {
+        int baseColor = source.getRGB(0, 0);
+
+        int width = source.getWidth();
+        int height = source.getHeight();
+
+        int topY = Integer.MAX_VALUE, topX = Integer.MAX_VALUE;
+        int bottomY = -1, bottomX = -1;
+        for(int y=0; y<height; y++) {
+            for(int x=0; x<width; x++) {
+                if ( baseColor != source.getRGB(x, y) ) {
+                    if (x < topX) topX = x;
+                    if (y < topY) topY = y;
+                    if (x > bottomX) bottomX = x;
+                    if (y > bottomY) bottomY = y;
+                }
+            }
+        }
+        bottomX= bottomX+1;
+        bottomY= bottomY+1;
+        return new Rectangle( topX, topY, bottomX-topX, bottomY-topY );
+    }
+
+
+    /**
+     * trim off the excess white to make a smaller image
+     * @param image
+     * @return
+     */
+    public static BufferedImage trim( BufferedImage image ) {
+        Rectangle r= getTrim(image);
+        return image.getSubimage( r.x, r.y, r.width, r.height );
+    }
 
     public static BufferedImage getScreenShot( ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
