@@ -131,8 +131,12 @@ public class ScreenshotsTool extends EventQueue {
 
         tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                long t1= System.currentTimeMillis();
-                doit( t1, t1-tb, 99999 );
+                if ( peekEvent(1200)==null ) {
+                    long t1= System.currentTimeMillis();
+                    doit( t1, t1-tb, 99999 );
+                } else {
+                    //System.err.println("update coming anyway");
+                }
             }
         } );
 
