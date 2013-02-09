@@ -64,14 +64,14 @@ import org.virbo.autoplot.util.TickleTimer;
  * to create documentation.
  * @author jbf
  */
-public class AutoScreenshotsTool extends EventQueue {
+public class ScreenshotsTool extends EventQueue {
 
     /**
      * start should be called from the event thread.
      */
     public static void start( Window parent ) {
 
-        Preferences prefs= Preferences.userNodeForPackage( AutoScreenshotsTool.class );
+        Preferences prefs= Preferences.userNodeForPackage( ScreenshotsTool.class );
         String s= prefs.get( "outputFolder", System.getProperty("user.home") );
 
         JPanel p= new JPanel();
@@ -86,7 +86,7 @@ public class AutoScreenshotsTool extends EventQueue {
         tf.setText(s);
         folderPanel.add( tf );
 
-        folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( AutoScreenshotsTool.class.getResource("/org/virbo/autoplot/file.png") ) ) {
+        folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( ScreenshotsTool.class.getResource("/org/virbo/autoplot/file.png") ) ) {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser ch= new JFileChooser();
                 ch.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
@@ -110,14 +110,14 @@ public class AutoScreenshotsTool extends EventQueue {
                     prefs.flush();
                 } catch ( BackingStoreException e ) {}
                 Toolkit.getDefaultToolkit().getSystemEventQueue().push(
-                    new AutoScreenshotsTool( parent, tf.getText() ));
+                    new ScreenshotsTool( parent, tf.getText() ));
             } catch ( IOException ex ) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    public AutoScreenshotsTool( Window parent, String outLocationFolder ) throws IOException {
+    public ScreenshotsTool( Window parent, String outLocationFolder ) throws IOException {
         this.outLocationFolder= new File( outLocationFolder );
         boolean fail= false;
         if (!this.outLocationFolder.exists()) {
@@ -168,9 +168,9 @@ public class AutoScreenshotsTool extends EventQueue {
     static BufferedImage pnt;
     static {
         try {
-            pnt = ImageIO.read(AutoScreenshotsTool.class.getResource("/resources/pointer.png"));
+            pnt = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer.png"));
         } catch (IOException ex) {
-            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     static int ptrXOffset= 7;
@@ -353,7 +353,7 @@ public class AutoScreenshotsTool extends EventQueue {
         try {
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
         } catch (AWTException ex) {
-            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
@@ -435,7 +435,7 @@ public class AutoScreenshotsTool extends EventQueue {
             logFile.write(String.format("%08.1f %1d %5d %s\n", dt / 100., reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
             logFile.flush();
         } catch (IOException ex) {
-            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if (  !reject ) {
