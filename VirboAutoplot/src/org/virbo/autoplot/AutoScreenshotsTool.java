@@ -44,7 +44,6 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -61,6 +60,8 @@ import org.virbo.autoplot.util.TickleTimer;
 
 /**
  * Jeremy's experiment that will create automatic documentation.
+ * This is intended to provide a means for users to more easily communicate and to make it easier
+ * to create documentation.
  * @author jbf
  */
 public class AutoScreenshotsTool extends EventQueue {
@@ -125,17 +126,7 @@ public class AutoScreenshotsTool extends EventQueue {
         if ( fail ) throw new IOException("output folder cannot be created");
         logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
 
-        if ( active==-1 ) {
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-            GraphicsDevice[] gs = ge.getScreenDevices();
-            GraphicsDevice target= parent.getGraphicsConfiguration().getDevice();
-
-            for(int i=0; i<gs.length; i++) {
-                if ( gs[i]==target ) active= i;
-            }
-
-        }
+        active= getActiveDisplay( parent );
 
         tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -144,6 +135,25 @@ public class AutoScreenshotsTool extends EventQueue {
             }
         } );
 
+    }
+
+    /**
+     * return the display that the window is within.  For single-head machines, this is 0.
+     * @param parent
+     * @return
+     */
+    private static int getActiveDisplay( Window parent ) {
+        int active= -1;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        GraphicsDevice target= parent.getGraphicsConfiguration().getDevice();
+
+        for(int i=0; i<gs.length; i++) {
+            if ( gs[i]==target ) active= i;
+        }
+
+        return active;
     }
 
 
@@ -310,34 +320,51 @@ public class AutoScreenshotsTool extends EventQueue {
         
     }
 
+    /**
+     * get a screenshot of the display Autoplot's main UI is running within.
+     * @return
+     */
+    public static BufferedImage getScreenShot() {
+        Window w= ScriptContext.getViewWindow();
+        int active= getActiveDisplay(w);
+        return getScreenShot(active);
+    }
+
+    /**
+     * get a screenshot of the given device.  For a single-head machine, this is always 0.
+     * @param active
+     * @return
+     */
     public static BufferedImage getScreenShot( int active ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
-        BufferedImage[] screenshots = new BufferedImage[gs.length];
+        BufferedImage screenshot;
 
         DisplayMode mode;
         Rectangle bounds;
 
-        for(int i=0; i<gs.length; i++) {
-            mode = gs[i].getDisplayMode();
-            bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
-            if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
-                // get the mouse info before grabbing the screenshot, which takes several hundred millis.
-                PointerInfo info= MouseInfo.getPointerInfo();
-                Point p= info.getLocation();
-                Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
-                try {
-                    screenshots[i] = new Robot(gs[i]).createScreenCapture(bounds);
-                } catch (AWTException ex) {
-                    Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                screenshots[i].getGraphics().drawImage( pnt, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
-                filterBackground( (Graphics2D)screenshots[i].getGraphics(), b );
-            }
+        int i = active;
+        mode = gs[i].getDisplayMode();
+        bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
+        PointerInfo info= MouseInfo.getPointerInfo();
+        Point p= info.getLocation();
+        Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
+        try {
+            screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+        } catch (AWTException ex) {
+            Logger.getLogger(AutoScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
-        return screenshots[active];
+        if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
+            // get the mouse info before grabbing the screenshot, which takes several hundred millis.
+            screenshot.getGraphics().drawImage( pnt, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
+        }
+        filterBackground( (Graphics2D)screenshot.getGraphics(), b );
+
+
+        return screenshot;
     }
 
     int active= -1;
@@ -355,7 +382,7 @@ public class AutoScreenshotsTool extends EventQueue {
         try {
             file.createNewFile();
             ImageIO.write(im, "png", file);
-            long processTime= ( System.currentTimeMillis() - processTime0 );
+            //long processTime= ( System.currentTimeMillis() - processTime0 );
             //System.err.println(""+file+" created in "+processTime+"ms.");
 
         } catch ( Exception ex ) {
