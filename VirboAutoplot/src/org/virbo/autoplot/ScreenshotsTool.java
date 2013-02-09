@@ -131,10 +131,15 @@ public class ScreenshotsTool extends EventQueue {
 
         tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( peekEvent(1200)==null ) {
+                AWTEvent update= peekEvent(1200);
+                if ( update==null ) {
                     long t1= System.currentTimeMillis();
                     doit( t1, t1-tb, 99999 );
                 } else {
+                    if ( canReject(update) ) {
+                        long t1= System.currentTimeMillis();
+                        doit( t1, t1-tb, 99999 );
+                    }
                     //System.err.println("update coming anyway");
                 }
             }
@@ -327,7 +332,6 @@ public class ScreenshotsTool extends EventQueue {
             monitor.setTaskProgress( i );
             if ( f.toString().endsWith(".png") ) {
                 BufferedImage im= ImageIO.read(f);
-                System.err.println( String.format("%4d: ", i) + im.getWidth() + "x" + im.getHeight() );
                 im= trim( im, r );
                 ImageIO.write( im, "png", f );
             }
@@ -398,7 +402,7 @@ public class ScreenshotsTool extends EventQueue {
     private void doit( long t1, long dt, int id ) {
         t0= t1;
 
-        long processTime0= System.currentTimeMillis();
+        //long processTime0= System.currentTimeMillis();
 
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
@@ -420,6 +424,23 @@ public class ScreenshotsTool extends EventQueue {
 
     int keyEscape=0;
 
+    private boolean canReject( AWTEvent theEvent ) {
+        boolean reject= true;
+        String ps= ((java.awt.event.InvocationEvent)theEvent).paramString();
+        if ( this.peekEvent(1200)==null ) {
+            // we want to use this if it will cause repaint.
+            if ( ps.contains("ComponentWorkRequest") ) { // nasty!
+                reject= false;
+            } else if ( ps.contains("ProcessingRunnable") ) {
+                reject= false;
+            }
+
+        } else {
+
+        }
+        return reject;
+    }
+
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
 
@@ -438,18 +459,7 @@ public class ScreenshotsTool extends EventQueue {
         if ( skip.contains( theEvent.getID() ) ) {
             reject= true;
             if ( theEvent.getID()==1200 ) {
-                String ps= ((java.awt.event.InvocationEvent)theEvent).paramString();
-                if ( this.peekEvent(1200)==null ) {
-                    // we want to use this if it will cause repaint.
-                    if ( ps.contains("ComponentWorkRequest") ) { // nasty!
-                        reject= false;
-                    } else if ( ps.contains("ProcessingRunnable") ) {
-                        reject= false;
-                    }
-
-                } else {
-
-                }
+                reject= canReject(theEvent);
             }
         } else {
             
