@@ -25,6 +25,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -166,9 +167,21 @@ public class ScreenshotsTool extends EventQueue {
     int block= 0;
 
     static BufferedImage pnt;
+    static BufferedImage pnt_b1;
+    static BufferedImage pnt_b2;
+    static BufferedImage pnt_b3;
+
+    /**
+     * mouse buttons
+     */
+    static int button=0;
+
     static {
         try {
             pnt = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer.png"));
+            pnt_b1 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b1.png"));
+            pnt_b2 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b2.png"));
+            pnt_b3 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b3.png"));
         } catch (IOException ex) {
             Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -327,15 +340,14 @@ public class ScreenshotsTool extends EventQueue {
     public static BufferedImage getScreenShot() {
         Window w= ScriptContext.getViewWindow();
         int active= getActiveDisplay(w);
-        return getScreenShot(active);
+        return getScreenShot(active,0);
     }
 
-    /**
-     * get a screenshot of the given device.  For a single-head machine, this is always 0.
-     * @param active
-     * @return
-     */
     public static BufferedImage getScreenShot( int active ) {
+        return getScreenShot( active, 0 );
+    }
+
+    public static BufferedImage getScreenShot( int active, int buttons ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
@@ -359,7 +371,17 @@ public class ScreenshotsTool extends EventQueue {
 
         if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
             // get the mouse info before grabbing the screenshot, which takes several hundred millis.
-            screenshot.getGraphics().drawImage( pnt, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
+            BufferedImage pointer=null;
+            if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
+                pointer= pnt_b1;
+            } else if ( ( button & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
+                pointer= pnt_b2;
+            } else if ( ( button & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
+                pointer= pnt_b3;
+            } else {
+                pointer= pnt;
+            }
+            screenshot.getGraphics().drawImage( pointer, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
         }
         filterBackground( (Graphics2D)screenshot.getGraphics(), b );
 
@@ -376,7 +398,7 @@ public class ScreenshotsTool extends EventQueue {
 
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
-        final BufferedImage im = getScreenShot( active );
+        final BufferedImage im = getScreenShot( active, button );
         //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
@@ -440,6 +462,19 @@ public class ScreenshotsTool extends EventQueue {
 
         if (  !reject ) {
             doit( t1, dt, theEvent.getID() );   // Take a picture here
+        }
+
+        if ( theEvent instanceof MouseEvent ) {
+            MouseEvent me= (MouseEvent)theEvent;
+            if ( ( me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
+                button= MouseEvent.BUTTON1_DOWN_MASK;
+            } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) { 
+                button= MouseEvent.BUTTON2_DOWN_MASK;
+            } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) { 
+                button= MouseEvent.BUTTON3_DOWN_MASK;
+            } else {
+                button= 0;
+            }
         }
 
         // 400 401 402 are Key events.
