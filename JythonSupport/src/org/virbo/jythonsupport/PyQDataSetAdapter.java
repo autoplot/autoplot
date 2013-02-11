@@ -5,6 +5,8 @@
 
 package org.virbo.jythonsupport;
 
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.Units;
 import org.python.core.PyArray;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -29,11 +31,23 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
 
     // see usages elsewhere, this is sloppy.
     // TODO: consider if [ DSA, DSB ] should append( DSA, DSB ) where DSA DSB are datasets.
+    /**
+     * adapts list to QDataSet.
+     * TODO: Consider: if element is a string, then enumeration units are used.
+     * @param p
+     * @return
+     */
     public static QDataSet adaptList( PyList p ) {
         double[] j= new double[ p.size() ];
+        //Units u= null;
         for ( int i=0; i<p.size(); i++ ) {
             Object n= p.get(i);
-             j[i]= PyQDataSet.getNumber(n).doubleValue();
+            //if ( u!=null || n instanceof String ) {
+            //    u= EnumerationUnits.getByName("default");
+            //    j[i]= ((EnumerationUnits)u).createDatum( n ).doubleValue( u );
+            //} else {
+                j[i]= PyQDataSet.getNumber(n).doubleValue();
+            //}
         }
         QDataSet q= DDataSet.wrap( j );
         return q;
