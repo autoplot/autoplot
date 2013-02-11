@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -279,9 +280,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     // since FileNotFoundException is a special exception where we don't want to interrupt the user with a popup, handle it specially.
                     if ( ex.value.__tojava__(Exception.class) instanceof java.io.FileNotFoundException ) {
                         Object javaClass= ex.value.__tojava__(Exception.class);
-                        if ( javaClass instanceof FileNotFoundException ) {
-                            throw (Exception)javaClass;
-                        }
+                        throw (Exception)javaClass;
+                    } else if ( ex.value.__tojava__(Exception.class) instanceof NoDataInIntervalException ) {
+                        Object javaClass= ex.value.__tojava__(Exception.class);
+                        throw (Exception)javaClass;
                     }
                     logger.warning( ex.toString() );
                     if (listener != null) {
