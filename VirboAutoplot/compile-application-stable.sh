@@ -6,15 +6,11 @@
 # so the configuration needs to be kept in sync.
 #
 
-# set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/local/jdk1.5.0_15__32/
-fi
-if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=$JAVA_HOME
+    JAVA_HOME=/usr/local/jdk1.6.0_35/
 fi
 if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
+    JAVA6_HOME=/usr/local/jdk1.6.0_35/
 fi
 
 if [ "" = "$KEYPASS" ]; then
@@ -48,23 +44,23 @@ mkdir temp-classes
 echo "copy jar file classes..."
 cd temp-classes
 for i in ../../APLibs/lib/*.jar; do
-   echo ${JAVA5_HOME}bin/jar xf $i
-   ${JAVA5_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}bin/jar xf $i
+   ${JAVA_HOME}bin/jar xf $i
 done
 
 # use beta version of cdf library that supports tt2000.
 echo "using tt2000 support"
 rm -rf gsfc/
-${JAVA5_HOME}bin/jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
+${JAVA_HOME}bin/jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
-   echo ${JAVA5_HOME}bin/jar xf $i
-   ${JAVA5_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}bin/jar xf $i
+   ${JAVA_HOME}bin/jar xf $i
 done
 
 for i in ../../APLibs/lib/commons/*.jar; do
-   echo ${JAVA5_HOME}bin/jar xf $i
-   ${JAVA5_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}bin/jar xf $i
+   ${JAVA_HOME}bin/jar xf $i
 done
 
 cd ..
@@ -106,25 +102,25 @@ echo "make jumbo jar file..."
 cd temp-classes
 
 mkdir -p ../dist/
-$JAVA5_HOME/bin/jar cf ../dist/AutoplotStable.jar *
+$JAVA_HOME/bin/jar cf ../dist/AutoplotStable.jar *
 cd ..
 echo "done make jumbo jar file..."
 
 echo "normalize jar file for signing..."
-$JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 echo "sign the jar files..."
-echo $JAVA5_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\"  dist/AutoplotStable.jar \"$ALIAS\"
-$JAVA5_HOME/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
+echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\"  dist/AutoplotStable.jar \"$ALIAS\"
+$JAVA_HOME/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"
 echo "repeat normalize/sign (workaround for known bug with large files...)"
-echo $JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-$JAVA5_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
-echo $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass \"$STOREPASS\"  dist/AutoplotStable.jar \"$ALIAS\"
-if ! $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
+echo $JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass \"$STOREPASS\"  dist/AutoplotStable.jar \"$ALIAS\"
+if ! $JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS"  dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources!"
    exit 1
 fi
 
 echo "pack the jar file..."
-$JAVA5_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
 #echo "done packing."

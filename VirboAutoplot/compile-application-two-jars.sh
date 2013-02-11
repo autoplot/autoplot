@@ -11,12 +11,12 @@
 #
 # This should be run from the folder "VirboAutoplot"
 
-# set JAVA5_HOME and JAVA6_HOME
-if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=/usr/local/jdk1.5.0_15__32/
+# set JAVA_HOME and JAVA6_HOME
+if [ "" = "$JAVA_HOME" ]; then
+    JAVA_HOME=/usr/local/jdk1.6.0_35/
 fi
 if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
+    JAVA6_HOME=/usr/local/jdk1.6.0_35/
 fi
 
 if [ "" = "$TAG" ]; then
@@ -144,35 +144,35 @@ hasErrors=0
 # compile key java classes.
 echo "compile sources..."
 cd temp-volatile-src
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk1.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk1.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 
 cd ..
@@ -186,27 +186,27 @@ fi
 echo "make jumbo jar files..."
 mkdir -p dist/
 cd temp-stable-classes
-$JAVA5_HOME/bin/jar cf ../dist/AutoplotAllStable.jar *
+$JAVA_HOME/bin/jar cf ../dist/AutoplotAllStable.jar *
 cd ..
 cd temp-volatile-classes
-$JAVA5_HOME/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotAllVolatile.jar *
+$JAVA_HOME/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotAllVolatile.jar *
 cd ..
 
 echo "done make jumbo jar files..."
 
 echo "sign the jar files..."
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllStable.jar virbo
+$JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
+$JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllStable.jar virbo
 
 echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
 
 cd temp-volatile-src
-$JAVA5_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
+$JAVA_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 echo "replace codebase, etc"
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
+$JAVA_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
+$JAVA_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
 
 echo "proguard/pack200 stuff..."
 #proguard is compiled for Java 6.  This needs to be fixed.

@@ -174,7 +174,7 @@ if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 te
 if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
 #if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/util/filesystem/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
