@@ -12,10 +12,12 @@ import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -233,8 +235,13 @@ public class JythonUtil {
 
         String prog= myCheat + params ;
 
-        PythonInterpreter interp= new PythonInterpreter();
-        interp.exec(prog);
+        PythonInterpreter interp= null;
+        try {
+            interp= new PythonInterpreter();
+            interp.exec(prog);
+        } catch ( PyException ex ) {
+            return new ArrayList();
+        }
 
         PyList sort= (PyList) interp.get( "sort_" );
 
