@@ -706,22 +706,19 @@ public class DataSetURI {
             }
             return tfile;
         } catch ( URIException ex ) {
-            throw new IOException(ex.getMessage()); //Java1.6 will change this
+            throw new IOException(ex); 
         } catch ( IllegalArgumentException ex ) {
             logger.log( Level.SEVERE, null, ex );
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {
-                IOException ex2= new IOException(ex.getMessage()); // JAVA 1.6 will clean this up.
-                ex2.initCause(ex);
+                IOException ex2= new IOException(ex); 
                 throw ex2;
             } else if ( ex.getMessage().contains("unable to delete") ) {
-                IOException ex2= new IOException(ex.getMessage());
-                ex2.initCause(ex);
+                IOException ex2= new IOException(ex);
                 throw ex2;
             } else {
-                IOException ex2= new IOException("Unsupported protocol: "+suri);
-                ex2.initCause(ex);
+                IOException ex2= new IOException("Unsupported protocol: "+suri,ex);
                 throw ex2;//TODO: we should probably never hide the original message.
             }
         }
