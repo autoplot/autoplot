@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -411,9 +412,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
             cacheRange = cacheRange1;
 
-            //if (ss.length > 1) {
-                mon.finished();
-            //}
+            mon.finished();
+
+            Map<String,Object> userProps= new HashMap();
+            userProps.put( "files", ss );
 
             if ( altResult!=null ) {
                 ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
@@ -432,6 +434,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                 QDataSet notes= notesBuilder.getDataSet();
                 if ( altResult!=null && notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
+                if ( altResult!=null ) altResult.putProperty( QDataSet.USER_PROPERTIES, userProps );
+
                 if ( rcent!=null ) rcent.finished(altResult);
                 return altResult;
 
@@ -446,6 +450,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                 QDataSet notes= notesBuilder.getDataSet();
                 if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
+                if ( result!=null ) result.putProperty( QDataSet.USER_PROPERTIES, userProps );
                 if ( rcent!=null ) rcent.finished(result);
                 return result;
             }
