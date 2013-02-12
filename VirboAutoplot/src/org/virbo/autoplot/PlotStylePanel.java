@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
@@ -153,7 +154,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
     private transient PropertyChangeListener colorListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            checkColors();
+            if ( checkColors() ) {
+                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            }
         }
     };
 
@@ -227,7 +230,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
     /**
      * check to see that foreground!=background.  Check for each plot element, foreground!=background
      */
-    private void checkColors() {
+    private boolean checkColors() {
         Color back= dom.getOptions().getBackground();
         Color fore= dom.getOptions().getForeground();
         Color color= dom.getOptions().getColor();
@@ -252,10 +255,10 @@ public class PlotStylePanel extends javax.swing.JPanel {
         for ( PlotElement p: pe ) {
             if ( closeColors( p.getStyle().getColor(), back ) ) {
                 final PlotElement pf= p;
-                final Color colorf= color;
-                SwingUtilities.invokeLater( new Runnable() { public void run() { pf.getStyle().setColor(colorf); } } );
+                return true;
             }
         }
+        return false;
     }
 
     /** This method is called from within the constructor to
@@ -499,7 +502,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
             dom.getOptions().setColor(fores[i]);
             dom.getOptions().setBackground(backs[i]);
         }
-        checkColors();
+        if ( checkColors() ) {
+            dom.getController().setStatus( "warning: Background and foreground colors are the same");
+        }
 }//GEN-LAST:event_foreBackColorsListActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
@@ -516,7 +521,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
             dom.getCanvases(0).getController().getDasCanvas().setForeground(c);
             dom.getOptions().setForeground(c);
             dom.getOptions().setColor(c);
-            checkColors();
+            if ( checkColors() ) {
+                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            }
         }
 }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
@@ -526,7 +533,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
             foreBackColorsList.setSelectedIndex(fores.length);
             backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
             dom.getOptions().setBackground(c);
-            checkColors();
+            if ( checkColors() ) {
+                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            }
         }
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
