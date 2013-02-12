@@ -141,8 +141,7 @@ public class DocumentationScrollPane extends JScrollPane {
                 setDocumentation(doc);
             }
         };
-        //SwingUtilities.invokeLater( run ); //TODO: there's a deadlock that happens here
-        run.run();
+        SwingUtilities.invokeLater( run ); //TODO: there's a deadlock that happens here
         addToHistory(doc);
     }
 
