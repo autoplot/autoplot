@@ -374,7 +374,18 @@ public class GridPngWalkView extends PngWalkView {
                                 this.repaintSoon();
                             }
                         } else {
-                            thumb = loadingImage;
+                            if ( thumbSize==400 ) { // kludge because thumbnails aren't big enough for this mode.
+                                int w = (int) ( thumbd.getWidth());
+                                int h = (int) ( thumbd.getHeight());
+                                outOfTime= outOfTime || System.currentTimeMillis()-t0 > PAINT_THUMB_TIMEOUT_MS;
+                                BufferedImage whthumb= wimage.getThumbnail(w,h,!outOfTime);
+                                thumb= whthumb;
+                                if ( thumb==loadingImage ) {
+                                    this.repaintSoon();
+                                }
+                            } else {
+                                thumb = loadingImage;
+                            }
                         }
                     } else {
                         thumb = loadingImage;
