@@ -155,6 +155,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
             Map<String,String> mparams = URISplit.parseParams(split.params);
             String stimeRange = viewRange.toString();
             mparams.put("timerange", stimeRange);
+
+            if ( resolution!=null ) {
+                mparams.put("resolution", String.valueOf(resolution));
+            }
             split.params = URISplit.formatParams(mparams);
 
             URISplit split2= URISplit.parse(AggregatingDataSource.this.uri);
