@@ -140,6 +140,7 @@ public class SimpleServlet extends HttpServlet {
             String zrange = ServletUtil.getStringParameter(request, "plot.zaxis.range", "");
             String zlog = ServletUtil.getStringParameter(request, "plot.zaxis.log", "");
             String zdrawTickLabels = ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "");
+            String grid= ServletUtil.getStringParameter( request, "drawGrid", "" );
 
             if (debug != null && !debug.equals("false")) {
                 for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
@@ -357,6 +358,10 @@ public class SimpleServlet extends HttpServlet {
             }
             if (!sbackgroundColor.equals("")) {
                 dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+            }
+
+            if ( !grid.equals("") ) {
+                dom.getOptions().setDrawGrid( grid.equals("true") );
             }
 
             logit("done with setStyle", t0, uniq, debug);
