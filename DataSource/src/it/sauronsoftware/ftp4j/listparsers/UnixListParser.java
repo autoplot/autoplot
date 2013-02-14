@@ -45,6 +45,8 @@ public class UnixListParser implements FTPListParser {
 					+ "(?:(\\d{4})|(?:(\\d{1,2}):(\\d{1,2})))\\s+"
 					+ "([^\\\\*?\"<>|]+)(?: -> ([^\\\\*?\"<>|]+))?$");
 
+        //TODO: jbf: this parser doesn't match files with question marks in the name
+
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
 			"MMM dd yyyy HH:mm", Locale.US);
 
@@ -148,6 +150,7 @@ public class UnixListParser implements FTPListParser {
 				ret[i].setModifiedDate(md);
 				ret[i].setName(nameString);
 			} else {
+                            System.err.println("Unix FTP parser failed at line: "+lines[i]);
 				throw new FTPListParseException();
 			}
 		}
