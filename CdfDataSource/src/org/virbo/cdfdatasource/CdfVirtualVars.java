@@ -140,6 +140,8 @@ public class CdfVirtualVars {
             return convertLog10( args.get(0) );
         } else if (function.equalsIgnoreCase("fftPower512")) {
             return Ops.fftPower(args.get(0), 512, mon );
+        } else if (function.equalsIgnoreCase("fftPower1024")) {
+            return Ops.fftPower(args.get(0), 1024, mon );
         } else if (function.equalsIgnoreCase("fftPower")) {
             mon.setProgressMessage("apply Hann window");
             QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) args.get(1).value(), Ops.FFTFilterType.Hanning);
@@ -264,7 +266,7 @@ public class CdfVirtualVars {
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftPowerDelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftPower","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
+                "fftPower","fftPower512","fftPower1024","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
                 "sum_values" );
 
         return functions.contains(function);

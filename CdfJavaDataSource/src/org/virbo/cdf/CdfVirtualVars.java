@@ -50,6 +50,8 @@ public class CdfVirtualVars {
             return convertLog10( args.get(0) );
         } else if (function.equalsIgnoreCase("fftPower512")) {
             return Ops.fftPower(args.get(0), 512, mon );
+        } else if (function.equalsIgnoreCase("fftPower1024")) {
+            return Ops.fftPower(args.get(0), 1024, mon );
         } else if (function.equalsIgnoreCase("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
             QDataSet size=  args.get(1);
             while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
@@ -172,7 +174,7 @@ public class CdfVirtualVars {
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftpower","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag");
+                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag");
         return functions.contains(function.toLowerCase());
     }
 }
