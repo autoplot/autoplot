@@ -83,6 +83,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         } catch (IOException ex) {
             //TODO: how to distinguish UnknownHostException to be offline?  avoid firing an event until I come up with a way.
             logger.log(Level.INFO,"exception when listing the first time, going offline",ex);
+            ex.printStackTrace();
             //throw new FileSystemOfflineException(ex);
             this.offline= true;
         }
@@ -242,6 +243,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                                 break;
                         } catch (FTPListParseException e) {
                                 // Let's try the next one.
+                            //TODO: questionMark in Unix filesystem!
                                 continue;
                         }
                 }
