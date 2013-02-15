@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A bug in the events files was corrected.  Also a tool for automatically generating a sequence of screenshots is used
-            to quickly generate the screenshot.</small></p>
+        <p><small>A bug were occasionally data would fail to be completely painted is fixed. <a href="http://autoplot.org/autoplot.jnlp?http://sarahandjeremy.net/~jbf/autoplot/vap/geothermal20130106.vap">geothermal20130106.vap</a> </small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -24,6 +23,12 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3604265: partial load of timeseries when scanning around.</li>
+            <li>3599689: agg sometimes not loading when two on same plot</li>
+            <li>3603701: Preserve DatumRange types (orbit:...) with built-in axis scan,history</li>
+            <li>3604777: agg completions missing when tab is pressed in address bar</li>
+            <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
+            <li>JythonDataSource tweaked bug where web filesystems would fail to update.</li>
             <li>AsOrderOneUnits routine (used in Length mouse module) would skip a unit, so it would use minutes then days</li>
             <li>ascii reader would mistakenly identify the 1001th line as a data line when it really was still the header.</li>
             <li>eventListColumn in ascii reader works for short files.</li>
