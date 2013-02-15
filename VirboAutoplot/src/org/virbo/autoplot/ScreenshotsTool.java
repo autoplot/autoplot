@@ -145,18 +145,23 @@ public class ScreenshotsTool extends EventQueue {
         }
         logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
 
+        this.parent= parent;
         active= getActiveDisplay( parent );
+        bounds= null;
 
         tickleTimer= new TickleTimer( 300, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
                     long t1= System.currentTimeMillis();
-                    doit( t1, t1-tb, 99999 );
+                    Rectangle r= doit( t1, t1-tb, 99999 );
+                    if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
+
                 } else {
                     if ( canReject(update) ) {
                         long t1= System.currentTimeMillis();
-                        doit( t1, t1-tb, 99999 );
+                        Rectangle r= doit( t1, t1-tb, 99999 );
+                        if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
                     }
                     //System.err.println("update coming anyway");
                 }
@@ -184,6 +189,20 @@ public class ScreenshotsTool extends EventQueue {
         return active;
     }
 
+    /**
+     * return the bounds of the active display.
+     * @param active
+     * @return
+     */
+    private static Rectangle getScreenBounds( int active ) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+
+        int i = active;
+        Rectangle b= gs[i].getDefaultConfiguration().getBounds();
+        
+        return b;
+    }
 
     long t0 = 0;
     long tb = System.currentTimeMillis();
@@ -224,12 +243,46 @@ public class ScreenshotsTool extends EventQueue {
     TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
     TickleTimer tickleTimer;
 
+    /**
+     * calculate the bounds we are going to keep, which will be typically by significantly smaller than the display.
+     * @param b the bounds concerning this process.
+     * @return the bounds relative to the input rectangle b.
+     */
+    static Rectangle getMyBounds( Rectangle b ) {
+        Rectangle r= null;
+
+        Frame[] frames = Frame.getFrames();
+        for (Frame frame : frames) {
+            if ( frame.isVisible() ) {
+                Rectangle rect= frame.getBounds();
+                if ( r==null ) r= rect; else r= r.union(rect);
+            }
+        }
+
+        Window[] windows= Window.getWindows();
+        for ( Window window: windows ) {
+            if ( window.isVisible() ) {
+                Rectangle rect= window.getBounds();
+                if ( r==null ) r= rect; else r= r.union(rect);
+            }
+        }
+
+        r= r.intersection(b);
+        r.width= Math.max(0,r.width);
+        r.height= Math.max(0,r.height);
+        r.translate( -b.x, -b.y );
+        return r;
+
+    }
+
     //mask out parts of the desktop that are not autoplot...
     static void filterBackground( Graphics2D g, Rectangle b ) {
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
 
-        Rectangle r= new Rectangle(0,0,2000,2000);
+        Rectangle r= g.getDeviceConfiguration().getBounds();
+        r= new Rectangle(0,0,r.width,r.height);
+
         Area s= new Area(r);
 
         Frame[] frames = Frame.getFrames();
@@ -332,20 +385,22 @@ public class ScreenshotsTool extends EventQueue {
 
 
     public static void trimAll( File dir ) throws IOException {
-        trimAll( dir, new NullProgressMonitor() );
+        trimAll( dir, null, new NullProgressMonitor() );
     }
+
     /**
      * find the common trim bounding box and trim all the images in the directory.
      * @param dir
+     * @param r the bounding rectangle, or null if getTrim should be used.
      * @throws IOException
      */
-    public static void trimAll( File dir, ProgressMonitor monitor ) throws IOException {
+    public static void trimAll( File dir, Rectangle r, ProgressMonitor monitor ) throws IOException {
 
         File[] ff= dir.listFiles();
 
         monitor.started();
 
-        Rectangle r= getTrim( dir, monitor );
+        if ( r==null ) r= getTrim( dir, monitor );
         monitor.setProgressMessage("trim images");
         monitor.setTaskSize( ff.length );
         int i=0;
@@ -426,8 +481,14 @@ public class ScreenshotsTool extends EventQueue {
     }
 
     int active= -1;
+    private final Window parent;
 
-    private void doit( long t1, long dt, int id ) {
+    /**
+     * the part of the display that has been affected during the capture.
+     */
+    Rectangle bounds= null;
+
+    private Rectangle doit( long t1, long dt, int id ) {
         t0= t1;
 
         //long processTime0= System.currentTimeMillis();
@@ -435,6 +496,11 @@ public class ScreenshotsTool extends EventQueue {
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
         final BufferedImage im = getScreenShot( active, button );
+
+        Rectangle b= getScreenBounds(active);
+        Rectangle myBounds= getMyBounds(b);
+        System.err.println("myBounds="+myBounds);
+
         //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
@@ -448,6 +514,7 @@ public class ScreenshotsTool extends EventQueue {
 
         t0= System.currentTimeMillis();
 
+        return myBounds;
     }
 
     int keyEscape=0;
@@ -526,7 +593,8 @@ public class ScreenshotsTool extends EventQueue {
         } 
 
         if (  !reject ) {
-            doit( t1, dt, theEvent.getID() );   // Take a picture here
+            Rectangle r= doit( t1, dt, theEvent.getID() );   // Take a picture here
+            if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
         }
 
         // 400 401 402 are Key events.
@@ -572,13 +640,13 @@ public class ScreenshotsTool extends EventQueue {
                 ".<br>Operation should now be normal.<br><br>Enter Pngwalk?" ), BorderLayout.CENTER );
         JCheckBox cb= new JCheckBox( String.format( "first trim %d images", count ) );
         p.add( cb, BorderLayout.SOUTH );
-        if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( null,
+        if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( parent,
             p,
             "Record Screenshots", JOptionPane.YES_NO_OPTION ) ) {
             if ( cb.isSelected() ) {
                 try {
                     DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(cb), "trimming images..." );
-                    trimAll( outLocationFolder, monitor );
+                    trimAll( outLocationFolder, bounds, monitor );
                 } catch ( IOException ex ) {
 
                 }
@@ -591,7 +659,7 @@ public class ScreenshotsTool extends EventQueue {
             if ( cb.isSelected() ) {
                 try {
                     DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(cb), "trimming images..." );
-                    trimAll( outLocationFolder, monitor );
+                    trimAll( outLocationFolder, bounds, monitor );
                 } catch ( IOException ex ) {
 
                 }
