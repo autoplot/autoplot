@@ -26,6 +26,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -55,6 +56,7 @@ import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.util.TickleTimer;
@@ -67,6 +69,9 @@ import org.virbo.autoplot.util.TickleTimer;
  */
 public class ScreenshotsTool extends EventQueue {
 
+    private static final int MOUSE_WHEEL_UP= 1;
+    private static final int MOUSE_WHEEL_DOWN= 2;
+
     /**
      * start should be called from the event thread.
      */
@@ -78,7 +83,7 @@ public class ScreenshotsTool extends EventQueue {
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
 
-        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br>Hold Ctrl and press Shift twice to stop recording." ), BorderLayout.CENTER );
+        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br>The folder must be empty.<br>Hold Ctrl and press Shift twice to stop recording." ), BorderLayout.CENTER );
 
         JPanel folderPanel= new JPanel();
         folderPanel.setLayout( new FlowLayout() );
@@ -105,6 +110,16 @@ public class ScreenshotsTool extends EventQueue {
         JOptionPane.OK_CANCEL_OPTION );
 
         if ( r==JOptionPane.OK_OPTION ) {
+            File f= new File( tf.getText() );
+            if ( f.exists() && f.listFiles().length>1 ) {
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( parent,"Folder is not empty.  Delete contents before starting?", "Folder must be empty", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    if ( !FileUtil.deleteFileTree(f) ) {
+                        JOptionPane.showMessageDialog(parent,"Unable to delete files");
+                    }
+                } else {
+                    return;
+                }
+            }
             try {
                 prefs.put( "outputFolder", tf.getText() );
                 try{
@@ -125,11 +140,14 @@ public class ScreenshotsTool extends EventQueue {
             fail= !this.outLocationFolder.mkdirs();
         }
         if ( fail ) throw new IOException("output folder cannot be created");
+        if ( this.outLocationFolder.listFiles().length>1 ) {
+            throw new IOException("output folder must be empty");
+        }
         logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
 
         active= getActiveDisplay( parent );
 
-        tickleTimer= new TickleTimer( 200, new PropertyChangeListener() {
+        tickleTimer= new TickleTimer( 300, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
@@ -179,6 +197,8 @@ public class ScreenshotsTool extends EventQueue {
     static BufferedImage pnt_b1;
     static BufferedImage pnt_b2;
     static BufferedImage pnt_b3;
+    static BufferedImage pnt_w1;
+    static BufferedImage pnt_w2;
 
     /**
      * mouse buttons
@@ -191,6 +211,8 @@ public class ScreenshotsTool extends EventQueue {
             pnt_b1 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b1.png"));
             pnt_b2 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b2.png"));
             pnt_b3 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_b3.png"));
+            pnt_w1 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_w1.png"));
+            pnt_w2 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_w2.png"));
         } catch (IOException ex) {
             Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -386,6 +408,12 @@ public class ScreenshotsTool extends EventQueue {
                 pointer= pnt_b2;
             } else if ( ( button & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
                 pointer= pnt_b3;
+            } else if ( ( button & MOUSE_WHEEL_UP ) == MOUSE_WHEEL_UP ) {
+                pointer= pnt_w1;
+                button= 0;
+            } else if ( ( button & MOUSE_WHEEL_DOWN ) == MOUSE_WHEEL_DOWN ) {
+                pointer= pnt_w2;
+                button= 0;
             } else {
                 pointer= pnt;
             }
@@ -474,21 +502,31 @@ public class ScreenshotsTool extends EventQueue {
             Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if (  !reject ) {
-            doit( t1, dt, theEvent.getID() );   // Take a picture here
-        }
-
         if ( theEvent instanceof MouseEvent ) {
             MouseEvent me= (MouseEvent)theEvent;
-            if ( ( me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
-                button= MouseEvent.BUTTON1_DOWN_MASK;
-            } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) { 
-                button= MouseEvent.BUTTON2_DOWN_MASK;
-            } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) { 
-                button= MouseEvent.BUTTON3_DOWN_MASK;
+            if ( me.getModifiersEx()!=0 ) {
+                if ( ( me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
+                    button= MouseEvent.BUTTON1_DOWN_MASK;
+                } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
+                    button= MouseEvent.BUTTON2_DOWN_MASK;
+                } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
+                    button= MouseEvent.BUTTON3_DOWN_MASK;
+                }
+                reject= false;
             } else {
-                button= 0;
+                if ( theEvent instanceof MouseWheelEvent ) {
+                    MouseWheelEvent mwe= (MouseWheelEvent)theEvent;
+                    button= mwe.getWheelRotation()<0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
+                    reject= false;
+                } else {
+                    button= 0;
+                    reject= true;
+                }
             }
+        } 
+
+        if (  !reject ) {
+            doit( t1, dt, theEvent.getID() );   // Take a picture here
         }
 
         // 400 401 402 are Key events.
@@ -529,9 +567,10 @@ public class ScreenshotsTool extends EventQueue {
 
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
+        int count= outLocationFolder.list().length;
         p.add( new JLabel( "<html>Screenshots have been recorded to "+outLocationFolder+
                 ".<br>Operation should now be normal.<br><br>Enter Pngwalk?" ), BorderLayout.CENTER );
-        JCheckBox cb= new JCheckBox( "first trim images" );
+        JCheckBox cb= new JCheckBox( String.format( "first trim %d images", count ) );
         p.add( cb, BorderLayout.SOUTH );
         if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( null,
             p,
