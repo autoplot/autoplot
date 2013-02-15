@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil.TimeStruct;
 import org.das2.util.LoggerManager;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
@@ -194,7 +195,21 @@ public class DataSourceUtil {
             sagg = URISplit.removeParam(sagg, "timerange");
             TimeParser tp;
             try {
-                tp= TimeParser.create(sagg);
+                tp= TimeParser.create(sagg,"v",new TimeParser.FieldHandler() {
+                    public String configure(Map<String, String> args) {
+                        return null;
+                    }
+                    public String getRegex() {
+                        return null;
+                    }
+                    public void parse(String fieldContent, TimeStruct startTime, TimeStruct timeWidth, Map<String, String> extra) throws ParseException {
+                        System.err.println("hello there "+fieldContent);
+                    }
+                    public String format(TimeStruct startTime, TimeStruct timeWidth, int length, Map<String, String> extra) throws IllegalArgumentException {
+                        return null;
+                    }
+                });
+
                 tp.parse(surl);
             } catch (ParseException ex) {
                 continue;
