@@ -573,6 +573,26 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
             }
         }
+
+        if ( slice && depend ) {
+            Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
+            if ( dep0map!=null ) {
+                QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
+                result.putProperty( QDataSet.CONTEXT_0, dep0 );
+            }
+        }
+
+        // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
+        boolean doPlusMinus= depend==false;
+        Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
+        Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
+        if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
+            QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, false, false, null ); //TODO: slice1
+            result.putProperty( QDataSet.BIN_PLUS, delta );
+            if ( !deltaMinus.equals(deltaPlus) ) delta= wrapDataSet( cdf, (String)deltaMinus, constraints, false, false, null );
+            result.putProperty( QDataSet.BIN_MINUS, delta );
+        }
+
         
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -393,6 +394,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         result.putProperty(QDataSet.NAME, svariable);
 
         final boolean doUnits = true;
+        Units units=null;
         if (doUnits) {
             if (thisAttributes.containsKey("UNITS")) {
                 String sunits= (String) thisAttributes.get("UNITS");
@@ -405,16 +407,48 @@ public class CdfFileDataSource extends AbstractDataSource {
                 Units u = (Units) result.property(QDataSet.UNITS);
                 if (u == null) {
                     result.putProperty(QDataSet.UNITS, mu);
+                    units= mu;
+                } else {
+                    units= u;
                 }
+            } else {
+                units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
             }
+        } else {
+            // doFill must not be true for this branch.
         }
 
+        final boolean doFill= ! UnitsUtil.isTimeLocation(units);
+        if ( doFill ) {
+            Object f= thisAttributes.get("FILLVAL");
+            double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+            if ( !Double.isNaN(dv) ) {
+                result.putProperty(QDataSet.FILL_VALUE, dv );
+            }
+            DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
+            if ( vrange!=null ) {
+                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+            }
+        }
+        
         if ( slice && depend ) { 
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
                 QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
                 result.putProperty( QDataSet.CONTEXT_0, dep0 );
             }
+        }
+
+        // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
+        boolean doPlusMinus= depend==false;
+        Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
+        Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
+        if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
+            QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, false, false, -1, null );
+            result.putProperty( QDataSet.BIN_PLUS, delta );
+            if ( !deltaMinus.equals(deltaPlus) ) delta= wrapDataSet( cdf, (String)deltaMinus, constraints, false, false, -1, null );
+            result.putProperty( QDataSet.BIN_MINUS, delta );
         }
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
