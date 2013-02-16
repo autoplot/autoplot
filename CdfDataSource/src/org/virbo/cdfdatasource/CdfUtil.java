@@ -20,7 +20,6 @@ import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import gsfc.nssdc.cdf.util.CDFUtils;
-import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.dsops.Ops;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -584,7 +582,7 @@ public class CdfUtil {
                     o2= Array.newInstance( byte.class, 1 );
                 }
                 if ( o2!=null ) {
-                    logger.fine( "handling rank 0 value by making 1-element array in "+variable );
+                    logger.log( Level.FINE, "handling rank 0 value by making 1-element array in {0}", variable);
                     Array.set( o2, 0, odata );
                     odata= o2;
                 }
