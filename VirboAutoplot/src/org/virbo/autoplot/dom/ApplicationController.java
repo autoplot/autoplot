@@ -1681,7 +1681,24 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dstProp the property name.
      */
     public void unbind( DomNode src, String srcProp, Object dst, String dstProp ) {
-        bindingSupport.unbind( src, srcProp, dst, dstProp );
+        String dstId = "???";
+        if (dst instanceof DomNode) {
+            dstId = ((DomNode) dst).getId();
+        }
+        if (dst instanceof DasCanvasComponent) {
+            dstId = "das2:" + ((DasCanvasComponent) dst).getDasName();
+        }
+        if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
+            BindingModel bm= findBinding( src, srcProp, ((DomNode)dst), dstProp );
+            Binding binding= this.bindingImpls.get(bm);
+            if ( binding!=null ) { 
+                deleteBinding(bm);
+            } else {
+                logger.fine("expected to find binding for "+src.getId()+"."+srcProp+" to "+((DomNode)dst).getId()+"."+dstProp);
+            }
+        } else {
+            bindingSupport.unbind( src, srcProp, dst, dstProp );
+        }
     }
     /**
      * unbind the object, removing any binding to this node.  For example, when the object is about to be deleted.
