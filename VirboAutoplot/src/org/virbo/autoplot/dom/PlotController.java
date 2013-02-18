@@ -732,9 +732,14 @@ public class PlotController extends DomNodeController {
     private Map<String,String> pendingDefaultsChanges= new HashMap();
 
     void bindPEToColorbar( PlotElement pe ) {
-        this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.dasColorBar, DasColorBar.PROPERTY_TYPE );
+        this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
     }
 
+    /**
+     * add the plot element to the plot, including the renderer and bindings.
+     * @param p
+     * @param reset
+     */
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
 
@@ -833,6 +838,14 @@ public class PlotController extends DomNodeController {
         return that;
     }
 
+    void removeBindingsPEToColorbar( PlotElement pe ) {
+        this.dom.controller.unbind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
+    }
+
+    /**
+     * remove the plot element from this plot: remove renderer, remove bindings, etc.
+     * @param p
+     */
     synchronized void removePlotElement(PlotElement p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) dasPlot.removeRenderer(rr);
@@ -845,6 +858,7 @@ public class PlotController extends DomNodeController {
         doPlotElementDefaultsChange(null);
         p.removePropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
         p.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+        removeBindingsPEToColorbar(p);
         pdListen.remove(p);
         if ( !p.getPlotId().equals("") ) p.setPlotId("");
         checkRenderType();
