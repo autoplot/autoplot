@@ -306,24 +306,6 @@ public class BindingSupport {
                 //sources.remove(master);
             } else {
                 implBindingContexts.put( master, list2 );
-//                System.err.println("implBindingContexts.size="+implBindingContexts.size());
-//                if ( implBindingContexts.size()>100 ) {
-//                    int i=0;
-//                    for ( Entry e: implBindingContexts.entrySet() ) {
-//                        i++;
-//                        if ( i>70 && i<80 ) {
-//                            System.err.println("=== "+e );
-//                            StackTraceElement[] ste= sources.get( e.getKey() );
-//                            for ( StackTraceElement ste1: ste ) {
-//                                if ( !ste1.toString().contains("BindingSupport.bind") && !ste1.toString().contains("ApplicationController.bind") ) {
-//                                    System.err.println( ste1 );
-//                                    break;
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//                }
             }
         }
     }
