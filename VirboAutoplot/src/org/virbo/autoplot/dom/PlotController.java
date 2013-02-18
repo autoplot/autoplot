@@ -731,6 +731,10 @@ public class PlotController extends DomNodeController {
 
     private Map<String,String> pendingDefaultsChanges= new HashMap();
 
+    void bindPEToColorbar( PlotElement pe ) {
+        this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.dasColorBar, DasColorBar.PROPERTY_TYPE );
+    }
+
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
 
@@ -739,6 +743,8 @@ public class PlotController extends DomNodeController {
         } else if ( rr instanceof SeriesRenderer ) {
             ((SeriesRenderer)rr).setColorBar( getDasColorBar() );
         }
+
+        bindPEToColorbar( p );
 
         boolean toTop= rr!=null && !( rr instanceof SpectrogramRenderer );
         if ( rr!=null ) {
