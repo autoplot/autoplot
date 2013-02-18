@@ -21,6 +21,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -431,14 +432,37 @@ public class LayoutPanel extends javax.swing.JPanel {
         SwingUtilities.invokeLater(run);
     }
 
+    /**
+     * return the elements of the list where the comparator indicates equal to the object.
+     * @param list
+     * @param c
+     * @param equalTo
+     * @return
+     */
+    private static List getSublist( List list, Comparator c, Object equalTo ) {
+        ArrayList result= new ArrayList(list.size());
+        for ( Object o: list ) {
+            if ( c.compare( o, equalTo )==0 ) {
+                result.add(o);
+            }
+        }
+        return result;
+    }
+
     private void updateBindingList() {
+        final List bindingList= new ArrayList( Arrays.asList( app.getBindings() ) );
+        List rm= getSublist( bindingList, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((BindingModel)o1).getDstProperty().equals("colortable") ? 0 : 1;
+            }
+        }, null );
+        bindingList.removeAll(rm);
         AbstractListModel elementsList = new AbstractListModel() {
-            Object[] foo= app.getBindings();
             public int getSize() {
-                return foo.length;
+                return bindingList.size();
             }
             public Object getElementAt(int index) {
-                return foo[index];
+                return bindingList.get(index);
             }
         };
         bindingListComponent.setModel(elementsList);
