@@ -2473,6 +2473,8 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "reference", seriesRenderer, "reference");
         ac.bind(plotElement.style, "antiAliased", seriesRenderer, "antiAliased");
         ac.bind(plotElement, PlotElement.PROP_CADENCECHECK, seriesRenderer, "cadenceCheck");
+        if ( seriesRenderer.getColorBar()!=null )
+            ac.bind(plotElement.style, "colortable", seriesRenderer.getColorBar(), "type");
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
