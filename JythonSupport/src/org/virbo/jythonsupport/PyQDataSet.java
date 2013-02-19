@@ -257,6 +257,46 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
     @Override
+    public PyObject __eq__(PyObject o) {
+        PyObject r= BinaryInfixOps.eq( this, o );
+        if ( r instanceof PyQDataSet ) {
+            throw new IllegalArgumentException("use .eq operator");
+        } else {
+            return r;
+        }
+    }
+
+    @Override
+    public PyObject __ne__(PyObject o) {
+        PyObject r= BinaryInfixOps.ne( this, o );
+        if ( r instanceof PyQDataSet ) {
+            throw new IllegalArgumentException("use .ne operator");
+        } else {
+            return r;
+        }
+    }
+
+    @Override
+    public PyObject __and__(PyObject o) {
+        PyObject r= BinaryInfixOps.and( this, o );
+        if ( r instanceof PyQDataSet ) {
+            throw new IllegalArgumentException("use .and operator");
+        } else {
+            return r;
+        }
+    }
+
+    @Override
+    public PyObject __or__(PyObject o) {
+        PyObject r= BinaryInfixOps.or( this, o );
+        if ( r instanceof PyQDataSet ) {
+            throw new IllegalArgumentException("use .or operator");
+        } else {
+            return r;
+        }
+    }
+
+    @Override
     public PyObject __findattr__(String name) {
         PyReflectedFunction func= binaryInfixMethods.get(name);
         if ( func!=null ) {
