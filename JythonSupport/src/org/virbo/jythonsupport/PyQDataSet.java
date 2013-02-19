@@ -20,6 +20,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyIterator;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
+import org.python.core.PyLong;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
@@ -173,31 +174,31 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.pow(that, rods));
     }
 
-//    @Override
-//    public PyObject __int__() {
-//        if ( rods.rank()>0 ) {
-//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
-//        }
-//        return Py.newInteger((int)rods.value());
-//    }
-//
-//    @Override
-//    public PyFloat __float__() {
-//        if ( rods.rank()>0 ) {
-//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
-//        }
-//        return Py.newFloat(rods.value());
-//    }
-//
-//    @Override
-//    public PyLong __long__() {
-//        if ( rods.rank()>0 ) {
-//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
-//        }
-//        return Py.newLong((int)rods.value());
-//    }
-//
-//
+    @Override
+    public PyObject __int__() {
+        if ( rods.rank()>0 ) {
+            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+        }
+        return Py.newInteger((int)rods.value());
+    }
+
+    @Override
+    public PyFloat __float__() {
+        if ( rods.rank()>0 ) {
+            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+        }
+        return Py.newFloat(rods.value());
+    }
+
+    @Override
+    public PyLong __long__() {
+        if ( rods.rank()>0 ) {
+            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+        }
+        return Py.newLong((int)rods.value());
+    }
+
+
     private static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
         binaryInfixMethods= new HashMap<String, PyReflectedFunction>(); //TODO: what is this?
