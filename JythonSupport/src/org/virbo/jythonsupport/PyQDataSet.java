@@ -199,7 +199,7 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
 
-    private static Map<String,PyReflectedFunction> binaryInfixMethods;
+    private final static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
         binaryInfixMethods= new HashMap<String, PyReflectedFunction>(); //TODO: what is this?
         binaryInfixMethods.put( "gt", new PyReflectedFunction("gt") );
