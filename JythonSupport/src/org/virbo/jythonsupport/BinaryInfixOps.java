@@ -5,7 +5,9 @@
 
 package org.virbo.jythonsupport;
 
+import org.python.core.PyInteger;
 import org.python.core.PyObject;
+import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -15,36 +17,53 @@ import org.virbo.dsops.Ops;
  */
 public class BinaryInfixOps {
 
-    public static PyQDataSet eq( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.eq(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject eq( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.eq(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet gt( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.gt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject gt( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.gt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet ge( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.ge(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject ge( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.ge(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet lt( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.lt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject lt( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.lt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) ;
+        return mycast( r );
     }
 
-    public static PyQDataSet le( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.le(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject le( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.le(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet ne( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.ne(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject ne( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.ne(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet and( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.and(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject and( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.and(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
 
-    public static PyQDataSet or( PyObject arg1, PyObject arg2 ) {
-        return new PyQDataSet( Ops.or(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) );
+    public static PyObject or( PyObject arg1, PyObject arg2 ) {
+        QDataSet r= Ops.or(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        return mycast( r );
     }
+
+    private static PyObject mycast( QDataSet r ) {
+        if ( r.rank()==0 ) {
+            return new PyInteger( r.value()==0 ? 0 : 1 );
+        } else {
+            return new PyQDataSet( r );
+        }
+    }
+
     
 }
