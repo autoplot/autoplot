@@ -445,10 +445,23 @@ public class CdfFileDataSource extends AbstractDataSource {
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
-            QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, false, false, -1, null );
-            result.putProperty( QDataSet.BIN_PLUS, delta );
-            if ( !deltaMinus.equals(deltaPlus) ) delta= wrapDataSet( cdf, (String)deltaMinus, constraints, false, false, -1, null );
-            result.putProperty( QDataSet.BIN_MINUS, delta );
+            Variable var= cdf.getVariable((String)deltaPlus);
+            QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.getRecVariance(), false, -1, null );
+            if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result) ) ) {
+                result.putProperty( QDataSet.BIN_PLUS, delta );
+                if ( !deltaMinus.equals(deltaPlus) ) {
+                    var= cdf.getVariable((String)deltaMinus);
+                    delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !var.getRecVariance(), false, -1, null );
+                }
+                if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result) ) ) {
+                    result.putProperty( QDataSet.BIN_MINUS, delta );
+                } else {
+                    result.putProperty( QDataSet.BIN_PLUS, null );
+                    logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                }
+            } else {
+                logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+            }
         }
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
