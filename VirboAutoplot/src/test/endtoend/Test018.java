@@ -172,7 +172,11 @@ public class Test018 {
     private static String bindStr( Application dom ) {
         StringBuilder b= new StringBuilder();
         for ( BindingModel bm: dom.getBindings() ) {
-            b.append(bm.toString()).append("!c");
+            if ( bm.toString().contains("colortable") ) {
+                // don't mention this.
+            } else {
+                b.append(bm.toString()).append("!c");
+            }
         }
         return b.toString();
     }
