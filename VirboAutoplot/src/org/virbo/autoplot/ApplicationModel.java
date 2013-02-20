@@ -357,15 +357,15 @@ public class ApplicationModel {
 
 
     /**
-     * Create a dataSource object and set autoplot to display this datasource.
+     * Create a dataSource object and set Autoplot to display this datasource.
      * A dataSource object is created by DataSetURI._getDataSource, which looks
      * at registered data sources to get a factory object, then the datasource is
      * created with the factory object.
      *
      * Preconditions: Any or no datasource is set.
-     * Postconditions: A dataSource object is created and autoplot is set to
+     * Postconditions: A dataSource object is created and Autoplot is set to
      *  plot the datasource.  A thread has been started that will load the dataset.
-     *  In headless mode, the dataset has been loaded sychronously.
+     *  In headless mode, the dataset has been loaded synchronously.
      *
      * @param surl the new data source URL.
      * @param mon progress monitor which is just used to convey messages.
