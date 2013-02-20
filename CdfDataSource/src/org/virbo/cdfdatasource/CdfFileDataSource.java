@@ -564,9 +564,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                     if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
                         QDataSet wds= SemanticOps.weightsDataSet(depDs);
                         int i0=0;
-                        int l1= wds.length(0)-1;
+                        int l0= (wds.length(0)-1)*1/8;
+                        int l1= (wds.length(0)-1)*7/8;
                         for ( i0=0; i0<depDs.length(); i0++ ) {
-                            if ( wds.value(i0,0)>0 && wds.value(i0,l1)>0 ) break;
+                            if ( wds.value(i0,l0)>0 && wds.value(i0,l1)>0 ) break;
                         }
                         if ( i0<depDs.length() ) {
                             QDataSet ex= Ops.extent( DataSetOps.slice1(depDs,0) );
