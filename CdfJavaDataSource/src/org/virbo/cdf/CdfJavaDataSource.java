@@ -583,6 +583,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
 
         // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
+        // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
         boolean doPlusMinus= depend==false;
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
