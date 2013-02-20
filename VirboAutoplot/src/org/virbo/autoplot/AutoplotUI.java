@@ -31,8 +31,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.GraphicsConfiguration;
 import java.awt.Toolkit;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetListener;
@@ -190,7 +188,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     private JScrollPane layoutPanel1;
     private LogConsole logConsole;
     private JScrollPane logConsolePanel;
-    private JScrollPane jythonScriptPanel;
+    private JPanel jythonScriptPanel;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
@@ -643,6 +641,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         // jython is often slow to start up the first time, so go ahead and do this in the background.
         run= new Runnable() {
+            @Override
             public String toString() { return "addInitializePython"; }
             public void run() {
                 try {
@@ -664,6 +663,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
                 invokeLater( 2500, false, new Runnable() {
+                    @Override
                     public String toString() { return "addAxesRunnable"; }
                     public void run() {
   APSplash.checkTime("addAxes1 in");
@@ -687,6 +687,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
                 invokeLater( 2500, false, new Runnable() {
+                    @Override
                     public String toString() { return "addStyle"; }
                     public void run() {
   APSplash.checkTime("addStyle1 in");
@@ -703,7 +704,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     }
 
     /**
-     * this method is disabled from Webstart version, since it doesn't work with
+     * this method is disabled from WebStart version, since it doesn't work with
      * the security model.
      * @throws HeadlessException
      */
@@ -765,6 +766,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
         invokeLater( 3530, false, new Runnable() {
+            @Override
             public String toString() { return "addLayout"; }
             public void run() {
                 //long t0= System.currentTimeMillis();
@@ -781,6 +783,7 @@ APSplash.checkTime("init 250");
             }
         } );
         invokeLater( 3550, false, new Runnable() {
+            @Override
             public String toString() { return "addDataPanel"; }
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
@@ -797,6 +800,7 @@ APSplash.checkTime("init 260");
             }
         } );
         invokeLater( 3570, false, new Runnable() { 
+            @Override
             public String toString() { return "addMetadataPanel"; }
             public void run() {
 APSplash.checkTime("init 269");
@@ -810,15 +814,16 @@ APSplash.checkTime("init 270");
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             final DataSetSelector fdataSetSelector= this.dataSetSelector; // org.pushngpixels.tracing.TracingEventQueueJMX showed this was a problem.
-            jythonScriptPanel= new JScrollPane();
+            jythonScriptPanel= new JPanel( new BorderLayout() );
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             invokeLater( 4000, true, new Runnable() {
+                @Override
                 public String toString() { return "addScriptPanel"; }
                 public void run() {
                     scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
-                       jythonScriptPanel.setViewportView(scriptPanel);
+                       jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
                        scriptPanelMenuItem.setSelected(true);
                     } } );
                 }
@@ -829,6 +834,7 @@ APSplash.checkTime("init 270");
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
             invokeLater( 4020, true, new Runnable() {
+                @Override
                 public String toString() { return "addLogConsole"; }
                 public void run() {
                     initLogConsole();
@@ -982,6 +988,7 @@ APSplash.checkTime("init 270");
     private void addBindings() {
 
         Runnable run= new Runnable() {
+            @Override
             public String toString() { return "bindings"; }
             public void run() {
                 BindingGroup bc = new BindingGroup();
@@ -2558,7 +2565,7 @@ APSplash.checkTime("init 52");
             JOptionPane.showMessageDialog(this, pane);
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
         }
 
     }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
@@ -2578,9 +2585,9 @@ APSplash.checkTime("init 52");
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
-        jythonScriptPanel= new JScrollPane();
+        jythonScriptPanel= new JPanel( new BorderLayout() );
         scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
-        jythonScriptPanel.setViewportView(scriptPanel);
+        jythonScriptPanel.add(scriptPanel, BorderLayout.CENTER );
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
     } else if ( scriptPanelMenuItem.isSelected() && jythonScriptPanel!=null ) {
@@ -2705,11 +2712,10 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
             } catch ( IOException ex ) {
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "", ex );
                 return;
             } catch ( Exception ex) {
-                logger.log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, "", ex );
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
             }
@@ -3154,7 +3160,6 @@ private void updateFrameTitle() {
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
         }
 
         System.err.println(welcome);
@@ -3199,7 +3204,7 @@ private void updateFrameTitle() {
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log( Level.SEVERE, "", e );
             }
         }
 
@@ -3336,6 +3341,7 @@ APSplash.checkTime("init 230");
                 if ( !script.equals("") ) {
                     if ( app!=null ) app.setStatus("running script "+script);
                     Runnable run= new Runnable() {
+                        @Override
                         public String toString() { return "runScriptRunnable"; }
                         public void run() {
                             try {
@@ -3426,7 +3432,7 @@ APSplash.checkTime("init 240");
                     logger.log(Level.FINE, "connection from {0}", socket);
                     rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.log( Level.SEVERE, "", ex );
                 }
             }
         });
@@ -3678,7 +3684,7 @@ APSplash.checkTime("init 240");
                     }
                     reader.close();
                 } catch (IOException iOException) {
-                    iOException.printStackTrace();
+                    logger.log( Level.SEVERE, "", iOException );
                 }
                 book.setTitle(toolLabel);
                 tools.add(book);
@@ -3789,7 +3795,7 @@ APSplash.checkTime("init 240");
             mm.mergeList(b,l);
             mm.setList(l);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, "", ex );
             applicationModel.getExceptionHandler().handleUncaught(ex);
         }
     }
