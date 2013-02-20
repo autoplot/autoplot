@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
+import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
@@ -500,14 +501,39 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( isValueAdjusting() ) {
                     return;
                 }
+
+                List<String> ss= new ArrayList<String>();
+
                 // is anyone listening to timerange?
                 boolean noOneListening= true;
                 BindingModel[] bms= application.getBindings();
                 for ( int i=0; i<bms.length; i++ ) {
                     if ( bms[i].getSrcId().equals( application.getId() ) && bms[i].srcProperty.equals( Application.PROP_TIMERANGE ) ) {
                         noOneListening= false;
+                        ss.add( bms[i].getDstId() );
                     }
                 }
+
+                if ( false ) {
+                    for ( int i=0; i<ss.size(); i++ ) {
+                        String s= ss.get(i);
+                        DomNode n= DomUtil.getElementById( node, s );
+                        final Axis a= (Axis)n;
+                        final Plot p= getPlotFor(a.controller.getDasAxis());
+                        a.getController().getDasAxis().addPropertyChangeListener( DasAxis.PROPERTY_TICKS, new PropertyChangeListener() {
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                if ( a.isVisible() && a.isDrawTickLabels() ) {
+                                    if ( !p.getTicksURI().equals("") ) {
+                                        System.err.println("a="+a);
+                                    } else {
+                                        System.err.println("maybe a="+a);
+                                    }
+                                }
+                            };
+                        });
+                    }
+                }
+
                 if ( noOneListening ) {
                     logger.fine("resetting application to default time range");
                     application.setTimeRange( Application.DEFAULT_TIME_RANGE );
