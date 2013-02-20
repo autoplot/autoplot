@@ -590,13 +590,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
         if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
             Variable var= cdf.getVariable((String)deltaPlus);
             QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.recordVariance(), false, null ); //TODO: slice1
-            if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result) ) ) {
+            Units deltaUnits= SemanticOps.getUnits(delta);
+            if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
                 result.putProperty( QDataSet.BIN_PLUS, delta );
                 if ( !deltaMinus.equals(deltaPlus) ) {
                     var= cdf.getVariable((String)deltaMinus);
                     delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !var.recordVariance(), false, null );
+                    deltaUnits= SemanticOps.getUnits(delta);
                 }
-                if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result) ) ) {
+                if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
                     result.putProperty( QDataSet.BIN_MINUS, delta );
                 } else {
                     result.putProperty( QDataSet.BIN_PLUS, null );
