@@ -1428,7 +1428,11 @@ public class AutoplotUtil {
                 return spec;
             }
             try {
-                spec = RenderType.valueOf(srenderType);
+                if ( srenderType.equals("spectrogram") ) {
+                    spec= specPref;
+                } else {
+                    spec = RenderType.valueOf(srenderType);
+                }
                 return spec;
             } catch (IllegalArgumentException e) {
                 int i= srenderType.indexOf(">");
