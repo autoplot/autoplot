@@ -386,6 +386,7 @@ public class ApplicationModel {
                     URI uri = DataSetURI.getURIValid(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
+                    this.getDocumentModel().getController().setFocusUri("");
                     File openable = DataSetURI.getFile(uri, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
                     if (split.params != null) {
                         LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
