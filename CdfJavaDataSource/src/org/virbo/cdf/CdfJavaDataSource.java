@@ -589,23 +589,27 @@ public class CdfJavaDataSource extends AbstractDataSource {
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
             Variable var= cdf.getVariable((String)deltaPlus);
-            QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.recordVariance(), false, null ); //TODO: slice1
-            Units deltaUnits= SemanticOps.getUnits(delta);
-            if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                result.putProperty( QDataSet.BIN_PLUS, delta );
-                if ( !deltaMinus.equals(deltaPlus) ) {
-                    var= cdf.getVariable((String)deltaMinus);
-                    delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !var.recordVariance(), false, null );
-                    deltaUnits= SemanticOps.getUnits(delta);
-                }
-                if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                    result.putProperty( QDataSet.BIN_MINUS, delta );
+            if ( var!=null ) {
+                QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.recordVariance(), false, null ); //TODO: slice1
+                Units deltaUnits= SemanticOps.getUnits(delta);
+                if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                    result.putProperty( QDataSet.BIN_PLUS, delta );
+                    if ( !deltaMinus.equals(deltaPlus) ) {
+                        var= cdf.getVariable((String)deltaMinus);
+                        delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !var.recordVariance(), false, null );
+                        deltaUnits= SemanticOps.getUnits(delta);
+                    }
+                    if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                        result.putProperty( QDataSet.BIN_MINUS, delta );
+                    } else {
+                        result.putProperty( QDataSet.BIN_PLUS, null );
+                        logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                    }
                 } else {
-                    result.putProperty( QDataSet.BIN_PLUS, null );
-                    logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                    logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                 }
             } else {
-                logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
             }
         }
 
