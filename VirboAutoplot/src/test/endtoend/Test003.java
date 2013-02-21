@@ -6,7 +6,6 @@ package test.endtoend;
 
 import java.io.IOException;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.util.filesystem.KeyChain;
 import org.virbo.autoplot.ScriptContext;
 
 /**
@@ -17,7 +16,7 @@ public class Test003 {
 
     public static void doit(int id, String uri) {
         try {
-            System.err.println("== %03d == "+id );
+            System.err.println( String.format( "== %03d == ", id ) );
             System.err.println("uri: "+uri);
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
