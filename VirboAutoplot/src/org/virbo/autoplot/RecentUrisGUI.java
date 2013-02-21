@@ -261,6 +261,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             ex.printStackTrace();
                         }
                     }
+                    scan.close();
 
                     for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
                         try {
