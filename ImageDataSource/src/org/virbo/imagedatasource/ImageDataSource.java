@@ -112,8 +112,8 @@ class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        //BufferedImage image = ImageIO.read(DataSetURI.getFile(uri, mon));
-        BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
+        BufferedImage image = ImageIO.read(DataSetURI.getFile(uri, mon));
+        //BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
 
         String rot= getParam( "rotate", "0" );
         if ( !rot.equals("0") ) {
