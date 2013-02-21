@@ -203,7 +203,6 @@ public class DataSourceUtil {
                         return null;
                     }
                     public void parse(String fieldContent, TimeStruct startTime, TimeStruct timeWidth, Map<String, String> extra) throws ParseException {
-                        System.err.println("hello there "+fieldContent);
                     }
                     public String format(TimeStruct startTime, TimeStruct timeWidth, int length, Map<String, String> extra) throws IllegalArgumentException {
                         return null;
