@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A bug were occasionally data would fail to be completely painted is fixed. <a href="http://autoplot.org/autoplot.jnlp?http://sarahandjeremy.net/~jbf/autoplot/vap/geothermal20130106.vap">geothermal20130106.vap</a> </small></p>
+        <p><small>Bill noted that Autoplot would sometime use different locations for ticks in a stack plot.  This is fixed.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,8 +23,14 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3605224: major ticks don't line up when one axis of stack has labels.</li>
+            <li>3605415: CDF type "spectrogram>noauto", and user pref for spectrogram</li>
+            <li>3605230: jython rank zero result of gt ought to be a boolean</li>
+            <li>3604997: color scatter not connected to colorbar</li>
+            <li>3604985: CDF DELTA_PLUS/DELTA_MINUS define bins for NN Spectrogram</li>
             <li>3604265: partial load of timeseries when scanning around.</li>
             <li>3599689: agg sometimes not loading when two on same plot</li>
+            <li>3604489: double check of isLocal in WebFileSystem results in failure </li>
             <li>3603701: Preserve DatumRange types (orbit:...) with built-in axis scan,history</li>
             <li>3604777: agg completions missing when tab is pressed in address bar</li>
             <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
