@@ -26,6 +26,12 @@ import org.virbo.dataset.QDataSet;
  */
 public class ReferenceCache {
 
+    /**
+     * System property the enables the reference cache.  Clients should check this before using the cache with code like:
+     * <code>
+     * boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
+     * </code>
+     */
     public static final String PROP_ENABLE_REFERENCE_CACHE= "enableReferenceCache";
 
     private static final Logger logger= LoggerManager.getLogger("apdss.refcache");
