@@ -18,7 +18,10 @@ import org.virbo.dsops.Ops;
 public class BinaryInfixOps {
 
     public static PyObject eq( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.eq(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet jarg1= JythonOps.coerceToDs(arg1);
+        QDataSet jarg2= JythonOps.coerceToDs(arg2);
+        if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1==jarg2 ? 1 : 0 );
+        QDataSet r= Ops.eq(  jarg1, jarg2 );
         return mycast( r );
     }
 
@@ -43,7 +46,10 @@ public class BinaryInfixOps {
     }
 
     public static PyObject ne( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.ne(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet jarg1= JythonOps.coerceToDs(arg1);
+        QDataSet jarg2= JythonOps.coerceToDs(arg2);
+        if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1!=jarg2 ? 1 : 0 );
+        QDataSet r= Ops.ne( jarg1, jarg2 );
         return mycast( r );
     }
 
