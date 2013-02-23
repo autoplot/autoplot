@@ -235,6 +235,9 @@ public class CDAWebDB {
             }
             XPath xp = XPathFactory.newInstance().newXPath();
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access", spid), document, XPathConstants.NODE );
+            if ( node==null ) {
+                throw new IOException("unable to find node for "+spid + " in "+ dbloc );
+            }
             NamedNodeMap attrs= node.getAttributes();
             String subdividedby=attrs.getNamedItem("subdividedby").getTextContent();
             String filenaming= attrs.getNamedItem("filenaming").getTextContent();
