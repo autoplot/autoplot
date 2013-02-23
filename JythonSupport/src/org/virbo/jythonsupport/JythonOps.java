@@ -19,6 +19,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
+import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PySingleton;
 import org.python.core.PyString;
@@ -117,8 +118,11 @@ public class JythonOps {
             } catch (ParseException ex) {
                throw Py.SyntaxError( "unable to parse string: "+arg0 );
             }
+        } else if ( arg0 instanceof PyNone ) {
+            // In python code, support test like "ds!=None"
+            return null;
         } else {
-            throw Py.TypeError("unable to coerce "+arg0+" to QDataSet");
+            throw Py.TypeError("JythonOps is unable to coerce "+arg0+" to QDataSet");
         }
         
     }
