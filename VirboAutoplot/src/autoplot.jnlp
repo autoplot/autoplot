@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <jnlp 
-    spec="1.0+" 
+    spec="1.0+"
     codebase="#{codebase}"
     href="autoplot.jnlp">
     <!-- codebase="http://autoplot.org/jnlp/#{tag}/" -->
@@ -15,42 +15,42 @@
         <icon href="logo64x64.gif" width="64" height="64" />
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
+        <offline-allowed/>
         <shortcut online="true">
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
-        <offline-allowed/>
-        <association mime-type="application/x-netcdf" extensions="cdf"/>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
     </information>
     
     <security>
         <all-permissions/>
     </security>
-    
+
+    <!-- start up as quickly as possible, doing updates in the background -->
+    <update check="background"/>
+
     <resources> 
         <j2se version="1.6+" initial-heap-size="96m" max-heap-size="1024m" java-vm-args="-Dsun.java2d.d3d=false"
               href="http://java.sun.com/products/autodl/j2se" >
         </j2se>
-        
+
+        <jar href="AutoplotVolatile.jar" />
+        <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
+        <!--<jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20130201.jar" /> -->
+
+        <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
+        <!--<extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" >-->
+        </extension>
+
         <property name="jnlp.packEnabled" value="true"/>
         <property name="deployment.security.authenticator" value="false"/>
 
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
-        
-        <jar href="AutoplotVolatile.jar" />
-        <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
-        <!--<jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20130201.jar" /> -->
-        
+                
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-           <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
-        <!--<extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" >-->
-        </extension>
         
     </resources> 
-
-    <!-- start up as quickly as possible, doing updates in the background -->
-    <update check="background"/>
 
     <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <argument>--nativeLAF</argument>
