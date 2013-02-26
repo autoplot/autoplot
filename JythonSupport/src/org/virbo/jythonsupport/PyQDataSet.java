@@ -446,7 +446,7 @@ public class PyQDataSet extends PyJavaInstance {
                     idx= rods.length()+idx;
                 }
 
-                QDataSet sds= rods.slice(idx);
+                QDataSet sds= rods.slice(idx); //TODO: why is this not the writable dataset, or a copy of it?
                 //TODO: properties and context.
                 return new PyQDataSet( sds );
                 
