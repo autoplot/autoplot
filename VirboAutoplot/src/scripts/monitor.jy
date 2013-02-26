@@ -1,4 +1,7 @@
-# demo the usage the the 
+# title: demo the usage of the monitor.
+# This is a demo of the monitor object which is available to users to
+# provide feedback in scripts.  
+
 monitor.setTaskSize(100)
 
 monitor.started()
