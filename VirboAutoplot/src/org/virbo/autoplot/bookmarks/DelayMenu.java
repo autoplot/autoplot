@@ -53,7 +53,7 @@ public class DelayMenu extends JMenu {
                             sel.maybePlot(e.getModifiers());
                         }
                     });
-
+                    mi.setToolTipText( ((Bookmark.Item) book).getUri() );
                     if (book.getIcon() != null) {
                         mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
                     }
