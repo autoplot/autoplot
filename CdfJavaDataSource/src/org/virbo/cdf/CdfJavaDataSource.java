@@ -5,6 +5,7 @@
 
 package org.virbo.cdf;
 
+import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
 import org.das2.datum.Units;
 import org.virbo.metatree.IstpMetadataModel;
@@ -12,6 +13,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import gov.nasa.gsfc.voyager.cdf.CDF;
 import gov.nasa.gsfc.voyager.cdf.CDFFactory;
 import gov.nasa.gsfc.voyager.cdf.Variable;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -30,6 +32,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -127,6 +130,23 @@ public class CdfJavaDataSource extends AbstractDataSource {
     }
 
     /**
+     * To resolve bug 3605590 we unload the cache after 10 seconds.  Joe at Aerospace had a problem where
+     * he couldn't kill a lingering autoplot process and then couldn't get at the file because it held a reference to the
+     * file.  Now we automatically unload all the cached files.  I did look at just disabling the cache, but the file is
+     * open and closed three times during the load.
+     */
+    public static TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            logger.log(Level.FINER, "unloading cache to resolve bug 3605590" );
+            synchronized (lock ) {
+                openFiles.clear();
+                openFilesRev.clear();
+                openFilesFresh.clear();
+            }
+        }
+    });
+
+    /**
      * get the abstract access object to the given CDF file.  This provides read-only access to the file, and a cache
      * is used to limit the number of references managed.
      * See bug https://sourceforge.net/tracker/index.php?func=detail&aid=3576013&group_id=199733&atid=970682
@@ -177,6 +197,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
+        timer.tickle("unload cdf soon");
         return cdf;
 
     }
