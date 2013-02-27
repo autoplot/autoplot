@@ -43,13 +43,16 @@ import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +93,9 @@ import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
@@ -3802,6 +3808,7 @@ APSplash.checkTime("init 240");
     
     private void runScript( String script ) {
         try {
+            URISplit split= URISplit.parse(script);
             File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
             RunScriptPanel pp = new RunScriptPanel();
             pp.loadFile(ff);
@@ -3811,6 +3818,13 @@ APSplash.checkTime("init 240");
                     File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                     File cpTo= new File( tools,ff.getName() );
                     if ( !ff.equals(cpTo ) ) {
+                        File log= new File( tools, "scripts.txt" );
+                        FileWriter out3 = new FileWriter( log, true );
+                        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + split.resourceUri + "\n" );
+                        out3.close();
+
                         if ( !Util.copyFile( ff, cpTo ) ) {
                             setStatus("warning: unable to copy file");
                         } else {
