@@ -23,6 +23,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>3605590: Java CDF reader no longer holds on to open files, this caused problems, and now we close after 10 seconds.</li>
+            <li>3606197: NN spectrograms fixed for rank 2 DEPEND_1.</li>
             <li>recent changes to Jython eq and ne infix ops broke Jython code like (ds!=None)</li>
             <li>3605224: major ticks don't line up when one axis of stack has labels.</li>
             <li>3605415: CDF type "spectrogram>noauto", and user pref for spectrogram</li>
