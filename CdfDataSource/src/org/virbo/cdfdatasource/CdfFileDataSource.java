@@ -520,7 +520,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
 
                         //if ( "ion_en".equals( (String) dep.get("NAME") ) ) reformDep= false;
-                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, -1, null);
+                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, -1, null);   //TODO: bug  3606198 with subsetting rank 2 DEPEND_1
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
