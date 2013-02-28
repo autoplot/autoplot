@@ -3662,38 +3662,44 @@ APSplash.checkTime("init 240");
         } );
     }
 
+    /**
+     * load the jython scripts in the users AUTOPLOT_DATA/tools directory.
+     * @return a list of bookmarks, each with the tool's URI and title set to the #LABEL in the script.
+     */
     private List<Bookmark> loadTools() {
         List<Bookmark> tools= new ArrayList();
         File toolsDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "tools" );
         if ( toolsDir.exists() ) {
             File[] ff= toolsDir.listFiles();
             for ( int i=0; i<ff.length; i++ ) {
-                Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
-                String toolLabel= ff[i].getName();
-                // read header comments for label and description.
-                try {
-                    BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
-                    String s = reader.readLine();
-                    while (s != null) {
-                        if ( s.startsWith("#") ) {
-                            if ( s.startsWith("# label:" ) ) {
-                               toolLabel= s.substring(8).trim();
-                            } else if ( s.startsWith("# LABEL:" ) ) {
-                               toolLabel= s.substring(8).trim();
-                            } else if ( s.startsWith("#LABEL:" ) ) {
-                               toolLabel= s.substring(7).trim();
+                if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
+                    Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
+                    String toolLabel= ff[i].getName();
+                    // read header comments for label and description.
+                    try {
+                        BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
+                        String s = reader.readLine();
+                        while (s != null) {
+                            if ( s.startsWith("#") ) {
+                                if ( s.startsWith("# label:" ) ) {
+                                   toolLabel= s.substring(8).trim();
+                                } else if ( s.startsWith("# LABEL:" ) ) {
+                                   toolLabel= s.substring(8).trim();
+                                } else if ( s.startsWith("#LABEL:" ) ) {
+                                   toolLabel= s.substring(7).trim();
+                                }
+                            } else {
+                                break;
                             }
-                        } else {
-                            break;
+                            s = reader.readLine();
                         }
-                        s = reader.readLine();
+                        reader.close();
+                    } catch (IOException iOException) {
+                        logger.log( Level.SEVERE, "", iOException );
                     }
-                    reader.close();
-                } catch (IOException iOException) {
-                    logger.log( Level.SEVERE, "", iOException );
+                    book.setTitle(toolLabel);
+                    tools.add(book);
                 }
-                book.setTitle(toolLabel);
-                tools.add(book);
             }
         } else {
             if ( !toolsDir.mkdirs() ) {
