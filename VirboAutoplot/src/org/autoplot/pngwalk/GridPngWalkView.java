@@ -440,6 +440,9 @@ public class GridPngWalkView extends PngWalkView {
                         if ( s.startsWith("orbit:") ) {
                             s= s.substring(6);
                         }
+                        if ( s.length()>20 && thumbSize<400 ) {
+                            g2.setFont(smallFont);
+                        }
                         g2.drawString( s, cx, cy);
                         g2.setClip(oldClip);
                     }
