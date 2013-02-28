@@ -924,7 +924,10 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     }
 
 private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
-    String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+    String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+    if ( this.prefNode.equals("pngwalk") ) {
+        surl= AutoplotUtil.getProperty("autoplot.default.pngwalk.bookmarks", "http://autoplot.org/data/pngwalk.demos.xml");
+    }
     int r = JOptionPane.showConfirmDialog(this, "Reset your bookmarks to " + surl + "?", "Reset Bookmarks", JOptionPane.OK_CANCEL_OPTION );
     if (r == JOptionPane.OK_OPTION) {
         try {
@@ -997,7 +1000,10 @@ private void URLTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:even
 
 private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeInDefaultMenuItemActionPerformed
         try {
-            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+            if ( this.prefNode.equals("pngwalk") ) {
+               surl= AutoplotUtil.getProperty("autoplot.default.pngwalk.bookmarks", "http://autoplot.org/data/pngwalk.demos.xml");
+            }
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
             List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
