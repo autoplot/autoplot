@@ -580,12 +580,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
         long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
         if ( loadingCount==0 && thumbLoadingCount==0) {
-            setStatus(""+loadedCount+" of "+totalCount + " images loaded, " + thumbLoadedCount + " thumbs, "
-                    + sizeThumbCount+ " exact size are loaded. " + mem + " MB free" );
+            setStatus(""+loadedCount+" of "+totalCount + " images loaded." );
         } else {
             setStatus("busy: "+loadedCount+" of "+totalCount + " images loaded, " 
-                    + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.  "
-                    + sizeThumbCount + " exact size are loaded. " + mem + "MB free");
+                    + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.");
         }
         
     }
