@@ -190,6 +190,11 @@
       </SubComponents>
     </Container>
     <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector1">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Enter the location of the images as a wildcard (/tmp/*.png) or template (/tmp/$Y$m$d.png).  .png, .gif, and .jpg files are supported."/>
+        <Property name="promptText" type="java.lang.String" value="Enter images filename template"/>
+        <Property name="value" type="java.lang.String" value=""/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelector1ActionPerformed"/>
       </Events>

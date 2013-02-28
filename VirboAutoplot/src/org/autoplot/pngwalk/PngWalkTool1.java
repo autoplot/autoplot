@@ -55,7 +55,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileView;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -67,10 +66,8 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.format.TimeDatumFormatter;
-import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -231,8 +228,31 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         String output= "file:" + home + "pngwalk" + java.lang.System.getProperty( "file.separator" )
                 + "product_$Y$m$d.png";
 
-        String sdeft= "<bookmark-list>  <bookmark>     <title>User Bookdefault</title>"
-                + "     <url>"+output+"</url>  </bookmark></bookmark-list>";
+        String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    <bookmark-folder remoteUrl=\"http://virbo.org/meta/viewDataFile.jsp?docname=418DBD06-4CA9-4D8E-44EB-F548AE6DBB9C&amp;filetype=data\">" +
+        "<title>Demos</title>" +
+        "<bookmark-list>" +
+        "    <bookmark>" +
+        "        <title>Northern Auroral Images</title>" +
+        "        <uri>pngwalk:http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_$H$M_N*.gif</uri>" +
+        "        <description>North Auroral Image from Space Weather Prediction Center</description>" +
+        "    </bookmark>" +
+        "    <bookmark>" +
+        "        <title>Southern Auroral Images</title>" +
+        "        <uri>pngwalk:http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_$H$M_S*.gif</uri>" +
+        "        <description>Southern Auroral Image from Space Weather Prediction Center</description>" +
+        "    </bookmark>" +
+        "    <bookmark>" +
+        "        <title>RBSP Emfisis HFR-WFR Orbits</title>" +
+        "        <uri>pngwalk:http://emfisis.physics.uiowa.edu/pngwalk/RBSP-A/HFR-WFR_orbit/product_$(o,id=rbspa-pp).png</uri>" +
+        "    </bookmark>" +
+        "    <bookmark>" +
+        "        <title>RBSP-A MagEIS Combined Spectra</title>" +
+        "        <uri>pngwalk:http://www.rbsp-ect.lanl.gov/data_pub/rbspa/ect/level2/combined-elec/rbspa_ect_L2-elec_$Y$m$d_v.1.0.0.png</uri>" +
+        "    </bookmark>" +
+        "</bookmark-list>" +
+    "</bookmark-folder>" +
+"</bookmark-list>";
+
 
         List<Bookmark> deft=null;
         try {
@@ -1140,6 +1160,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         jPanel1Layout.linkSize(new java.awt.Component[] {nextButton, nextSetButton, prevButton, prevSetButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
+        dataSetSelector1.setToolTipText("Enter the location of the images as a wildcard (/tmp/*.png) or template (/tmp/$Y$m$d.png).  .png, .gif, and .jpg files are supported.");
+        dataSetSelector1.setPromptText("Enter images filename template");
+        dataSetSelector1.setValue("");
         dataSetSelector1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataSetSelector1ActionPerformed(evt);
@@ -1185,7 +1208,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 78, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
                 .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
@@ -1222,7 +1245,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusLabel))
         );
