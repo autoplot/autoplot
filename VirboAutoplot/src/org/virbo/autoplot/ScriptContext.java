@@ -155,7 +155,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void setDataSourceURL(String surl) throws InterruptedException {
         model.setDataSourceURL(surl);
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -171,7 +171,7 @@ public class ScriptContext extends PyJavaInstance {
             view.dataSetSelector.setValue(suri);
         }
         model.resetDataSetSourceURL(suri, new NullProgressMonitor());
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -193,7 +193,7 @@ public class ScriptContext extends PyJavaInstance {
             Plot p= pe==null ? dom.getPlots(0) : dom.getController().getPlotFor(pe);
             dom.getController().doplot( p, pe, surl1, surl2 );
         }
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -205,7 +205,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot(int chNum, String surl) throws InterruptedException {
         maybeInitModel();
         model.setDataSet( chNum, null, surl );
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -218,7 +218,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot(int chNum, String label, String surl) throws InterruptedException {
         maybeInitModel();
         model.setDataSet( chNum, label, surl );
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -294,7 +294,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot( int chNum, String label, QDataSet ds) throws InterruptedException {
         maybeInitModel();
         model.setDataSet( chNum, label, ds );
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -309,7 +309,7 @@ public class ScriptContext extends PyJavaInstance {
         ArrayDataSet yds= ArrayDataSet.copy(y);
         if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
         model.setDataSet( chNum, label, yds);
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
     /**
@@ -334,7 +334,7 @@ public class ScriptContext extends PyJavaInstance {
             if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
             model.setDataSet(chNum, label, zds);
         }
-        model.waitUntilIdle(false);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
 
