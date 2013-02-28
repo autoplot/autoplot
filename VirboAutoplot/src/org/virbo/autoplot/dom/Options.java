@@ -413,6 +413,22 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_MOUSEMODULE, oldMouseModule, mouseModule);
     }
 
+    /**
+     * the slice preference.  Should slices be shown from the rebinned pixels or from the original data
+     */
+    protected boolean sliceRebinnedData = false;
+    public static final String PROP_SLICEREBINNEDDATA = "sliceRebinnedData";
+
+    public boolean isSliceRebinnedData() {
+        return sliceRebinnedData;
+    }
+
+    public void setSliceRebinnedData(boolean sliceRebinnedData) {
+        boolean oldSliceRebinnedData = this.sliceRebinnedData;
+        this.sliceRebinnedData = sliceRebinnedData;
+        propertyChangeSupport.firePropertyChange(PROP_SLICEREBINNEDDATA, oldSliceRebinnedData, sliceRebinnedData);
+    }
+
     // Note these are weird: I'm not sure if I've just forgotten items or this was intensional.
     // I suspect that it is intensional that a subset of the options are treated this way.  Seems like
     // there was an issue with colors if I didn't do this.  Anyway, we sync useTimeRangeEditor because
