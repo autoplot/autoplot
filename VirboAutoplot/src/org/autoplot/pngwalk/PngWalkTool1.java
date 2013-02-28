@@ -649,7 +649,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         nextButton.requestFocus();
 
-    if (isQualityControlEnabled()) {
+        if (isQualityControlEnabled()) {
             qcPanel = new QualityControlPanel();
             JSplitPane qcPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabs, qcPanel);
             qcPane.setResizeWeight(1.0);
@@ -667,6 +667,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             bc.addBinding( b );
         }
         bc.bind();
+
+        setStatus("ready");
 
     }
 
