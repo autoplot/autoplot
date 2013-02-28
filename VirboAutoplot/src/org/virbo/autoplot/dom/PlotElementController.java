@@ -2325,6 +2325,10 @@ public class PlotElementController extends DomNodeController {
                 AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
                 oldRenderer, cb, false );
 
+        if ( newRenderer!=oldRenderer && newRenderer instanceof SpectrogramRenderer ) {
+            ((SpectrogramRenderer)newRenderer).setSliceRebinnedData( dom.getOptions().isSliceRebinnedData() );
+        }
+
         if ( cb!=null 
                 && !dom.getController().isValueAdjusting()
                 && RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb.setVisible( true );
