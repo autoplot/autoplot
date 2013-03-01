@@ -349,13 +349,34 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     mds= (MutablePropertyDataSet) mds.trim(1,mds.length());
                 }
             }
+            
+            String label= getParam( "label", null );
+            if ( label!=null ) {
+                mds.putProperty( QDataSet.LABEL, label );
+            }
 
+            String title= getParam( "title", null );
+            if ( title!=null ) {
+                mds.putProperty( QDataSet.TITLE, title );
+            }
             return mds;
 
         } else {
             if (vds == null) {
                 throw new IllegalArgumentException("didn't find column: " + column);
             }
+
+            String label= getParam( "label", null );
+            if ( label!=null ) {
+                vds.putProperty( QDataSet.LABEL, label );
+            }
+
+            String title= getParam( "title", null );
+            if ( title!=null ) {
+                vds.putProperty( QDataSet.TITLE, title );
+            }
+
+
             if (dep0 != null) {
                 vds.putProperty(QDataSet.DEPEND_0, dep0);
             }
@@ -438,10 +459,15 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         delim = params.get("delim");
-
         String sFixedColumns = params.get("fixedColumns");
         if (sFixedColumns == null) {
-            if (delim == null) {
+            String format= params.get("format");
+            if ( format!=null ) {
+                AsciiParser.RegexParser p= parser.getRegexParserForFormat( format );
+                columnCount = p.fieldCount();
+                parser.setRecordParser(p);
+                delim= " "; // this is because timeformats needs a delimiter
+            } else if (delim == null) {
                 AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
                 if ( p == null) {
                     throw new IllegalArgumentException("no records found");
