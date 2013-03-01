@@ -952,7 +952,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         this.status = message;
         if ( message.startsWith("busy:" ) ) {
             setMessage( BUSY_ICON, message.substring(5).trim() );
-            logger.fine(message);
+            logger.finer(message);
         } else if ( message.startsWith("warning:" ) ) {
             setMessage( WARNING_ICON, message.substring(8).trim() );
             logger.warning(message);
@@ -960,7 +960,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             setMessage( ERROR_ICON, message.substring(6).trim() );
             logger.severe(message);
         } else {
-            logger.info(message);
+            logger.fine(message);
             setMessage(message);
         }
 
