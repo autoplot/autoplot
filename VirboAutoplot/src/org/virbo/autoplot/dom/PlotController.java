@@ -442,6 +442,24 @@ public class PlotController extends DomNodeController {
             a.setLog(false);
         }
     }
+
+    /**
+     * introduced when a linear digitized trace was put on top of a log spectrogram.
+     * We need to be more sophistocated about how we resolve the two.
+     * @param a1
+     * @param a2
+     * @return
+     */
+    private Axis resolveSettings( Axis a1, Axis a2 ) {
+        Axis result= new Axis();
+        result.range = DatumRangeUtil.union( a1.range, a2.range );
+        if ( a1.log==a2.log ) {
+            result.log= a1.log;
+        } else {
+            result.log= result.range.min().doubleValue(result.range.getUnits()) > 0;
+        }
+        return result;
+    }
     /**
      * set the zoom so that all of the plotElements' data is visible.  Thie means finding
      * the "union" of each plotElements' plotDefault ranges.  If any plotElement's default log
@@ -467,8 +485,7 @@ public class PlotController extends DomNodeController {
                     newSettings = (Plot) plot1.copy();
                 } else {
                     try {
-                        newSettings.xaxis.range = DatumRangeUtil.union(newSettings.xaxis.range, plot1.getXaxis().getRange());
-                        newSettings.xaxis.log = newSettings.xaxis.log & plot1.xaxis.log;
+                        newSettings.xaxis= resolveSettings( newSettings.xaxis,plot1.getXaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
                             logger.log( Level.INFO, "plot elements on the same xaxis have inconsistent units: {0} {1}",
@@ -477,8 +494,7 @@ public class PlotController extends DomNodeController {
                         }
                     }
                     try {
-                        newSettings.yaxis.range = DatumRangeUtil.union(newSettings.yaxis.range, plot1.getYaxis().getRange());
-                        newSettings.yaxis.log = newSettings.yaxis.log & plot1.yaxis.log;
+                        newSettings.yaxis= resolveSettings( newSettings.yaxis, plot1.getYaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
                             logger.log( Level.INFO, "plot elements on the same yaxis have inconsistent units: {0} {1}",
@@ -487,8 +503,7 @@ public class PlotController extends DomNodeController {
                         }
                     }
                     try {
-                        newSettings.zaxis.range = DatumRangeUtil.union(newSettings.zaxis.range, plot1.getZaxis().getRange());
-                        newSettings.zaxis.log = newSettings.zaxis.log & plot1.zaxis.log;
+                        newSettings.zaxis= resolveSettings( newSettings.zaxis, plot1.getZaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
                             logger.log( Level.INFO, "plot elements on the same zaxis have inconsistent units: {0} {1}",
