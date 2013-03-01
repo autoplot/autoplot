@@ -82,6 +82,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "read the last n records."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "eventListColumn=",
                     "read in the file as an event list, where the first two columns are UT times"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "title=",
+                    "title for the dataset"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "label=",
+                    "label for the dataset"));
 
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
