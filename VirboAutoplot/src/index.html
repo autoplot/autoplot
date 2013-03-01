@@ -23,6 +23,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>minor cleanup of PNGWalk tool, add new default bookmarks</li>
+            <li>turn on tooltips for bookmarks, showing location.</li>
             <li>3605590: Java CDF reader no longer holds on to open files, this caused problems, and now we close after 10 seconds.</li>
             <li>3606197: NN spectrograms fixed for rank 2 DEPEND_1.</li>
             <li>recent changes to Jython eq and ne infix ops broke Jython code like (ds!=None)</li>
@@ -37,6 +39,9 @@
             <li>3603701: Preserve DatumRange types (orbit:...) with built-in axis scan,history</li>
             <li>3604777: agg completions missing when tab is pressed in address bar</li>
             <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>JythonDataSource tweaked bug where web filesystems would fail to update.</li>
             <li>AsOrderOneUnits routine (used in Length mouse module) would skip a unit, so it would use minutes then days</li>
             <li>ascii reader would mistakenly identify the 1001th line as a data line when it really was still the header.</li>
@@ -61,31 +66,11 @@
             <li>3600315: Some dialogs still weren't positioned relative to their parent.</li>
             <li>CDF INT8 type was never added.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Columns AA and up are plottable in Excel spreadsheet reader.</li>
-            <li>CSV editor uses parts of the ascii table GUI to make a more usable editor, before it would just show first 20 lines.</li>
-            <li>Dan upgraded the JPG metadata-extractor library to support Java 7.</li>
-            <li>3599237: Time Range Tool would not accept time range string unless enter was pressed before exiting the GUI</li>
-            <li>RBSP-B orbits file had a bug in it, and orbits after 240 were incorrect.</li>
-            <li>3598146: undos of autoRenderType misreported as T->T</li>
-            <li>3597950: save as dialog kept forgetting last directory because of "file:/" prefix</li>
-            <li>3578215: fix layout doesn't preserve relative heights, correcting "make same height" action</li>
-            <li>double entries file:/*/*.vap and /*/*.vap are now subsumed in URI history</li>
-            <li>Make aggregation finally handles versioning, looking for "vXX" or "vX.X.X"</li>
-            <li>3596556: Jython scripts handling of FileNotFoundException</li>
-            <li>3596098: canvas image on layout tab is always repainted, never cached</li>
-            <li>work around javaws bug where png files can't be used for icons on Macs.</li>
-            <li>clean up of bookmarks, when bookmark is dragged to or from remote folder.</li>
-            <li>minor clean-up of scripts that used old CDAWeb names.</li>
-            <li>documentation lookup in script editor is done off the event thread</li>
-            <li>undo/redo bug where "unidentified change" would break things</li>
-            <li>history dialog doesn't use data loading thread, minor bugfixes.</li>
-            <li>TCA (empheris) progress wheel showed where the data loading thread needed to be synchronized because of double loads.</li>
-            <li>3594789: poor feedback when component unbundles are incorrect.  setException must be called after setDataSet(null)</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>add controls for label and title in ASCII URIs.</li>
+            <li>record source of scripts installed in tools menu.</li>
+            <li>sliceRebinnedData is now persistent between sessions, and is off by default.</li>
             <li>add support for sliding FFT and better control of the window function.</li>
             <li>add experimental rebinner for LANL RBSP data that indicates spectrogram boundaries</li>
             <li>experimental tool for recording GUI sequences added</li>
