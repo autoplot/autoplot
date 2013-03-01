@@ -49,6 +49,7 @@ import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.BundleBuilder;
 import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.dsutil.Reduction;
@@ -85,7 +86,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
             }
             DatumRange result = fsm.getRangeFor(ss[0]);
-            for (int i = 0; i < ss.length; i++) {
+            for (int i = 1; i < ss.length; i++) {
                 DatumRange r1 = fsm.getRangeFor(ss[i]);
                 result = result.include(r1.max()).include(r1.min());
             }
@@ -326,6 +327,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         logger.warning("delegate returned null");
                         ds1 = delegateDataSource.getDataSet(mon1);
                         continue;
+                    }
+                    QDataSet xds= SemanticOps.xtagsDataSet(ds1);
+                    if ( xds!=null ) {
+                        QDataSet exds= Ops.extent(xds);
+                        if ( !dr1.intersects(DataSetUtil.asDatumRange(exds)) ) {
+                            logger.log(Level.WARNING, "file for {0} contains data from an unexpected interval: {1}", new Object[] { dr1, exds } );
+                        }
                     }
 
                     List<String> problems= new ArrayList();
