@@ -36,6 +36,7 @@
         <p>
             <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet. <br>
             <a href="script.jsp"> script.jsp</a>: web form for sending scripts to the ScriptServlet. <br>
+            <a href="script2.jsp"> script2.jsp</a>: web form for running a server-side script, right now set up to do URI templates.<br>
         </p>
     </body>
 </html>
