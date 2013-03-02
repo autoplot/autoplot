@@ -18,6 +18,10 @@
         <servlet-name>SetLogLevel</servlet-name>
         <servlet-class>org.virbo.autoplot.SetLogLevel</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ScriptServlet2</servlet-name>
+        <servlet-class>org.virbo.autoplot.ScriptServlet2</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -29,6 +33,10 @@
     <servlet-mapping>
         <servlet-name>SetLogLevel</servlet-name>
         <url-pattern>/SetLogLevel</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScriptServlet2</servlet-name>
+        <url-pattern>/ScriptServlet2</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
