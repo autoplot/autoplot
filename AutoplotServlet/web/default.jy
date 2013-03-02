@@ -1,0 +1,23 @@
+resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V$v.cef', 'example file to load' )
+timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
+
+from org.das2.fsm import FileStorageModelNew
+from org.das2.util.filesystem import FileSystem
+i= FileStorageModelNew.splitIndex( resourceURI )
+
+root= resourceURI[0:i]      # the static part of the name
+template= resourceURI[i:]   # the templated part of the name
+
+fs= FileSystem.create( root )
+fsm= FileStorageModelNew.create( fs, template )
+
+names= fsm.getNamesFor( DatumRangeUtil.parseTimeRange(timerange) )
+
+for n in names:
+   print root + n 
+
+if ( len(names)==0 ):
+   print '# '+resourceURI
+   print '# '+timerange
+   print '# none found.'
+
