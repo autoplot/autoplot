@@ -469,6 +469,6 @@ public class SimpleServlet extends HttpServlet {
     }// </editor-fold>
 
     private void logit(String string, long t0, long id, String debug) {
-        logger.log( ( ( debug!=null && !debug.equals("false") ) ? Level.INFO : Level.FINER ), String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
+        logger.log( ( ( debug!=null && !debug.equals("false") ) ? Level.FINE : Level.FINER ), String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
     }
 }
