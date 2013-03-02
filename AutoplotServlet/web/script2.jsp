@@ -15,12 +15,13 @@
     </head>
     <body>
         <h2>Autoplot unglob Servlet</h2>
-    <br><br>
-
+        <p>The resolves all the templated URIs.  Note this is using Das2's FileStorageModel, so the web server will be
+            quaried to resolve only available files and version numbers.
     <form action="ScriptServlet2" method="GET">
-        Enter Script:<br>
-        <textarea rows="1" cols="120" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea>
-        <textarea rows="1" cols="120" name="timerange" >2010-03-01/2010-03-10</textarea>
+        Enter Aggregation URI (<a href="http://autoplot.org/help#Wildcard_codes">help</a>)<br>
+        <textarea rows="1" cols="120" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
+        Enter ISO8601 Time Range: <br>
+        <textarea rows="1" cols="120" name="timerange" >2010-03-01/2010-03-10</textarea><br>
         <br>
         <input type="submit" value="Execute" />
     </form>
