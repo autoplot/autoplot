@@ -7,6 +7,8 @@ package org.virbo.jythonsupport.ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.swing.JEditorPane;
@@ -45,19 +47,26 @@ public class EditorAnnotationsSupport {
 
     EditorAnnotationsSupport(JEditorPane editorPanel) {
         this.editorPanel = editorPanel;
-        editorPanel.getDocument().addDocumentListener(new DocumentListener() {
-
+        final DocumentListener annoList= new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
-
             public void removeUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
-
             public void changedUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
+        };
+        editorPanel.getDocument().addDocumentListener(annoList);
+        this.editorPanel.addPropertyChangeListener( "document", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getOldValue()!=null ) {
+                    ((Document)evt.getOldValue()).removeDocumentListener(annoList);
+                }
+                ((Document)evt.getNewValue()).addDocumentListener(annoList);
+            }
+
         });
         editorPanel.setToolTipText("this will contain annotations");
     }
