@@ -83,9 +83,10 @@ public class ScriptServlet2 extends HttpServlet {
                 scriptFile="default.jy";
             }
 
-            // make sure these symbols are imported.
+            // make sure these symbols are imported, otherwise there will be problems with imports.py.
             Object o = new org.das2.dataset.AverageTableRebinner();
             o= org.das2.graph.SymColor.black;
+            // end, make sure these...
 
             if ( scriptFile.contains("/") ) {
                 throw new ServletException("scriptFile cannot contain /");
@@ -104,11 +105,13 @@ public class ScriptServlet2 extends HttpServlet {
             interp.set( "response", response );
 
             Map<String,String> m= new HashMap();
+            request.getParameterMap();
             Enumeration e= request.getParameterNames(); // request.getParameterMap() returns string arrays!
             while ( e.hasMoreElements() ) {
                 String k= (String)e.nextElement();
                 if ( !k.equals("scriptFile") ) {
                     String v= request.getParameter(k);
+                    if ( v.equals("on") ) v= "T"; // kludge for checkbox
                     m.put( k,v );
                 }
             }
