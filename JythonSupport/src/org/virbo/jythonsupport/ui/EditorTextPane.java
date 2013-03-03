@@ -8,6 +8,7 @@ package org.virbo.jythonsupport.ui;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -34,6 +35,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.jythoncompletion.CompletionSettings;
+import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.python.core.PyObject;
 import org.virbo.jythonsupport.PyQDataSet;
@@ -58,62 +62,71 @@ public class EditorTextPane extends JEditorPane {
         Runnable run= new Runnable() {
             public void run() {
 
-        final UndoManager undo = new UndoManager();
+                final UndoManager undo = new UndoManager();
 
-        getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
-            public void actionPerformed( ActionEvent e ) {
-                if ( undo.canUndo() ) undo.undo();
-            }
-        });
+                getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
+                    public void actionPerformed( ActionEvent e ) {
+                        if ( undo.canUndo() ) undo.undo();
+                    }
+                });
 
-        getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
-            public void actionPerformed( ActionEvent e ) {
-               try {
-                    if ( undo.canRedo() ) undo.redo();
-               } catch ( javax.swing.undo.CannotRedoException ex ) {
-                   
-               }
-            }
-        });
+                getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
+                    public void actionPerformed( ActionEvent e ) {
+                       try {
+                            if ( undo.canRedo() ) undo.redo();
+                       } catch ( javax.swing.undo.CannotRedoException ex ) {
 
-        getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
-            public void actionPerformed( ActionEvent e ) {
-               Font f= getFont();
-               float size= f.getSize2D();
-               float step= size < 14 ? 1 : 2;
-               setFont( f.deriveFont( Math.min( 40, size + step ) ) );
-            }
-        } );
+                       }
+                    }
+                });
 
-        getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
-            public void actionPerformed( ActionEvent e ) {
-               Font f= getFont();
-               float size= f.getSize2D();
-               float step= size < 14 ? 1 : 2;
-               setFont( f.deriveFont( Math.max( 4, size - step ) ) );
-            }
-        } );
+                getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
+                    public void actionPerformed( ActionEvent e ) {
+                       Font f= getFont();
+                       float size= f.getSize2D();
+                       float step= size < 14 ? 1 : 2;
+                       setFont( f.deriveFont( Math.min( 40, size + step ) ) );
+                    }
+                } );
 
-        Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
+                getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
+                    public void actionPerformed( ActionEvent e ) {
+                       Font f= getFont();
+                       float size= f.getSize2D();
+                       float step= size < 14 ? 1 : 2;
+                       setFont( f.deriveFont( Math.max( 4, size - step ) ) );
+                    }
+                } );
 
-        Toolkit tk= Toolkit.getDefaultToolkit();
+                getActionMap().put( "settings", new AbstractAction( "settings" ) {
+                    public void actionPerformed( ActionEvent e ) {
+                       CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
+                        PropertyEditor p= new PropertyEditor(settings);
+                        p.showModalDialog(EditorTextPane.this);
+                    }
+                } );
 
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y,tk.getMenuShortcutKeyMask() ), "redo" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
-        
-        doLayout(); // kludge for DefaultSyntaxKit
-        DefaultSyntaxKit.initKit();
+                Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
 
-        JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
-        EditorTextPane.this.setContentType("text/python");
-        getDocument().addUndoableEditListener(undo);
-        if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
-        
-        String sf= prefs.get( PROP_FONT, "monospaced" );
-        setFont( Font.decode(sf) );
-        
+                Toolkit tk= Toolkit.getDefaultToolkit();
+
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y,tk.getMenuShortcutKeyMask() ), "redo" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
+
+                doLayout(); // kludge for DefaultSyntaxKit
+                DefaultSyntaxKit.initKit();
+
+                JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
+                EditorTextPane.this.setContentType("text/python");
+                getDocument().addUndoableEditListener(undo);
+                if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
+
+                String sf= prefs.get( PROP_FONT, "monospaced" );
+                setFont( Font.decode(sf) );
+
             }
 
         };
