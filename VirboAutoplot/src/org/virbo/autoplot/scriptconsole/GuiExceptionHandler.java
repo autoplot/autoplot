@@ -34,7 +34,6 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.DasApplication;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +41,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -54,8 +52,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.LogRecord;
-import java.util.logging.XMLFormatter;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -87,7 +87,6 @@ import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
-import org.virbo.autoplot.state.Vap1_07Scheme;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -667,6 +666,21 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     boolean uncaught;
     Throwable t;
 
+    private String getReport( GuiExceptionHandlerSubmitForm form ) {
+        String id= form.getUsernameTextField().getText().replaceAll(" ","_");
+        if ( id.trim().equals("") ) id= "anon";
+        map.put( USER_ID, id );
+
+        String email= form.getEmailTextField().getText();
+        map.put( EMAIL, email );
+
+        map.put( INCLSCREEN, form.isAllowScreenshot() );
+
+        String report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+        return report;
+
+    }
+        
     public synchronized void submitRuntimeException( Throwable t, boolean uncaught ) {
         int rteHash;
         rteHash= hashCode( t );
@@ -688,7 +702,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         map=new HashMap();
 
-        String id= "anon";
+        String id;
         id= System.getProperty("user.name");
 
         map.put( USER_ID, id );
@@ -715,23 +729,22 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             form.getEmailTextField().setText( (String)map.get(EMAIL) );
 
             String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Submit" };
+            
+            boolean useEmail= "T".equals( System.getProperty("autoplot.emailrte") );
+            if ( useEmail ) {
+                choices[3]= "Submit Email";
+            }
+            
             Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
             Icon icon= new ImageIcon( AutoplotUtil.getAutoplotIcon() );
             int option= JOptionPane.showOptionDialog( parent, form, "Submit Exception Report",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, choices, choices[3] )  ;
             if ( option==2 ) {
                 return;
-            } else if ( option==1 ) {
-                id= form.getUsernameTextField().getText().replaceAll(" ","_");
-                if ( id.trim().equals("") ) id= "anon";
-                map.put( USER_ID, id );
-
-                String email= form.getEmailTextField().getText();
-                map.put( EMAIL, email );
-
-                map.put( INCLSCREEN, form.isAllowScreenshot() );
-
-                report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+                
+            } else if ( option==1 ) { // save to file
+                
+                report= getReport( form );
 
                 JFileChooser chooser= new JFileChooser();
                 chooser.setFileFilter( this.getFileNameExtensionFilter("xml files", new String[] { ".xml" } ) );
@@ -749,48 +762,54 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     }
                 }
 
-            } else if ( option==3 ) {
 
-            //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
-                id= form.getUsernameTextField().getText().replaceAll(" ", "_");
-                if ( id.trim().equals("") ) id= "anon";
-                map.put( USER_ID, id );
-
-                String email= form.getEmailTextField().getText();
-                map.put( EMAIL, email );
-
-                map.put( INCLSCREEN, form.isAllowScreenshot() );
-
-                report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
-                String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
-
-                HttpClient client = new HttpClient();
-                client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
-                PostMethod postMethod = new PostMethod(url);
-
-                Part[] parts= {
-                    new StringPart( "secret", "secret" ),
-                    new StringPart( "todo", "upload" ),
-                    new FilePart( "uploadfile", new ByteArrayPartSource( fname, report.getBytes() ) ),
-                };
-
-                postMethod.setRequestEntity(
-                        new MultipartRequestEntity( parts, postMethod.getParams() ));
-
-                try {
-                    int statusCode1 = client.executeMethod(postMethod);
-                    if ( statusCode1==200 ) {
-                        if ( this.submitButton!=null ) this.submitButton.setEnabled(false);
+            } else if ( option==3 ) { // submit
+                report= getReport( form );
+                
+                if ( useEmail ) {
+                    try {
+                        SendEmailFeedback.sendEmail(report);
                         notsent= false;
-                        postMethod.releaseConnection();
-                    } else {
-                        postMethod.releaseConnection();
-                        JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+postMethod.getStatusLine()+"<br><br>Consider save to file and email to faden@cottagesystems.com" );
+                    } catch (AddressException ex) {
+                        JOptionPane.showMessageDialog( null, ex.toString() );
+                    } catch (MessagingException ex) {
+                        JOptionPane.showMessageDialog( null, ex.toString() );
                     }
+                    
+                } else {
+            //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
+                    report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+                    String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
 
-                } catch ( IOException ex ) {
-                    JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+ex.toString()+"<br><br>Consider save to file and email to "+CUSTODIAN );
+                    HttpClient client = new HttpClient();
+                    client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
+                    PostMethod postMethod = new PostMethod(url);
+
+                    Part[] parts= {
+                        new StringPart( "secret", "secret" ),
+                        new StringPart( "todo", "upload" ),
+                        new FilePart( "uploadfile", new ByteArrayPartSource( fname, report.getBytes() ) ),
+                    };
+
+                    postMethod.setRequestEntity(
+                            new MultipartRequestEntity( parts, postMethod.getParams() ));
+
+                    try {
+                        int statusCode1 = client.executeMethod(postMethod);
+                        if ( statusCode1==200 ) {
+                            if ( this.submitButton!=null ) this.submitButton.setEnabled(false);
+                            notsent= false;
+                            postMethod.releaseConnection();
+                        } else {
+                            postMethod.releaseConnection();
+                            JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+postMethod.getStatusLine()+"<br><br>Consider save to file and email to faden@cottagesystems.com" );
+                        }
+
+                    } catch ( IOException ex ) {
+                        JOptionPane.showMessageDialog( null, "<html>I/O Exception when posting to<br>"+url+":<br><br>"+ex.toString()+"<br><br>Consider save to file and email to "+CUSTODIAN );
+                    }
                 }
+                
             } else if ( option==0 ) {
                 id= form.getUsernameTextField().getText().replaceAll(" ","_");
                 if ( id.trim().equals("") ) id= "anon";
