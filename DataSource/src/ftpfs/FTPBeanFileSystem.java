@@ -17,6 +17,7 @@ import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
 import ftpfs.ftp.FtpObserver;
+import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPFile;
 import it.sauronsoftware.ftp4j.FTPListParseException;
 import it.sauronsoftware.ftp4j.FTPListParser;
@@ -205,7 +206,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         InputStream in = new FileInputStream(listing);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "US-ASCII"));
 
         List<String> llist= new ArrayList<String>(370);
         
@@ -278,7 +279,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     public DirectoryEntry[] parseLsl(String dir, File listing) throws IOException {
         InputStream in = new FileInputStream(listing);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in,"US-ASCII"));
 
         String aline = reader.readLine();
 
