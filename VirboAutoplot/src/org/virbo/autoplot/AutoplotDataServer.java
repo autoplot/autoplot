@@ -176,6 +176,7 @@ public class AutoplotDataServer {
         alm.addOptionalSwitchArgument("cache", "c", "cache", "", "location where files are downloaded, default is $HOME/autoplot_data/cache");
         alm.addBooleanSwitchArgument("nostream",  "", "nostream","disable streaming, as will Bill's dataset which is X and Y table");
         alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
+        alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
 
         alm.requireOneOf(new String[]{"uri"});
         alm.process(args);
@@ -208,9 +209,13 @@ public class AutoplotDataServer {
             }
 
             File ff= new File( fcache, "testCache.empty" );
-            FileOutputStream fo= new FileOutputStream( ff );
-            fo.write( "AutoplotDataServer is able to write a file\n".getBytes() );
-            fo.close();
+            FileOutputStream fo=null;
+            try {
+                fo= new FileOutputStream( ff );
+                fo.write( "AutoplotDataServer is able to write a file\n".getBytes() );
+            } finally {
+                if ( fo!=null ) fo.close();
+            }
 
             FileSystem.settings().setLocalCacheDir(new File(cache));
             logger.log(Level.FINE, "using cache dir {0}", FileSystem.settings().getLocalCacheDir());
@@ -221,7 +226,7 @@ public class AutoplotDataServer {
         if (suri.equals("")) {
             alm.printUsage();
             logger.fine("uri must be specified.");
-            System.exit(-1);
+            if ( !alm.getBooleanValue("noexit") ) System.exit(-1); else return;
         }
 
         String format = alm.getValue("format");
@@ -230,7 +235,7 @@ public class AutoplotDataServer {
         if ( format.length()>0 && !outfile.equals(DEFT_OUTFILE) ) {
             if ( !outfile.endsWith(format) ) {
                 System.err.println("format="+format+" doesn't match outfile extension. outfile="+outfile );
-                System.exit(-2);
+                if ( !alm.getBooleanValue("noexit") ) System.exit(-2); else return;
             }
         }
         if (outfile.endsWith(".qds")) {
@@ -358,8 +363,8 @@ public class AutoplotDataServer {
                  out.printf("[00]%06d<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
              }
         }
-
-        System.exit(0);
+        
+        if ( !alm.getBooleanValue("noexit") ) System.exit(0); else return;
 
     }
 
