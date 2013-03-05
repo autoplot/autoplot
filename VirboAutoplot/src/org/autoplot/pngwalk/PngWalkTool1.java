@@ -15,7 +15,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -38,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -82,6 +85,7 @@ import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
+import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
@@ -386,6 +390,35 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         return tool;
     }
 
+    /**
+     * copy image to the system clipboard.
+     * @param parent
+     * @param ssrc 
+     */
+    protected static void copyToClipboard( Component parent, String ssrc ) {
+        if ( ssrc==null ) {
+            JOptionPane.showMessageDialog( parent, "No image is selected." );
+            return;
+        }
+        File src;
+        try {
+            src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog( parent, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
+            return;
+        }
+        
+        try {
+            ImageSelection iss= new ImageSelection();
+            iss.setImage( ImageIO.read( src ) );
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents( iss, ImageSelection.getNullClipboardOwner() );
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog( parent, "<html>Unable to read image<br>"+ex.getMessage() );
+        }
+   
+    }
+    
     /**
      * save a copy of the current selection to a local disk.
      */
