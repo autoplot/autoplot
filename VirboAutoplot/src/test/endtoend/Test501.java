@@ -103,7 +103,8 @@ public class Test501 {
         setTitle(fileUri);
         String name;
         if ( doTest ) {
-            String id= String.format( "%016d",Math.abs(uri.hashCode()));
+            int h = uri.hashCode();
+            String id= String.format( "%016d",Math.abs(h));
             name= String.format( "test%03d_%s.png", testid, id );
             result= name;
         } else {
