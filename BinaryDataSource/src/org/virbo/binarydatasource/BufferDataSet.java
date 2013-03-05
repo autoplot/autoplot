@@ -194,7 +194,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             logger.warning( String.format( "field length (%d) is greater than record length (%d) for len0=%d.", (int)fieldLen, (int)reclen, (int)len0 ) );
         }
         if ( reclen>0 && ( back.remaining()< ( reclen*len0 ) ) ) {
-            logger.warning( String.format( "back buffer is too short (len=%d) for len0=%d.", (int)fieldLen, (int)reclen, (int)len0 ) );
+            logger.warning( String.format( "back buffer is too short (len=%d) for %d records each reclen=%d.", (int)back.remaining(), (int)len0, (int)reclen ) );
         }
     }
 
