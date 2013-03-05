@@ -14,7 +14,7 @@ import java.awt.*;
  */
 public class Util
 {
-	protected Util()
+	private Util()
 	{
 	}
 
