@@ -277,9 +277,9 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
                         break;
                     case IGNORE:
                         ignoreBadge.paintIcon(this, g2, imgX + 5, imgY + 5);
+                        break;
                     default:
                         // Don't do anything.
-                        return;
                 }
             } else {
                 Color color0= g2.getColor();
@@ -293,6 +293,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
                         break;
                     case IGNORE:
                         g2.setColor( Color.GRAY );
+                        break;
                     default:
                         // Don't do anything.
                         return;
