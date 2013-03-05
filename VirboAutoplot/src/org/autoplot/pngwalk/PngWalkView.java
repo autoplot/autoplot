@@ -163,6 +163,14 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
                 PngWalkTool1.saveLocalCopy(PngWalkView.this,file);
             }
         } ) );
+        m.add( new JMenuItem( new AbstractAction( "Copy to clipboard..." ) {
+            public void actionPerformed(ActionEvent e) {
+                if ( PngWalkView.this.seq==null ) return;
+                String file= DataSetURI.fromUri( seq.currentImage().getUri() );
+                PngWalkTool1.copyToClipboard(PngWalkView.this,file);
+            }
+        } ) );
+        
         return m;
     }
 
