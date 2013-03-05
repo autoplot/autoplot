@@ -275,7 +275,11 @@ public class ScreenshotsTool extends EventQueue {
 
     }
 
-    //mask out parts of the desktop that are not autoplot...
+    /**
+     *  mask out parts of the desktop that are not Autoplot, for the user's privacy.
+     *  @param g 
+     *  @param b the rectangle showing the display translation.
+     */
     static void filterBackground( Graphics2D g, Rectangle b ) {
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
@@ -383,7 +387,11 @@ public class ScreenshotsTool extends EventQueue {
         return image.getSubimage( r.x, r.y, r.width, r.height );
     }
 
-
+    /**
+     * find the common trim bounding box and trim all the images in the directory.
+     * @param dir
+     * @throws IOException
+     */
     public static void trimAll( File dir ) throws IOException {
         trimAll( dir, null, new NullProgressMonitor() );
     }
@@ -428,10 +436,24 @@ public class ScreenshotsTool extends EventQueue {
         return getScreenShot(active,0);
     }
 
+    /**
+     * Get a screenshot of the display indicated by active.  Only one screen
+     * of a dual-head is returned.
+     * @param active the display number.  See getActiveDisplay(window);
+     * @return image of the screen.
+     */
     public static BufferedImage getScreenShot( int active ) {
         return getScreenShot( active, 0 );
     }
 
+    /**
+     * Get a screenshot of the display indicated by active.  Only one screen
+     * of a dual-head is returned.  The buttons integer indicates that button presses
+     * or wheel events should be indicated.
+     * @param active the display number.  See getActiveDisplay(window);
+     * @param buttons one of: MouseEvent.BUTTON1_DOWN_MASK, MouseEvent.BUTTON2_DOWN_MASK, MouseEvent.BUTTON3_DOWN_MASK, MOUSE_WHEEL_UP, MOUSE_WHEEL_DOWN
+     * @return image of the screen.
+     */
     public static BufferedImage getScreenShot( int active, int buttons ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
