@@ -106,9 +106,11 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                                     do {
                                             anscestor = anscestor.getParent();
                                             if ( anscestor==null ) {
-                                                System.err.println("here");
+                                                new Exception("anscestor is null").printStackTrace();
+                                                value = "NULL"; // I don't think this happens...
+                                            } else {
+                                                value = anscestor.getLevel();
                                             }
-                                            value = anscestor.getLevel();
                                     } while (value == null);
                                     value = "INHERITED(" + value + ")";
 
