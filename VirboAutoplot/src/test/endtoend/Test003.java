@@ -39,6 +39,10 @@ public class Test003 {
             ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
             ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
+            doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
+            doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
+            doit(28, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ephem.jyds?R=T&L=T&MLT=T&ILT=T" );
+            
             //these require a keychain.txt file.
             doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_pre_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
             doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_pre_ect-mageis-mr-elec-L1.vap");
@@ -69,7 +73,7 @@ public class Test003 {
             doit(24, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2-elec/rbspa_pre_ect-rept-sci-L2-elec.vap?timerange");
             doit(25, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2-ion/rbspa_pre_ect-rept-sci-L2-ion.vap");
 
-
+            
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
             ScriptContext.setCanvasSize(800, 600);
 
