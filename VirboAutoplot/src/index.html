@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New FFT function allows the window size and windowing to be selected.</small></p>
+        <p><small>Sloppy code prevented completions on http://www.rbsp-ect.lanl.gov/.</small></p>
 
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>small findbugs cleanup</li>
+            <li>rte0014594906: bad format code "v" in completion</li>
+            <li>3606898: http://www.rbsp-ect.lanl.gov/ completion</li>
             <li>Old versions of Java webstart (1.6u16) would fail to start because of mediawiki improperly reporting fail status.</li>
             <li>minor cleanup of PNGWalk tool, add new default bookmarks</li>
             <li>turn on tooltips for bookmarks, showing location.</li>
