@@ -311,7 +311,12 @@ public class AutoplotDataServer {
                 //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
                 //TODO: find a way to test for this and give a good error message.
                 logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
-                QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                QDataSet ds1= null;
+                try {
+                    ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                } catch ( Exception ex ) {
+                    logger.log( Level.WARNING, "execption when trying to read "+dr, ex ); 
+                }
                 logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
                     if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
