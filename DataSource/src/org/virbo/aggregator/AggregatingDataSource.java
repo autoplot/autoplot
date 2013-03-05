@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
@@ -329,7 +330,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         continue;
                     }
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
-                    if ( xds!=null ) {
+                    if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         QDataSet exds= Ops.extent(xds);
                         if ( !dr1.intersects(DataSetUtil.asDatumRange(exds)) ) {
                             logger.log(Level.WARNING, "file for {0} contains data from an unexpected interval: {1}", new Object[] { dr1, exds } );
