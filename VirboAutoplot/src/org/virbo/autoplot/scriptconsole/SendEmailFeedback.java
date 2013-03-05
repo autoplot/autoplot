@@ -32,7 +32,7 @@ public class SendEmailFeedback {
 
         Properties props = new java.util.Properties();
 
-        //  props.put("mail.smtp.host", 'mercury.physics.uiowa.edu')
+        //props.put("mail.smtp.host", "mercury.physics.uiowa.edu");
         props.put("mail.smtp.host", "localhost");
         props.put("mail.debug", "true");
 
@@ -42,19 +42,19 @@ public class SendEmailFeedback {
         msg.setFrom(new InternetAddress(frm));
         InternetAddress[] address = new InternetAddress[]{new InternetAddress(to)};
         msg.setRecipients(Message.RecipientType.TO, address);
-        msg.setSubject("[errorReport]");
+        msg.setSubject("[errorReport] from " + System.getProperty("user.name"));
         msg.setSentDate( new java.util.Date() );
+        msg.setText( report );
 
-        // Set message content
-
-        MimeMultipart multipart = new MimeMultipart();
-
-        MimeBodyPart messageBodyPart = new MimeBodyPart();
-
-        messageBodyPart.setDataHandler( new DataHandler( report, "text/xml") );
-        multipart.addBodyPart(messageBodyPart);
-
-        msg.setContent(multipart);
+        //// Set message content
+        //MimeMultipart multipart = new MimeMultipart();
+        //
+        //MimeBodyPart messageBodyPart = new MimeBodyPart();
+        //
+        //messageBodyPart.setDataHandler( new DataHandler( report, "text/xml") );
+        //multipart.addBodyPart(messageBodyPart);
+        //
+        //msg.setContent(multipart);
 
         // Send the message
         Transport.send(msg);
