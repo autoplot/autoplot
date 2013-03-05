@@ -934,7 +934,7 @@ public class DataSetURI {
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
-                urlc.setConnectTimeout(3000); // Reiner describes hang at LANL
+                urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
                 in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
                 OutputStream out= new FileOutputStream( tempfile );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
