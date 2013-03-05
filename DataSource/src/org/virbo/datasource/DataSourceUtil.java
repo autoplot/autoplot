@@ -195,20 +195,7 @@ public class DataSourceUtil {
             sagg = URISplit.removeParam(sagg, "timerange");
             TimeParser tp;
             try {
-                tp= TimeParser.create(sagg,"v",new TimeParser.FieldHandler() {
-                    public String configure(Map<String, String> args) {
-                        return null;
-                    }
-                    public String getRegex() {
-                        return null;
-                    }
-                    public void parse(String fieldContent, TimeStruct startTime, TimeStruct timeWidth, Map<String, String> extra) throws ParseException {
-                    }
-                    public String format(TimeStruct startTime, TimeStruct timeWidth, int length, Map<String, String> extra) throws IllegalArgumentException {
-                        return null;
-                    }
-                });
-
+                tp= TimeParser.create(sagg,"v", TimeParser.IGNORE_FIELD_HANDLER );
                 tp.parse(surl);
             } catch (ParseException ex) {
                 continue;
@@ -243,7 +230,7 @@ public class DataSourceUtil {
             // here, since we are not going to look inside the files.
             if ( moveUs.size()>4 && sagg.contains("$d") ) {
                 String sagg1= sagg.replace("$d","01");
-                TimeParser tp1= TimeParser.create(sagg1);
+                TimeParser tp1= TimeParser.create(sagg,"v", TimeParser.IGNORE_FIELD_HANDLER );
                 boolean fail= false;
                 for ( int i=0; i<moveUs.size(); i++ ) {
                     try {
