@@ -41,9 +41,10 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         this.jds= jds;
     }
 
+    @Override
     public void setTimeRange(DatumRange dr) {
         if ( jds!=null ) {
-            if ( this.timeRange==null || !( this.timeRange!=null && this.timeRange.equals(dr)) ) {
+            if ( this.timeRange==null || !( this.timeRange.equals(dr)) ) {
                 synchronized ( jds ) {
                     jds.interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
                 }
@@ -57,22 +58,27 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         this.uri = URISplit.format(split);
     }
 
+    @Override
     public DatumRange getTimeRange() {
         return this.timeRange;
     }
 
+    @Override
     public void setTimeResolution(Datum d) {
         // do nothing.
     }
 
+    @Override
     public Datum getTimeResolution() {
         return null;
     }
 
+    @Override
     public String getURI() {
         return uri;
     }
 
+    @Override
     public void setURI(String suri) throws ParseException {
         this.uri = suri;
         DatumRange tr = URISplit.parseTimeRange(uri);
@@ -86,30 +92,34 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
      * @param jythonScript
      */
     protected static JythonDataSourceTimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
-        BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
-
-        String line= reader.readLine();
-        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-zA-Z:/]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+        BufferedReader reader=null;
         JythonDataSourceTimeSeriesBrowse tsb1=null;
-        while ( line!=null ) {
-            Matcher m= s.matcher(line);
-            if ( m.matches() ) {
-                tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
-                String str= m.group(1);
-                URISplit split= URISplit.parse(uri);
-                Map<String,String> params= URISplit.parseParams(split.params);
-                String stimerange= params.get( JythonDataSource.PARAM_TIMERANGE );
-                if ( stimerange!=null && stimerange.length()>0 ) {
-                    str= params.get( JythonDataSource.PARAM_TIMERANGE );
+        try {
+            reader = new LineNumberReader( new FileReader( jythonScript ) );
+
+            String line= reader.readLine();
+            Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-zA-Z:/]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+            while ( line!=null ) {
+                Matcher m= s.matcher(line);
+                if ( m.matches() ) {
+                    tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
+                    String str= m.group(1);
+                    URISplit split= URISplit.parse(uri);
+                    Map<String,String> params= URISplit.parseParams(split.params);
+                    String stimerange= params.get( JythonDataSource.PARAM_TIMERANGE );
+                    if ( stimerange!=null && stimerange.length()>0 ) {
+                        str= params.get( JythonDataSource.PARAM_TIMERANGE );
+                    }
+                    DatumRange tr= DatumRangeUtil.parseTimeRange(str);
+                    tsb1.setTimeRange(tr);
+                } else if ( line.contains("timerange") && line.contains("getParam") ) {
+                    logger.warning("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
                 }
-                DatumRange tr= DatumRangeUtil.parseTimeRange(str);
-                tsb1.setTimeRange(tr);
-            } else if ( line.contains("timerange") && line.contains("getParam") ) {
-                logger.warning("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
+                line= reader.readLine();
             }
-            line= reader.readLine();
+        } finally {
+            if ( reader!=null ) reader.close();
         }
-        reader.close();
         return tsb1;
 
     }
