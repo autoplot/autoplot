@@ -9,7 +9,8 @@ import org.virbo.autoplot.AutoplotDataServer;
 /**
  * Tests of the AutoplotDataServer.  Note that this is only a simulation, for
  * example each call to the AutoplotDataServer is typically started from a 
- * fresh session.
+ * fresh session.  On http://sarahandjeremy.net:8080/hudson/job/autoplot-test036
+ * this is implemented as a shell script.
  * @author jbf
  */
 public class Test036 {
