@@ -112,7 +112,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     public PngWalkView[] views;
     TearoffTabbedPane tabs;
     
-    WalkImageSequence seq;
+    transient WalkImageSequence seq;
     
     Pattern actionMatch=null;
     String actionCommand=null;
@@ -127,7 +127,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         
     int returnTabIndex=0; // index of the tab we left to look at the single panel view.  TODO: account for tear off.
 
-    DatumRange pendingGoto= null;  // after password is entered, then go to this range.
+    transient DatumRange pendingGoto= null;  // after password is entered, then go to this range.
 
     public static void main(String[] args) {
 
@@ -227,11 +227,6 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             tool.setTemplate(template);
         } 
 
-        String home= java.lang.System.getProperty( "user.home" ) + java.lang.System.getProperty( "file.separator" );
-
-        String output= "file:" + home + "pngwalk" + java.lang.System.getProperty( "file.separator" )
-                + "product_$Y$m$d.png";
-
         String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    <bookmark-folder remoteUrl=\"http://virbo.org/meta/viewDataFile.jsp?docname=418DBD06-4CA9-4D8E-44EB-F548AE6DBB9C&amp;filetype=data\">" +
         "<title>Demos</title>" +
         "<bookmark-list>" +
@@ -303,10 +298,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {
-                String productFile=null;
                 final String suri;
                 if ( tool.seq==null ) {
-                    productFile=null;
                     suri=null;
                 } else {
                     String s = tool.getSelectedFile();
@@ -348,6 +341,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     } catch ( ParseException ex ) {
                         throw new RuntimeException(ex);
                     }
+                    String productFile=null;
                     productFile = template.substring(0, i0) + ".vap";
                     suri = productFile + "?timeRange=" + timeRange;
                 }
@@ -738,7 +732,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * respond to changes of the current index.
      */
-    private transient PropertyChangeListener indexListener= new PropertyChangeListener() {
+    private PropertyChangeListener indexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             String item= seq.currentImage().getUri().toString();
 
@@ -758,7 +752,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * listen for status updates from other agents, relay the status for the view.
      */
-    private transient PropertyChangeListener statusListener= new PropertyChangeListener() {
+    private PropertyChangeListener statusListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
            setStatus((String)evt.getNewValue());
         }
@@ -934,7 +928,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * roughly the timerange displayed and selected.  This is left loose to support binding.
      */
-    DatumRange timeRange;
+    transient DatumRange timeRange;
     public static final String PROP_TIMERANGE = "timeRange";
 
     public DatumRange getTimeRange() {
@@ -955,7 +949,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         setting= false;
     }
 
-    PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
+    transient PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             setTimeRange((DatumRange)evt.getNewValue());
         }
@@ -963,7 +957,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
     boolean setting= false;
 
-    PropertyChangeListener seqIndexListener= new PropertyChangeListener() {
+    transient PropertyChangeListener seqIndexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             boolean setting0= setting;
             setting= true;
@@ -973,7 +967,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     };
 
-    protected String status = "initializing...";
+    transient protected String status = "initializing...";
     public static final String PROP_STATUS = "status";
 
     public String getStatus() {
@@ -1037,7 +1031,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     };
 
-    List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
+    transient List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
     List<String> actionCommands= new ArrayList<String>();
     List<JButton> actionButtons= new ArrayList<JButton>();
 
