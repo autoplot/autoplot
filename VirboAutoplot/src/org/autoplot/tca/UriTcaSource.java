@@ -161,6 +161,11 @@ public class UriTcaSource extends AbstractQFunction {
                     read= true;
                 }
                 if ( read ) {
+                    double check= DatumRangeUtil.normalize( dr, DataSetUtil.asDatumRange(context).min() );
+                    if ( check<-100 || check>200 ) {
+                        System.err.println("check suppressed bad read...");
+                        context=null;
+                    }
                     if ( context!=null ) dr= DatumRangeUtil.union( dr, DataSetUtil.asDatumRange(context,true) );
                     tsb.setTimeRange(dr);
                 }
