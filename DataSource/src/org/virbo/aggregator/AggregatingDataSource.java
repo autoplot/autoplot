@@ -332,7 +332,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         QDataSet exds= Ops.extent(xds);
-                        if ( UnitsUtil.isTimeLocation( dr1.getUnits() ) && UnitsUtil.isTimeLocation(SemanticOps.getUnits(exds)) ) {
+                        if ( !( UnitsUtil.isTimeLocation( dr1.getUnits() ) && UnitsUtil.isTimeLocation(SemanticOps.getUnits(exds)) ) ) {
                             logger.log(Level.WARNING, "Hey units! {0} {1}", new Object[] { dr1.getUnits(), SemanticOps.getUnits(exds) } );
                         }
                         if ( !dr1.intersects(DataSetUtil.asDatumRange(exds)) ) {
