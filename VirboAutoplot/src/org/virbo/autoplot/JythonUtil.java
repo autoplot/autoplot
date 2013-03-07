@@ -131,7 +131,7 @@ public class JythonUtil {
             public void run() {
                 try {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
-                    System.err.println("invokeScriptSoon("+url+")");
+                    logger.log(Level.FINE, "invokeScriptSoon({0})", url);
                     interp.execfile(url.openStream(), url.toString());
                     mon.finished();
                 } catch (IOException ex) {
