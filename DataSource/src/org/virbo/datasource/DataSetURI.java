@@ -1102,6 +1102,8 @@ public class DataSetURI {
             this.doc = doc;
             this.maybePlot = maybePlot;
         }
+     
+        public static CompletionResult SEPARATOR= new CompletionResult("====", "Used to request a separator");
     }
 
     /**
