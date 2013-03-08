@@ -3607,6 +3607,15 @@ APSplash.checkTime("init 240");
         });
     }
 
+    private void runTool( String suri, int modifiers ) throws MalformedURLException {
+        if ( !( ( modifiers & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
+            JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+        } else {
+            plotUri("script:"+ suri );
+        }
+
+        
+    }
     /**
      * looks for and adds tools on a new thread.
      */
@@ -3644,11 +3653,7 @@ APSplash.checkTime("init 240");
                     Action a= new AbstractAction(t.getTitle()) {
                         public void actionPerformed(ActionEvent e) {
                             try {
-                                if ( !( ( e.getModifiers() & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
-                                    JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
-                                } else {
-                                    plotUri("script:"+ ((Bookmark.Item) tt).getUri() );
-                                }
+                                runTool( suri, e.getModifiers() );
                             } catch (MalformedURLException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
