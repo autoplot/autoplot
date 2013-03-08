@@ -799,6 +799,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
 
             public void itemSelected(CompletionResult s1) {
+                if ( s1==CompletionResult.SEPARATOR ) return; // this was a mistake
                 //dataSetSelector.setSelectedItem(s1.completion);
                 setValue(s1.completion);
                 if (s1.maybePlot) {
@@ -996,8 +997,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
                         } else {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
-                            if ( completions.size()==0 ) {
-                                completions = DataSetURI.getFileSystemCacheCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                            if ( completions.size()==0 || ( surll.startsWith("http:") && surll.substring(7).split("/").length<2 ) ) {
+                                List<CompletionResult> compl1= DataSetURI.getFileSystemCacheCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                                if ( completions.size()>0 ) completions.add(CompletionResult.SEPARATOR);
+                                completions.addAll(compl1);
                             }
                         }
                     }
