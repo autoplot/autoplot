@@ -23,9 +23,19 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>reset FS memory caches off of the event thread.</li>
+            <li>JythonDataSource checks for CancelledOperationException, which shouldn't produce popup.</li>
+            <li>3607312: improve feedback when ds[0,:] is used on rank 1 dataset</li>
+            <li>progress monitors and long warning messages were not erased properly for short plots.</li>
+            <li>minor logging cleaning</li>
             <li>small findbugs cleanup</li>
+            <li>bugfix: annotations for error wouldn't clear when editing</li>
+            <li>AutoplotDataServer would truncate datasets when an exception was encountered.</li>
+            <li>fftPower function now normalizes for window</li>
+            <li>getFrequencyDomainTags now handles case for FFT of RBSP Mag data where Hz is a better unit than KHz.</li>
             <li>rte0014594906: bad format code "v" in completion</li>
             <li>3606898: http://www.rbsp-ect.lanl.gov/ completion</li>
+            <li>preserve log setting when overplotting a linear on log axis when linear data could fit on log</li>
             <li>Old versions of Java webstart (1.6u16) would fail to start because of mediawiki improperly reporting fail status.</li>
             <li>minor cleanup of PNGWalk tool, add new default bookmarks</li>
             <li>turn on tooltips for bookmarks, showing location.</li>
@@ -71,7 +81,12 @@
             <li>CDF INT8 type was never added.</li>
         </ul>
         <p>Features:</p>
-        <ul>
+        <ul>        
+            <li>new three-argument |fftPower(512,2,'Hanning') function allows slide and window selection.</li>
+            <li>add "copy to clipboard" popup menu item to pngwalk tool, so users can easily copy an image to an email.</li>
+            <li>allow autoplot.emailrte=T in properties to allow emailing RTE from networks that don't allow POST</li>
+            <li>request processor thread limit is upped to 8 from 6, which was a kludgy fix.</li>
+            <li>ascii parser has new format spec, e.g. format='f8,i2,i2,i2'</li>
             <li>add controls for label and title in ASCII URIs.</li>
             <li>record source of scripts installed in tools menu.</li>
             <li>sliceRebinnedData is now persistent between sessions, and is off by default.</li>
