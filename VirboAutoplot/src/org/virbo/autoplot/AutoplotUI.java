@@ -2872,8 +2872,12 @@ private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workOfflineCheckBoxMenuItemActionPerformed
-    FileSystem.settings().setOffline(workOfflineCheckBoxMenuItem.isSelected());
-    FileSystem.reset();
+    final boolean workOffline= workOfflineCheckBoxMenuItem.isSelected();
+    FileSystem.settings().setOffline( workOffline );
+    RequestProcessor.invokeLater( new Runnable() { public void run() {
+        FileSystem.reset();
+        setMessage( workOffline ? "Now working offline" : "Working online");
+    } } );
 }//GEN-LAST:event_workOfflineCheckBoxMenuItemActionPerformed
 
 private void searchToolTipsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchToolTipsMenuItemActionPerformed
@@ -2886,8 +2890,13 @@ private void manageFilesystemsMIActionPerformed(java.awt.event.ActionEvent evt) 
 
 private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMemoryCachesMIActionPerformed
     logger.fine("Resetting FileSystems...");
-    FileSystem.reset();
-    setMessage("FileSystem memory caches reset");
+    Runnable run= new Runnable() {
+        public void run() {
+           FileSystem.reset();
+           setMessage("FileSystem memory caches reset");
+        }
+    };
+    RequestProcessor.invokeLater(run);
 }//GEN-LAST:event_resetMemoryCachesMIActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
