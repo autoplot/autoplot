@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
 import org.das2.datum.DatumRangeUtil;
@@ -269,12 +270,15 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         logger.log(Level.FINE, "debugging line number={0}", reader.getLineNumber());
                     }
                     causedBy = ex;
+                    Object javaClass= ex.value.__tojava__(Exception.class);
                     // since FileNotFoundException is a special exception where we don't want to interrupt the user with a popup, handle it specially.
-                    if ( ex.value.__tojava__(Exception.class) instanceof java.io.FileNotFoundException ) {
-                        Object javaClass= ex.value.__tojava__(Exception.class);
+                    if ( javaClass instanceof java.io.FileNotFoundException ) {
                         throw (Exception)javaClass;
-                    } else if ( ex.value.__tojava__(Exception.class) instanceof NoDataInIntervalException ) {
-                        Object javaClass= ex.value.__tojava__(Exception.class);
+                    } else if ( javaClass instanceof NoDataInIntervalException ) {
+                        throw (Exception)javaClass;
+                    } else if ( javaClass instanceof CancelledOperationException ) {
+                        throw (Exception)javaClass;
+                    } else if ( javaClass instanceof org.das2.util.monitor.CancelledOperationException ) { //TODO: why are there two?
                         throw (Exception)javaClass;
                     }
                     logger.warning( ex.toString() );
