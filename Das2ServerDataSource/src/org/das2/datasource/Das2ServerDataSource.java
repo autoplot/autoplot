@@ -223,13 +223,15 @@ class Das2ServerDataSource extends AbstractDataSource {
                 }
 
             } catch ( org.virbo.qstream.StreamException ex ) {
-                if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
+                Throwable cause= ex.getCause();
+                if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 
                     ex.printStackTrace();
                     //TODO CancelledOperationException
                     throw (java.io.InterruptedIOException)ex.getCause();
-                } else if ( ex.getCause()!=null && ( ex.getCause() instanceof org.das2.dataset.NoDataInIntervalException )) {
+                } else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
                     throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
-
+                } else if ( ex.getMessage().contains("Empty response from reader")  ) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
                     ex.printStackTrace();
                     throw ex;
