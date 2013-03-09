@@ -139,16 +139,19 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     public class AggTimeSeriesBrowse implements TimeSeriesBrowse {
 
+        @Override
         public void setTimeRange(DatumRange dr) {
             viewRange = quantize(dr);
             logger.log(Level.FINE, "set timerange={0}", viewRange);
         }
 
+        @Override
         public void setTimeResolution(Datum d) {
             resolution= d;
             logger.log(Level.FINE, "set resolution={0}", d);
         }
 
+        @Override
         public String getURI() {
             String surl = DataSetURI.fromUri( AggregatingDataSource.this.resourceURI ) + "?" ;
             if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
@@ -170,10 +173,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
             return URISplit.format(split);
         }
 
+        @Override
         public DatumRange getTimeRange() {
             return viewRange;
         }
 
+        @Override
         public Datum getTimeResolution() {
             return resolution;
         }
@@ -183,6 +188,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             return "aggtsb: " + viewRange + "@" + ( resolution==null ? "intrinsic" : resolution );
         }
 
+        @Override
         public void setURI(String suri) throws ParseException {
             viewRange= URISplit.parseTimeRange(suri);
         }
@@ -192,7 +198,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
-
+        
         ReferenceCache.ReferenceCacheEntry rcent=null;
         if ( useReferenceCache ) {
             rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
@@ -333,7 +339,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         QDataSet exds= Ops.extent(xds);
                         if ( !( UnitsUtil.isTimeLocation( dr1.getUnits() ) && UnitsUtil.isTimeLocation(SemanticOps.getUnits(exds)) ) ) {
-                            logger.log(Level.WARNING, "Hey units! {0} {1}", new Object[] { dr1.getUnits(), SemanticOps.getUnits(exds) } );
+                            logger.log(Level.WARNING, "Hey units! \"{0}\" \"{1}\"", new Object[] { dr1.getUnits(), SemanticOps.getUnits(exds) } );
                         }
                         if ( !dr1.intersects(DataSetUtil.asDatumRange(exds)) ) {
                             logger.log(Level.WARNING, "file for {0} contains data from an unexpected interval: {1}", new Object[] { dr1, exds } );
