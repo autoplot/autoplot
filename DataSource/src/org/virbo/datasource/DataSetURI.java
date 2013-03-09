@@ -341,6 +341,7 @@ public class DataSetURI {
     /**
      * get the datasource factory for the URL.
      * @throws URISyntaxException if the schemeSpecficPart is not itself a URI.
+     * TODO: this should probably throw UnrecognizedDataSourceException
      */
     public static DataSourceFactory getDataSourceFactory(
             URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException, URISyntaxException {
