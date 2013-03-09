@@ -5,17 +5,14 @@
 
 package org.virbo.datasource;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
@@ -53,6 +50,7 @@ public class CompletionsList {
                         label = label.substring(labelprefix.length());
                     }
                     Action a = new AbstractAction(label) {
+                        @Override
                         public void actionPerformed(ActionEvent ev) {
                             listener.itemSelected(s1);
                         }
