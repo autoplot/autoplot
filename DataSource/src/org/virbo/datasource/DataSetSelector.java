@@ -491,6 +491,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             JOptionPane.showMessageDialog( DataSetSelector.this, msg, "Empty File", JOptionPane.WARNING_MESSAGE );
             setMessage("" + ex.getMessage());
             return true;
+        } else if ( ex instanceof UnrecognizedDataSourceException ) {
+            JOptionPane.showMessageDialog( DataSetSelector.this, "<html>Unable to find data source plugin for:<br>"+msg, "Unrecognized data source", JOptionPane.WARNING_MESSAGE );
+            setMessage("" + ex.getMessage());
+            return true;
         }
         return false;
     }
