@@ -967,6 +967,27 @@ public class DataSetSelector extends javax.swing.JPanel {
         } );
     }
 
+    private void mergeLocalIntoRemote( List<CompletionResult> remote, List<CompletionResult> local ) {
+        boolean sep= false;
+        List<String> remoteLabels= new ArrayList(remote.size());
+        for ( int i=0; i<remote.size(); i++ ) {
+            remoteLabels.add(remote.get(i).completion);
+        }
+        
+        for ( CompletionResult l: local ) {
+            if ( remoteLabels.contains(l.completion) ) {
+                logger.log(Level.FINEST, "already contains {0}", l.completion);
+            } else {
+                if ( sep==false && remote.size()>0 ) {
+                    remote.add(CompletionResult.SEPARATOR);
+                    sep= true;
+                }
+                remote.add(l);
+                logger.log(Level.FINEST, "appening {0}", l.completion);
+            }
+        }
+    }
+    
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
@@ -1001,10 +1022,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
                         } else {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
-                            if ( completions.size()==0 || ( surll.startsWith("http:") && surll.substring(7).split("/").length<2 ) ) {
+                            if ( completions.isEmpty() || surll.startsWith("http:") ) {
                                 List<CompletionResult> compl1= DataSetURI.getFileSystemCacheCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
-                                if ( completions.size()>0 ) completions.add(CompletionResult.SEPARATOR);
-                                completions.addAll(compl1);
+                                mergeLocalIntoRemote( completions, compl1 );
                             }
                         }
                     }
