@@ -13,6 +13,7 @@ import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
+import com.lowagie.tools.split_pdf;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dasml.DOMBuilder;
@@ -3825,44 +3826,70 @@ APSplash.checkTime("init 240");
             applicationModel.getExceptionHandler().handleUncaught(ex);
         }
     }
-    
-    private void runScript( String script ) {
-        try {
-            URISplit split= URISplit.parse(script);
-            File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
-            RunScriptPanel pp = new RunScriptPanel();
-            pp.loadFile(ff);
-            int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
-            if ( r==JOptionPane.OK_OPTION ) {
-                if ( pp.getToolsCB().isSelected() ) {
-                    File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                    File cpTo= new File( tools,ff.getName() );
-                    if ( !ff.equals(cpTo ) ) {
-                        File log= new File( tools, "scripts.txt" );
-                        FileWriter out3 = new FileWriter( log, true );
-                        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-                        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-                        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + split.resourceUri + "\n" );
-                        out3.close();
 
+    private void askRunScript( RunScriptPanel pp, final URI resourceUri, final File ff ) throws IOException {
+        int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+        final boolean doCpTo;
+        if ( r==JOptionPane.OK_OPTION ) {
+            if ( pp.getToolsCB().isSelected() ) {
+                doCpTo= true;
+            } else {
+                doCpTo= false;
+            }
+            if ( scriptPanel!=null ) {
+                if ( ! scriptPanel.isDirty() ) {
+                    scriptPanel.loadFile(ff);
+                }
+            }
+            applicationModel.addRecent(dataSetSelector.getValue());
+            Runnable run= new Runnable() {
+                public void run() {
+                    if ( doCpTo  ) {
+                        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                        File cpTo= new File( tools,ff.getName() );
+                        try {
                         if ( !Util.copyFile( ff, cpTo ) ) {
                             setStatus("warning: unable to copy file");
                         } else {
                             setStatus("copied file to "+cpTo );
                             reloadTools();
                         }
+                        File log= new File( tools, "scripts.txt" );
+                        FileWriter out3 = new FileWriter( log, true );
+                        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
+                        out3.close();
+                        } catch ( IOException ex ) {
+                            logger.log( Level.WARNING,null,ex);
+                        }
                     } else {
-                        setStatus("warning: file is already in tools");
+
+                    }
+                    RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
+                }
+            };
+            new Thread(run,"runScript").start();
+        }
+
+    }
+    
+    private void runScript( String script ) {
+        try {
+            final URISplit split= URISplit.parse(script);
+            final File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
+            final RunScriptPanel pp = new RunScriptPanel();
+            pp.loadFile(ff);
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        askRunScript( pp, split.resourceUri, ff );
+                    } catch ( IOException ex ) {
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
-                if ( scriptPanel!=null ) {
-                    if ( ! scriptPanel.isDirty() ) {
-                        scriptPanel.loadFile(ff);
-                    }
-                }
-                applicationModel.addRecent(dataSetSelector.getValue());
-                RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
-            }
+            };
+            SwingUtilities.invokeLater(run);
         } catch (URISyntaxException ex) {
             logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
