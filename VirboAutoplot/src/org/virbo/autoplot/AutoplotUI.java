@@ -416,14 +416,15 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         dataSetSelector.registerActionTrigger( "(.*)\\.pngwalk", new AbstractAction( "pngwalk") {
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
                 PngWalkTool1.start( pngwalk, AutoplotUI.this);
-                applicationModel.addRecent(dataSetSelector.getValue());
             }
         });
 
         dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
+                applicationModel.addRecent(dataSetSelector.getValue());
                 runScript( dataSetSelector.getValue() );
             }
         });
@@ -435,6 +436,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
                 } else {
+                    applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( script );
                 }
             }
@@ -456,16 +458,22 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "vapfile:(.*)", new AbstractAction( "valfile") {
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 String vapfile= dataSetSelector.getValue().substring(8);
-                try {
-                    InputStream in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
-                    applicationModel.doOpen( in, null );
-                } catch ( IOException ex ) {
-                    JOptionPane.showConfirmDialog(AutoplotUI.this, "Unable to load: "+vapfile );
+                if ( !( vapfile.endsWith(".xml") ) ) {
+                    DataSetSelector source= (DataSetSelector)ev.getSource();
+                    source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
+                } else {
+                    applicationModel.addRecent(dataSetSelector.getValue());
+                    try {
+                        InputStream in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
+                        applicationModel.doOpen( in, null );
+                    } catch ( IOException ex ) {
+                        JOptionPane.showConfirmDialog(AutoplotUI.this, "Unable to load: "+vapfile );
+                    }
                 }
             }
         });
 
-        URISplit.setOtherSchemes( Arrays.asList( "script","pngwalk", "bookmarks") );
+        URISplit.setOtherSchemes( Arrays.asList( "script","pngwalk", "bookmarks","vapfile") );
 
         APSplash.checkTime("init 40");
 
