@@ -45,33 +45,16 @@ def getParam( x, default, title='', enums='' ):
      print 'in jython script, variable params was overriden.'
      return default
 
-# this will become internal to Autoplot
+# invokeLater command is a scientist-friendly way to define a function that 
+# is called on a different thread.
 import java.lang.Thread, java.lang.Runnable
-
 class InvokeLaterRunnable( java.lang.Runnable ):
-   
-   def __init__( self, fun, args ):
+   def __init__( self, fun, args, kw ):
       self.fun= fun
       self.args= args
-      
+      self.kw= kw
    def run( self ):
-      f= self.fun      
-      l= len( self.args )
-      if ( l==0 ):
-         f( )
-      elif ( l==1 ):
-         f( self.args[0] )
-      elif ( l==2 ):
-         f( self.args[0], self.args[1] )
-      elif ( l==3 ):
-         f( self.args[0], self.args[1], self.args[2] )      
-      elif ( l==4 ):
-         f( self.args[0], self.args[1], self.args[2], self.args[3] )      
-      
-
-      
-def invokeLater( fun, *args ):
-   if ( len(args)>4 ):
-       raise Exception( 'invokeLater can only handle up to 4 arguments' )
-   r= InvokeLaterRunnable( fun, args )
+      self.fun( *self.args, **self.kw )
+def invokeLater( fun, *args, **kw ):
+   r= InvokeLaterRunnable( fun, args, kw )
    java.lang.Thread(r,'invokeLater').start()
