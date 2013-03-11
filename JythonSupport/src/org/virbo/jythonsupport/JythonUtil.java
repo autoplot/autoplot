@@ -12,12 +12,10 @@ import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -46,7 +44,7 @@ public class JythonUtil {
     private static final Logger logger= LoggerManager.getLogger("jython");
 
     /**
-     * create an interpretter object configured for Autoplot contexts:
+     * create an interpreter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
      *   * a standard set of names are imported.
      *   
@@ -101,7 +99,7 @@ public class JythonUtil {
         File ff2= FileSystem.settings().getLocalCacheDir();
         File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" );
         if ( ! ff.exists() ) {
-            logger.warning("looking for "+ff+", but didn't find it.");
+            logger.log(Level.WARNING, "looking for {0}, but didn''t find it.", ff);
             logger.warning("doesn't seem like we have the right file, downloading...");
             File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
             ff= f;
@@ -147,7 +145,7 @@ public class JythonUtil {
 
         } finally {
             try {
-                reader.close();
+                if ( reader!=null ) reader.close();
             } catch (IOException ex) {
                 Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
             }
