@@ -1829,18 +1829,14 @@ public class AutoplotUtil {
             // TIP: Make the JOptionPane resizable using the HierarchyListener.  
             editorPane.addHierarchyListener(new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
-                    try {
-                        Window window = SwingUtilities.getWindowAncestor(editorPane);
-                        if (window instanceof Dialog) {
-                            final Dialog dialog = (Dialog)window;
-                            if (!dialog.isResizable()) {
-                                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                                    dialog.setResizable(true);
-                                } } );
-                            }
+                    Window window = SwingUtilities.getWindowAncestor(editorPane);
+                    if (window instanceof Dialog) {
+                        final Dialog dialog = (Dialog)window;
+                        if (!dialog.isResizable()) {
+                            SwingUtilities.invokeLater( new Runnable() { public void run() {
+                                dialog.setResizable(true);
+                            } } );
                         }
-                    } catch ( Exception ex ) {
-                        ex.printStackTrace();
                     }
                 }
             });        
