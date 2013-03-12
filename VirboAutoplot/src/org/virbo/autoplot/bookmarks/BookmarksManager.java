@@ -1054,7 +1054,7 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
     edit.setEditable(descriptionTextField.isEditable());
     
-    int ok= JOptionPane.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), edit.isEditable() ? JOptionPane.OK_CANCEL_OPTION : JOptionPane.OK_CANCEL_OPTION );
+    int ok= AutoplotUtil.showConfirmDialog( this, jScrollPane2, titleTextField.getText(), edit.isEditable() ? JOptionPane.OK_CANCEL_OPTION : JOptionPane.OK_CANCEL_OPTION );
     if ( edit.isEditable() && ok==JOptionPane.OK_OPTION ) {
         String ntxt= edit.getText();
         if ( ! ntxt.equals(txt) ) {
