@@ -46,10 +46,10 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="rebinPanel" alignment="0" min="-2" pref="142" max="-2" attributes="0"/>
-                      <Component id="colortableTypePanel" alignment="0" min="-2" pref="141" max="-2" attributes="0"/>
+                      <Component id="rebinPanel" pref="152" max="32767" attributes="0"/>
+                      <Component id="colortableTypePanel" alignment="0" pref="152" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="22" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
