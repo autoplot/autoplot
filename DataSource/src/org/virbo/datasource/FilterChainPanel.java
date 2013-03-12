@@ -159,18 +159,18 @@ public class FilterChainPanel extends JPanel {
 
         JScrollPane p= new JScrollPane(optionsPanel);
         Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension ps= new Dimension( 800, 800 );
+        Dimension ps= new Dimension( 700, 700 );
 
         //if ( ps.getHeight()+100 >d.getHeight() ) {
             //Dimension v= new Dimension( Math.min( ps.width, d.width ), d.height-100 );
-            Dimension v= new Dimension( 800, Math.min( 800, d.height ) );
+            Dimension v= new Dimension( 700, Math.min( 700, d.height ) );
             p.setMaximumSize(v);
             p.setPreferredSize(v);
         //}
         
         p.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
 
-       int r= JOptionPane.showConfirmDialog( this, p, "Add Filter", JOptionPane.OK_CANCEL_OPTION );
+       int r= AutoplotUtil.showConfirmDialog( this, p, "Add Filter", JOptionPane.OK_CANCEL_OPTION );
        if ( r==JOptionPane.OK_OPTION ) {
            String ss=null;
            Enumeration<AbstractButton> ee= group.getElements();
