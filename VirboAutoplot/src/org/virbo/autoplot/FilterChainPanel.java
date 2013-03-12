@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.datasource;
+package org.virbo.autoplot;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

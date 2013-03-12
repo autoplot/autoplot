@@ -1847,5 +1847,17 @@ public class AutoplotUtil {
 //                return counter;
 //        }
     }
+    
+    /**
+     * TODO: allow resizing!
+     * @param parentComponent
+     * @param message
+     * @param title
+     * @param optionType
+     * @return 
+     */
+    public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
+        return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+    }
 
 }

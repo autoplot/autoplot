@@ -52,7 +52,6 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.FilterChainPanel;
 
 /**
  * PlotElement for controlling how data is handled.
