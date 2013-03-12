@@ -41,9 +41,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import javax.swing.JComponent;
@@ -57,8 +61,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.CLOSED_OPTION;
+import static javax.swing.JOptionPane.getRootFrame;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -1815,41 +1822,37 @@ public class AutoplotUtil {
         //JOptionPane.showMessageDialog( parent, message, title, messageType );
         //JOptionPane.showOptionDialog( parent, message, title, JOptionPane.DEFAULT_OPTION, messageType, null, null, null);
 
-        JOptionPane.showOptionDialog( parentComponent, message, title, JOptionPane.DEFAULT_OPTION, messageType, null, null, null);
+        if ( message instanceof Component ) {
+            final Component editorPane= (Component)message;
+            // Sandip Chitale's solution
+            // https://blogs.oracle.com/scblog/entry/tip_making_joptionpane_dialog_resizable
+            // TIP: Make the JOptionPane resizable using the HierarchyListener.  
+            editorPane.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    try {
+                        Window window = SwingUtilities.getWindowAncestor(editorPane);
+                        if (window instanceof Dialog) {
+                            final Dialog dialog = (Dialog)window;
+                            if (!dialog.isResizable()) {
+                                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                                    dialog.setResizable(true);
+                                } } );
+                            }
+                        }
+                    } catch ( Exception ex ) {
+                        ex.printStackTrace();
+                    }
+                }
+            });        
+        }
+        
+        JOptionPane.showMessageDialog( parentComponent, message, title, messageType );
 
-//        JOptionPane             pane = new JOptionPane( message, JOptionPane.DEFAULT_OPTION, messageType, null, null, null);
-//        int style = styleFromMessageType(messageType);
-//        JDialog dialog = pane.createDialog(parentComponent, title, style);
-//
-//        pane.setInitialValue(initialValue);
-//        pane.setComponentOrientation(((parentComponent == null) ?
-//	    getRootFrame() : parentComponent).getComponentOrientation());
-//
-//        int style = styleFromMessageType(messageType);
-//        JDialog dialog = pane.createDialog(parentComponent, title, style);
-//
-//        pane.selectInitialValue();
-//        dialog.show();
-//        dialog.dispose();
-//
-//        Object        selectedValue = pane.getValue();
-//
-//        if(selectedValue == null)
-//            return CLOSED_OPTION;
-//        if(options == null) {
-//            if(selectedValue instanceof Integer)
-//                return ((Integer)selectedValue).intValue();
-//            return CLOSED_OPTION;
-//        }
-//        for(int counter = 0, maxCounter = options.length;
-//            counter < maxCounter; counter++) {
-//            if(options[counter].equals(selectedValue))
-//                return counter;
-//        }
     }
     
     /**
-     * TODO: allow resizing!
+     * Wrapper for displaying ok,cancel dialogs.  
+     * If the message is a component, then the dialog will be resizeable.
      * @param parentComponent
      * @param message
      * @param title
@@ -1857,7 +1860,29 @@ public class AutoplotUtil {
      * @return 
      */
     public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
+        
+        if ( message instanceof Component ) {
+            final Component editorPane= (Component)message;
+            // Sandip Chitale's solution
+            // https://blogs.oracle.com/scblog/entry/tip_making_joptionpane_dialog_resizable
+            // TIP: Make the JOptionPane resizable using the HierarchyListener.  
+            editorPane.addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    Window window = SwingUtilities.getWindowAncestor(editorPane);
+                    if (window instanceof Dialog) {
+                        final Dialog dialog = (Dialog)window;
+                        if (!dialog.isResizable()) {
+                            SwingUtilities.invokeLater( new Runnable() { public void run() {
+                                dialog.setResizable(true);
+                            } } );
+                        }
+                    }
+                }
+            });        
+        }
+        
         return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+        
     }
 
 }
