@@ -7,8 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Sloppy code prevented completions on http://www.rbsp-ect.lanl.gov/.</small></p>
-
+        <p><small>White overplot on white background is allowed now, and a small warning is displayed.</small></p>
+        <!-- The ascii parser wouldn't allow files with three or more iso8601 timetags per record. -->
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,6 +23,10 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Ascii parser can now handle files with three ISO8601 timetags</li>
+            <li>Provide a more precise error message when a reference to a plugin is found but plugin is not available.</li>
+            <li>bugfix: test025 showed where Bx**2 was dropping depend_0 after recent changes.</li>
+            <li>3606898: completions based on local listings are always displayed along FS completions</li>
             <li>reset FS memory caches off of the event thread.</li>
             <li>JythonDataSource checks for CancelledOperationException, which shouldn't produce popup.</li>
             <li>3607312: improve feedback when ds[0,:] is used on rank 1 dataset</li>
@@ -31,10 +35,10 @@
             <li>small findbugs cleanup</li>
             <li>bugfix: annotations for error wouldn't clear when editing</li>
             <li>AutoplotDataServer would truncate datasets when an exception was encountered.</li>
+            <li>wave[DEP0[sec]]*window[] now preserves DEPEND_0</li>
             <li>fftPower function now normalizes for window</li>
             <li>getFrequencyDomainTags now handles case for FFT of RBSP Mag data where Hz is a better unit than KHz.</li>
             <li>rte0014594906: bad format code "v" in completion</li>
-            <li>3606898: http://www.rbsp-ect.lanl.gov/ completion</li>
             <li>preserve log setting when overplotting a linear on log axis when linear data could fit on log</li>
             <li>Old versions of Java webstart (1.6u16) would fail to start because of mediawiki improperly reporting fail status.</li>
             <li>minor cleanup of PNGWalk tool, add new default bookmarks</li>
@@ -42,6 +46,9 @@
             <li>3605590: Java CDF reader no longer holds on to open files, this caused problems, and now we close after 10 seconds.</li>
             <li>3606197: NN spectrograms fixed for rank 2 DEPEND_1.</li>
             <li>recent changes to Jython eq and ne infix ops broke Jython code like (ds!=None)</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>3605224: major ticks don't line up when one axis of stack has labels.</li>
             <li>3605415: CDF type "spectrogram>noauto", and user pref for spectrogram</li>
             <li>3605230: jython rank zero result of gt ought to be a boolean</li>
@@ -54,34 +61,9 @@
             <li>3604777: agg completions missing when tab is pressed in address bar</li>
             <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>JythonDataSource tweaked bug where web filesystems would fail to update.</li>
-            <li>AsOrderOneUnits routine (used in Length mouse module) would skip a unit, so it would use minutes then days</li>
-            <li>ascii reader would mistakenly identify the 1001th line as a data line when it really was still the header.</li>
-            <li>eventListColumn in ascii reader works for short files.</li>
-            <li>orbit range preserved in das2 history, the axis built-in history would loose identity.</li>
-            <li>3603591: Jython internal implementation would result in concurrency problems when thrashing AutoplotServer</li>
-            <li>TimeRangeTool defaults to RBSP-A orbit instead of RBSP-B.</li>
-            <li>3603563: pngwalk tool close doesn't exit when it is the only dialog</li>
-            <li>3603262: special error messages for malformed URIs</li>
-            <li>3603173: copy plot elements down resets ranges</li>
-            <li>null pointer exception if inspect icon was pressed before entering a URI.</li>
-            <li>rte_0087414712: null pointer exception when hanning filter used on rank 2 dataset without dep0 and dep1.</li>
-            <li>contours renderer checks for rank 2 dataset</li>
-            <li>old deprecated addPanel and deletePanel methods removed.</li>
-            <li>rte_0644107226: null pointer exception when internal URIs (vap+internal:data_1,data_2) cannot be handled.</li>
-            <li>MultiFieldTimeParser made public so it can be used in scripts.</li>
-            <li>clear the RENDER_TYPE when make a (X,Y->Z) bundle with Add Plot... dialog.</li>
-            <li>bugfix with CDF editor since components were made selectable, non-data elements like Epoch are accessible again</li>
-            <li>remove unnecessary creation of das2 filesystem when downloadResourceAsTempFile is used, which prevented Bob's data from loading.</li>
-            <li>RPWS Juno plugin allows waveforms to be viewed.</li>
-            <li>downloadFileAsTempFile avoids creating das2 filesystem because it would hang for Bob's TSDS server</li>
-            <li>3600315: Some dialogs still weren't positioned relative to their parent.</li>
-            <li>CDF INT8 type was never added.</li>
-        </ul>
         <p>Features:</p>
         <ul>        
+            <li>Jython invokeLater command introduced to support simple concurrent scripts.</li>
             <li>new three-argument |fftPower(512,2,'Hanning') function allows slide and window selection.</li>
             <li>add "copy to clipboard" popup menu item to pngwalk tool, so users can easily copy an image to an email.</li>
             <li>allow autoplot.emailrte=T in properties to allow emailing RTE from networks that don't allow POST</li>
@@ -90,8 +72,10 @@
             <li>add controls for label and title in ASCII URIs.</li>
             <li>record source of scripts installed in tools menu.</li>
             <li>sliceRebinnedData is now persistent between sessions, and is off by default.</li>
-            <li>add support for sliding FFT and better control of the window function.</li>
             <li>add experimental rebinner for LANL RBSP data that indicates spectrogram boundaries</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>experimental tool for recording GUI sequences added</li>
             <li>add vapfile: prefix so that I can read in exception reports without changing file names</li>
             <li>version stamp finally added to the address bar</li>
@@ -107,13 +91,6 @@
             <li>Add skip parameter to csv file reader to support MyTracks app.</li>
             <li>Rows are plottable in the Excel spreadsheet reader.</li>
             <li>GPS metadata retrieved in (JPG) image viewer</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>command line on console tab keeps last 20 commands between sessions</li>
-            <li>introduce secret feature for testing reference cache -DenableReferenceCache=true will enable the cache for CDF and aggregations.</li>
-            <li>add collapse functions to scripting.  These were available in the processes but not by the same name in scripting.</li>
-            <li>RBSP orbits updated to 2012-01-08</li>
         </ul>
 
         <p>Known issues:</p>
