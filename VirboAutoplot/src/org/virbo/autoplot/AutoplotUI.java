@@ -2577,7 +2577,7 @@ APSplash.checkTime("init 52");
             pane.getVerticalScrollBar().setUnitIncrement( 12 );
             pane.setPreferredSize(new java.awt.Dimension(jtp.getPreferredSize().width + 50,480));
 
-            JOptionPane.showMessageDialog(this, pane);
+            AutoplotUtil.showMessageDialog(this, pane, "About Autoplot "+AboutUtil.getReleaseTag(), JOptionPane.INFORMATION_MESSAGE );
 
         } catch (IOException ex) {
             logger.log( Level.SEVERE, "", ex );
@@ -3836,7 +3836,7 @@ APSplash.checkTime("init 240");
     }
 
     private void askRunScript( RunScriptPanel pp, final URI resourceUri, final File ff ) throws IOException {
-        int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+        int r = AutoplotUtil.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
         final boolean doCpTo;
         if ( r==JOptionPane.OK_OPTION ) {
             if ( pp.getToolsCB().isSelected() ) {
