@@ -146,6 +146,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( recs[2]==-1 ) {
                     attributes= MetadataUtil.sliceProperties(attributes, 0);
                 }
+                if ( map.get(PARAM_SLICE1)!=null ) {
+                    attributes.put( PARAM_SLICE1, map.get(PARAM_SLICE1) );
+                }
             }
 
             MutablePropertyDataSet result;
@@ -391,8 +394,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             result = CdfUtil.wrapCdfHyperDataHacked( variable, recs[0], recCount, recs[2], slice1, mon );
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
-        result.putProperty(QDataSet.NAME, svariable);
-
+        result.putProperty(QDataSet.NAME, svariable);            
+        
         final boolean doUnits = true;
         Units units=null;
         if (doUnits) {
@@ -490,6 +493,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( labl!=null ) {
                     try {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                        if ( idep==1 ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( CDFException ex ) {
                         //label is not actally in the file.
                     }
@@ -590,6 +594,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                             result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );
                         } else if ( idep<1 ) {
                             result.putProperty( "BUNDLE_"+(idep), DataSetUtil.toBundleDs(bundleDs) );
+                        } else if ( idep==1 ) {
+                            Units u= (Units) lablDs.property(QDataSet.UNITS);
+                            String component= u.createDatum(lablDs.value(slice1)).toString();
+                            result.putProperty(QDataSet.NAME, svariable+"_"+component );
                         }
                     } else {
                         result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );

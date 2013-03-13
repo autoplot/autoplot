@@ -240,6 +240,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( recs[2]==-1 ) {
                     attributes= MetadataUtil.sliceProperties(attributes, 0);
                 }
+                if ( map.get(PARAM_SLICE1)!=null ) {
+                    attributes.put( PARAM_SLICE1, map.get(PARAM_SLICE1) );
+                }                
             }
         }
 
@@ -354,6 +357,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     renderType= null;
                 }
                 result.putProperty(QDataSet.RENDER_TYPE, renderType );
+                
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
                     if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
                         String rt= (String)istpProps.get("RENDER_TYPE" );
@@ -652,6 +656,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( labl!=null ) {
                     try {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                        if ( idep==1 ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
                         //label is not actally in the file.
                     }
