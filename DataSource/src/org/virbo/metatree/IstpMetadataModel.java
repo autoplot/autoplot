@@ -303,6 +303,13 @@ public class IstpMetadataModel extends MetadataModel {
                 units = Units.cdfEpoch;
             } else {
                 String label = (String) attrs.get("LABLAXIS");
+                String sslice1= (String) attrs.get("slice1");
+                if ( label==null && sslice1!=null ) {
+                    int islice= Integer.parseInt(sslice1);
+                    QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
+                    Units u= (Units) lablDs.property(QDataSet.UNITS);
+                    label= u.createDatum(lablDs.value(islice)).toString();
+                }
                 if (label == null) {
                     label = sunits;
                 } else {
