@@ -378,7 +378,7 @@ public class JythonCompletionTask implements CompletionTask {
             logger.log( Level.SEVERE, "", ex );
         } finally {
             try {
-                if ( read!=null ) read.close();
+                read.close();
             } catch ( IOException ex2 ) {
             }
         }
