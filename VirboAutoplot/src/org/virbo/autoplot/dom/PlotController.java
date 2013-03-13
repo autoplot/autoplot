@@ -311,6 +311,7 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
 
         ac.bind(this.plot, Plot.PROP_LEGENDPOSITION, dasPlot1, DasPlot.PROP_LEGENDPOSITION );
+        ac.bind(this.plot, Plot.PROP_DISPLAYLEGEND, dasPlot1, DasPlot.PROP_DISPLAYLEGEND );
 
         ac.bind(application.getOptions(), Options.PROP_OVERRENDERING, dasPlot1, "overSize");
 
@@ -1271,6 +1272,7 @@ public class PlotController extends DomNodeController {
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
+        ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
     }
 
     public BindingModel[] getBindings() {
