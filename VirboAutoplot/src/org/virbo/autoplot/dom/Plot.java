@@ -99,6 +99,19 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_LEGENDPOSITION, oldLegendPosition, legendPosition);
     }
 
+    protected boolean displayLegend = true;
+    public static final String PROP_DISPLAYLEGEND = "displayLegend";
+
+    public boolean isDisplayLegend() {
+        return displayLegend;
+    }
+
+    public void setDisplayLegend(boolean displayLegend) {
+        boolean oldDisplayLegend = this.displayLegend;
+        this.displayLegend = displayLegend;
+        propertyChangeSupport.firePropertyChange(PROP_DISPLAYLEGEND, oldDisplayLegend, displayLegend);
+    }
+
     /**
      * indicates that the label was set by a machine, not a human, and can be
      * updated automatically.
@@ -277,6 +290,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
+        if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
     }
 
     @Override
@@ -323,6 +337,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
         b= that.legendPosition.equals(this.legendPosition);
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
+        b= that.displayLegend==this.displayLegend;
+        if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYLEGEND, that.displayLegend, this.displayLegend ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
