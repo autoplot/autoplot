@@ -419,62 +419,10 @@ public class JythonCompletionTask implements CompletionTask {
         interp.exec( ss2  );
         
         interp.exec(eval);
-        PyStringMap locals = (PyStringMap) interp.getLocals();
-        PyList po2 = locals.keys();
-        for (int i = 0; i < po2.__len__(); i++) {
-            PyString s = (PyString) po2.__getitem__(i);
-            String ss = s.toString();
-            String signature = null; // java signature
-            if (ss.startsWith(cc.completable)) {
-                PyObject po = locals.get(s);
-                String label = ss;
-                String args = "";
-                if (po instanceof PyReflectedFunction) {
-                    label = ss + "() JAVA";
-                    PyReflectedFunction prf = (PyReflectedFunction) po;
-                    PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
-                    signature = methodSignature(peek.getMethod(0));
-                    args = methodArgs(peek.getMethod(0));
-                    int j= signature.indexOf("#");
-                    if ( j>-1 ) {
-                        label= signature.substring(j+1);
-                        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
-                        Class ret= peek.getMethod(0).getReturnType();
-                        label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
-                    }
-
-                } else if (po.isCallable()) {
-                    label = ss + "() ";
-                    signature= "x"; // oh wow we don't use signature anymore...
-                } else if (po.isNumberType()) {
-                    if ( po.getType().getFullName().equals("javaclass")  ) {
-                        label = ss;
-                    } else if ( po.getType().getFullName().equals("javapackage")  ) {
-                        label = ss;
-                    } else { //TODO: check for PyFloat, etc.
-                        String sss= po.toString();
-                        if ( sss.contains("<") ) { // it's not what I think it is, a number
-                            label = ss;
-                        } else {
-                            label = ss + " = " + sss;
-                        }
-                    }
-                } else {
-                    logger.fine("");
-                }
-                String link = null;
-                if (signature != null) {
-                    String autoplotDoc= "http://autoplot.org/developer.scripting#";
-                    //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
-                    link = autoplotDoc + ss;
-                }
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
-            }
-        }
-
+        getLocalsCompletions( interp, cc, rs);
     }
 
-    private String argsList( Class[] classes ) {
+    private static String argsList( Class[] classes ) {
         //String LPAREN="%28";
         String LPAREN = "(";
         //String RPAREN="%29";
@@ -494,11 +442,11 @@ public class JythonCompletionTask implements CompletionTask {
         return sig.toString();
     }
 
-    private String methodArgs(Method javaMethod) {
+    private static String methodArgs(Method javaMethod) {
         return argsList( javaMethod.getParameterTypes());
     }
     
-    private String methodSignature(Method javaMethod) {
+    private static String methodSignature(Method javaMethod) {
         String n= javaMethod.getDeclaringClass().getCanonicalName();
         if ( n==null ) {
             // anonymous methods or inner class.
@@ -584,5 +532,61 @@ public class JythonCompletionTask implements CompletionTask {
 
     public void cancel() {
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public static void getLocalsCompletions(PythonInterpreter interp, CompletionContext cc, CompletionResultSet rs) {
+        PyStringMap locals = (PyStringMap) interp.getLocals();
+
+        PyList po2 = locals.keys();
+        for (int i = 0; i < po2.__len__(); i++) {
+            PyString s = (PyString) po2.__getitem__(i);
+            String ss = s.toString();
+            String signature = null; // java signature
+            if (ss.startsWith(cc.completable)) {
+                PyObject po = locals.get(s);
+                String label = ss;
+                String args = "";
+                if (po instanceof PyReflectedFunction) {
+                    label = ss + "() JAVA";
+                    PyReflectedFunction prf = (PyReflectedFunction) po;
+                    PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
+                    signature = methodSignature(peek.getMethod(0));
+                    args = methodArgs(peek.getMethod(0));
+                    int j= signature.indexOf("#");
+                    if ( j>-1 ) {
+                        label= signature.substring(j+1);
+                        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                        Class ret= peek.getMethod(0).getReturnType();
+                        label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                    }
+
+                } else if (po.isCallable()) {
+                    label = ss + "() ";
+                    signature= "x"; // oh wow we don't use signature anymore...
+                } else if (po.isNumberType()) {
+                    if ( po.getType().getFullName().equals("javaclass")  ) {
+                        label = ss;
+                    } else if ( po.getType().getFullName().equals("javapackage")  ) {
+                        label = ss;
+                    } else { //TODO: check for PyFloat, etc.
+                        String sss= po.toString();
+                        if ( sss.contains("<") ) { // it's not what I think it is, a number
+                            label = ss;
+                        } else {
+                            label = ss + " = " + sss;
+                        }
+                    }
+                } else {
+                    logger.fine("");
+                }
+                String link = null;
+                if (signature != null) {
+                    String autoplotDoc= "http://autoplot.org/developer.scripting#";
+                    //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                    link = autoplotDoc + ss;
+                }
+                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+            }
+        }
     }
 }
