@@ -12,6 +12,9 @@ import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
 
@@ -22,8 +25,9 @@ import org.virbo.datasource.MetadataModel;
  */
 public class CefMetadataModel extends MetadataModel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.cef");
     /**
-     * returns the Entry that is convertable to double as a double.
+     * returns the Entry that is convertible to double as a double.
      * @throws IllegalArgumentException for strings
      */
     private Double doubleValue(Object o, Units units) {
@@ -81,7 +85,7 @@ public class CefMetadataModel extends MetadataModel {
                 }
             }
         }
-        if ( getScaleType(attrs).equals("log") && min <= 0 ) {
+        if ( "log".equals(getScaleType(attrs)) && min <= 0 ) {
             min = max / 10000;
         }
         
@@ -140,7 +144,7 @@ public class CefMetadataModel extends MetadataModel {
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
             
         } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex);
         }
 
         return properties;
