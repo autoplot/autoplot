@@ -3470,7 +3470,7 @@ APSplash.checkTime("init 240");
     public void setMessage( Icon icon, String message ) {
         if ( message==null ) message= "<null>"; // TODO: fix this later
         String myMess= message;
-        if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
+        //if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         myMess= myMess.replaceAll("\n","");
 
         final String fmyMess= myMess;
