@@ -304,11 +304,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 List<QDataSet> attr= new ArrayList();
                 String function= (String)attr1.get("FUNCTION");
                 if ( function==null ) function= (String)attr1.get("FUNCT");
-                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, mon ) );
-                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, mon ) );
-                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, mon ) );
-                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, mon ) );
-                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, mon ) );
+                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
+                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
+                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
+                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
+                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
                 try {
                     Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
                     result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
@@ -317,7 +317,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
 
             } else { // typical route
-                result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, mon );
+                int slice1= -1; // not yet implemented 
+                result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, -1, mon );
                 logger.log(Level.FINE, "got {0}", result);
             }
 
@@ -484,21 +485,24 @@ public class CdfJavaDataSource extends AbstractDataSource {
     }
 
     private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> attr ) throws Exception, ParseException {
-        return wrapDataSet( cdf, svariable, constraints, reform, depend, attr, new NullProgressMonitor() );
+        return wrapDataSet( cdf, svariable, constraints, reform, depend, attr, -1, new NullProgressMonitor() );
     }
 
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
+     *
      * @param cdf
      * @param svariable the name of the variable to read
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      * @param depend if true, recurse to read variables this depends on.
+     * @param slice1 if >-1, then slice on the first dimension.  This is to support extracting components.
      * @return
      * @throws CDFException
      * @throws ParseException
      */
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, ProgressMonitor mon ) throws Exception, ParseException {
+    
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
         Variable variable = cdf.getVariable(svariable);
         if ( variable==null ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
@@ -548,14 +552,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
         MutablePropertyDataSet result;
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, 0, -1, 1, new NullProgressMonitor() );
+            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, 0, -1, 1, slice1, new NullProgressMonitor() );
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
             if ( slice ) {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, recs[0], recCount, recs[2], mon);
+            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, recs[0], recCount, recs[2], slice1, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
@@ -685,7 +689,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, null);
+                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, -1, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
@@ -886,7 +890,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 reformDep= false;
             }
 
-            MutablePropertyDataSet depDs = wrapDataSet( cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, null );
+            MutablePropertyDataSet depDs = wrapDataSet( cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, -1, null );
 
             if ( idep>0 && reformDep==false && depDs.length()==1 && variable.getNumberOfValues()>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                 depDs= (MutablePropertyDataSet)depDs.slice(0);
