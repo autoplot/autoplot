@@ -482,9 +482,14 @@ public class CdfFileDataSource extends AbstractDataSource {
             for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
                 int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
-                MutablePropertyDataSet lablDs = (MutablePropertyDataSet) thisAttributes.get("LABL_PTR_" + sidep);
+                Object oo= thisAttributes.get("LABL_PTR_" + sidep);
+                MutablePropertyDataSet lablDs=null;
                 String labl=null;
-                if ( lablDs==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                if ( oo instanceof MutablePropertyDataSet ) {
+                    lablDs= (MutablePropertyDataSet) oo;
+                } else if ( oo instanceof String ) {
+                    labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                }
                 if ( dep != null && qubeDims.length<=idep ) {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
