@@ -490,7 +490,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 MutablePropertyDataSet lablDs=null;
                 String labl=null;
                 if ( oo instanceof MutablePropertyDataSet ) {
-                    lablDs= (MutablePropertyDataSet) oo;
+                    labl= (String) ( (MutablePropertyDataSet) oo).property( QDataSet.NAME) ;
                 } else if ( oo instanceof String ) {
                     labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 }
@@ -715,7 +715,8 @@ public class CdfFileDataSource extends AbstractDataSource {
                         Object val = entry.getData();
                         String name = (String) val;
                         Variable labl1var= cdf.getVariable(name);
-                        QDataSet qds= CdfUtil.wrapCdfHyperData( labl1var, 0, -1, 1 );
+                        MutablePropertyDataSet qds= CdfUtil.wrapCdfHyperData( labl1var, 0, -1, 1 );
+                        qds.putProperty( QDataSet.NAME, name );
                         props.put(attr.getName(), qds );
                     } else if ( ipass==1 && !isDep ) {
                         props.put(attr.getName(), entry.getData());
