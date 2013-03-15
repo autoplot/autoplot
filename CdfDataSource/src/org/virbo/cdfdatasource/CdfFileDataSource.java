@@ -482,14 +482,14 @@ public class CdfFileDataSource extends AbstractDataSource {
             for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
                 int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
-                String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
-                if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                MutablePropertyDataSet lablDs = (MutablePropertyDataSet) thisAttributes.get("LABL_PTR_" + sidep);
+                String labl=null;
+                if ( lablDs==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 if ( dep != null && qubeDims.length<=idep ) {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
 
-                MutablePropertyDataSet lablDs= null;
                 if ( labl!=null ) {
                     try {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
@@ -707,7 +707,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                         Map<String, Object> newVal = readAttributes(cdf, cdf.getVariable(name), depth + 1);
                         newVal.put("NAME", name); // tuck it away, we'll need it later.
                         props.put(attr.getName(), newVal);
-
+                    } else if ( attr.getName().equals("LABL_PTR_1") ) {
+                        Object val = entry.getData();
+                        String name = (String) val;
+                        Variable labl1var= cdf.getVariable(name);
+                        QDataSet qds= CdfUtil.wrapCdfHyperData( labl1var, 0, -1, 1 );
+                        props.put(attr.getName(), qds );
                     } else if ( ipass==1 && !isDep ) {
                         props.put(attr.getName(), entry.getData());
                     }
