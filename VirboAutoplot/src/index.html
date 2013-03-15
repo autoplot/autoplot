@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>White overplot on white background is allowed now, and a small warning is displayed.</small></p>
+        <p><small>3-argument fftPower function is introduced, allowing slide and window selection.</small></p>
         <!-- The ascii parser wouldn't allow files with three or more iso8601 timetags per record. -->
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,10 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>status bar at the bottom no longer truncates.</li>
+            <li>autohistogram/autoranging would fail sometimes with log, picking linear instead.</li>
+            <li>Larry pointed out that "|hanning(1024)|fftPower(1024)" was briefly broken.</li>
+            <li>run script dialog would sometimes hang on Windows 7.  This is fixed by starting the dialog on the event thread.</li>
             <li>3607777: dialogs should be resizable.  FilterChainPanel would clip okay button on small displays.</li>            
             <li>Ascii parser can now handle files with three ISO8601 timetags</li>
             <li>Provide a more precise error message when a reference to a plugin is found but plugin is not available.</li>
@@ -63,7 +67,10 @@
             <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
         </ul>
         <p>Features:</p>
-        <ul>        
+        <ul>
+            <li>TITLE property is propogated through fftPower</li>
+            <li>interpolate binXinterpY introduced.</li>
+            <li>checkQube introduced to detect when datasets are really QUBEs and some opperations apply.</li>
             <li>Jython invokeLater command introduced to support simple concurrent scripts.</li>
             <li>new three-argument |fftPower(512,2,'Hanning') function allows slide and window selection.</li>
             <li>add "copy to clipboard" popup menu item to pngwalk tool, so users can easily copy an image to an email.</li>
