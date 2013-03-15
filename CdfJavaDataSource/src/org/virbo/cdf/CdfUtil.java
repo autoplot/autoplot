@@ -213,8 +213,19 @@ public class CdfUtil {
         return result;
     }
 
+    /**
+     *
+     * @param cdf the value of cdf
+     * @param variable the value of variable
+     * @param recStart the value of recStart
+     * @param recCount the value of recCount
+     * @param recInterval the value of recInterval
+     * @param slice1 the value of slice1
+     * @param mon the value of mon
+     * @throws Exception
+     */
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
-            CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
+            CDF cdf, Variable variable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {
         logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { variable.getName(), String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         {
