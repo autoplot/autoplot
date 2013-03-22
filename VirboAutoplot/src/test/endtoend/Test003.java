@@ -6,6 +6,8 @@ package test.endtoend;
 
 import java.io.IOException;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.autoplot.ScriptContext;
 
 /**
@@ -115,6 +117,14 @@ public class Test003 {
             ScriptContext.load("http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/particle_mea/mea_h0_cdaweb/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15");
             ScriptContext.writeToPng("test003_008.png");
 
+            System.err.println("Local Cache Dir: "+FileSystem.settings().getLocalCacheDir());
+            FileSystem[] fss= FileSystem.peekInstances();
+            for ( FileSystem fs: fss ) {
+                if ( fs instanceof WebFileSystem ) {
+                    System.err.println( fs.toString() + ":\t" + ( ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ) );
+                }
+            }
+                    
             if (headless) {
                 System.exit(0);
             }
