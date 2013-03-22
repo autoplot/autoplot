@@ -626,12 +626,16 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * the current dataset plotted.  
+     * the current dataset plotted, after operations (component property) has been applied.
      */
     public static final String PROP_DATASET = "dataSet";
 
     protected QDataSet dataSet = null;
 
+    /**
+     * the current dataset plotted, after operations (component property) has been applied.
+     * @return 
+     */
     public QDataSet getDataSet() {
         return dataSet;
     }
