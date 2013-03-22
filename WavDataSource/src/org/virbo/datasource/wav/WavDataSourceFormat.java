@@ -298,4 +298,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
         }
 
     }
+
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==1 || ( ds.rank()==2 && ( SemanticOps.isRank2Waveform(ds) || ds.length(0)<16 ) ); //16 channels
+    }
+
+    public String getDescription() {
+        return "WAVE audio";
+    }
 }
