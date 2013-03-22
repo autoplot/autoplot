@@ -588,4 +588,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         out.close();
     }
 
+   public boolean canFormat(QDataSet ds) {
+        return ( ds.rank()>0 && ds.rank()<3 );
+    }
+
+    public String getDescription() {
+        return "ASCII Table";
+    }
+
 }

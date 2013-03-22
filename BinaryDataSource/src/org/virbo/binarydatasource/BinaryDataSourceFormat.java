@@ -16,6 +16,7 @@ import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 
@@ -151,5 +152,12 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         
     }
 
+    public boolean canFormat(QDataSet ds) {
+        return ! ( ds.rank()==0  || SemanticOps.isJoin(ds) );
+    }
+
+    public String getDescription() {
+        return "Binary Table";
+    }
 
 }

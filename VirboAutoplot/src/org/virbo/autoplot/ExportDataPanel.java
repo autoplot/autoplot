@@ -10,6 +10,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.event.ItemEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -32,6 +33,9 @@ import org.virbo.datasource.DataSourceFormat;
  */
 public class ExportDataPanel extends javax.swing.JPanel {
 
+    private QDataSet originalDataSet;
+    private QDataSet processedDataSet;
+            
     /** Creates new form ExportDataPanel */
     public ExportDataPanel() {
         initComponents();
@@ -40,18 +44,17 @@ public class ExportDataPanel extends javax.swing.JPanel {
     public void setDataSet(Application model) {
         DataSourceController dsc = model.getController().getDataSourceFilter().getController();
 
-        if (dsc.getFillDataSet() != null) {
-            String name = (String) dsc.getFillDataSet().property(QDataSet.NAME);
+        originalDataSet= dsc.getFillDataSet();
+        if ( originalDataSet!= null) {
+            String name = (String) originalDataSet.property(QDataSet.NAME);
             if ( name==null ) name= "data";
-            if (name != null) {
-                String f= new File(".").getAbsoluteFile().getParent();
-                f= f+"/"+name.toLowerCase();
-                filenameTF.setText(f);
-            }
-            originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), dsc.getFillDataSet() ) );
+            String f= new File(".").getAbsoluteFile().getParent();
+            f= f+"/"+name.toLowerCase();
+            filenameTF.setText(f);
+            originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), originalDataSet ) );
         }
 
-        QDataSet processedDataSet= model.getController().getPlotElement().getController().getDataSet();
+        processedDataSet= model.getController().getPlotElement().getController().getDataSet();
         if ( processedDataSet!=null ) {
             if ( !processedDataSet.equals(dsc.getFillDataSet() ) ) {
                 processedDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", processedDataB.getToolTipText(), processedDataSet ) );
@@ -322,7 +325,21 @@ public class ExportDataPanel extends javax.swing.JPanel {
             }
         }
 
-        additionalOptionsButton.setEnabled(editorPanel!=null);
+        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            DataSourceFormat form= DataSourceRegistry.getInstance().getFormatByExt(ss);
+            if ( form!=null ) {
+                additionalOptionsButton.setEnabled(true);
+                originalDataB.setEnabled( originalDataSet!=null && form.canFormat( originalDataSet ) );
+                processedDataB.setEnabled( processedDataSet!=null && form.canFormat( processedDataSet ) );
+                processedWithinXRangeB.setEnabled( processedDataSet!=null && form.canFormat( processedDataSet ) );
+            } else {
+                additionalOptionsButton.setEnabled(false);
+                originalDataB.setEnabled( true );
+                processedDataB.setEnabled( true );
+                processedWithinXRangeB.setEnabled( true );
+            }
+        }
+        
 
     }//GEN-LAST:event_formatDLItemStateChanged
 

@@ -54,11 +54,14 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -67,6 +70,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -366,6 +370,18 @@ public class GuiSupport {
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
                 Collections.sort(exts);
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
+                edp.getFormatDL().setRenderer( new DefaultListCellRenderer() {
+                    @Override
+                    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                        String ext= String.valueOf(value);
+                        DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
+                        if ( format!=null ) {
+                            return new JLabel( value.toString() + " " + format.getDescription() );
+                        } else {
+                            return new JLabel( value.toString() + " (some text)" );
+                        }
+                    }
+                });
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
                 String currentFileString = prefs.get("ExportDataCurrentFile", "");
                 String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");

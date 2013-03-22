@@ -78,4 +78,12 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
     }
 
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==1;
+    }
+
+    public String getDescription() {
+        return "IDL Saveset";
+    }
+
 }

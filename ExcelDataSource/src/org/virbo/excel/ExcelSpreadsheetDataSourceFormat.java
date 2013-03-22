@@ -192,4 +192,12 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
                 
         out.close();
     }
+
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==1 || ds.rank()==2;
+    }
+
+    public String getDescription() {
+        return "Excel Spreadsheet";
+    }
 }

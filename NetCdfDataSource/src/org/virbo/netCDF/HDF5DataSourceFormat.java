@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetIterator;
@@ -20,7 +19,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
-import org.virbo.dsops.Ops;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
@@ -138,4 +136,12 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 //        QDataSet out= Ops.rand(100);
 //        new HDF5DataSourceFormat().formatData("file:///home/jbf/foo.nc", out, new NullProgressMonitor() );
 //    }
+
+    public boolean canFormat(QDataSet ds) {
+        return true;
+    }
+
+    public String getDescription() {
+        return "HDF5";
+    }
 }

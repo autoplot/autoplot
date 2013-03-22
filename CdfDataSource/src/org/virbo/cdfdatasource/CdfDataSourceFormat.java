@@ -25,6 +25,7 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import static gsfc.nssdc.cdf.CDFConstants.*;
+import org.virbo.dataset.SemanticOps;
 
 /**
  * Format the QDataSet into CDF tables.
@@ -445,5 +446,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     }
 
+    public boolean canFormat(QDataSet ds) {
+        return ! ( ds.rank()==0  || SemanticOps.isJoin(ds) );
+    }
+
+    public String getDescription() {
+        return "NASA Common Data Format";
+    }
 
 }

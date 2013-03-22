@@ -99,4 +99,12 @@ public class ImageDataSourceFormat implements DataSourceFormat {
 
     }
 
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==3 && ( ds.length()<5 || ds.length(0,0)<5 );
+    }
+
+    public String getDescription() {
+        return "Image Format";
+    }
+
 }

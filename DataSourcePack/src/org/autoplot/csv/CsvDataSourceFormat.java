@@ -128,4 +128,12 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         writer.close();
         fw.close();
     }
+
+    public boolean canFormat(QDataSet ds) {
+        return ds.rank()==1 || ds.rank()==2;
+    }
+
+    public String getDescription() {
+        return "Comma Separated Values";
+    }
 }

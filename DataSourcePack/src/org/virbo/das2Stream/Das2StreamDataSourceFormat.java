@@ -68,4 +68,13 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
             }
         }
     }
+
+    public boolean canFormat(QDataSet ds) {
+        return true; // at least it should, so if it can't it's a bug elsewhere.
+    }
+
+    public String getDescription() {
+        return "QDataSet transfer format";
+    }
+
 }
