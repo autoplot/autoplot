@@ -13,7 +13,6 @@ import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
-import com.lowagie.tools.split_pdf;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dasml.DOMBuilder;
@@ -44,7 +43,6 @@ import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -3120,6 +3118,27 @@ private void updateFrameTitle() {
     }
 
 
+    private static Runnable getRunScriptRunnable( final AutoplotUI app, 
+            final ApplicationModel model, final String script, 
+            final List<String> scriptArgs, final boolean quit  ) {
+        Runnable r= new Runnable() {
+            @Override
+            public String toString() { return "runScriptRunnable"; }
+            public void run() {
+                try {
+                    ScriptContext.setApplicationModel(model); // initialize
+                    JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
+                    if ( app!=null ) app.setStatus( READY_MESSAGE );
+                    if ( quit ) { //TODO: headless doesn't seem to work
+                        AppManager.getInstance().quit();
+                    }
+                } catch (IOException ex) {
+                    throw new IllegalArgumentException(ex);
+                }   
+            }
+        };
+        return r;
+    }
     /**
      * @param args the command line arguments
      */
@@ -3157,13 +3176,22 @@ private void updateFrameTitle() {
         final List<String> scriptArgs= new ArrayList<String>();
 
         for ( int i=1; i<args.length; i++ ) { // grab any arguments after --script and hide them from the processor.
-            if ( args.length>i && args[i-1].equals("--script") ) {
+            if ( args.length>i && args[i-1].startsWith("--script") ) {
                 List<String> apArgs= new ArrayList<String>();
-                for ( int j=0; j<=i; j++ ) {
-                    apArgs.add(args[j]);
-                }
-                for ( int j=i; j<args.length; j++ ) {
-                    scriptArgs.add(args[j]);
+                if ( args[i-1].charAt(8)=='=' ) {
+                    for ( int j=0; j<i; j++ ) {
+                        apArgs.add(args[j]);
+                    }
+                    for ( int j=i; j<args.length; j++ ) {
+                        scriptArgs.add(args[j]);
+                    }        
+                } else {
+                    for ( int j=0; j<=i; j++ ) {
+                        apArgs.add(args[j]);
+                    }        
+                    for ( int j=i+1; j<args.length; j++ ) {
+                        scriptArgs.add(args[j]);
+                    }
                 }
                 args= apArgs.toArray( new String[ apArgs.size() ] );
                 break;
@@ -3364,22 +3392,7 @@ APSplash.checkTime("init 230");
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
                     if ( app!=null ) app.setStatus("running script "+script);
-                    Runnable run= new Runnable() {
-                        @Override
-                        public String toString() { return "runScriptRunnable"; }
-                        public void run() {
-                            try {
-                                ScriptContext.setApplicationModel(model); // initialize
-                                JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
-                                if ( app!=null ) app.setStatus( READY_MESSAGE );
-                                if ( headless && !server ) { //TODO: headless doesn't seem to work
-                                    AppManager.getInstance().quit();
-                                }
-                            } catch (IOException ex) {
-                                throw new IllegalArgumentException(ex);
-                            }   
-                        }
-                    };
+                    Runnable run= getRunScriptRunnable( app, model, script, scriptArgs, headless && !server );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
 APSplash.checkTime("init 240");
