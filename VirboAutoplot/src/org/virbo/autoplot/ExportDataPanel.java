@@ -56,7 +56,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         processedDataSet= model.getController().getPlotElement().getController().getDataSet();
         if ( processedDataSet!=null ) {
-            if ( !processedDataSet.equals(dsc.getFillDataSet() ) ) {
+            if ( !processedDataSet.equals(originalDataSet ) ) {
                 processedDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", processedDataB.getToolTipText(), processedDataSet ) );
             } else {
                 processedDataB.setToolTipText( String.format( "<html>%s</html>", "No processing is done to the dataset before plotting" ) );
@@ -337,6 +337,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 originalDataB.setEnabled( true );
                 processedDataB.setEnabled( true );
                 processedWithinXRangeB.setEnabled( true );
+            }
+            if ( processedDataSet.equals(originalDataSet ) ) {
+                processedDataB.setEnabled(false);
             }
         }
         
