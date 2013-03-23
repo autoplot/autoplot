@@ -188,9 +188,10 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             if ( EventQueue.isDispatchThread() ) {
                 throw new IllegalStateException("should not be called from event queue");
             }
-                Datum now = TimeUtil.now();
+            Datum tz= Units.milliseconds.createDatum( Calendar.getInstance().getTimeZone().getRawOffset() );
+                Datum now = TimeUtil.now().add(tz);
                 list = new DatumRange[8];
-                list[0] = new DatumRange(TimeUtil.prevMidnight(now), TimeUtil.nextMidnight(now));
+                list[0] = new DatumRange(TimeUtil.prevMidnight(now).subtract(tz), TimeUtil.nextMidnight(now).subtract(tz) );
                 list[1] = list[0].previous();
                 list[2] = new DatumRange(TimeUtil.prevWeek(list[1].min()), list[1].min());
                 list[3] = new DatumRange(TimeUtil.prev(TimeUtil.MONTH, list[2].min()), list[2].min());
