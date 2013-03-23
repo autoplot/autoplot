@@ -341,6 +341,12 @@ public class ExportDataPanel extends javax.swing.JPanel {
             if ( processedDataSet.equals(originalDataSet ) ) {
                 processedDataB.setEnabled(false);
             }
+            if ( !originalDataB.isEnabled() && originalDataB.isSelected() ) {
+                processedDataB.setSelected(true);
+            } 
+            if ( !processedDataB.isEnabled() && processedDataB.isSelected() ) {
+                processedWithinXRangeB.setSelected(true);
+            }
         }
         
 
