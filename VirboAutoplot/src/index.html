@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>3-argument fftPower function is introduced, allowing slide and window selection.</small></p>
+        <p><small>Improvements to the export dialog such as limiting to valid options and labeling extentions.</small></p>
         <!-- The ascii parser wouldn't allow files with three or more iso8601 timetags per record. -->
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>sprocess was called twice when exporting the processed data.</li>
+            <li>3608830: disable export options that won't work.</li>
+            <li>rte_1825469520: URL doesn't contain authority (http:///autoplot.org/)</li>
             <li>v2013b_23 had a bug that broke slice1 keyword for C-based reader</li>
             <li>status bar at the bottom no longer truncates.</li>
             <li>autohistogram/autoranging would fail sometimes with log, picking linear instead.</li>
