@@ -375,11 +375,13 @@ public class GuiSupport {
                     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                         String ext= String.valueOf(value);
                         DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
-                        if ( format!=null ) {
-                            return new JLabel( value.toString() + " " + format.getDescription() );
-                        } else {
-                            return new JLabel( value.toString() + " (some text)" );
+                        Component parent= super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+                        if ( parent instanceof JLabel ) {
+                            if ( format!=null ) {
+                                ((JLabel)parent).setText( value.toString() + " " + format.getDescription() );
+                            }
                         }
+                        return parent;
                     }
                 });
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
