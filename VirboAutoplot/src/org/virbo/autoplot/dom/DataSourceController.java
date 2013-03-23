@@ -25,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
@@ -110,7 +109,7 @@ public class DataSourceController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent e) {
             logger.log( Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{e.getPropertyName(), e.getOldValue(), e.getNewValue()});
             if (e.getNewValue() == null && e.getOldValue() == null) {
-                return;
+                // do nothing
             } else {
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
@@ -337,13 +336,13 @@ public class DataSourceController extends DomNodeController {
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
-            if ( getTsb() != null && ps.size()>0 ) {
+            if ( getTsb() != null && ps.isEmpty() ) {
                 setDataSet(null);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
                 }
-            } else if ( getTsb()!=null && ps.size()==0 ) {
+            } else if ( getTsb()!=null && ps.isEmpty() ) {
                 timeSeriesBrowseController = new TimeSeriesBrowseController(this,null);
 
                 DomNode node1;
@@ -360,9 +359,9 @@ public class DataSourceController extends DomNodeController {
 
                 if ( !UnitsUtil.isTimeLocation( this.dom.getTimeRange().getUnits() ) ) {
                     List<BindingModel> bms= this.dom.getController().findBindings( this.dom, Application.PROP_TIMERANGE, null, null );
-                    if ( bms==null || bms.size()==0 ) {
+                    if ( bms==null || bms.isEmpty() ) {
                         logger.log(Level.FINE, "claiming dom timerange for TSB: {0}", this.dsf.getUri());
-                        p.setContext( getTsb().getTimeRange() );
+                        if ( p!=null ) p.setContext( getTsb().getTimeRange() );
                         this.dom.setTimeRange( getTsb().getTimeRange() );
                         logger.log(Level.FINE, "about to setup Gen for {0}", this);
                         timeSeriesBrowseController.setupGen( node1, propertyName );
@@ -372,7 +371,7 @@ public class DataSourceController extends DomNodeController {
                         update( );
                     } else {
                         logger.fine("unable to use timerange as guide");
-                        p.setContext( getTsb().getTimeRange() );
+                        if ( p!=null ) p.setContext( getTsb().getTimeRange() );
                         timeSeriesBrowseController.setupGen( node1, propertyName );
                         update( );
                     }
@@ -380,10 +379,12 @@ public class DataSourceController extends DomNodeController {
                     logger.log(Level.FINE, "using plot context for TSB: {0}", this.dsf.getUri());
                     timeSeriesBrowseController.setupGen( node1, propertyName );
                     if ( node1!=dom ) {
-                        dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
-                        BindingModel bm= dom.controller.findBinding( dom, Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
-                        //TODO: verify this! https://sourceforge.net/tracker/index.php?func=detail&aid=3516161&group_id=199733&atid=970682
-                        if ( bm!=null ) dom.controller.deleteBinding(bm);
+                        if ( p!=null ) {
+                            dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
+                            BindingModel bm= dom.controller.findBinding( dom, Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
+                            //TODO: verify this! https://sourceforge.net/tracker/index.php?func=detail&aid=3516161&group_id=199733&atid=970682
+                            if ( bm!=null ) dom.controller.deleteBinding(bm);
+                        }
                     }
                     update( );
                 }
@@ -508,7 +509,7 @@ public class DataSourceController extends DomNodeController {
             setStatus("done, apply fill");
 
             List<PlotElement> pele= dom.controller.getPlotElementsFor(dsf);
-            if ( pele.size()==0 ) {
+            if ( pele.isEmpty() ) {
                 setStatus("warning: done loading data but no plot elements are listening");
             }
 
@@ -577,7 +578,7 @@ public class DataSourceController extends DomNodeController {
                     if (intTsb == null) {
                         intTsb = new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
                     }
-                    logger.warning( "adding to internal tsb: "+ parentTsb );
+                    logger.log( Level.WARNING, "adding to internal tsb: {0}", parentTsb);
                     intTsb.addTimeSeriesBrowse(parentTsb);
                 }
             } else {
@@ -761,12 +762,8 @@ public class DataSourceController extends DomNodeController {
                 }
             } else {
                 ArrayDataSet zds = ArrayDataSet.copy(z);
-                if (x != null) {
-                    zds.putProperty(QDataSet.DEPEND_0, x);
-                }
-                if (y != null) {
-                    zds.putProperty(QDataSet.DEPEND_1, y);
-                }
+                zds.putProperty(QDataSet.DEPEND_0, x);
+                zds.putProperty(QDataSet.DEPEND_1, y);
                 if ( DataSetUtil.validate( x, y, z, null ) ) {
                     zprops.put(QDataSet.DEPEND_0,xprops);
                     zprops.put(QDataSet.DEPEND_1,yprops);
@@ -1164,6 +1161,11 @@ public class DataSourceController extends DomNodeController {
                 }
                 changesSupport.changePerformed(this, PENDING_UPDATE);
             }
+            
+            @Override
+            public String toString() {
+                return "load "+dataSource.toString();
+            }
         };
 
         if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
@@ -1256,7 +1258,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     public void setDataSource(DataSource dataSource) {
-        DataSource oldDataSource = null;
+        DataSource oldDataSource;
         synchronized ( this ) {
             oldDataSource= this.dataSource;
             this.dataSource = dataSource;
@@ -1556,7 +1558,7 @@ public class DataSourceController extends DomNodeController {
         Caching cache1 = getCaching();
 
         if ( dom.getController().isValueAdjusting() ) {
-            logger.warning( "return of bug first demoed by test033: where the adjusting property is breifly cleared. " + dom.getController().changesSupport.isValueAdjusting() );
+            logger.log( Level.WARNING, "return of bug first demoed by test033: where the adjusting property is breifly cleared. {0}", dom.getController().changesSupport.isValueAdjusting());
             logger.warning( "See https://sourceforge.net/tracker/?func=detail&aid=3409414&group_id=199733&atid=970682");
             try {
                 Thread.sleep(100);
@@ -1715,7 +1717,7 @@ public class DataSourceController extends DomNodeController {
      */
     private PlotElement getPlotElement() {
         List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
-        if (pele.size() == 0) {
+        if (pele.isEmpty()) {
             return null;
         } else {
             return pele.get(0);
