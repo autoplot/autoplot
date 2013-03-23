@@ -209,7 +209,8 @@ public class MetadataPanel extends javax.swing.JPanel {
                 updateComponentDataSetPropertiesView();
             }
         };
-        RequestProcessor.invokeLater(run);
+        new Thread(run,"updateComponentDataSet").start();
+        //RequestProcessor.invokeLater(run);
     }
 
     private String format(double d) {
@@ -223,6 +224,9 @@ public class MetadataPanel extends javax.swing.JPanel {
     }
     boolean statisticsDirty;
 
+    /**
+     * create a string showing a histogram.  See org.virbo.dataset.DataSetUtil.toSparkline
+     */
 //    private String histStr(QDataSet ds) {
 //        QDataSet hist = Ops.histogram(ds, 20);
 //        QDataSet dep0 = (QDataSet) hist.property(QDataSet.DEPEND_0);
@@ -271,7 +275,8 @@ public class MetadataPanel extends javax.swing.JPanel {
                 }
             }
         };
-        RequestProcessor.invokeLater(run);
+        new Thread( run, "updateStats" ).start();
+        //RequestProcessor.invokeLater(run);
     }
 
     private synchronized void updateDataSetPropertiesView() {
