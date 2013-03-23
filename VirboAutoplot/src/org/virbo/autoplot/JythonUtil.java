@@ -87,7 +87,7 @@ public class JythonUtil {
                     interp.exec("params['" + snam + "']='" + sval+"'");
                 } else {
                     if ( snam.startsWith("-") ) {
-                        System.err.println("script arguments should not start with -, they should be name=value");
+                        System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
                     }
                     System.err.println("bad parameter: "+ snam);
                 }
