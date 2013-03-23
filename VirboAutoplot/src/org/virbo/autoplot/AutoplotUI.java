@@ -3178,7 +3178,7 @@ private void updateFrameTitle() {
         for ( int i=1; i<args.length; i++ ) { // grab any arguments after --script and hide them from the processor.
             if ( args.length>i && args[i-1].startsWith("--script") ) {
                 List<String> apArgs= new ArrayList<String>();
-                if ( args[i-1].charAt(8)=='=' ) {
+                if ( args[i-1].length()>8 && args[i-1].charAt(8)=='=' ) {
                     for ( int j=0; j<i; j++ ) {
                         apArgs.add(args[j]);
                     }
