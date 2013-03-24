@@ -336,7 +336,7 @@ public class DataSourceController extends DomNodeController {
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
-            if ( getTsb() != null && ps.isEmpty() ) {
+            if ( getTsb() != null && !ps.isEmpty() ) {
                 setDataSet(null);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
@@ -1396,10 +1396,12 @@ public class DataSourceController extends DomNodeController {
 
             if ( result!=null && getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
-                if ( timeSeriesBrowseController.domPlot==null ) {
-                    logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
-                } else {
-                    timeSeriesBrowseController.domPlot.getXaxis().setAutoRange(true);
+                if ( timeSeriesBrowseController!=null ) {
+                    if ( timeSeriesBrowseController.domPlot==null ) {
+                        logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
+                    } else {
+                        timeSeriesBrowseController.domPlot.getXaxis().setAutoRange(true);
+                    }
                 }
             }
 
