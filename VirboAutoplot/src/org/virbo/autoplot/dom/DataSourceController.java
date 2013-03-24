@@ -336,7 +336,7 @@ public class DataSourceController extends DomNodeController {
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
-            if ( getTsb() != null && !ps.isEmpty() ) {
+            if ( getTsb() != null && !ps.isEmpty() ) { 
                 setDataSet(null);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
