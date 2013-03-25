@@ -507,7 +507,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
                         if ( idep==1 ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( CDFException ex ) {
-                        //label is not actally in the file.
+                        //label is not actually in the file.
                     }
                     if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
                         logger.log(Level.FINER, "setting null displayType to time_series", displayType);
