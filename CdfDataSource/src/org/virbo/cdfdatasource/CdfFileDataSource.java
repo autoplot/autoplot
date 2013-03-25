@@ -492,7 +492,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( oo instanceof MutablePropertyDataSet ) {
                     labl= (String) ( (MutablePropertyDataSet) oo).property( QDataSet.NAME) ;
                 } else if ( oo instanceof String ) {
-                    labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                    try {
+                        Variable v= cdf.getVariable((String)oo);
+                        labl= (String)oo;
+                    } catch ( CDFException ex ) {
+                        labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                    }
                 }
                 if ( labl!=null ) {
                     try {
