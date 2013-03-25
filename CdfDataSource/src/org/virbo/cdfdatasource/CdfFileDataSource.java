@@ -496,8 +496,11 @@ public class CdfFileDataSource extends AbstractDataSource {
                         Variable v= cdf.getVariable((String)oo);
                         labl= (String)oo;
                     } catch ( CDFException ex ) {
-                        labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                        logger.log( Level.FINE, "LABL_PTR_{0} pointed to non-existant variable {1}", new Object[]{sidep, oo});
                     }
+                }
+                if ( labl==null ) {
+                    labl= (String) thisAttributes.get("LABEL_" + sidep);// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 }
                 if ( labl!=null ) {
                     try {
