@@ -867,7 +867,7 @@ public class DataSetURI {
             if ( result.exists() && ( tnow-result.lastModified() ) / 1000 < timeoutSeconds && !tempfile.exists() ) {
                 logger.log(Level.FINE, "using young temp file {0}", result);
                 action= ACTION_USE_CACHE;
-            } else if ( tempfile.exists() ) {
+            } else if ( tempfile.exists() ) { //TODO: check for old temp file
                 logger.log(Level.FINE, "waiting for other thread to load temp resource {0}", tempfile);
                 action= ACTION_WAIT_EXISTS;
             } else {
@@ -950,7 +950,7 @@ public class DataSetURI {
             }
         }
 
-        result.deleteOnExit();
+        //result.deleteOnExit(); // we can no longer do this, because another process may have created the file.
 
         //checkNonHtml( tempfile, url ); // until 9/22/2011 we didn't check this...
 
