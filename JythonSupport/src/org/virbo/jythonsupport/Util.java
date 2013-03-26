@@ -14,17 +14,23 @@ import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.TimeParser;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -32,6 +38,7 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -162,12 +169,6 @@ public class Util {
     private static Map<String, Object> metadata;
     private static String metadataSurl;
 
-    /**
-     * @deprecated use getMetadata
-     */
-    public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
-        return getMetadata( surl, mon );
-    }
 
     /**
      * load the metadata for the url.  This can be called independently from getDataSet,
@@ -296,6 +297,113 @@ public class Util {
         Arrays.sort(result);
         return result;
     }
+    
+        
+    /**
+     * return an array of URLs that match the spec for the time range provided.
+     * For example,
+     * <p><blockquote><pre>
+     *  uri= 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX'
+     *  xx= getTimeRangesFor( uri, '2000-jan', '$Y-$d-$m' )
+     *  for x in xx:
+     *    print x
+     * </pre></blockquote><p>
+     *
+     * @param surl an Autoplot uri with an aggregation specifier.
+     * @param timeRange a string that is parsed to a time range, such as "2001"
+     * @param format format for the result, such as "%Y-%m-%d"
+     * @return a list of URLs without the aggregation specifier.
+     * @throws java.io.IOException if the remote folder cannot be listed.
+     * @throws java.text.ParseException if the timerange cannot be parsed.
+     */
+    public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
+        DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
+        FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
+        TimeParser tf = TimeParser.create(format);
+
+        String[] ss = fsm.getNamesFor(dr);
+        String[] result = new String[ss.length];
+
+        for (int i = 0; i < ss.length; i++) {
+            DatumRange dr2 = fsm.getRangeFor(ss[i]);
+            result[i] = tf.format(dr2.min(), dr2.max());
+        }
+
+        return result;
+    }
+    
+    /**
+     * Given a spec to format timeranges and a range to contain each timerange,
+     * produce a list of all timeranges covering the range formatted with the
+     * spec.  For example, <code>generateTimeRanges( "%Y-%m-%d", "Jun 2009" )</code> would result in
+     * 2009-06-01, 2009-06-02, ..., 2009-06-30.
+     * @param spec such as "%Y-%m".  Note specs like "%Y%m" will not be parsable.
+     * @param srange range limiting the list, such as "2009"
+     * @return a string array of formatted time ranges, such as [ "2009-01", "2009-02", ..., "2009-12" ]
+     * @throws java.text.ParseException of the outer range cannot be parsed.
+     */
+    public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
+        TimeParser tp= TimeParser.create(spec);
+        DatumRange range= DatumRangeUtil.parseTimeRange(srange);
+
+        String sstart;
+        try {
+            sstart= tp.format( range.min(), null );
+        } catch ( Exception ex ) { // orbit files have limited range
+            DatumRange dr= tp.getValidRange();
+            DatumRange dd= DatumRangeUtil.sloppyIntersection(range, dr);
+            if ( dd.width().value()==0 ) {
+                return new String[0]; // no intersection
+            }
+            sstart= tp.format( dd.min(), null );
+        }
+
+        tp.parse(sstart);
+        DatumRange curr= tp.getTimeRange();
+        List<String> result= new ArrayList<String>();
+        while ( range.intersects(curr) ) {
+            String scurr= tp.format( curr.min(), curr.max() );
+            result.add( scurr );
+            DatumRange oldCurr= curr;
+            curr= curr.next();
+            if ( oldCurr.equals(curr) ) { // orbits return next() that is this at the ends.
+                break;
+            }
+        }
+        return result.toArray( new String[result.size()] );
+
+    }
+    
+    /**
+     * Export the data into a format implied by the filename extension.  
+     * See the export data dialog for additional parameters available for formatting.
+     *
+     * For example:
+     * <p><blockquote><pre>
+     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
+     * </pre></blockquote></p>
+     * 
+     * @param ds
+     * @param file local file name that is the target
+     * @throws java.lang.Exception
+     */
+    public static void formatDataSet(QDataSet ds, String file) throws Exception {
+        if (!file.contains(":/")) {
+            file = new File(file).getCanonicalFile().toString();
+        }
+        URI uri = DataSetURI.getURIValid(file);
+
+        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
+        
+        if (format == null) {
+            throw new IllegalArgumentException("no format for extension: " + file);
+        }
+
+        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
+
+    }
+        
 
     public static void main( String[] args ) throws Exception {
         DataSetURI.init();
