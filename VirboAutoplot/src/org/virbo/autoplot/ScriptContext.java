@@ -604,19 +604,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.text.ParseException if the timerange cannot be parsed.
      */
     public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
-        DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
-        FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
-        TimeParser tf = TimeParser.create(format);
-
-        String[] ss = fsm.getNamesFor(dr);
-        String[] result = new String[ss.length];
-
-        for (int i = 0; i < ss.length; i++) {
-            DatumRange dr2 = fsm.getRangeFor(ss[i]);
-            result[i] = tf.format(dr2.min(), dr2.max());
-        }
-
-        return result;
+        return org.virbo.jythonsupport.Util.getTimeRangesFor( surl, timeRange, format );
     }
 
     /**
@@ -630,37 +618,28 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.text.ParseException of the outer range cannot be parsed.
      */
     public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
-        TimeParser tp= TimeParser.create(spec);
-        DatumRange range= DatumRangeUtil.parseTimeRange(srange);
-
-        String sstart;
-        try {
-            sstart= tp.format( range.min(), null );
-        } catch ( Exception ex ) { // orbit files have limited range
-            DatumRange dr= tp.getValidRange();
-            DatumRange dd= DatumRangeUtil.sloppyIntersection(range, dr);
-            if ( dd.width().value()==0 ) {
-                return new String[0]; // no intersection
-            }
-            sstart= tp.format( dd.min(), null );
-        }
-
-        tp.parse(sstart);
-        DatumRange curr= tp.getTimeRange();
-        List<String> result= new ArrayList<String>();
-        while ( range.intersects(curr) ) {
-            String scurr= tp.format( curr.min(), curr.max() );
-            result.add( scurr );
-            DatumRange oldCurr= curr;
-            curr= curr.next();
-            if ( oldCurr.equals(curr) ) { // orbits return next() that is this at the ends.
-                break;
-            }
-        }
-        return result.toArray( new String[result.size()] );
-
+        return org.virbo.jythonsupport.Util.generateTimeRanges( spec, srange );
     }
 
+    /**
+     * Export the data into a format implied by the filename extension.  
+     * See the export data dialog for additional parameters available for formatting.
+     *
+     * For example:
+     * <p><blockquote><pre>
+     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
+     * </pre></blockquote></p>
+     * 
+     * @param ds
+     * @param file local file name that is the target
+     * @throws java.lang.Exception
+     */    
+    public static void formatDataSet(QDataSet ds, String file) throws Exception {
+        org.virbo.jythonsupport.Util.formatDataSet( ds, file );
+    }    
+    
+    
     /**
      * set the title of the plot.
      * @param title
@@ -845,36 +824,6 @@ public class ScriptContext extends PyJavaInstance {
             }
         }
         return;
-    }
-
-    /**
-     * Export the data into a format implied by the filename extension.  
-     * See the export data dialog for additional parameters available for formatting.
-     *
-     * For example:
-     * <p><blockquote><pre>
-     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
-     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
-     * </pre></blockquote></p>
-     * 
-     * @param ds
-     * @param file local file name that is the target
-     * @throws java.lang.Exception
-     */
-    public static void formatDataSet(QDataSet ds, String file) throws Exception {
-        if (!file.contains(":/")) {
-            file = new File(file).getCanonicalFile().toString();
-        }
-        URI uri = DataSetURI.getURIValid(file);
-
-        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
-        
-        if (format == null) {
-            throw new IllegalArgumentException("no format for extension: " + file);
-        }
-
-        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
-
     }
 
     /**
