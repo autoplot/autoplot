@@ -60,7 +60,9 @@ class Das2ServerDataSource extends AbstractDataSource {
         HashMap<String,String> params2 = new HashMap(params);
         params2.put("server", "dataset");
 
-        timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
+        if ( params2.get("start_time")!=null && params2.get("end_time")!=null ) {
+            timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
+        }
 
         resolution= null;
     }
