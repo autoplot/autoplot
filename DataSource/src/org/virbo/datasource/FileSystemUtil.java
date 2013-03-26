@@ -110,15 +110,24 @@ public class FileSystemUtil {
         }
     }
 
+    /**
+     * Interface to be used with deleteFilesInTree.  
+     */
     public static interface Check {
+        /**
+         * simply return true or false.  With deleteFilesInTree, true would
+         * indicate that the file should be deleted.
+         * @param f a file.
+         * @return boolean, to be interpreted by another code.
+         */
         boolean check( File f );
     }
     
     /**
-     * deletes all files and folders below root, and root, just as "rm -r" would.
-     * TODO: check links
-     * @root the root of the tree to start searching.
-     * @shouldDelete return true if the file should be deleted.
+     * deletes all files where shouldDelete returns true and empty 
+     * folders below root, and root.
+     * @param root the root of the tree to start searching.
+     * @param shouldDelete return true if the file should be deleted.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
      */
@@ -143,6 +152,8 @@ public class FileSystemUtil {
         }
         
         if ( notEmpty && root.listFiles().length==0 ) {
+            success = success && (!root.exists() || root.delete());
+        } else if (  root.listFiles().length==0 ) {
             success = success && (!root.exists() || root.delete());
         }
         
