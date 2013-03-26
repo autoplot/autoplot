@@ -32,6 +32,7 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
 
@@ -517,11 +518,26 @@ public class PyQDataSet extends PyJavaInstance {
             DataSetIterator iter = new QubeDataSetIterator(ds);
 
             QDataSet dep0= null;
-            QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
-            ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
-            dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
-            if ( dep0!=null ) {
-                dep0= DataSetOps.applyIndex( dep0, 0, that, false );
+            
+            if ( that.rank()>1 && ( SemanticOps.isBundle(that) || SemanticOps.isLegacyBundle(that) ) ) {
+                for ( int j=0; j<that.length(0); j++ ) {
+                    QDataSet that1= DataSetOps.unbundle(that,j);
+                    QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory( that1 );
+                    ((QubeDataSetIterator)iter).setIndexIteratorFactory(j, fit);
+                    if ( j==0 ) {
+                        dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                        if ( dep0!=null ) {
+                            dep0= DataSetOps.applyIndex( dep0, 0, that1, false );
+                        }
+                    }
+                }
+            } else {
+                QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);        
+                dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                if ( dep0!=null ) {
+                    dep0= DataSetOps.applyIndex( dep0, 0, that, false );
+                }
             }
 
             DDataSet result= iter.createEmptyDs();
