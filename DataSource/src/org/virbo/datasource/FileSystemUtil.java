@@ -110,6 +110,47 @@ public class FileSystemUtil {
         }
     }
 
-
+    public static interface Check {
+        boolean check( File f );
+    }
+    
+    /**
+     * deletes all files and folders below root, and root, just as "rm -r" would.
+     * TODO: check links
+     * @root the root of the tree to start searching.
+     * @shouldDelete return true if the file should be deleted.
+     * @throws IllegalArgumentException if it is unable to delete a file
+     * @return true if the operation was successful.
+     */
+    public static boolean deleteFilesInTree( File root, Check shouldDelete ) throws IllegalArgumentException {
+        if (!root.exists()) {
+            return true;
+        }
+        File[] children = root.listFiles();
+        boolean success = true;
+        boolean notEmpty= children.length>0;
+        for (int i = 0; i < children.length; i++) {
+            if (children[i].isDirectory()) {
+                success = success && deleteFilesInTree(children[i],shouldDelete);
+            } else {
+                if ( shouldDelete.check(children[i]) ) {
+                    success = success && ( !children[i].exists() || children[i].delete() );
+                    if (!success) {
+                        throw new IllegalArgumentException("unable to delete file " + children[i]);
+                    }
+                }
+            }
+        }
+        
+        if ( notEmpty && root.listFiles().length==0 ) {
+            success = success && (!root.exists() || root.delete());
+        }
+        
+        if (!success) {
+            throw new IllegalArgumentException("unable to delete folder " + root);
+        }
+        
+        return success;
+    }
     
 }
