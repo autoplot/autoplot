@@ -760,11 +760,10 @@ public class DataSetURI {
      *
      * This will almost always download, very little caching is done.  We allow subsequent
      * calls within 10 seconds to use the same file (by default).  The timeoutSeconds parameter
-     * can be used to set this to any limit.
+     * can be used to set this to any limit.  Files older than 1 day are deleted.
      * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
-     * TODO: what about Tomcat and other long java processes?
      * 
      * @param url the address to download.
      * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.
@@ -832,8 +831,23 @@ public class DataSetURI {
 
         logger.log( Level.FINEST, "downloadResourceAsTempFile:\n  sURL: {0}\n  file: {1}", new Object[]{url, tempfile});
 
-        long tnow= System.currentTimeMillis();
+        final long tnow= System.currentTimeMillis();
 
+        // since we cannot deleteOnExit, we now delete any file in temp that is over a day old.
+        synchronized (DataSetURI.class) {
+            File localCache1= new File( local, "temp" );
+            FileSystemUtil.deleteFilesInTree( localCache1, new FileSystemUtil.Check() {
+                @Override
+                public boolean check(File f) {
+                    if ( tnow - f.lastModified() > 86400000 ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } ); 
+        }
+        
         synchronized (DataSetURI.class) {
 
             // clean up after old dead processes that left file behind.  I had hudson test that would block test035 from working.
