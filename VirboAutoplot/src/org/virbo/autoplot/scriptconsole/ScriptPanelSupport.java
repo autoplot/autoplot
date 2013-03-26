@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Event;
 import java.beans.PropertyChangeSupport;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import java.awt.HeadlessException;
@@ -21,12 +22,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
@@ -355,7 +359,7 @@ public class ScriptPanelSupport {
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
-                                if ( mode==2 ) { // trace
+                                if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
                                     String text = panel.getEditorPanel().getText();
                                     int i0 = 0;
                                     while (i0 < text.length()) {
@@ -382,6 +386,22 @@ public class ScriptPanelSupport {
                                         System.err.println(s);
                                     }
                                     annotationsSupport.clearAnnotations();
+                                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) ) {
+                                    JPanel p= new JPanel();
+                                    Map<String,String> vars= new HashMap();
+                                    org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, vars, p );
+                                    if ( fd.count>0 ) {
+                                        if ( JOptionPane.showConfirmDialog( panel, p )==JOptionPane.OK_OPTION ) {
+                                            org.virbo.jythonsupport.ui.Util.resetVariables( fd, vars );
+                                        }
+                                        for ( Entry<String,String> v: vars.entrySet() ) {
+                                            interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
+                                        }
+                                        interp.exec(panel.getEditorPanel().getText());
+                                    } else {
+                                        // no parameters
+                                        interp.exec(panel.getEditorPanel().getText());
+                                    }
                                 } else {
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
