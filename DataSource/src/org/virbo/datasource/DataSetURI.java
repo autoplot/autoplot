@@ -760,13 +760,13 @@ public class DataSetURI {
      *
      * This will almost always download, very little caching is done.  We allow subsequent
      * calls within 10 seconds to use the same file (by default).  The timeoutSeconds parameter
-     * can be used to set this to any limit.  Files older than 1 day are deleted.
+     * can be used to set this to any limit.  Files older than one day are deleted.
      * 
      * This is not deleted if the file is already local.  Do not delete this file
      * yourself, it should be deleted when the process exits.
      * 
      * @param url the address to download.
-     * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.
+     * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.  12 hours is the longest allowed interval.
      * @param mon a progress monitor.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
@@ -774,6 +774,10 @@ public class DataSetURI {
     public static File downloadResourceAsTempFile( URL url, int timeoutSeconds, ProgressMonitor mon ) throws IOException {
 
         if ( timeoutSeconds==-1 ) timeoutSeconds= 10;
+        
+        if ( timeoutSeconds>43200 ) {
+            throw new IllegalArgumentException("timeoutSeconds is greater than 12 hours.");
+        }
 
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
