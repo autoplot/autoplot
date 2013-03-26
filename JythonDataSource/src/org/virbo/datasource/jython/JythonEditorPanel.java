@@ -261,6 +261,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return spacer;
     }
 
+    /**
+     * See org.virbo.jythonsupport.ui.Util.createForm
+     * @param f
+     * @param params
+     * @return 
+     */
     private boolean doVariables( File f, Map<String,String> params ) {
 
         Map<String,JythonUtil.Param> parms;
