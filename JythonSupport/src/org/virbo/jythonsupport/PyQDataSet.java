@@ -686,7 +686,7 @@ public class PyQDataSet extends PyJavaInstance {
                 iter.putValue(ds, d);
             }
         } else if ( val.rank()!=iter.rank() ) {
-            throw new IllegalArgumentException("not supported, couldn't reconcile ranks: arg=" + val.rank() + " and ds=" + iter.rank());
+            throw new IllegalArgumentException("not supported, couldn't reconcile ranks in set[" + val + "]=" + iter );
         } else {
             QubeDataSetIterator it = new QubeDataSetIterator(val);
             while (it.hasNext()) {
