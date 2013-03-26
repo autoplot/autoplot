@@ -21,6 +21,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
@@ -40,6 +41,17 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+        
+        boolean okay= DataSetUtil.checkQube(data); // some RBSP/ECT data has rank 2 DEPEND_1 when it is really a qube.
+        
+        if ( !okay ) {
+            throw new IllegalArgumentException("Data is not a qube.  Each record must have the same DEPEND_1.");
+        }
+        
+        if ( dep1!=null && dep1.rank()==2 ) {
+            dep1= dep1.slice(0);
+        }
+                
         if (dep1 != null) {
             if (dep0 != null) {
                 String l = (String) dep0.property(QDataSet.LABEL);
