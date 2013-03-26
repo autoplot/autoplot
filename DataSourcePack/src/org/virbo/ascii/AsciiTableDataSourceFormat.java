@@ -29,6 +29,7 @@ import org.virbo.datasource.AbstractDataSourceFormat;
 import org.das2.datum.format.FormatStringFormatter;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dsops.Ops;
 
 /**
@@ -348,6 +349,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
         
+        boolean okay= DataSetUtil.checkQube(data); // some RBSP/ECT data has rank 2 DEPEND_1 when it is really a qube.
+        
+        if ( !okay ) {
+            throw new IllegalArgumentException("Data is not a qube.  Each record must have the same DEPEND_1.");
+        }
+        
+        if ( dep1!=null && dep1.rank()==2 ) {
+            dep1= dep1.slice(0);
+        }
+        
         DatumFormatter format=null;
 
         String head= getParam( "header", "" ); // could be "rich"
@@ -393,6 +404,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
             Units dep1units = (Units) dep1.property(QDataSet.UNITS);
             if (dep1units == null) dep1units = Units.dimensionless;
+            
+            if ( dep1.rank()>1 ) {
+                
+            }
             
             int i;
             for (  i = 0; i < dep1.length()-1; i++) {
