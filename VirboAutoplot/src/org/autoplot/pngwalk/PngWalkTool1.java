@@ -335,15 +335,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                     //String timeRange = s.substring(i0 + 1, i1);
                     
                     //kludge: LANL showed a bug where "user" was inserted into the URL.  Check for this.
-                    int j1= template.lastIndexOf("/");
-                    int j2= s.lastIndexOf("/");
-                    String templ1= template;
-                    if ( j1!=j2 && !template.substring(0,j1).contains("$") ) {
-                        templ1= template.substring(j1);
-                        s= s.substring(j2);
-                        //TODO: fix this!
+
+                    if ( s.contains("//user@") && !template.contains("//user@") ) {
+                        s= s.replace("//user@", "//" );
                     }
-                    TimeParser tp= TimeParser.create( templ1 );
+
+                    TimeParser tp= TimeParser.create( template );
                     String timeRange = s;
                     try {
                         DatumRange dr= tp.parse(timeRange).getTimeRange();
