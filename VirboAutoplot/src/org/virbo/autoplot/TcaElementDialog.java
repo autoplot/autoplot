@@ -11,6 +11,10 @@
 
 package org.virbo.autoplot;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.virbo.autoplot.bookmarks.Bookmark;
+
 /**
  *
  * @author jbf
@@ -23,6 +27,16 @@ public class TcaElementDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         primaryDataSetSelector.setPlotItButtonVisible(false);
+        org.virbo.autoplot.bookmarks.Util.loadRecent( "tcaRecent", primaryDataSetSelector, getDefault() );
+
+
+    }
+
+    private List<Bookmark> getDefault() {
+        List<Bookmark> result= new ArrayList();
+        result.add( new Bookmark.Item("vap+das2server:http://emfisis.physics.uiowa.edu/das/das2Server?dataset=rbsp/ephemerisA.dsdf&start_time=2012-12-29T00:00:00.000Z&end_time=2012-12-30T00:00:00.000Z&interval=60"));
+        result.add( new Bookmark.Item("vap+das2server:http://emfisis.physics.uiowa.edu/das/das2Server?dataset=rbsp/ephemerisB.dsdf&start_time=2012-12-29T00:00:00.000Z&end_time=2012-12-30T00:00:00.000Z&interval=60"));
+        return result;
     }
 
     /** This method is called from within the constructor to
