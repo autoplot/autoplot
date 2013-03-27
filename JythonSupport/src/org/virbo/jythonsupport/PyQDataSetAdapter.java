@@ -16,13 +16,18 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
- *
+ * Adapt QDataSet results to PyQDataSet, which provides __getitem__
+ * and __setitem__.  (ds[0,0]=ds[0,0]+1)
  * @author jbf
  */
 public class PyQDataSetAdapter implements PyObjectAdapter {
 
     public boolean canAdapt(Object arg0) {
-        return ( arg0 instanceof QDataSet );
+        if ( arg0 instanceof QDataSet ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public PyObject adapt(Object arg0) {
