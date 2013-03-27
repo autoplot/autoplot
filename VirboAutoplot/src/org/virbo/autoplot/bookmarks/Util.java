@@ -64,6 +64,16 @@ public class Util {
 
         } else {
             setRecent( sel, deft );
+            PrintStream fout= null; // redundant code, see below.
+            try {
+                fout = new PrintStream(f);
+                Bookmark.formatBooks(fout,getRecent(sel));
+                fout.close();
+            } catch (FileNotFoundException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } finally {
+                if ( fout!=null ) fout.close();
+            }
         }
 
         sel.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
