@@ -62,6 +62,8 @@ public class Util {
                 logger.log(Level.SEVERE, null, ex);
             }
 
+        } else {
+            setRecent( sel, deft );
         }
 
         sel.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
