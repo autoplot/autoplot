@@ -729,11 +729,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             form.getUsernameTextField().setText( (String)map.get(USER_ID) );
             form.getEmailTextField().setText( (String)map.get(EMAIL) );
 
-            String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Submit" };
+            String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Switch to Email", "Submit" };
             
             boolean useEmail= "T".equals( System.getProperty("autoplot.emailrte") );
             if ( useEmail ) {
-                choices[3]= "Submit Email";
+                choices[4]= "Submit Email";
+                choices[3]= "Switch to Post";
             }
             
             Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
@@ -763,8 +764,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     }
                 }
 
-
-            } else if ( option==3 ) { // submit
+            } else if ( option==3 ) { // switch to email
+                if ( useEmail ) {
+                    System.setProperty( "autoplot.emailrte", "F" );
+                } else {
+                    System.setProperty( "autoplot.emailrte", "T" );
+                }
+            } else if ( option==4 ) { // submit
                 report= getReport( form );
                 
                 if ( useEmail ) {
