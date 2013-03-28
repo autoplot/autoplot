@@ -5,6 +5,8 @@
 
 package org.virbo.autoplot.bookmarks;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -91,6 +93,23 @@ public class Util {
 
             }
         });
+        
+        sel.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                PrintStream fout= null;
+                try {
+                    fout = new PrintStream(f);
+                    List<Bookmark> result= getRecent(sel);
+                    result.add( new Bookmark.Item( sel.getValue() ) );
+                    Bookmark.formatBooks(fout,result);
+                    fout.close();
+                } catch (FileNotFoundException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                } finally {
+                    if ( fout!=null ) fout.close();
+                }
+            }
+        });        
 
     }
 
