@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small><a href="http://www.sarahandjeremy.net:8080/hudson">Hudson</a> cleanup includes bug where recent change broke this product.</small></p>
+        <p><small>Add ticks from dialog now keeps its own history.</small></p>
         <!-- The ascii parser wouldn't allow files with three or more iso8601 timetags per record. -->
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,14 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>fix problem where save vap before load vap would leave Craig in a strange folder</li>
+            <li>Leonard pointed out case where CAA would return CDFs that didn't properly mark fill and would cause RTE.</li>
+            <li>Reiner had RTE caused by URL having "user@" inserted automatically when authorization was needed</li>
+            <li>Bugfix when output of rank 2 where was used to index dataset.</li>
+            <li>Non-ascii check in ascii parser didn't account for tabs (ascii=9)</li>
+            <li>trace function restored when developing jython scripts.</li>
+            <li>downloadResourceAsTempFile cleanup policy changed to support multiple processes and Tomcat servers</li>
+            <li>history dialog takes timezone into account when listing today, yesterday, etc</li>
             <li>recent change broke BUNDLE in rank 3 datasets from CDF file.</li>
             <li>sprocess was called twice when exporting the processed data.</li>
             <li>3608830: disable export options that won't work.</li>
@@ -74,6 +82,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>QStream now has int8 transfer type to support CDF_TT2000 timetags.</li>
+            <li>Additional ticks from... dialog keeps a separate history.</li>
+            <li>Introduction of SparseDataSet, backed by a map and used to easily describe bundles.</li>
+            <li>finally, ~ can be used in the address bar to refer to one's home folder</li>
+            <li>export data disabled options are not valid.</li>
             <li>TITLE property is propogated through fftPower</li>
             <li>interpolate binXinterpY introduced.</li>
             <li>checkQube introduced to detect when datasets are really QUBEs and some opperations apply.</li>
