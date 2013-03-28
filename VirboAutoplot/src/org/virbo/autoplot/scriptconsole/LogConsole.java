@@ -408,7 +408,7 @@ public class LogConsole extends javax.swing.JPanel {
                     try {
                         //buf.append(recMsg).append("\n");
                         recMsg += "\n";
-                        doc.insertString(doc.getLength(), recMsg, attr);
+                        doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.
                     } catch (BadLocationException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
