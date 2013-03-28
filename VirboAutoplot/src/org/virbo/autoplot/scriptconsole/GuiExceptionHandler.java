@@ -87,6 +87,7 @@ import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
+import org.virbo.dsops.Ops;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -779,7 +780,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 } else {
             //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
                     report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
-                    String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
+                    
+                    String sid= (String)map.get("USER_ID");
+                    sid= safe( sid.replaceAll(" ","").replaceAll("_","") );
+                    String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, sid );
 
                     HttpClient client = new HttpClient();
                     client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
