@@ -203,7 +203,7 @@ public class PersistentStateSupport {
      */
     public int saveAs() {
         JFileChooser chooser= new JFileChooser();
-        if ( getDirectory()!=null ) chooser.setCurrentDirectory( new File( getDirectory() ) );
+        if ( getDirectory()!=null && getDirectory().length()>0 ) chooser.setCurrentDirectory( new File( getDirectory() ) );
         if ( getCurrentFile()!=null ) {
             File child= new File( getCurrentFile() );
             File parent= FileSystem.settings().getLocalCacheDir();
@@ -513,6 +513,17 @@ public class PersistentStateSupport {
     public static final String PROP_DIRECTORY = "directory";
 
     public String getDirectory() {
+        //propertyChangeSupport.firePropertyChange ( PROPERTY_CURRENT_FILE, oldFile, currentFile );
+        if ( directory==null || directory.equals("") ) {
+            Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
+            String f= prefs.get( PREF_FILE+ext+"_recent", "" );
+            if ( f.length()>0 ) {
+                String[] ss= f.split("::");
+                f= ss[0];
+                File ff= new File(f);
+                directory= ff.getParent();
+            }
+        }
         return directory;
     }
 
