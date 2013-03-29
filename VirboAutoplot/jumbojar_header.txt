@@ -16,9 +16,9 @@
 # such as "unzip".
 
 if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-        exec "${JAVA_HOME}"/bin/java -Xmx1000M -jar $0 "$@"
+        exec "${JAVA_HOME}"/bin/java -Xmx1000M -Dsun.java2d.d3d=false -jar $0 "$@"
 else
-        exec /usr/bin/env java -Xmx1000M -jar $0 "$@"
+        exec /usr/bin/env java -Xmx1000M -Dsun.java2d.d3d=false -jar $0 "$@"
 fi
 
 # JAR FILE DATA STARTS AFTER THIS TEXT #
