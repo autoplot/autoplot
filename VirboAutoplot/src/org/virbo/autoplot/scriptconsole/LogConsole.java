@@ -17,9 +17,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -125,7 +127,7 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        timer2 = new Timer(100, new ActionListener() {
+        timer2 = new Timer(300, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 update();
             }
@@ -240,24 +242,24 @@ public class LogConsole extends javax.swing.JPanel {
         if ( handler==null ) {
             handler = new Handler() {
                 public synchronized void publish(LogRecord rec) {
-                    synchronized (LogConsole.this) {
-                        Object[] parms= rec.getParameters();
+                    Object[] parms= rec.getParameters();
 
-                        String recMsg;
-                        if ( parms==null || parms.length==0 ) {
-                            recMsg = rec.getMessage();
-                        } else {
-                            recMsg = MessageFormat.format( rec.getMessage(), parms );
-                        }
-                        if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
-                            recMsg= rec.getThrown().toString();
-                        } else {
-                            // no message.  breakpoint here for debugging.
-                            int i=0;
-                        }
-                        LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
-                        copy.setLoggerName(rec.getLoggerName());
-                        copy.setMillis(rec.getMillis());
+                    String recMsg;
+                    if ( parms==null || parms.length==0 ) {
+                        recMsg = rec.getMessage();
+                    } else {
+                        recMsg = MessageFormat.format( rec.getMessage(), parms );
+                    }
+                    if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
+                        recMsg= rec.getThrown().toString();
+                    } else {
+                        // no message.  breakpoint here for debugging.
+                        int i=0;
+                    }
+                    LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
+                    copy.setLoggerName(rec.getLoggerName());
+                    copy.setMillis(rec.getMillis());
+                    synchronized (LogConsole.this) {
                         records.add(copy);
                         timer2.restart();
                         if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
@@ -266,15 +268,14 @@ public class LogConsole extends javax.swing.JPanel {
                     }
                     if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
                         if (LogConsole.this.oldStdErr != null) {
-                            String recMsg;
+                            String recMsg1;
                             String msg= rec.getMessage();
-                            Object[] parms= rec.getParameters();
                             if ( parms==null || parms.length==0 ) {
-                                recMsg = msg;
+                                recMsg1 = msg;
                             } else {
-                                recMsg = MessageFormat.format( msg, parms );
+                                recMsg1 = MessageFormat.format( msg, parms );
                             }
-                            LogConsole.this.oldStdErr.println( recMsg );
+                            LogConsole.this.oldStdErr.println( recMsg1 );
                         }
                     }
                 }
@@ -353,6 +354,7 @@ public class LogConsole extends javax.swing.JPanel {
      */
     public synchronized void update() {
         try {
+            //long t0= System.currentTimeMillis();
             int n = records.size();
             long t = n == 0 ? 0 : records.get(n - 1).getMillis();
             boolean timeStamps = showTimeStamps;
@@ -368,6 +370,12 @@ public class LogConsole extends javax.swing.JPanel {
             MutableAttributeSet highlistAttr = new SimpleAttributeSet();
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
 
+            while (records.size() > RECORD_SIZE_LIMIT) {
+                records.remove(0);
+            }
+            
+            //int nrec= records.size();
+            
             for (LogRecord rec : records) {
                 if (rec.getLevel().intValue() >= level) {
                     if (lastT != 0 && rec.getMillis() - lastT > 5000) {
@@ -408,15 +416,29 @@ public class LogConsole extends javax.swing.JPanel {
                     try {
                         //buf.append(recMsg).append("\n");
                         recMsg += "\n";
-                        doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.
+                        doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.   
                     } catch (BadLocationException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
-            while (records.size() > RECORD_SIZE_LIMIT) {
-                records.remove(0);
-            }
+            
+//            FileWriter w=null;
+//            try {
+//                File ff= new File("/tmp/logconsole.txt");
+//                w=new FileWriter( ff,true );
+//                w.write( String.format( "%d records %d ms\n", nrec, System.currentTimeMillis()-t0 ) );
+//            } catch (IOException ex) {
+//                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+//            } finally {
+//                try {
+//                    if ( w!=null ) w.close();
+//                } catch ( IOException ex ) {
+//                    // do nothing
+//                }
+//            }
+//                        
+            
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
