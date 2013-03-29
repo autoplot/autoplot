@@ -1933,8 +1933,12 @@ public class PlotElementController extends DomNodeController {
                 // nothing
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                String l=  (String) qube.slice(0).property( QDataSet.LABEL );
+                peleCopy.getPlotDefaults().getXaxis().setLabel( l==null ? "" : l );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setLabel( l==null ? "" : l );
                 peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
+                
             }
 
         } else if ( spec==RenderType.digital ) {
