@@ -797,6 +797,23 @@ public class DataSetURI {
 
         String id= split.path.substring(split.scheme.length()+3); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
 
+        final long tnow= System.currentTimeMillis();
+
+        // since we cannot deleteOnExit, we now delete any file in temp that is over a day old.
+        synchronized (DataSetURI.class) {
+            File localCache1= new File( local, "temp" );
+            FileSystemUtil.deleteFilesInTree( localCache1, new FileSystemUtil.Check() {
+                @Override
+                public boolean check(File f) {
+                    if ( tnow - f.lastModified() > 86400000 ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } ); 
+        }
+        
         File localCache= new File( local, "temp" );
         localCache= new File( localCache, id );
         if ( !localCache.exists() ) {
@@ -834,23 +851,6 @@ public class DataSetURI {
         File tempfile= new File(filename + ".temp");
 
         logger.log( Level.FINEST, "downloadResourceAsTempFile:\n  sURL: {0}\n  file: {1}", new Object[]{url, tempfile});
-
-        final long tnow= System.currentTimeMillis();
-
-        // since we cannot deleteOnExit, we now delete any file in temp that is over a day old.
-        synchronized (DataSetURI.class) {
-            File localCache1= new File( local, "temp" );
-            FileSystemUtil.deleteFilesInTree( localCache1, new FileSystemUtil.Check() {
-                @Override
-                public boolean check(File f) {
-                    if ( tnow - f.lastModified() > 86400000 ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } ); 
-        }
         
         synchronized (DataSetURI.class) {
 
