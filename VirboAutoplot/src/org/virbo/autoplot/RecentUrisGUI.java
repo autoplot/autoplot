@@ -46,7 +46,7 @@ import org.das2.datum.Units;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
- *
+ * This useful dialog needs to be rewritten... 
  * @author jbf
  */
 public class RecentUrisGUI extends javax.swing.JPanel {
@@ -274,7 +274,6 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         }
                     }
 
-                    System.err.println("stevens"+daysURIs);
                 }
 
                 skip= new boolean[8];
