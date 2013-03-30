@@ -46,7 +46,8 @@ import org.das2.datum.Units;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
- * This useful dialog needs to be rewritten... 
+ * This useful dialog needs to be rewritten.  
+ * See https://sourceforge.net/tracker/index.php?func=detail&aid=3609545&group_id=199733&atid=970682
  * @author jbf
  */
 public class RecentUrisGUI extends javax.swing.JPanel {
