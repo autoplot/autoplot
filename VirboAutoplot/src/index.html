@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Add ticks from dialog now keeps its own history.</small></p>
-        <!-- The ascii parser wouldn't allow files with three or more iso8601 timetags per record. -->
+        <p><small>Submit RTE dialog now has button to switch over to sending email, to support networks where http post isn't allowed.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,20 +24,23 @@
         <ul>
             <li>bookmarks download timeout was in milliseconds instead of seconds, which caused RTE now that there is a 12 hour limit.</li>
             <li>initial coding of int8 transfer type in QStream had bug</li>
-            <li> 2987871: limit the number of records formatted to the log console BEFORE formatting them, not after</li>
+            <li>2987871: limit the number of records formatted to the log console BEFORE formatting them, not after</li>
             <li>fix problem where save vap before load vap would leave Craig in a strange folder</li>
             <li>Leonard pointed out case where CAA would return CDFs that didn't properly mark fill and would cause RTE.</li>
             <li>Reiner had RTE caused by URL having "user@" inserted automatically when authorization was needed</li>
             <li>Bugfix when output of rank 2 where was used to index dataset.</li>
             <li>Non-ascii check in ascii parser didn't account for tabs (ascii=9)</li>
             <li>trace function restored when developing jython scripts.</li>
-            <li>downloadResourceAsTempFile cleanup policy changed to support multiple processes and Tomcat servers</li>
+            <li>3609543: downloadResourceAsTempFile cleanup policy changed to support multiple processes and Tomcat servers</li>
             <li>history dialog takes timezone into account when listing today, yesterday, etc</li>
             <li>recent change broke BUNDLE in rank 3 datasets from CDF file.</li>
             <li>sprocess was called twice when exporting the processed data.</li>
             <li>3608830: disable export options that won't work.</li>
             <li>rte_1825469520: URL doesn't contain authority (http:///autoplot.org/)</li>
             <li>recent history takes current timezone into account when listing today and yesterday's URIs</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>v2013b_23 had a bug that broke slice1 keyword for C-based reader</li>
             <li>status bar at the bottom no longer truncates.</li>
             <li>autohistogram/autoranging would fail sometimes with log, picking linear instead.</li>
@@ -69,20 +71,6 @@
             <li>3606197: NN spectrograms fixed for rank 2 DEPEND_1.</li>
             <li>recent changes to Jython eq and ne infix ops broke Jython code like (ds!=None)</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>3605224: major ticks don't line up when one axis of stack has labels.</li>
-            <li>3605415: CDF type "spectrogram>noauto", and user pref for spectrogram</li>
-            <li>3605230: jython rank zero result of gt ought to be a boolean</li>
-            <li>3604997: color scatter not connected to colorbar</li>
-            <li>3604985: CDF DELTA_PLUS/DELTA_MINUS define bins for NN Spectrogram</li>
-            <li>3604265: partial load of timeseries when scanning around.</li>
-            <li>3599689: agg sometimes not loading when two on same plot</li>
-            <li>3604489: double check of isLocal in WebFileSystem results in failure </li>
-            <li>3603701: Preserve DatumRange types (orbit:...) with built-in axis scan,history</li>
-            <li>3604777: agg completions missing when tab is pressed in address bar</li>
-            <li>3587261: white-trace-on-white background is allowed again, because trace on top of spectrogram.  A warning is displayed now.</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
@@ -95,6 +83,9 @@
             <li>interpolate binXinterpY introduced.</li>
             <li>checkQube introduced to detect when datasets are really QUBEs and some opperations apply.</li>
             <li>Jython invokeLater command introduced to support simple concurrent scripts.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>new three-argument |fftPower(512,2,'Hanning') function allows slide and window selection.</li>
             <li>add "copy to clipboard" popup menu item to pngwalk tool, so users can easily copy an image to an email.</li>
             <li>allow autoplot.emailrte=T in properties to allow emailing RTE from networks that don't allow POST</li>
@@ -104,24 +95,6 @@
             <li>record source of scripts installed in tools menu.</li>
             <li>sliceRebinnedData is now persistent between sessions, and is off by default.</li>
             <li>add experimental rebinner for LANL RBSP data that indicates spectrogram boundaries</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>experimental tool for recording GUI sequences added</li>
-            <li>add vapfile: prefix so that I can read in exception reports without changing file names</li>
-            <li>version stamp finally added to the address bar</li>
-            <li>Only useful Plot Styles are enabled</li>
-            <li>3596086: CDF vector components selectable</li>
-            <li>add libraries for sending email, to be used in scripts</li>
-            <li>add button for creating time range strings in Create Pngwalk dialog</li>
-            <li>3598216: File cache can be organized by alpha as well as by size.</li>
-            <li>RFE 3600323: AutoplotDataServer handles TSBs that do not product time series data</li>
-            <li>local ro_cache.txt can now contain files that are not in the public http, to support data providers</li>
-            <li>undo list and getLongUndoDescription now consider timerange bindings when reporting changes.</li>
-            <li>AutoplotServlet now reports host that served the data in response header, to support clusters of servers</li>
-            <li>Add skip parameter to csv file reader to support MyTracks app.</li>
-            <li>Rows are plottable in the Excel spreadsheet reader.</li>
-            <li>GPS metadata retrieved in (JPG) image viewer</li>
         </ul>
 
         <p>Known issues:</p>
