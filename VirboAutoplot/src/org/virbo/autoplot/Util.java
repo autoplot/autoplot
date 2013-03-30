@@ -4,10 +4,12 @@
  */
 package org.virbo.autoplot;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.das2.util.AboutUtil;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -92,6 +95,21 @@ public class Util {
         }
 
         List<String> result = new ArrayList<String>();
+
+        String buildTime = "???";
+        java.net.URL buildURL = AboutUtil.class.getResource("/buildTime.txt");
+        if (buildURL != null) {
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(buildURL.openStream()));
+                buildTime = reader.readLine();
+                reader.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        if ( !buildTime.equals("???") ) {
+            result.add("build time: "+buildTime);
+        }
 
         LinkedHashMap<String, String> abbrevs = new LinkedHashMap<String, String>();
 
