@@ -121,6 +121,16 @@
             <entry key="build.user.name" value="${user.name}"/>
         </propertyfile>
     </target>
+    <target name="-pre-compile"> <!--this was copied over from servlet.  Since I got this to work there, I'm including it here.-->
+        <!-- Empty placeholder for easier customization. -->
+        <!-- You can override this target in the ../build.xml file. -->
+        <tstamp>
+            <format property="timestamp" pattern="yyyy-MM-dd'T'HH:mm'Z'" timezone="GMT"/>
+        </tstamp>
+        <echo>after: ${timestamp}</echo>
+        <echo file="build/classes/buildTime.txt">${timestamp}</echo>
+    </target>
+        
     <target name="jnlp-release-pre-jar" depends="compile">
         <tstamp>
             <format property="default_release_tag" pattern="yyyyMMdd" locale="en,GMT+0:00">
