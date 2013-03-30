@@ -23,6 +23,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>bookmarks download timeout was in milliseconds instead of seconds, which caused RTE now that there is a 12 hour limit.</li>
+            <li>initial coding of int8 transfer type in QStream had bug</li>
+            <li> 2987871: limit the number of records formatted to the log console BEFORE formatting them, not after</li>
             <li>fix problem where save vap before load vap would leave Craig in a strange folder</li>
             <li>Leonard pointed out case where CAA would return CDFs that didn't properly mark fill and would cause RTE.</li>
             <li>Reiner had RTE caused by URL having "user@" inserted automatically when authorization was needed</li>
@@ -82,6 +85,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
             <li>QStream now has int8 transfer type to support CDF_TT2000 timetags.</li>
             <li>Additional ticks from... dialog keeps a separate history.</li>
             <li>Introduction of SparseDataSet, backed by a map and used to easily describe bundles.</li>
