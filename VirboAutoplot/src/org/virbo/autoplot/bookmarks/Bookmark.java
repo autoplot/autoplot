@@ -218,7 +218,7 @@ public abstract class Bookmark {
 
                 } else {
                     logger.log(Level.FINE, "Using downloadResourceAsTempFile route.  Files are cached for up to 3600 seconds" );
-                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
+                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600, new NullProgressMonitor()) );
                     if (  remoteUrl.endsWith(".gz" ) ) {
                         logger.fine("bookmarks stream is uncompressed because of .gz");
                         in= new GZIPInputStream( in );
@@ -227,7 +227,7 @@ public abstract class Bookmark {
                 }
             } catch ( URISyntaxException ex ) {
                 logger.log(Level.FINE, "fall back to Using downloadResourceAsTempFile route: {0}", rurl);
-                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600000, new NullProgressMonitor()) );
+                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600, new NullProgressMonitor()) );
                 logger.fine("  got it...");
             }
 
