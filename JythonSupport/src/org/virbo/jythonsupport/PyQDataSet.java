@@ -506,7 +506,7 @@ public class PyQDataSet extends PyJavaInstance {
                     resultIter.next();
                     resultIter.putValue(result, d);
                 }
-                DataSetUtil.copyDimensionProperties( ds, result );
+                DataSetUtil.copyDimensionProperties( rods, result );
 
                 return new PyQDataSet(result);
             } else {
