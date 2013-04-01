@@ -368,7 +368,7 @@ public class PyQDataSet extends PyJavaInstance {
         if ( func!=null ) {
             return func.__call__(this);
         } else {
-            return super.invoke(name);
+            return super.invoke(name,args);
         }
     }
 
@@ -698,6 +698,37 @@ public class PyQDataSet extends PyJavaInstance {
         }
     }
 
+    /* we need to wrap put methods as well... */
+    public void putProperty( String prop, Object value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putProperty(prop,value);
+    }
+    public void putProperty( String prop, int index, Object value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putProperty(prop,index,value);
+    }
+    public void putValue( double value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putValue(value);
+    }
+    public void putValue( int i0, double value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putValue(i0,value);
+    }
+    public void putValue( int i0, int i1, double value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putValue(i0,i1,value);
+    }
+    public void putValue( int i0, int i1, int i2, double value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putValue(i0,i1,i2,value);
+    }
+    public void putValue( int i0, int i1, int i2, int i3, double value ) {
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        ds.putValue(i0,i1,i2,i3,value);
+    }
+
+    
     /**
      * convert the Python number, sequence, or Rank0DataSet to a
      * dataset with a compatible geometry.
