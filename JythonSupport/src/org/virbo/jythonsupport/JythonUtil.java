@@ -198,11 +198,31 @@ public class JythonUtil {
      }
 
     /**
-     * scrape through the script looking for getParam calls.  These are executed, and we
-     * get labels and infer types from the defaults.  For example,
-     * getParam( 'foo', 3.0 ) will always return a real and
-     * getParam( 'foo', 3 ) will always return an integer.
-     * @param reader
+     * <p>scrape through the script looking for getParam calls.  These are executed, and we
+     * get labels and infer types from the defaults.  For example,<br>
+     * <tt>getParam( 'foo', 3.0 )</tt> will always return a real and<br>
+     * <tt>getParam( 'foo', 3 )</tt> will always return an integer.<br>
+     * 
+     * Other examples include:<br>
+     * <tt>getParam( 'foo', 'A', '', [ 'A', 'B' ] )</tt> constrains the values to A or B<br>
+     * </p>
+     * <p>
+     * Thinking about the future, people have asked that human-ready labels be fixed to list selections. 
+     * Constraints should be added to number parameters to specify ranges.  And last it would
+     * be nice to specify when a parameter is ignored by the script (dA is not used is mode B is active).
+     * <br>
+     * <tt>getParam( 'foo', 3, '', { 'min':0, 'max':10 } )</tt> might (Not implemented) constrain ranges<br>
+     * <tt>getParam( 'sc', 'A', '', [ 'A', 'B' ], { 'A':'big one', 'B':'little one' } )</tt> might (Not implemented) allow labels<br>
+     * <tt>getParam( 'foo', 'dA', '', [], { '_ignoreIf':'sc==B' } )</tt> might (Not implemented) allow groups to be disabled when not active<br>
+     * </p>
+     * <p>A few things the Autoplot script developer must know:
+     * <ul>
+     * <li>getParam calls can only contain literals, and each must be executable as if it were the only line of code.  This may be relaxed in the future.
+     * <li>the entire getParam line must be on one line.  This too may be relaxed.
+     * </ul>
+     * </p>
+     * 
+     * @param reader A reader that has an open Jython file.
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
@@ -233,7 +253,7 @@ public class JythonUtil {
 
         String prog= myCheat + params ;
 
-        PythonInterpreter interp= null;
+        PythonInterpreter interp;
         try {
             interp= new PythonInterpreter();
             interp.exec(prog);
@@ -336,7 +356,7 @@ public class JythonUtil {
     }
 
     /**
-     * return python code that is equivalent, except it has not side-effects like plotting.
+     * return python code that is equivalent, except it has no side-effects like plotting.
      * This code is not exact, for example (a,b)= (1,2) is not supported.
      * @param reader input to read.
      * @return the script as a string, with side-effects removed.
