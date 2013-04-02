@@ -22,12 +22,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.ThreadManager;
 
 /**
  *
@@ -273,14 +275,27 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     }//GEN-LAST:event_addressBarUriButtonActionPerformed
 
     private void allUrisButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allUrisButtonActionPerformed
-        Application dom2= (Application)dom.copy();
+        final Application dom2= (Application)dom.copy();
         DomOps.aggregateAll(dom2);
-        dom.syncTo(dom2);
-        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
-        for ( DataSourceFilter dsf: dsfs ) {
-            dsf.getController().update();
+        Runnable run= new Runnable() {
+            public void run() {
+                dom.syncTo(dom2);
+                DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+                for ( DataSourceFilter dsf: dsfs ) {
+                    dsf.getController().update();
+                }
+            }
+        };
+        
+        if ( ! ThreadManager.getInstance().run( run, "aggregateUris" ) ) {
+            JOptionPane.showConfirmDialog( this, "Operation is currently busy.");
         }
-        SwingUtilities.getWindowAncestor(this).setVisible(false);
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                SwingUtilities.getWindowAncestor(AggregateUrisDialog.this).setVisible(false);
+            }
+        });
+
     }//GEN-LAST:event_allUrisButtonActionPerformed
 
     private void showWildcardsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showWildcardsButtonActionPerformed
