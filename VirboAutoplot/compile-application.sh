@@ -218,6 +218,7 @@ if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:.
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 
 # this can be removed soon:
+if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSetBuilder.java; then hasErrors=1; fi
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSet.java; then hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
