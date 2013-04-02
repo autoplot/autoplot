@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -35,6 +36,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import jsyntaxpane.components.Markers;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -212,10 +214,20 @@ public class ScriptPanelSupport {
             Runnable run= new Runnable() {
                 public void run() {
                     try {
+                        annotationsSupport.clearAnnotations();
                         Document d = panel.getEditorPanel().getDocument();
                         d.remove(0, d.getLength());
                         d.insertString(0, fs, null);
                         panel.setDirty(false);
+                    } catch ( NullPointerException ex ) {
+                        try {
+                            Document d = panel.getEditorPanel().getDocument();
+                            d.remove(0, d.getLength());
+                            d.insertString(0, fs, null);
+                            panel.setDirty(false);
+                        } catch ( BadLocationException ex2 ) {
+                            
+                        }
                     } catch ( BadLocationException ex ) {
                         
                     }
@@ -290,7 +302,8 @@ public class ScriptPanelSupport {
 
                                 public void exceptionThrown(Exception e) {
                                     if (e instanceof PyException) {
-                                        annotateError((PyException) e, 0, null );
+                                        PyException ex= (PyException)e;
+                                        annotateError(ex, 0, null );
                                     }
                                 }
                             });
