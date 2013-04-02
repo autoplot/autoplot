@@ -75,11 +75,15 @@ public class EditorAnnotationsSupport {
      * remove all annotations
      */
     public void clearAnnotations() {
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                Markers.removeMarkers(editorPanel);
-            }
-        } );
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            Markers.removeMarkers(editorPanel);
+        } else {
+           SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    Markers.removeMarkers(editorPanel);
+                }
+            } );
+        }
         annotations= new TreeMap<Integer, Annotation>();
     }
 
@@ -147,6 +151,10 @@ public class EditorAnnotationsSupport {
                 Document doc = editorPanel.getDocument();
                 Element root = editorPanel.getDocument().getDefaultRootElement();
 
+                if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
+                    return;
+                }
+                
                 if ( line<1 || line>root.getElementCount()+1 ) {
                     throw new IllegalArgumentException( "no such line: "+line );
                 }
@@ -209,7 +217,7 @@ public class EditorAnnotationsSupport {
      */
     public String getToolTipText(MouseEvent me) {
         int offset= editorPanel.viewToModel(me.getPoint());
-        if ( editorPanel.getSelectionStart()<offset && offset<editorPanel.getSelectionEnd() ) {
+        if ( editorPanel.getSelectionStart()<=offset && offset<editorPanel.getSelectionEnd() ) {
             String eval= editorPanel.getSelectedText();
             if ( interp!=null ) {
                 try {
@@ -218,6 +226,8 @@ public class EditorAnnotationsSupport {
                 } catch ( Exception ex ) {
                     return ""+ex.toString();
                 }
+            } else {
+                return "Interpreter is not active";
             }
         }
 
