@@ -515,7 +515,7 @@ public class PyQDataSet extends PyJavaInstance {
         } else {
             QDataSet that = (QDataSet) o;
             
-            DataSetIterator iter = new QubeDataSetIterator(ds);
+            DataSetIterator iter = new QubeDataSetIterator(rods);
 
             QDataSet dep0= null;
             
@@ -525,7 +525,7 @@ public class PyQDataSet extends PyJavaInstance {
                     QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory( that1 );
                     ((QubeDataSetIterator)iter).setIndexIteratorFactory(j, fit);
                     if ( j==0 ) {
-                        dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                        dep0= (QDataSet) rods.property(QDataSet.DEPEND_0);
                         if ( dep0!=null ) {
                             dep0= DataSetOps.applyIndex( dep0, 0, that1, false );
                         }
@@ -534,7 +534,7 @@ public class PyQDataSet extends PyJavaInstance {
             } else {
                 QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                 ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);        
-                dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                dep0= (QDataSet) rods.property(QDataSet.DEPEND_0);
                 if ( dep0!=null ) {
                     dep0= DataSetOps.applyIndex( dep0, 0, that, false );
                 }
@@ -553,7 +553,7 @@ public class PyQDataSet extends PyJavaInstance {
             if ( dep0!=null && dep0.length()==result.length() ) {
                 result.putProperty( QDataSet.DEPEND_0, dep0 ); // yeah, we did it right!
             }
-            DataSetUtil.copyDimensionProperties( ds, result );
+            DataSetUtil.copyDimensionProperties( rods, result );
             
             return new PyQDataSet(result);
         }
