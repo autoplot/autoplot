@@ -17,7 +17,6 @@ import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
 import ftpfs.ftp.FtpObserver;
-import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPFile;
 import it.sauronsoftware.ftp4j.FTPListParseException;
 import it.sauronsoftware.ftp4j.FTPListParser;
@@ -27,7 +26,6 @@ import it.sauronsoftware.ftp4j.listparsers.MLSDListParser;
 import it.sauronsoftware.ftp4j.listparsers.NetWareListParser;
 import it.sauronsoftware.ftp4j.listparsers.UnixListParser;
 import java.io.BufferedReader;
-import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,7 +35,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -93,7 +90,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     private static File userLocalRoot( URI rooturi ) throws IOException {
-        String auth= rooturi.getAuthority();
+        String auth= rooturi.getAuthority(); 
         if ( auth==null ) {
              throw new MalformedURLException("URL doesn't contain authority, check for ///");
         }
