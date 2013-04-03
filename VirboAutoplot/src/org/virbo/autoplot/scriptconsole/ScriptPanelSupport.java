@@ -29,13 +29,16 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
@@ -269,6 +272,11 @@ public class ScriptPanelSupport {
         } else {
             logger.log(Level.SEVERE, null, ex);
             annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString(),interp);
+            JEditorPane textArea= panel.getEditorPanel();
+            Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,ex.traceback.tb_lineno-1-5)); // -1 is for zero-base, 5 lines of context.
+            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
+            element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,ex.traceback.tb_lineno-1));
+            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
         }
     }
 
