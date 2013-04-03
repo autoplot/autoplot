@@ -272,11 +272,16 @@ public class ScriptPanelSupport {
         } else {
             logger.log(Level.SEVERE, null, ex);
             annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString(),interp);
-            JEditorPane textArea= panel.getEditorPanel();
-            Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,ex.traceback.tb_lineno-1-5)); // -1 is for zero-base, 5 lines of context.
-            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
-            element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,ex.traceback.tb_lineno-1));
-            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
+            final int line= ex.traceback.tb_lineno-1;
+            final JEditorPane textArea= panel.getEditorPanel();
+            SwingUtilities.invokeLater( new Runnable() { public void run() {
+                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,line-5)); // 5 lines of context.
+                if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
+                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                    Element element= textArea.getDocument().getDefaultRootElement().getElement(line); // 5 lines of context.
+                    if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
+                } } );
+            } } );
         }
     }
 
