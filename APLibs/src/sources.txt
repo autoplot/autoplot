@@ -11,10 +11,13 @@ Beansbinding framework for connecting java beans.
 = cdfjava.jar =
 SPDF, Goddard, NASA.  http://cdf.gsfc.nasa.gov/
 
+= OpenDAP =
+
 = dasCore.jar =
 Plasma Wave Group at The University of Iowa.  http://www.das2.org
 
 = itext-1.2.jar =
+PDF library for printing to PDF.
 
 = JDiskHog.jar =
 Open-source java tool for finding big files.  http://code.google.com/p/jdiskhog/.
@@ -40,3 +43,7 @@ https://swing-layout.dev.java.net/
 
 = netCDF/*.jar =
 http://www.unidata.ucar.edu/software/netcdf/
+
+= jsyntaxpane =
+http://code.google.com/p/jsyntaxpane/
+
