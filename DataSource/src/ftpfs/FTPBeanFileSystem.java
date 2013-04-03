@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -74,7 +75,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         return bean;
     }
 
-    FTPBeanFileSystem(URI root) throws FileSystemOfflineException {
+    FTPBeanFileSystem(URI root) throws FileSystemOfflineException, IOException {
         super(root, userLocalRoot(root) );
         if ( FileSystem.settings().isOffline() ) {
             this.setOffline(true);
@@ -91,8 +92,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
         
     }
 
-    private static File userLocalRoot( URI rooturi ) {
+    private static File userLocalRoot( URI rooturi ) throws IOException {
         String auth= rooturi.getAuthority();
+        if ( auth==null ) {
+             throw new MalformedURLException("URL doesn't contain authority, check for ///");
+        }
         String[] ss= auth.split("@");
 
         String userInfoNoPassword= null;
