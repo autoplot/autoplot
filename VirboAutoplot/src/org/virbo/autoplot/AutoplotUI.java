@@ -299,7 +299,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         initComponents();
         //TODO: this needs to be explored more:  It gets the desired behavior where running an 
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
-        //but makes it so URIs cannot be entered.
+        //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //  this.setFocusableWindowState(false);
                 
         expertMenuItems.add( editDomMenuItem );
