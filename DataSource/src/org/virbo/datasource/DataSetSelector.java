@@ -1094,6 +1094,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (Exception ex ) {
                     if ( !maybeHandleException(ex) ) {
                         logger.log( Level.SEVERE, "", ex );
+                        ex.printStackTrace();
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
                     }
                     return;
@@ -1300,6 +1301,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                 dataSetSelectorActionPerformed(evt);
             }
         });
+        dataSetSelector.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                dataSetSelectorFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                dataSetSelectorFocusLost(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -1447,6 +1456,15 @@ private void dataSetSelectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-F
 private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuCanceled
     popupCancelled = true;
 }//GEN-LAST:event_dataSetSelectorPopupMenuCanceled
+
+    private void dataSetSelectorFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dataSetSelectorFocusGained
+        System.err.println("datasetselector focus gained");
+    }//GEN-LAST:event_dataSetSelectorFocusGained
+
+    private void dataSetSelectorFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dataSetSelectorFocusLost
+        System.err.println("datasetselector focus lost");
+    }//GEN-LAST:event_dataSetSelectorFocusLost
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JComboBox dataSetSelector;
