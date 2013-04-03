@@ -12,6 +12,7 @@ Beansbinding framework for connecting java beans.
 SPDF, Goddard, NASA.  http://cdf.gsfc.nasa.gov/
 
 = OpenDAP =
+http://www.opendap.org/
 
 = dasCore.jar =
 Plasma Wave Group at The University of Iowa.  http://www.das2.org
@@ -47,3 +48,5 @@ http://www.unidata.ucar.edu/software/netcdf/
 = jsyntaxpane =
 http://code.google.com/p/jsyntaxpane/
 
+= FTP =
+http://www.sauronsoftware.it
