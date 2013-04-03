@@ -1094,7 +1094,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (Exception ex ) {
                     if ( !maybeHandleException(ex) ) {
                         logger.log( Level.SEVERE, "", ex );
-                        ex.printStackTrace();
+                        ex.printStackTrace(); 
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
                     }
                     return;
