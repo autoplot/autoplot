@@ -74,6 +74,7 @@ import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
+import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSource;
@@ -1093,9 +1094,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage("done getting completions");
                 } catch (Exception ex ) {
                     if ( !maybeHandleException(ex) ) {
-                        logger.log( Level.SEVERE, "", ex );
-                        ex.printStackTrace(); 
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
+                        if ( ex instanceof RuntimeException ) {
+                            throw (RuntimeException)ex;
+                        } else {
+                            throw new RuntimeException(ex);
+                        }
                     }
                     return;
                 }
