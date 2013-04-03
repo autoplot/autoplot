@@ -27,7 +27,6 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.EmptyFileException;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -84,7 +83,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public DataSource getDataSource(URI uri) throws Exception {
+    public DataSource getDataSource(URI uri) {
         return new CdfFileDataSource( uri );
     }
     
