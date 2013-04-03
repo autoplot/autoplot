@@ -404,13 +404,13 @@ public class ScriptPanelSupport {
                                     Map<String,String> vars= new HashMap();
                                     org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, vars, p );
                                     if ( fd.count>0 ) {
-                                        if ( JOptionPane.showConfirmDialog( panel, p )==JOptionPane.OK_OPTION ) {
+                                        if ( JOptionPane.showConfirmDialog( panel, p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             org.virbo.jythonsupport.ui.Util.resetVariables( fd, vars );
+                                            for ( Entry<String,String> v: vars.entrySet() ) {
+                                                interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
+                                            }
+                                            interp.exec(panel.getEditorPanel().getText());
                                         }
-                                        for ( Entry<String,String> v: vars.entrySet() ) {
-                                            interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
-                                        }
-                                        interp.exec(panel.getEditorPanel().getText());
                                     } else {
                                         // no parameters
                                         interp.exec(panel.getEditorPanel().getText());
