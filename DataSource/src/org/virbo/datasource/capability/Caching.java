@@ -28,4 +28,10 @@ public interface Caching {
      * @param surl
      */
     void resetURI( String surl );
+    
+    /**
+     * reset any internal storage, and any subsequent calls should return false
+     * to satisfies.
+     */
+    void reset();
 }
