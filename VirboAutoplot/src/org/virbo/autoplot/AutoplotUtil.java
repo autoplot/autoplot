@@ -118,6 +118,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.Caching;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;
@@ -263,6 +264,10 @@ public class AutoplotUtil {
         for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
             if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
                 final DataSourceFilter fdsf= dsf;
+                Caching c= fdsf.getController().getCaching();
+                if ( c!=null ) {
+                    c.reset();
+                }
                 RequestProcessor.invokeLater( new Runnable() { public void run() {
                     fdsf.getController().update();
                 } } );
