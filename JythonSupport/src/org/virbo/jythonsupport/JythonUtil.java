@@ -85,12 +85,16 @@ public class JythonUtil {
 
         InteractiveInterpreter interp = new InteractiveInterpreter( null, pySys );
         
-        Py.getAdapter().addPostClass(new PyQDataSetAdapter());
-        URL imports= JythonOps.class.getResource("imports.py");
-        if ( imports==null ) {
-            throw new RuntimeException("unable to locate imports.py on classpath");
+        boolean loadAutoplotStuff= true;
+        if ( loadAutoplotStuff ) {
+            Py.getAdapter().addPostClass(new PyQDataSetAdapter());
+            URL imports= JythonOps.class.getResource("imports.py");
+            if ( imports==null ) {
+                throw new RuntimeException("unable to locate imports.py on classpath");
+            }
+            interp.execfile(imports.openStream(), "imports.py");
         }
-        interp.execfile(imports.openStream(), "imports.py");
+
         return interp;
 
     }
