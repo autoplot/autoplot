@@ -26,6 +26,7 @@ import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
@@ -59,7 +60,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     protected final static String PARAM_SCRIPT= "script";
     protected final static String PARAM_TIMERANGE= "timerange";
 
-    private static final Logger logger= Logger.getLogger( LogNames.APDSS_JYDS );
+    private static final Logger logger= LoggerManager.getLogger( LogNames.APDSS_JYDS );
     private boolean notCheckedTsb= true;
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
@@ -460,6 +461,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
     }
 
+    @Override
     public boolean satisfies(String surl) {
         if ( surl.startsWith("vap+inline:") ) return false;
         try {
@@ -469,6 +471,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
     }
 
+    @Override
     public void resetURI(String surl) {
         try {
             this.uri = new URI(surl);
@@ -478,8 +481,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
-
-
+    }
+    
+    @Override
+    public void reset() {
+        interp= null;
     }
 
     private String maybeQuoteString(String sval) {
