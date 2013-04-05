@@ -39,9 +39,8 @@ public final class EventThreadResponseMonitor {
 
     private long lastPost;
     private long response;
-    private String pending;
 
-    private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 300;
+    private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 100;
     private static final int WARN_LEVEL_MILLIS= 500; // acceptable millisecond delay in processing
     private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
     private static final int WATCH_INTERVAL_MILLIS = 1000;
@@ -98,7 +97,8 @@ public final class EventThreadResponseMonitor {
 
                         //System.err.print( dumpPendingEvents() );
 
-                        SwingUtilities.invokeAndWait( responseRunnable() );
+                        String pending= dumpPendingEvents();
+                        SwingUtilities.invokeAndWait( responseRunnable(pending) );
                         
                     } catch ( InterruptedException ex ) {
 
@@ -114,7 +114,7 @@ public final class EventThreadResponseMonitor {
      * the response runnable simply measures how long it takes for an event to be processed by the event thread.
      * @return
      */
-    Runnable responseRunnable() {
+    private Runnable responseRunnable( final String pending ) {
         return new Runnable() {
             public void run() {
                 response= System.currentTimeMillis();
