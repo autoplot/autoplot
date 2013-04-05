@@ -65,6 +65,10 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
 
         resolution= null;
+        if ( params2.get("resolution")!=null ) {
+            resolution= Units.seconds.parse( params2.get("resolution") );
+        }
+
     }
 
     private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
