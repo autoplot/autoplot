@@ -72,6 +72,12 @@ public class CanvasLayoutPanel extends JLabel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
+            final int km = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+            if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers()>16 ) ) {
+                return;
+            }
+            System.err.println("popup: "+e);
             if (target == null) {
                 return;
             }
@@ -92,7 +98,6 @@ public class CanvasLayoutPanel extends JLabel {
                             (int)( bounds.y * scale ),
                             (int)( bounds.width * scale ),
                             (int)( bounds.height * scale) );
-                    final int km = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
                     // if the click is on an edge of an invisible component, select it.
                     boolean invisibleEdgeClick= !c.isVisible() && rectEdgeClicked( mbounds, e.getX(), e.getY() );
                     if ( c.isVisible() || invisibleEdgeClick ) {
