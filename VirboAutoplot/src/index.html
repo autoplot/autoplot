@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Submit RTE dialog now has button to switch over to sending email, to support networks where http post isn't allowed.</small></p>
+        <p><small>It was almost impossible to select multiple plots and do "Swap Position" on a Mac.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -22,6 +22,10 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Steve at Goddard pointed out that is nearly impossible to select multiple plots and swap two plots' positions on a mac without a mouse.</li>
+            <li>Reload all data now resets Jython data source properly, which would cache the interpreter.</li>
+            <li>excessive gaps in LSpec routine resolved by loosening inter-sweep cadence check.</li>
+            <li>unrecognized errors from the Data Sources were only printed to the status bar.  Now we get a popup.</li>
             <li>jython getItem for QDataSet could fail if dataset was not writable.</li>
             <li>trimDataSet's trim operation wouldn't allow a trim(0,len) operation to work.</li>
             <li>jython invoke(name,PyObject args) did not properly wrap the function
@@ -76,6 +80,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>data_$Y$m$d_$v.$v.$v.dat is now okay, which is more likely to be discovered by users than is $(v,sep)</li>
             <li>greaterOf and lesserOf methods introduced</li>
             <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
             <li>QStream now has int8 transfer type to support CDF_TT2000 timetags.</li>
