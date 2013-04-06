@@ -22,9 +22,11 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>rte_0932474502: User arm at Iowa would get runtime errors about width=0 on SunOS.  </li>
+            <li>3610169: JythonDataSources wouldn't reject if the timeseries was not specified, causing ranges to reset because it wouldn't adopt the axis range.</li>
             <li>Steve at Goddard pointed out that is nearly impossible to select multiple plots and swap two plots' positions on a mac without a mouse.</li>
             <li>Reload all data now resets Jython data source properly, which would cache the interpreter.</li>
-            <li>excessive gaps in LSpec routine resolved by loosening inter-sweep cadence check.</li>
+            <li>excessive gaps in LSpec routine resolved by loosening intra-sweep cadence check.</li>
             <li>unrecognized errors from the Data Sources were only printed to the status bar.  Now we get a popup.</li>
             <li>jython getItem for QDataSet could fail if dataset was not writable.</li>
             <li>trimDataSet's trim operation wouldn't allow a trim(0,len) operation to work.</li>
