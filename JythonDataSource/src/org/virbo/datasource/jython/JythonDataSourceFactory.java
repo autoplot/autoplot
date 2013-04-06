@@ -38,6 +38,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import static org.virbo.datasource.jython.JythonDataSource.PARAM_SCRIPT;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
@@ -54,6 +55,25 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         JythonDataSource result = new JythonDataSource(uri,this);
         return result;
     }
+    
+    /**
+     * get the name of the script, which is non-trivial since it can be in either the resourceURI or script=
+     * @return
+     */    
+    private static String getScript(String suri)  {
+        String jythonScript; // script to run.
+        
+        URISplit split= URISplit.parse(suri);
+        Map <String,String> params= URISplit.parseParams(split.params);
+        
+        if ( params.get( PARAM_SCRIPT )!=null ) {
+            // getFile( resourceURI ) //TODO: since we don't getFile(resourceURI), we can't use filePollUpdating.  Also, why do we have local variable?
+            jythonScript= params.get( PARAM_SCRIPT );
+        } else {
+            jythonScript= split.resourceUri.toString();
+        }
+        return jythonScript;
+    }    
 
     private Map<String, Object> getNames(URI uri, ProgressMonitor mon) throws Exception {
         PythonInterpreter interp = new PythonInterpreter();
@@ -97,16 +117,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
-
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
-        String furi;
-        if ( params.containsKey("script") ) {
-            furi= params.get("script");
-        } else {
-            furi= split.resourceUri.toString();
-        }
+    protected static Map<String,JythonUtil.Param> getParams( String suri, ProgressMonitor mon ) throws IOException {
+        String furi= getScript( suri );
 
         File src = DataSetURI.getFile(furi, mon );
 
@@ -119,7 +131,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
 
         return result;
+    }
 
+    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
+        return getParams( uri.toString(), mon );
     }
 
     @Override
@@ -166,10 +181,32 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return result;
     }
 
+    /**
+     * Reject when:
+     *   - the URI doesn't contain a timerange but the data source ha
+     * @param surl
+     * @param problems
+     * @param mon
+     * @return 
+     */
     @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
+        
+        URISplit split= URISplit.parse(surl);
+        Map<String,String> uriParams= URISplit.parseParams(split.params);
+        
+        try {
+            Map<String,JythonUtil.Param> parms= getParams( surl, mon);
+            if ( parms.containsKey( JythonDataSource.PARAM_TIMERANGE ) && !uriParams.containsKey(JythonDataSource.PARAM_TIMERANGE) ) {
+                problems.add(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED);
+                return true;
+            }
+        } catch ( IOException ex ) {
+            problems.add(ex.toString());
+            return true;
+        }
+        
         if (surl.contains("?")) {
-            URISplit split= URISplit.parse(surl);
             if ( split.params.length()>0 ) {
                 return false;
             } else {
@@ -177,7 +214,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             }
         } else {
             try {
-                URISplit split= URISplit.parse(surl);
                 if ( split.scheme!=null && split.scheme.equals("inline") ) {
                     return false;
                 }
