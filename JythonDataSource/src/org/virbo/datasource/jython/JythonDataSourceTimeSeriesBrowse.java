@@ -103,12 +103,15 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
                 Matcher m= s.matcher(line);
                 if ( m.matches() ) {
                     tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
-                    String str= m.group(1);
+                    String str= m.group(1); // the default value
                     URISplit split= URISplit.parse(uri);
                     Map<String,String> params= URISplit.parseParams(split.params);
                     String stimerange= params.get( JythonDataSource.PARAM_TIMERANGE );
                     if ( stimerange!=null && stimerange.length()>0 ) {
                         str= params.get( JythonDataSource.PARAM_TIMERANGE );
+                        if ( str.startsWith("'") && str.endsWith("'") && str.length()>1 ) {
+                            str= str.substring(1,str.length()-1);
+                        }
                     }
                     DatumRange tr= DatumRangeUtil.parseTimeRange(str);
                     tsb1.setTimeRange(tr);
