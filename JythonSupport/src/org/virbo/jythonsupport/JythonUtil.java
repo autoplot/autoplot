@@ -296,6 +296,9 @@ public class JythonUtil {
                 if ( p.deft instanceof String ) {
                     p.type= 'A';
                     p.deft= p.deft.toString();
+                } else if ( p.deft instanceof PyString ) {
+                    p.type= 'A';
+                    p.deft= p.deft.toString();
                 } else if ( p.deft instanceof PyInteger ) {
                     p.type= 'F';
                     p.deft= ((PyInteger)p.deft).__tojava__(int.class);
