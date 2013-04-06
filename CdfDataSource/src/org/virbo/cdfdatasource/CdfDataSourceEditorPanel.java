@@ -484,7 +484,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         DefaultTreeModel tm= new DefaultTreeModel( root );
 
-        parameterTree.setShowsRootHandles(false);
+        parameterTree.setRootVisible(false);
         parameterTree.setModel(tm);
 
         if ( selection!=null ) parameterTree.setSelectionPath(selection);
