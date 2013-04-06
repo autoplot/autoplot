@@ -617,12 +617,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             String deft= deftsList.get(j);
             char type= typesList.get(j);
 
-            if ( !value.equals(deft) || params.containsKey(name) ) {
+            if ( name.equals( JythonDataSource.PARAM_TIMERANGE ) || ! value.equals(deft) || params.containsKey(name) ) {
                 if ( type=='A' ) {
                     value= value.replaceAll("\'", "");
-                    if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
-                        value=  "'" + value + "'";
-                    }
+                    //The value is escaped when the URI is formatted, so there's no reason to enquote it here.
+                    //boolean containsSpaces= value.contains(" ");
+                    //if ( containsSpaces && !( value.startsWith("'") && value.endsWith("'") ) ) {
+                    //    value=  "'" + value + "'";
+                    //}
                     params.put( name, value );
                 } else if ( type=='R' ) {
                     URISplit ruriSplit= URISplit.parse(value);
