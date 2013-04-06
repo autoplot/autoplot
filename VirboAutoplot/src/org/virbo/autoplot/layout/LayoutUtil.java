@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class LayoutUtil {
 
-    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
     private static boolean ALLOW_EXCESS_SPACE = true;
 
@@ -152,7 +152,8 @@ public class LayoutUtil {
             return;
         }
 
-
+        logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
+       
         changed = changed | maybeSetMinimum(c, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMaximum(c, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMinimum(r, needYmin, 0, needYmin / em, 0);
