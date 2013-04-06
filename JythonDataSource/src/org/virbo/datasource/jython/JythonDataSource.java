@@ -86,15 +86,18 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
     }
 
+    /**
+     * get the name of the script, which is non-trivial since it can be in either the resourceURI or script=
+     * @return
+     * @throws IOException 
+     */
     private File getScript() throws IOException {
         File jythonScript; // script to run.
-        URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
-
+        
         if ( params.get( PARAM_SCRIPT )!=null ) {
             // getFile( resourceURI ) //TODO: since we don't getFile(resourceURI), we can't use filePollUpdating.  Also, why do we have local variable?
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
         } else {
-            resourceURI= null; //TODO: huh?  resourceURI is local
             jythonScript= getFile(new NullProgressMonitor());
         }
         return jythonScript;
