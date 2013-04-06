@@ -21,6 +21,7 @@
             <menu submenu="autoplot" />
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
+        <association mime-type="application/x-netcdf" extensions="cdf"/>        
     </information>
     
     <security>
