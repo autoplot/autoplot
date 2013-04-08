@@ -16,9 +16,11 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import org.virbo.autoplot.AutoplotUtil;
 
 /**
  * Settings GUI for the Log Console dialog.  The log console is more complex than it first seems, in that it
@@ -46,7 +48,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 		null,
 	};
 
-	private static class LogLevelComboBoxModel implements ComboBoxModel {
+	private class LogLevelComboBoxModel implements ComboBoxModel {
 		private Logger logger;
 		private LogLevelComboBoxModel(Logger logger) {
 			if (logger == null) {
@@ -58,6 +60,22 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 		public void setSelectedItem(Object anItem) {
 			Level level = (Level)anItem;
 			logger.setLevel(level);
+                        boolean invisible= true;
+                        StringBuilder err= new StringBuilder();
+                        for ( Handler h: logger.getHandlers() ) {
+                            if ( h.getLevel().intValue()>level.intValue() ) {
+                                err.append("handler filters data: ").append(h).append( "\n");
+                            } else {
+                                invisible= false;
+                            }
+                        }
+                        if ( invisible ) {
+                            err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
+                        }
+                        if ( err.length()>0 ) {
+                            AutoplotUtil.showMessageDialog( LogConsoleSettingsDialog.this, 
+                                    err.toString(), "Misconfigured Logger", JOptionPane.OK_OPTION );
+                        }
 		}
 
 		public Object getSelectedItem() {
