@@ -1353,6 +1353,8 @@ APSplash.checkTime("init 52");
         Logger.getLogger("autoplot").addHandler(h);
         Logger.getLogger("apdss").setLevel(Level.INFO);
         Logger.getLogger("apdss").addHandler(h);
+        Logger.getLogger("jython").setLevel(Level.INFO);
+        Logger.getLogger("jython").addHandler(h);
         Logger.getLogger("console").setLevel(Level.INFO);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
