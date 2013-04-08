@@ -161,6 +161,11 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         verbosityPanel.validate();
         this.console= console;
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
+        
+        searchForTextField.setText( console.getSearchText() );
+        timeStampsCheckBox.setSelected( console.showTimeStamps );
+        logLevelCheckBox.setSelected( console.showLevel );
+        loggerIDCheckBox.setSelected( console.showLoggerId );
     }
 
     private void initLogSettings() {
