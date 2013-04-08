@@ -13,6 +13,7 @@ import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
+import java.awt.AWTEvent;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dasml.DOMBuilder;
@@ -34,6 +35,7 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -300,8 +302,25 @@ public class AutoplotUI extends javax.swing.JFrame {
         //TODO: this needs to be explored more:  It gets the desired behavior where running an 
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
-        //  this.setFocusableWindowState(false);
-                
+        //this.setFocusableWindowState(false);
+          
+        if ( false ) {
+        Toolkit.getDefaultToolkit().addAWTEventListener( new AWTEventListener() {
+            Component focus;
+            public void eventDispatched(AWTEvent event) {
+                Component c= AutoplotUI.this.getFocusOwner();
+                if ( c!=focus ) {
+                    System.err.println(c);
+                    focus= c;
+                    if ( focus instanceof JButton ) {
+                        System.err.printf(">>>%s<<<\n",((JButton)focus).getText());
+                    }
+                }
+                //System.err.println( event.getSource() );
+            }
+        }, FocusEvent.FOCUS_GAINED );
+        }
+        
         expertMenuItems.add( editDomMenuItem );
         expertMenuItems.add( editDomSeparator );
         expertMenuItems.add( inspectVapFileMenuItem );
