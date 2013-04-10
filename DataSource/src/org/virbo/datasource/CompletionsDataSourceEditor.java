@@ -360,7 +360,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         this.suri= uri;
-        DataSourceFactory dsf= DataSetURI.getDataSourceFactory( new URI(uri), mon);
+        DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(uri), mon);
         if ( dsf==null ) {
             throw new UnrecognizedDataSourceException(uri);
         }
