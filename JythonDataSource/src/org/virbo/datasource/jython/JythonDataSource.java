@@ -30,8 +30,11 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
+import org.python.core.PyArray;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
+import org.python.core.PyFloat;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -352,6 +355,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             QDataSet res;
             if (result instanceof PyList) {
                 res = JythonOps.coerceToDs((PyList) result);
+            } else if ( result instanceof PyArray ) {
+                res = JythonOps.coerceToDs((PyArray) result);
+            } else if ( result instanceof PyInteger ) {
+                res = JythonOps.coerceToDs((PyInteger) result);
+            } else if ( result instanceof PyFloat ) {
+                res = JythonOps.coerceToDs((PyFloat) result);
             } else {
                 res = (QDataSet) result.__tojava__(QDataSet.class);
             }
