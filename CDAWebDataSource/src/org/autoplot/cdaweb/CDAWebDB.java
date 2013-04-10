@@ -105,7 +105,7 @@ public class CDAWebDB {
             String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
 
             logger.log( Level.FINE, "downloading file {0}", dbloc);
-            File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ;
+            File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ; // bug 3055130 okay
             FileInputStream fin=null;
             InputStream altin= null;
             try {
@@ -387,11 +387,7 @@ public class CDAWebDB {
             String tmpl= getNaming(ds.toUpperCase());
             String base= getBaseUrl(ds.toUpperCase());
             URI baseUri;
-            try {
-                baseUri = new URI(base);
-            } catch (URISyntaxException ex1) {
-                throw new IllegalArgumentException("unable to make URI from "+base );
-            }
+            baseUri = DataSetURI.toUri(base);
             FileSystem fs= FileSystem.create( baseUri );
             
             FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
