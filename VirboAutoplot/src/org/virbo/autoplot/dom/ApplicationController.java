@@ -289,6 +289,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     }
     
+    // listen for focus changes and update the focus plot and plotElement.
     FocusAdapter focusAdapter = new FocusAdapter() {
 
         @Override
@@ -311,8 +312,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             Renderer r = dasPlot.getFocusRenderer();
 
             if (r != null) {
-                p = findPlotElement(r);
-                setPlotElement(p);
+                try {
+                    p = findPlotElement(r);
+                    setPlotElement(p);
+                } catch ( IllegalArgumentException ex ) {
+                    // transitional case.  TODO: thread locking would presumably fix this.  
+                }
             }
             
             // if there's just one plotElement in the plot, then go ahead and set the focus uri.
