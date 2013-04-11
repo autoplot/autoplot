@@ -523,12 +523,17 @@ public class PyQDataSet extends PyJavaInstance {
                 for ( int j=0; j<that.length(0); j++ ) {
                     QDataSet that1= DataSetOps.unbundle(that,j);
                     QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory( that1 );
-                    ((QubeDataSetIterator)iter).setIndexIteratorFactory(j, fit);
-                    if ( j==0 ) {
-                        dep0= (QDataSet) rods.property(QDataSet.DEPEND_0);
-                        if ( dep0!=null ) {
-                            dep0= DataSetOps.applyIndex( dep0, 0, that1, false );
+                    try {
+                        ((QubeDataSetIterator)iter).setIndexIteratorFactory(j, fit);
+                        if ( j==0 ) {
+                            dep0= (QDataSet) rods.property(QDataSet.DEPEND_0);
+                            if ( dep0!=null ) {
+                                dep0= DataSetOps.applyIndex( dep0, 0, that1, false );
+                            }
                         }
+                    } catch ( ArrayIndexOutOfBoundsException ex ) {
+                        ArrayIndexOutOfBoundsException ex1= new ArrayIndexOutOfBoundsException("array index is out of bounds because of expression like accumS[r] where r is rank 2 list of indeces.");
+                        throw ex1;
                     }
                 }
             } else {
