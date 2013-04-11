@@ -223,7 +223,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                     file= names[0];
                 }
             } catch (ParseException ex) {
-                Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -310,7 +310,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                     return true;
                 }
             }
-            return delegateFactory.reject( delegateSurl, problems, mon );
+            boolean delegateRejects= delegateFactory.reject( delegateSurl, problems, mon );
+            if ( delegateRejects && problems.size()==1 && problems.get(0).equals(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED) ) {
+                delegateRejects= false;
+            }
+            return delegateRejects;
             
         } catch (URISyntaxException e) {
             logger.log( Level.SEVERE, surl, e );
