@@ -41,6 +41,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionsDataSourceEditor;
@@ -59,6 +60,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger( "apdss.agg");
+    
     /** Creates new form AggregatingDataSourceEditorPanel */
     public AggregatingDataSourceEditorPanel() {
         initComponents();
@@ -321,7 +324,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         try {
             selectedRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
-            Logger.getLogger(AggregatingDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         if (updateYear) {
@@ -545,7 +548,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
 
         } catch (Exception ex) {
-            Logger.getLogger(AggregatingDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             RuntimeException ex2 = new RuntimeException("Unable to create example file for aggregation", ex);
             throw ex2;
         }
@@ -597,6 +600,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         allParams.putAll(URISplit.parseParams(dsplit.params));
         String tr = timeRangeTextField.getText();
         tr= tr.replaceAll(" ","+");
+        String tr0= allParams.get("timerange"); // check that the delegate didn't insert a timerange
+        if ( tr0!=null && tr0.length()>0 ) {
+            if ( tr.trim().length()==0 ) {
+                logger.log( Level.FINE, "I didn't get timerange but delegate did");
+                tr= tr0;
+            }
+        }
         allParams.put("timerange", tr);
         //if ( reduceCB.isSelected() ) {
         //    allParams.put("reduce","T"); // warning--this is going to become the default.
