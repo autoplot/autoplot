@@ -45,6 +45,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -205,6 +206,19 @@ public class CdfJavaDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
+        boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
+
+        ReferenceCache.ReferenceCacheEntry rcent=null;
+        if ( useReferenceCache ) {
+            rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
+            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+                QDataSet result= rcent.park( mon );
+                return result;
+            } else {
+                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
+            }
+        }
+        
         File cdfFile;
         cdfFile = getFile(mon);
 
@@ -248,6 +262,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         // Now call the other getDataSet...
         QDataSet result= getDataSet(mon,attributes);
+        
+        if ( rcent!=null ) rcent.finished(result);
 
         return result;
         
