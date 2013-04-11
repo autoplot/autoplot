@@ -333,8 +333,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
 
             } else { // typical route
-                int slice1= -1; // not yet implemented 
-                result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, -1, mon );
+                //String os1= (String)map.get(PARAM_SLICE1);
+                //if ( os1!=null && !os1.equals("") && cdf.getVariable(svariable).getDimensions().length>0 ) {
+                //    int is= Integer.parseInt(os1);
+                //    result= wrapDataSet( cdf, svariable, constraint, false, true, attr1, is, mon );
+                //} else {
+                    result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, -1, mon );
+                //}
                 logger.log(Level.FINE, "got {0}", result);
             }
 
