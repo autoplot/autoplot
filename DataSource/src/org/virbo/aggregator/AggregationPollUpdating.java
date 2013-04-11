@@ -31,7 +31,7 @@ import org.virbo.datasource.capability.Updating;
  */
 public class AggregationPollUpdating implements Updating {
 
-    private static final Logger logger= Logger.getLogger("apdss");
+    private static final Logger logger= Logger.getLogger("apdss.agg");
 
     FileStorageModelNew fsm;
     DatumRange dr;
