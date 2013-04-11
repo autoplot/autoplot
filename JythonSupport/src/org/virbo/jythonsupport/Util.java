@@ -60,6 +60,7 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet( String surl, String stimeRange, ProgressMonitor mon ) throws Exception {
+        long t0= System.currentTimeMillis();
         logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{surl, stimeRange} );
         URI uri = DataSetURI.getURI(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
@@ -85,6 +86,7 @@ public class Util {
         }
         metadataSurl= surl;
 
+        logger.fine( String.format( "read in %9.2f sec: %s", (System.currentTimeMillis()-t0)/1000., surl ) );
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
