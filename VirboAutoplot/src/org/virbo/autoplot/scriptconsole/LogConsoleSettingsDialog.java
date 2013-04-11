@@ -66,11 +66,11 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                             if ( h.getLevel().intValue()>level.intValue() ) {
                                 err.append("handler filters data: ").append(h).append( "\n");
                             } else {
-                                invisible= false;
+                                invisible= false; 
                             }
                         }
-                        if ( invisible ) {
-                            err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
+                        if ( invisible ) {//TODO: check parents
+                            //err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
                         }
                         if ( err.length()>0 ) {
                             AutoplotUtil.showMessageDialog( LogConsoleSettingsDialog.this, 
