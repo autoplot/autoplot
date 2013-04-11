@@ -33,6 +33,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -528,6 +529,11 @@ public class CdfUtil {
                 CdfJavaDataSource.dsCachePut( uri, result );
             }
         }
+        
+        if ( slice1>-1 ) {
+            result= DataSetOps.slice1(result,slice1);
+        }
+        
         return result;
     }
     
