@@ -46,6 +46,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -62,6 +63,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -594,7 +597,9 @@ public class AutoplotUI extends javax.swing.JFrame {
                 }
             }
         });
-
+        
+        AutoplotUtil.maybeLoadSystemProperties();
+        
         autoLayout = new LayoutListener(model);
         APSplash.checkTime("init 55");
         APSplash.checkTime("init 60");
