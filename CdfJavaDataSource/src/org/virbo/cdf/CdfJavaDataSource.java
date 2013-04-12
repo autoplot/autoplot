@@ -314,7 +314,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         try {
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
-
+            
             MutablePropertyDataSet result;
             if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
                 List<QDataSet> attr= new ArrayList();
@@ -333,13 +333,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
 
             } else { // typical route
-                //String os1= (String)map.get(PARAM_SLICE1);
-                //if ( os1!=null && !os1.equals("") && cdf.getVariable(svariable).getDimensions().length>0 ) {
-                //    int is= Integer.parseInt(os1);
-                //    result= wrapDataSet( cdf, svariable, constraint, false, true, attr1, is, mon );
-                //} else {
+                String os1= (String)map.get(PARAM_SLICE1);
+                if ( os1!=null && !os1.equals("") && cdf.getVariable(svariable).getDimensions().length>0 ) {
+                    int is= Integer.parseInt(os1);
+                    result= wrapDataSet( cdf, svariable, constraint, false, true, attr1, is, mon );
+                } else {
                     result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, -1, mon );
-                //}
+                }
                 logger.log(Level.FINE, "got {0}", result);
             }
 
@@ -672,10 +672,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
                 if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
-                if ( dep != null && qubeDims.length<=idep ) {
-                    logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
-                    continue;
-                }
 
                 MutablePropertyDataSet lablDs= null;
                 if ( labl!=null ) {
@@ -691,6 +687,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     }
                 }
 
+                if ( dep != null && qubeDims.length<=idep ) {
+                    logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
+                    continue;
+                }
+                
                 MutablePropertyDataSet  depDs=null;
 
                 logger.log(Level.FINER, "displayType={0}", displayType);
@@ -844,6 +845,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
     @Override
     public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException {
+        System.err.println("here");
         if (attributes == null) {
             try {
                 File cdfFile;
