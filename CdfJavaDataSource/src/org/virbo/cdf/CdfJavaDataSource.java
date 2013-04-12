@@ -870,7 +870,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
     @Override
     public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException {
-        System.err.println("here");
         if (attributes == null) {
             try {
                 File cdfFile;
