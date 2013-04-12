@@ -48,7 +48,10 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.LinkedHashMap;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -115,6 +118,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
@@ -396,6 +400,40 @@ public class AutoplotUtil {
         }
         JOptionPane.showConfirmDialog( parent , new JScrollPane(p), "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
 
+    }
+
+    /**
+     * check to see if the user has the file HOME/autoplot_data/system.properties, which
+     * if found will cause System.setProperty for each one.  This was introduced
+     * to facilitate Craig with his testing of enableReferenceCache=true, and should
+     * make it easier to provide generic extensions.
+     */
+    public static void maybeLoadSystemProperties() {
+        File propFile= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "system.properties" );
+        if ( propFile.exists() ) {
+            logger.log( Level.FINER, "loading %s", propFile );
+            Properties props= new Properties();
+            InputStream in=null;
+            try {
+                in = new FileInputStream(propFile);
+                props.load( in );
+                in.close();
+                for ( Entry p: props.entrySet()) {
+                    logger.log( Level.FINEST, "%s=%s", new Object[] { p.getKey(), p.getValue() } );
+                    System.setProperty( (String)p.getKey(), (String)p.getValue() );
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                if ( in!=null ) try {
+                    in.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else {
+            logger.log( Level.FINEST, "no system.properties file found: %s", propFile );
+        }
     }
 
     public static class AutoRangeDescriptor {
