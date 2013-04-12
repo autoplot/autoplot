@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>It was almost impossible to select multiple plots and do "Swap Position" on a Mac.</small></p>
+        <p><small>Occasional failures of test018 appear to be fixed.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Java CDF reader improves support for slice1 by slicing as each block is read in.</li>
+            <li>waitUntilIdle checks the event queue again for pending updates (test018 would fail occasionally)</li>
+            <li>test100 (Jemmy GUI testing) and test037 (user scripts) are functional again.</li>
             <li>rte_0932474502: User arm at Iowa would get runtime errors about width=0 on SunOS.  </li>
             <li>3610169: JythonDataSources wouldn't reject if the timeseries was not specified, causing ranges to reset because it wouldn't adopt the axis range.</li>
             <li>Steve at Goddard pointed out that is nearly impossible to select multiple plots and swap two plots' positions on a mac without a mouse.</li>
@@ -82,6 +85,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce autoplot_data/config/system.properties</li>
+            <li>lanlNN can be made the default NN for testing now with a system property.</li>
             <li>data_$Y$m$d_$v.$v.$v.dat is now okay, which is more likely to be discovered by users than is $(v,sep)</li>
             <li>greaterOf and lesserOf methods introduced</li>
             <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
