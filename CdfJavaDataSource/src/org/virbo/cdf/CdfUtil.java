@@ -318,7 +318,8 @@ public class CdfUtil {
                     //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
                     //logger.fine("reading variable "+variable.getName());
-                    odata= cdf.get1D( variable.getName(), true );
+                    //odata= cdf.get1D( variable.getName(), true );
+                    odata= cdf.get1DSlice1( variable.getName(), slice1, true );
                 }
             } else {
                 if ( variable.getType()==CDFConstants.CDF_TT2000 ) { //TODO: other types like Long64?
@@ -372,6 +373,16 @@ public class CdfUtil {
             }
             qube[0]= (int)recCount;
         }
+        if ( slice1>-1 ) { 
+            if ( recCount==-1 ) throw new IllegalArgumentException("recCount==-1 and slice1>-1");
+            int[] nqube= new int[qube.length-1];
+            nqube[0]= qube[0];
+            for ( int i=2;i<qube.length;i++ ) {
+                nqube[i-1]= qube[i];
+            }
+            qube= nqube;
+        }
+        
 
         if ( variable.rowMajority()==false ) buf= null;   // we won't support this yet.
 
@@ -530,9 +541,9 @@ public class CdfUtil {
             }
         }
         
-        if ( slice1>-1 ) {
-            result= DataSetOps.slice1(result,slice1);
-        }
+        //if ( slice1>-1 ) {
+        //    result= DataSetOps.slice1(result,slice1);
+        //}
         
         return result;
     }
