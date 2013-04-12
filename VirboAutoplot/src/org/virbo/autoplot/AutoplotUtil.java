@@ -48,8 +48,11 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -409,8 +412,27 @@ public class AutoplotUtil {
      * make it easier to provide generic extensions.
      */
     public static void maybeLoadSystemProperties() {
-        File propFile= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "system.properties" );
-        if ( propFile.exists() ) {
+        File config= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "config" );
+        if ( !config.exists() ) {
+            if ( !config.mkdirs() ) {
+                logger.log(Level.WARNING, "mkdir {0} failed", config);
+                return;
+            }
+        }
+        File propFile= new File( config, "system.properties" );
+        if ( !propFile.exists() ) {
+            PrintWriter w=null;
+            try {
+                w= new PrintWriter( new FileWriter( propFile ) );
+                w.println("#enableReferenceCache=true");
+                w.println("#useLanlNearestNeighbor=true");
+                w.close();
+            } catch ( IOException ex ) {
+                logger.log(Level.WARNING, "write initial {0} failed", propFile );
+            } finally {
+                if ( w!=null ) w.close();
+            }
+        } else {
             logger.log( Level.FINER, "loading %s", propFile );
             Properties props= new Properties();
             InputStream in=null;
@@ -425,14 +447,14 @@ public class AutoplotUtil {
             } catch (IOException ex) {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
-                if ( in!=null ) try {
-                    in.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                if ( in!=null ) {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
-        } else {
-            logger.log( Level.FINEST, "no system.properties file found: %s", propFile );
         }
     }
 
