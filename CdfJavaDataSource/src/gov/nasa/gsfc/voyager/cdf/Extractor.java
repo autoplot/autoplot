@@ -1567,6 +1567,113 @@ public class Extractor {
         return (double[])get1DSeries(thisCDF, var, pt, false);
     }
 
+    /**
+     * J.Faden added this to get an implementation of slice1, which allows
+     * part of each record to be read.
+     * @param thisCDF
+     * @param var
+     * @param slice1 the index on the first dimension.  If slice1=-1 then don't slice.
+     * @param pt
+     * @param preserve
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException 
+     */
+    public static Object get1DSeries(CDF thisCDF, Variable var, int slice1, int[] pt,
+        boolean preserve) throws IllegalAccessException,InvocationTargetException {
+        int end = -1;
+        int begin = 0;
+        int nv = 0;
+        if (pt != null) {
+            if (var.recordVariance()) {
+                begin = pt[0];
+                nv = 1;
+                if (pt.length > 1) {
+                    end = pt[1];
+                    nv = end - begin + 1;
+                }
+            }
+        } else {
+            nv = var.getNumberOfValues();
+            if (nv == 0) return null;
+        }
+        if (!var.recordVariance()) nv = 1;
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
+        int type = var.getType();
+        int itemSize = slice1==-1 ? var.getDataItemSize() : var.getDataItemSize() / var.getDimensions()[0] ;
+        int elements = itemSize/DataTypes.size[type];
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            if (preserve) ldata = new long[nv*elements];
+            if (!preserve) data = new double[nv*elements];
+            longType = true;
+        } else {
+            if ( ! ( preserve && DataTypes.typeCategory[type] == 0 ) ) { // special case where we just return float[]
+                data = new double[nv*elements];
+            }
+        }
+
+        Object temp = null;
+        if (DataTypes.typeCategory[type] == 0) temp = new float[nv*elements];
+        if (longType && !preserve) temp = new long[nv*elements];
+
+        Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
+        ByteBuffer bv;
+        int blk = 0;
+        int offset = 0;
+        if (pt == null) {
+            begin = ((int [])locations.elementAt(0))[0];
+            end = ((int [])locations.elementAt(locations.size() - 1))[1];
+        }
+        ByteBuffer sl= ByteBuffer.allocate( itemSize*nv ); //slice1
+        int otherDimensionsSize= itemSize;
+        for ( int i=1; i<var.getDimensions().length-1; i++ ) {
+            otherDimensionsSize*= var.getDimensions()[i];
+        }
+        for (; blk < locations.size(); blk++) {
+            int [] loc = (int [])locations.elementAt(blk);
+            int first = loc[0];
+            int last = loc[1];
+            if (last < begin) continue;
+            int count = (last - first + 1);
+            bv = positionBuffer((CDFImpl)thisCDF, var, loc[2], count);
+            if ( slice1>-1 ) {
+                doSlice1( bv, sl, offset, count, var.getDataItemSize(), slice1*otherDimensionsSize, otherDimensionsSize );
+                bv= sl;
+                sl.flip();
+            }
+            if (begin > first) {
+                int pos = bv.position() + (begin - first)*itemSize;
+                bv.position(pos);
+            }
+            if (end < 0) { // single point needed
+                if (longType && preserve) {
+                    do1D(bv, type, temp, ldata, 0, elements, preserve);
+                } else {
+                    do1D(bv, type, temp, data, 0, elements);
+                }
+                offset += elements;
+            } else {
+                int term = (end <= last)?end:last;
+                int init = (begin > first)?begin:first;
+                count = (term - init + 1);
+                if (longType && preserve) {
+                    do1D(bv, type, temp, ldata, offset, count*elements,
+                    preserve);
+                } else {
+                    do1D(bv, type, temp, data, offset, count*elements,preserve);
+                }
+                offset += count*elements;
+            }
+            if (end <= last) break;
+        }
+        if (offset == 0) return null;
+        if (longType && preserve) return ldata;
+        if (DataTypes.typeCategory[type]==0 && preserve ) return temp;
+        return data;
+        
+    }
     public static Object get1DSeries(CDF thisCDF, Variable var, int[] pt,
         boolean preserve) throws IllegalAccessException,
         InvocationTargetException {
@@ -1659,6 +1766,36 @@ public class Extractor {
        do1D(bv, type, temp, result, offset, number, false);
     }
 
+    /**
+     * read supports reading a slice of a dataset.  For example, we want
+     * just the Bx component of B-GSM.
+     * @param bv the byte buffer for the CDF file.
+     * @param type DataTypes.typeCategory[type]
+     * @param result result array
+     * @param offset offset into byteBuffer in bytes
+     * @param nrec number of records to read.
+     * @param recLen length of each record in bytes.
+     * @param readOffset offset into each record in bytes.
+     * @param readLen length of each record in bytes.
+     */
+    static void doSlice1(ByteBuffer bv, ByteBuffer result, int offset, int nrec, int recLen, int readOffset, int readLen ) {
+        logger.log( Level.FINEST, "doSlice1( buf.position={0} )", 
+                new Object[] { bv.position() } );
+
+        int ipos= bv.position();
+        for ( int i=0; i<nrec; i++ ) {
+            bv.limit(ipos+readOffset+readLen);
+            bv.position(ipos+readOffset);
+            result.put(bv);
+            ipos= ipos + recLen;
+            System.err.println("i="+i);
+            if ( i==40 ) {
+                System.err.println("hereherehere");
+            }
+        }
+        
+    }
+    
     static void do1D(ByteBuffer bv, int type, Object temp, Object result,
        int offset, int number, boolean preserve) throws IllegalAccessException,
        InvocationTargetException {
