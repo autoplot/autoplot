@@ -284,6 +284,15 @@ public interface CDF {
     public Object get1D( String varName, boolean preserve ) throws Throwable;
 
     /**
+     * accessor that can preserve type.
+     * @param varName
+     * @param preserve true will preserve type, false will convert to double array
+     * @return
+     * @throws Throwablel
+     */
+    public Object get1DSlice1( String varName,int slice1, boolean preserve ) throws Throwable;
+
+    /**
      * returns value of 1 dimensional variable at the specified point.
      */
     public double[] get1D(String varName, int point) throws Throwable;

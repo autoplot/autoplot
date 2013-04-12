@@ -914,6 +914,12 @@ public abstract class CDFImpl implements java.io.Serializable {
         return Extractor.get1DSeries(thisCDF, var, null, preserve);
     }
 
+    public Object get1DSlice1(String varName, int slice1, boolean preserve) throws Throwable {
+        Variable var = (Variable)variableTable.get(varName);
+        if (var == null) throw new Throwable("No such variable " + varName);
+        return Extractor.get1DSeries(thisCDF, var, slice1, null, preserve);
+    }
+    
     public double[] get1D(String varName, int point) throws Throwable {
         return (double[]) get1D(varName, point, false);
     }
