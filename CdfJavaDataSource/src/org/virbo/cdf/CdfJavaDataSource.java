@@ -683,10 +683,22 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 int sidep= idep;
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
-                String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
+                // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
+                Object oo= thisAttributes.get("LABL_PTR_" + sidep);
+                MutablePropertyDataSet lablDs=null;
+                String labl=null;
+                if ( oo instanceof MutablePropertyDataSet ) {
+                    labl= (String) ( (MutablePropertyDataSet) oo).property( QDataSet.NAME) ;
+                } else if ( oo instanceof String ) {
+                    try {
+                        Variable v= cdf.getVariable((String)oo);
+                        labl= (String)oo;
+                    } catch ( RuntimeException ex ) {
+                        logger.log( Level.FINE, "LABL_PTR_{0} pointed to non-existant variable {1}", new Object[]{sidep, oo});
+                    }
+                }                
                 if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
 
-                MutablePropertyDataSet lablDs= null;
                 if ( labl!=null ) {
                     try {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
