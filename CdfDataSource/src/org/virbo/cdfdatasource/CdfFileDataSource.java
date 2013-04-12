@@ -175,6 +175,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                 String os1= (String)map.get(PARAM_SLICE1);
                 if ( os1!=null && !os1.equals("") && variable.getNumDims()>0 ) {
                     int is= Integer.parseInt(os1);
+                    long n1= variable.getDimSizes()[0];
+                    if ( is>=n1 ) {
+                        throw new IllegalArgumentException("slice1="+is+" is too big for the dimension size ("+n1+")");
+                    }
                     result= wrapDataSet( cdf, svariable, constraint, false, true, is, mon );
                 } else {
                     result= wrapDataSet(cdf, svariable, constraint, false, true, -1, mon );
@@ -218,7 +222,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                     logger.fine("renderType=image not supported in CDF files");
                     renderType= null;
                 }
-                result.putProperty(QDataSet.RENDER_TYPE, renderType );
+                String os1= (String)map.get(PARAM_SLICE1);
+                if ( os1!=null && !os1.equals("") && variable.getNumDims()>0 ) {
+                    logger.finer("dropping render type because of slice1");
+                } else {
+                    result.putProperty(QDataSet.RENDER_TYPE, renderType );
+                }
                 
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
                     if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
@@ -287,7 +296,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         } catch (CDFException ex) {
             if ( rcent!=null ) rcent.exception(ex);
-            throw new IllegalArgumentException("no such variable: " + svariable);
+            throw new IllegalArgumentException("no such variable: " + svariable,ex);
 
         } finally {
             mon.finished();

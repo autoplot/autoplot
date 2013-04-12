@@ -378,7 +378,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     logger.fine("renderType=image not supported in CDF files");
                     renderType= null;
                 }
-                result.putProperty(QDataSet.RENDER_TYPE, renderType );
+                String os1= (String)map.get(PARAM_SLICE1);
+                if ( os1!=null && os1.length()>0 ) {
+                    logger.finer("dropping render type because of slice1");
+                } else {
+                    result.putProperty(QDataSet.RENDER_TYPE, renderType );
+                }
                 
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
                     if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
@@ -571,6 +576,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
         long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
         boolean slice= recs[1]==-1;
         MutablePropertyDataSet result;
+        
+        if ( variable.getDimensions().length>0 && slice1>-1 ) {
+            int n1= variable.getDimensions()[0];
+            if ( slice1>=n1 ) {
+                throw new IllegalArgumentException("slice1="+slice1+" is too big for the dimension size ("+n1+")");
+            }
+        }
+                        
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
             result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, 0, -1, 1, slice1, new NullProgressMonitor() );

@@ -318,8 +318,12 @@ public class CdfUtil {
                     //odata= cdf.get1D( variable.getName() ); // this is my hack
                 } else {
                     //logger.fine("reading variable "+variable.getName());
-                    //odata= cdf.get1D( variable.getName(), true );
-                    odata= cdf.get1DSlice1( variable.getName(), slice1, true );
+                    //
+                    if ( slice1==-1 ) {
+                        odata= cdf.get1D( variable.getName(), true );
+                    } else {
+                        odata= cdf.get1DSlice1( variable.getName(), slice1, true );
+                    }
                 }
             } else {
                 if ( variable.getType()==CDFConstants.CDF_TT2000 ) { //TODO: other types like Long64?
