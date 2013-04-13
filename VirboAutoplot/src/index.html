@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Improve support for bins datasets for tags.  slice0 didn't properly handle this, or the display data slice.</li>
+            <li>old NN and spectrogram routines didn't handle bins tags, seriously misrepresenting the data.</li>
+            <li>autoplot_data/config/system.properties includes rangeChecking switch after bins datasets caused incorrect rendering of data.</li>
             <li>Java CDF reader improves support for slice1 by slicing as each block is read in.</li>
             <li>waitUntilIdle checks the event queue again for pending updates (test018 would fail occasionally)</li>
             <li>test100 (Jemmy GUI testing) and test037 (user scripts) are functional again.</li>
