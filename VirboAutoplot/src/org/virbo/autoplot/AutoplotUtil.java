@@ -425,8 +425,12 @@ public class AutoplotUtil {
             PrintWriter w=null;
             try {
                 w= new PrintWriter( new FileWriter( propFile ) );
+                w.println("# reference cache allows some URIs to be resolved once per plot.");
                 w.println("#enableReferenceCache=true");
+                w.println("# use new LANL-requested Nearest Neighbor rebinning that looks at bin boundaries.");
                 w.println("#useLanlNearestNeighbor=true");
+                w.println("# do check on index and rank with commonly used datasets, at a slight performance cost.");
+                w.println("#rangeChecking=true");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed", propFile );
