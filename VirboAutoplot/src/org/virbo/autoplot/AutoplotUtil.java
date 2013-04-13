@@ -98,6 +98,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.SpectrogramRenderer.RebinnerEnum;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
@@ -1691,16 +1692,23 @@ public class AutoplotUtil {
             return result;
         } else if (renderType == RenderType.nnSpectrogram) {
             SpectrogramRenderer result;
+            RebinnerEnum nn;
+            if ( "true".equals( System.getProperty("useLanlNearestNeighbor","false") ) ) {
+                nn= SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor;
+            } else {
+                nn= SpectrogramRenderer.RebinnerEnum.nearestNeighbor;
+            }
             if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
                 result= (SpectrogramRenderer) recyclable;
-                if ( conf ) result.setRebinner(SpectrogramRenderer.RebinnerEnum.nearestNeighbor);
+                if ( conf ) result.setRebinner(nn);
             } else {
+                
                 result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
-                if ( conf ) result.setRebinner(SpectrogramRenderer.RebinnerEnum.nearestNeighbor);
+                if ( conf ) result.setRebinner(nn);
                 return result;
             }
-            result.setRebinner( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
+            result.setRebinner( nn );
             return result;
         } else if (renderType == RenderType.hugeScatter) {
             if (recyclable != null && recyclable instanceof ImageVectorDataSetRenderer) {

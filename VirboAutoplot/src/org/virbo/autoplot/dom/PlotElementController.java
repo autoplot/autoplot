@@ -2306,8 +2306,14 @@ public class PlotElementController extends DomNodeController {
         } else if ( ele.getRenderType()==RenderType.fillToZero ) {
             s.setSymbolConnector(PsymConnector.SOLID);
             s.setFillToReference(true);
-        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {//TODO: check nnSpectrogram preference.
-            s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
+        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {
+            SpectrogramRenderer.RebinnerEnum r;
+            if ( "true".equals( System.getProperty("useLanlNearestNeighbor","false") ) ) {
+                r= SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor;
+            } else {
+                r= SpectrogramRenderer.RebinnerEnum.nearestNeighbor;
+            }
+            s.setRebinMethod( r );
         } else if ( ele.getRenderType()==RenderType.spectrogram ) {
             s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
         }
