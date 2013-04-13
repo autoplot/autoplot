@@ -134,7 +134,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Utility functions for Autoplot and other related applications. Note this
+ * has no reference to the specific app AutoplotUI, because this is also used
+ * in the applet which doesn't use AutoplotUI.
  * @author jbf
  */
 public class AutoplotUtil {
@@ -450,13 +452,13 @@ public class AutoplotUtil {
                     System.setProperty( (String)p.getKey(), (String)p.getValue() );
                 }
             } catch (IOException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             } finally {
                 if ( in!=null ) {
                     try {
                         in.close();
                     } catch (IOException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
