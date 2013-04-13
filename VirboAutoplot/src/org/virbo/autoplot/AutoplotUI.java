@@ -598,8 +598,6 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         
-        AutoplotUtil.maybeLoadSystemProperties();
-        
         autoLayout = new LayoutListener(model);
         APSplash.checkTime("init 55");
         APSplash.checkTime("init 60");
@@ -3230,6 +3228,8 @@ private void updateFrameTitle() {
         }
         alm.process(args);
 
+        AutoplotUtil.maybeLoadSystemProperties();
+                        
         String welcome= "welcome to autoplot";
         String tag;
         try {
