@@ -1,4 +1,4 @@
-print 'If python 2.2.1 Lib is available, then libaries can be found.'
+print 'If python 2.2.1 Lib is available, then libraries can be found.'
 
 print '###'
 import sys
