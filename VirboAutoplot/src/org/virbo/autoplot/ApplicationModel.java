@@ -1194,26 +1194,6 @@ public class ApplicationModel {
     }
 
     /**
-     * Holds value of property autoRangeSuppress.
-     */
-    private boolean autoRangeSuppress;
-
-    /**
-     * Getter for property autoRangeSuppress.
-     * @return Value of property autoRangeSuppress.
-     */
-    public boolean isAutoRangeSuppress() {
-        return this.autoRangeSuppress;
-    }
-
-    /**
-     * Setter for property autoRangeSuppress.
-     * @param autoRangeSuppress New value of property autoRangeSuppress.
-     */
-    public void setAutoRangeSuppress(boolean autoRangeSuppress) {
-        this.autoRangeSuppress = autoRangeSuppress;
-    }
-    /**
      * when true, we are in the process of restoring a state.  Changes should not
      * be pushed to the undo stack.
      */
