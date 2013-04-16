@@ -461,6 +461,31 @@ public class PlotController extends DomNodeController {
         }
         return result;
     }
+    
+    /**
+     * only autorange when the settings have completely changed.  Chris and Craig
+     * @param axis
+     * @param newSettings
+     * @return 
+     */
+    private Axis reluctantRanging( Axis axis, Axis newSettings ) {
+        try {
+            if ( axis.getRange().rescale(-1,2).intersects( newSettings.getRange() ) ) {
+                double d1= DatumRangeUtil.normalize( axis.getRange(), newSettings.getRange().min(), axis.isLog() );
+                double d2= DatumRangeUtil.normalize( axis.getRange(), newSettings.getRange().max(), axis.isLog() );
+                if ( Math.abs(d2-d1)>0.1 ) {
+                    return axis;
+                } else {
+                    return newSettings;
+                }
+            } else {
+                return newSettings;
+            }
+        } catch ( InconvertibleUnitsException ex ) {
+            return newSettings;
+        }
+    }
+    
     /**
      * set the zoom so that all of the plotElements' data is visible.  Thie means finding
      * the "union" of each plotElements' plotDefault ranges.  If any plotElement's default log
@@ -529,11 +554,12 @@ public class PlotController extends DomNodeController {
 
         if ( x ) {
             logCheck(newSettings.getXaxis());
-            plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
-            if ( newSettings.getXaxis().getRange().toString().equals("1984-01-17") ) {
-                System.err.println("here");
+            Axis newAxis= newSettings.getXaxis();
+            if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
+                newAxis= reluctantRanging( plot.getXaxis(), newAxis );
             }
-            plot.getXaxis().setRange(newSettings.getXaxis().getRange());
+            plot.getXaxis().setLog( newAxis.isLog() );
+            plot.getXaxis().setRange( newAxis.getRange());
             plot.getXaxis().setAutoRange(true);
 
             if ( haveTsb==true ) {
@@ -543,16 +569,26 @@ public class PlotController extends DomNodeController {
             }
 
         }
+        
         if ( y ) {
             logCheck(newSettings.getYaxis());
-            plot.getYaxis().setLog( newSettings.getYaxis().isLog() );
-            plot.getYaxis().setRange(newSettings.getYaxis().getRange());
+            Axis newAxis= newSettings.getYaxis();
+            if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
+                newAxis= reluctantRanging( plot.getYaxis(), newAxis );
+            }
+            plot.getYaxis().setLog( newAxis.isLog() );
+            plot.getYaxis().setRange( newAxis.getRange());
             plot.getYaxis().setAutoRange(true);
         }
+        
         if ( z ) {
             logCheck(newSettings.getZaxis());
-            plot.getZaxis().setLog( newSettings.getZaxis().isLog() );
-            plot.getZaxis().setRange(newSettings.getZaxis().getRange());
+            Axis newAxis= newSettings.getZaxis();
+            if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
+                newAxis= reluctantRanging( plot.getZaxis(), newAxis );
+            }
+            plot.getZaxis().setLog( newAxis.isLog() );
+            plot.getZaxis().setRange( newAxis.getRange() );
             plot.getZaxis().setAutoRange(true);
         }
     }

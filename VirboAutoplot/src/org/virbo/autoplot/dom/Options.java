@@ -17,6 +17,12 @@ public class Options extends DomNode {
 
     public static final String PROP_COLOR = "color";
     public static final String PROP_FILLCOLOR = "fillColor";
+    
+    /**
+     * try to recycle old axis settings.  If the new range is near the 
+     * old range, then just use the old range.
+     */
+    public static String VALUE_AUTORANGE_TYPE_RELUCTANT="reluctant";
 
     public Options() {
 
@@ -318,6 +324,20 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
+    private String autorangeType = "";
+    
+    public static final String PROP_AUTORANGETYPE = "autorangeType";
+
+    public String getAutorangeType() {
+        return autorangeType;
+    }
+
+    public void setAutorangeType( String autorangeType ) {
+        String oldAutorangeType = this.autorangeType;
+        this.autorangeType = autorangeType;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORANGETYPE, oldAutorangeType, autorangeType);
+    }
+    
     protected boolean autolabelling = true;
     public static final String PROP_AUTOLABELLING = "autolabelling";
 
