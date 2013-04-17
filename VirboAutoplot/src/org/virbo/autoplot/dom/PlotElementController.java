@@ -2253,13 +2253,23 @@ public class PlotElementController extends DomNodeController {
      * @return the plot containing this plotElement's renderer, or null.
      */
     public DasPlot getDasPlot() {
-        Plot p= dom.controller.getPlotFor(plotElement);
-        if ( p==null ) return null;
+        Plot p=null;
+        DomLock lock= this.mutatorLock();
+        lock.lock("getDasPlot");
+        p= dom.controller.getPlotFor(plotElement);
+        lock.unlock();
+        if ( p==null ) {
+            return null;
+        }
         return p.controller.getDasPlot();
     }
 
     private DasColorBar getColorbar() {
-        Plot p= dom.controller.getPlotFor(plotElement);
+        Plot p=null;
+        DomLock lock= this.mutatorLock();
+        lock.lock("getColorbar");
+        p= dom.controller.getPlotFor(plotElement);
+        lock.unlock();
         if ( p==null ) {
             throw new IllegalArgumentException("no plot found for element ("+plotElement+","+plotElement.getPlotId()+")");
         }
