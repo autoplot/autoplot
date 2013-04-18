@@ -383,6 +383,7 @@ public class ApplicationModel {
         try {
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 try {
+                    surl= surl.replaceAll("\\\\", "/");
                     URI uri = DataSetURI.getURIValid(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
