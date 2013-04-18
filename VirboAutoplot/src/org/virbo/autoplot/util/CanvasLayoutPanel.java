@@ -28,6 +28,8 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Timer;
@@ -38,7 +40,10 @@ import org.das2.graph.Renderer;
 import org.das2.util.ClassMap;
 
 /**
- *
+ * This is the small GUI in the upper left corner of the layout tab.
+ * this shows more abstractly where plots sit in relation to one another, for
+ * reference.
+ * 
  * @author jbf
  */
 public class CanvasLayoutPanel extends JLabel {
@@ -46,8 +51,7 @@ public class CanvasLayoutPanel extends JLabel {
     JComponent target;
     ClassMap<Color> types;
     Timer timer;
-
-    private boolean adjusting=false;
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     public CanvasLayoutPanel() {
         types = new ClassMap<Color>();
@@ -77,7 +81,7 @@ public class CanvasLayoutPanel extends JLabel {
             if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers()>16 ) ) {
                 return;
             }
-            System.err.println("popup: "+e);
+            logger.log(Level.FINE, "popup: {0}", e);
             if (target == null) {
                 return;
             }
@@ -88,7 +92,6 @@ public class CanvasLayoutPanel extends JLabel {
             if ( theight * scale > getHeight() ) {
                scale= (double)getHeight() / theight;
             }
-            adjusting= true;
             for (int i = target.getComponentCount() - 1; i >= 0; i--) {
                 Component c = target.getComponent(i);
                 Color color = types.get(c.getClass());
@@ -124,17 +127,25 @@ public class CanvasLayoutPanel extends JLabel {
                     }
                 }
             }
-            adjusting= false;
         }
     };
     protected Object component = null;
     public static final String PROP_COMPONENT = "component";
 
+    /**
+     * get the primary selected component.
+     * @return 
+     */
     public Object getComponent() {
         return component;
     }
 
+    /**
+     * set the primary selected component.
+     * @return 
+     */
     public void setComponent(Object component) {
+        logger.log(Level.FINER, "setComponent({0})", component);
         Object oldComponent = this.component;
         this.component = component;
         repaint();
@@ -144,12 +155,20 @@ public class CanvasLayoutPanel extends JLabel {
     protected List<Object> selectedComponents = new ArrayList();
     public static final String PROP_SELECTEDCOMPONENTS = "selectedComponents";
 
+    /**
+     * get the user-selected components.
+     * @return a list containing the components.
+     */
     public List<Object> getSelectedComponents() {
         return new ArrayList(selectedComponents);
     }
 
+    /**
+     * set the selected components.
+     * @param selectedComponents 
+     */
     public void setSelectedComponents(List<Object> selectedComponents) {
-        //if ( adjusting ) return;
+        logger.log(Level.FINER, "setSelectedComponents({0})", selectedComponents);
         List<Object> oldSelectedComponents = this.selectedComponents;
         this.selectedComponents = new ArrayList( selectedComponents );
         propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
@@ -298,6 +317,11 @@ public class CanvasLayoutPanel extends JLabel {
 
     }
 
+    /**
+     * mark this type of component with the given color.
+     * @param c the class of the component, like org.das2.graph.DasPlot.class
+     * @param color the color, like Color.BLUE
+     */
     public void addComponentType(Class c, Color color) {
         this.types.put(c, color);
     }
