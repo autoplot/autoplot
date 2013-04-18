@@ -11,6 +11,9 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,20 +53,58 @@ public class TimeSeriesBrowseController {
     private DomNode listenNode=null;
     private String listenProp=null;
 
+    private static List<Axis> getTimerangeBoundAxes( Application dom ) {
+        List<BindingModel> bms= DomUtil.findBindings( dom, dom, Application.PROP_TIMERANGE );
+        List<Axis> result= new ArrayList<Axis>();
+        for ( BindingModel bm: bms ) {
+            if ( bm.getDstProperty().equals( Axis.PROP_RANGE ) ) {
+                result.add( (Axis)DomUtil.getElementById( dom, bm.getDstId() ) );
+            }
+        }
+        return result;
+    }
+    
+    private static List<Axis> getOtherBoundAxes( Application dom, Axis axis ) {
+        List<BindingModel> bms= DomUtil.findBindings( dom, axis, Axis.PROP_RANGE );
+        List<Axis> result= new ArrayList<Axis>();
+        for ( BindingModel bm: bms ) {
+            if ( bm.getSrcProperty().equals(Application.PROP_TIMERANGE) ) {
+                result.addAll( getTimerangeBoundAxes( dom ) );
+            } else if ( bm.getSrcId().equals(axis.getId()) ) {
+                result.add( (Axis) DomUtil.getElementById( dom, bm.getDstId() ) );
+            } else if ( bm.getDstId().equals(axis.getId()) ) {
+                result.add( (Axis) DomUtil.getElementById( dom, bm.getSrcId() ) );
+            }
+        }
+        return result;
+    }
+    
     TimeSeriesBrowseController( DataSourceController dataSourceController, final PlotElement p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
         updateTsbTimer = new TickleTimer(100, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( dsf.getController().getApplication().getController().isValueAdjusting() ) {
+                //TODO: this would work, but the particular axis is not actually adjusting.  We need
+                //to figure out who it's attached to, and see if any are adjusting.  Maybe even
+                //put in new code in plot.getXAxis.valueIsAdjusting to check bindings.
+                
+                Application dom= dsf.getController().getApplication();
+                
+                // 
+                List<Axis> otherAxes= getOtherBoundAxes( dom, domPlot.getXaxis() );
+                for ( Axis a: otherAxes ) {
+                    if ( a.getController().getDasAxis().valueIsAdjusting() ) {
+                        logger.log( Level.FINEST, "{0} is adjusting", a);
+                        return;
+                    }
+                }
+                
+                if ( dom.getController().isValueAdjusting() ) {
                     updateTsbTimer.tickle();
-                    return;
+                    logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
                     if ( p!=null && ( p.getController().getDataSourceFilter()==null || p.getController().getDataSourceFilter().getController().getTsb() == null ) ) {
-                        // leftover event doesn't need any special handling since TSB has been removed.
-                        // System.err.println("entering that strange branch that probably isn't needed ");
-                        return;
                     } else {
                         updateTsb(false);
                         changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
