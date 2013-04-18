@@ -1142,6 +1142,8 @@ public class DataSourceController extends DomNodeController {
     public synchronized void update() {
         changesSupport.performingChange(this, PENDING_UPDATE);
 
+        logger.log(Level.FINE, "request update {0}", getDataSource());
+        
         setDataSet(null);
 
         Runnable run = new Runnable() {
@@ -1388,6 +1390,7 @@ public class DataSourceController extends DomNodeController {
         try {
 
             // Call the data source to get the data set.
+            logger.log( Level.FINE, "load {0}", getDataSource());
             result = getDataSource().getDataSet(mymon);
 
             if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
