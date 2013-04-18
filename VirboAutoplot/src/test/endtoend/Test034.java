@@ -81,6 +81,11 @@ public class Test034 {
         writeToPng( "test034_004b.png" );
     }
 
+    /**
+     * main method for testing.
+     * @param args
+     * @throws Exception 
+     */
     public static void main( String[] args ) throws Exception {
 
         long t0;
