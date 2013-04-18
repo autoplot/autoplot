@@ -95,6 +95,7 @@ public class TimeSeriesBrowseController {
                 List<Axis> otherAxes= getOtherBoundAxes( dom, domPlot.getXaxis() );
                 for ( Axis a: otherAxes ) {
                     if ( a.getController().getDasAxis().valueIsAdjusting() ) {
+                        updateTsbTimer.tickle();
                         logger.log( Level.FINEST, "{0} is adjusting", a);
                         return;
                     }
