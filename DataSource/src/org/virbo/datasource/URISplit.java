@@ -626,6 +626,9 @@ public class URISplit {
             }
         }
 
+        if ( rsurl.substring(0,iquery ).contains("\\") ){
+            rsurl= rsurl.substring(0,iquery).replaceAll("\\\\","/") + rsurl.substring(iquery);
+        }
         if (result.scheme != null) {
             int iauth = result.scheme.length() + 1;
             while (iauth < rsurl.length() && rsurl.charAt(iauth) == '/') {
@@ -633,7 +636,9 @@ public class URISplit {
             }
             iauth = rsurl.indexOf('/', iauth);
             if (iauth == -1) iauth = rsurl.length();
-
+            if ( rsurl.charAt(iauth-1)==':' && rsurl.charAt(iauth-3)==':'  ) {
+                    iauth= iauth-2;
+            }
             result.authority = rsurl.substring(0, iauth);
         }
 
