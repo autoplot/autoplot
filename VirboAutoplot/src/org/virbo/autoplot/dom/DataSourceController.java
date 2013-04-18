@@ -1166,7 +1166,7 @@ public class DataSourceController extends DomNodeController {
             
             @Override
             public String toString() {
-                return "load "+dataSource.toString();
+                return "load "+String.valueOf(dataSource);
             }
         };
 
