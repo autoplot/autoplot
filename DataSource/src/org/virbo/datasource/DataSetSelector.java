@@ -33,11 +33,11 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,11 +74,8 @@ import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
-import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.aggregator.AggregatingDataSource;
-import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
@@ -93,8 +90,10 @@ import org.virbo.dsops.Ops;
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
     private static int MAX_RECENT=20;
-    private boolean pendingChanges= false;
-
+    private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
+    private Object PENDING_EDIT="edit";
+    private Object PENDING_PLOT="plot";
+    
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
@@ -122,7 +121,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         try {
                             maybePlotImmediately();
                         } finally {
-                            pendingChanges= false;
+                            pendingChanges.remove( PENDING_PLOT );
                         }
                     }
                 };
@@ -189,7 +188,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return
      */
     public boolean isPendingChanges() {
-        if ( maybePlotTimer.isRunning() || pendingChanges ) {
+        if ( maybePlotTimer.isRunning() || !pendingChanges.isEmpty() ) {
             return true;
         } else {
             return false;
@@ -407,7 +406,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             keyModifiers = 0;
         }
         
-        pendingChanges= true;
+        pendingChanges.put( PENDING_PLOT, this );
         maybePlotTimer.restart();
     }
 
@@ -657,8 +656,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 dialog.setExpertMode(isExpertMode());
                             }
 
+                            pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
                             dialog.setVisible(true);
-
+                            pendingChanges.remove( PENDING_EDIT );
                             if (!dialog.isCancelled()) {
                                 logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
                                 dataSetSelector.setSelectedItem(fedit.getURI());
