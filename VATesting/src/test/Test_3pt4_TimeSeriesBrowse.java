@@ -5,19 +5,18 @@
 
 package test;
 
-import java.io.IOException;
+import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasAxis;
-import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
-import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.dom.BindingModel;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
 
@@ -35,7 +34,7 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             JFrameOperator mainFrame = new JFrameOperator(app);
             ScriptContext.waitUntilIdle();
 
-            new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); // TODO: try vap+cdf:
+            new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); // TODO: try vap+cdf:
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             ScriptContext.waitUntilIdle();
 
@@ -49,22 +48,17 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
             ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
-
-            if ( ScriptContext.getDocumentModel().getBindings().length==2 &&
-                    ScriptContext.getDocumentModel().getBindings(0).getSrcProperty().equals("timeRange")) {
+        
+            if ( ScriptContext.getDocumentModel().getBindings().length==4 &&
+                    ScriptContext.getDocumentModel().getBindings(1).getSrcProperty().equals("timeRange")) {
                 return 0;
             } else {
                 return 1;
             }
-        } catch ( IOException ex ) {
+        } catch ( Exception ex ) {
             Logger.getLogger(Test_3pt4_TimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt4_TimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
-            return -1;
-        }
-        
+        }        
     }
 
     public static void main(String[] argv) {
