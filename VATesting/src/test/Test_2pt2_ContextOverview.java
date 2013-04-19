@@ -20,11 +20,12 @@ import org.virbo.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
 /**
- *
+ * Do a context overview and some zooming.
  * @author jbf
  */
 public class Test_2pt2_ContextOverview implements Scenario {
 
+    @Override
     public int runIt(Object o) {
 
         try {
@@ -33,7 +34,7 @@ public class Test_2pt2_ContextOverview implements Scenario {
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
 
-            Thread.sleep(1000); //give the menus a moment to initialize
+            Thread.sleep(3000); //give the menus a moment to initialize
 
             JMenuBarOperator menuop= new JMenuBarOperator(mainFrame);
 
