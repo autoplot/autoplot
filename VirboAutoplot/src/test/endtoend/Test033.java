@@ -9,6 +9,7 @@ import org.autoplot.pngwalk.CreatePngWalk;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import java.io.File;
+import org.das2.datum.DatumRangeUtil;
 
 
 /**
@@ -79,6 +80,28 @@ public class Test033 {
         CreatePngWalk.doIt( dom, pp );
 
     }
+    
+    /**
+     * pngwalk where context is used to show one slice vs another.
+     * @throws Exception 
+     */
+    private static void makePngWalk5() throws Exception {
+        Application dom= ScriptContext.getDocumentModel();
+
+        String pwd= new File("pngwalk5").getAbsoluteFile().toString();
+
+        CreatePngWalk.Params pp= new CreatePngWalk.Params();
+        pp.outputFolder= pwd;
+        pp.product= "product5";
+        pp.timeFormat= "$Y$m$d-$(H,span=6)";
+        pp.timeRangeStr= "1984-01-14 through 1984-01-23";
+
+        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+
+        dom.getPlots(1).getXaxis().setRange( DatumRangeUtil.parseTimeRange("1984-01-14 through 1984-01-23") );
+        System.err.println("writing pngwalk at "+pwd );
+        CreatePngWalk.doIt( dom, pp );
+    }
 
 
     /**
@@ -126,9 +149,13 @@ public class Test033 {
         makePngWalk3();
         System.err.printf( "test 003: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
-        //t0= System.currentTimeMillis();
-        //makePngWalk4();
-        //System.err.printf( "test 004: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        t0= System.currentTimeMillis();
+        makePngWalk4();
+        System.err.printf( "test 004: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+
+        t0= System.currentTimeMillis();
+        makePngWalk5();
+        System.err.printf( "test 005: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
         
         System.exit(0);
     }
