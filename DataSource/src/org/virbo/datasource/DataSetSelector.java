@@ -92,7 +92,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private static int MAX_RECENT=20;
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
     private Object PENDING_EDIT="edit";
-    private Object PENDING_PLOT="plot";
+    private Object PENDING_PLOT="plot"; 
     
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
