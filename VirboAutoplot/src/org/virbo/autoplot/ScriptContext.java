@@ -396,8 +396,7 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
-
-        model.waitUntilIdle(false);
+        waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         writeToPng( filename, width, height );
@@ -431,6 +430,8 @@ public class ScriptContext extends PyJavaInstance {
             filename= filename + ".png";
         }
 
+        waitUntilIdle();
+        
         maybeMakeParent(filename);
         
         final FileOutputStream out1 = new FileOutputStream(filename);
@@ -451,8 +452,10 @@ public class ScriptContext extends PyJavaInstance {
         }
     }
 
-    public static void writeToPng( BufferedImage image, String filename ) throws IOException {
+    public static void writeToPng( BufferedImage image, String filename ) throws IOException, InterruptedException {
 
+        waitUntilIdle();
+        
         maybeMakeParent(filename);
 
         final FileOutputStream out1 = new FileOutputStream(filename);
@@ -492,7 +495,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPng(OutputStream out) throws InterruptedException, IOException {
-        model.waitUntilIdle(false);
+        waitUntilIdle();
 
         DasCanvas c = model.getCanvas();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
@@ -519,12 +522,12 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
             filename= filename + ".pdf";
         }
-        model.waitUntilIdle(false);
+        waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         model.getCanvas().setSize( width, height );
         model.getCanvas().validate();
-        model.waitUntilIdle(false);
+        waitUntilIdle();
 
         maybeMakeParent(filename);
 
@@ -542,12 +545,12 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPdf( OutputStream out ) throws InterruptedException, IOException, IllegalAccessException {
-        model.waitUntilIdle(false);
+        waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         model.getCanvas().setSize( width, height );
         model.getCanvas().validate();
-        model.waitUntilIdle(false);
+        waitUntilIdle();
         model.getCanvas().writeToGraphicsOutput( out, new PdfGraphicsOutput() );
         
     }
@@ -578,7 +581,7 @@ public class ScriptContext extends PyJavaInstance {
      * @return
      */
     public static BufferedImage writeToBufferedImage( ) throws InterruptedException {
-        model.waitUntilIdle(false);
+        waitUntilIdle();
         
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
@@ -838,8 +841,8 @@ public class ScriptContext extends PyJavaInstance {
 
 
     /**
-     * wait until the application is idle.
-     *@see http://autoplot.org/data/tools/reloadAll.jy
+     * wait until the application is idle.  This does a model.waitUntilIdle,
+     * but also checks for the DataSetSelector for pending operations.
      */
     public static void waitUntilIdle() throws InterruptedException {
         if ( view!=null ) {
@@ -852,10 +855,11 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * wait until the application is idle.  The id is a convenience to 
-     * developers, for example used to trigger breakpoints.
+     * developers when debugging, for example used to trigger breakpoints.
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
     public static void waitUntilIdle( String id ) throws InterruptedException {
+        logger.log(Level.INFO, "waitUntilIdle({0})", id);
         if ( view!=null ) {
             while ( view.getDataSetSelector().isPendingChanges() ) {
                 Thread.sleep(100);
