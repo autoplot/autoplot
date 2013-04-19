@@ -51,6 +51,9 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
+            System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
+            Thread.sleep(2000);
+            
             ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
         
             BindingModel[] bms= ScriptContext.getDocumentModel().getBindings();
