@@ -30,6 +30,11 @@ public class Test_2pt2_ContextOverview implements Scenario {
 
         try {
             createGui();
+            
+            Application dom= getDocumentModel();
+            
+            dom.getOptions().setAutolayout(false);
+            
             AutoplotUI app = (AutoplotUI) getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
@@ -42,8 +47,6 @@ public class Test_2pt2_ContextOverview implements Scenario {
             new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
 
             waitUntilIdle();
-
-            Application dom= getDocumentModel();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
             System.err.println("after wait, data loaded. "+range0);

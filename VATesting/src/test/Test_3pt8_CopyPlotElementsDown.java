@@ -28,9 +28,12 @@ public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
+            
+            Application dom = getDocumentModel();
+            dom.getOptions().setAutolayout(false);
+            
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
-            Application dom = getDocumentModel();
 
             plot( "vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter" );
             waitUntilIdle();

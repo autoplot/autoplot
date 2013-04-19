@@ -35,9 +35,12 @@ public class Test_3pt7_ZoomPan implements Scenario {
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
+            Application dom = getDocumentModel();
+            dom.getOptions().setAutolayout(false);
+            
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
-            Application dom = getDocumentModel();
+            
             DasPlot p = dom.getController().getPlot().getController().getDasPlot();
             MouseWheelEvent e;
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
@@ -59,7 +62,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
             if ( dr0.width().value()==125.0
                     && dr1.width().value()==100.0
                     && dr1.width().value()==100.0
-                    && close( dr2.width().value(), 156.88488 ) ) {
+                    && close( dr2.width().value(), 177.201 ) ) { // autolayout=false -> 156.88488 ) ) {
                 return 0;
             } else {
                 return 1;

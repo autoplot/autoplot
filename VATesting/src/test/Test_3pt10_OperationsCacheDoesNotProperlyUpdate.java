@@ -25,8 +25,10 @@ public class Test_3pt10_OperationsCacheDoesNotProperlyUpdate implements Scenario
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
 
-            waitUntilIdle();
             Application dom = getDocumentModel();
+            dom.getOptions().setAutolayout(false);
+            
+            waitUntilIdle();
 
             plot( "vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=juno/waves/flight/survey.dsdf&start_time=2012-07-21T12:00:00.000Z&end_time=2012-07-21T24:00:00.000Z" );
             waitUntilIdle();

@@ -35,6 +35,10 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
+
+            Application dom= getDocumentModel();
+            dom.getOptions().setAutolayout(false);
+            
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
 
@@ -42,7 +46,6 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             waitUntilIdle();
 
-            Application dom= getDocumentModel();
 
             dom.setTimeRange( DatumRangeUtil.parseTimeRange("2005-09-08") );
 

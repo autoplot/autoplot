@@ -16,6 +16,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.BindingModel;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
@@ -31,6 +32,9 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
         try {
             ScriptContext.createGui();
             AutoplotUI app = (AutoplotUI) ScriptContext.getViewWindow();
+            Application dom = ScriptContext.getDocumentModel();
+            dom.getOptions().setAutolayout(false);
+            
             JFrameOperator mainFrame = new JFrameOperator(app);
             ScriptContext.waitUntilIdle();
 
