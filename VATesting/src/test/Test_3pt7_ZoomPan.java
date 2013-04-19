@@ -59,8 +59,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
             if ( dr0.width().value()==125.0
                     && dr1.width().value()==100.0
                     && dr1.width().value()==100.0
-                    && close( dr2.width().value(), 163.93 ) ) {
-                System.err.println( "failed because of: !close( "+dr2.width().value()+" , 163.93 )");
+                    && close( dr2.width().value(), 156.88488 ) ) {
                 return 0;
             } else {
                 return 1;

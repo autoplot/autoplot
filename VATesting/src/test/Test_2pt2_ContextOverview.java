@@ -79,7 +79,7 @@ public class Test_2pt2_ContextOverview implements Scenario {
 
             writeToPng( "Test_2pt2_ContextOverview.002.png");
 
-            boolean tbindings= dom.getBindings().length==5;
+            boolean tbindings= dom.getBindings().length==13; // colorbar
             boolean trange= range0.equals( dom.getPlots(1).getXaxis().getRange() );
 
             if ( tbindings && trange ) {
