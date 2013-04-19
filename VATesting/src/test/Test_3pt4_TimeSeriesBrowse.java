@@ -49,6 +49,11 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
         
+            BindingModel[] bms= ScriptContext.getDocumentModel().getBindings();
+            for ( BindingModel bm: bms ) {
+                System.err.println(bm);
+            }
+
             if ( ScriptContext.getDocumentModel().getBindings().length==4 &&
                     ScriptContext.getDocumentModel().getBindings(1).getSrcProperty().equals("timeRange")) {
                 return 0;
