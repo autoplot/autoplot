@@ -658,14 +658,15 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                             pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
                             dialog.setVisible(true);
-                            pendingChanges.remove( PENDING_EDIT );
                             if (!dialog.isCancelled()) {
                                 logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
                                 dataSetSelector.setSelectedItem(fedit.getURI());
                                 keyModifiers = dialog.getModifiers();
                                 maybePlot(true);
+                                pendingChanges.remove( PENDING_EDIT );
                             } else {
                                 setMessage("editor cancelled");
+                                pendingChanges.remove( PENDING_EDIT );
                             }
                         } };
                         SwingUtilities.invokeLater(run);
