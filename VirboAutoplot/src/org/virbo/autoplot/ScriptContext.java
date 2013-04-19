@@ -850,6 +850,19 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+    /**
+     * wait until the application is idle.  The id is a convenience to 
+     * developers, for example used to trigger breakpoints.
+     *@see http://autoplot.org/data/tools/reloadAll.jy
+     */
+    public static void waitUntilIdle( String id ) throws InterruptedException {
+        if ( view!=null ) {
+            while ( view.getDataSetSelector().isPendingChanges() ) {
+                Thread.sleep(100);
+            }
+        }
+        model.waitUntilIdle(false);
+    }    
 
     /**
      * save the current state as a vap file
