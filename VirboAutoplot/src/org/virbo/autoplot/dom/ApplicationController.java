@@ -601,77 +601,80 @@ public class ApplicationController extends DomNodeController implements RunLater
             lock.unlock();
             return;
         }
-        String id= pelement.getId();
-        if (application.plotElements.size() > 1 ) {
+        try {
+            String id= pelement.getId();
+            if (application.plotElements.size() > 1 ) {
 
-            DasPlot p = pelement.controller.getDasPlot();
-            Renderer r= pelement.controller.getRenderer();
-            if (p != null && r != null ) {
-                p.removeRenderer(r);    
+                DasPlot p = pelement.controller.getDasPlot();
+                Renderer r= pelement.controller.getRenderer();
+                if (p != null && r != null ) {
+                    p.removeRenderer(r);    
+                }
+                Plot domplot= getPlotFor(pelement);
+
+                //plotElement.removePropertyChangeListener(application.childListener);
+                pelement.removePropertyChangeListener(domListener);
+                pelement.getStyle().removePropertyChangeListener(domListener);
+                unbind(pelement);
+                unbind(pelement.getStyle());
+                unbindImpl(pelement); //TODO: I need to remind myself why there are two types of bindings...
+                unbindImpl(pelement.getStyle());
+                pelement.controller.unbindDsf();
+                pelement.controller.disconnect();
+                pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
+                if ( r!=null ) r.setColorBar(null);
+                //PlotController.pdListen
+                if ( domplot!=null ) {
+                    domplot.controller.pdListen.remove(pelement);
+                }
+                if ( r!=null ) r.setDataSet(null);
+                pelement.controller.deleted= true;
+                //pelement.controller.renderer=null; //TODO: check that the renderer gets GC'd.
+                //pelement.controller.changesSupport=null;
+                //pelement.controller= null; // we need this to unbind later.
+                pelement.removePropertyChangeListener(plotIdListener);
+
+                PlotElement parent= pelement.controller.getParentPlotElement();
+                if ( parent!=null ) {
+                    parent.getStyle().removePropertyChangeListener( pelement.controller.parentStyleListener );
+                }
+
             }
-            Plot domplot= getPlotFor(pelement);
 
-            //plotElement.removePropertyChangeListener(application.childListener);
-            pelement.removePropertyChangeListener(domListener);
-            pelement.getStyle().removePropertyChangeListener(domListener);
-            unbind(pelement);
-            unbind(pelement.getStyle());
-            unbindImpl(pelement); //TODO: I need to remind myself why there are two types of bindings...
-            unbindImpl(pelement.getStyle());
-            pelement.controller.unbindDsf();
-            pelement.controller.disconnect();
-            pelement.controller.dataSet= null; // get rid of these for now, until we can figure out why these are not G/C'd.
-            if ( r!=null ) r.setColorBar(null);
-            //PlotController.pdListen
-            if ( domplot!=null ) {
-                domplot.controller.pdListen.remove(pelement);
-            }
-            if ( r!=null ) r.setDataSet(null);
-            pelement.controller.deleted= true;
-            //pelement.controller.renderer=null; //TODO: check that the renderer gets GC'd.
-            //pelement.controller.changesSupport=null;
-            //pelement.controller= null; // we need this to unbind later.
-            pelement.removePropertyChangeListener(plotIdListener);
+            DataSourceFilter dsf = getDataSourceFilterFor(pelement);
 
-            PlotElement parent= pelement.controller.getParentPlotElement();
-            if ( parent!=null ) {
-                parent.getStyle().removePropertyChangeListener( pelement.controller.parentStyleListener );
+            ArrayList<PlotElement> elements =
+                    new ArrayList<PlotElement>(Arrays.asList(application.getPlotElements()));
+            elements.remove(pelement);
+            if ( elements.size()>0 ) {
+                if (!elements.contains(getPlotElement())) {  // reset the focus element Id
+                    if (elements.size() == 0) {
+                        setPlotElement(null);
+                    } else {
+                        setPlotElement(elements.get(0)); // maybe use currentIdx
+                    }
+                }
+                application.setPlotElements(elements.toArray(new PlotElement[elements.size()]));
+            } else {
+                dsf.setUri("");  // this panel and the dsf should go together
+                pelement.setLegendLabelAutomatically("");
+                pelement.setActive(true);
             }
 
-        }
-
-        DataSourceFilter dsf = getDataSourceFilterFor(pelement);
-
-        ArrayList<PlotElement> elements =
-                new ArrayList<PlotElement>(Arrays.asList(application.getPlotElements()));
-        elements.remove(pelement);
-        if ( elements.size()>0 ) {
-            if (!elements.contains(getPlotElement())) {  // reset the focus element Id
-                if (elements.size() == 0) {
-                    setPlotElement(null);
-                } else {
-                    setPlotElement(elements.get(0)); // maybe use currentIdx
+            if (dsf != null) {
+                List<PlotElement> dsfElements = getPlotElementsFor(dsf);
+                if ( dsfElements.size() == 0 && application.getDataSourceFilters().length>1 ) {
+                    deleteDataSourceFilter(dsf);
                 }
             }
-            application.setPlotElements(elements.toArray(new PlotElement[elements.size()]));
-        } else {
-            dsf.setUri("");  // this panel and the dsf should go together
-            pelement.setLegendLabelAutomatically("");
-            pelement.setActive(true);
-        }
-
-        if (dsf != null) {
-            List<PlotElement> dsfElements = getPlotElementsFor(dsf);
-            if ( dsfElements.size() == 0 && application.getDataSourceFilters().length>1 ) {
-                deleteDataSourceFilter(dsf);
+            for ( PlotElement p: application.plotElements ) {
+                if ( p.getParent().equals(id) ) {
+                    p.setParent("");
+                }
             }
+        } finally {
+            lock.unlock();
         }
-        for ( PlotElement p: application.plotElements ) {
-            if ( p.getParent().equals(id) ) {
-                p.setParent("");
-            }
-        }
-        lock.unlock();
     }
 
     /**
@@ -1437,6 +1440,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         setStatus("resetting...");
 
         DomLock lock= mutatorLock();
+        while ( lock.isLocked() ) {
+            logger.info( "lock is not available: "+lock.toString() );
+            System.err.println( changesSupport.isValueAdjusting() );
+            try {        
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         lock.lock("Reset");
         Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
