@@ -877,7 +877,7 @@ public class ScriptContext extends PyJavaInstance {
         if ( ! filename.endsWith(".vap") )
             throw new IllegalArgumentException("filename must end in vap");
         if ( !( filename.startsWith("file:") ) ) {
-            filename= "file://" + new File(filename).getAbsolutePath().replaceAll("\\\\", "/" );
+            filename= DataSetURI.fromFile(new File(filename));
         }
         URISplit split= URISplit.parse(filename);
         String uri= DataSetURI.fromUri(split.resourceUri);
