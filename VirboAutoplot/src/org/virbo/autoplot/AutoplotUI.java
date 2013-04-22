@@ -1702,7 +1702,7 @@ APSplash.checkTime("init 52");
             @Override
             protected void saveImpl(File f,String scheme) throws IOException {
                 applicationModel.doSave(f,scheme);
-                applicationModel.addRecent(f.toURI().toString());
+                applicationModel.addRecent( DataSetURI.fromFile( f ));
                 parent.setStatus("saved " + f);
             }
 
