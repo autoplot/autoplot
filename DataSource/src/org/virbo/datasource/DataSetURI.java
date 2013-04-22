@@ -516,6 +516,17 @@ public class DataSetURI {
         }
         
     }
+    
+    /**
+     * canonical method for converting from File to human-readable string.  This
+     * simply tacks on "file://" to the filename.  This was introduced so that there
+     * is one canonical way to do this.
+     * @param file
+     * @return 
+     */
+    public static String fromFile( File file ) {
+        return "file://"+file.getAbsolutePath().replaceAll("\\\\","/");
+    }
 
     /**
      * Legacy behavior was to convert pluses into spaces in URIs.  This caused problems
