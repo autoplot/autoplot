@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.TimeRangeTool;
 
 /**
@@ -68,7 +69,8 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     public void writeDefaults() {
         Preferences prefs= Preferences.userNodeForPackage( CreatePngWalkDialog.class );
         prefs.put( "filenameRoot", flnRootTf.getText().trim() );
-        prefs.put( "outputFolder", outputFolderTf.getText().trim() );
+        File ff= getOutputFolder( getOutputFolderTf().getText().trim() );
+        prefs.put( "outputFolder", DataSetURI.fromFile(ff).substring(7) );
         prefs.put( "timeFormat", ((String)timeFormatCB.getSelectedItem()).trim() );
         prefs.put( "timeRange", timeRangeTf.getText().trim() );
         prefs.putBoolean( "createThumbs", createThumbsCb.isSelected() );
@@ -85,10 +87,17 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         }
     }
 
+    private File getOutputFolder( String sff ) {
+        if ( sff.startsWith("file://") ) sff= sff.substring(7);
+        if ( sff.startsWith("file:") ) sff= sff.substring(5);
+        File ff= new File( sff );
+        return ff;
+    }
     public CreatePngWalk.Params getParams() {
         CreatePngWalk.Params params = new CreatePngWalk.Params();
-        params.outputFolder = getOutputFolderTf().getText();
-        if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
+        File ff= getOutputFolder( getOutputFolderTf().getText().trim() );
+        params.outputFolder = DataSetURI.fromFile( ff ).substring(7);
+        if ( !( params.outputFolder.endsWith("/") ) ) {
             params.outputFolder= params.outputFolder + "/";
         }
         params.timeRangeStr = getTimeRangeTf().getText().trim();
