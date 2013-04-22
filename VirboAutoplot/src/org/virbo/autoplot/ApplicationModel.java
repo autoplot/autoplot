@@ -934,16 +934,16 @@ public class ApplicationModel {
         StatePersistence.saveState(f, createState(true), "");
         setUseEmbeddedDataSet(false);
 
-        setVapFile( "file://"+f.toString() );
-        addRecent( "file://"+f.toString() );
+        setVapFile( DataSetURI.fromFile(f) );
+        addRecent( DataSetURI.fromFile(f) );
     }
 
     void doSave(File f, String scheme ) throws IOException {
         StatePersistence.saveState(f, createState(true), scheme);
         setUseEmbeddedDataSet(false);
 
-        setVapFile( "file://"+f.toString() );
-        addRecent( "file://"+f.toString() );
+        setVapFile( DataSetURI.fromFile(f) );
+        addRecent( DataSetURI.fromFile(f) );
     }
 
     /**
