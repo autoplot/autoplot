@@ -70,6 +70,15 @@ public class AppManager {
     public void quit(  ) {
         System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
     }
+    
+    /**
+     * quit with the exit status.  By convention, 0 means okay, and non-0 means something wrong.
+     * @param status 
+     */
+    public void quit( int status ) {
+        System.exit(status); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+    }
+    
 
     /**
      * returns true if quit can be called, exiting the program.  If the callback throws an exception, then a warning is displayed.  I expect
