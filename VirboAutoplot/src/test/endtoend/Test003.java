@@ -23,7 +23,7 @@ public class Test003 {
             System.err.println("uri: "+uri);
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
-            System.err.println( String.format( "read in %6.2 sec", ( System.currentTimeMillis()-t0 )/1000. ) );
+            System.err.println( String.format( "read in %6.2f sec", ( System.currentTimeMillis()-t0 )/1000. ) );
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
