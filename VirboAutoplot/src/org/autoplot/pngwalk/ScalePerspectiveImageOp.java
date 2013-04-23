@@ -15,7 +15,7 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
 
 /**
- *
+ * ImageOp that draws the reflection as well as the perspective view of the data.
  * @author jbf
  */
 public class ScalePerspectiveImageOp implements BufferedImageOp {
@@ -80,7 +80,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         }
     }
 
-    Shape getOutline( double x, double y ) {
+    private Shape getOutline( double x, double y ) {
         GeneralPath path= new GeneralPath();
         Point2D dst= new Point2D.Float();
         dst= this.getPoint2D( new Point2D.Float(0,0), dst);
@@ -97,7 +97,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         return path;
     }
 
-    private final int index(int i, int j) {
+    private int index(int i, int j) {
         int ii= i + j * nw;
         ii= ( ii>this.maxidx ) ? maxidx : ii;
         ii= ( ii<0 ) ? 0 : ii;
@@ -171,8 +171,8 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                     double	ww1 = Math.max( 1,weight * ( ( (0.4 ) / (rh1) ) *(j - (h-rh1) ) ) );
 
                     rr[didx] += 255*((color >> 16 & 0xff) - AVG);
-                    gg[didx] += 255*((color >> 8 & 0xff) - AVG);
-                    bb[didx] += 255*((color >> 0 & 0xff) - AVG);
+                    gg[didx] += 255*((color >> 8  & 0xff) - AVG);
+                    bb[didx] += 255*((      color  & 0xff) - AVG);
                     aa[didx] += 255* ww1;
                     nn[didx] += 255;
 
