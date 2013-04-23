@@ -31,9 +31,7 @@ import org.xml.sax.SAXException;
  */
 public class Test140 {
     
-    private static final int READ_SIZE_LIMIT_DAYS = 400; // chris has /voyager2/pws/SpecAnalyzer-Distogram.dsdf which is about a year, intentionally.
-
-    private static int testid=140;
+    private static int testid;
 
     /**
      *
@@ -45,7 +43,7 @@ public class Test140 {
      */
     private static String do1( String uri, int iid, boolean doTest ) throws Exception {
 
-        System.err.printf( "== %03d %s ==\n", iid, uri );
+        System.err.printf( "== %03d ==\n", iid );
         System.err.printf( "uri: %s\n", uri );
 
         long t0= System.currentTimeMillis();
@@ -70,7 +68,7 @@ public class Test140 {
         }
 
         plot( ds );
-        setCanvasSize( 750, 300 );
+        setCanvasSize( 450, 300 );
         int i= uri.lastIndexOf("/");
 
         getApplicationModel().waitUntilIdle(true);
