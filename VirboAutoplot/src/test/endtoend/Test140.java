@@ -157,7 +157,8 @@ public class Test140 {
     public static void main( String[] args ) throws Exception {
 
         if ( args.length==0 ) {
-            args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
+            //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
+            args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
@@ -166,6 +167,8 @@ public class Test140 {
         
         for ( int i=1; i<args.length; i++ ) {
             String uri= args[i];
+            System.err.println("\n== from "+uri+" ==");
+            
             File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
             if ( uri.endsWith(".xml") ) {
                 iid= doBookmarks(ff,iid,exceptions);
@@ -182,5 +185,14 @@ public class Test140 {
             System.err.println(e.getKey());
             System.err.println(e.getValue());
         }
+        
+        if ( exceptions.isEmpty() ) {
+            System.err.println("(none)");
+            System.exit(0);  // TODO: something is firing up the event thread
+        } else {
+            System.err.println("("+exceptions.size()+" exceptions)");
+            System.exit(1);
+        }
+        
     }
 }
