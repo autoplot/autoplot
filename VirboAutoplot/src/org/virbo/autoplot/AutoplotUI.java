@@ -3163,7 +3163,12 @@ private void updateFrameTitle() {
                     }
                 } catch (IOException ex) {
                     throw new IllegalArgumentException(ex);
-                }   
+                } catch ( Exception ex ) {
+                    if ( quit ) {
+                        ex.printStackTrace();
+                        AppManager.getInstance().quit(1);
+                    }
+                }
             }
         };
         return r;
