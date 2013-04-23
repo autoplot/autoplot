@@ -6,7 +6,6 @@
 package test.endtoend;
 
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -21,11 +20,8 @@ import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.StreamDescriptor;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
 
 import static org.virbo.autoplot.ScriptContext.*;
