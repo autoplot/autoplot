@@ -145,7 +145,6 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                 double pp = p>0 ? ( i * p)  : ( ( i-w ) *p );
                 double hai= h1 - 2 * pp;
                 int j1= y1 + (int) ( pp + j * ( hai / h ) );
-                //int j1 = y1 + (int) (((j * (1000 - pp * 2)) + pp * h) * h1 / h / 1000 );
                 int didx = index(i1, j1);
                 int weight;
                 if (hasBg) {
@@ -155,8 +154,8 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                 }
 
                 rr[didx] += weight * ((color >> 16 & 0xff) - AVG);
-                gg[didx] += weight * ((color >> 8 & 0xff) - AVG);
-                bb[didx] += weight * ((color >> 0 & 0xff) - AVG);
+                gg[didx] += weight * ((color >> 8  & 0xff) - AVG);
+                bb[didx] += weight * ((      color & 0xff) - AVG);
                 aa[didx] += 255 * weight;
                 nn[didx] += weight;
                 
@@ -195,11 +194,6 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         } else {
                             int rr1= (rr[didx] / n + AVG);
-                            if ( rr1==0 ) {
-//                                System.err.println("here");
-                            } else {
-//                                System.err.println("rather here");
-                            }
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         }
                         dest.setRGB(i, j, color);
