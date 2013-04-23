@@ -19,9 +19,11 @@ public class Test003 {
     public static void doit(int id, String uri) {
         try {
             System.err.println( String.format( "== %03d == ", id ) );
+            long t0= System.currentTimeMillis();
             System.err.println("uri: "+uri);
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
+            System.err.println( String.format( "read in %6.2 sec", ( System.currentTimeMillis()-t0 )/1000. ) );
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -70,10 +72,10 @@ public class Test003 {
 
             doit(22, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/sci-all-L1/rbspa_pre_ect-rept-sci-all-L1.vap?timerange=20121004");
 
-            //REPT L2
-            doit(23, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2_orbit/rbspa_pre_ect-rept-sci-L2.vap?timerange=20121010");
-            doit(24, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2-elec/rbspa_pre_ect-rept-sci-L2-elec.vap?timerange");
-            doit(25, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2-ion/rbspa_pre_ect-rept-sci-L2-ion.vap");
+            //REPT L24            doit(23, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2_orbit/rbspa_pre_ect-rept-sci-L2.vap?timerange=20121010");
+            //doit(24, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-elec-L2/rbspa_pre_ect-rept-sci-elec-L2.vap");
+            doit(24, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-rept-sci-elec-L2.vap");
+            doit(25, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-rept-sci-ion-L2.vap");
 
             
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
