@@ -35,6 +35,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
@@ -130,7 +131,10 @@ public class EditorTextPane extends JEditorPane {
             }
 
         };
-        SwingUtilities.invokeLater(run);
+        
+        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            SwingUtilities.invokeLater(run);
+        }
 
     }
 
