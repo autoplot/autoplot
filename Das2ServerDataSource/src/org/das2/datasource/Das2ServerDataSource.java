@@ -34,6 +34,7 @@ import org.das2.datum.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
@@ -59,6 +60,25 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
         HashMap<String,String> params2 = new HashMap(params);
         params2.put("server", "dataset");
+
+        if ( params.get("dataset")==null ) {
+            String dataset= params.remove("arg_0");
+            params.put( "dataset", dataset );
+        }
+        
+        String str= params.get("timerange");
+        if ( str!=null ) {
+            try {
+                DatumRange tr= DatumRangeUtil.parseTimeRange( str );
+                params2.put( "start_time", tr.min().toString() );
+                params2.put( "end_time", tr.max().toString() );  
+                params2.remove("timerange");
+            } catch (ParseException ex) {
+                logger.log(Level.WARNING, "unable to parse timerange {0}", str);
+            }
+        } else {
+            
+        }
 
         if ( params2.get("start_time")!=null && params2.get("end_time")!=null ) {
             timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );

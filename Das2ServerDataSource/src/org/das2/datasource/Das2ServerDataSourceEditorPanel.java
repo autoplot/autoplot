@@ -802,11 +802,25 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         Map<String,String> params= URISplit.parseParams(split.params);
         dataSetId= params.remove("dataset");
+        if ( dataSetId==null ) {
+            dataSetId= params.remove("arg_0");
+        }
         if ( dataSetId!=null && dataSetId.startsWith("/") ) {
             dataSetId= dataSetId.substring(1);
         }
         String startTime= params.remove("start_time");
         String endTime= params.remove("end_time");
+        String str= params.remove("timerange");
+        if ( str!=null ) {
+            DatumRange tr;
+            try {
+                tr = DatumRangeUtil.parseTimeRange( str );
+                startTime= tr.min().toString();
+                endTime= tr.max().toString();
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
         if ( startTime!=null && endTime!=null ) {
             try {
                 Datum t1= TimeUtil.create( startTime );

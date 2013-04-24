@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
@@ -101,10 +104,33 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         
     }
 
+    /**
+     * Indicate if a URI is acceptable.
+     * vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?galileo/pws/EDPosition.dsdf&timerange=2001-10-17
+     * @param surl
+     * @param problems
+     * @param mon
+     * @return true if it is not acceptable.
+     */
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
         Map<String,String> params= URISplit.parseParams(split.params);
         String ds= params.get("dataset");
+        if ( params.get("arg_0")!=null ) {
+            ds=  params.get("arg_0");
+        }
+        String str= params.get("timerange");
+        if ( str!=null ) {
+            try {
+                DatumRange tr= DatumRangeUtil.parseTimeRange( str );
+                params.put( "start_time", tr.min().toString() );
+                params.put( "end_time", tr.max().toString() );    
+            } catch (ParseException ex) {
+                logger.log(Level.WARNING, "unable to parse timerange {0}", str);
+            }
+        } else {
+            
+        }
         return !( params.containsKey("start_time") && params.containsKey("end_time") && ds!=null && ds.length()>0 );
     }
 
