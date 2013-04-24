@@ -568,12 +568,14 @@ public class ScriptPanelSupport {
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
             JFileChooser chooser = new JFileChooser();
-            if (openFile.length() > 0) {
-                chooser.setSelectedFile(new File(openFile));
-            }
             chooser.setFileFilter(getFileFilter());
             if (file != null) {
                 chooser.setSelectedFile(file);
+            }
+            if (openFile.length() > 0) {
+                // this hangs on Java 1.7.0_17 Linux Centos 6:
+                //chooser.getFileSystemView().isParent(chooser.getCurrentDirectory(),new File(openFile));
+                //chooser.setSelectedFile(new File(openFile));
             }
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
