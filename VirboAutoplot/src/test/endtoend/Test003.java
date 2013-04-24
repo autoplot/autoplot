@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.graph.SpectrogramRenderer;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.autoplot.ScriptContext;
@@ -42,7 +43,7 @@ public class Test003 {
 
             ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
             ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-
+            
             //doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
             doit(26, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbsp_ect-rept-lvt.jyds?timerange=2012-10-15" );
             //doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
@@ -54,7 +55,7 @@ public class Test003 {
             doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_pre_ect-mageis-mr-elec-L1.vap");
             //doit(11, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level2/plots/sci-L2-elec/rbspa_pre_ect-mageis-sci-L2-elec.vap");
 
-            doit(12, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level2/plots/sci-elec-L2/rbspa_pre_ect-mageis-sci-elec-L2.vap");
+            doit(12, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-mageis-sci-elec-L2.vap");
 
             doit(13, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-cem-L1/rbspa_pre_ect-hope-hk-cem-L1.vap");
 
@@ -78,7 +79,7 @@ public class Test003 {
             //doit(24, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-elec-L2/rbspa_pre_ect-rept-sci-elec-L2.vap");
             doit(24, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-rept-sci-elec-L2.vap");
             doit(25, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-rept-sci-ion-L2.vap");
-
+            
             
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
             ScriptContext.setCanvasSize(800, 600);
