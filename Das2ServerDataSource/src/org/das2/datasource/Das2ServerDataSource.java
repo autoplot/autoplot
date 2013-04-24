@@ -63,7 +63,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         if ( params.get("dataset")==null ) {
             String dataset= params.remove("arg_0");
-            params.put( "dataset", dataset );
+            if ( dataset!=null ) params.put( "dataset", dataset );
         }
         
         String str= params.get("timerange");
