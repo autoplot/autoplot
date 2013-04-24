@@ -390,20 +390,12 @@ public class Test013 {
 
     }
 
-    private static void testReadJoin() {
-    
-
-    }
-
     public static void main(String[] args)  {
         try {
 
             MutablePropertyDataSet ds;
-
-            testReadJoin();
-
-            testBundle();
-            xxx("testBundle");
+            //testBundle();
+            //xxx("testBundle");
 
             test8();
 
