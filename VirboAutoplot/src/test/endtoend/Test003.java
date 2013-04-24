@@ -43,8 +43,10 @@ public class Test003 {
             ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
             ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
-            doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
+            //doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
+            doit(26, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbsp_ect-rept-lvt.jyds?timerange=2012-10-15" );
+            //doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
+            doit(27, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbsp_ect-mageis-lvt.jyds" );
             doit(28, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ephem.jyds?R=T&L=T&MLT=T&ILT=T" );
             
             //these require a keychain.txt file.
