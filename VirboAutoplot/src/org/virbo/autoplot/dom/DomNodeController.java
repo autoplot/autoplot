@@ -203,14 +203,37 @@ public class DomNodeController {
         return changesSupport.mutatorLock();
     }
 
+    /**
+     * the client knows a change will be coming, and the canvas' clients should
+     * know that its current state will change soon.  Example pending changes
+     * would be:
+     *   layout because tick labels are changing
+     *   data is loading
+     *
+     * @param client the object that will perform the change.  This allows the
+     *   canvas (and developers) identify who has registered the change.
+     * @param lockObject object identifying the change.
+     */
     public void registerPendingChange(Object client, Object lockObject) {
         changesSupport.registerPendingChange(client, lockObject);
     }
 
+    /**
+     * performingChange tells that the change is about to be performed.  This
+     * is a place holder in case we use a mutator lock, but currently does
+     * nothing.  If the change has not been registered, it will be registered implicitly.
+     * @param client the object that is mutating the bean.
+     * @param lockObject an object identifying the change.  
+     */
     public void performingChange(Object client, Object lockObject) {
         changesSupport.performingChange(client, lockObject);
     }
 
+    /**
+     * the change is complete, and as far as the client is concerned, the canvas
+     * is valid.
+     * @param lockObject
+     */    
     public void changePerformed(Object client, Object lockObject) {
         changesSupport.changePerformed(client, lockObject);
     }
