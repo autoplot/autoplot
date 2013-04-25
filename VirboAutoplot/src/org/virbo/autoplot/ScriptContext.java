@@ -9,12 +9,9 @@ import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.VectorDataSet;
-import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
-import org.das2.datum.TimeParser;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -23,16 +20,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
-import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -40,7 +35,6 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.python.core.PyJavaInstance;
-import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
@@ -52,7 +46,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormat;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 
@@ -920,6 +913,31 @@ public class ScriptContext extends PyJavaInstance {
         }
     }
 
+    /**
+     * reset the layout to have the given number of rows and columns.  This is
+     * similar to the subplot command in Matlab and !p.multi in IDL.  Once 
+     * additional plots are added, use the plot command with the index argument.
+     * 
+     * @param nrows
+     * @param ncolumns 
+     */
+    public static void setLayout( int nrows, int ncolumns ) {
+        reset();
+        DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
+        Lock canvasLock= c.mutatorLock();
+        Lock lock= dom.getController().mutatorLock();
+        try {
+            canvasLock.lock();
+            lock.lock();
+            Plot p= dom.getController().getPlot();
+            dom.getController().addPlots( nrows, ncolumns, null );
+            dom.getController().deletePlot(p);
+        } finally {
+            lock.unlock();
+            canvasLock.unlock();
+        }
+    }
+    
     /**
      * reset the application to its initial state.
      */
