@@ -912,14 +912,30 @@ public class ScriptContext extends PyJavaInstance {
             throw new RuntimeException(ex);
         }
     }
-
+    
+    /**
+     * make the layout more efficient by removing empty spaces and overlapping 
+     * plots.
+     */
+    public static void fixLayout() {
+        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+    }
+    
+    /**
+     * make a stack plot.
+     * @param nrows 
+     */
+    public static void setLayout( int nrows ) {
+        setLayout( nrows, 1 );
+    }
+    
     /**
      * reset the layout to have the given number of rows and columns.  This is
      * similar to the subplot command in Matlab and !p.multi in IDL.  Once 
      * additional plots are added, use the plot command with the index argument.
      * 
-     * @param nrows
      * @param ncolumns 
+     * @param nrows
      */
     public static void setLayout( int nrows, int ncolumns ) {
         reset();
