@@ -574,8 +574,9 @@ public class ScriptPanelSupport {
             }
             if (openFile.length() > 0) {
                 // this hangs on Java 1.7.0_17 Linux Centos 6:
-                //chooser.getFileSystemView().isParent(chooser.getCurrentDirectory(),new File(openFile));
-                //chooser.setSelectedFile(new File(openFile));
+                chooser.getFileSystemView().isParent(chooser.getCurrentDirectory(),new File(openFile));
+                chooser.setSelectedFile(new File(openFile));
+                // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
             }
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
