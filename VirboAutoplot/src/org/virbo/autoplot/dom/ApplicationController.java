@@ -1867,6 +1867,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         return results.toArray( new BindingModel[results.size()] );
     }
     
+    /**
+     * return the dom element (plot,axis,etc) with this id.
+     * @param id
+     * @return the DomNode with this id.
+     */
+    public DomNode getElementById( String id ) {
+        return DomUtil.getElementById(this.application, id );
+    }
+    
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
