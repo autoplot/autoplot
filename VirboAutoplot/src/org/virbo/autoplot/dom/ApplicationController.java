@@ -648,7 +648,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             elements.remove(pelement);
             if ( elements.size()>0 ) {
                 if (!elements.contains(getPlotElement())) {  // reset the focus element Id
-                    if (elements.size() == 0) {
+                    if (elements.isEmpty()) {
                         setPlotElement(null);
                     } else {
                         setPlotElement(elements.get(0)); // maybe use currentIdx
@@ -663,7 +663,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             if (dsf != null) {
                 List<PlotElement> dsfElements = getPlotElementsFor(dsf);
-                if ( dsfElements.size() == 0 && application.getDataSourceFilters().length>1 ) {
+                if ( dsfElements.isEmpty() && application.getDataSourceFilters().length>1 ) {
                     deleteDataSourceFilter(dsf);
                 }
             }
@@ -1110,7 +1110,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         try {
 
             newPlot= copyPlot(domPlot, bindx, bindy, false);
-            if (srcElements.size() == 0) {
+            if (srcElements.isEmpty()) {
                 return newPlot;
             }
 
@@ -1297,7 +1297,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         Row row = (Row) DomUtil.getElementById(application, domPlot.getRowId());
         List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
         plotsUsingRow.remove(domPlot);
-        if (plotsUsingRow.size() == 0) {
+        if (plotsUsingRow.isEmpty()) {
             deleteRow = row;
         }
 
@@ -1327,7 +1327,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             plots.remove(domPlot);
 
             if (!plots.contains(getPlot())) {
-                if (plots.size() == 0) {
+                if (plots.isEmpty()) {
                     setPlot(null);
                 } else {
                     setPlot(plots.get(0));
@@ -1359,7 +1359,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             String dsfId = pdf.getId();
             List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
             usages.remove(dsf);
-            if (usages.size() == 0) {
+            if (usages.isEmpty()) {
                 alsoRemove.add(pdf);
             }
         }
@@ -1409,7 +1409,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             String dsfId = pdf.getId();
             List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
             usages.remove(dsf);
-            if (usages.size() == 0) {
+            if (usages.isEmpty()) {
                 alsoRemove.add(pdf);
             }
         }
@@ -1419,7 +1419,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         dsfs.removeAll(alsoRemove);
 
         if (!dsfs.contains(getDataSourceFilter())) {
-            if (dsfs.size() == 0) {
+            if (dsfs.isEmpty()) {
                 setDataSourceFilter(null);
             } else {
                 setDataSourceFilter(dsfs.get(0));
@@ -1445,7 +1445,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         DomLock lock= mutatorLock();
         while ( lock.isLocked() ) {
-            logger.info( "lock is not available: "+lock.toString() );
+            logger.log( Level.INFO, "lock is not available: {0}", lock.toString());
             System.err.println( changesSupport.isValueAdjusting() );
             try {        
                 Thread.sleep(500);
@@ -1747,7 +1747,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( binding!=null ) { 
                 deleteBinding(bm);
             } else {
-                logger.fine("expected to find binding for "+src.getId()+"."+srcProp+" to "+((DomNode)dst).getId()+"."+dstProp);
+                logger.log(Level.FINE, "expected to find binding for {0}.{1} to {2}.{3}", new Object[]{src.getId(), srcProp, ((DomNode)dst).getId(), dstProp});
             }
         } else {
             bindingSupport.unbind( src, srcProp, dst, dstProp );
@@ -1817,7 +1817,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void deleteBinding(BindingModel binding) {
         Binding b = bindingImpls.get(binding);
         if ( b==null ) {
-            new IllegalArgumentException("didn't find the binding implementation for "+binding+", ignoring").printStackTrace();
+            logger.log(Level.SEVERE, "didn''t find the binding implementation for {0}, ignoring", binding);
             return; //TODO: why?
         }
         b.unbind();
@@ -2050,9 +2050,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     public Plot getFirstPlotFor( DataSourceFilter dsf ) {
         String lookFor= dsf.getId();
         PlotElement f= null;
-
-        List<DataSourceFilter> dsfs= new ArrayList();
-        dsfs.add(dsf);
 
         for ( PlotElement pe : application.plotElements ) {
             if ( pe.getDataSourceFilterId().equals(lookFor) ) {
