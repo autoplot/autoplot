@@ -1045,7 +1045,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( dir==null && nrow==1 ) {
                 rows = Collections.singletonList(ccontroller.getRowFor(plot));
             } else {
-                rows = ccontroller.addRows(nrow,dir);
+                if ( dir==null ) {
+                    rows = ccontroller.addRows(nrow,LayoutConstants.BELOW);
+                } else {
+                    rows = ccontroller.addRows(nrow,dir);
+                }
             }
             for (int i = 0; i < nrow; i++) {
                 for (int j = 0; j < ncol; j++) {
