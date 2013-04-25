@@ -74,12 +74,33 @@ public class PlotController extends DomNodeController {
         dasPlot.getYAxis().addPropertyChangeListener(listener);
     }
 
-    public PlotController( Application dom, Plot plot ) {
+    public PlotController( final Application dom, Plot plot ) {
         super( plot );
         this.dom = dom;
         this.plot = plot;
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
+        this.plot.addPropertyChangeListener( Plot.PROP_ID, new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent evt ) {
+                if ( dom.controller.isValueAdjusting() ) return;
+                DomLock lock = dom.controller.mutatorLock();
+                lock.lock( "Changing plot id" );
+                for ( BindingModel b: dom.getBindings() ) {
+                    if ( b.getSrcId().equals(evt.getOldValue() ) ) {
+                        b.srcId= (String)evt.getNewValue();
+                    } 
+                    if ( b.getDstId().equals(evt.getOldValue() ) ) {
+                        b.dstId= (String)evt.getNewValue();
+                    }
+                }
+                for ( PlotElement pe: dom.plotElements ) {
+                    if ( pe.getPlotId().equals(evt.getOldValue()) ) {
+                        pe.setPlotId((String) evt.getNewValue());
+                    }
+                }
+                lock.unlock();
+            }
+        });
         dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
