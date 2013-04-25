@@ -168,6 +168,28 @@ public class DataSourceController extends DomNodeController {
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_VALID_RANGE, updateMePropertyChangeListener);
 
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_URI, resetMePropertyChangeListener);
+        
+        dsf.addPropertyChangeListener( Plot.PROP_ID, new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent evt ) {
+                if ( dom.controller.isValueAdjusting() ) return;
+                ChangesSupport.DomLock lock = dom.controller.mutatorLock();
+                lock.lock( "Changing dsf id" );
+                for ( BindingModel b: dom.getBindings() ) {
+                    if ( b.getSrcId().equals(evt.getOldValue() ) ) {
+                        b.srcId= (String)evt.getNewValue();
+                    } 
+                    if ( b.getDstId().equals(evt.getOldValue() ) ) {
+                        b.dstId= (String)evt.getNewValue();
+                    }
+                }
+                for ( PlotElement pe: dom.plotElements ) {
+                    if ( pe.getDataSourceFilterId().equals(evt.getOldValue()) ) {
+                        pe.setDataSourceFilterId((String) evt.getNewValue());
+                    }
+                }
+                lock.unlock();
+            }
+        });
 
     }
 
