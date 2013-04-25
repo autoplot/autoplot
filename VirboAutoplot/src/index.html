@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A script digests data for the entire Van Allen Probes mission.</small></p>
+        <p><small>Custom renderers allow for arbitrary data renderings.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -22,6 +22,9 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>plot id changes are propogated through the rest of the vap.</li>
+            <li>filenames with spaces would cause problems again.</li>
+            <li>SemanticOps.isTableDataSet wouldn't count rank 2 table with rank 2 ytags as table.</li>
             <li>3611281: Clean up TSB requests when a set of plots shares a time axis.  This bug would cause excessive hits to the das2servers.</li>
             <li>Test100 and other tests work properly again</li>
             <li>3611375: waitUntilIdle properly counts an active editor as idle.</li>
@@ -66,6 +69,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add setLayout and fixLayout commands to jython.</li>
+            <li>add getElementById to application controller.</li>
+            <li>add more efficient method for specifying das2server URIs that doesn't require parsing timeranges.</li>
+            <li>scripts called from the command-line with --script= will reflect uncaught exceptions in exit status.</li>
+            <li>test140 introduced, to support testing URI lists written by others.</li>
             <li>introduce autoplot_data/config/system.properties</li>
             <li>lanlNN can be made the default NN for testing now with a system property.</li>
             <li>data_$Y$m$d_$v.$v.$v.dat is now okay, which is more likely to be discovered by users than is $(v,sep)</li>
