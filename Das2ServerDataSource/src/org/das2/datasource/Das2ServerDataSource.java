@@ -60,12 +60,16 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
         HashMap<String,String> params2 = new HashMap(params);
         params2.put("server", "dataset");
-
+        
         if ( params.get("dataset")==null ) {
             String dataset= params.remove("arg_0");
-            if ( dataset!=null ) params.put( "dataset", dataset );
+            if ( dataset!=null ) {
+                params.put( "dataset", dataset );
+                params2.put( "dataset", dataset );
+                params2.remove("arg_0");
+            }
         }
-        
+                
         String str= params.get("timerange");
         if ( str!=null ) {
             try {
@@ -125,6 +129,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("resolution");
         otherParams.remove("dataset");
         otherParams.remove("tsb");
+        otherParams.remove("timerange");
 
         String item= (String) otherParams.remove("item");
         String interval= (String)otherParams.remove("interval");
