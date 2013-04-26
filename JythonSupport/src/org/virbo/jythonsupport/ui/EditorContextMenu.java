@@ -118,6 +118,37 @@ public class EditorContextMenu {
             throw new RuntimeException(ex);
         }
     }
+    
+    /**
+     * comment or uncomment the code.  When amount is positive, we add the comment. 
+     * When it's negative, we remove the comment from each line.
+     * @param txt the block of text, starting but not including the newline, and ending just before a newline.
+     * @param amount positive or negative number of spaces.
+     * @return
+     */
+    private static String comment( String txt, int amount ) {
+        try {
+            StringBuilder result= new StringBuilder();
+            BufferedReader r= new BufferedReader( new StringReader(txt) );
+            String dedent= amount<0 ? "   ".substring(0,-1*amount) : "";
+            String indent= amount>0 ? "   ".substring(0,   amount) : "";
+            String line= r.readLine();
+            String hash= "#";
+            while ( line!=null ) {
+                String line1= line.trim();
+                int ind= line.indexOf(line1);
+                if ( amount<0 && line1.startsWith(hash) ) line= line.substring(0,ind)+line1.substring(1);
+                if ( amount>0 ) line= hash + line.substring(0,ind) + line1;
+                result.append(line);
+                line= r.readLine();
+                if ( line!=null ) result.append("\n");
+            }
+            return result.toString();
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
 
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
@@ -273,6 +304,50 @@ public class EditorContextMenu {
                 }
             } );
             mi.setToolTipText("indent the selected block of lines");
+            actionsMenu.add( mi );
+            mi= new JMenuItem( new AbstractAction("comment block") {
+                public void actionPerformed(ActionEvent e) {
+                    int i= editor.getSelectionStart();  // note the netbeans source has all these operators, implemented correctly...
+                    int j= editor.getSelectionEnd();
+                    int limit= editor.getText().length();
+                    try {
+                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
+                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        String txt= editor.getText( i, j-i );
+                        txt= comment( txt, 1 );
+                        editor.getDocument().remove( i, j-i );
+                        editor.getDocument().insertString( i, txt, null );
+                        editor.setSelectionStart(i);
+                        editor.setSelectionEnd(i+txt.length());
+                    } catch ( BadLocationException ex ) {
+
+                    }
+                }
+            } );
+            mi.setToolTipText("comment the selected block of lines");
+            actionsMenu.add( mi );
+            mi= new JMenuItem( new AbstractAction("uncomment block") {
+                public void actionPerformed(ActionEvent e) {
+                    int i= editor.getSelectionStart();
+                    int j= editor.getSelectionEnd();
+                    int limit= editor.getText().length();
+                    try {
+                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
+                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        String txt= editor.getText( i, j-i );
+                        txt= comment( txt, -1 );
+                        editor.getDocument().remove( i, j-i );
+                        editor.getDocument().insertString( i, txt, null );
+                        editor.setSelectionStart(i);
+                        editor.setSelectionEnd(i+txt.length());
+                    } catch ( BadLocationException ex ) {
+
+                    }
+                }
+            } );
+            mi.setToolTipText("uncomment the selected block of lines");
             actionsMenu.add( mi );
 
             menu.add( actionsMenu );
