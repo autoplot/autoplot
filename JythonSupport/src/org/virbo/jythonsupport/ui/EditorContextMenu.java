@@ -150,6 +150,29 @@ public class EditorContextMenu {
     }
     
 
+    /**
+     * return the index of the start and end of the selection, rounded out
+     * to complete lines.
+     * @return [start,len] where start is the index of the first character and len is the number of characters.
+     */
+    private int[] roundLines(  ) {
+        int i= editor.getSelectionStart();  // note the netbeans source has all these operators, implemented correctly...
+        int j= editor.getSelectionEnd();
+        try {
+            int limit= editor.getText().length();
+            
+            while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+            if ( i>=0 && i<limit-1 && editor.getText(i,1).equals("\n") && !editor.getText(i+1,1).equals("\n") ) i++;
+            while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
+                        
+            return new int[] { i, j-i };
+            
+        } catch (BadLocationException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+    }
+    
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
@@ -263,19 +286,14 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("indent block") {
                 public void actionPerformed(ActionEvent e) {
-                    int i= editor.getSelectionStart();  // note the netbeans source has all these operators, implemented correctly...
-                    int j= editor.getSelectionEnd();
-                    int limit= editor.getText().length();
+                    int[] il= roundLines();
                     try {
-                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
-                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
-                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
-                        String txt= editor.getText( i, j-i );
+                        String txt= editor.getText( il[0], il[1] );
                         txt= indent( txt, 2 );
-                        editor.getDocument().remove( i, j-i );
-                        editor.getDocument().insertString( i, txt, null );
-                        editor.setSelectionStart(i);
-                        editor.setSelectionEnd(i+txt.length());
+                        editor.getDocument().remove( il[0], il[1] );
+                        editor.getDocument().insertString( il[0], txt, null );
+                        editor.setSelectionStart(il[0]);
+                        editor.setSelectionEnd(il[0]+txt.length());
                     } catch ( BadLocationException ex ) {
 
                     }
@@ -285,19 +303,14 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("dedent block") {
                 public void actionPerformed(ActionEvent e) {
-                    int i= editor.getSelectionStart();
-                    int j= editor.getSelectionEnd();
-                    int limit= editor.getText().length();
+                    int[] il= roundLines();
                     try {
-                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
-                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
-                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
-                        String txt= editor.getText( i, j-i );
+                        String txt= editor.getText( il[0], il[1] );
                         txt= indent( txt, -2 );
-                        editor.getDocument().remove( i, j-i );
-                        editor.getDocument().insertString( i, txt, null );
-                        editor.setSelectionStart(i);
-                        editor.setSelectionEnd(i+txt.length());
+                        editor.getDocument().remove( il[0], il[1] );
+                        editor.getDocument().insertString( il[0], txt, null );
+                        editor.setSelectionStart(il[0]);
+                        editor.setSelectionEnd(il[0]+txt.length());
                     } catch ( BadLocationException ex ) {
 
                     }
@@ -307,19 +320,14 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("comment block") {
                 public void actionPerformed(ActionEvent e) {
-                    int i= editor.getSelectionStart();  // note the netbeans source has all these operators, implemented correctly...
-                    int j= editor.getSelectionEnd();
-                    int limit= editor.getText().length();
+                    int[] il= roundLines();
                     try {
-                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
-                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
-                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
-                        String txt= editor.getText( i, j-i );
+                        String txt= editor.getText( il[0], il[1] );
                         txt= comment( txt, 1 );
-                        editor.getDocument().remove( i, j-i );
-                        editor.getDocument().insertString( i, txt, null );
-                        editor.setSelectionStart(i);
-                        editor.setSelectionEnd(i+txt.length());
+                        editor.getDocument().remove( il[0], il[1] );
+                        editor.getDocument().insertString( il[0], txt, null );
+                        editor.setSelectionStart(il[0]);
+                        editor.setSelectionEnd(il[0]+txt.length());
                     } catch ( BadLocationException ex ) {
 
                     }
@@ -329,19 +337,14 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("uncomment block") {
                 public void actionPerformed(ActionEvent e) {
-                    int i= editor.getSelectionStart();
-                    int j= editor.getSelectionEnd();
-                    int limit= editor.getText().length();
+                    int[] il= roundLines();
                     try {
-                        while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
-                        if ( i>=0 && editor.getText(i,1).equals("\n") ) i++;
-                        while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
-                        String txt= editor.getText( i, j-i );
+                        String txt= editor.getText( il[0], il[1] );
                         txt= comment( txt, -1 );
-                        editor.getDocument().remove( i, j-i );
-                        editor.getDocument().insertString( i, txt, null );
-                        editor.setSelectionStart(i);
-                        editor.setSelectionEnd(i+txt.length());
+                        editor.getDocument().remove( il[0], il[1] );
+                        editor.getDocument().insertString( il[0], txt, null );
+                        editor.setSelectionStart(il[0]);
+                        editor.setSelectionEnd(il[0]+txt.length());
                     } catch ( BadLocationException ex ) {
 
                     }
