@@ -6,6 +6,7 @@
 package test.endtoend;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.Map;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.zip.GZIPOutputStream;
+import org.das2.util.Base64;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -33,6 +36,29 @@ public class Test140 {
     
     private static int testid;
 
+    private static String uuwow( String t ) {
+        if ( t.length()>1024 ) {
+            throw new IllegalArgumentException("string is too long, more than 1024");
+        }
+        
+        try {
+            ByteArrayOutputStream out= new ByteArrayOutputStream();
+            GZIPOutputStream zout= new GZIPOutputStream( out );
+        
+            zout.write( t.getBytes(), 0, t.length() );
+            zout.flush();
+            zout.close();
+            
+            byte[] bytes= out.toByteArray();
+        
+            return Base64.encodeBytes( bytes );
+            
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+        
+    }
+    
     /**
      *
      * @param uri the URI to load
@@ -85,8 +111,9 @@ public class Test140 {
         setTitle(fileUri);
         String name;
         if ( doTest ) {
-            int h = uri.hashCode();
-            String id= String.format( "%016d",Math.abs(h));
+            String id= Ops.safeName( uri );
+            //int h = uri.hashCode();
+            //String id= String.format( "%016d",Math.abs(h));
             name= String.format( "test%03d_%s.png", testid, id );
             result= name;
         } else {
@@ -172,7 +199,8 @@ public class Test140 {
 
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
-            args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
+            //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
+            args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140_1.txt" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
