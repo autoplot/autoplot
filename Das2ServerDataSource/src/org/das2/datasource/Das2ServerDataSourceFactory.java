@@ -121,6 +121,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         }
         String str= params.get("timerange");
         if ( str!=null ) {
+            str= str.replaceAll("\\+"," ");
             try {
                 DatumRange tr= DatumRangeUtil.parseTimeRange( str );
                 params.put( "start_time", tr.min().toString() );

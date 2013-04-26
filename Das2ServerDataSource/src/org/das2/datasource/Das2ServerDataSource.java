@@ -72,6 +72,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 
         String str= params.get("timerange");
         if ( str!=null ) {
+            str= str.replaceAll("\\+"," ");
             try {
                 DatumRange tr= DatumRangeUtil.parseTimeRange( str );
                 params2.put( "start_time", tr.min().toString() );
