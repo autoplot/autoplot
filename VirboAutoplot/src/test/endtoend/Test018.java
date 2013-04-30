@@ -67,6 +67,8 @@ public class Test018 {
 
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
 
+        System.err.println( "xaxis.getRange()="+xaxis.getRange() );
+        System.err.println( "cacheImageValid="+domPlot.getController().getDasPlot().isCacheImageValid() );
         writeToPng(testId + "_003.png");
 
     }
