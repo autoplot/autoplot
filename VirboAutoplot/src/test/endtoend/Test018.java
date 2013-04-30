@@ -6,11 +6,15 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.util.GraphicalLogHandler;
+import org.das2.system.DasLogger;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
@@ -44,6 +48,14 @@ public class Test018 {
      */
     private static void test3(String testId) throws IOException, InterruptedException {
         System.err.println("=== test018 test3 ===");
+//        
+//        System.err.println("turn up logging");
+//        Logger logger= DasLogger.getLogger(DasLogger.GRAPHICS_LOG);
+//        logger.setLevel( Level.ALL );
+//        logger.addHandler( new GraphicalLogHandler() );
+//        
+//        logger.fine("can you hear me?");
+//        
         reset();
         Application dom = getDocumentModel();
         dom.getController().reset(); 
@@ -69,8 +81,12 @@ public class Test018 {
 
         System.err.println( "xaxis.getRange()="+xaxis.getRange() );
         System.err.println( "cacheImageValid="+domPlot.getController().getDasPlot().isCacheImageValid() );
+        System.err.println( "canvas isPendingChanges="+domPlot.getController().getDasPlot().getCanvas().isPendingChanges() );
+        System.err.println( "canvas isDirty="+domPlot.getController().getDasPlot().getCanvas().isDirty() );
         writeToPng(testId + "_003.png");
-
+        
+        //logger.setLevel( Level.INFO );
+        
     }
 
     private static void test1(String testId) throws IOException, InterruptedException {
@@ -234,7 +250,6 @@ public class Test018 {
 
             String testId= "test018";
             getDocumentModel().getOptions().setAutolayout(false);
-            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
             setCanvasSize(600, 600);
 
@@ -249,7 +264,7 @@ public class Test018 {
             test5( testId );
             test6( testId ); // test out binding
 
-            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
