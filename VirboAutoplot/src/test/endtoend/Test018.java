@@ -42,8 +42,8 @@ public class Test018 {
      * @throws IOException
      * @throws InterruptedException
      */
-    private static void test2(String testId) throws IOException, InterruptedException {
-        System.err.println("=== test018 test2 ===");
+    private static void test3(String testId) throws IOException, InterruptedException {
+        System.err.println("=== test018 test3 ===");
         reset();
         Application dom = getDocumentModel();
         dom.getController().reset(); 
@@ -56,8 +56,6 @@ public class Test018 {
         ApplicationController controller= dom.getController();
         Plot domPlot= dom.getPlots(0);
 
-        System.err.println( domPlot.getXaxis().getRange() );
-        
         Plot that = dom.getController().copyPlotAndPlotElements( domPlot, null, false, false);
         controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
         controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
@@ -67,12 +65,8 @@ public class Test018 {
 
         that.getZaxis().setRange( DatumRange.newDatumRange( 1e4, 1e8, that.getZaxis().getRange().getUnits() ) ); //TODO: why does this autorange so poorly?
 
-        getApplicationModel().waitUntilIdle(false); // TODO: look into why this is necessary.
-
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
-        getApplicationModel().waitUntilIdle(false);
 
-        SpectrogramRenderer r= (SpectrogramRenderer) domPlot.getController().getDasPlot().getRenderer(0);
         writeToPng(testId + "_003.png");
 
     }
@@ -247,8 +241,8 @@ public class Test018 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             test1( testId );
-            test2( testId );
-            //no test3, to straighten out the numbering
+            //no test2, to straighten out the numbering
+            test3( testId );
             test4( testId );
             test5( testId );
             test6( testId ); // test out binding
