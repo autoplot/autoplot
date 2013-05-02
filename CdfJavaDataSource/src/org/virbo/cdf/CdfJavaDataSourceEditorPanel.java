@@ -278,7 +278,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     long subsetMaxRec=-1;
 
     File cdfFile;
-    CDF cdf=null;
+    CDF cdf;
+    Throwable cdfException;
 
     /**
      * allow more abstract sources, namely cdaweb, to turn off these controls.
@@ -306,12 +307,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
         DataSetURI.checkLength(cdfFile);
 
+        logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
         try {
-            cdf = cdf = CdfJavaDataSource.getCdfFile(cdfFile.toString());
+            cdf = CdfJavaDataSource.getCdfFile(cdfFile.toString());
+            cdfException= null;
         } catch ( Exception ex ) {
-            throw ex;
+            cdfException= ex;
         } catch ( Throwable ex ) {
-            throw new Exception(ex);
+            cdfException= ex;
         }
         return true;
     }
@@ -328,7 +331,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             String fileName= cdfFile.toString();
 
             logger.log(Level.FINE, "opening cdf file {0}", fileName);
-            if ( cdf==null ) {
+            if ( cdf==null && cdfException==null ) {
                 try {
                     cdf = CdfJavaDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
@@ -336,6 +339,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 }
             }
     
+            if ( cdfException!=null ) {
+                this.selectVariableLabel.setText( " " );
+                this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("Error") ) );
+                this.paramInfo.setText( "\nUnable to read cdf file." );
+                return;
+            }
+            
             logger.finest("inspect cdf for plottable parameters");
             
                 boolean isMaster= fileName.contains("MASTERS");

@@ -272,6 +272,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     File cdfFile;
     CDF cdf;
+    CDFException cdfException;
 
     /**
      * allow more abstract sources, namely cdaweb, to turn off these controls.
@@ -299,7 +300,13 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         DataSetURI.checkLength(cdfFile);
 
         logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
-        cdf= CdfFileDataSourceFactory.getCDFFile( cdfFile.toString() ); // only open the cdf once.
+        try {
+            cdf= CdfFileDataSourceFactory.getCDFFile( cdfFile.toString() ); // only open the cdf once.
+            cdfException= null;
+        } catch ( CDFException ex ) {
+            this.cdf= null;
+            this.cdfException= ex;
+        }
 
         return true;
     }
@@ -310,8 +317,15 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         try {
 
-            if ( cdf==null ) {
+            if ( cdf==null && cdfException==null ) {
                 cdf= CdfFileDataSourceFactory.getCDFFile( cdfFile.toString() ); // only open the cdf once.
+            }
+            
+            if ( cdfException!=null ) {
+                this.selectVariableLabel.setText( " " );
+                this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("Error") ) );
+                this.paramInfo.setText( "\n"+cdfException.toString() );
+                return;
             }
             
             logger.finest("inspect cdf for plottable parameters");
