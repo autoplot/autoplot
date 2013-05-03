@@ -72,54 +72,108 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
         File file= new File( split.resourceUri );
+        boolean append= params.get("append").equals("T") ;
         
-        if ( file.exists() && !file.delete() ) {
-            throw new IllegalArgumentException("Unable to delete file"+file);
+        if ( ! append ) {
+            if ( file.exists() && !file.delete() ) {
+                throw new IllegalArgumentException("Unable to delete file"+file);
+            }
+            cdf = CDF.create( file.toString() );
+            unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
+            lablAxisAttr= Attribute.create( cdf, "LABLAXIS", VARIABLE_SCOPE );
+            catdescAttr= Attribute.create( cdf, "CATDESC", VARIABLE_SCOPE );
+            displayTypeAttr=  Attribute.create( cdf, "DISPLAY_TYPE", VARIABLE_SCOPE );
+            validmaxAttr= Attribute.create( cdf, "VALIDMAX", VARIABLE_SCOPE );
+            validminAttr= Attribute.create( cdf, "VALIDMIN", VARIABLE_SCOPE );
+            fillvalAttr= Attribute.create( cdf, "FILLVAL", VARIABLE_SCOPE );
+            scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
+            scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
+            formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
+
+        } else {
+            if ( file.exists() ) {
+                cdf= CDF.open(file.toString());
+                unitsAttr= cdf.getAttribute( "UNITS" );
+                lablAxisAttr= cdf.getAttribute( "LABLAXIS" );
+                catdescAttr= cdf.getAttribute( "CATDESC" );
+                displayTypeAttr=  cdf.getAttribute( "DISPLAY_TYPE" );
+                validmaxAttr= cdf.getAttribute( "VALIDMAX" );
+                validminAttr= cdf.getAttribute( "VALIDMIN" );
+                fillvalAttr= cdf.getAttribute( "FILLVAL" );
+                scalemaxAttr= cdf.getAttribute( "SCALEMAX" );
+                scaleminAttr= cdf.getAttribute( "SCALEMIN" );
+                formatAttr=  cdf.getAttribute( "FORMAT" );
+                
+            } else {
+                cdf = CDF.create( file.toString() );
+                unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
+                lablAxisAttr= Attribute.create( cdf, "LABLAXIS", VARIABLE_SCOPE );
+                catdescAttr= Attribute.create( cdf, "CATDESC", VARIABLE_SCOPE );
+                displayTypeAttr=  Attribute.create( cdf, "DISPLAY_TYPE", VARIABLE_SCOPE );
+                validmaxAttr= Attribute.create( cdf, "VALIDMAX", VARIABLE_SCOPE );
+                validminAttr= Attribute.create( cdf, "VALIDMIN", VARIABLE_SCOPE );
+                fillvalAttr= Attribute.create( cdf, "FILLVAL", VARIABLE_SCOPE );
+                scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
+                scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
+                formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
+
+            }
         }
-        cdf = CDF.create( file.toString() );
+        
 
         nameFor(data); // allocate a good name
 
-        unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
-        lablAxisAttr= Attribute.create( cdf, "LABLAXIS", VARIABLE_SCOPE );
-        catdescAttr= Attribute.create( cdf, "CATDESC", VARIABLE_SCOPE );
-        displayTypeAttr=  Attribute.create( cdf, "DISPLAY_TYPE", VARIABLE_SCOPE );
-        validmaxAttr= Attribute.create( cdf, "VALIDMAX", VARIABLE_SCOPE );
-        validminAttr= Attribute.create( cdf, "VALIDMIN", VARIABLE_SCOPE );
-        fillvalAttr= Attribute.create( cdf, "FILLVAL", VARIABLE_SCOPE );
-        scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
-        scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
-        formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
-
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 
-        if (dep0 != null) {
-            String name= nameFor(dep0);
-            addVariableRankN(dep0, name, new HashMap<String,String>(),mon);
-            depend_0 = Attribute.create(cdf, "DEPEND_0", VARIABLE_SCOPE);
+        if ( dep0 != null ) {
+            if ( !append ) {
+                String name= nameFor(dep0);
+                addVariableRankN(dep0, name, new HashMap<String,String>(),mon);
+            }
+            try {
+                depend_0 = Attribute.create(cdf, "DEPEND_0", VARIABLE_SCOPE);
+            } catch ( CDFException ex ) {
+                depend_0 = cdf.getAttribute("DEPEND_0");
+            }
         }
         
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
 
         if (dep1 != null) {
-            String name= nameFor(dep1);
-            addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
-            depend_1 = Attribute.create(cdf, "DEPEND_1", VARIABLE_SCOPE);
+            if ( !append ) {
+                String name= nameFor(dep1);
+                addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
+            }
+            try {
+                depend_1 = Attribute.create(cdf, "DEPEND_1", VARIABLE_SCOPE);
+            } catch ( CDFException ex ) {
+                depend_1 = cdf.getAttribute("DEPEND_1");
+            }
         }
 
         QDataSet dep2 = (QDataSet) data.property(QDataSet.DEPEND_2);
 
         if (dep2 != null) {
-            String name= nameFor(dep2);
-            addVariableRank1NoVary(dep2, name, new HashMap<String,String>(), new NullProgressMonitor() );
-            depend_2 = Attribute.create(cdf, "DEPEND_2", VARIABLE_SCOPE);
+            if ( !append ) {
+                String name= nameFor(dep2);
+                addVariableRank1NoVary(dep2, name, new HashMap<String,String>(), new NullProgressMonitor() );
+            }
+            try {
+                depend_2 = Attribute.create(cdf, "DEPEND_2", VARIABLE_SCOPE);
+            } catch ( CDFException ex ) {
+                depend_2 = cdf.getAttribute("DEPEND_2");
+            }
         }
 
         Variable var= addVariableRankN(data, nameFor(data), params, mon );
         
-        if ( dep0!=null ) Entry.create( depend_0, var.getID(), CDF_CHAR, nameFor(dep0) );
-        if ( dep1!=null ) Entry.create( depend_1, var.getID(), CDF_CHAR, nameFor(dep1) );
-        if ( dep2!=null ) Entry.create( depend_2, var.getID(), CDF_CHAR, nameFor(dep2) );
+        try {
+            if ( dep0!=null ) Entry.create( depend_0, var.getID(), CDF_CHAR, nameFor(dep0) );
+            if ( dep1!=null ) Entry.create( depend_1, var.getID(), CDF_CHAR, nameFor(dep1) );
+            if ( dep2!=null ) Entry.create( depend_2, var.getID(), CDF_CHAR, nameFor(dep2) );
+        } catch ( CDFException ex ) {
+            ex.printStackTrace();
+        }
 
         cdf.close();
 
