@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Custom renderers allow for arbitrary data renderings.</small></p>
+        <p><small>New test140 makes it easy to test to see that a set of URIs doesn't change.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -22,6 +22,8 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>"24 hours" / "60 minutes" works properly now (=24)</li>
+            <li>poor feedback when malformed cdf is used</li>
             <li>plot id changes are propogated through the rest of the vap.</li>
             <li>filenames with spaces would cause problems again.</li>
             <li>SemanticOps.isTableDataSet wouldn't count rank 2 table with rank 2 ytags as table.</li>
@@ -44,31 +46,10 @@
             <li>rte_0932474502: User arm at Iowa would get runtime errors about width=0 on SunOS.  </li>
             <li>3610169: JythonDataSources wouldn't reject if the timeseries was not specified, causing ranges to reset because it wouldn't adopt the axis range.</li>
             <li>Steve at Goddard pointed out that is nearly impossible to select multiple plots and swap two plots' positions on a mac without a mouse.</li>
-            <li>Reload all data now resets Jython data source properly, which would cache the interpreter.</li>
-            <li>excessive gaps in LSpec routine resolved by loosening intra-sweep cadence check.</li>
-            <li>unrecognized errors from the Data Sources were only printed to the status bar.  Now we get a popup.</li>
-            <li>jython getItem for QDataSet could fail if dataset was not writable.</li>
-            <li>trimDataSet's trim operation wouldn't allow a trim(0,len) operation to work.</li>
-            <li>jython invoke(name,PyObject args) did not properly wrap the function
-            <li>bookmarks download timeout was in milliseconds instead of seconds, which caused RTE now that there is a 12 hour limit.</li>
-            <li>initial coding of int8 transfer type in QStream had bug</li>
-            <li>2987871: limit the number of records formatted to the log console BEFORE formatting them, not after</li>
-            <li>fix problem where save vap before load vap would leave Craig in a strange folder</li>
-            <li>Leonard pointed out case where CAA would return CDFs that didn't properly mark fill and would cause RTE.</li>
-            <li>Reiner had RTE caused by URL having "user@" inserted automatically when authorization was needed</li>
-            <li>Bugfix when output of rank 2 where was used to index dataset.</li>
-            <li>Non-ascii check in ascii parser didn't account for tabs (ascii=9)</li>
-            <li>trace function restored when developing jython scripts.</li>
-            <li>3609543: downloadResourceAsTempFile cleanup policy changed to support multiple processes and Tomcat servers</li>
-            <li>history dialog takes timezone into account when listing today, yesterday, etc</li>
-            <li>recent change broke BUNDLE in rank 3 datasets from CDF file.</li>
-            <li>sprocess was called twice when exporting the processed data.</li>
-            <li>3608830: disable export options that won't work.</li>
-            <li>rte_1825469520: URL doesn't contain authority (http:///autoplot.org/)</li>
-            <li>recent history takes current timezone into account when listing today and yesterday's URIs</li>
         </ul>
         <p>Features:</p>
         <ul>
+	    <li>add createEvent method to make it easy to create events datasets in scripts.</li>
             <li>add setLayout and fixLayout commands to jython.</li>
             <li>add getElementById to application controller.</li>
             <li>add more efficient method for specifying das2server URIs that doesn't require parsing timeranges.</li>
@@ -77,6 +58,9 @@
             <li>introduce autoplot_data/config/system.properties</li>
             <li>lanlNN can be made the default NN for testing now with a system property.</li>
             <li>data_$Y$m$d_$v.$v.$v.dat is now okay, which is more likely to be discovered by users than is $(v,sep)</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>greaterOf and lesserOf methods introduced</li>
             <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
             <li>QStream now has int8 transfer type to support CDF_TT2000 timetags.</li>
@@ -88,18 +72,6 @@
             <li>interpolate binXinterpY introduced.</li>
             <li>checkQube introduced to detect when datasets are really QUBEs and some opperations apply.</li>
             <li>Jython invokeLater command introduced to support simple concurrent scripts.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>new three-argument |fftPower(512,2,'Hanning') function allows slide and window selection.</li>
-            <li>add "copy to clipboard" popup menu item to pngwalk tool, so users can easily copy an image to an email.</li>
-            <li>allow autoplot.emailrte=T in properties to allow emailing RTE from networks that don't allow POST</li>
-            <li>request processor thread limit is upped to 8 from 6, which was a kludgy fix.</li>
-            <li>ascii parser has new format spec, e.g. format='f8,i2,i2,i2'</li>
-            <li>add controls for label and title in ASCII URIs.</li>
-            <li>record source of scripts installed in tools menu.</li>
-            <li>sliceRebinnedData is now persistent between sessions, and is off by default.</li>
-            <li>add experimental rebinner for LANL RBSP data that indicates spectrogram boundaries</li>
         </ul>
 
         <p>Known issues:</p>
