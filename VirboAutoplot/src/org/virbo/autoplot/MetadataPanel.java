@@ -26,8 +26,10 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.AutoHistogram;
@@ -360,6 +362,19 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
         });
     }
+    
+    private QDataSet getCadenceJoin( QDataSet ds ) {
+        JoinDataSet cadence= new JoinDataSet(1);
+        for ( int i=0; i<ds.length(); i++ ) {
+            QDataSet dep0= (QDataSet) ds.slice(0).property(QDataSet.DEPEND_0);
+            if ( dep0==null ) {
+                cadence.join( DataSetUtil.asDataSet(1) );
+            } else {
+                cadence.join( (RankZeroDataSet) dep0.property(QDataSet.CADENCE) );
+            }
+        }
+        return cadence;
+    }
 
     @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
@@ -412,18 +427,23 @@ public class MetadataPanel extends javax.swing.JPanel {
 
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
 
-            RankZeroDataSet cadence;
+            QDataSet cadence;
 
             if (dep0 == null) {
-                cadence = DataSetUtil.asDataSet(1);
+                if ( SemanticOps.isJoin(ds) ) {
+                    cadence= getCadenceJoin( ds );
+                } else {
+                    cadence = DataSetUtil.asDataSet(1);
+                }
             } else {
                 cadence = (RankZeroDataSet) dep0.property(QDataSet.CADENCE);
             }
 
             if (cadence != null) {
-                Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
-                Units u = d.getUnits();
-                map.put("Cadence", format(d.doubleValue(u)) + " " + u);
+                //Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
+                //Units u = d.getUnits();
+                //map.put("Cadence", format(d.doubleValue(u)) + " " + u);
+                map.put("Cadence", cadence );
             } else {
                 map.put("Cadence", "null");
             }
