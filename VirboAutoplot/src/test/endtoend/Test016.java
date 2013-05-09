@@ -65,13 +65,11 @@ public class Test016 {
             dep0.putProperty(QDataSet.UNITS, autoRange.property(QDataSet.UNITS) );
         }
 
-        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
-        
         plot( hist );
         setCanvasSize( 600, 600 );
 
         //final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
-        xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
         xAxis.setLabel(DataSetUtil.format(autoRange));
 
