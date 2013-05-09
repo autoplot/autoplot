@@ -174,65 +174,68 @@ public class DodsDataSource extends AbstractDataSource {
         String label= adapter.getSource().toString();
         mon.setProgressMessage( "parse " + label+".dds" );
 
-        MyDDSParser parser = new MyDDSParser();
-        parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
+        try {
+            MyDDSParser parser = new MyDDSParser();
+            parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
 
-        getMetadata(mon);
+            getMetadata(mon);
 
-        Map<String,Object> interpretedMetadata = null;
+            Map<String,Object> interpretedMetadata = null;
 
-        boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
-        if (isIstp) {
-            Map<String,Object> m = new IstpMetadataModel().properties(metadata);
-            interpretedMetadata = m;
-        }
+            boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
+            if (isIstp) {
+                Map<String,Object> m = new IstpMetadataModel().properties(metadata);
+                interpretedMetadata = m;
+            }
 
-        if (isIstp) {
-                String constraint1 = getIstpConstraint(adapter, metadata, parser, variable);
-                adapter.setConstraint(constraint1);
+            if (isIstp) {
+                    String constraint1 = getIstpConstraint(adapter, metadata, parser, variable);
+                    adapter.setConstraint(constraint1);
 
-        } else {
+            } else {
 
-            if (this.constraint == null && adapter.getVariable()!=null ) {
-                StringBuilder constraint1 = new StringBuilder("?");
-                constraint1.append(adapter.getVariable());
-                if (!adapter.getVariable().contains("[")) {
-                    int[] ii = parser.getRecDims(adapter.getVariable());
-                    if (ii != null) {
-                        for (int i = 0; i < ii.length; i++) {
-                            constraint1.append("[0:1:").append(ii[i]).append("]");
+                if (this.constraint == null && adapter.getVariable()!=null ) {
+                    StringBuilder constraint1 = new StringBuilder("?");
+                    constraint1.append(adapter.getVariable());
+                    if (!adapter.getVariable().contains("[")) {
+                        int[] ii = parser.getRecDims(adapter.getVariable());
+                        if (ii != null) {
+                            for (int i = 0; i < ii.length; i++) {
+                                constraint1.append("[0:1:").append(ii[i]).append("]");
+                            }
                         }
                     }
+                    adapter.setConstraint(constraint1.toString());
                 }
-                adapter.setConstraint(constraint1.toString());
             }
+
+            adapter.loadDataset( mon, metadata );
+            MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
+
+            if (isIstp) {
+                interpretedMetadata.remove("DEPEND_0");
+                interpretedMetadata.remove("DEPEND_1");
+                interpretedMetadata.remove("DEPEND_2");
+                DataSetUtil.putProperties(interpretedMetadata, ds);
+            }
+
+            synchronized (this) {
+                AttributeTable at = das.getAttributeTable(variable);
+                ds.putProperty(QDataSet.METADATA,at);
+            }
+
+            if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
+                ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+            }
+
+            //ds.putProperty( QDataSet.UNITS, null );
+            //ds.putProperty( QDataSet.DEPEND_0, null );
+            return ds;
+        } finally {
+            
+            mon.finished();
+
         }
-
-        adapter.loadDataset( mon, metadata );
-        MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
-
-        if (isIstp) {
-            interpretedMetadata.remove("DEPEND_0");
-            interpretedMetadata.remove("DEPEND_1");
-            interpretedMetadata.remove("DEPEND_2");
-            DataSetUtil.putProperties(interpretedMetadata, ds);
-        }
-
-        mon.finished();
-
-        synchronized (this) {
-            AttributeTable at = das.getAttributeTable(variable);
-            ds.putProperty(QDataSet.METADATA,at);
-        }
-
-        if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
-            ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
-        }
-
-        //ds.putProperty( QDataSet.UNITS, null );
-        //ds.putProperty( QDataSet.DEPEND_0, null );
-        return ds;
-
     }
 
     @Override
