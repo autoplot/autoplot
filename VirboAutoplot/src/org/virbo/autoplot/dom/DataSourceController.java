@@ -1493,6 +1493,9 @@ public class DataSourceController extends DomNodeController {
                 if ( message.startsWith("550 ") ) {
                     message= message.substring(4);
                 }
+                if ( message.startsWith("file:/") || message.startsWith("http://") || message.startsWith("https://" ) ) {
+                    message= "File not found: "+message;
+                }
                 setException(ex);
                 setDataSet(null);
                 setStatus("warning: " + message);
