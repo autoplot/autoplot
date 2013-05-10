@@ -126,8 +126,11 @@ public class Test019 {
      */
     public static void testTimeParser() throws Exception {
         //LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
-        //testTimeParser1( "$(periodic;offset=2285;start=2000-346;period=PT27D)", "2286", "2001-373/PT27D");
-        testTimeParser1( "$(j,Y=2012)$(hrinterval,names=01|02|03|04)", "01702", "2012-01-17T06:00/18:00");
+        testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "0",  "2000-001");
+        testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "20", "2000-021");        
+        testTimeParser1( "$(periodic;offset=2285;start=2000-346;period=P27D)", "1", "1832-02-08/P27D");
+        testTimeParser1( "$(periodic;offset=2285;start=2000-346;period=P27D)", "2286", "2001-007/P27D");        
+        testTimeParser1( "$(j,Y=2012)$(hrinterval,names=01|02|03|04)", "01702", "2012-01-17T06:00/12:00");
         testTimeParser1( "$(j,Y=2012).$H$M$S.$(subsec,places=3)", "017.020000.245", "2012-01-17T02:00:00.245/02:00:00.246");
         testTimeParser1( "$(j,Y=2012).$x.$X.$(ignore).$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
         testTimeParser1( "$(j,Y=2012).*.*.*.$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
