@@ -168,11 +168,9 @@ public class Test019 {
         DatumRange dr= parseISO8601Range(test);
         DatumRange drref= parseISO8601Range(ref);
         if ( drref.equals(dr) ) {
-            System.err.println(test);
+            System.err.println( "OK: "+test );
         } else {
-            System.err.println( test + " != " + ref + ", " + dr + "!=" + drref );
-            dr= parseISO8601Range(test); // for debugging
-            drref= parseISO8601Range(ref);
+            throw new IllegalArgumentException( "test failed: "+ test + " != " + ref + ", " + dr + "!=" + drref );
         }
     }
 
@@ -194,7 +192,6 @@ public class Test019 {
             testRestrictedFileSystemAccess();
             testLayout();
             testFileSystemModel();
-            testTimeParser();
         } catch (Exception ex) {
             TestSupport.logger.log( Level.SEVERE, "error in test019", ex );
             ex.printStackTrace();
