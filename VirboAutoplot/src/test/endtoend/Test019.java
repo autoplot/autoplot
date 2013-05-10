@@ -12,12 +12,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileSystem;
+import static test.datum.TestDatumRangeUtil.testParse8601_1;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include
@@ -122,6 +124,10 @@ public class Test019 {
      * @throws Exception
      */
     public static void testTimeParser() throws Exception {
+        testTimeParser1( "$(j,Y=2012).$H$M$S.$(subsec,places=3)", "017.020000.245", "2012-01-17T02:00:00.245/02:00:00.246");
+        testTimeParser1( "$(j,Y=2012).$x.$X.$(ignore).$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
+        testTimeParser1( "$(o,id=rbspa-pp)", "31",  "2012-09-10T14:45:51.316Z/2012-09-10T23:44:37.174Z");
+        //testTimeParser1( "$(j,Y=2012)$(hrinterval,names=01|02|03|04)", "01702", "2012-01-17T06:00/18:00");
         testTimeParser1( "$-1Y $-1m $-1d $H$M", "2012 03 30 1620", "2012-03-30T16:20 to 2012-03-30T16:21" );
         testTimeParser1( "$Y",            "2012",     "2012-01-01T00:00 to 2013-01-01T00:00");
         testTimeParser1( "$Y-$j",         "2012-017", "2012-01-17T00:00 to 2012-01-18T00:00");
@@ -158,8 +164,33 @@ public class Test019 {
         System.err.printf( "%d parses of %s: %d ms\n", nt, test, System.currentTimeMillis()-t0 );
     }
     
+    public static void testParse8601_1( String test, String ref ) throws ParseException {
+        DatumRange dr= parseISO8601Range(test);
+        DatumRange drref= parseISO8601Range(ref);
+        if ( drref.equals(dr) ) {
+            System.err.println(test);
+        } else {
+            System.err.println( test + " != " + ref + ", " + dr + "!=" + drref );
+            dr= parseISO8601Range(test); // for debugging
+            drref= parseISO8601Range(ref);
+        }
+    }
+
+    public static void testParse8601() throws ParseException {
+        testParse8601_1( "2000-01-01T13:00Z/PT1H", "2000-01-01T13:00Z/2000-01-01T14:00" );
+        testParse8601_1( "20000101T1300Z/PT1H", "2000-01-01T13:00Z/2000-01-01T14:00" );
+        testParse8601_1( "2000-01-01T00:00Z/P1D", "2000-01-01T00:00Z/2000-01-01T24:00" );
+        testParse8601_1( "2007-03-01T13:00:00Z/P1Y2M10DT2H30M", "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" );
+        testParse8601_1( "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z", "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" );
+        testParse8601_1( "P1Y2M10DT2H30M/2008-05-11T15:30:00Z", "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" );
+        testParse8601_1( "2008-05-10/2008-05-11", "2008-05-10T00:00:00Z/2008-05-11T00:00:00Z" );
+        testParse8601_1( "2008-009/2008-010", "2008-01-09T00:00:00Z/2008-01-10T00:00:00Z" );
+    }
+    
     public static void main( String[] args ) {
         try {
+            testTimeParser();
+            testParse8601(); // this test comes from a test within das2.
             testRestrictedFileSystemAccess();
             testLayout();
             testFileSystemModel();
