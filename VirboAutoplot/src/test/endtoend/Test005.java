@@ -121,7 +121,7 @@ public class Test005 {
 
             xxx("demo13");
 
-            plot("vap:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
+            plot("http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
             xxx("demo14");
 
