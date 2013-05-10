@@ -18,6 +18,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import static test.datum.TestDatumRangeUtil.testParse8601_1;
 
@@ -124,8 +125,13 @@ public class Test019 {
      * @throws Exception
      */
     public static void testTimeParser() throws Exception {
+        //LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
         testTimeParser1( "$(j,Y=2012).$H$M$S.$(subsec,places=3)", "017.020000.245", "2012-01-17T02:00:00.245/02:00:00.246");
         testTimeParser1( "$(j,Y=2012).$x.$X.$(ignore).$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
+        testTimeParser1( "$(j,Y=2012).*.*.*.$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
+        // The following shows a bug where it doesn't consider the length of $H and just stops on the next period.
+        // A field cannot contain the following delimiter.
+        //  testTimeParser1( "$(j,Y=2012).*.$H", "017.x.y.z.02", "2012-01-17T02:00:00/03:00:00");
         testTimeParser1( "$(o,id=rbspa-pp)", "31",  "2012-09-10T14:45:51.316Z/2012-09-10T23:44:37.174Z");
         //testTimeParser1( "$(j,Y=2012)$(hrinterval,names=01|02|03|04)", "01702", "2012-01-17T06:00/18:00");
         testTimeParser1( "$-1Y $-1m $-1d $H$M", "2012 03 30 1620", "2012-03-30T16:20 to 2012-03-30T16:21" );
