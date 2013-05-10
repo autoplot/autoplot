@@ -176,7 +176,11 @@ public class DodsDataSource extends AbstractDataSource {
 
         try {
             MyDDSParser parser = new MyDDSParser();
-            parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
+            try {
+                parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
+            } catch ( FileNotFoundException ex ) {
+                throw new FileNotFoundException( "OpenDAP Server unavailable, file not found: \n"+ex.getMessage());
+            }
 
             getMetadata(mon);
 
