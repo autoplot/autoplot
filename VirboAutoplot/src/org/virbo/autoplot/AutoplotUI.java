@@ -2553,14 +2553,18 @@ APSplash.checkTime("init 52");
             }
             buffy.append("</ul>" );
 
+            buffy.append( "<h2>Open Source Components:</h2>");
+            buffy.append( "Autoplot uses many open-source components, such as: <br>");
+            buffy.append( "OpenDAP, jsyntaxpane, Jython, CDF, FITS, NetCDF, HSSF (Excel), Batik (PDF), iText, JSON, POI, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
+            
             buffy.append("<h2>Runtime Information:</h2>");
 
             String javaVersion = System.getProperty("java.version"); // applet okay
             String arch = System.getProperty("os.arch"); // applet okay
             java.text.DecimalFormat nf = new java.text.DecimalFormat("0.0");
-            String mem = nf.format(Runtime.getRuntime().maxMemory() / (1024 * 1024));
-            String tmem= nf.format(Runtime.getRuntime().totalMemory() / (1024 * 1024));
-            String fmem= nf.format(Runtime.getRuntime().freeMemory() / (1024 * 1024));
+            String mem = nf.format(Runtime.getRuntime().maxMemory()   / 1000000 );
+            String tmem= nf.format(Runtime.getRuntime().totalMemory() / 1000000 );
+            String fmem= nf.format(Runtime.getRuntime().freeMemory()  / 1000000 );
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
             String aboutContent = "<ul>" +
                 "<li>Java version: " + javaVersion +
@@ -2571,6 +2575,7 @@ APSplash.checkTime("init 52");
                 "<li>pwd: " + pwd +
                 "</ul>";
             buffy.append( aboutContent );
+            
             buffy.append("</html>");
 
 
