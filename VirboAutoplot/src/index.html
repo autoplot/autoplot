@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New test140 makes it easy to test to see that a set of URIs doesn't change.</small></p>
+        <p><small>Improved support for ISO8601 time ranges.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -22,9 +22,17 @@
 
         <p>Bugfixes:</p>
         <ul>
+            <li>Thread deadlock was showing up in Hudson tests.</li>
+            <li>OpenDAP error feedback improved while CDAWeb's OpenDAP server is currently down.</li>
+            <li>bugfix labels in ascii tables when units contain * / and ^.</li>
+            <li>Bob had a short list of bugs.</li>
+            <li>Bugfix in QStream reduction when Join dataset is reduced.</li>
+            <li>rte_1999763719: malformed CDF gave the impression problem was with Autoplot</li>
             <li>"24 hours" / "60 minutes" works properly now (=24)</li>
-            <li>poor feedback when malformed cdf is used</li>
             <li>plot id changes are propogated through the rest of the vap.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>filenames with spaces would cause problems again.</li>
             <li>SemanticOps.isTableDataSet wouldn't count rank 2 table with rank 2 ytags as table.</li>
             <li>3611281: Clean up TSB requests when a set of plots shares a time axis.  This bug would cause excessive hits to the das2servers.</li>
@@ -35,43 +43,26 @@
             <li>rfe 3596086: CDF Java implementation now implements slice1 to save memory</li>
             <li>more corrections for Windows names like c:\foo\file.txt</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Improve support for bins datasets for tags.  slice0 didn't properly handle this, or the display data slice.</li>
-            <li>old NN and spectrogram routines didn't handle bins tags, seriously misrepresenting the data.</li>
-            <li>autoplot_data/config/system.properties includes rangeChecking switch after bins datasets caused incorrect rendering of data.</li>
-            <li>Java CDF reader improves support for slice1 by slicing as each block is read in.</li>
-            <li>waitUntilIdle checks the event queue again for pending updates (test018 would fail occasionally)</li>
-            <li>test100 (Jemmy GUI testing) and test037 (user scripts) are functional again.</li>
-            <li>rte_0932474502: User arm at Iowa would get runtime errors about width=0 on SunOS.  </li>
-            <li>3610169: JythonDataSources wouldn't reject if the timeseries was not specified, causing ranges to reset because it wouldn't adopt the axis range.</li>
-            <li>Steve at Goddard pointed out that is nearly impossible to select multiple plots and swap two plots' positions on a mac without a mouse.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>New ISO8601 range parser supports "2012-02-02T02:00/04:00"</li>
+            <li>New timerange field types from http://tsds.org/uri_specification, including $x, hrinterval, subsec and periodic.</li>
+            <li>Start list of open source components in help screen, report memory sizes in 1000*1000 byte units, not 1024*1024.</li>
+            <li>Metadata veiw of dataset checks for JoinDataSets so they can be inspected, cadence is reported for each joined dataset.</li>
+            <li>interpolateGrid introduced, which performs rank 2 interpolation when for 1-D X and Y grid.</li>
 	    <li>add createEvent method to make it easy to create events datasets in scripts.</li>
+            <li>add fft that supports slide and windows but still provides access to real and imaginary components.</li>
             <li>add setLayout and fixLayout commands to jython.</li>
             <li>add getElementById to application controller.</li>
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>add more efficient method for specifying das2server URIs that doesn't require parsing timeranges.</li>
             <li>scripts called from the command-line with --script= will reflect uncaught exceptions in exit status.</li>
             <li>test140 introduced, to support testing URI lists written by others.</li>
             <li>introduce autoplot_data/config/system.properties</li>
             <li>lanlNN can be made the default NN for testing now with a system property.</li>
             <li>data_$Y$m$d_$v.$v.$v.dat is now okay, which is more likely to be discovered by users than is $(v,sep)</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>greaterOf and lesserOf methods introduced</li>
-            <li>submit runtime error has button to switch to email submit, supporting environments where post is not allowed.</li>
-            <li>QStream now has int8 transfer type to support CDF_TT2000 timetags.</li>
-            <li>Additional ticks from... dialog keeps a separate history.</li>
-            <li>Introduction of SparseDataSet, backed by a map and used to easily describe bundles.</li>
-            <li>finally, ~ can be used in the address bar to refer to one's home folder</li>
-            <li>export data disabled options are not valid.</li>
-            <li>TITLE property is propogated through fftPower</li>
-            <li>interpolate binXinterpY introduced.</li>
-            <li>checkQube introduced to detect when datasets are really QUBEs and some opperations apply.</li>
-            <li>Jython invokeLater command introduced to support simple concurrent scripts.</li>
         </ul>
 
         <p>Known issues:</p>
