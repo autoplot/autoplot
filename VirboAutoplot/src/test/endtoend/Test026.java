@@ -14,7 +14,7 @@ import org.das2.datum.UnitsConverter;
 import static org.das2.datum.DatumRangeUtil.*;
 
 /**
- * Tests of time parsing.  A little testing appears in Test009, but this
+ * Tests of time parsing.  A little testing appears in Test019, but this
  * provides an comprehensive list that will be a good reference.
  * @author jbf
  */
