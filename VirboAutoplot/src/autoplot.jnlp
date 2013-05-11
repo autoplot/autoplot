@@ -54,7 +54,6 @@
     </resources> 
 
     <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
-        <argument>--nativeLAF</argument>
         <!-- <argument>- -eventThreadMonitor</argument> <!- - object monitors for slow GUI response and hung application -->
         <!-- <argument>http://autoplot.org/data/versioning/data_2010_03_01_v1.00.qds</argument> -->
         <!-- <argument>http://autoplot.org/data/versioning/data_2010_03_02_v1.00.qds</argument> -->
