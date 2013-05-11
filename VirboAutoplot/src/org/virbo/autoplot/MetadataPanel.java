@@ -370,7 +370,9 @@ public class MetadataPanel extends javax.swing.JPanel {
             if ( dep0==null ) {
                 cadence.join( DataSetUtil.asDataSet(1) );
             } else {
-                cadence.join( (RankZeroDataSet) dep0.property(QDataSet.CADENCE) );
+                if ( dep0.property(QDataSet.CADENCE)!=null ) {
+                    cadence.join( (RankZeroDataSet) dep0.property(QDataSet.CADENCE) );
+                }
             }
         }
         return cadence;
