@@ -121,7 +121,7 @@ public class Test019 {
 
     /**
      * test time parsing when the format is known.  This time parser is much faster than the time parser of Test009, which must
-     * infer the format as it parses.
+     * infer the format as it parses. 
      * @throws Exception
      */
     public static void testTimeParser() throws Exception {
@@ -176,8 +176,8 @@ public class Test019 {
     }
     
     public static void testParse8601_1( String test, String ref ) throws ParseException {
-        DatumRange dr= parseISO8601Range(test);
         DatumRange drref= parseISO8601Range(ref);
+        DatumRange dr= parseISO8601Range(test);
         if ( drref.equals(dr) ) {
             System.err.println( "OK: "+test );
         } else {
@@ -185,7 +185,13 @@ public class Test019 {
         }
     }
 
+    /**
+     * Test026 also checks this.
+     */
     public static void testParse8601() throws ParseException {
+        testParse8601_1( "2012-01-17T02:00:00.245/02:00:00.246", "2012-01-17T02:00:00.245/2012-01-17T02:00:00.246" );
+        testParse8601_1( "2007-12-14T13:30/15:30", "2007-12-14T13:30/2007-12-14T15:30" );
+        testParse8601_1( "2007-11-13/15", "2007-11-13T00:00/2007-11-15T00:00" );
         testParse8601_1( "2000-01-01T13:00Z/PT1H", "2000-01-01T13:00Z/2000-01-01T14:00" );
         testParse8601_1( "20000101T1300Z/PT1H", "2000-01-01T13:00Z/2000-01-01T14:00" );
         testParse8601_1( "2000-01-01T00:00Z/P1D", "2000-01-01T00:00Z/2000-01-01T24:00" );
@@ -198,8 +204,8 @@ public class Test019 {
     
     public static void main( String[] args ) {
         try {
-            testTimeParser();
             testParse8601(); // this test comes from a test within das2.
+            testTimeParser();
             testRestrictedFileSystemAccess();
             testLayout();
             testFileSystemModel();
