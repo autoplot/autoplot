@@ -81,6 +81,27 @@ public class CompletionSettings {
             logger.log( Level.SEVERE, null, ex );
         }
     }
+    
+    private String editorFont = "sans-12";
+    
+    public static final String PROP_EDITORFONT = "editorFont";
+
+    public String getEditorFont() {
+        return editorFont;
+    }
+
+    public void setEditorFont(String editorFont) {
+        String oldEditorFont = this.editorFont;
+        this.editorFont = editorFont;
+        propertyChangeSupport.firePropertyChange(PROP_EDITORFONT, oldEditorFont, editorFont);
+        prefs.put( PROP_EDITORFONT, editorFont );
+        try {
+            prefs.flush();
+        } catch ( BackingStoreException ex ) {
+            logger.log( Level.SEVERE, null, ex );
+        }
+    }
+
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
@@ -95,6 +116,7 @@ public class CompletionSettings {
     public void loadPreferences() {
         docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/" ) ;
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
+        editorFont= prefs.get( PROP_EDITORFONT, "sans-12" );
     }
 
 }

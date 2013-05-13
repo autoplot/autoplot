@@ -6,8 +6,11 @@ package org.virbo.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -15,9 +18,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.jythoncompletion.CompletionSettings;
@@ -41,7 +46,17 @@ public class EditorContextMenu {
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
         maybeCreateMenu();
-        
+
+        JythonCompletionProvider.getInstance().settings().addPropertyChangeListener( new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getPropertyName().equals( CompletionSettings.PROP_EDITORFONT ) ) {
+                    editor.setFont( Font.decode((String)evt.getNewValue() ) );
+                }
+            }
+            
+        });
+
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
 
 //        editor.addMouseListener(new MouseAdapter() {
@@ -172,6 +187,21 @@ public class EditorContextMenu {
         }
         
     }
+    
+    /**
+     * encode font into string like "sans-12".  This is a copy of Autoplot's
+     * DomUtil.encodeFont.
+     * @param f
+     * @return 
+     */
+    public static String encodeFont(java.awt.Font f) {
+        String style="-";
+        if ( f.isBold() ) style+="bold";
+        if ( f.isItalic() ) style+="italic";
+        String result= f.getFamily();
+        if ( style.length()>1 ) result+= style;
+        return result + "-" + f.getSize();
+    }    
     
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
@@ -368,12 +398,14 @@ public class EditorContextMenu {
 
             mi= new JMenuItem( new AbstractAction("Pick Font...") {
                 public void actionPerformed(ActionEvent e) {
-                    JFontChooser chooser = new JFontChooser( null );
-
+                    JFrame parent= (JFrame)SwingUtilities.getWindowAncestor( editor );
+                    JFontChooser chooser = new JFontChooser( parent );
+                    chooser.setLocationRelativeTo( editor );
                     chooser.setExampleText("ds= getDataSet('http://autoplot.org/data/data.dat')");
                     chooser.setFont( editor.getFont() );
                     if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-                       editor.setFont(chooser.getFont());
+                       CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
+                       settings.setEditorFont( encodeFont( chooser.getFont() ) );
                     }
                 }
             } );
