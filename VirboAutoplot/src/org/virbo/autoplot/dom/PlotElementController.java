@@ -205,7 +205,14 @@ public class PlotElementController extends DomNodeController {
                 RenderType oldRenderType = (RenderType) evt.getOldValue();
                 PlotElement parentEle= getParentPlotElement();
                 if (parentEle != null) {
-                    parentEle.setRenderType(newRenderType);
+                    if ( parentEle.getRenderType().equals(newRenderType) ) {
+                        if ( plotElement.getPlotId().length()>0 ) {
+                            doResetRenderTypeInt(newRenderType);
+                            updateDataSet();
+                        }
+                    } else {
+                        parentEle.setRenderType(newRenderType);
+                    }
                 } else {
                     if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                         resetRanges= true;
@@ -2447,6 +2454,29 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * just reset this plot element's rendertype, ignoring parent.
+     * @param renderType 
+     */
+    private void doResetRenderTypeInt( RenderType renderType ) {
+        DomLock lock= this.mutatorLock();
+        lock.lock("Reset Render Rype");
+        try {
+            plotElement.propertyChangeSupport.firePropertyChange( PlotElement.PROP_RENDERTYPE, null, renderType );
+        } finally {
+            lock.unlock();
+        }
+        Renderer oldRenderer= getRenderer();
+        maybeCreateDasPeer();
+        if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
+            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+            //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
+            if ( oldDs!=null ) {
+                getRenderer().setDataSet(oldDs);
+            }
+        }        
+    }
+    
+    /**
      * used to explicitly set the rendering type.  This installs a das2 renderer
      * into the plot to implement the render type.
      *
@@ -2472,22 +2502,7 @@ public class PlotElementController extends DomNodeController {
                 ch.getController().getRenderer().setDataSet(oldDs);
             }
         }
-        DomLock lock= this.mutatorLock();
-        lock.lock("Reset Render Rype");
-        try {
-            plotElement.propertyChangeSupport.firePropertyChange( PlotElement.PROP_RENDERTYPE, null, renderType );
-        } finally {
-            lock.unlock();
-        }
-        Renderer oldRenderer= getRenderer();
-        maybeCreateDasPeer();
-        if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
-            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
-            //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
-            if ( oldDs!=null ) {
-                getRenderer().setDataSet(oldDs);
-            }
-        }
+        doResetRenderTypeInt(renderType);
     }
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
