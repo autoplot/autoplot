@@ -20,5 +20,5 @@ zip -r ../autoplot.jar.1 * | grep -v "adding:"
 cd ..
 cat ../starterScript.sh > autoplot.jar
 cat autoplot.jar.1 >> autoplot.jar
-rm autoplot.jar.1
-rm -r tjar
+#rm autoplot.jar.1
+#rm -r tjar
