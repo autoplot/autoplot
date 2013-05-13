@@ -70,7 +70,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -100,7 +99,6 @@ import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetSelector;
@@ -129,8 +127,11 @@ public class GuiSupport {
     public void doPasteDataSetURL() {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable contents = clipboard.getContents(null);
+        if ( contents==null ) {
+            logger.fine("contents was null");
+            return;
+        }
         boolean hasTransferableText =
-                (contents != null) &&
                 contents.isDataFlavorSupported(DataFlavor.stringFlavor);
         String result = null;
         if (hasTransferableText) {
@@ -138,11 +139,9 @@ public class GuiSupport {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException ex) {
                 //highly unlikely since we are using a standard DataFlavor
-                System.out.println(ex);
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
             } catch (IOException ex) {
-                System.out.println(ex);
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
             }
         }
         if (result != null) {
@@ -294,7 +293,7 @@ public class GuiSupport {
 
     private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, String dscontrol  ) throws IOException {
 
-        logger.fine("exporting data to "+uriOut + " using format "+format );
+        logger.log(Level.FINE, "exporting data to {0} using format {1}", new Object[]{uriOut, format});
 
         ProgressMonitor mon=null;
         try {
@@ -338,15 +337,15 @@ public class GuiSupport {
             parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
         } catch ( IllegalArgumentException ex ) {
             parent.applicationModel.getExceptionHandler().handle(ex);
-            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
             logger.log(Level.SEVERE, uriOut, ex );
         } catch (RuntimeException ex ) {
             parent.applicationModel.getExceptionHandler().handleUncaught(ex);
-            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
             logger.log(Level.SEVERE, uriOut, ex );
         } catch (Exception ex) {
             parent.applicationModel.getExceptionHandler().handle(ex);
-            logger.fine(" ..caused exception: "+uriOut + " using format "+format );
+            logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
             logger.log(Level.SEVERE, uriOut, ex );
         }
         if ( mon!=null ) mon.finished();
@@ -876,7 +875,7 @@ public class GuiSupport {
                     if ( out!=null ) out.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log( Level.WARNING, null, e );
             }
         }
     }
@@ -1062,9 +1061,9 @@ public class GuiSupport {
                 applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
                 dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
             } else if (dia.getDepCount() == -1) {
-                if (pelement == null) {
-                    pelement = dom.getController().addPlotElement(plot, null);
-                }
+                //if (pelement == null) {
+                //    pelement = dom.getController().addPlotElement(plot, null);
+                //}
             }
         } catch ( Exception ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
             applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
@@ -1348,9 +1347,11 @@ public class GuiSupport {
         ezMenu.addMenuListener( new MenuListener() {
             public void menuSelected(MenuEvent e) {
                 PlotElement pe= app.dom.getController().getPlotElement();
-                QDataSet ds=null;
+                QDataSet ds;
                 if ( pe!=null ) {
                     ds= pe.getController().getDataSet();
+                } else {
+                    return;
                 }
                 Map<String,RenderType> tt= getRenderTypeForString();
                 for ( int i=0; i<ezMenu.getItemCount(); i++ ) {
