@@ -107,8 +107,6 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );
 
-                Preferences prefs= Preferences.userNodeForPackage( EditorTextPane.class );
-
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
@@ -125,7 +123,7 @@ public class EditorTextPane extends JEditorPane {
                 getDocument().addUndoableEditListener(undo);
                 if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
 
-                String sf= prefs.get( PROP_FONT, "monospaced" );
+                String sf= JythonCompletionProvider.getInstance().settings().getEditorFont();
                 setFont( Font.decode(sf) );
 
             }
