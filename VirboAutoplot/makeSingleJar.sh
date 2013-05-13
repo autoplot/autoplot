@@ -12,6 +12,8 @@ mkdir tjar
 cd tjar
 unzip ../AutoplotStable.jar
 unzip -o ../AutoplotVolatile.jar
+rm -f META-INF/MANIFEST.MF   # remove leftover signatures.
+echo "Main-Class: org.virbo.autoplot.AutoplotUI" > META_INF/MANIFEST.MF
 zip -r ../autoplot.jar.1 *
 
 cd ..
