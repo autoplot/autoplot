@@ -206,7 +206,7 @@ public class PlotElementController extends DomNodeController {
                 PlotElement parentEle= getParentPlotElement();
                 if (parentEle != null) {
                     if ( parentEle.getRenderType().equals(newRenderType) ) {
-                        if ( plotElement.getPlotId().length()>0 ) {
+                        if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/tracker/?func=detail&aid=3613187&group_id=199733&atid=970682
                             doResetRenderTypeInt(newRenderType);
                             updateDataSet();
                         }
