@@ -216,6 +216,8 @@ mv temp-classes/META-INF/build.txt.1 temp-classes/META-INF/build.txt
 echo "make jumbo jar file..."
 cd temp-classes
 mkdir -p ../dist/
+rm -f ../temp-src/MANIFEST.MF   # remove leftover signatures.
+echo "Main-Class: org.virbo.autoplot.AutoplotUI" > ../temp-src/MANIFEST.MF
 $JAR cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
 cd ..
 
