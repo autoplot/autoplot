@@ -7,6 +7,7 @@ package org.virbo.autoplot.scriptconsole;
 
 import org.virbo.jythonsupport.ui.EditorContextMenu;
 import java.awt.Event;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -75,6 +77,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         
         this.selector = selector;
 
+        this.textArea.setFont( Font.decode(JythonCompletionProvider.getInstance().settings().getEditorFont() ) );
+        
         this.textArea.addCaretListener(new CaretListener() {
 
             public void caretUpdate(CaretEvent e) {
