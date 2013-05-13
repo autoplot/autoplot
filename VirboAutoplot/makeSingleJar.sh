@@ -14,6 +14,9 @@ cd tjar
 unzip ../AutoplotStable.jar | grep -v "inflating:" | grep -v "creating:"
 unzip -o ../AutoplotVolatile.jar | grep -v "inflating:" | grep -v "creating:"
 rm -f META-INF/MANIFEST.MF   # remove leftover signatures.
+rm -f META-INF/DAS2.DSA
+rm -f META-INF/DAS2.SF
+
 echo "Main-Class: org.virbo.autoplot.AutoplotUI" > META-INF/MANIFEST.MF
 zip -r ../autoplot.jar.1 * | grep -v "adding:"
 
