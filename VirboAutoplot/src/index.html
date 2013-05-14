@@ -13,7 +13,7 @@
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
         </p>
 
-        <p>This is the Autoplot2012b branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2013a branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 6 is now required.
         </p>
 
@@ -21,7 +21,12 @@
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
         <p>Bugfixes:</p>
+        SourceForge has changed the numbering of all the bugs.  If you go to the page
+        https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
+        to resolve old numbers.
         <ul>
+            <li>1038: copy plots down non-default renderType & parent plotElement</li>
+            <li>1040: rte_0739382963: java.lang.SecurityException...signer info
             <li>Thread deadlock was showing up in Hudson tests.</li>
             <li>OpenDAP error feedback improved while CDAWeb's OpenDAP server is currently down.</li>
             <li>bugfix labels in ascii tables when units contain * / and ^.</li>
@@ -29,16 +34,16 @@
             <li>Bugfix in QStream reduction when Join dataset is reduced.</li>
             <li>rte_1999763719: malformed CDF gave the impression problem was with Autoplot</li>
             <li>"24 hours" / "60 minutes" works properly now (=24)</li>
-            <li>plot id changes are propogated through the rest of the vap.</li>
+            <li>plot id changes are propagated through the rest of the vap.</li>
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
             <li>filenames with spaces would cause problems again.</li>
             <li>SemanticOps.isTableDataSet wouldn't count rank 2 table with rank 2 ytags as table.</li>
-            <li>3611281: Clean up TSB requests when a set of plots shares a time axis.  This bug would cause excessive hits to the das2servers.</li>
+            <li>1032: Clean up TSB requests when a set of plots shares a time axis.  This bug would cause excessive hits to the das2servers.</li>
             <li>Test100 and other tests work properly again</li>
-            <li>3611375: waitUntilIdle properly counts an active editor as idle.</li>
-            <lI>3611210: test002 occasionally hangs</li>
+            <li>1033: waitUntilIdle properly counts an active editor as idle.</li>
+            <lI>1031: test002 occasionally hangs</li>
             <li>rte_0665049794: changes to improve handling of output from fftPower. </li>
             <li>rfe 3596086: CDF Java implementation now implements slice1 to save memory</li>
             <li>more corrections for Windows names like c:\foo\file.txt</li>
