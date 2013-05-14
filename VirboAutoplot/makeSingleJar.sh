@@ -23,5 +23,7 @@ zip -r ../autoplot.jar.1 * | grep -v "adding:"
 cd ..
 cat ../starterScript.sh > autoplot.jar
 cat autoplot.jar.1 >> autoplot.jar
+
+# clean up temporary files
 rm autoplot.jar.1
 rm -r tjar
