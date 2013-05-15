@@ -17,8 +17,11 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 import org.das2.util.Base64;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -32,35 +35,15 @@ import org.virbo.datasource.DataSetURI;
 import org.xml.sax.SAXException;
 
 /**
- * download a list of URIs, then attempt to read from each one.  
+ * download a list of URIs, then attempt to read from each one.  The
+ * URI can be either a dataset or a .vap file, and "script:" "pngwalk:" and 
+ * "bookmarks:" URIs are ignored.
+ * 
  * @author jbf
  */
 public class Test140 {
     
     private static int testid;
-
-    private static String uuwow( String t ) {
-        if ( t.length()>1024 ) {
-            throw new IllegalArgumentException("string is too long, more than 1024");
-        }
-        
-        try {
-            ByteArrayOutputStream out= new ByteArrayOutputStream();
-            GZIPOutputStream zout= new GZIPOutputStream( out );
-        
-            zout.write( t.getBytes(), 0, t.length() );
-            zout.flush();
-            zout.close();
-            
-            byte[] bytes= out.toByteArray();
-        
-            return Base64.encodeBytes( bytes );
-            
-        } catch ( IOException ex ) {
-            throw new RuntimeException(ex);
-        }
-        
-    }
     
     /**
      * make sure name is unique by checking to see if the file exists and
@@ -101,7 +84,7 @@ public class Test140 {
         long t0= System.currentTimeMillis();
         tsec= t0; // for non-vap non-uri
         
-        QDataSet ds;
+        QDataSet ds=null;
         if ( uri.endsWith(".vap") ) {
             // for vap files, load the vap and grab the first dataset.
             ScriptContext.load(uri);
@@ -153,6 +136,10 @@ public class Test140 {
 
         }
 
+        if ( ds!=null ) {
+            System.err.println( "dataset: "+ds );
+        }
+        
         String result;
 
         String name;
@@ -243,7 +230,9 @@ public class Test140 {
      * @throws Exception 
      */
     public static void main( String[] args ) throws Exception {
-
+        Logger l= LoggerManager.getLogger("apdss.das2server");
+        l.setLevel( Level.ALL );
+        
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
