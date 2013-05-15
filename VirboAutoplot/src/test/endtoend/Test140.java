@@ -8,16 +8,19 @@ package test.endtoend;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.zip.GZIPOutputStream;
 import org.das2.util.Base64;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -60,6 +63,26 @@ public class Test140 {
     }
     
     /**
+     * make sure name is unique by checking to see if the file exists and
+     * modifying it until the name is unique.
+     * @param name
+     * @param ext .png
+     * @param append if true, then tack on the extention.
+     * @return the unique name
+     */
+    private static String getUniqueFilename( String name, String ext, boolean append ) {
+      File ff= new File(name+ext);
+      while ( ff.exists() ) {
+         name= name + "_";
+         ff= new File(name+".png");
+      }  
+      if ( append ) {
+         return name+ext;
+      } else {
+         return name;
+      }
+    }
+    /**
      *
      * @param uri the URI to load
      * @param iid the index of the test.
@@ -72,58 +95,82 @@ public class Test140 {
         System.err.printf( "== %03d ==\n", iid );
         System.err.printf( "uri: %s\n", uri );
 
-        long t0= System.currentTimeMillis();
-        QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri );
-
-        double t= (System.currentTimeMillis()-t0)/1000.;
-        MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
-        hist.putProperty( QDataSet.TITLE, uri );
-
         String label= String.format( "test%03d_%03d", testid, iid );
-        hist.putProperty( QDataSet.LABEL, label );
-        formatDataSet( hist, label+".qds");
 
-        QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
-        if ( dep0!=null ) {
-            MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-            formatDataSet( hist2, label+".dep0.qds");
+        double tsec;
+        long t0= System.currentTimeMillis();
+        tsec= t0; // for non-vap non-uri
+        
+        QDataSet ds;
+        if ( uri.endsWith(".vap") ) {
+            // for vap files, load the vap and grab the first dataset.
+            ScriptContext.load(uri);
+            ds= getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
+            tsec= (System.currentTimeMillis()-t0)/1000.;
+            MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+            hist.putProperty( QDataSet.LABEL, label );
+            formatDataSet( hist, getUniqueFilename(label,".qds",true) );
+            
+        } else if ( uri.startsWith("script:") ) {
+            System.err.println("skipping script");
+        } else if ( uri.startsWith("bookmarks:") ) {
+            System.err.println("skipping bookmarks");
+        } else if ( uri.startsWith("pngwalk:") ) {
+            System.err.println("skipping pngwalk");
         } else {
-            PrintWriter pw= new PrintWriter( label+".dep0.qds" );
-            pw.println("no dep0");
-            pw.close();
+            ds= org.virbo.jythonsupport.Util.getDataSet( uri );
+            tsec= (System.currentTimeMillis()-t0)/1000.;
+            MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+            hist.putProperty( QDataSet.TITLE, uri );
+
+            hist.putProperty( QDataSet.LABEL, label );
+            formatDataSet( hist, label+".qds");
+
+            QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
+            if ( dep0!=null ) {
+                MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
+                formatDataSet( hist2, label+".dep0.qds");
+            } else {
+                PrintWriter pw= new PrintWriter( label+".dep0.qds" );
+                pw.println("no dep0");
+                pw.close();
+            }
+
+            plot( ds );
+            setCanvasSize( 450, 300 );
+            int i= uri.lastIndexOf("/");
+
+            getApplicationModel().waitUntilIdle(true);
+
+            String fileUri= uri.substring(i+1);
+
+            if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+                String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+                fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+            }
+
+            setTitle(fileUri);
+
         }
 
-        plot( ds );
-        setCanvasSize( 450, 300 );
-        int i= uri.lastIndexOf("/");
+        String result;
 
-        getApplicationModel().waitUntilIdle(true);
-
-        String fileUri= uri.substring(i+1);
-
-        if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-            String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-            fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
-        }
-
-        String result= null;
-
-        setTitle(fileUri);
         String name;
-        if ( doTest ) {
-            String id= Ops.safeName( uri );
-            //int h = uri.hashCode();
-            //String id= String.format( "%016d",Math.abs(h));
-            name= String.format( "test%03d_%s.png", testid, id );
+        if ( doTest ) {            
+            String id= URLEncoder.encode( uri, "US-ASCII" );
+            id= id.replaceAll("%","_"); // make more human-ledgible, it doesn't need to be absolutely unique
+            name= String.format( "test%03d_%s", testid, id );
             result= name;
         } else {
-            name= String.format( "ex_test%03d_%03d.png", testid, iid );
+            name= String.format( "ex_test%03d_%03d", testid, iid );
             result= null;
         }
-        writeToPng( name );
-        System.err.printf( "wrote to file: %s\n", name );
-
-        System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
+        
+        String name1= getUniqueFilename( name, ".png", true );
+        writeToPng( name1 );
+        
+        System.err.printf( "wrote to file: %s\n", name1 );
+        System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
 
         return result;
     }
@@ -200,7 +247,8 @@ public class Test140 {
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
-            args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140_1.txt" };
+            //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140_1.txt" };
+            args= new String[] { "140", "http://sarahandjeremy.net/jeremy/rbsp/test/test140.txt" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
