@@ -151,6 +151,12 @@ public class LayoutUtil {
             c.getParent().resizeAllComponents();
             return;
         }
+        
+        if ( needYmax<-120 ) {
+            logger.log(Level.WARNING, "needYmax: {0}", needYmax);
+            c.getParent().resizeAllComponents();
+            return;
+        }
 
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
        
