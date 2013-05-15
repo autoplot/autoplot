@@ -2308,10 +2308,18 @@ public class ApplicationController extends DomNodeController implements RunLater
         return ((CanvasController)getCanvas().controller).getDasCanvas();
     }
 
+    /**
+     * get the DasRow implementation for the marginRow.
+     * @return the DasRow implementation for the marginRow.
+     */
     public DasRow getRow() {
         return getCanvas().getMarginRow().getController().getDasRow();
     }
 
+    /**
+     * get the DasColumn implementation for the marginRow.
+     * @return the DasColumn implementation for the marginColumn.
+     */
     public DasColumn getColumn() {
         return getCanvas().getMarginColumn().getController().getDasColumn();
     }
