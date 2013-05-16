@@ -10,6 +10,7 @@
 package org.virbo.datasource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -60,10 +61,14 @@ public class FileSystemUtil {
      */
     public static boolean resourceExists( String context ) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(context);
-        FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
-        if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
-            return true;
-        } else {
+        try {
+            FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
+            if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch ( FileNotFoundException ex ) {
             return false;
         }
     }
@@ -90,7 +95,7 @@ public class FileSystemUtil {
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
      * @throws java.net.MalformedURLException
      */
-    static boolean resourceIsLocal(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
+    protected static boolean resourceIsLocal(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException, FileNotFoundException {
         URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isLocal() ) {
@@ -100,7 +105,16 @@ public class FileSystemUtil {
         }
     }
 
-    static boolean resourceIsFile(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
+    /**
+     * returns true if the string identifies a file resource (not a folder).
+     * @param context
+     * @return true if the resource is a file.
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws UnknownHostException
+     * @throws URISyntaxException
+     * @throws FileNotFoundException 
+     */
+    protected static boolean resourceIsFile(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException, FileNotFoundException {
         URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isData() ) {
