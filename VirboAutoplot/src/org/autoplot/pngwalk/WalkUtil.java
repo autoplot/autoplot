@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -69,6 +70,9 @@ public class WalkUtil {
         try {
             fs = FileSystem.create( DataSetURI.getResourceURI( surl.substring(0, i + 1) ) );
         } catch (UnknownHostException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return false;
+        } catch ( FileNotFoundException ex ) {
             logger.log(Level.SEVERE, null, ex);
             return false;
         }
