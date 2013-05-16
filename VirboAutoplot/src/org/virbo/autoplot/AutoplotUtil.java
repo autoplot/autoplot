@@ -1556,7 +1556,7 @@ public class AutoplotUtil {
 //            if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
 //                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
 //            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
-            if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
+            if ( ( bundle1!=null && bundle1.length()<30 ) || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
                 if (fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
