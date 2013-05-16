@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.AboutUtil;
 import org.virbo.datasource.DataSourceUtil;
@@ -88,12 +89,6 @@ public class Util {
     public static List<String> getBuildInfos() throws IOException {
         Enumeration<URL> urls = Util.class.getClassLoader().getResources("META-INF/build.txt");
 
-        Enumeration<URL> urls2 = Util.class.getClassLoader().getResources("META-INF/build.txt");
-        List<URL> urls3= new ArrayList();
-        while ( urls2.hasMoreElements() ) {
-            urls3.add(urls2.nextElement());
-        }
-
         List<String> result = new ArrayList<String>();
 
         String buildTime = "???";
@@ -104,7 +99,7 @@ public class Util {
                 buildTime = reader.readLine();
                 reader.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
             }
         }
         if ( !buildTime.equals("???") ) {
@@ -134,18 +129,11 @@ public class Util {
             Properties props = new Properties();
             props.load(url.openStream());
 
-//            String cvsTagName = props.getProperty("build.tag");
             String svnTag = svnTag( props.getProperty("build.svnurl"), 
                     props.getProperty("build.svnrevision"),
                     jarname );
 
             String tagName = tagName(svnTag, abbrevs);
-//            String version;
-//            if (cvsTagName == null || cvsTagName.length() <= 9) {
-//                version = "untagged_version";
-//            } else {
-//                version = cvsTagName.substring(6, cvsTagName.length() - 2);
-//            }
 
             result.add(name + ": " + tagName + " (" + props.getProperty("build.timestamp") + " " + props.getProperty("build.user.name") + ")");
 
@@ -253,9 +241,42 @@ public class Util {
         return success;
     }
     
+    /**
+     * remove empty branches from file tree.  This is like "rm -r $root"
+     * @param root the root directory from which to start a search.
+     * @param problems any files which could not be deleted are listed here.
+     * @return true if successful.
+     */
+    public static boolean pruneFileTree( File root, List<String> problems ) {
+        if (!root.exists()) {
+            return false; // doesn't exist
+        }
+        File[] children = root.listFiles();
+        boolean success = true;
+
+        for (int i = 0; i < children.length; i++) {
+            if (children[i].isDirectory()) {
+                success = success && pruneFileTree( children[i], problems );
+            }
+        }
+        
+        children = root.listFiles();
+        if ( children.length==0 ) {
+            if ( !root.delete() ) {
+                problems.add( "unable to delete "+root );
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+    }
+    
 
     public static String strjoin(Collection<String> c, String delim) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String s : c) {
             if (result.length() > 0) {
                 result.append(delim);
