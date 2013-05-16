@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -27,8 +29,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
 
@@ -143,12 +147,8 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     }
 
     public boolean doPlotSelected() {
-        FSTreeModel model = (FSTreeModel) jTree1.getModel();
-        TreePath[] paths = jTree1.getSelectionPaths();
-        if ( paths==null || paths.length == 0) {
-            return true;
-        }
-        File f = model.getFile(paths[0]);
+        File f = getSelectedFile(jTree1);
+        if ( f==null ) return true;
         String sf = f.toString();
         String outsideName= outsideName( sf );
         if ( outsideName!=null ) {
@@ -158,8 +158,45 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         }
         return false;
     }
-
-    Action getCopyToAction(final JTree jtree) {
+ 
+    /**
+     * navigate through the cache looking for empty folders and removing them.
+     * @param n the root folder.
+     * @return true if successful.
+     */
+    Action getPruneTreeAction(final JTree jtree) {
+        return new AbstractAction("Prune empty branches") {
+            public void actionPerformed(ActionEvent e) {
+            
+                File local = getSelectedFile(jtree);
+        
+                ProgressMonitor mon1= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(jtree), "Pruning Cache..." );
+                mon1.started();
+        
+                List<String> problems= new ArrayList();
+                boolean y= org.virbo.autoplot.Util.pruneFileTree( local, problems );
+                mon1.finished();
+                if ( y ) {
+                    JOptionPane.showMessageDialog( jtree, "<html>Successful", "Prune fscache", JOptionPane.PLAIN_MESSAGE );
+                } else {
+                    StringBuilder msg= new StringBuilder( "Some problems occured while pruning cache:" );
+                    for ( String s: problems ) {
+                        msg.append( "<br>" ).append(s);
+                    }
+                    JOptionPane.showMessageDialog( jtree, "<html>"+msg+"</html>" );
+                }
+                FSTreeModel model = (FSTreeModel) jtree.getModel();
+                scan( model.root );
+            }
+        };
+    }
+    
+    /**
+     * return the first selected file or null if nothing is selected.
+     * @param jtree
+     * @return 
+     */
+    private File getSelectedFile( JTree jtree ) {
         FSTreeModel model = (FSTreeModel) jtree.getModel();
         TreePath[] paths = jtree.getSelectionPaths();
         final File f;
@@ -168,6 +205,11 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         } else {
             f= null;
         }
+        return f;
+    }
+    
+    Action getCopyToAction(final JTree jtree) {
+        final File f= getSelectedFile(jtree);
         return new AbstractAction("Copy To...") {
 
             public void actionPerformed(ActionEvent e) {
