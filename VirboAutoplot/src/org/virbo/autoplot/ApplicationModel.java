@@ -1340,6 +1340,31 @@ public class ApplicationModel {
     }
 
     /**
+     * navigate through the cache looking for empty folders and removing them.
+     * @param n the root folder.
+     * @return true if successful.
+     */
+    public boolean pruneCache( File n ) {
+
+        ProgressMonitor mon1= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(getCanvas()), "Pruning Cache..." );
+        mon1.started();
+        
+        List<String> problems= new ArrayList();
+        boolean y= Util.pruneFileTree( n, problems );
+        mon1.finished();
+        if ( y ) {
+            JOptionPane.showMessageDialog( this.getCanvas(), "<html>Successful", "Prune fscache", JOptionPane.PLAIN_MESSAGE );
+        } else {
+            StringBuilder msg= new StringBuilder( "Some problems occured while pruning cache:" );
+            for ( String s: problems ) {
+                msg.append( "<br>" ).append(s);
+            }
+            JOptionPane.showMessageDialog( this.getCanvas(), "<html>"+msg+"</html>" );
+        }
+        return y;
+    }
+
+    /**
      * Utility field used by bound properties.
      */
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
