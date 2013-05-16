@@ -169,6 +169,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
             
                 File local = getSelectedFile(jtree);
+                if ( local==null ) {
+                    return;
+                }
         
                 ProgressMonitor mon1= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(jtree), "Pruning Cache..." );
                 mon1.started();
@@ -213,11 +216,14 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         return new AbstractAction("Copy To...") {
 
             public void actionPerformed(ActionEvent e) {
+                if ( f==null ) {
+                    return;
+                }
                 JFileChooser chooser = new JFileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 File p=  new File("foo").getAbsoluteFile().getParentFile();
                 chooser.setCurrentDirectory( p ); //http://www.rgagnon.com/javadetails/java-0370.html
-                if ( f!=null ) chooser.setSelectedFile( new File(p,f.getName() ) );
+                chooser.setSelectedFile( new File(p,f.getName() ) );
                 chooser.setAcceptAllFileFilterUsed(false);
                 if (chooser.showSaveDialog(jtree) == JFileChooser.APPROVE_OPTION) {
                     File destdir = chooser.getSelectedFile();
