@@ -9,6 +9,7 @@
 
 package ftpfs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import org.das2.util.filesystem.FileSystem;
@@ -16,7 +17,7 @@ import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.filesystem.FileSystemFactory;
 
 /**
- *
+ * Factory that create FTPBeanFileSystem objects.  See FileSystem.create.
  * @author jbf
  */
 public class FTPBeanFileSystemFactory implements FileSystemFactory {
@@ -25,9 +26,12 @@ public class FTPBeanFileSystemFactory implements FileSystemFactory {
     public FTPBeanFileSystemFactory() {
     }
 
-    public FileSystem createFileSystem(URI root) throws FileSystem.FileSystemOfflineException {
+    @Override
+    public FileSystem createFileSystem(URI root) throws FileSystem.FileSystemOfflineException, FileNotFoundException {
         try {
             return new FTPBeanFileSystem(root);
+        } catch ( FileNotFoundException ex ) {
+            throw ex;
         } catch ( IOException ex ) {
             throw new FileSystemOfflineException(ex,root);
         }

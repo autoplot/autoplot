@@ -28,6 +28,7 @@ import it.sauronsoftware.ftp4j.listparsers.UnixListParser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -72,23 +73,34 @@ public class FTPBeanFileSystem extends WebFileSystem {
         return bean;
     }
 
-    FTPBeanFileSystem(URI root) throws FileSystemOfflineException, IOException {
+    FTPBeanFileSystem( URI root ) throws FileSystemOfflineException, FileSystemOfflineException, IOException {
         super(root, userLocalRoot(root) );
         if ( FileSystem.settings().isOffline() ) {
             this.setOffline(true);
         }
         try {
             this.listDirectory("/"); // list the root to see if it is offline.
+        } catch (java.net.ConnectException ex) {
+            FileNotFoundException ex2= new FileNotFoundException( ex.getLocalizedMessage() );
+            throw ex2;
         } catch (IOException ex) {
-            //TODO: how to distinguish UnknownHostException to be offline?  avoid firing an event until I come up with a way.
-            logger.log(Level.INFO,"exception when listing the first time, going offline",ex);
-            ex.printStackTrace();
-            //throw new FileSystemOfflineException(ex);
-            this.offline= true;
+            if ( ex.getMessage().startsWith("550") ) {
+                throw new FileNotFoundException( "550 not found: "+root.toString() );
+            } else {
+                logger.log(Level.INFO,"exception when listing the first time, going offline",ex);
+                this.offline= true;
+            }
         }
         
     }
 
+    /**
+     * identify where the local cache will be.  Note the File does not
+     * yet exist until the data is read.
+     * @param rooturi
+     * @return local File indicating where the root will be.
+     * @throws IOException 
+     */
     private static File userLocalRoot( URI rooturi ) throws IOException {
         String auth= rooturi.getAuthority(); 
         if ( auth==null ) {
@@ -122,11 +134,6 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         local = new File(local, s);
 
-        try {
-            FileSystemUtil.maybeMkdirs(local);
-        } catch ( IOException ex ) {
-            throw new IllegalArgumentException("unable to mkdirs "+local );
-        }
         return local;
 
     }
@@ -397,10 +404,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
         while ( !successOrCancel ) {
             try {
                 File newDir= new File(localRoot, directory);
-                FileSystemUtil.maybeMkdirs(newDir);
-                File listing = new File(localRoot, directory + ".listing");
-                File listingt = new File(localRoot, directory + ".listing.temp");
-
+                File listing;
+                File listingt;
                 FtpBean bean = getFtpBean();
                 try {
                     userInfo= KeyChain.getDefault().getUserInfo(url);
@@ -418,6 +423,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     String cwd= bean.getDirectory(); // URI should not contain remote root.  // will allow for this.
                     bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
 
+                    FileSystemUtil.maybeMkdirs(newDir);
+                    listing = new File(localRoot, directory + ".listing");
+                    listingt = new File(localRoot, directory + ".listing.temp");
+                    
                 } catch (NullPointerException ex) {
                     logger.log( Level.SEVERE, "Unable to make connection to " + getRootURL().getHost(), ex );
                     IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost()); // TODO: Java 1.6 will fix this
@@ -462,6 +471,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     KeyChain.getDefault().clearUserPassword(url);
                     // loop for them to try again.
                 } else if ( e.getMessage().startsWith("550") ) {
+                    
+                    new File(localRoot, directory);
                     throw new IOException( e.getMessage()+": "+directory);
                 } else {
                     throw new IOException(e.getMessage()); //JAVA5
