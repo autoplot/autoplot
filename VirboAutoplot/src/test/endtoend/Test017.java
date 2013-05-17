@@ -29,14 +29,13 @@ public class Test017 {
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {
-        System.err.println("-- timer " + (System.currentTimeMillis() - t0) + " --- finished: " + id  );
+        System.err.println("timer: in " + (System.currentTimeMillis() - t0) + "ms finished " + id  );
         t0 = System.currentTimeMillis();
     }
 
     public static void main(String[] args)  {
 
         try {
-        QDataSet ds;
 
         int count;
 
@@ -116,30 +115,30 @@ public class Test017 {
 
         "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
-        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
+        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
         //No data is drawn:
-        "011 ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
+        "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
         "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
         //Suspect problem identifying valid data: "" +
         "013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
         //Fails to guess cadence:
-        "014 ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/mag_15sec/2000/i8_15sec_mag_20000101_v02.cdf?F1_Average_B_15s",
+        "014 ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
         //Strange message:
 
         //java.lang.RuntimeException: java.lang.IllegalArgumentException: not supported: Lo E PD
         //at org.virbo.autoplot.ApplicationModel.resetDataSetSourceURL(ApplicationModel.java:249)
 
-        "015 ftp://cdaweb.gsfc.nasa.gov/pub/istp/lanl/97_spa/2005/l7_k0_spa_20050405_v01.cdf?spa_p_dens",
+        "015 ftp://cdaweb.gsfc.nasa.gov/pub/data/lanl/97_spa/2005/l7_k0_spa_20050405_v01.cdf?spa_p_dens",
         //This is described in bug https://sourceforge.net/tracker2/index.php?func=detail&aid=2620088&group_id=199733&atid=970682",
 
         //No data is displayed:
-        "016 ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
+        "016 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
 
         //Vectors plotted as spectrogram:
-        "017 ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
+        "017 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
         //Works fine, but nicely demonstrates AutoHistogram's robust statistics and the potential to indentify fill values automatically:
-        "018 ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/mgf/1998/ge_k0_mgf_19980102_v01.cdf?IB",
+        "018 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/mgf/1998/ge_k0_mgf_19980102_v01.cdf?IB",
         //[edit] 4 OpenDAP
 
         //Rank 2 spectrogram over OpenDAP:
@@ -255,30 +254,30 @@ public class Test017 {
 
     };
 
-    private static Runnable getRunnable( final String s, final String label ) {
+    private static Runnable getRunnable( final String uri, final String id ) {
         Runnable run= new Runnable() {
             public void run()  {
                 try {
                     QDataSet ds;
-                    ds = Util.getDataSet(s);
+                    ds = Util.getDataSet(uri);
                     MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                    hist.putProperty(QDataSet.TITLE, s);
-                    hist.putProperty(QDataSet.LABEL, label);
-                    formatDataSet(hist, label + ".qds");
+                    hist.putProperty(QDataSet.TITLE, uri);
+                    hist.putProperty(QDataSet.LABEL, id);
+                    formatDataSet(hist, id + ".qds");
                     QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
                     if (dep0 != null) {
                         MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                        formatDataSet(hist2, label + ".dep0.qds");
+                        formatDataSet(hist2, id + ".dep0.qds");
                     } else {
-                        PrintWriter pw = new PrintWriter(label + ".dep0.qds");
+                        PrintWriter pw = new PrintWriter(id + ".dep0.qds");
                         pw.println("no dep0");
                         pw.close();
                     }
                     plot(ds);
                     setCanvasSize(750, 300);
-                    int i = s.lastIndexOf("/");
-                    setTitle(s.substring(i + 1));
-                    writeToPng(label + ".png");
+                    int i = uri.lastIndexOf("/");
+                    setTitle(uri.substring(i + 1));
+                    writeToPng(id + ".png");
 
                 } catch (Exception ex) {
                     TestSupport.logger.log(Level.SEVERE, null, ex);
@@ -288,9 +287,12 @@ public class Test017 {
         return run;
     }
 
-    private static void doTest( final String s, final String label, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
+    private static void doTest( final String uri, final String id, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
 
-        Runnable run= getRunnable( s, label );
+        System.err.printf( "== %s ==\n", id );
+        System.err.printf( "uri: %s\n", uri );
+        
+        Runnable run= getRunnable( uri, id );
         int timeoutSeconds= 180;
 
         Future f=null;
@@ -309,8 +311,8 @@ public class Test017 {
         if ( f!=null && "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) { //findbugs wrong
             System.err.println("okay!");
         } else {
-            PrintWriter pw = new PrintWriter(label + ".error");
-            pw.println(s);
+            PrintWriter pw = new PrintWriter(id + ".error");
+            pw.println(uri);
             pw.println("\ntimeout in "+timeoutSeconds+" seconds.");
 
             pw.close();
