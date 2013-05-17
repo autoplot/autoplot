@@ -76,8 +76,12 @@ class TsdsDataSource extends AbstractDataSource {
             logger.log(Level.FINE, "tsds url= {0}", url0);
 
             if (params.get("out") == null) {
-                exceptionFromConstruct = new IllegalArgumentException("url must contain out=");
-                return;
+                if (params.isEmpty() ) {
+                    // legacy
+                } else {
+                    exceptionFromConstruct = new IllegalArgumentException("url must contain out=");
+                    return;
+                }
             }
 
             mon.setProgressMessage("loading parameter metadata");
@@ -168,16 +172,26 @@ class TsdsDataSource extends AbstractDataSource {
         String str= params.get("timerange");
 
         if ( str==null ) {
-            DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
-            String sEndDate= params2.get("EndDate");
-            DatumRange dr1; 
-            if ( sEndDate==null ) {
-                dr1= dr0;
-                hasEndDate= false;
+            DatumRange dr0,dr1;
+            if ( params2.isEmpty() ) { // this should be rejected now.  I'll delete this after Bob confirms that support for this can be removed.
+                String suri= uri.toString();
+                int i= suri.indexOf("to_");
+                String sto= suri.substring(i+3,i+11);
+                i= suri.indexOf("tf_");
+                String stf= suri.substring(i+3,i+11);
+                dr0 = DatumRangeUtil.parseTimeRangeValid(sto);
+                dr1 = DatumRangeUtil.parseTimeRangeValid(stf);
             } else {
-                dr1= DatumRangeUtil.parseTimeRangeValid(sEndDate);
-                hasEndDate= true;
-            } // EndDate is no longer required to support near-realtime
+                dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
+                String sEndDate= params2.get("EndDate");
+                if ( sEndDate==null ) {
+                    dr1= dr0;
+                    hasEndDate= false;
+                } else {
+                    dr1= DatumRangeUtil.parseTimeRangeValid(sEndDate);
+                    hasEndDate= true;
+                } // EndDate is no longer required to support near-realtime
+            }
             timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
         } else {
             timeRange = quantizeTimeRange( DatumRangeUtil.parseTimeRangeValid(str) );

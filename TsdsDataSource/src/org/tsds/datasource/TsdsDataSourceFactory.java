@@ -53,8 +53,9 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
         Map params= URISplit.parseParams(split.params);
-        if ( split.params.equals("") ) {
-            return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
+        if ( params.isEmpty() ) {
+            return true;
+            //return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
         } else {
             return !( params.containsKey("StartDate") && params.containsKey("param1") );
         }
