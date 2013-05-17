@@ -69,11 +69,11 @@ public class ScriptContext extends PyJavaInstance {
         }
         if ( view!=null ) {
             if ( SwingUtilities.isEventDispatchThread() ) {
-                view.setVisible(true);
+                if ( !view.isVisible() ) view.setVisible(true);
             } else {
                 SwingUtilities.invokeLater( new Runnable() {
                     public void run() {
-                        view.setVisible(true);
+                        if ( !view.isVisible() ) view.setVisible(true);
                     }
                 } );
             }
