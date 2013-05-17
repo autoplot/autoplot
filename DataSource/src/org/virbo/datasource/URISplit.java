@@ -271,6 +271,7 @@ public class URISplit {
             } else {
                 if ( surl.startsWith("~/" ) ) { // finally add this to unix.
                     surl= System.getProperty("user.home") + surl.substring(1);
+                    result.resourceUriCarotPos += System.getProperty("user.home").length()-1;
                 }
                 result.surl = "file://";
                 result.scheme= "file";
