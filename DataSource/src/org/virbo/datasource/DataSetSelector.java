@@ -719,11 +719,16 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showCompletions(String surl1, int carotpos1) {
         String surl2= surl1.trim();
         int off= surl1.indexOf(surl2);
-        final String surl= surl2;
-        final int carotpos= Math.min( carotpos1 - off, surl2.length() );
+        String surl= surl2;
+        int carotpos= Math.min( carotpos1 - off, surl2.length() );
 
         URISplit split = URISplit.parse(surl, carotpos, true);
-
+        
+        if ( surl1.startsWith("~") ) {
+            surl= split.resourceUri.toString();
+            carotpos= split.resourceUriCarotPos;
+        }
+        
         boolean shortFsCompletion= carotpos<6 && ( surl.startsWith("/") || ( surl.length()>1 && Character.isLetter(surl.charAt(0)) && surl.charAt(1)==':' ) );
 
         boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl));
