@@ -88,6 +88,12 @@ public class AutoplotApplet extends JApplet {
     private Image splashImage;
     private JCheckBoxMenuItem overviewMenuItem = null;
 
+    /**
+     * return the value specified by the parameter, or the deft value.
+     * @param name the parameter name, such as "foreground"
+     * @param deft default value
+     * @return the value specified by the parameter, or the deft value.
+     */
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
         if (result == null) {
@@ -97,6 +103,12 @@ public class AutoplotApplet extends JApplet {
         }
     }
 
+    /**
+     * return the value specified by the parameter, or the deft value.
+     * @param name the parameter name, such as "foreground"
+     * @param deft default value
+     * @return the value specified by the parameter, or the deft value.
+     */
     private int getIntParameter(String name, int deft) {
         String result = getParameter(name);
         if (result == null) {
@@ -258,9 +270,9 @@ public class AutoplotApplet extends JApplet {
         getContentPane().add(progressComponent);
         validate();
 
-        logger.fine("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE,"init AutoplotApplet " + VERSION + " @ {0} msec", (System.currentTimeMillis() - t0));
 
-        logger.fine("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE,"done init AutoplotApplet " + VERSION + " @ {0} msec", (System.currentTimeMillis() - t0));
 
         repaint();
 
@@ -281,7 +293,7 @@ public class AutoplotApplet extends JApplet {
 
     @Override
     public void start() {
-        logger.fine("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE,"start AutoplotApplet " + VERSION + " @ {0} msec", (System.currentTimeMillis() - t0));
         super.start();
 
         model = new ApplicationModel();
@@ -298,14 +310,14 @@ public class AutoplotApplet extends JApplet {
         model.setApplet(true);
         model.dom.getOptions().setAutolayout(false);
 
-        logger.fine("ApplicationModel created @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "ApplicationModel created @ {0} msec", (System.currentTimeMillis() - t0));
 
         model.addDasPeersToApp();
 
-        logger.fine("done addDasPeersToApp @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done addDasPeersToApp @ {0} msec", (System.currentTimeMillis() - t0));
 
         try {
-            logger.fine("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
+            logger.log(Level.FINE, "Formatters: {0}", DataSourceRegistry.getInstance().getFormatterExtensions());
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -352,7 +364,7 @@ public class AutoplotApplet extends JApplet {
         }
 
         setInitializationStatus("readParameters");
-        logger.fine("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done readParameters @ {0} msec", (System.currentTimeMillis() - t0));
 
         String vap = getParameter("vap");
         if (vap != null) {
@@ -360,29 +372,29 @@ public class AutoplotApplet extends JApplet {
             try {
 
                 URL url= new URL(vap);
-                logger.fine("load vap "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.log(Level.FINE, "load vap {0} @ {1} msec", new Object[]{url, System.currentTimeMillis() - t0});
 
                 in = url.openStream();
 
-                logger.fine("open vap stream "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.log(Level.FINE, "open vap stream {0} @ {1} msec", new Object[]{url, System.currentTimeMillis() - t0});
 
                 appmodel.doOpen(in, null);
-                logger.fine("done open vap @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.log(Level.FINE, "done open vap @ {0} msec", (System.currentTimeMillis() - t0));
                 
                 appmodel.waitUntilIdle(false);
-                logger.fine("done load vap and waitUntilIdle @ " + (System.currentTimeMillis() - t0) + " msec");
+                logger.log(Level.FINE, "done load vap and waitUntilIdle @ {0} msec", (System.currentTimeMillis() - t0));
                 Canvas cc= appmodel.getDocumentModel().getCanvases(0);
-                logger.fine("vap height, width= " + cc.getHeight() + ","+ cc.getWidth() );
+                logger.log(Level.FINE, "vap height, width= {0},{1}", new Object[]{cc.getHeight(), cc.getWidth()});
                 width= getIntParameter( "width", cc.getWidth() );
                 height= getIntParameter( "height", cc.getHeight() );
-                logger.fine("output height, width= " + width + ","+ height );
+                logger.log(Level.FINE, "output height, width= {0},{1}", new Object[]{width, height});
             } catch ( InterruptedException ex ) {
                 logger.log(Level.SEVERE, null, ex);
             } catch ( IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    in.close();
+                    if ( in!=null ) in.close();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -443,16 +455,16 @@ public class AutoplotApplet extends JApplet {
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item); */
 
-        if (sforegroundColor != null && !sforegroundColor.equals("")) {
+        if (!sforegroundColor.equals("")) {
             appmodel.canvas.setForeground(Color.decode(sforegroundColor));
         }
-        if (sbackgroundColor != null && !sbackgroundColor.equals("")) {
+        if (!sbackgroundColor.equals("")) {
             appmodel.canvas.setBackground(Color.decode(sbackgroundColor));
         }
 
         getContentPane().setLayout(new BorderLayout());
 
-        logger.fine("done set parameters @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done set parameters @ {0} msec", (System.currentTimeMillis() - t0));
 
         // createAppletTester();
         //Logger.getLogger("").setLevel( Level.WARNING );
@@ -469,9 +481,9 @@ public class AutoplotApplet extends JApplet {
             DataSource dsource;
             try {
                 dsource = DataSetURI.getDataSource(surl);
-                logger.fine("get dsource for " + surl +" @ " + (System.currentTimeMillis() - t0) + " msec");
-                logger.fine("  got dsource="+dsource );
-                logger.fine("  dsource.getClass()="+dsource.getClass() );
+                logger.log(Level.FINE, "get dsource for {0} @ {1} msec", new Object[]{surl, System.currentTimeMillis() - t0});
+                logger.log(Level.FINE, "  got dsource={0}", dsource);
+                logger.log(Level.FINE, "  dsource.getClass()={0}", dsource.getClass());
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
@@ -482,11 +494,13 @@ public class AutoplotApplet extends JApplet {
             DatumRange timeRange1 = null;
             if (!stimeRange.equals("")) {
                 timeRange1 = DatumRangeUtil.parseTimeRangeValid(stimeRange);
-                TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
-                if (tsb != null) {
-                    logger.fine("do tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
-                    tsb.setTimeRange(timeRange1);
-                    logger.fine("done tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
+                if ( dsource!=null ) {
+                    TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
+                    if (tsb != null) {
+                        logger.log(Level.FINE, "do tsb.setTimeRange @ {0} msec", (System.currentTimeMillis() - t0));
+                        tsb.setTimeRange(timeRange1);
+                        logger.log(Level.FINE, "done tsb.setTimeRange @ {0} msec", (System.currentTimeMillis() - t0));
+                    }
                 }
             }
 
@@ -495,35 +509,35 @@ public class AutoplotApplet extends JApplet {
                 TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                 if (tsb == null) {
                     try {
-                        logger.fine("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
-                        logger.fine("  dsource="+dsource );
-                        logger.fine("  dsource.getClass()="+dsource.getClass() ) ;
+                        logger.log(Level.FINE, "do getDataSet @ {0} msec", (System.currentTimeMillis() - t0));
+                        logger.log(Level.FINE, "  dsource={0}", dsource);
+                        logger.log(Level.FINE, "  dsource.getClass()={0}", dsource.getClass()) ;
                         if ( dsource.getClass().toString().contains("CsvDataSource") ) logger.fine( " WHY IS THIS CsvDataSource!?!?" );
 
-                        ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
+                        ds = dsource.getDataSet(loadInitialMonitor);
                         for ( int i=0; i<Math.min(12,ds.length()); i++ ) {
                             System.err.printf("ds[%d]=%s\n",i,ds.slice(i));
                         }
-                        logger.fine("loaded ds: "+ds );
-                        logger.fine("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
+                        logger.log(Level.FINE, "loaded ds: {0}", ds);
+                        logger.log(Level.FINE, "done getDataSet @ {0} msec", (System.currentTimeMillis() - t0));
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
                 }
             }
 
-            logger.fine("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
+            logger.log(Level.FINE, "do setDataSource @ {0} msec", (System.currentTimeMillis() - t0));
 
             appmodel.setDataSource(dsource);
-            logger.fine("done setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
+            logger.log(Level.FINE, "done setDataSource @ {0} msec", (System.currentTimeMillis() - t0));
 
             setInitializationStatus("dataSourceSet");
 
             if (stimeRange != null && !stimeRange.equals("")) {
                 try {
-                    logger.fine("wait for idle @ " + (System.currentTimeMillis() - t0) + " msec (due to stimeRange)");
+                    logger.log(Level.FINE, "wait for idle @ {0} msec (due to stimeRange)", (System.currentTimeMillis() - t0));
                     appmodel.waitUntilIdle(true);
-                    logger.fine("done wait for idle @ " + (System.currentTimeMillis() - t0) + " msec");
+                    logger.log(Level.FINE, "done wait for idle @ {0} msec", (System.currentTimeMillis() - t0));
                 } catch (InterruptedException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -534,7 +548,7 @@ public class AutoplotApplet extends JApplet {
             setInitializationStatus("dataSetLoaded");
         }
 
-        logger.fine("done dataSetLoaded @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done dataSetLoaded @ {0} msec", (System.currentTimeMillis() - t0));
 
         // axis settings
         Plot p = dom.getController().getPlot();
@@ -613,7 +627,7 @@ public class AutoplotApplet extends JApplet {
             }
         }
 
-        logger.fine("done setRenderType @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done setRenderType @ {0} msec", (System.currentTimeMillis() - t0));
 
         if (!scolor.equals("")) {
             try {
@@ -658,18 +672,18 @@ public class AutoplotApplet extends JApplet {
         getContentPane().add(model.getCanvas());
 
 
-        logger.fine("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done add to applet @ {0} msec", (System.currentTimeMillis() - t0));
 
         validate();
 
-        logger.fine("done applet.validate @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "done applet.validate @ {0} msec", (System.currentTimeMillis() - t0));
 
         repaint();
         appmodel.getCanvas().setVisible(true);
         initializing = false;
 
         repaint();
-        logger.fine("ready @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE, "ready @ {0} msec", (System.currentTimeMillis() - t0));
         setInitializationStatus("ready");
 
         dom.getController().getPlot().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
@@ -737,7 +751,7 @@ public class AutoplotApplet extends JApplet {
             new Thread(run).start();
         }
 
-        logger.fine("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+        logger.log(Level.FINE,"done start AutoplotApplet " + VERSION + " @ {0} msec", (System.currentTimeMillis() - t0));
     }
 
     private void createAppletTester() {
