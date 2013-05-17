@@ -173,7 +173,7 @@ public class Test024 {
             System.err.println(tsb);
         }
         {
-            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
+            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109" );
             TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
             System.err.println(tsb);
         }
