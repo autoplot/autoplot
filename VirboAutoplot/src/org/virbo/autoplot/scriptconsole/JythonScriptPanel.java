@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Dimension;
 import org.virbo.jythonsupport.ui.EditorContextMenu;
 import java.awt.Event;
 import java.awt.Font;
@@ -66,6 +67,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
+        setMinimumSize( new Dimension(400,400) );
+
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
 
         setContext(CONTEXT_APPLICATION);
