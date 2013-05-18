@@ -536,6 +536,10 @@ public class PyQDataSet extends PyJavaInstance {
                         throw ex1;
                     }
                 }
+            } else if ( that.rank()==0 ) {
+                QDataSet sds= rods.slice( (int)that.value() ); //TODO: why is this not the writable dataset, or a copy of it?
+                return new PyQDataSet( sds );
+                
             } else {
                 QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                 ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);        
