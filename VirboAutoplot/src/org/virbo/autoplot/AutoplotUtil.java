@@ -842,6 +842,7 @@ public class AutoplotUtil {
                 mono= true;
             }
         }
+        if ( ds.rank()!=1 ) mono= false; //TODO: bins scheme
         
         // these are from the dataset metadata.
         AutoRangeDescriptor typical= null;
@@ -886,7 +887,7 @@ public class AutoplotUtil {
             return result;
         }
 
-        if (mono) {
+        if (mono && ds.rank()==1 ) { //TODO: support bins scheme
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
             QDataSet wds= DataSetUtil.weightsDataSet(ds); // use weights rather than checking for fill and valid range.  The weights datset will reflect this information.
             if (cadence == null || cadence.value() > Double.MAX_VALUE / 100)
