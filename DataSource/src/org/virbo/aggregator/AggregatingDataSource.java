@@ -82,11 +82,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
     private DatumRange quantize(DatumRange timeRange) {
         try {
             String[] ss = fsm.getNamesFor(timeRange); // 3523483 there's a bug here when reading from a zip file, because we need to download it first.
-            if (ss.length == 0) {
-                //TODO: Juno uses wildcard in the name.
+            DatumRange result= timeRange;
+            Datum oneDay= Units.hours.createDatum(24);
+            while ( ss.length == 0 && result.width().value()>0 && result.width().lt( oneDay ) ) {
+                result= DatumRangeUtil.rescale( result, -1, 2 );
+                ss = fsm.getNamesFor(result);
+            } 
+            if ( ss.length==0 ) {
                 return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
             }
-            DatumRange result = fsm.getRangeFor(ss[0]);
+            result = fsm.getRangeFor(ss[0]);
             for (int i = 1; i < ss.length; i++) {
                 DatumRange r1 = fsm.getRangeFor(ss[i]);
                 result = result.include(r1.max()).include(r1.min());
@@ -94,6 +99,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
             if ( timeRange.contains(result) ) {
                 return timeRange;
             } else {
+                if ( !result.intersects(timeRange) ) {
+                    if ( result.max().lt(timeRange.min() ) ) {
+                        result= DatumRangeUtil.rescale( result, 0, 2 );
+                    } else if ( result.min().gt(timeRange.max()) ) {
+                        result= DatumRangeUtil.rescale( result, -1, 1 );
+                    }
+                }
                 return result;
             }
         } catch (IOException ex) {
