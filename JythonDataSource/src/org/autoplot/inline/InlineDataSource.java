@@ -5,6 +5,7 @@
 
 package org.autoplot.inline;
 
+import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -41,12 +42,12 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class InlineDataSource extends AbstractDataSource {
 
+    PythonInterpreter interp;
     public InlineDataSource(URI uri) {
         super(uri);
     }
-
+    
     private MutablePropertyDataSet jyCommand( String c ) throws Exception {
-        PythonInterpreter interp = JythonUtil.createInterpreter(false);
         PyObject result= interp.eval(c);
 
         QDataSet res;
@@ -131,8 +132,6 @@ public class InlineDataSource extends AbstractDataSource {
 
         String linkCommand= "link( "+s + ")";
 
-        PythonInterpreter interp = JythonUtil.createInterpreter(false);
-
         try {
             PyObject result= interp.eval( linkCommand ); //wha?
             QDataSet res = (QDataSet) result.__tojava__(QDataSet.class);
@@ -168,8 +167,11 @@ public class InlineDataSource extends AbstractDataSource {
     //vap+inline:1,2,3&DEPEND_0=1,2,3&DEPEND_0.UNITS=hours since 2000-001T00:00
     //vap+inline:exp(findgen(20))&UNITS=eV&SCALE_TYPE=log&LABEL=Energy
     //vap+inline:vap+inline:ripples(1440)&DEPEND_0=timegen('2003-05-01','1 min',1440)
-    
+    //vap+inline:t=linspace(0,2*PI,200)&cos(2*t)),sin(3*t)),t
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+
+        interp= JythonUtil.createInterpreter(false);
+                
         String s= getURI();
 
         s= s.replaceAll("%20"," ");
@@ -230,6 +232,9 @@ public class InlineDataSource extends AbstractDataSource {
                 } else {
                     throw new ParseException("expected = for non-number",0);
                 }
+            } else if ( isAssignment(arg) ) {
+                interp.exec(arg);
+                
             } else if ( arg.charAt(0)>='a' && arg.charAt(0)<='z') { // fun with jython?
                 //TODO: didn't do jython because of dependency
                 ds= parseInlineDs(arg);
@@ -238,6 +243,10 @@ public class InlineDataSource extends AbstractDataSource {
             }
         }
 
+        if ( ds==null ) {
+            throw new IllegalArgumentException("URI don't contain anything to plot");
+        }
+        
         for ( int idep=0; idep<4; idep++ ) {
             Map<String,String> depp= deppropn[idep];
             if ( depp==null ) continue;
@@ -316,6 +325,13 @@ public class InlineDataSource extends AbstractDataSource {
             ds.putProperty( QDataSet.BUNDLE_1, bundle1 );
         }
         return ds;
+    }
+
+    private boolean isAssignment(String arg) {
+        int i= arg.indexOf("=");
+        if ( i==-1 ) return false;
+        Pattern p= Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]*\\s*");
+        return p.matcher(arg.substring(0,i)).matches();
     }
 
 }
