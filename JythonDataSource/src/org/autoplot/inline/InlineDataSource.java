@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.inline;
 
-import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -16,6 +11,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyList;
@@ -36,18 +32,22 @@ import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**
-/**
- *
+ * Data source used mostly for demonstrations and quick modifications
+ * of data.
  * @author jbf
  */
 public class InlineDataSource extends AbstractDataSource {
 
+    Logger logger= LoggerManager.getLogger("jython.inline");
+    
     PythonInterpreter interp;
     public InlineDataSource(URI uri) {
         super(uri);
     }
     
     private MutablePropertyDataSet jyCommand( String c ) throws Exception {
+        logger.finest(c);
+        
         PyObject result= interp.eval(c);
 
         QDataSet res;
@@ -81,6 +81,8 @@ public class InlineDataSource extends AbstractDataSource {
      * @return
      */
     private MutablePropertyDataSet parseInlineDsSimple( String s ) {
+        logger.log(Level.FINEST, "parseInlineDsSimple {0}", s);
+        
         Units u= Units.dimensionless;
         Units tu= Units.us2000;
         EnumerationUnits eu= EnumerationUnits.create("default");
@@ -126,6 +128,8 @@ public class InlineDataSource extends AbstractDataSource {
     }
 
     private MutablePropertyDataSet parseInlineDs( String s ) throws Exception {
+        logger.log(Level.FINEST, "parseInlineDs {0}", s);
+
         if ( s.equals("None") || s.equals("null") || s.equals("") ) return null;
             
         boolean isCommand= s.length()>0 && s.charAt(0)>='a' && s.charAt(0)<='z';
@@ -170,6 +174,9 @@ public class InlineDataSource extends AbstractDataSource {
     //vap+inline:t=linspace(0,2*PI,200)&cos(2*t)),sin(3*t)),t
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
 
+        logger.log(Level.FINE, "getDataSet {0}", getURI() );
+
+        logger.log( Level.FINER, "create interpreter");
         interp= JythonUtil.createInterpreter(false);
                 
         String s= getURI();
@@ -233,6 +240,8 @@ public class InlineDataSource extends AbstractDataSource {
                     throw new ParseException("expected = for non-number",0);
                 }
             } else if ( isAssignment(arg) ) {
+                logger.log( Level.FINER, "assignment {0}", arg);
+
                 interp.exec(arg);
                 
             } else if ( arg.charAt(0)>='a' && arg.charAt(0)<='z') { // fun with jython?
