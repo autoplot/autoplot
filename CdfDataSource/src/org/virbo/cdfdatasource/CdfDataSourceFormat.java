@@ -72,7 +72,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
         File file= new File( split.resourceUri );
-        boolean append= params.get("append").equals("T") ;
+        boolean append= "T".equals( params.get("append") ) ;
         
         if ( ! append ) {
             if ( file.exists() && !file.delete() ) {
