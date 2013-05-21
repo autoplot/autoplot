@@ -219,53 +219,59 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
         }
         
-        File cdfFile;
-        cdfFile = getFile(mon);
-
-        logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
-
-        String fileName = cdfFile.toString();
-        
-        Map map = getParams();
-
-        CDF cdf= getCdfFile(fileName);
-        logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
-        
-        String svariable = (String) map.get(PARAM_ID);
-        if (svariable == null) {
-            svariable = (String) map.get("arg_0");
-        }
-        String constraint = null;
-
-        String interpMeta = (String) map.get(PARAM_INTERPMETA);
-        if (!"no".equals(interpMeta)) {
-            Variable variable;
-            int i = svariable.indexOf("[");
-            if (i != -1) {
-                constraint = svariable.substring(i);
-                svariable = svariable.substring(0, i);
-            }
-            variable= cdf.getVariable(svariable);
-            long numRec= variable.getNumberOfValues();
+        try {
             
-            long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
-            if ( attributes==null ) {
-                attributes = readAttributes(cdf, variable, 0);
-                if ( recs[2]==-1 ) {
-                    attributes= MetadataUtil.sliceProperties(attributes, 0);
-                }
-                if ( map.get(PARAM_SLICE1)!=null ) {
-                    attributes.put( PARAM_SLICE1, map.get(PARAM_SLICE1) );
-                }                
+            File cdfFile;
+            cdfFile = getFile(mon);
+
+            logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
+
+            String fileName = cdfFile.toString();
+
+            Map map = getParams();
+
+            CDF cdf= getCdfFile(fileName);
+            logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
+
+            String svariable = (String) map.get(PARAM_ID);
+            if (svariable == null) {
+                svariable = (String) map.get("arg_0");
             }
-        }
+            String constraint = null;
 
-        // Now call the other getDataSet...
-        QDataSet result= getDataSet(mon,attributes);
-        
-        if ( rcent!=null ) rcent.finished(result);
+            String interpMeta = (String) map.get(PARAM_INTERPMETA);
+            if (!"no".equals(interpMeta)) {
+                Variable variable;
+                int i = svariable.indexOf("[");
+                if (i != -1) {
+                    constraint = svariable.substring(i);
+                    svariable = svariable.substring(0, i);
+                }
+                variable= cdf.getVariable(svariable);
+                long numRec= variable.getNumberOfValues();
 
-        return result;
+                long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
+                if ( attributes==null ) {
+                    attributes = readAttributes(cdf, variable, 0);
+                    if ( recs[2]==-1 ) {
+                        attributes= MetadataUtil.sliceProperties(attributes, 0);
+                    }
+                    if ( map.get(PARAM_SLICE1)!=null ) {
+                        attributes.put( PARAM_SLICE1, map.get(PARAM_SLICE1) );
+                    }                
+                }
+            }
+
+            // Now call the other getDataSet...
+            QDataSet result= getDataSet(mon,attributes);
+            if ( rcent!=null ) rcent.finished(result);
+            return result;
+            
+        } catch ( Exception ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
+            
+        } 
         
     }
 
