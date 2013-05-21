@@ -34,7 +34,7 @@ public class Test010 {
         tests.add("http://stevens.lanl.gov/");
         tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
         tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
-        //tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
+        tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
         tests.add("http://caa.estec.esa.int/caa/search.xml");
         tests.add("http://papco.org/data");
 
