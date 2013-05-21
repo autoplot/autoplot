@@ -284,13 +284,6 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
 
-            String os1= (String)map.get(PARAM_SLICE1);
-            if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
-                int is= Integer.parseInt(os1);
-                result= DataSetOps.slice1(result,is);
-                this.attributes= null; // they aren't relevant now.
-            }
-
             if ( rcent!=null ) rcent.finished(result);
             return result;
 
