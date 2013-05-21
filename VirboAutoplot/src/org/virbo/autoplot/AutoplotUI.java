@@ -63,8 +63,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -2762,7 +2760,6 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
                 logger.log( Level.SEVERE, "", ex );
-                return;
             } catch ( Exception ex) {
                 logger.log( Level.SEVERE, "", ex );
                 throw new RuntimeException(ex);
@@ -3375,7 +3372,11 @@ APSplash.checkTime("init 200");
 APSplash.checkTime("init 210");
                 final boolean server= !alm.getValue("port").equals("-1");
                 if ( server ) {
-                    int iport = Integer.parseInt(alm.getValue("port"));
+                    if ( app==null ) {
+                        throw new IllegalArgumentException("Server cannot be used in headless mode");
+                    }
+                    int iport;
+                    iport = Integer.parseInt(alm.getValue("port"));
                     app.setupServer(iport, model);
                     model.getDocumentModel().getOptions().setServerEnabled(true);
                 }
@@ -3434,7 +3435,7 @@ APSplash.checkTime("init 230");
 
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
-                    if ( app!=null ) app.setStatus("running script "+script);
+                    app.setStatus("running script "+script);
                     Runnable run= getRunScriptRunnable( app, model, script, scriptArgs, headless && !server );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
@@ -3716,7 +3717,6 @@ APSplash.checkTime("init 240");
             JSeparator userSep= new JSeparator();
             userSep.setName("userSep"); // so we can find it later
             toolsMenu.add( userSep );
-            isep= toolsMenu.getMenuComponentCount();
         }
 
         SwingUtilities.invokeLater( new Runnable() {
