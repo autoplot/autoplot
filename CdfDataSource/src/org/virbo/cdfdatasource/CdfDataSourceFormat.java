@@ -25,6 +25,9 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import static gsfc.nssdc.cdf.CDFConstants.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
 
 /**
@@ -43,6 +46,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     Map<QDataSet,String> names;
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
+    
     public CdfDataSourceFormat() {
         names= new HashMap<QDataSet,String>();
     }
@@ -78,6 +83,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( file.exists() && !file.delete() ) {
                 throw new IllegalArgumentException("Unable to delete file"+file);
             }
+            logger.log(Level.FINE, "create CDF file {0}", file);
             cdf = CDF.create( file.toString() );
             unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
             lablAxisAttr= Attribute.create( cdf, "LABLAXIS", VARIABLE_SCOPE );
@@ -92,6 +98,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         } else {
             if ( file.exists() ) {
+                logger.log(Level.FINE, "open CDF file {0}", file);
                 cdf= CDF.open(file.toString());
                 unitsAttr= cdf.getAttribute( "UNITS" );
                 lablAxisAttr= cdf.getAttribute( "LABLAXIS" );
@@ -172,7 +179,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( dep1!=null ) Entry.create( depend_1, var.getID(), CDF_CHAR, nameFor(dep1) );
             if ( dep2!=null ) Entry.create( depend_2, var.getID(), CDF_CHAR, nameFor(dep2) );
         } catch ( CDFException ex ) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE,null,ex);
         }
 
         cdf.close();
