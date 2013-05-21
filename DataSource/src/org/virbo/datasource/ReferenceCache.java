@@ -112,13 +112,11 @@ public class ReferenceCache {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ds, uri} );
             this.qds= new WeakReference<QDataSet>(ds);
             this.status= ReferenceCacheEntryStatus.DONE;
-            return;
         }
         public void exception( Exception ex ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ex, uri} );
             this.exception= ex;
             this.status= ReferenceCacheEntryStatus.DONE;
-            return;
         }
 
         /**
@@ -214,7 +212,7 @@ public class ReferenceCache {
             } catch (InterruptedException ex) {
                 Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if ( !monitor.isFinished() ) {
+            if ( !( ent.monitor.isFinished() || ent.monitor.isCancelled() ) ) {
                 monitor.setTaskSize( ent.monitor.getTaskSize());
                 monitor.setTaskProgress( ent.monitor.getTaskProgress());
             }
@@ -228,7 +226,6 @@ public class ReferenceCache {
         logger.log( Level.FINEST, "putDataSet on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
         result.qds= new WeakReference<QDataSet>(ds);
         result.status= ReferenceCacheEntryStatus.DONE;
-        return;
     }
 
     /**
