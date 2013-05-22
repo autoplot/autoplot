@@ -133,6 +133,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.HtmlResponseIOException;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
@@ -2932,6 +2933,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     logger.fine("Resetting FileSystems...");
     Runnable run= new Runnable() {
         public void run() {
+           ReferenceCache.getInstance().reset(); // you just have to know this is what it is doing for now...
            FileSystem.reset();
            setMessage("FileSystem memory caches reset");
         }
