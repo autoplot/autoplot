@@ -3437,14 +3437,12 @@ APSplash.checkTime("init 230");
 
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
-                    app.setStatus("running script "+script);
+                    if ( app!=null ) app.setStatus("running script "+script);
                     Runnable run= getRunScriptRunnable( app, model, script, scriptArgs, headless && !server );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
 APSplash.checkTime("init 240");
-                    if ( app!=null ) {
-                        app.setStatus( READY_MESSAGE );
-                    }
+                    if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
 
                 //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
