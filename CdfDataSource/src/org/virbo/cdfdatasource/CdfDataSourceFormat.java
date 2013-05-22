@@ -242,6 +242,24 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
             export= fexport;
 
+        } else if ( type==CDF_INT4 ) {
+            int[] bexport= new int[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (int)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDF_INT2 ) {
+            short[] bexport= new short[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
         } else if ( type==CDF_BYTE ) {
             byte[] bexport= new byte[ ds.length() ];
             int i = 0;
@@ -277,10 +295,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 oexport= new double[ds.length()][];
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][];
+            } else if ( type==CDF_INT4 ) {
+                oexport= new int[ds.length()][];
+            } else if ( type==CDF_INT2 ) {
+                oexport= new short[ds.length()][];
             } else if ( type==CDF_BYTE ) {
                 oexport= new byte[ds.length()][];
             } else {
-                throw new IllegalArgumentException("type not supported"+type);
+                throw new IllegalArgumentException("type not supported: "+type);
             }
             for ( int i=0; i<ds.length(); i++ ) {
                 Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
@@ -292,6 +314,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 oexport= new double[ds.length()][][];
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][][];
+            } else if ( type==CDF_INT4 ) {
+                oexport= new int[ds.length()][];
+            } else if ( type==CDF_INT2 ) {
+                oexport= new short[ds.length()][];
             } else if ( type==CDF_BYTE ) {
                 oexport= new byte[ds.length()][][];
             } else {
@@ -307,6 +333,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 oexport= new double[ds.length()][][][];
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][][][];
+            } else if ( type==CDF_INT4 ) {
+                oexport= new int[ds.length()][];
+            } else if ( type==CDF_INT2 ) {
+                oexport= new short[ds.length()][];
             } else if ( type==CDF_BYTE ) {
                 oexport= new byte[ds.length()][][][];
             } else {
@@ -332,6 +362,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 type= CDF_FLOAT;
             } else if ( t.equals("byte")) {
                 type= CDF_BYTE;
+            } else if ( t.equals("int2")) {
+                type= CDF_INT2;
+            } else if ( t.equals("int4")) {
+                type= CDF_INT4;
             } else if ( t.equals("double")) {
                 type= CDF_DOUBLE;
             }
