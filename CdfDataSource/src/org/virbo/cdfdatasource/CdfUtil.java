@@ -493,29 +493,40 @@ public class CdfUtil {
         long[] dimCounts;
         long[] dimIntervals;
 
-        if (dims == 0) {
+        if (dims == 0) {  // rank 1
             dimCounts = new long[]{0};
             dimIntervals = new long[]{0};
+            
         } else if (dims == 1) {
+            dimIntervals = new long[]{1};
             if ( slice1>-1 ) {
-                logger.finer("slice1 implemented at read to save space");
                 dimCounts = new long[]{1};
-                dimIntervals = new long[]{1};
                 dimIndeces= new long[] { slice1 };
                 dimSizes= new long[] { 1 };
             } else {
-                dimCounts = new long[]{dimSizes[0]};
-                dimIntervals = new long[]{1};
+                dimCounts = new long[]{ dimSizes[0] };
             }
 
         } else if (dims == 2) {
-            dimIndeces = new long[]{0, 0};
-            dimCounts = new long[]{dimSizes[0], dimSizes[1]};
             dimIntervals = new long[]{1, 1};
+            if ( slice1>-1 ) {
+                dimCounts= new long[] { 1, dimSizes[1] };
+                dimIndeces = new long[]{ slice1, 0};
+                dimSizes= new long[] { 1, dimSizes[1] };
+            } else {
+                dimIndeces = new long[]{ 0, 0 };
+                dimCounts = new long[]{ dimSizes[0], dimSizes[1] };
+            }
         } else if (dims == 3) {
-            dimIndeces = new long[]{0, 0, 0};
-            dimCounts = new long[]{dimSizes[0], dimSizes[1], dimSizes[2]};
             dimIntervals = new long[]{1, 1, 1};
+            if ( slice1>-1 ) {
+                dimCounts= new long[] { 1, dimSizes[1], dimSizes[2] };
+                dimIndeces = new long[]{ slice1, 0, 0 };
+                dimSizes= new long[] { 1, dimSizes[1], dimSizes[2] };            
+            } else {
+                dimIndeces = new long[]{0, 0, 0};
+                dimCounts = new long[]{dimSizes[0], dimSizes[1], dimSizes[2]};
+            }
         } else {
             if (recCount != -1) {
                 throw new IllegalArgumentException("rank 5 not implemented");
