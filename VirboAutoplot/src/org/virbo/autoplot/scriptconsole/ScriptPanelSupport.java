@@ -299,7 +299,7 @@ public class ScriptPanelSupport {
 
     /**
      * Execute the script.  For context data source, this means putting the URI in the data set selector and telling it to plot.
-     * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK is enter editor.
+     * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK is enter editor.  SHIFT_MASK brings up parameters GUI.
      */
     protected void executeScript(final int mode) {
 
@@ -420,7 +420,7 @@ public class ScriptPanelSupport {
                                         if ( JOptionPane.showConfirmDialog( panel, p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             org.virbo.jythonsupport.ui.Util.resetVariables( fd, vars );
                                             for ( Entry<String,String> v: vars.entrySet() ) {
-                                                interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
+                                                interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
                                             }
                                             interp.exec(panel.getEditorPanel().getText());
                                         }
