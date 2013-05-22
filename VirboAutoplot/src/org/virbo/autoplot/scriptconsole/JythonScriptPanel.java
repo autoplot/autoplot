@@ -303,7 +303,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("Execute");
-        savePlotButton.setToolTipText("Execute script.  Alt modifier enters editor GUI.  Ctrl modifier attempts to trace program location.  ");
+        savePlotButton.setToolTipText("<html>Execute script.  <br>Alt modifier enters editor GUI.  <br>Ctrl modifier attempts to trace program location.  <br>Shift modifier will being up parameters gui.");
         savePlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 savePlotButtonActionPerformed(evt);
@@ -379,10 +379,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(openButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(newScriptButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 60, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
+                .add(fileNameTextField)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 81, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jScrollPane2)

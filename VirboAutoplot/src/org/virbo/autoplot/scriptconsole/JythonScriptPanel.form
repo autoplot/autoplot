@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -26,11 +26,11 @@
               <Component id="openButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="newScriptButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="60" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="contextSelector" min="-2" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
-              <Component id="fileNameTextField" pref="506" max="32767" attributes="0"/>
+              <Component id="fileNameTextField" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="caretPositionLabel" min="-2" pref="81" max="-2" attributes="0"/>
           </Group>
@@ -66,7 +66,7 @@
           <Image iconType="3" name="/org/virbo/autoplot/go.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Execute"/>
-        <Property name="toolTipText" type="java.lang.String" value="Execute script.  Alt modifier enters editor GUI.  Ctrl modifier attempts to trace program location.  "/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Execute script.  &lt;br&gt;Alt modifier enters editor GUI.  &lt;br&gt;Ctrl modifier attempts to trace program location.  &lt;br&gt;Shift modifier will being up parameters gui."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="savePlotButtonActionPerformed"/>
