@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Improved support for ISO8601 time ranges.</small></p>
+        <p><small>The slice1 keyword for CDF reading supports rank 3 and rank 4 datasets.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1044: CDF slice1 was not properly implemented for rank 3 and rank 4 datasets.</li>
+            <li>update RBSP orbit files</li>
             <li>1042: plot command grabs focus</li>
             <li>1041: don't create empty folders when folder names are mistyped</li>
             <li>1038: copy plots down non-default renderType & parent plotElement</li>
@@ -52,6 +54,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>inline data source supports assignments, like vap+inline:t=linspace(0,2*PI,200)&amp;cos(t*2),sin(t*3),t</li>
             <li>New ISO8601 range parser supports "2012-02-02T02:00/04:00"</li>
             <li>New timerange field types from http://tsds.org/uri_specification, including $x, hrinterval, subsec and periodic.</li>
             <li>Start list of open source components in help screen, report memory sizes in 1000*1000 byte units, not 1024*1024.</li>
