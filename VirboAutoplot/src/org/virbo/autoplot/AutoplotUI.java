@@ -3343,7 +3343,9 @@ APSplash.checkTime("init -80");
                 }
 APSplash.checkTime("init -70");
                 final AutoplotUI app;
-                if ( !headless ) {
+                if ( headless ) {
+                    app= null;
+                } else {
                     app= new AutoplotUI(model);
 
                     app.createDropTargetListener( app.dataSetSelector );
@@ -3367,8 +3369,6 @@ APSplash.checkTime("init 200");
                         org.autoplot.external.AddCfaSampListener.addCfaSampListener( app.dataSetSelector );
                     }
 
-                } else {
-                    app= null;
                 }
 
 APSplash.checkTime("init 210");
@@ -3407,9 +3407,9 @@ APSplash.checkTime("init 220");
                             return "repaintRunnable";
                         }
                         public void run() {
-                            app.applicationModel.canvas.repaint();
+                            if ( app!=null ) app.applicationModel.canvas.repaint();
                             if ( initialURL==null || !initialURL.startsWith("pngwalk:") ) {
-                                app.setVisible(true);
+                                if ( app!=null ) app.setVisible(true);
                             }
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
@@ -3421,18 +3421,18 @@ APSplash.checkTime("init 220");
                     logger.removeHandler( APSplash.getInstance().getLogHandler() );
 
                     if ( alm.getValue("mode").equals("basic") ) {
-                        app.setExpertMode(false);
+                        if ( app!=null ) app.setExpertMode(false);
                     }
 
                 }
 APSplash.checkTime("init 230");
                 if ( !headless && initialURL != null) {
-                    app.dataSetSelector.setValue(initialURL);
-                    app.dataSetSelector.maybePlot(false);
+                    if ( app!=null ) app.dataSetSelector.setValue(initialURL);
+                    if ( app!=null ) app.dataSetSelector.maybePlot(false);
                 }
                 
                 if (bookmarks != null) {
-                    app.initialBookmarksUrl= bookmarks;
+                    if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
 
                 final String script= alm.getValue("script");
