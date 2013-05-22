@@ -1603,7 +1603,7 @@ public class Extractor {
         boolean longType = false;
         int type = var.getType();
         int itemSize = slice1==-1 ? var.getDataItemSize() : var.getDataItemSize() / var.getDimensions()[0] ;
-        int elements = itemSize/DataTypes.size[type];
+        int elements = itemSize/DataTypes.size[type];  // elements is the number of data elements (e.g. floats) per record.
         if (DataTypes.typeCategory[type] == DataTypes.LONG) {
             if (preserve) ldata = new long[nv*elements];
             if (!preserve) data = new double[nv*elements];
@@ -1627,8 +1627,9 @@ public class Extractor {
             end = ((int [])locations.elementAt(locations.size() - 1))[1];
         }
         ByteBuffer sl= ByteBuffer.allocate( itemSize*nv ); //slice1
-        int otherDimensionsSize= itemSize;
-        for ( int i=1; i<var.getDimensions().length-1; i++ ) {
+        int otherDimensionsSize= DataTypes.size[type];
+        if ( slice1==-1 ) otherDimensionsSize*= var.getDimensions()[0];
+        for ( int i=1; i<var.getDimensions().length; i++ ) {
             otherDimensionsSize*= var.getDimensions()[i];
         }
         for (; blk < locations.size(); blk++) {
@@ -1638,7 +1639,13 @@ public class Extractor {
             if (last < begin) continue;
             int count = (last - first + 1);
             bv = positionBuffer((CDFImpl)thisCDF, var, loc[2], count);
+            ByteBuffer copy= ByteBuffer.allocate( bv.limit() );
+            copy.order(bv.order());
+            copy.put(bv);
+            copy.flip();
+            bv= copy;
             if ( slice1>-1 ) {
+                sl.order(bv.order());
                 doSlice1( bv, sl, offset, count, var.getDataItemSize(), slice1*otherDimensionsSize, otherDimensionsSize );
                 bv= sl;
                 sl.flip();
@@ -1776,7 +1783,7 @@ public class Extractor {
      * @param nrec number of records to read.
      * @param recLen length of each record in bytes.
      * @param readOffset offset into each record in bytes.
-     * @param readLen length of each record in bytes.
+     * @param readLen length of each read in bytes.
      */
     static void doSlice1(ByteBuffer bv, ByteBuffer result, int offset, int nrec, int recLen, int readOffset, int readLen ) {
         logger.log( Level.FINEST, "doSlice1( buf.position={0} )", 
@@ -1788,10 +1795,6 @@ public class Extractor {
             bv.position(ipos+readOffset);
             result.put(bv);
             ipos= ipos + recLen;
-            System.err.println("i="+i);
-            if ( i==40 ) {
-                System.err.println("hereherehere");
-            }
         }
         
     }
