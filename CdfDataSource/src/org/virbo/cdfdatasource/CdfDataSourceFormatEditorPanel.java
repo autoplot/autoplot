@@ -43,7 +43,7 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
 
         jLabel1.setText("Type:");
 
-        typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "double", "float", "byte" }));
+        typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "double", "float", "int4", "int2", "byte" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
