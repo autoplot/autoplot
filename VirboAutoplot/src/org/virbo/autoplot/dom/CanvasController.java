@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.GeneralPath;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -30,10 +32,12 @@ import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
+import org.das2.graph.GraphUtil;
 import org.das2.graph.Painter;
 import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
+import static org.virbo.autoplot.dom.DomNodeController.logger;
 import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
@@ -680,6 +684,8 @@ public class CanvasController extends DomNodeController {
 
         if ( !dasCanvas.isShowing() ) return;
 
+        long t0= System.currentTimeMillis();
+                
         final List<Shape> sel= new ArrayList<Shape>();
         final List<Rectangle> clip= new ArrayList<Rectangle>();
 
@@ -695,7 +701,9 @@ public class CanvasController extends DomNodeController {
         for ( Object o: selectedItems ) {
             if ( o instanceof Plot ) {
                 DasPlot p= ((Plot)o).getController().getDasPlot();
-                sel.add( SelectionUtil.getSelectionArea( p ) );
+                GeneralPath result= new GeneralPath();
+                GraphUtil.reducePath( SelectionUtil.getSelectionArea( p ).getPathIterator(null), result, 10 );
+                sel.add( result );
                 clip.add( p.getBounds() );
             } else if ( o instanceof PlotElement ) {
                 Renderer rend= ((PlotElement)o).getController().getRenderer();
@@ -703,13 +711,17 @@ public class CanvasController extends DomNodeController {
                 DasPlot p= rend.getParent();
                 if ( p==null ) return; // transitional case
                 Rectangle r= p.getBounds();
-                sel.add( SelectionUtil.getSelectionArea( rend ) );
+                GeneralPath result= new GeneralPath();
+                GraphUtil.reducePath( SelectionUtil.getSelectionArea( rend ).getPathIterator(null), result, 10 );
+                sel.add( result );
                 clip.add( r );
             }
         }
-
+        
         final Painter p= new Painter() {
             public void paint(Graphics2D g) {
+                long t0= System.currentTimeMillis();
+                
                 // note it's non-trivial to apply transforms as the plot moves.
                 if ( dasCanvas.lisPaintingForPrint() ) {
                     logger.fine("not painting select");
@@ -733,6 +745,7 @@ public class CanvasController extends DomNodeController {
                         g.setStroke(stroke0);
                     }
                 }
+                logger.log(Level.FINE, "paint selection in {0} ms", (System.currentTimeMillis()-t0));
             }
         };
 
@@ -749,6 +762,9 @@ public class CanvasController extends DomNodeController {
                 clearSelectionTimer.restart();
             }
         } );
+        
+        logger.log(Level.FINE, "highlite selection in {0}ms", (System.currentTimeMillis()-t0));
+
 
     }
 
