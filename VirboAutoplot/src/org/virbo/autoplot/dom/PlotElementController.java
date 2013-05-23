@@ -585,14 +585,17 @@ public class PlotElementController extends DomNodeController {
                 QDataSet context= (QDataSet) fillDs.property(QDataSet.CONTEXT_0);
                 if ( context!=null ) {
                     DatumRange cdr;
-                    if ( context.rank()==1 ) {
-                        cdr= DataSetUtil.asDatumRange( context, true );
-                    } else {
-                        cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
+                    try {
+                        if ( context.rank()==1 ) {
+                            cdr= DataSetUtil.asDatumRange( context, true );
+                        } else {
+                            cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
+                        }
+                        Plot plot= this.dom.getController().getPlotFor(plotElement);
+                        plot.getController().getDasPlot().setDisplayContext( cdr );  // note this property is just a placeholder, and is sensed by ColumnColumnConnector.
+                    } catch ( IllegalArgumentException ex ) {
+                        logger.fine(ex.toString());
                     }
-                    Plot plot= this.dom.getController().getPlotFor(plotElement);
-                    plot.getController().getDasPlot().setDisplayContext( cdr );  // note this property is just a placeholder, and is sensed by ColumnColumnConnector.
-
                 } else {
                     // TODO: ???
                 }
