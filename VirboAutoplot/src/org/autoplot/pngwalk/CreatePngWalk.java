@@ -25,6 +25,8 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.ProgressMonitor;
@@ -34,6 +36,9 @@ import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.StatePersistence;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
@@ -42,6 +47,35 @@ import org.virbo.autoplot.state.StatePersistence;
  */
 public class CreatePngWalk {
 
+    private static String[] getListOfTimes( Params params ) throws IllegalArgumentException, ParseException {
+        String[] times;
+        if ( params.batchUri!=null && params.batchUri.length()>0 ) {
+            try {
+                QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( params.batchUri );
+                if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
+                    timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
+                }
+                if ( timesds.rank()!=2 ) {
+                    throw new IllegalArgumentException("expected bins dataset for times");
+                }
+                times= new String[timesds.length()];
+                TimeParser tp= TimeParser.create(params.timeFormat);
+                for ( int i=0; i<times.length; i++ ) {
+                    times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) );
+                }
+            } catch (Exception ex) {
+                if ( ex instanceof IllegalArgumentException ){
+                    throw (IllegalArgumentException)ex;
+                } else {
+                    throw new IllegalArgumentException(ex);
+                }
+            }
+        } else {
+            times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
+        }
+        return times;
+    }
+    
     public static class Params {
 
         /**
@@ -79,6 +113,13 @@ public class CreatePngWalk {
          */
         public String timeFormat;
 
+        /**
+         * Uri that creates an events dataset, like 
+         * 'http://emfisis.physics.uiowa.edu/events/rbsp-a/burst/rbsp-a_burst_times_20130201.txt?eventListColumn=3'
+         * or null for automatically generating names based on template.
+         */
+        public String batchUri;
+        
         /*
          * if true, the also create thumbs.
          */
@@ -198,6 +239,8 @@ public class CreatePngWalk {
         build.append("--timeFormat='").append(params.timeFormat).append( "' ");
         ff.println( "timeRange=" + params.timeRangeStr );
         build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+        ff.println( "batchUri=" + params.batchUri );
+        build.append("--batchUri=").append(params.batchUri).append( " ");
         if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
             ff.println( "rescalex="+ params.rescalex );
             build.append("--rescalex=").append(params.rescalex).append( " ");
@@ -339,7 +382,7 @@ public class CreatePngWalk {
                     return;
                 }
 
-                String[] times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
+                String[] times = getListOfTimes( params );
 
                 doBatch( times, dom, params, mon );
 
@@ -365,8 +408,9 @@ public class CreatePngWalk {
             }
 
         } else {
-            String[] times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
-
+            
+            String[] times = getListOfTimes( params );
+            
             ProgressMonitor mon;
             if (ScriptContext.getViewWindow() == null) {
                 mon = new org.das2.util.monitor.NullProgressMonitor();
@@ -385,7 +429,9 @@ public class CreatePngWalk {
         System.err.println("CreatePngWalk 20121008");
         final ArgumentList alm = new ArgumentList("CreatePngWalk");
         alm.addOptionalSwitchArgument( "timeFormat", "f", "timeFormat", "$Y$m$d", "timeformat for png files, e.g. $Y is year, $j is day of year");
-        alm.addSwitchArgument( "timeRange", "r", "timeRange", "time range to cover, e.g. 2011 through 2012" );
+        alm.addOptionalSwitchArgument( "timeRange", "r", "timeRange", "", "time range to cover, e.g. 2011 through 2012" );
+        alm.requireOneOf( new String[] { "timeRange","batchUri" } );
+        alm.addOptionalSwitchArgument( "batchUri", "b", "batchUri", "", "optionally provide list of timeranges" );
         alm.addOptionalSwitchArgument( "createThumbs", "t", "createThumbs", "y", "create thumbnails, y (default) or n" );
         alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
         alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
@@ -406,7 +452,7 @@ public class CreatePngWalk {
         params.version= alm.getValue("version");
         params.autorange= alm.getBooleanValue("autorange");
         params.update= alm.getBooleanValue("update");
-        
+        params.batchUri= alm.getValue("batchUri");
         String vap= alm.getValue("vap");
         ScriptContext.plot(vap);
 
