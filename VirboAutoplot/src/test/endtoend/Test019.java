@@ -126,6 +126,8 @@ public class Test019 {
      */
     public static void testTimeParser() throws Exception {
         //LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
+        testTimeParser1( "$Y$m$d-$(Y,end)$m$d", "20130202-20140303", "2013-02-02/2014-03-03" );
+        testTimeParser1( "$Y$m$d-$(d,end)", "20130202-13", "2013-02-02/2013-02-13" );
         testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "0",  "2000-001");
         testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "20", "2000-021");        
         testTimeParser1( "$(periodic;offset=2285;start=2000-346;period=P27D)", "1", "1832-02-08/P27D");
