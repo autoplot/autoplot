@@ -115,6 +115,8 @@ public class Test019 {
 
         if ( !dr.equals(drnorm) ) {
             throw new IllegalStateException("ranges do not match: "+spec + " " +test + "--> " + dr + ", should be "+norm );
+        } else {
+            System.err.println( String.format( "%s:  \t%s-->\t%s", spec, test, norm ) );
         }
         return true;
     }
