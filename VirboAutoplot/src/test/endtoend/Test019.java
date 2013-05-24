@@ -18,6 +18,7 @@ import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
@@ -213,7 +214,10 @@ public class Test019 {
     
     public static void main( String[] args ) {
         try {
-            TimeParser tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
+            TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+            tp.format( TimeUtil.now(), null);
+            
+            tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
             Map<String,String> extra= new HashMap();
             System.err.println( tp.parse( "20130524-b", extra ) );
             System.err.println( "sc="+extra.get("sc") );
