@@ -8,8 +8,11 @@ package test.endtoend;
 import java.io.File;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.print.attribute.HashAttributeSet;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
@@ -128,7 +131,9 @@ public class Test019 {
      */
     public static void testTimeParser() throws Exception {
         //LoggerManager.getLogger("datum.timeparser").setLevel(Level.ALL);
+        testTimeParser1( "$Y$m$d-$(enum,values=a|b|c|d)", "20130202-a", "2013-02-02/2013-02-03" );
         testTimeParser1( "$Y$m$d-$(Y,end)$m$d", "20130202-20140303", "2013-02-02/2014-03-03" );
+        testTimeParser1( "$Y$m$d-$(Y,end)$m$(d,shift=1)", "20130202-20140303", "2013-02-02/2014-03-04" );
         testTimeParser1( "$Y$m$d-$(d,end)", "20130202-13", "2013-02-02/2013-02-13" );
         testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "0",  "2000-001");
         testTimeParser1( "$(periodic;offset=0;start=2000-001;period=P1D)", "20", "2000-021");        
@@ -208,6 +213,10 @@ public class Test019 {
     
     public static void main( String[] args ) {
         try {
+            TimeParser tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
+            Map<String,String> extra= new HashMap();
+            System.err.println( tp.parse( "20130524-b", extra ) );
+            System.err.println( "sc="+extra.get("sc") );
             testParse8601(); // this test comes from a test within das2.
             testTimeParser();
             testRestrictedFileSystemAccess();
