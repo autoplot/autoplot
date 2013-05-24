@@ -30,21 +30,21 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
     boolean[] isNumber;
 
     private boolean multiFieldAdjacent( String spec ) {
-        return spec.length()>3 && spec.charAt(2)=='%' && spec.charAt(3)!='%';
+        return spec.length()>3 && spec.charAt(2)=='$' && spec.charAt(3)!='$';
     }
 
     private int fieldCount( String spec ) {
         int count=0;
         for ( int i=0; i<spec.length(); i++ ) {
-            if ( spec.charAt(i)=='%' && spec.charAt(i+1)!='%' ) count++;
+            if ( spec.charAt(i)=='$' && spec.charAt(i+1)!='$' ) count++;
         }
         return count;
     }
 
     private boolean isNumber( String spec ) {
-        if ( spec.equals("%{ignore}") ) {
+        if ( spec.equals("$(ignore)") ) {
             return false;
-        } else if ( spec.equals("%b") ) { //TODO: %-1{b}, etc.
+        } else if ( spec.equals("$b") ) { //TODO: $-1{b}, etc.
             return false;
         } else {
             return fieldCount( spec )==1;
@@ -63,7 +63,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             if ( multiFieldAdjacent(timeFormats[0]) ) {
                 timeFormat= new StringBuilder(timeFormats[0]); // to have indeterminate length for first field, we need terminator.
             } else {
-                timeFormat= new StringBuilder("%-1").append( timeFormats[0].substring(1) ); //kludge for whitespace
+                timeFormat= new StringBuilder("$-1").append( timeFormats[0].substring(1) ); //kludge for whitespace
             }
         } else {
             timeFormat= new StringBuilder(timeFormats[0]);
@@ -74,7 +74,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
             if ( multiFieldAdjacent(timeFormats[i]) ) {
                 timeFormat.append( " " ).append( timeFormats[i] ); // to have indeterminate length for first field, we need terminator.
             } else {
-                timeFormat.append( " " ).append("%-1") .append( timeFormats[i].substring(1) ); //kludge for whitespace
+                timeFormat.append( " " ).append("$-1") .append( timeFormats[i].substring(1) ); //kludge for whitespace
             }
         }
 
@@ -84,18 +84,18 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         } else {
             lastDigitFormat=null; // we can't use this feature
             String lastTimeFormat= timeFormats[timeFormats.length-1];
-            String[] lastTimeFormats= lastTimeFormat.split("%");
+            String[] lastTimeFormats= lastTimeFormat.split("$");
             StringBuilder sb= new StringBuilder();
             for ( int i=1; i<lastTimeFormats.length; i++ ) {
-                if ( lastTimeFormats[i].startsWith("{") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith("}") ) ) { // if there is a delimiter
-                    sb.append("%").append("-1").append(lastTimeFormats[i]);
-                } else if ( lastTimeFormats[i].startsWith("{") ) {
-                    sb.append("%").append(lastTimeFormats[i]); 
+                if ( lastTimeFormats[i].startsWith("(") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith(")") ) ) { // if there is a delimiter
+                    sb.append("$").append("-1").append(lastTimeFormats[i]);
+                } else if ( lastTimeFormats[i].startsWith("(") ) {
+                    sb.append("$").append(lastTimeFormats[i]); 
                 } else {
                     if ( lastTimeFormats[i].length()>1 ) { // if there is a delimiter there, then we can have variable length fields.
-                        sb.append("%").append("-1").append(lastTimeFormats[i]);
+                        sb.append("$").append("-1").append(lastTimeFormats[i]);
                     } else {
-                        sb.append("%").append(lastTimeFormats[i]);
+                        sb.append("$").append(lastTimeFormats[i]);
                     }
                 }
             }

@@ -565,9 +565,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("timeFormat");
         if (o != null) {
             String timeFormat = o.replaceAll("\\+", " ");
-            timeFormat = timeFormat.replaceAll("\\$", "%");
-            timeFormat = timeFormat.replaceAll("\\(", "{");
-            timeFormat = timeFormat.replaceAll("\\)", "}");
+            timeFormat = timeFormat.replaceAll("\\%", "$");
+            timeFormat = timeFormat.replaceAll("\\{", "(");
+            timeFormat = timeFormat.replaceAll("\\}", ")");
             String timeColumnName = params.get("time");
             timeColumn = timeColumnName == null ? 0 : parser.getFieldIndex(timeColumnName);
 
