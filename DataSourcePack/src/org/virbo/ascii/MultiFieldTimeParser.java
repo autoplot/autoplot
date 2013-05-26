@@ -84,7 +84,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         } else {
             lastDigitFormat=null; // we can't use this feature
             String lastTimeFormat= timeFormats[timeFormats.length-1];
-            String[] lastTimeFormats= lastTimeFormat.split("$");
+            String[] lastTimeFormats= lastTimeFormat.split("\\$");
             StringBuilder sb= new StringBuilder();
             for ( int i=1; i<lastTimeFormats.length; i++ ) {
                 if ( lastTimeFormats[i].startsWith("(") && ( i==lastTimeFormats.length-1 || !lastTimeFormats[i].endsWith(")") ) ) { // if there is a delimiter
