@@ -116,11 +116,11 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
      * @throws ParseException
      */
     public double parseField(String field, int columnIndex) throws ParseException {
-        double d= -1e31;
+        double d;
         if ( isNumber[columnIndex-firstColumn] ) {
             d= Double.parseDouble(field); // attempt to parse the number
             if ( d-(int)d == 0 ) { //TODO: this needs more thorough testing, to see what happens with time fields, etc.
-                field= ""+ (int)d; // http://vho.nasa.gov/mission/helios2/H276_021.dat contains float years "1976.0000" that don't parse.
+                field= String.valueOf((int)d); // http://vho.nasa.gov/mission/helios2/H276_021.dat contains float years "1976.0000" that don't parse.
             }
         }
         if ( columnIndex==firstColumn ) {
