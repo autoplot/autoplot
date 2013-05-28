@@ -290,7 +290,9 @@ public class CdfFileDataSource extends AbstractDataSource {
         } catch (CDFException ex) {
             if ( rcent!=null ) rcent.exception(ex);
             throw new IllegalArgumentException("no such variable: " + svariable,ex);
-
+        } catch ( RuntimeException ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
         } finally {
             mon.finished();
             
