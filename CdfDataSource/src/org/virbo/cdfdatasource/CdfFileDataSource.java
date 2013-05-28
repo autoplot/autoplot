@@ -277,7 +277,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         dep1_.putProperty( QDataSet.FILL_VALUE, null );
                         while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
                         if ( dep1_.value()>1e6 ) {
-                            logger.warning("offset units do not appear to be in "+dep1units+", using ns");
+                            logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
                             ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
                         }
                     }
@@ -298,16 +298,6 @@ public class CdfFileDataSource extends AbstractDataSource {
             
         }
 
-    }
-
-    private Variable maybeGetVariable( Vector vars, String name ) {
-        for ( Object ov: vars ) {
-            Variable v= (Variable)ov;
-            if ( v.getName().equals(name) ) {
-                return v;
-            }
-        }
-        return null;
     }
 
     private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon) throws CDFException, ParseException {
@@ -591,7 +581,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
                     if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
                         QDataSet wds= SemanticOps.weightsDataSet(depDs);
-                        int i0=0;
+                        int i0;
                         int l0= (wds.length(0)-1)*1/8;
                         int l1= (wds.length(0)-1)*7/8;
                         for ( i0=0; i0<depDs.length(); i0++ ) {
@@ -688,7 +678,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             gattr= cdf.getAttribute("Source_name");
             if ( gattr!=null ) {
                 entries= gattr.getEntries();
-                if ( gattr!=null && entries.size()>0 ) {
+                if ( entries.size()>0 ) {
                    String s= String.valueOf(( (Entry)gattr.getEntries().get(0)).getData() );
                    props.put( "Source_name", s );
                 }
