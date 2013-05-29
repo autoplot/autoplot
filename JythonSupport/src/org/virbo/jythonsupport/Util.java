@@ -49,34 +49,54 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 public class Util {
 
     private static final Logger logger= LoggerManager.getLogger("jython");
+
     /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
+     * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
      * monitor the load.
      *
      * This adds a timeRange parameter so that TimeSeriesBrowse-capable datasources
      * can be used from AutoplotServer.
      *
-     * @param ds
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param stimeRange a string representing the timerange to load, such as 2012-02-02/2012-02-03
+     * @param monitor progress monitor object.
      */
-    public static QDataSet getDataSet( String surl, String stimeRange, ProgressMonitor mon ) throws Exception {
+    public static QDataSet getDataSet( String suri, String stimeRange, ProgressMonitor mon ) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{suri, stimeRange} );
+        DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
+        return getDataSet( suri, timeRange, mon );
+    }
+
+    /**
+     * load the data specified by URI into Autoplot's internal data model.  This will
+     * block until the load is complete, and a ProgressMonitor object can be used to
+     * monitor the load.
+     *
+     * This adds a timeRange parameter so that TimeSeriesBrowse-capable datasources
+     * can be used from AutoplotServer.
+     *
+     * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param timeRange the timerange to load, if the data supports time series browsing.
+     * @param monitor progress monitor object.
+     */
+    public static QDataSet getDataSet( String suri, DatumRange timeRange, ProgressMonitor monitor ) throws Exception {
         long t0= System.currentTimeMillis();
-        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{surl, stimeRange} );
-        URI uri = DataSetURI.getURI(surl);
+        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{suri, timeRange} );
+        URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
-        if (mon == null) {
-            mon = new NullProgressMonitor();
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
         }
 
         TimeSeriesBrowse tsb= result.getCapability( TimeSeriesBrowse.class );
         if ( tsb!=null ) {
-            DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
             tsb.setTimeRange( timeRange );
         } else {
             logger.info("Warning: TimeSeriesBrowse capability not found, simply returning dataset.");
         }
-        QDataSet rds= result.getDataSet(mon);
+        QDataSet rds= result.getDataSet(monitor);
         //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
 
         try {
@@ -84,9 +104,9 @@ public class Util {
         } catch ( Exception e ) {
 
         }
-        metadataSurl= surl;
+        metadataSurl= suri;
 
-        logger.fine( String.format( "read in %9.2f sec: %s", (System.currentTimeMillis()-t0)/1000., surl ) );
+        logger.fine( String.format( "read in %9.2f sec: %s", (System.currentTimeMillis()-t0)/1000., suri ) );
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
@@ -109,11 +129,11 @@ public class Util {
      * monitor the load.
      * @param ds
      */
-    public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        logger.log( Level.FINE, "getDataSet({0})", surl );
-        URI uri = DataSetURI.getURIValid(surl);
+    public static QDataSet getDataSet(String suri, ProgressMonitor mon) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0})", suri );
+        URI uri = DataSetURI.getURIValid(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
-        if ( factory==null ) throw new IllegalArgumentException("unsupported extension: "+surl);
+        if ( factory==null ) throw new IllegalArgumentException("unsupported extension: "+suri);
         DataSource result = factory.getDataSource( uri );
         if (mon == null) {
             mon = new NullProgressMonitor();
@@ -126,7 +146,7 @@ public class Util {
         } catch ( Exception e ) {
             
         }
-        metadataSurl= surl;
+        metadataSurl= suri;
 
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
@@ -145,13 +165,13 @@ public class Util {
 
     /**
      * returns the dataSource for the given URI.  This will include capabilities, like TimeSeriesBrowse.
-     * @param surl
+     * @param suri
      * @return
      * @throws Exception
      */
-    public static DataSource getDataSource( String surl ) throws Exception {
-        logger.log( Level.FINE, "getDataSet({0})", surl );
-        URI uri = DataSetURI.getURIValid(surl);
+    public static DataSource getDataSource( String suri ) throws Exception {
+        logger.log( Level.FINE, "getDataSet({0})", suri );
+        URI uri = DataSetURI.getURIValid(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
         return result;
@@ -176,18 +196,18 @@ public class Util {
      * load the metadata for the url.  This can be called independently from getDataSet,
      * and data sources should not assume that getDataSet is called before getMetaData.
      * Some may, in which case a bug report should be submitted.
-     * @param surl
+     * @param suri
      * @param mon
      * @return metadata tree created by the data source.
      * @throws java.lang.Exception
      */
-    public static Map<String, Object> getMetadata(String surl, ProgressMonitor mon) throws Exception {
-        logger.log( Level.FINE, "getMetadata({0})", surl );
+    public static Map<String, Object> getMetadata(String suri, ProgressMonitor mon) throws Exception {
+        logger.log( Level.FINE, "getMetadata({0})", suri );
 
-        if (surl.equals(metadataSurl)) {
+        if (suri.equals(metadataSurl)) {
             return metadata;
         } else {
-            URI url = DataSetURI.getURIValid(surl);
+            URI url = DataSetURI.getURIValid(suri);
             DataSourceFactory factory = DataSetURI.getDataSourceFactory(url, new NullProgressMonitor());
             DataSource result = factory.getDataSource(url);
             if (mon == null) {
@@ -203,25 +223,37 @@ public class Util {
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param surl
+     * @param suri
      * @return data set for the URL.
      * @throws Exception depending on data source.
      */
-    public static QDataSet getDataSet(String surl) throws Exception {
-        return getDataSet(surl, new NullProgressMonitor() );
+    public static QDataSet getDataSet(String suri) throws Exception {
+        return getDataSet(suri, new NullProgressMonitor() );
     }
 
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param surl
-     * @return data set for the URL.
+     * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param stimeRange timerange like "2012-02-02/2012-02-03"
+     * @return data set for the URI.
      * @throws Exception depending on data source.
      */
-    public static QDataSet getDataSet(String surl, String stimerange ) throws Exception {
-        return getDataSet(surl, stimerange, new NullProgressMonitor() );
+    public static QDataSet getDataSet(String suri, String stimerange ) throws Exception {
+        return getDataSet(suri, stimerange, new NullProgressMonitor() );
     }
 
+    /**
+     * load the data specified by URL into Autoplot's internal data model.  This will
+     * block until the load is complete.
+     * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
+     * @param timeRange timerange object
+     * @return data set for the URI.
+     * @throws Exception depending on data source.
+     */    
+    public static QDataSet getDataSet(String suri, DatumRange timerange ) throws Exception {
+        return getDataSet(suri, timerange, new NullProgressMonitor() );
+    }
     /**
      * load data from the input stream into Autoplot internal data model.  This
      * will block until the load is complete.  This works by creating a temporary
