@@ -424,7 +424,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 String pngwalk= dataSetSelector.getValue().substring("pngwalk:".length());
                 if ( pngwalk.endsWith("/") || pngwalk.endsWith(".")) { // normally reject method would trigger another completion
                     DataSetSelector source= (DataSetSelector)ev.getSource();
-                    source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" );
+                    source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" ); // we can't easily search for .pngwalk here because of inclfiles
                 } else {
                     PngWalkTool1.start( pngwalk, AutoplotUI.this);
                     applicationModel.addRecent(dataSetSelector.getValue());
@@ -3076,7 +3076,7 @@ private void updateFrameTitle() {
                     url = null;
                 }
 
-                if ( url!=null && url.startsWith("pngwalk:") ) {
+                if ( url!=null && ( url.startsWith("pngwalk:") || url.endsWith(".pngwalk") || url.contains(".pngwalk?") ) ) {
                     //TODO: check other prefixes...
                     PngWalkTool1.start( url, app );
                     app.applicationModel.addRecent(app.dataSetSelector.getValue());
@@ -3407,9 +3407,11 @@ APSplash.checkTime("init 220");
                             return "repaintRunnable";
                         }
                         public void run() {
-                            if ( app!=null ) app.applicationModel.canvas.repaint();
-                            if ( initialURL==null || !initialURL.startsWith("pngwalk:") ) {
-                                if ( app!=null ) app.setVisible(true);
+                            if ( app!=null ) {
+                                app.applicationModel.canvas.repaint();
+                                if ( initialURL==null || ! ( initialURL.startsWith("pngwalk:") 
+                                        || initialURL.endsWith(".pngwalk") 
+                                        || initialURL.contains(".pngwalk?" ) ) ) app.setVisible(true);
                             }
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
@@ -3426,12 +3428,12 @@ APSplash.checkTime("init 220");
 
                 }
 APSplash.checkTime("init 230");
-                if ( !headless && initialURL != null) {
+                if ( !headless && initialURL!=null) {
                     if ( app!=null ) app.dataSetSelector.setValue(initialURL);
                     if ( app!=null ) app.dataSetSelector.maybePlot(false);
                 }
                 
-                if (bookmarks != null) {
+                if ( bookmarks!=null ) {
                     if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
 
