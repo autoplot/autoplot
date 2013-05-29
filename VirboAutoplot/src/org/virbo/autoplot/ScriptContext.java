@@ -955,6 +955,27 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
+     * make a single plot with so many plot elements.
+     */
+    public static void setLayoutOverplot( int nplotElement ) {
+        reset();
+        DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
+        Lock canvasLock= c.mutatorLock();
+        Lock lock= dom.getController().mutatorLock();
+        try {
+            canvasLock.lock();
+            lock.lock();
+            Plot p= dom.getController().getPlot();
+            for ( int i=1; i<nplotElement; i++ ) {
+                dom.getController().addPlotElement( p, null );
+            }
+        } finally {
+            lock.unlock();
+            canvasLock.unlock();
+        }
+    }
+            
+    /**
      * reset the application to its initial state.
      */
     public static void reset() {
