@@ -24,6 +24,8 @@ import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import static test.datum.TestDatumRangeUtil.testParse8601_1;
 
 /**
@@ -77,6 +79,33 @@ public class Test019 {
 //        }
     }
 
+    public static void testFSMVersioning() throws Exception {
+        String uri= "http://sarahandjeremy.net/~jbf/autoplot/tests/test019_fsm/vers/";
+        FileStorageModelNew fsm;
+        String[] ss;
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep).cdf" );
+        System.err.println(fsm);
+        ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
+        for ( String s: ss ) {
+            System.err.println(s);
+        }
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep,ge=2).cdf" );
+        System.err.println(fsm);
+        ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
+        for ( String s: ss ) {
+            System.err.println(s);
+        }
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep,lt=2).cdf" );
+        System.err.println(fsm);
+        ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
+        for ( String s: ss ) {
+            System.err.println(s);
+        }
+    }
+    
     public static void testLayout( ) throws ParseException {
         double [] res0, res1, res2;
         res0= DasDevicePosition.parseFormatStr("100 % -5 em +4 px");
@@ -216,6 +245,8 @@ public class Test019 {
         try {
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             tp.format( TimeUtil.now(), null);
+            
+            testFSMVersioning();
             
             tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
             Map<String,String> extra= new HashMap();
