@@ -6,7 +6,6 @@ package test.endtoend;
 
 import java.io.IOException;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.graph.SpectrogramRenderer;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.autoplot.ScriptContext;
@@ -24,7 +23,7 @@ public class Test003 {
             System.err.println("uri: "+uri);
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
-            System.err.println( String.format( "read in %6.2f sec", ( System.currentTimeMillis()-t0 )/1000. ) );
+            System.err.println( String.format( "test003_%03d read in %.2f sec", id, ( System.currentTimeMillis()-t0 )/1000. ) );
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
