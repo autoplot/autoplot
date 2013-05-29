@@ -341,10 +341,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (p != null) {
                 logger.log(Level.FINE, "focus due to plot getting focus: {0}", p);
                 setFocusUri( getFocusUriFor( p ) );
-                setPlotElement(p);
-                setStatus("" + domPlot + ", " + p + " selected");
-                if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
-                    canvas.controller.indicateSelection( Collections.singletonList((DomNode)p) ); // don't flash plot node, just the plot element.
+                if ( getPlotElement()!=p ) { 
+                    setPlotElement(p);
+                    setStatus("" + domPlot + ", " + p + " selected");
+                    if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
+                        canvas.controller.indicateSelection( Collections.singletonList((DomNode)p) ); // don't flash plot node, just the plot element.
+                    }
                 }
             } else {
                 setStatus("" + domPlot + " selected");
@@ -2172,7 +2174,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             setStatus("no plot element selected");
         } else {
             setStatus(plotElement + " selected");
-            if ( application.getPlotElements().length>1 || ( plotElement!=oldPlotElement ) ) {
+            if ( plotElement!=oldPlotElement ) {
                 getCanvas().controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
             }
             if ( plotElement!=oldPlotElement ) {
