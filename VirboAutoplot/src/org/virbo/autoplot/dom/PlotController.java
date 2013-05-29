@@ -535,7 +535,7 @@ public class PlotController extends DomNodeController {
                         newSettings.xaxis= resolveSettings( newSettings.xaxis,plot1.getXaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
-                            logger.log( Level.INFO, "plot elements on the same xaxis have inconsistent units: {0} {1}",
+                            logger.log( Level.FINE, "plot elements on the same xaxis have inconsistent units: {0} {1}",
                                     new Object[]{newSettings.xaxis.range.getUnits().toString(), plot1.getXaxis().getRange().getUnits().toString()});
                             warnedAboutUnits= true;
                         }
@@ -544,7 +544,7 @@ public class PlotController extends DomNodeController {
                         newSettings.yaxis= resolveSettings( newSettings.yaxis, plot1.getYaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
-                            logger.log( Level.INFO, "plot elements on the same yaxis have inconsistent units: {0} {1}",
+                            logger.log( Level.FINE, "plot elements on the same yaxis have inconsistent units: {0} {1}",
                                     new Object[]{newSettings.yaxis.range.getUnits().toString(), plot1.getYaxis().getRange().getUnits().toString()});
                             warnedAboutUnits= true;
                         }
@@ -553,7 +553,7 @@ public class PlotController extends DomNodeController {
                         newSettings.zaxis= resolveSettings( newSettings.zaxis, plot1.getZaxis() );
                     } catch ( InconvertibleUnitsException ex ) {
                         if ( !warnedAboutUnits ) {
-                            logger.log( Level.INFO, "plot elements on the same zaxis have inconsistent units: {0} {1}",
+                            logger.log( Level.FINE, "plot elements on the same zaxis have inconsistent units: {0} {1}",
                                     new Object[]{newSettings.zaxis.range.getUnits().toString(), plot1.getZaxis().getRange().getUnits().toString()});
                             warnedAboutUnits= true;
                         }
