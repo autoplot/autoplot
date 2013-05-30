@@ -48,6 +48,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     public AggregatingDataSourceFactory() {
     }
 
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         String suri=  DataSetURI.fromUri(uri);
         if ( suri.contains("&timerange") && !suri.contains("?") ) {
@@ -124,7 +125,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         URISplit split = URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        String delegateFile = null;
+        String delegateFile;
         String stimeRange= params.get( "timerange" );
         if ( stimeRange!=null ) {
             DatumRange tdr= null;
@@ -257,6 +258,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( delegateFactory==null ) {
             delegateFactory= getDelegateDataSourceFactory(cc.surl);
@@ -281,6 +283,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
+    @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split = URISplit.parse(surl);
         Map map = URISplit.parseParams(split.params);
@@ -332,6 +335,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         this.delegateFactory= delegateFactory;
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz==TimeSeriesBrowse.class ) {
            return (T) new DefaultTimeSeriesBrowse();
