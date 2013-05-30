@@ -30,6 +30,9 @@
       <Properties>
         <Property name="selectedIndex" type="int" value="1"/>
       </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jTabbedPane1StateChanged"/>
+      </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
@@ -45,13 +48,13 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel3" alignment="0" pref="486" max="32767" attributes="0"/>
+                  <Component id="jLabel3" alignment="0" pref="489" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                              <Component id="timeRangeTextField" pref="450" max="32767" attributes="0"/>
+                              <Component id="timeRangeTextField" pref="457" max="32767" attributes="0"/>
                           </Group>
                           <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -69,8 +72,8 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="stopTextField" pref="394" max="32767" attributes="0"/>
-                                  <Component id="startTextField" alignment="0" pref="394" max="32767" attributes="0"/>
+                                  <Component id="stopTextField" pref="423" max="32767" attributes="0"/>
+                                  <Component id="startTextField" alignment="0" pref="423" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -98,7 +101,7 @@
                           <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="stopTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="34" max="32767" attributes="0"/>
+                      <EmptySpace pref="84" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -170,35 +173,35 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel2" alignment="0" pref="486" max="32767" attributes="0"/>
+                  <Component id="jLabel2" alignment="0" pref="489" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                              <Component id="orbitFeedbackLabel" pref="450" max="32767" attributes="0"/>
+                              <Component id="orbitFeedbackLabel" pref="457" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
-                              <Component id="orbitComboBox" pref="342" max="32767" attributes="0"/>
+                              <Component id="orbitComboBox" pref="361" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel4" min="-2" pref="107" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="scComboBox" pref="343" max="32767" attributes="0"/>
+                              <Component id="scComboBox" pref="358" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabel10" pref="462" max="32767" attributes="0"/>
+                      <Component id="jLabel10" pref="469" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="scFeedbackTF" pref="450" max="32767" attributes="0"/>
+                      <Component id="scFeedbackTF" pref="455" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -223,7 +226,7 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="orbitFeedbackLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="71" max="32767" attributes="0"/>
+                      <EmptySpace pref="119" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -325,10 +328,10 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel1" alignment="0" pref="486" max="32767" attributes="0"/>
+                  <Component id="jLabel1" alignment="0" pref="489" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                      <Component id="nrtComboBox" pref="462" max="32767" attributes="0"/>
+                      <Component id="nrtComboBox" pref="467" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -339,7 +342,7 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="nrtComboBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="168" max="32767" attributes="0"/>
+                      <EmptySpace pref="191" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

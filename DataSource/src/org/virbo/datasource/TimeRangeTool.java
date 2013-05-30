@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -45,6 +46,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     boolean timeRangeFocus= true;
 
     String orbit=""; // save the orbit so it isn't clobbered by the GUI.
+    private DatumRange pendingTimeRange;
 
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
@@ -165,16 +167,27 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private String[] getSpacecraft() {
         return new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini" };
     }
+    private void resetSpacecraft( final String sc  ) {
+        resetSpacecraft(sc, null);
+    }
 
-    private void resetSpacecraft( final String sc ) {
+    private void resetSpacecraft( final String sc, DatumRange focusRange  ) {
         logger.log(Level.FINE, "resetSpacecraft({0})", sc);
 
         final Orbits o= Orbits.getOrbitsFor(sc);
         final List<String> ss= new ArrayList();
         String orb= o.first();
         int count=1;
+        boolean gotFocus= focusRange==null;
+
+        String focusOrb= null;
+
         while ( orb!=null && count<10 ) {
             try {
+                if ( !gotFocus && o.getDatumRange(orb).intersects(focusRange) ) {
+                    gotFocus=true;
+                    focusOrb= orb;
+                }
                 String str = String.valueOf(o.getDatumRange(orb));
                 ss.add(orb+": "+str);
             } catch (ParseException ex) { // this won't happen
@@ -183,6 +196,25 @@ public class TimeRangeTool extends javax.swing.JPanel {
             orb= o.next(orb);
             count++;
         }
+
+        final String focus= focusRange==null ? null : o.getOrbit( focusRange.min() );
+
+        String s= focus;
+        if ( focus!=null ) {
+            for ( int i=0; i<3;i++ ) s= o.prev(s);
+            ss.add("...");
+            for ( int i=0; i<7; i++ ) {
+               String str;
+               try {
+                    str = String.valueOf(o.getDatumRange(s));
+                    ss.add(s+":"+str );
+                    s= o.next(s);
+             } catch (ParseException ex) {
+                    Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
+             }
+            }
+        }
+
         if ( orb!=null ) {
             orb= o.last();
             List<String> lastOrbits= new ArrayList();
@@ -210,6 +242,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     try { // is enterred orbit legal orbit
                         o.getDatumRange(orbit);
                         orbitComboBox.setSelectedItem(orbit);
+                        if ( focus!=null ) {
+                           orbitComboBox.setSelectedItem(focus);
+                        }
                     } catch ( ParseException ex ) {
                         // orbit wasn't found for this spacecraft
                     }
@@ -259,6 +294,12 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         nrtComboBox = new javax.swing.JComboBox();
 
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
+
         jLabel3.setText("Select Time By Calendar Dates");
 
         jLabel7.setText("Enter Time Range:");
@@ -299,13 +340,13 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE))
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE))
                     .add(jLabel7))
                 .addContainerGap())
             .add(jPanel1Layout.createSequentialGroup()
@@ -319,8 +360,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                             .add(jLabel9))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
-                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))))
+                            .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                            .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -341,7 +382,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel9)
                     .add(stopTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Calendar", jPanel1);
@@ -384,29 +425,29 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(orbitFeedbackLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE))
+                        .add(orbitFeedbackLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel5)
                         .add(80, 80, 80)
-                        .add(orbitComboBox, 0, 342, Short.MAX_VALUE))
+                        .add(orbitComboBox, 0, 361, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(scComboBox, 0, 343, Short.MAX_VALUE)))
+                        .add(scComboBox, 0, 358, Short.MAX_VALUE)))
                 .addContainerGap())
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+                .add(jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
                 .addContainerGap())
             .add(jPanel2Layout.createSequentialGroup()
                 .add(24, 24, 24)
-                .add(scFeedbackTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                .add(scFeedbackTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -427,7 +468,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(orbitComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(orbitFeedbackLabel)
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(119, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Orbits", jPanel2);
@@ -441,10 +482,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
             .add(jPanel3Layout.createSequentialGroup()
                 .add(12, 12, 12)
-                .add(nrtComboBox, 0, 462, Short.MAX_VALUE)
+                .add(nrtComboBox, 0, 467, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -453,7 +494,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nrtComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(168, Short.MAX_VALUE))
+                .addContainerGap(191, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NRT", jPanel3);
@@ -511,6 +552,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
             DatumRange dr= DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
             startTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.min() ) );
             stopTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.max() ) );
+            pendingTimeRange= dr;
         }  catch ( ParseException ex ) {
 
         }
@@ -527,6 +569,14 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private void stopTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_stopTextFieldFocusGained
         timeRangeFocus= false;
     }//GEN-LAST:event_stopTextFieldFocusGained
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+       if ( jTabbedPane1.getSelectedIndex()==1 ) {
+           if ( pendingTimeRange!=null ) {
+               resetSpacecraft( (String)scComboBox.getSelectedItem(), pendingTimeRange );
+           }
+       }
+    }//GEN-LAST:event_jTabbedPane1StateChanged
 
     /**
      * shows the orbit timerange, clipping off text past the first colon.
@@ -545,6 +595,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
             orbitFeedbackLabel.setText("No such orbit found: "+ sorbit);
         }
         return sorbit;
+    }
+
+    public static void main( String[] args ) {
+        TimeRangeTool trt= new TimeRangeTool();
+        JOptionPane.showConfirmDialog(null,trt);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
