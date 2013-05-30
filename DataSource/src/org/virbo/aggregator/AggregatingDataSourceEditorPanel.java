@@ -228,7 +228,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         range = range.trim();
         if ((evt.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
             DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(range);
-            DatumRange dr2 = null;
+            DatumRange dr2;
             try {
                 dr2 = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
                 dr2 = DatumRangeUtil.union(dr1, dr2);
@@ -272,6 +272,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private javax.swing.JComboBox yearsComboBox;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -308,7 +309,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             outerRangeTextField.setText(ex.toString());
             return;
         }
-        outerRangeTextField.setText("found files for " + dr.toString());
+        outerRangeTextField.setText("found files for " + dr);
         outerRangeTextField.setIcon(null);
     }
 
@@ -394,8 +395,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         updatingDropLists = false;
     }
 
+    @Override
     public boolean reject(String uri) throws Exception {
-        String delegateUrl = null;
+        String delegateUrl;
         delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(uri, new NullProgressMonitor() );
 
         if (delegateEditorPanel == null) {
@@ -410,8 +412,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }
 
 
+    @Override
     public boolean prepare(String url, java.awt.Window parent, ProgressMonitor mon) throws IOException, URISyntaxException, Exception {
-        String delegateUrl = null;
+        String delegateUrl;
         delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, new NullProgressMonitor() );
 
         Pattern p= Pattern.compile("(vap(\\+[a-z]+)?\\:)?([^\\?]*)(\\?.*)");
@@ -448,7 +451,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
         
         // set the focus to the timerange if that's all we need.
-        String delegateUrl = null;
+        String delegateUrl;
         try {
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI(), null );
             DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
@@ -463,6 +466,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
     }
 
+    @Override
     public void setURI(String url) {
         split = URISplit.parse(url);
         params = URISplit.parseParams(split.params);
@@ -555,6 +559,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         Runnable run = new Runnable() {
 
+            @Override
             public void run() {
                 updateTimeRanges();
                 updateDropLists(true, true);
@@ -581,6 +586,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
     }
 
+    @Override
     public String getURI() {
         String delegateUrl;
         String vapScheme= split.vapScheme;
@@ -620,6 +626,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         return URISplit.format(split);
     }
 
+    @Override
     public void markProblems(List<String> problems) {
         List<String> p= new ArrayList(problems);
         if ( p.contains( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ) ) {
