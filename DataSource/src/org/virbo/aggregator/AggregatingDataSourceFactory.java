@@ -101,7 +101,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         fs = FileSystem.create( DataSetURI.toUri(sansArgs.substring(0, i)));
 
         if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
-        String spec= sansArgs.substring(i).replaceAll("\\$", "%");
+        String spec= sansArgs.substring(i).replaceAll("\\%", "\\$");
         FileStorageModelNew fsm = FileStorageModelNew.create(fs, spec );
 
         return fsm;
