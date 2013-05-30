@@ -376,7 +376,7 @@ public class DataSetURI {
         ext = DataSetURI.getExt(uri.toASCIIString());
         if (ext == null) ext = "";
 
-        DataSourceFactory factory = null;
+        DataSourceFactory factory;
 
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
@@ -588,7 +588,6 @@ public class DataSetURI {
             }
         }
         if ( ex2!=null ) throw ex2;
-        return;
 
     }
 
@@ -857,7 +856,7 @@ public class DataSetURI {
 
         filename = new File( localCache, filename ).toString();
 
-        Object action="";
+        Object action;
         File result= new File( filename );  // final name
         File tempfile= new File(filename + ".temp");
 
@@ -1242,7 +1241,7 @@ public class DataSetURI {
 
         mon.setLabel("getting remote listing");
 
-        FileSystem fs = null;
+        FileSystem fs;
         String[] s;
 
         fs = FileSystem.create( DataSetURI.toUri(surlDir) );
@@ -1389,7 +1388,7 @@ public class DataSetURI {
 
         mon.setLabel("getting remote listing");
 
-        FileSystem fs = null;
+        FileSystem fs;
         String[] s;
 
         if ( surlDir.equals("file:" ) || surlDir.equals("file://" ) ) {  //TODO: could go ahead and list
@@ -1471,6 +1470,7 @@ public class DataSetURI {
         }
 
         Arrays.sort(s,new Comparator<String>() {
+            @Override
             public int compare(String o1, String o2) {  // put ones starting with '.' at the end
                 boolean d1= o1.startsWith(".");
                 boolean d2= o2.startsWith(".");
@@ -1512,7 +1512,7 @@ public class DataSetURI {
                 URISplit split2= URISplit.parse(sagg);
                 Map <String,String> params2= URISplit.parseParams( split2.params );
                 String tr= params2.remove("timerange");
-                if ( params2.size()==0 ) {
+                if ( params2.isEmpty() ) {
                     split2.params=null;
                 } else {
                     split2.params= URISplit.formatParams(params2);
