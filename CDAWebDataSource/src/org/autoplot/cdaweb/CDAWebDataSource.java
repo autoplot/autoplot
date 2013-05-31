@@ -190,6 +190,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                             }
                             CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                             ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
+                            if ( ds1==null ) {
+                                logger.fine("component resulted in null dataset: "+file1);
+                                return null;
+                            }
                             comps.add( ds1 );
                             nc++;
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
