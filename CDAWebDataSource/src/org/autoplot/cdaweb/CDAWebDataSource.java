@@ -116,7 +116,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             try {
                 db.maybeRefresh( SubTaskMonitor.create(mon,0,10) );
             } catch ( IOException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, null, ex );
                 mon.setProgressMessage("unable to connect via ftp");
                 Thread.sleep(1000);
                 throw ex;
@@ -189,20 +189,28 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                             }
                             CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
-                            if ( ds1==null ) {
-                                logger.fine("component resulted in null dataset: "+file1);
-                                return null;
+                            try {
+                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
+                            } catch ( Exception ex ) {
+                                ds1= null; // !!!!
                             }
                             comps.add( ds1 );
                             nc++;
                             comp= (String) metadata.get( "COMPONENT_"  + nc );
                         }
-                        try {
-                            Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
-                            ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
-                        } catch (IllegalArgumentException ex ){
-                            throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                        boolean missingComponent= false;
+                        for ( int j=0; j<comps.size(); j++ ) {
+                            if ( comps.get(j)==null ) {
+                                missingComponent= true;
+                            }
+                        }
+                        if ( !missingComponent ) {
+                            try {
+                                Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
+                                ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
+                            } catch (IllegalArgumentException ex ){
+                                throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                            }
                         }
                     } else {
                     throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
@@ -217,28 +225,32 @@ public class CDAWebDataSource extends AbstractDataSource {
                     } else {
                         file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                     }
-                    logger.fine( "loading "+file1 );
+                    logger.log( Level.FINE, "loading {0}", file1);
                     CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                 }
 
-                if ( result==null && accum==null ) {
-                    range= webService ? range1 : fsm.getRangeFor(files[i]);
-                    if ( files.length==1 ) {
-                        result= (MutablePropertyDataSet)ds1;
+                if ( ds1!=null ) {
+                    if ( result==null && accum==null ) {
+                        range= webService ? range1 : fsm.getRangeFor(files[i]);
+                        if ( files.length==1 ) {
+                            result= (MutablePropertyDataSet)ds1;
+                        } else {
+                            accum = ArrayDataSet.maybeCopy(ds1);
+                            accum.grow(accum.length()*files.length*11/10);  //110%
+                        }
                     } else {
-                        accum = ArrayDataSet.maybeCopy(ds1);
-                        accum.grow(accum.length()*files.length*11/10);  //110%
+                        ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
+                        if ( accum.canAppend(ads1) ) {
+                            accum.append( ads1 );
+                        } else {
+                            accum.grow( accum.length() + ads1.length() * ( files.length-i) );
+                            accum.append( ads1 );
+                        }
+                        range= DatumRangeUtil.union( range, webService ? range1 : fsm.getRangeFor(files[i]) );
                     }
                 } else {
-                    ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
-                    if ( accum.canAppend(ads1) ) {
-                        accum.append( ads1 );
-                    } else {
-                        accum.grow( accum.length() + ads1.length() * ( files.length-i) );
-                        accum.append( ads1 );
-                    }
-                    range= DatumRangeUtil.union( range, webService ? range1 : fsm.getRangeFor(files[i]) );
+                    logger.log(Level.FINE, "failed to read data for granule: {0}", files[i]);
                 }
 
             }
