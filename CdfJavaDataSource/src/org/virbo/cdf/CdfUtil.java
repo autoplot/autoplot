@@ -346,8 +346,9 @@ public class CdfUtil {
         }
 
         if ( ( odata==null && buf==null ) && ( varType != CDFConstants.CDF_CHAR && varType!=CDFConstants.CDF_UCHAR ) ) {
-            logger.fine("something went wrong");
-            throw new NullPointerException("something went wrong");
+            String message= "something went wrong when reading "+variable.getName()+", both odata and buf are null";
+            logger.fine(message);
+            throw new NullPointerException(message);
         }
 
         MutablePropertyDataSet result;
