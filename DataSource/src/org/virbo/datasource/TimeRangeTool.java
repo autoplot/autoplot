@@ -126,6 +126,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
             jTabbedPane1.setSelectedIndex(0);
             try {
                 DatumRange dr= DatumRangeUtil.parseTimeRange(s);
+                this.pendingTimeRange= dr;
                 timeRangeTextField.setText(dr.toString());
                 startTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.min() ) );
                 stopTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.max() ) );
