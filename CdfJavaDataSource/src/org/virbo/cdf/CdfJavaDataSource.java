@@ -701,7 +701,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( labl!=null ) {
                     try {
                         lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
-                        if ( idep==1 ) attributes.put( "LABL_PTR_1", lablDs );
+                        if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
                         //label is not actally in the file.
                     }
