@@ -470,6 +470,9 @@ public class PyQDataSet extends PyJavaInstance {
                         }
                     }
                 }
+                if ( slices.__len__()>rods.rank() ) {
+                    throw new IllegalArgumentException("rank "+slices.__len__()+" access on a rank "+rods.rank()+" dataset" );
+                }
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
