@@ -580,10 +580,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
                     // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
                     if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
-                        MutablePropertyDataSet b= maybeReduceRank2( depDs );
+                        MutablePropertyDataSet b= org.virbo.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
                         if ( b!=null ) {
                             lablDs= b;
-                        }
+                        }                    
                     }
                     QDataSet bundleDs= lablDs;
                     if ( slice1>-1 ) {
@@ -823,61 +823,4 @@ public class CdfFileDataSource extends AbstractDataSource {
         return attributes;
     }
 
-    /**
-     * RBSP/ECT/MAGEIS has files where typically the energy labels are
-     * constant, but they must be rank 2 because they can vary.  Seth 
-     * wishes the Energy labels be shown when they are constant, and this 
-     * is a quick check to detect the case.  The data can also contain
-     * fill records and channels that contain all fill.
-     * @param depDs 
-     * @return the rank 1 dataset.
-     */
-    public static MutablePropertyDataSet maybeReduceRank2(MutablePropertyDataSet depDs) {
-        QDataSet wds= SemanticOps.weightsDataSet(depDs);
-        MutablePropertyDataSet result= null;
-        int l0=-1,l1=-1;
-        int l= wds.length(0)-1; // index of last channel
-        int j= -1;
-        
-        int i0= depDs.length();        
-        // find the first valid record.  We assume there is data in channel n/8 (32 channels, check channel 4)
-        while ( i0==depDs.length() && j<wds.length(0) ) {
-            j++;
-            for ( i0=0; i0<depDs.length(); i0++ ) {
-                if ( wds.value(i0,j)>0 ) break;
-            }
-        }
-        
-        if ( i0==depDs.length() && j==wds.length(0) ) {
-            // we found no valid data!
-            return null;
-        }
-        
-        // identify the lowest and highest channels containing data.
-        for ( j=0; ( l0==-1||l1==-1 ) && j<wds.length(); j++ ) {
-            if ( l0==-1 && wds.value(i0,j)>0 ) l0= j;
-            if ( l1==-1 && wds.value(i0,l-j)>0 ) l1=l-j;
-        }
-
-        if ( i0<depDs.length() ) {
-            MutablePropertyDataSet test;
-            QDataSet ex;
-            test= DataSetOps.slice1(depDs,l0);
-            test.putProperty( QDataSet.BIN_MINUS, null );
-            test.putProperty( QDataSet.BIN_PLUS, null );
-            ex= Ops.extent( test );
-            if ( ex.value(0)==ex.value(1) ) {
-                result= (MutablePropertyDataSet)depDs.slice(i0);
-            }
-            test= DataSetOps.slice1(depDs,l1);
-            test.putProperty( QDataSet.BIN_MINUS, null );
-            test.putProperty( QDataSet.BIN_PLUS, null );
-            ex= Ops.extent( test );
-            if ( ex.value(0)!=ex.value(1) ) {
-                result= null;
-            }
-        }
-
-        return result;
-    }
 }

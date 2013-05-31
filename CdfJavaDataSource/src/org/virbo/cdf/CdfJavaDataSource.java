@@ -786,7 +786,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
 
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
-                        // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
+                    if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
+                        MutablePropertyDataSet b= org.virbo.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
+                        if ( b!=null ) {
+                            lablDs= b;
+                        }
+                    }
+
+                    // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
                         if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
                             QDataSet wds= SemanticOps.weightsDataSet(depDs);
                             int i0=0;
