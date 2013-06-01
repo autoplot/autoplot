@@ -114,6 +114,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 startTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.min() ) );
                 stopTextField.setText( TimeDatumFormatter.DEFAULT.format( dr.max() ) );
                 timeRangeTextField.setText( dr.toString() );
+                pendingTimeRange= dr;
+                resetSpacecraft((String)scComboBox.getSelectedItem(),pendingTimeRange);
 
             } catch ( ParseException ex ) {
 
