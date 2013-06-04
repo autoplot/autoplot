@@ -95,7 +95,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/datasource/fileMag.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Edit data source"/>
+        <Property name="toolTipText" type="java.lang.String" value="Inspect data source"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
