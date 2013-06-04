@@ -54,6 +54,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.components.DasProgressPanel;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.util.FileUtil;
@@ -72,6 +73,8 @@ public class ScreenshotsTool extends EventQueue {
     private static final int MOUSE_WHEEL_UP= 1;
     private static final int MOUSE_WHEEL_DOWN= 2;
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.screenshots");
+    
     /**
      * start should be called from the event thread.
      */
@@ -185,7 +188,7 @@ public class ScreenshotsTool extends EventQueue {
         for(int i=0; i<gs.length; i++) {
             if ( gs[i]==target ) active= i;
         }
-
+        logger.log(Level.FINE, "active display is #{0}", active);  //TODO: track this down where the wrong display is used when mouse pointer is on the other screen.
         return active;
     }
 
