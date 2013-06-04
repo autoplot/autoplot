@@ -729,6 +729,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             carotpos= split.resourceUriCarotPos;
         }
         
+        if ( surl.startsWith("vap ") ) {
+            surl= "vap+"+surl.substring(4); // kludge to fix where plus was turned into space.
+        }
+        
         boolean shortFsCompletion= carotpos<6 && ( surl.startsWith("/") || ( surl.length()>1 && Character.isLetter(surl.charAt(0)) && surl.charAt(1)==':' ) );
 
         boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl));
@@ -1354,7 +1358,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String context = ((String) dataSetSelector.getEditor().getItem()).trim();
         if ( context==null ) context= "";
-        String ext = context==null ? "" : DataSetURI.getExt(context);
+        if ( context.startsWith("vap ") ) context= "vap+"+context.substring(4);
+        String ext = DataSetURI.getExt(context);
         final String fcontext= context;
 
         // hooks for browsing, such as "vap+internal"
