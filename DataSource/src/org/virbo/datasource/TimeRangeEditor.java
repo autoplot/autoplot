@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -41,6 +42,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsUtil;
+import static org.virbo.datasource.DataSetSelector.logger;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 
 /**
@@ -347,6 +349,17 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             peer.setValue(surl);
             boolean wasRejected= false;
             DataSourceEditorPanel edit = null;
+            
+            // hooks for browsing, such as "vap+internal"
+            for (String browseTriggerRegex : peer.browseTriggers.keySet()) {
+                if (Pattern.matches(browseTriggerRegex, surl)) {
+                    logger.finest("matches browse trigger");
+                    Action action = peer.browseTriggers.get(browseTriggerRegex);
+                    action.actionPerformed( new ActionEvent(this, 123, "dataSetSelect") );
+                    return;
+                }
+            }  
+            
             try {
                 edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
                 if ( edit!=null && edit.reject(surl) ) {
