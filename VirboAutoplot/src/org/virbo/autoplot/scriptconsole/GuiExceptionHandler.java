@@ -80,8 +80,11 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.Base64;
+import org.virbo.autoplot.AppManager;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
@@ -129,6 +132,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static final String USER_ID= "USER_ID";
     private static final String EMAIL="EMAIL";
     private static final String FOCUS_URI="FOCUS_URI";
+    private static final String PENDING_FOCUS_URI="PENDING_FOCUS_URI";    
+    private static final String APP_COUNT="APP_COUNT";    // number of apps/pngwalks open
     private static final String INCLDOM= "INCLDOM";
     private static final String INCLSCREEN= "INCLSCREEN";
 
@@ -534,13 +539,22 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             focus.appendChild( doc.createTextNode((String)data.get(FOCUS_URI)) );
             e.appendChild(focus);
 
+            Element ele;
+            ele= doc.createElement("pendingFocusUri");
+            ele.appendChild( doc.createTextNode((String)data.get(PENDING_FOCUS_URI)) );
+            e.appendChild(ele);
+
+            ele= doc.createElement("appCount");
+            ele.appendChild( doc.createTextNode( String.valueOf( data.get(APP_COUNT)) ) );
+            e.appendChild(ele);
+            
             formatBuildInfos( doc, e, bis );
 
             formatPlatform( doc, e );
 
             formatException( doc, e, t );
 
-            Element ele= doc.createElement( "uncaught" );
+            ele= doc.createElement( "uncaught" );
             ele.appendChild( doc.createTextNode( String.valueOf(uncaught) ) );
             e.appendChild(ele);
 
@@ -690,6 +704,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String eventId= sdf.format( now );
 
+        String pendingFocus="N/A"; // many RTEs come from the selector where the string is not processed.
+        Window w= ScriptContext.getViewWindow();
+        if ( w instanceof AutoplotUI ) {
+            AutoplotUI app= ((AutoplotUI)w);
+            pendingFocus= app.getDataSetSelector().getValue();
+        }     
+        int appCount= AppManager.getInstance().getApplicationCount();
+        
         bis= null;
         try {
             bis = AboutUtil.getBuildInfos();
@@ -709,7 +731,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         map.put( USER_ID, id );
         map.put( EMAIL, "" );
         map.put( FOCUS_URI, focusURI );
-
+        map.put( PENDING_FOCUS_URI, pendingFocus );
+        map.put( APP_COUNT, appCount );
+        
         this.uncaught= uncaught;
         this.t= t;
 
