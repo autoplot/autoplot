@@ -7,6 +7,8 @@ package org.virbo.autoplot;
 
 import external.PlotCommand;
 import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,9 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.das2.system.RequestProcessor;
@@ -152,6 +157,7 @@ public class JythonUtil {
         org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
         try {
             textArea.loadFile(file);
+            textArea.setMinimumSize( new Dimension(640,480) );
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -162,14 +168,15 @@ public class JythonUtil {
         support= new ScriptPanelSupport(textArea);
         support.setReadOnly();
         
-        tp.add( textArea, "script" );
+        tp.add( new JScrollPane(textArea), "script" );
         
         org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
         if ( fd.count>0 ) {
-            tp.add( p, "params" );
+            tp.add( new JScrollPane(p), "params" );
             tp.setSelectedIndex(1);
         } 
-        int result= AutoplotUtil.showConfirmDialog( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
+                
+        int result= AutoplotUtil.showConfirmDialog2( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
         }
