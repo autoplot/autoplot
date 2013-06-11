@@ -152,7 +152,14 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      */
     private static int showScriptDialog( Component parent, File file, Map<String,String> fvars ) {
+        
         JPanel p= new JPanel();
+        org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
+
+        if ( fd.count==0 ) {
+            return JOptionPane.OK_OPTION;
+        }
+        
         JTabbedPane tp= new JTabbedPane();
         org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
         try {
@@ -170,11 +177,8 @@ public class JythonUtil {
         
         tp.add( new JScrollPane(textArea), "script" );
         
-        org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
-        if ( fd.count>0 ) {
-            tp.add( new JScrollPane(p), "params" );
-            tp.setSelectedIndex(1);
-        } 
+        tp.add( new JScrollPane(p), "params" );
+        tp.setSelectedIndex(1);
                 
         int result= AutoplotUtil.showConfirmDialog2( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
