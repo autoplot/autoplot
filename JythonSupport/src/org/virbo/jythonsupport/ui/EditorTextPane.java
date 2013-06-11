@@ -58,6 +58,8 @@ public class EditorTextPane extends JEditorPane {
 
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
+    private boolean initialized= false;
+    
     public EditorTextPane() {
 
         Runnable run= new Runnable() {
@@ -126,6 +128,7 @@ public class EditorTextPane extends JEditorPane {
                 String sf= JythonCompletionProvider.getInstance().settings().getEditorFont();
                 setFont( Font.decode(sf) );
 
+                initialized= true;
             }
 
         };
@@ -205,11 +208,25 @@ public class EditorTextPane extends JEditorPane {
 
     public void loadFile( File f ) throws FileNotFoundException, IOException {
         try {
-            String s= loadFileToString(f);
-            Document d = this.getDocument();
-            d.remove( 0, d.getLength() );
-            d.insertString( 0, s, null );
+            final String s= loadFileToString(f);
             //setDirty(false);
+            if ( initialized ) {
+                Document d = this.getDocument();
+                d.remove( 0, d.getLength() );
+                d.insertString( 0, s, null );
+            } else {
+                SwingUtilities.invokeLater( new Runnable() { 
+                    public void run() {
+                        try {
+                            Document d = EditorTextPane.this.getDocument();
+                            d.remove( 0, d.getLength() );
+                            d.insertString( 0, s, null );
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+            }
         } catch (BadLocationException ex) {
             throw new RuntimeException(ex);
         }
