@@ -3684,11 +3684,23 @@ APSplash.checkTime("init 240");
         });
     }
 
-    private void runTool( String suri, int modifiers ) throws MalformedURLException {
-        if ( !( ( modifiers & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
-            JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
-        } else {
+    /**
+     * run the tool at the given URI, with the modifiers. 
+     * @param suri URI of the script.
+     * @param modifiers 1:query for parameters  2:inspect before running.
+     * @throws MalformedURLException
+     * @throws IOException 
+     */
+    private void runTool( String suri, int modifiers ) throws MalformedURLException, IOException {
+        if (( ( modifiers & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) ) { 
+            JythonUtil.invokeScriptSoon( DataSetURI.getURL(suri),
+                    applicationModel.getDocumentModel(),
+                    null, true,
+                    getStatusBarProgressMonitor("done running script") );
+        } else if (( ( modifiers & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
             plotUri("script:"+ suri );
+        } else {
+            JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
         }
 
         
@@ -3729,8 +3741,11 @@ APSplash.checkTime("init 240");
                     Action a= new AbstractAction(t.getTitle()) {
                         public void actionPerformed(ActionEvent e) {
                             try {
-                                runTool( suri, e.getModifiers() );
+                                runTool( suri, ActionEvent.SHIFT_MASK );
+                                //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
                             } catch (MalformedURLException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (IOException ex ) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
                         }
