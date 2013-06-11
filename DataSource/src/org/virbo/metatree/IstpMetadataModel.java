@@ -273,57 +273,61 @@ public class IstpMetadataModel extends MetadataModel {
             
         }
 
-        Units units = Units.dimensionless;
+        Units units;
+        String sunits= "";
         if (attrs.containsKey("UNITS")) {
-            String sunits = String.valueOf( attrs.get("UNITS") );
-
-            try {
-                units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
-            } catch (IllegalArgumentException e) {
-                units = Units.dimensionless;
-            }
-
-            // we need to distinguish between ms and epoch times.
-            boolean isMillis=false;
-            Object ovalidMax= attrs.get("VALIDMAX");
-            Object ovalidMin= attrs.get("VALIDMIN");
-            if ( ovalidMax!=null && ovalidMin!=null 
-                    && ovalidMax instanceof Number && ovalidMin instanceof Number
-                    && units==Units.milliseconds ) {
-                double validMax= ((Number)ovalidMax).doubleValue();
-                double validMin= ((Number)ovalidMin).doubleValue();
-                isMillis= validMin<validMax && validMin < 1e8 && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
-            }
-
-            Object ofv= attrs.get( "FILLVAL" );
-            double dv= doubleValue( ofv, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
-            if ( !Double.isNaN(dv) ) {
-                properties.put(QDataSet.FILL_VALUE, dv );
-            }
-
-            boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
-            if (isEpoch) {
-                units = Units.cdfEpoch;
-            } else {
-                String label = (String) attrs.get("LABLAXIS");
-                String sslice1= (String) attrs.get("slice1");
-                if ( label==null && sslice1!=null ) {
-                    int islice= Integer.parseInt(sslice1);
-                    QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
-                    Units u= (Units) lablDs.property(QDataSet.UNITS);
-                    label= u.createDatum(lablDs.value(islice)).toString();
-                }
-                if (label == null) {
-                    label = sunits;
-                } else {
-                    if (!sunits.equals("")) {
-                        label += " (" + sunits + ")";
-                    }
-                }
-                properties.put(QDataSet.LABEL, label);
-            }
-            properties.put(QDataSet.UNITS, units);
+            sunits = String.valueOf( attrs.get("UNITS") );
+        } else {
+            logger.log(Level.INFO, "UNITS are missing for {0}", title);
         }
+        
+        try {
+            units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
+        } catch (IllegalArgumentException e) {
+            units = Units.dimensionless;
+        }
+
+        // we need to distinguish between ms and epoch times.
+        boolean isMillis=false;
+        Object ovalidMax= attrs.get("VALIDMAX");
+        Object ovalidMin= attrs.get("VALIDMIN");
+        if ( ovalidMax!=null && ovalidMin!=null 
+                && ovalidMax instanceof Number && ovalidMin instanceof Number
+                && units==Units.milliseconds ) {
+            double validMax= ((Number)ovalidMax).doubleValue();
+            double validMin= ((Number)ovalidMin).doubleValue();
+            isMillis= validMin<validMax && validMin < 1e8 && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
+        }
+
+        Object ofv= attrs.get( "FILLVAL" );
+        double dv= doubleValue( ofv, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+        if ( !Double.isNaN(dv) ) {
+            properties.put(QDataSet.FILL_VALUE, dv );
+        }
+
+        boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
+        if (isEpoch) {
+            units = Units.cdfEpoch;
+        } else {
+            String label = (String) attrs.get("LABLAXIS");
+            String sslice1= (String) attrs.get("slice1");
+            if ( label==null && sslice1!=null ) {
+                int islice= Integer.parseInt(sslice1);
+                QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
+                Units u= (Units) lablDs.property(QDataSet.UNITS);
+                label= u.createDatum(lablDs.value(islice)).toString();
+            }
+            if (label == null) {
+                label = sunits;
+            } else {
+                if (!sunits.equals("")) {
+                    label += " (" + sunits + ")";
+                }
+            }
+            properties.put(QDataSet.LABEL, label);
+        }
+        properties.put(QDataSet.UNITS, units);
+        
 
         if ( UnitsUtil.isTimeLocation(units) && !doRecurse && properties.containsKey(QDataSet.LABEL) ) {
             properties.remove(QDataSet.LABEL);
@@ -343,7 +347,6 @@ public class IstpMetadataModel extends MetadataModel {
                     properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
                 }
 
-                Object ofv= attrs.get( "FILLVAL" );
                 if ( ofv!=null && ofv instanceof Number ) {
                     Number fillVal= (Number) ofv;
                     double fillVald= fillVal.doubleValue();
