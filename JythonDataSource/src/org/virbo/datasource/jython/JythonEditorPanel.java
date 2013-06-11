@@ -263,6 +263,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     /**
      * See org.virbo.jythonsupport.ui.Util.createForm
+     * See org.virbo.jythonsupport.ui.Util.doVariables which is a copy.
      * @param f
      * @param params
      * @return 
