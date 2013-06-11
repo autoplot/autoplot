@@ -152,7 +152,7 @@ public class Util {
     }
             
     /**
-     * See org.virbo.jythonsupport.ui.Util.createForm
+     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
      * @param f
      * @param params
      * @return 
