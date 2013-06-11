@@ -6,8 +6,10 @@
 package org.virbo.autoplot;
 
 import external.PlotCommand;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -17,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -24,8 +29,11 @@ import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.jythonsupport.ui.EditorTextPane;
+import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
  *
@@ -132,6 +140,44 @@ public class JythonUtil {
     }
     
     /**
+     * show the script and the variables (like we have always done with jyds scripts)
+     * @param parent
+     * @param file
+     * @param fvars
+     * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
+     */
+    private static int showScriptDialog( Component parent, File file, Map<String,String> fvars ) {
+        JPanel p= new JPanel();
+        JTabbedPane tp= new JTabbedPane();
+        org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
+        try {
+            textArea.loadFile(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        ScriptPanelSupport support;
+        support= new ScriptPanelSupport(textArea);
+        support.setReadOnly();
+        
+        tp.add( textArea, "script" );
+        
+        org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
+        if ( fd.count>0 ) {
+            tp.add( p, "params" );
+            tp.setSelectedIndex(1);
+        } 
+        int result= AutoplotUtil.showConfirmDialog( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
+        if ( result==JOptionPane.OK_OPTION ) {
+            org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
+        }
+        return result;
+    }
+            
+            
+    /**
      * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
      * executed, and monitor should be used to detect that the script is finished.
@@ -157,18 +203,14 @@ public class JythonUtil {
             fvars= vars;
         }
         
-        if ( askParams ) {            
+        int response= JOptionPane.OK_OPTION;
+        if ( askParams ) {     
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
-            JPanel p= new JPanel();
-            org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
-            if ( fd.count>0 ) {
-                if ( JOptionPane.showConfirmDialog( dom.getController().getDasCanvas(), p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                    org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
-                }
-            } 
+            response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars );
         } else {
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
         }
+        
         Runnable run= new Runnable() {
             public void run() {
                 try {
@@ -192,6 +234,8 @@ public class JythonUtil {
                 }
             }
         };
-        RequestProcessor.invokeLater(run);
+        if ( response==JOptionPane.OK_OPTION ) {
+            RequestProcessor.invokeLater(run);
+        }
     }
 }
