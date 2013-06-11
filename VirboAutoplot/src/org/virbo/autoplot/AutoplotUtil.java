@@ -46,6 +46,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.BufferedWriter;
@@ -56,6 +57,10 @@ import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -1959,6 +1964,53 @@ public class AutoplotUtil {
         
         return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
         
+    }
+    
+    /**
+     * new okay/cancel dialog that is resizable and is made with a simple dialog.
+     * @param parent
+     * @param message
+     * @param title
+     * @return 
+     */
+    public static int showConfirmDialog2( Component parent, Object message, String title, int optionType ) {
+        if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
+            throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
+        }
+        Window p= SwingUtilities.getWindowAncestor(parent);
+        final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
+        dia.setLocationRelativeTo(p);
+        
+        dia.setLayout( new BorderLayout() );
+        JPanel pc= new JPanel();
+        final List<Integer> result= new ArrayList(1);
+        BoxLayout b= new BoxLayout(pc,BoxLayout.X_AXIS);
+        pc.setLayout( b );
+        pc.add( Box.createGlue() );
+        pc.add( new JButton( new AbstractAction("Cancel") {
+            public void actionPerformed(ActionEvent e) {
+                result.add( JOptionPane.CANCEL_OPTION );
+                dia.setVisible(false);
+            }
+        }) );
+        pc.add( new JButton( new AbstractAction("Okay") {
+            public void actionPerformed(ActionEvent e) {
+                result.add( JOptionPane.OK_OPTION );
+                dia.setVisible(false);
+            }
+        }) );
+        
+        dia.setResizable(true);
+        if ( !( message instanceof Component ) ) {
+            throw new IllegalArgumentException("message must be component for now.");
+        }
+        dia.add( (Component)message );
+        dia.add( pc, BorderLayout.SOUTH );
+        dia.setTitle(title);
+        dia.setMinimumSize( new Dimension(300,300) );
+        dia.pack();
+        dia.setVisible(true);
+        return result.get(0);
     }
 
 }
