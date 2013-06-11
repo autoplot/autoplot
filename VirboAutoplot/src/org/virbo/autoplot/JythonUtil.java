@@ -6,11 +6,17 @@
 package org.virbo.autoplot;
 
 import external.PlotCommand;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -108,31 +114,78 @@ public class JythonUtil {
 
     /**
      * invoke the python script on another thread.
-     * @param url
+     * @param url the address of the script.
      */
-    public static void invokeScriptSoon( final URL url ) {
+    public static void invokeScriptSoon( final URL url ) throws IOException {
         invokeScriptSoon( url, null, new NullProgressMonitor() );
     }
 
+    
     /**
-     * run the script on its own thread.  
-     * @param url
-     * @param dom, if null, then null is passed into the script and the script must not use dom.
-     * @param mon, if null, then a NullProgressMonitor is created.
+     * invoke the python script on another thread.
+     * @param url the address of the script.
+     * @param dom if null, then null is passed into the script and the script must not use dom.
+     * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      */
-    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon1 ) {
+    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon1 ) throws IOException {
+        invokeScriptSoon( url, dom, new HashMap(), false, mon1 );
+    }
+    
+    /**
+     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * provided a dialog to set the parameters.  Note this will return before the script is actually
+     * executed, and monitor should be used to detect that the script is finished.
+     * @param url the address of the script.
+     * @param dom if null, then null is passed into the script and the script must not use dom.
+     * @param vars values for parameters, or null.
+     * @param askParams if true, query the user for parameter settings.
+     * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     */
+    public static void invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, ProgressMonitor mon1 ) throws IOException {
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
         } else {
             mon= mon1;
         }
+        final File file;
+        
+        final Map<String,String> fvars;
+        if ( vars==null ) {
+            fvars= new HashMap();
+        } else {
+            fvars= vars;
+        }
+        
+        if ( askParams ) {            
+            file = DataSetURI.getFile( url, new NullProgressMonitor() );
+            JPanel p= new JPanel();
+            org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
+            if ( fd.count>0 ) {
+                if ( JOptionPane.showConfirmDialog( dom.getController().getDasCanvas(), p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
+                }
+            } 
+        } else {
+            file = DataSetURI.getFile( url, new NullProgressMonitor() );
+        }
         Runnable run= new Runnable() {
             public void run() {
                 try {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
                     logger.log(Level.FINE, "invokeScriptSoon({0})", url);
-                    interp.execfile(url.openStream(), url.toString());
+                    for ( Map.Entry<String,String> v: fvars.entrySet() ) {
+                        if ( v.getValue() instanceof String ) {
+                            if ( !v.getValue().startsWith("'") ) {
+                                interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
+                            } else {
+                                interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
+                            }
+                        } else {
+                            interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
+                        }
+                    }
+                    interp.execfile( new FileInputStream(file), url.toString());
                     mon.finished();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
