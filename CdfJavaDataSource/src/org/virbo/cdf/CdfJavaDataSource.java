@@ -171,6 +171,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     cdf = CDFFactory.getCDF(fileName);
                     openFiles.put(fileName, cdf);
                     openFilesRev.put(cdf, fileName);
+                    System.err.println("open files fresh: "+openFilesFresh );
                     openFilesFresh.put(fileName,System.currentTimeMillis()); logger.log(Level.FINER, "added cdf file {0} to cache: {1}", new Object[] { fileName, cdf } );
                     if ( openFiles.size()>FILE_CACHE_SIZE_LIMIT ) {
                         String oldest= openFiles.entrySet().iterator().next().getKey();
@@ -179,6 +180,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
             } else {
                 synchronized (lock) { // freshen reference.
+                    System.err.println("open files fresh: "+openFilesFresh );
                     long date= openFilesFresh.get(fileName);
                     if ( new File(fileName).lastModified() > date ) {
                         cdf = CDFFactory.getCDF(fileName);
