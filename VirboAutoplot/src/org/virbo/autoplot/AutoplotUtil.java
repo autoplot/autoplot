@@ -107,6 +107,7 @@ import org.das2.graph.SpectrogramRenderer.RebinnerEnum;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.ExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.WebFileSystem;
@@ -468,6 +469,30 @@ public class AutoplotUtil {
                 }
             }
         }
+    }
+
+    /**
+     * put in a place to call where the message is shown assuming the 
+     * problem is on the user's end, but provide a button to inspect
+     * the exception.
+     * 
+     * @param parent parent component to center the dialog.
+     * @param string the message, a string or html code.
+     * @param ex the wrapped exception
+     * @param exh an exception handler to show the exception.
+     */
+    public static void showUserExceptionDialog( Component parent, String string, final Exception ex, final ExceptionHandler exh ) {
+        JPanel p= new JPanel( new BorderLayout( ) );
+        JLabel l1= new JLabel( string );
+        p.add( l1, BorderLayout.CENTER );
+        JPanel p1= new JPanel( new BorderLayout() );
+        p1.add( new JButton( new AbstractAction("View Exception") {
+            public void actionPerformed( ActionEvent ev ) {
+                exh.handleUncaught(ex);
+            }
+        }), BorderLayout.EAST );
+        p.add( p1, BorderLayout.SOUTH );
+        JOptionPane.showMessageDialog( parent, p );
     }
 
     public static class AutoRangeDescriptor {
