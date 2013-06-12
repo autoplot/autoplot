@@ -174,7 +174,8 @@ public class CdfVirtualVars {
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag");
+                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
+                "sum_values" );
         return functions.contains(function.toLowerCase());
     }
 }
