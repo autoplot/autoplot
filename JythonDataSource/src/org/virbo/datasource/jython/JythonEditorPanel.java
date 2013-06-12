@@ -45,6 +45,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
@@ -56,10 +57,12 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.LogNames;
+import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
+import org.virbo.jythonsupport.ui.Util;
 
 /**
  *
@@ -365,7 +368,43 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     valuePanel.add( ctf );
                     filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     valuePanel.add( filesButton );
+                    
+                } else if ( parm.type=='T' ) {
+                    String val;
+                    if ( params.get(vname)!=null ) {
+                        val= params.get(vname);
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= String.valueOf( parm.deft );
+                        params.put( vname, val );
+                    }
+                    final JTextField tf= new JTextField();
+                    Dimension x= tf.getPreferredSize();
+                    x.width= Integer.MAX_VALUE;
+                    tf.setMaximumSize(x);
+                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
 
+                    tf.setText( val );
+                    ctf= tf;
+                    
+                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
+                    JButton button= new JButton( fileIcon );
+                    button.addActionListener( new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            TimeRangeTool tt= new TimeRangeTool();
+                            tt.setSelectedRange(tf.getText());
+                            int r= JOptionPane.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+                            if ( r==JOptionPane.OK_OPTION) {
+                                tf.setText(tt.getSelectedRange());
+                            }
+                        }
+                    });
+                    
+                    valuePanel.add( ctf );
+                    button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                    valuePanel.add( button );
+                    
                 } else {
                     String val;
                     if ( params.get(vname)!=null ) {
