@@ -1046,7 +1046,8 @@ public class CdfUtil {
             List<String> warn= new ArrayList();
 
             long maxRec = var.getMaxWrittenRecord();
-
+            long recCount= maxRec+1;
+            
             int rank;
             long[] dims = var.getDimSizes();
             if (dims == null) {
@@ -1063,7 +1064,7 @@ public class CdfUtil {
             if ( virtual!=null ) {
                 try {
                     Entry entry = virtual.getEntry(var);
-                    if ( String.valueOf(entry.getData()).equals("TRUE") ) {
+                    if ( String.valueOf(entry.getData()).equalsIgnoreCase("TRUE") ) {
                        if ( function!=null ) {
                             String sfunction= String.valueOf( function.getEntry(var).getData() );
                             if ( CdfVirtualVars.isSupported( sfunction ) ) {
@@ -1111,7 +1112,7 @@ public class CdfUtil {
                     if ( virtual!=null ) {
                         Entry entry = virtual.getEntry(var);
                         String satt= String.valueOf(entry.getData());
-                        if ( satt.equals("TRUE") ) {
+                        if ( satt.equalsIgnoreCase("TRUE") ) {
                             if ( !isVirtual ) { // maybe some virtual functions are not supported.
                                 continue;
                             } else {
@@ -1146,7 +1147,7 @@ public class CdfUtil {
                         Object att= getAttribute( cdf, var, "VIRTUAL" );
                         if ( att!=null ) {
                             logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
-                            if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
+                            if ( String.valueOf(att).equalsIgnoreCase("TRUE") ) {
                                 String funct= (String)getAttribute( cdf, var, "FUNCTION" );
                                 if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
                                 if ( !CdfVirtualVars.isSupported(funct) ) {
@@ -1186,14 +1187,14 @@ public class CdfUtil {
                         xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
                         xMaxRec = xDependVariable.getMaxWrittenRecord();
                         if ( xMaxRec!=maxRec && !isVirtual && var.getRecVariance() ) {
-                            if ( maxRec==-1 ) maxRec+=1; //why?
-                            warn.add("depend0 length is inconsistent with length ("+(maxRec+1)+")" );
+                            if ( maxRec==-1 ) maxRec=0; //why?
+                            warn.add("depend0 length is inconsistent with length ("+(recCount)+")" );
                             //TODO: warnings are incorrect for Themis data.
                         }
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
-                    warn.add( "problem with " + aAttr.getName() + ": " + e.getMessage() );
+                    warn.add( "problem with " + ( aAttr!=null ? aAttr.getName() : "<null>" ) + ": " + e.getMessage() );
                 }
 
                 DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
@@ -1246,12 +1247,6 @@ public class CdfUtil {
                     }
                     desc += ")";
                 }
-                if ( hasEntry( virtual, var ) ) {
-                    if ( "true".equalsIgnoreCase( String.valueOf( virtual.getEntry(var).getData() ) ) ) {
-                        desc += " (virtual function "+vdescr+")";
-                    }
-                }
-
 
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
@@ -1261,7 +1256,11 @@ public class CdfUtil {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
                     if (maxRec != xMaxRec)
-                        descbuf.append("").append(maxRec + 1).append(" records of ").append(recDesc).append("<br>");
+                        if ( isVirtual ) {
+                            descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
+                        } else {
+                            descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                        }
                     if (scatDesc != null)
                         descbuf.append("").append(scatDesc).append("<br>");
                     if (svarNotes !=null ) {
