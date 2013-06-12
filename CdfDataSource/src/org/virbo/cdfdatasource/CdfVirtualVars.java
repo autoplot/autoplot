@@ -17,10 +17,12 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
-import org.virbo.dsutil.FFTUtil;
 
 /**
- *
+ * Implementations of the CDF virtual variables seen in CDAWeb, but implemented in QDataSet.
+ * These should reflect a subset of those functions, with the IDL implementations at
+ * http://spdf.gsfc.nasa.gov/CDAWlib.html
+ * see ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/unix/CDAWlib.tar.gz, routine read_myCDF.pro
  * @author jbf
  */
 public class CdfVirtualVars {
@@ -121,20 +123,23 @@ public class CdfVirtualVars {
 //      endif ;if function defined for this virtual variable
 
     /**
-     *
-     * @param function
-     * @param args
+     * Implementations of CDF virtual functions.  These are a subset of those in the CDAWeb library, plus a couple
+     * extra that they will presumably add to the library at some point.
+     * @param metadata the metadata for the new result dataset, in QDataSet semantics such as FILL_VALUE=-1e31
+     * @param function the function name, which is case insensitive.  See code isSupported for list of function names.
+     * @param args list of QDataSets that are the arguments to the function
+     * @param mon monitor for the function
      * @see isSupported
      * @return
      */
-    public static QDataSet execute(  Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) {
+    public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) {
         if ( function.equalsIgnoreCase("sum_values" ) ) {
             QDataSet sum= args.get(0);
             for ( int i=1; i<args.size(); i++ ) {
                 sum= Ops.add( sum, args.get(i) );
             }
             return sum;
-        } else if ( function.equalsIgnoreCase("compute_magnitude") ) {
+        } else if (function.equalsIgnoreCase("compute_magnitude")) {
             return computeMagnitude( args.get(0) );
         } else if (function.equalsIgnoreCase("convert_log10")) {
             return convertLog10( args.get(0) );
@@ -150,6 +155,7 @@ public class CdfVirtualVars {
             //QDataSet hann= FFTUtil.getWindowHanning( (int) args.get(1).value() );
             //return Ops.fftPower( args.get(0), hann, mon );
         } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
+            //introduced to support PlasmaWaveGroup
             QDataSet deltaT = args.get(1);       // time between successive measurements.
             MutablePropertyDataSet waves= DataSetOps.makePropertiesMutable( args.get(0) );
             while ( deltaT.rank()>0 ) deltaT= deltaT.slice(0);
@@ -179,7 +185,7 @@ public class CdfVirtualVars {
             MutablePropertyDataSet poww= DataSetOps.makePropertiesMutable(pow);
             QDataSet trs1= Ops.add( (QDataSet) pow.property(QDataSet.DEPEND_1),translation.slice(0));
             poww.putProperty( QDataSet.DEPEND_1, trs1 );
-   throw new IllegalArgumentException("untested");
+            throw new IllegalArgumentException("fftPowerDeltaTranslation512 is untested");
             //return poww;
         } else if ( function.equalsIgnoreCase("calc_p") ) {
             return calcP( args );
@@ -217,14 +223,13 @@ public class CdfVirtualVars {
                 }
             }
             return esa_data;
-
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
     }
 
     /**
-     * see virtual_funcs.pro functon calc_p
+     * see virtual_funcs.pro function calc_p
      */
     protected static QDataSet calcP( List<QDataSet> args ) {
         QDataSet coefficient= DataSetUtil.asDataSet( 1.6726e-6 );
@@ -265,10 +270,9 @@ public class CdfVirtualVars {
 
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
-                "fftPowerDelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftPower","fftPower512","fftPower1024","fftPowerDeltaTranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
+                "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
+                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
                 "sum_values" );
-
-        return functions.contains(function);
+        return functions.contains(function.toLowerCase());
     }
 }
