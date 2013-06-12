@@ -166,7 +166,7 @@ public class JythonUtil {
         public String doc;
         public List<Object> enums;  // the allowed values
         /**
-         * A (String) or F (Double or Integer) or R (URI)
+         * T (TimeRange), A (String), F (Double or Integer), or R (URI)
          * Note a string with the values enumerated either T or F is treated as a boolean.
          */
         public char type;
@@ -291,6 +291,9 @@ public class JythonUtil {
             }
             if ( p.name.equals("resourceURI") ) {
                 p.type= 'R';
+                p.deft= p.deft.toString();
+            } else if ( p.name.equals("timerange") ) {
+                p.type= 'T';
                 p.deft= p.deft.toString();
             } else {
                 if ( p.deft instanceof String ) {
