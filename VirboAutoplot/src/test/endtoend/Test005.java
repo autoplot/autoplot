@@ -66,9 +66,9 @@ public class Test005 {
             }
             xxx("demo3");
 
-            plot("http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
-            writeToPng("test005_demo1_r.png");
-            xxx("demo1 return");
+            //plot("http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
+            //writeToPng("test005_demo1_r.png");
+            //xxx("demo1 return");
 
             plot("http://autoplot.org/data/autoplot.xls?column=A");
             writeToPng("test005_demo4.png");
