@@ -78,6 +78,10 @@ public class PlotElementController extends DomNodeController {
     private static final String PENDING_SET_DATASET= "setDataSet";
     private static final String PENDING_COMPONENT_OP= "componentOp";
     private static final String PENDING_UPDATE_DATASET= "updateDataSet";
+    /**
+     * we need to reset the render type, but we can't do this from the event thread.
+     */
+    private static final String PENDING_RESET_RENDER_TYPE= "resetRenderType";
 
     final private Application dom;
     private PlotElement plotElement;
@@ -188,6 +192,40 @@ public class PlotElementController extends DomNodeController {
         }
     };
     
+    private void resetRenderTypeImp( RenderType oldRenderType, RenderType newRenderType ) {
+        PlotElement parentEle= getParentPlotElement();
+        if (parentEle != null) {
+            if ( parentEle.getRenderType().equals(newRenderType) ) {
+                if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/tracker/?func=detail&aid=3613187&group_id=199733&atid=970682
+                    doResetRenderTypeInt(newRenderType);
+                    updateDataSet();
+                }
+            } else {
+                parentEle.setRenderType(newRenderType);
+            }
+        } else {
+            if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
+                resetRanges= true;
+                if ( plotElement.getComponent().equals("") ) {
+                    resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
+                } else {
+                    QDataSet sliceDs= getDataSet();
+                    if ( sliceDs==null ) {
+                        // This happens when we load a vap.
+                        sliceDs= getDataSourceFilter().getController().getFillDataSet(); // Since this is null, I suspect we can do the same behavior in either case.
+                        resetPlotElement( sliceDs, plotElement.getRenderType() );
+                    } else {
+                        resetPlotElement( sliceDs, plotElement.getRenderType()); // I'm assuming that getDataSet() has been set already, which should be the case.
+                    }
+                }
+            } else {
+                doResetRenderType(newRenderType);
+                updateDataSet();
+            }
+            setResetPlotElement(false);
+        }
+    }
+
     PropertyChangeListener plotElementListener = new PropertyChangeListener() {
 
         @Override
@@ -201,38 +239,24 @@ public class PlotElementController extends DomNodeController {
                 if ( dom.getController().isValueAdjusting() ) {
                     //return; // occasional NullPointerException, bug 2988979
                 }
-                RenderType newRenderType = (RenderType) evt.getNewValue();
-                RenderType oldRenderType = (RenderType) evt.getOldValue();
-                PlotElement parentEle= getParentPlotElement();
-                if (parentEle != null) {
-                    if ( parentEle.getRenderType().equals(newRenderType) ) {
-                        if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/tracker/?func=detail&aid=3613187&group_id=199733&atid=970682
-                            doResetRenderTypeInt(newRenderType);
-                            updateDataSet();
-                        }
-                    } else {
-                        parentEle.setRenderType(newRenderType);
-                    }
-                } else {
-                    if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
-                        resetRanges= true;
-                        if ( plotElement.getComponent().equals("") ) {
-                            resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
-                        } else {
-                            QDataSet sliceDs= getDataSet();
-                            if ( sliceDs==null ) {
-                                // This happens when we load a vap.
-                                sliceDs= getDataSourceFilter().getController().getFillDataSet(); // Since this is null, I suspect we can do the same behavior in either case.
-                                resetPlotElement( sliceDs, plotElement.getRenderType() );
-                            } else {
-                                resetPlotElement( sliceDs, plotElement.getRenderType()); // I'm assuming that getDataSet() has been set already, which should be the case.
+                final RenderType newRenderType = (RenderType) evt.getNewValue();
+                final RenderType oldRenderType = (RenderType) evt.getOldValue();
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            try {
+                                changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
+                                resetRenderTypeImp( oldRenderType, newRenderType ); 
+                            } finally {
+                                changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
                             }
                         }
-                    } else {
-                        doResetRenderType(newRenderType);
-                        updateDataSet();
-                    }
-                    setResetPlotElement(false);
+                    };
+                    run.run(); //TODO: figure this out.  The autoranging fails because it happens elsewhere...
+                    //RequestProcessor.invokeLater(run);
+                } else {
+                    resetRenderTypeImp( oldRenderType, newRenderType );
                 }
             } else if (evt.getPropertyName().equals(PlotElement.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
