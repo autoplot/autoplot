@@ -824,7 +824,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         };
 
         completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
-
+        //TODO Here's the plan: we will make the popupMenu be non-focusable, then delegate the Up,Down,Enter and Escape to it when the popup is showing.
+        //completionsPopupMenu.setFocusable(true);
+        
         setMessage("done getting completions");
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -1198,9 +1200,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ), "complete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), "plot");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK), "plot");
-        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_MASK), "smallerFont");
-        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_MASK), "biggerFont");
-        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_MASK), "biggerFont");
+
         needToAddKeys = false;
     }
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
