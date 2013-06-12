@@ -292,11 +292,9 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                 };
-                if ( true ) { //isAsyncProcess(newv) ) {
-                    RequestProcessor.invokeLater(run);
-                } else {
-                    run.run();
-                }
+                
+                RequestProcessor.invokeLater(run);
+                
             }
         }
     };
@@ -415,6 +413,7 @@ public class PlotElementController extends DomNodeController {
      * @throws Exception when the processStr cannot be processed.
      */
     private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException, Exception {
+        setStatus("busy: process dataset");
         String label= null;
         c= c.trim();
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
@@ -489,6 +488,7 @@ public class PlotElementController extends DomNodeController {
                 fillDs = DataSetOps.sprocess(c, fillDs, null);
             }
         } 
+        setStatus("done, process dataset");
         return fillDs;
     }
 
@@ -823,10 +823,10 @@ public class PlotElementController extends DomNodeController {
             Runnable run= new Runnable() {
                 public void run() { // java complains about method not override.
                     try {
-                         updateDataSetImmediately();
+                        updateDataSetImmediately();
                     } catch ( Exception ex ) {
-                        ex.printStackTrace(); // wrapping somehow didn't show original exception.
-                         throw new IllegalArgumentException(ex);
+                        logger.log( Level.WARNING, null, ex ); // wrapping somehow didn't show original exception.
+                        throw new IllegalArgumentException(ex);
                     }
                 }
             };
@@ -1134,9 +1134,6 @@ public class PlotElementController extends DomNodeController {
      */
     private synchronized void resetPlotElement(QDataSet fillDs, RenderType renderType) {
         logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
-        if ( false && renderer != null) {
-            renderer.setActive(true);
-        }
 
         if (fillDs != null) {
 
@@ -1577,7 +1574,7 @@ public class PlotElementController extends DomNodeController {
                     throw new RuntimeException(ex);
                 }
                 props= processProperties( comp, props ); //TODO: support components
-                if ( props.size()==0 ) { // many of the filters drop the properties
+                if ( props.isEmpty() ) { // many of the filters drop the properties
                   props= AutoplotUtil.extractProperties(fillDs);
                 }
             }
@@ -1745,7 +1742,7 @@ public class PlotElementController extends DomNodeController {
             }
         } else { // hugeScatter okay
 
-            Map<String,Object> yprop=null, xprop=null, prop=null;
+            Map<String,Object> yprop, xprop=null, prop=null;
 
             QDataSet bundle1= (QDataSet) properties.get(QDataSet.BUNDLE_1);
             if ( bundle1!=null ) {
@@ -2101,12 +2098,6 @@ public class PlotElementController extends DomNodeController {
     private boolean doUnitsCheck( QDataSet fillDs ) {
         RenderType spec = plotElement.getRenderType();
 
-        Map<String,Object> props= new HashMap();
-
-        if (props == null) {
-            props = Collections.EMPTY_MAP;
-        }
-
         DatumRange xrange= plotElement.getPlotDefaults().getXaxis().getRange();
         DatumRange yrange= plotElement.getPlotDefaults().getYaxis().getRange();
         DatumRange zrange= plotElement.getPlotDefaults().getZaxis().getRange();
@@ -2137,7 +2128,6 @@ public class PlotElementController extends DomNodeController {
             }
 
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
-            Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
             if (yds == null) {
                 if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
                     JoinDataSet ds= new JoinDataSet(2);
@@ -2172,7 +2162,6 @@ public class PlotElementController extends DomNodeController {
                     yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); //TODO: QUBE assumed
                 } else {
                     yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
-                    yprops= null;
                 }
             }
 
@@ -2263,7 +2252,7 @@ public class PlotElementController extends DomNodeController {
      * @return the plot containing this plotElement's renderer, or null.
      */
     public DasPlot getDasPlot() {
-        Plot p=null;
+        Plot p;
         DomLock lock= this.mutatorLock();
         lock.lock("getDasPlot");
         p= dom.controller.getPlotFor(plotElement);
@@ -2275,7 +2264,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     private DasColorBar getColorbar() {
-        Plot p=null;
+        Plot p;
         DomLock lock= this.mutatorLock();
         lock.lock("getColorbar");
         p= dom.controller.getPlotFor(plotElement);
@@ -2566,10 +2555,9 @@ public class PlotElementController extends DomNodeController {
             public Object convertForward(Object value) {
                 String title= (String)value;
                 if ( title.contains("CONTEXT" ) ) {
-                    String contextStr="";
                     if ( plotElement!=null ) {
                         if ( dataSet!=null ) {
-                            contextStr= DataSetUtil.contextAsString(dataSet);
+                            String contextStr= DataSetUtil.contextAsString(dataSet);
                             title= insertString( title, "CONTEXT", contextStr );
                         }
                     }
