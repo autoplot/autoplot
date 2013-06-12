@@ -400,7 +400,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                             }
                         }
                     });
-                    
+                    button.setToolTipText("Time Range Tool");
                     valuePanel.add( ctf );
                     button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     valuePanel.add( button );
