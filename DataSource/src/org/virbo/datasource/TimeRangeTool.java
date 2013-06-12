@@ -157,7 +157,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 return timeRangeTextField.getText();
             }
         } else if ( idx==1 ) {
-            return "orbit:"+scComboBox.getSelectedItem()+":"+orbitComboBox.getSelectedItem();
+            String sc= (String)scComboBox.getSelectedItem();
+            String orb= (String)orbitComboBox.getSelectedItem();
+            int i= orb.indexOf(":");
+            if ( i>-1 ) orb= orb.substring(0,i);
+            return "orbit:"+sc+":"+orb;
         } else if ( idx==2 ) {
             String s= (String)nrtComboBox.getSelectedItem();
             int i= s.indexOf(" ");
