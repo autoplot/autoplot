@@ -776,6 +776,7 @@ public class CdfUtil {
             List<String> warn= new ArrayList();
 
             long maxRec = var.getNumberOfValues(); 
+            long recCount= maxRec;
 
             int rank;
             int[] dims = var.getDimensions();
@@ -802,6 +803,8 @@ public class CdfUtil {
                 continue;
             }
 
+            boolean isVirtual= false;
+            
             if ( false ) {
                 result.put(var.getName(), null);
             } else {
@@ -849,6 +852,7 @@ public class CdfUtil {
                                     }
                                     vdescr= vdescr+" )";
                                 }
+                                isVirtual= true;
                             }
                         }
                     }
@@ -924,14 +928,6 @@ public class CdfUtil {
                     desc += ")";
                 }
 
-                Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
-                if ( att!=null ) {
-                    if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
-                        desc += " (virtual function "+vdescr+")";
-                    }
-                }
-
-
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
@@ -940,15 +936,15 @@ public class CdfUtil {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
                     if (maxRec != xMaxRec)
-                        descbuf.append("").append(maxRec).append(" records of ").append(recDesc).append("<br>");
+                        if ( isVirtual ) {
+                            descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
+                        } else {
+                            descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                        }
                     if (scatDesc != null)
                         descbuf.append("").append(scatDesc).append("<br>");
                     if (svarNotes !=null ) {
                         descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
-                    }
-
-                    if ( vdescr!=null && vdescr.length()>0 ) {
-                        descbuf.append("<br>virtual variable implemented by ").append(vdescr).append("<br>");
                     }
 
                     for ( String s: warn ) {
