@@ -1461,7 +1461,9 @@ APSplash.checkTime("init 52");
                 }
             } else if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
                 setStatus(ERROR_ICON,"Unable to open URI: " + surl);
-                JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
+                AutoplotUtil.showUserExceptionDialog( this, 
+                        "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause(),
+                        ex, applicationModel.getExceptionHandler() );
             } else {
                 applicationModel.getExceptionHandler().handleUncaught(ex);
                 String msg= ex.getMessage();
