@@ -1103,94 +1103,96 @@ public class AutoplotUtil {
         result.log = isLog;
 
         // interpret properties, looking for hints about scale type and ranges.
-        if (properties != null) {
+        if ( properties != null ) {
 
             Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
 
             Units uu=  (Units) properties.get(QDataSet.UNITS);
             if ( uu==null ) uu= Units.dimensionless;
+            if ( UnitsUtil.isIntervalOrRatioMeasurement(uu) ) {
 
-            Datum ftmin=  uu.createDatum( tmin==null ? -1 * Double.MAX_VALUE : tmin );
+                Datum ftmin=  uu.createDatum( tmin==null ? -1 * Double.MAX_VALUE : tmin );
 
-            if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
-//                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
-//                if ( tmin.doubleValue()<0 ) {
-                    tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
-//                }
-            }
-
-            DatumRange range = getRange( tmin, tmax, uu );
-            
-            // see if the typical extent is consistent with extent seen.  If the
-            // typical extent won't hide the data's structure, then use it.
-            if ((tmin != null || tmax != null)) {
-                double d1, d2;
-                if (result.log) {
-                    if ( ftmin.doubleValue(uu)<=0 ) ftmin= uu.createDatum(1e-38);
-                    Datum limit= ftmin;
-                    try {
-                        Datum dd1 = result.range.min().ge(limit) ? result.range.min() : limit; // these represent the range seen, guard against min
-                        Datum dd2 = result.range.max().ge(limit) ? result.range.max() : limit;
-                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
-                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
-                    } catch (InconvertibleUnitsException ex) {
-                        range = makeDimensionless(range);
-                        result.range = makeDimensionless(result.range);
-                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
-                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
-                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
-                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
-                    }
-                    if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
-                        range= DatumRangeUtil.rescaleLog( range, 0, 2 );
-                        d2= d2/2;
-                        d1= d1/2;
-                        logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
-                    }
-                    if ( d1<-4 && d2>0  ) { //often with log we get "1 count" averages that are very small (demo2: po_h0_hyd_$Y$m$d_v01.cdf)
-                        logger.fine("rejecting statistical range because min is too small.");
-                        result.range = range;
-                        result.robustMin= range.min().doubleValue(result.range.getUnits());
-                        result.robustMax= range.max().doubleValue(result.range.getUnits());
-                        d1= 0;
-                        d2= 1;
-                    }
-                } else {
-                    try {
-                        d1 = DatumRangeUtil.normalize(range, result.range.min());
-                        d2 = DatumRangeUtil.normalize(range, result.range.max());
-                    } catch (InconvertibleUnitsException ex) {
-                        range = makeDimensionless(range);
-                        result.range = makeDimensionless(result.range);
-                        d1 = DatumRangeUtil.normalize(range, result.range.min());
-                        d2 = DatumRangeUtil.normalize(range, result.range.max());
-                    }
-                    if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range //TODO: I don't understand this...
-                        range= DatumRangeUtil.rescale( range, 0, 2 );
-                        d2= d2/2;
-                        d1= d1/2;
-                        logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
-                    }
+                if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
+    //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
+    //                if ( tmin.doubleValue()<0 ) {
+                        tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+    //                }
                 }
-                if (d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
-                        && d2 > 0.   // and the stats max is greater than the typical range min()
-                        && d2 < 1.14  // and the top isn't clipping data badly  //TODO: we really need to be more robust about this.  hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109 was failing because a small number of points was messing this up.
-                        && d1 > -0.1 // and the bottom isn't clipping data badly
-                        && d1 < 1.   // and the stats min is less then the typical range max().
-                        && uu.isConvertableTo( u ) ) {  // and we ARE talking about the same thing
-                    result.range = range;
-                    // just use the metadata settings.
-                    logger.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
-                    return result; // DANGER--EXIT POINT
-                } else {
-                    logger.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin, tmax, result.range});
+
+                DatumRange range = getRange( tmin, tmax, uu );
+
+                // see if the typical extent is consistent with extent seen.  If the
+                // typical extent won't hide the data's structure, then use it.
+                if ((tmin != null || tmax != null)) {
+                    double d1, d2;
+                    if (result.log) {
+                        if ( ftmin.doubleValue(uu)<=0 ) ftmin= uu.createDatum(1e-38);
+                        Datum limit= ftmin;
+                        try {
+                            Datum dd1 = result.range.min().ge(limit) ? result.range.min() : limit; // these represent the range seen, guard against min
+                            Datum dd2 = result.range.max().ge(limit) ? result.range.max() : limit;
+                            d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                            d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                        } catch (InconvertibleUnitsException ex) {
+                            range = makeDimensionless(range);
+                            result.range = makeDimensionless(result.range);
+                            Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                            Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                            d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                            d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                        }
+                        if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                            range= DatumRangeUtil.rescaleLog( range, 0, 2 );
+                            d2= d2/2;
+                            d1= d1/2;
+                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                        }
+                        if ( d1<-4 && d2>0  ) { //often with log we get "1 count" averages that are very small (demo2: po_h0_hyd_$Y$m$d_v01.cdf)
+                            logger.fine("rejecting statistical range because min is too small.");
+                            result.range = range;
+                            result.robustMin= range.min().doubleValue(result.range.getUnits());
+                            result.robustMax= range.max().doubleValue(result.range.getUnits());
+                            d1= 0;
+                            d2= 1;
+                        }
+                    } else {
+                        try {
+                            d1 = DatumRangeUtil.normalize(range, result.range.min());
+                            d2 = DatumRangeUtil.normalize(range, result.range.max());
+                        } catch (InconvertibleUnitsException ex) {
+                            range = makeDimensionless(range);
+                            result.range = makeDimensionless(result.range);
+                            d1 = DatumRangeUtil.normalize(range, result.range.min());
+                            d2 = DatumRangeUtil.normalize(range, result.range.max());
+                        }
+                        if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range //TODO: I don't understand this...
+                            range= DatumRangeUtil.rescale( range, 0, 2 );
+                            d2= d2/2;
+                            d1= d1/2;
+                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                        }
+                    }
+                    if (d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
+                            && d2 > 0.   // and the stats max is greater than the typical range min()
+                            && d2 < 1.14  // and the top isn't clipping data badly  //TODO: we really need to be more robust about this.  hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109 was failing because a small number of points was messing this up.
+                            && d1 > -0.1 // and the bottom isn't clipping data badly
+                            && d1 < 1.   // and the stats min is less then the typical range max().
+                            && uu.isConvertableTo( u ) ) {  // and we ARE talking about the same thing
+                        result.range = range;
+                        // just use the metadata settings.
+                        logger.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
+                        return result; // DANGER--EXIT POINT
+                    } else {
+                        logger.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin, tmax, result.range});
+                    }
                 }
             }
         }
 
         // round out to frame the data with empty space, so that the data extent is known.
-        if (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u)) {
+        if (UnitsUtil.isIntervalOrRatioMeasurement(u) ) {
             if (result.log) {
                 if (result.robustMax <= 0.0) result.robustMax = 1000;
                 if (result.robustMin <= 0.0) result.robustMin = result.robustMax / 1e3;
