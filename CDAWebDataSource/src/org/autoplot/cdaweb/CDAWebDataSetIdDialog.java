@@ -41,7 +41,7 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         StringBuilder sb= new StringBuilder(); 
         for ( int i=0; i<filter.length(); i++ ) { 
             char ch= filter.charAt(i);
-            if ( Character.isLetterOrDigit(ch) || ch=='.' || ch=='*' || ch=='?' ) {
+            if ( Character.isLetterOrDigit(ch) || ch=='.' || ch=='*' || ch=='?' || ch=='-' || ch=='_') {
                 sb.append(ch);
             } else {
                 sb.append('?');
