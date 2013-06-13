@@ -63,7 +63,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                 URISplit split= URISplit.parse(cc.surl);
                 Map<String,String> params= URISplit.parseParams(split.params);
                 String ds= params.get("ds").toUpperCase();
-                if ( ds!=null ) {
+                if ( ds!=null && ds.length()>0 ) {
                     CDAWebDB db= CDAWebDB.getInstance();
 
                     String tr= db.getTimeRange(ds);
@@ -90,7 +90,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                 URISplit split= URISplit.parse(cc.surl);
                 Map<String,String> params= URISplit.parseParams(split.params);
                 String ds= params.get("ds").toUpperCase();
-                if ( ds!=null ) {
+                if ( ds!=null && ds.length()>0 ) {
                     String master= CDAWebDB.getInstance().getMasterFile( ds.toLowerCase(), mon );
 
                     File f= FileSystemUtil.doDownload( master, mon );
