@@ -241,7 +241,9 @@ public class CDAWebDB {
             NamedNodeMap attrs= node.getAttributes();
             String subdividedby=attrs.getNamedItem("subdividedby").getTextContent();
             String filenaming= attrs.getNamedItem("filenaming").getTextContent();
-            filenaming= filenaming.replace("%Q", "?%v"); // templates don't quite match
+            
+            if ( filenaming.contains("%Q"))
+            filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
             if ( subdividedby.equals("None") ) {
                 return filenaming;
             } else {
