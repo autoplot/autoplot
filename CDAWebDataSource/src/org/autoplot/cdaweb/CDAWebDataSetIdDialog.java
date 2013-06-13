@@ -31,6 +31,27 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         initComponents();
     }
 
+    /**
+     * check that the filter contains only a-z A-Z 0-9 . * ? .  All other
+     * chars are replaced with ?.
+     * @param filter
+     * @return regular expression.
+     */
+    private String toRegexSafe( String filter ) {
+        StringBuilder sb= new StringBuilder(); 
+        for ( int i=0; i<filter.length(); i++ ) { 
+            char ch= filter.charAt(i);
+            if ( Character.isLetterOrDigit(ch) || ch=='.' || ch=='*' || ch=='?' ) {
+                sb.append(ch);
+            } else {
+                sb.append('?');
+            }
+        }
+        filter= sb.toString();
+        String regex= "(?i)"+filter.replaceAll("\\.","\\.").replaceAll("\\?",".").replaceAll("\\*",".*");
+        return regex;
+    }
+    
     public void refresh() {
         CDAWebDB db= CDAWebDB.getInstance();
         Map<String,String> ids= db.getServiceProviderIds();
@@ -43,13 +64,14 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
 
         Pattern p= null;
         if ( filter.length()>0 ) {
-            String regex= "(?i)"+filter.replaceAll("\\.","\\.").replaceAll("\\?",".").replaceAll("\\*",".*");
+            String regex= toRegexSafe(filter);
             p = Pattern.compile( regex );
         }
         
         for ( Entry<String,String> e: ids.entrySet() ) {
-            if ( p==null || p.matcher(e.getKey()).find() || p.matcher(e.getValue()).find() ) {
-               model.addElement( e.getKey() + ": " +e.getValue() );
+            String add= e.getKey() + ": " +e.getValue();
+            if ( p==null || p.matcher( add ).find() ) {
+               model.addElement( add );
             }
         }
 
