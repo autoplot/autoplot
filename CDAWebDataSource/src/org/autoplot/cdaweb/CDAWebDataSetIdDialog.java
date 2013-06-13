@@ -13,6 +13,7 @@ package org.autoplot.cdaweb;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 
@@ -40,8 +41,14 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
 
         DefaultListModel model= new DefaultListModel();
 
+        Pattern p= null;
+        if ( filter.length()>0 ) {
+            String regex= "(?i)"+filter.replaceAll("\\.","\\.").replaceAll("\\?",".").replaceAll("\\*",".*");
+            p = Pattern.compile( regex );
+        }
+        
         for ( Entry<String,String> e: ids.entrySet() ) {
-            if ( e.getKey().toLowerCase().contains(filter) || e.getValue().toLowerCase().contains(filter) ) {
+            if ( p==null || p.matcher(e.getKey()).find() || p.matcher(e.getValue()).find() ) {
                model.addElement( e.getKey() + ": " +e.getValue() );
             }
         }
