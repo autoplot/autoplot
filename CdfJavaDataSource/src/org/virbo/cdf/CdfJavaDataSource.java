@@ -322,7 +322,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
         try {
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
-            
+
+            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
+
             MutablePropertyDataSet result;
             if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
                 List<QDataSet> attr= new ArrayList();
@@ -344,14 +346,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 String os1= (String)map.get(PARAM_SLICE1);
                 if ( os1!=null && !os1.equals("") && cdf.getVariable(svariable).getDimensions().length>0 ) {
                     int is= Integer.parseInt(os1);
-                    result= wrapDataSet( cdf, svariable, constraint, false, true, attr1, is, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, mon );
                 } else {
-                    result= wrapDataSet(cdf, svariable, constraint, false, true, attr1, -1, mon );
+                    result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, mon );
                 }
                 logger.log(Level.FINE, "got {0}", result);
             }
 
-            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
             if ( !doDep ) {
                 result.putProperty( QDataSet.DEPEND_0, null );
                 result.putProperty( QDataSet.DEPEND_1, null );

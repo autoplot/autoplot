@@ -151,6 +151,8 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
 
+            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
+            
             MutablePropertyDataSet result;
             if ( attributes!=null && attributes.containsKey("VIRTUAL") && ( attributes.containsKey("FUNCTION") || attributes.containsKey("FUNCT") ) ) {
                 List<QDataSet> attr= new ArrayList();
@@ -179,15 +181,14 @@ public class CdfFileDataSource extends AbstractDataSource {
                     if ( is>=n1 ) {
                         throw new IllegalArgumentException("slice1="+is+" is too big for the dimension size ("+n1+")");
                     }
-                    result= wrapDataSet( cdf, svariable, constraint, false, true, is, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, is, mon );
                 } else {
-                    result= wrapDataSet(cdf, svariable, constraint, false, true, -1, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, -1, mon );
                 }
             }
 
             CdfFileDataSourceFactory.closeCDF(cdf);
 
-            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
             if ( !doDep ) {
                 result.putProperty( QDataSet.DEPEND_0, null );
                 result.putProperty( QDataSet.DEPEND_1, null );
