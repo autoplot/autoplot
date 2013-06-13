@@ -31,7 +31,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -43,6 +45,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -180,7 +183,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         currentDs= ds;
 
         final String fmaster;
-        if ( ds!=null ) {
+        if ( ds!=null && ds.length()>0 ) {
             String master= CDAWebDB.getInstance().getMasterFile(ds,mon); // do the download off the event thread.
             fmaster= master;
         } else {
@@ -189,7 +192,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         Runnable run= new Runnable() {
             public synchronized void run() {
-                if ( ds!=null ) {
+                if ( ds!=null && ds.length()>0 ) {
                     try {
                         final CdfJavaDataSourceEditorPanel panel= new CdfJavaDataSourceEditorPanel();
 
@@ -266,7 +269,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         //messageComponent= null;
 
-        if ( ds!=null ) {
+        if ( ds!=null && ds.length()>0 ) {
             String desc= CDAWebDB.getInstance().getServiceProviderIds().get(ds);
             descriptionLabel.setText( "<html><small>"+desc+"</small></html>");
         } else {
@@ -274,8 +277,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         
         try {
-            if ( ds == null ? currentDs != null : true ) {
+            if ( ( ds==null || ds.length()==0 ) ? currentDs != null : true ) {
                 doRefreshDataSet(ds,args);
+            } else {
+                messageComponent= new JLabel("<html><em><br>&nbsp;No dataset selected.</em></html>"); // this causes problem when droplist is used.
+                parameterPanel.add( messageComponent, BorderLayout.NORTH );
+                parameterPanel.validate();    
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
@@ -356,6 +363,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         jLabel3 = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
         availableTextField = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         descriptionLabel = new javax.swing.JLabel();
 
         jLabel1.setText("Dataset:");
@@ -387,6 +395,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         availableTextField.setText("data availability");
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/cdaweb/calendar.png"))); // NOI18N
+        jButton1.setToolTipText("Time Range Tool");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout timeRangePanelLayout = new org.jdesktop.layout.GroupLayout(timeRangePanel);
         timeRangePanel.setLayout(timeRangePanelLayout);
         timeRangePanelLayout.setHorizontalGroup(
@@ -396,21 +412,27 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(timeRangePanelLayout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(availableTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE))
+                        .add(availableTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(timeRangePanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)))
+                        .add(timeRangeTextField)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         timeRangePanelLayout.setVerticalGroup(
             timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(timeRangePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(timeRangePanelLayout.createSequentialGroup()
+                        .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel3)
+                            .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(availableTextField)
                 .addContainerGap())
         );
@@ -421,19 +443,18 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(dsidComboBox, 0, 259, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pickDsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
             .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
+            .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(dsidComboBox, 0, 334, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(pickDsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -475,11 +496,22 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         RequestProcessor.invokeLater(run);
     }//GEN-LAST:event_dsidComboBoxActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        TimeRangeTool tt= new TimeRangeTool();
+        JTextField tf= timeRangeTextField;
+        tt.setSelectedRange(tf.getText());
+        int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+        if ( r==JOptionPane.OK_OPTION) {
+            tf.setText(tt.getSelectedRange());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel availableTextField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JComboBox dsidComboBox;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel parameterPanel;
