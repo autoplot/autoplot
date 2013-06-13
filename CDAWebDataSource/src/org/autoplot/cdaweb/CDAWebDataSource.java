@@ -259,6 +259,17 @@ public class CDAWebDataSource extends AbstractDataSource {
                 result= accum;
             }
 
+            if ( result!=null && result.property(QDataSet.DEPEND_1)==null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS
+                Map dep1p= (Map) metadata.get("DEPEND_1");
+                if ( dep1p!=null && dep1p.containsKey("NAME") ) {
+                    String dep1= (String)dep1p.get("NAME");
+                    String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
+                    CdfJavaDataSource masterSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
+                    result.putProperty( QDataSet.DEPEND_1, ds1 );
+                }
+            }
+            
             // kludge to get y labels when they are in the skeleton.
             if ( result!=null && result.rank()==2 ) {
                 QDataSet labels= (QDataSet) result.property(QDataSet.DEPEND_1);
