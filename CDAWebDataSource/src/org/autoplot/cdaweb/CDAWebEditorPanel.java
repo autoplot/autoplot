@@ -122,14 +122,20 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         tr = tr1;
                     }
                 } catch (ParseException ex) {
-                    availableTextField.setText(ex.toString());
+                    String t= ex.toString();
+                    if ( t.length()>100 ) t= t.substring(0,100)+"...";
+                    availableTextField.setText(t);
                 }
             }
             timeRangeTextField.setText(tr.toString());
         } catch (ParseException ex) {
-            availableTextField.setText(ex.toString());
+            String t= ex.toString();
+            if ( t.length()>100 ) t= t.substring(0,100)+"...";
+            availableTextField.setText(t);
         } catch ( IOException ex ) {
-            availableTextField.setText(ex.toString());
+            String t= ex.toString();
+            if ( t.length()>100 ) t= t.substring(0,100)+"...";
+            availableTextField.setText(t);
         }
     }
 
@@ -149,6 +155,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 return;
             }
             String avail= CDAWebDB.getInstance().getTimeRange(ds);
+            if ( avail.length()>100 ) avail= avail.substring(0,100)+"...";
             availableTextField.setText(avail);
             final DatumRange dr= DatumRangeUtil.parseTimeRange( avail );
             Runnable run= new Runnable() {
@@ -159,7 +166,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             RequestProcessor.invokeLater(run);
 
         } catch ( ParseException ex ) {
-            availableTextField.setText(ex.toString());
+            String t= ex.toString();
+            if ( t.length()>100 ) t= t.substring(0,100)+"...";
+            availableTextField.setText(t);
         }
 
     }
