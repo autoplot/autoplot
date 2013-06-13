@@ -59,8 +59,12 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
 
     public String getSelectedItem() {
         String sel= (String) dsList.getSelectedValue();
-        int i= sel.indexOf(":");
-        return sel.substring(0,i);
+        if ( sel==null ) {
+            return "";
+        } else {
+            int i= sel.indexOf(":");
+            return sel.substring(0,i);
+        }
     }
 
     /** This method is called from within the constructor to
