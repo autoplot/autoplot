@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>vap+inline now supports variable declarations.</small></p>
+        <p><small>Autoplot now queries for scripts with parameters.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>cdaweb fixes after RBSP data was added, including $(v,sep) and virtual variable for DEPEND_1 coming from master file.</li>
             <li>events renderer would occasionally fail because of race condition</li>
             <li>ISO8601 2013-04/2013-06 did not parse properly</li>
             <li>build up code that reduces rank2 DEPEND_1 in mageis data.</li>
@@ -55,6 +56,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>TimeRangeTool is used in more places</li>
             <li>always bring up options dialog when tools have parameters.</li>
             <li>#308 ge and lt modifiers for version numbers in filename templates </li>
             <li>smoothFit function added, which is like smooth but does a fit at the edges.</li>
