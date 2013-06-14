@@ -2006,7 +2006,6 @@ public class AutoplotUtil {
         }
         Window p= SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
-        dia.setLocationRelativeTo(p);
         
         dia.setLayout( new BorderLayout() );
         JPanel pc= new JPanel();
@@ -2020,12 +2019,14 @@ public class AutoplotUtil {
                 dia.setVisible(false);
             }
         }) );
+        pc.add( Box.createHorizontalStrut(7) );
         pc.add( new JButton( new AbstractAction("Okay") {
             public void actionPerformed(ActionEvent e) {
                 result.add( JOptionPane.OK_OPTION );
                 dia.setVisible(false);
             }
         }) );
+        pc.add( Box.createHorizontalStrut(7) );
         
         dia.setResizable(true);
         if ( !( message instanceof Component ) ) {
@@ -2036,6 +2037,8 @@ public class AutoplotUtil {
         dia.setTitle(title);
         dia.setMinimumSize( new Dimension(300,300) );
         dia.pack();
+        dia.setLocationRelativeTo(p);
+
         dia.setVisible(true);
         return result.get(0);
     }
