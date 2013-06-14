@@ -33,6 +33,7 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.AWTEventListener;
@@ -59,6 +60,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -3697,7 +3699,7 @@ APSplash.checkTime("init 240");
         if (( ( modifiers & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) ) { 
             JythonUtil.invokeScriptSoon( DataSetURI.getURL(suri),
                     applicationModel.getDocumentModel(),
-                    null, true,
+                    null, true, false,
                     getStatusBarProgressMonitor("done running script") );
         } else if (( ( modifiers & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
             plotUri("script:"+ suri );
@@ -3910,6 +3912,36 @@ APSplash.checkTime("init 240");
         }
     }
 
+    /**
+     * install the script into the tools folder.
+     * @param ff
+     * @param resourceUri 
+     */
+    protected void installTool( File ff, URI resourceUri ) {
+        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+        File cpTo= new File( tools,ff.getName() );
+        try {
+        if ( !Util.copyFile( ff, cpTo ) ) {
+            setStatus("warning: unable to copy file");
+        } else {
+            setStatus("copied file to "+cpTo );
+            reloadTools();
+        }
+        File log= new File( tools, "scripts.txt" );
+        FileWriter out3 = new FileWriter( log, true );
+        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
+        out3.close();
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING,null,ex);
+        }
+        Window w= ScriptContext.getViewWindow();
+        if ( w instanceof AutoplotUI ) {
+            ((AutoplotUI)w).reloadTools();
+        }
+    }
+    
     private void askRunScript( RunScriptPanel pp, final URI resourceUri, final File ff ) throws IOException {
         int r = AutoplotUtil.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
         final boolean doCpTo;
@@ -3928,24 +3960,7 @@ APSplash.checkTime("init 240");
             Runnable run= new Runnable() {
                 public void run() {
                     if ( doCpTo  ) {
-                        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                        File cpTo= new File( tools,ff.getName() );
-                        try {
-                        if ( !Util.copyFile( ff, cpTo ) ) {
-                            setStatus("warning: unable to copy file");
-                        } else {
-                            setStatus("copied file to "+cpTo );
-                            reloadTools();
-                        }
-                        File log= new File( tools, "scripts.txt" );
-                        FileWriter out3 = new FileWriter( log, true );
-                        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-                        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-                        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
-                        out3.close();
-                        } catch ( IOException ex ) {
-                            logger.log( Level.WARNING,null,ex);
-                        }
+                        installTool(ff,resourceUri);
                     } else {
 
                     }
@@ -3966,7 +3981,10 @@ APSplash.checkTime("init 240");
             Runnable run= new Runnable() {
                 public void run() {
                     try {
-                        askRunScript( pp, split.resourceUri, ff );
+                        ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
+                        JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
+                                new HashMap(), true, true, mon );
+                        //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
                         logger.log(Level.SEVERE, null, ex);
                     }

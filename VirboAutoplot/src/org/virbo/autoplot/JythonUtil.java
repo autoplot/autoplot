@@ -6,27 +6,38 @@
 package org.virbo.autoplot;
 
 import external.PlotCommand;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.das2.components.DasProgressPanel;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -34,6 +45,7 @@ import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.scriptconsole.MakeToolPanel;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -141,7 +153,7 @@ public class JythonUtil {
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      */
     public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon1 ) throws IOException {
-        invokeScriptSoon( url, dom, new HashMap(), false, mon1 );
+        invokeScriptSoon( url, dom, new HashMap(), false, false, mon1 );
     }
     
     /**
@@ -151,20 +163,20 @@ public class JythonUtil {
      * @param fvars
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      */
-    private static int showScriptDialog( Component parent, File file, Map<String,String> fvars ) {
+    private static int showScriptDialog( Component parent, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) {
         
         JPanel p= new JPanel();
         org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
 
-        if ( fd.count==0 ) {
+        if ( fd.count==0 && !makeTool ) {
             return JOptionPane.OK_OPTION;
         }
         
+        JPanel scriptPanel= new JPanel( new BorderLayout() );
         JTabbedPane tp= new JTabbedPane();
         org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
         try {
             textArea.loadFile(file);
-            textArea.setMinimumSize( new Dimension(640,480) );
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -175,14 +187,42 @@ public class JythonUtil {
         support= new ScriptPanelSupport(textArea);
         support.setReadOnly();
         
-        tp.add( new JScrollPane(textArea), "script" );
+        JScrollPane script= new JScrollPane(textArea);
+        script.setMinimumSize( new Dimension(640,380) );
+        script.setPreferredSize( new Dimension(640,380) );
+        scriptPanel.add( script, BorderLayout.CENTER );
+        scriptPanel.add( new JLabel("<html>Run the script:<br>"+file ), BorderLayout.NORTH );
+        MakeToolPanel makeToolPanel= new MakeToolPanel();
+        if ( makeTool ) {
+            scriptPanel.add( makeToolPanel, BorderLayout.SOUTH );
+        }
         
-        tp.add( new JScrollPane(p), "params" );
-        tp.setSelectedIndex(1);
+        tp.add( scriptPanel, "script" );
+        
+        JScrollPane params= new JScrollPane(p);
+        params.setMinimumSize( new Dimension(640,480) );
+        tp.add( params, "params" );
+        if ( makeTool ) {
+            tp.setSelectedIndex(0);
+        } else {
+            tp.setSelectedIndex(1);
+        }
                 
         int result= AutoplotUtil.showConfirmDialog2( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
+            if ( makeTool ) {
+                if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
+                    Window w= ScriptContext.getViewWindow();
+                    if ( w instanceof AutoplotUI ) {
+                        ((AutoplotUI)w).installTool( file, resourceUri );
+                        ((AutoplotUI)w).reloadTools();
+                    } else {
+                        throw new RuntimeException("Unable to install"); // and hope the submit the error.
+                    }
+                }
+            }
+
         }
         return result;
     }
@@ -196,9 +236,10 @@ public class JythonUtil {
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param vars values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
+     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      */
-    public static void invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, ProgressMonitor mon1 ) throws IOException {
+    public static void invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, boolean makeTool, ProgressMonitor mon1) throws IOException {
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
@@ -216,8 +257,15 @@ public class JythonUtil {
         
         int response= JOptionPane.OK_OPTION;
         if ( askParams ) {     
+            URI uri = null;
+            try {
+                uri= url.toURI();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
-            response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars );
+            response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars, makeTool, uri );
+            
         } else {
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
         }
