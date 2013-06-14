@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
@@ -69,6 +70,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -131,6 +133,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         examplesComboBox = new javax.swing.JComboBox();
         jLabel7 = new javax.swing.JLabel();
         descriptionLabel = new javax.swing.JLabel();
+        timeRangeTool = new javax.swing.JButton();
 
         das2ServerComboBox.setEditable(true);
         das2ServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
@@ -183,7 +186,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10));
+        validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10)); // NOI18N
         validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
 
         discoveryCb.setText("require example time");
@@ -207,6 +210,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         descriptionLabel.setText(" ");
 
+        timeRangeTool.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/das2/datasource/calendar.png"))); // NOI18N
+        timeRangeTool.setToolTipText("Time Range Tool");
+        timeRangeTool.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeToolActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -215,35 +226,41 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE))
+                        .add(jScrollPane2))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(das2ServerComboBox, 0, 549, Short.MAX_VALUE)
+                            .add(das2ServerComboBox, 0, 630, Short.MAX_VALUE)
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
                                 .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 314, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .add(discoveryCb))
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)))
+                            .add(jScrollPane1)))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel4)
-                            .add(layout.createSequentialGroup()
-                                .add(21, 21, 21)
-                                .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(examplesComboBox, 0, 234, Short.MAX_VALUE))
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel7)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE))
+                                .add(descriptionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(jLabel3)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jLabel4)
+                                .add(0, 0, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(21, 21, 21)
+                                        .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 267, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(examplesComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                        .add(jLabel3)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(timeRangeTextField)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(timeRangeTool)))
+                                .add(18, 18, 18)
                                 .add(viewDsdfButton))))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
@@ -277,7 +294,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
                     .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(viewDsdfButton))
+                    .add(viewDsdfButton)
+                    .add(timeRangeTool))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -679,6 +697,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
 
+    private void timeRangeToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolActionPerformed
+        TimeRangeTool tt= new TimeRangeTool();
+        JTextField tf= timeRangeTextField;
+        tt.setSelectedRange(tf.getText());
+        int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+        if ( r==JOptionPane.OK_OPTION) {
+            tf.setText(tt.getSelectedRange());
+        }
+    }//GEN-LAST:event_timeRangeToolActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextArea ReaderParamsTextArea;
@@ -699,6 +727,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JTextField tcaItem;
     public javax.swing.JTextField tcaTextField;
     public javax.swing.JTextField timeRangeTextField;
+    public javax.swing.JButton timeRangeTool;
     public javax.swing.JLabel validRangeLabel;
     public javax.swing.JButton viewDsdfButton;
     // End of variables declaration//GEN-END:variables
