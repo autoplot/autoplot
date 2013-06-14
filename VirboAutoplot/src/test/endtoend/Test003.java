@@ -5,10 +5,17 @@
 package test.endtoend;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WebFileSystem;
+import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.datasource.DataSetURI;
 
 /**
  * Reiner's stuff, other vap files.
@@ -34,7 +41,23 @@ public class Test003 {
     public static void main(String[] args) {
 
         boolean headless = true;
-
+        
+        boolean loginBeforeTest= false;
+        if ( loginBeforeTest ) {
+            try {
+                DataSetURI.getExplicitExt("foo.dat"); // trigger initialization of Autoplot settings.
+                KeyChain.getDefault().getUserInfo( new URL("http://ectsoc@www.rbsp-ect.lanl.gov/") );
+                KeyChain.getDefault().getUserInfo( new URL("http://ectrept@www.rbsp-ect.lanl.gov/") );
+                KeyChain.getDefault().getUserInfo( new URL("http://www.rbsp-ect.lanl.gov/") );
+                KeyChain.getDefault().getUserInfo( new URL("http://ectmageis@www.rbsp-ect.lanl.gov/") );
+                KeyChain.getDefault().getUserInfo( new URL("http://ecthope@www.rbsp-ect.lanl.gov/") );
+            } catch (CancelledOperationException ex) {
+                Logger.getLogger(Test003.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(Test003.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         try {
             if (!headless) {
                 ScriptContext.createGui();
@@ -64,7 +87,8 @@ public class Test003 {
 
             doit(17, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts2-L1/rbspa_pre_ect-hope-sci-cnts2-L1.vap");
 
-            doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts-L1/rbspa_pre_ect-hope-sci-cnts-L1.vap");
+            doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap");
+            //doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts-L1/rbspa_pre_ect-hope-sci-cnts-L1.vap");
             //doit(18, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap?timerange=20121101");
 
             //REPT
