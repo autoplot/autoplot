@@ -3741,22 +3741,26 @@ APSplash.checkTime("init 240");
             public void run() {
                 for ( Bookmark t: tools ) {
                     final Bookmark tt= t;
-                    final String suri = ((Bookmark.Item) tt).getUri();
-                    Action a= new AbstractAction(t.getTitle()) {
-                        public void actionPerformed(ActionEvent e) {
-                            try {
-                                runTool( suri, ActionEvent.SHIFT_MASK );
-                                //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
-                            } catch (MalformedURLException ex) {
-                                logger.log(Level.SEVERE, null, ex);
-                            } catch (IOException ex ) {
-                                logger.log(Level.SEVERE, null, ex);
+                    if ( t instanceof Bookmark.Folder ) {
+                        //Not supported but soon will be...
+                    } else {
+                        final String suri = ((Bookmark.Item) tt).getUri();
+                        Action a= new AbstractAction(t.getTitle()) {
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    runTool( suri, ActionEvent.SHIFT_MASK );
+                                    //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
+                                } catch (MalformedURLException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                } catch (IOException ex ) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
                             }
-                        }
-                    };
-                    JMenuItem ji= new JMenuItem(a);
-                    ji.setToolTipText( "<html>"+ suri + "<br>press ctrl to inspect" );
-                    toolsMenu.add( ji );
+                        };
+                        JMenuItem ji= new JMenuItem(a);
+                        ji.setToolTipText( "<html>"+ suri + "<br>press ctrl to inspect" );
+                        toolsMenu.add( ji );
+                    }
                 }
             }
         } );
