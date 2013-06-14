@@ -198,6 +198,12 @@ public class IstpMetadataModel extends MetadataModel {
         return type;
     }
 
+    /**
+     * Interpret the ISTP metadata into QDataSet properties.
+     * @param meta
+     * @return 
+     */
+    @Override
     public Map<String, Object> properties(Map<String, Object> meta) {
         return properties( meta, true );
     }
@@ -208,7 +214,7 @@ public class IstpMetadataModel extends MetadataModel {
      * @param doRecurse if true, then allow recursion for other properties.
      * @return
      */
-    public Map<String, Object> properties(Map<String, Object> meta, boolean doRecurse ) {
+    private Map<String, Object> properties(Map<String, Object> meta, boolean doRecurse ) {
 
         Map attrs;
         if ( meta==null ) {
