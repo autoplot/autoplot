@@ -46,6 +46,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -394,9 +395,12 @@ public class ApplicationModel {
                         if ( params.containsKey("timerange") && !params.containsKey("timeRange") ) {
                             params.put("timeRange", params.remove("timerange") );
                         }
+                        params.put("PWD",split.path);
                         doOpen(openable, params);
                     } else {
-                        doOpen(openable);
+                        LinkedHashMap<String, String> params = new LinkedHashMap();
+                        params.put("PWD",split.path);
+                        doOpen(openable, params);
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
