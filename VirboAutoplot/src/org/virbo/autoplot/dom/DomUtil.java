@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.beans.BeansUtil;
@@ -24,15 +27,18 @@ import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 
 /**
- *
+ * operations for the DOM, such as search-for-node and child properties
  * @author jbf
  */
 public class DomUtil {
 
+    private static final Logger logger= LoggerManager.getLogger( "autoplot.dom.util");
+    
     /**
      * trim the string on the left, leaving the right visible.
      * @param s
@@ -778,6 +784,54 @@ public class DomUtil {
 
         }
         return result;
+    }
+
+    /**
+     * Look through the state property values for references to ${PWD}
+     * and replace them with sval.
+     * @param state the domNode, typically starting from the Application root.
+     * @param node %{PWD}
+     * @param sval /tmp
+     */
+    public static void applyMacro( DomNode state, String node, String sval) {
+        String[] props = BeansUtil.getPropertyNames(state.getClass());
+        PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(state.getClass());
+
+        for (int i = 0; i < props.length; i++) {
+            if (props[i].equals("controller")) continue;
+            try {
+                if ( pds[i] instanceof IndexedPropertyDescriptor) {
+                    Object vals1 = pds[i].getReadMethod().invoke(state, new Object[0]);
+                    for ( int j=0; j<Array.getLength(vals1); j++ ) {
+                        Object val1= Array.get( vals1, j );
+                        if ( val1 instanceof DomNode  ) {
+                            applyMacro( (DomNode)val1, node, sval );
+                        } else if ( val1 instanceof String ) {
+                            System.err.println( val1 );
+                            String sval1= (String)val1;
+                            if ( sval1.contains( node ) ) {
+                                sval1= sval1.replaceAll( node, sval );
+                                pds[i].getWriteMethod().invoke( state, sval1 );
+                            }
+                        }
+                    }
+                } else {
+                    Object val1 = pds[i].getReadMethod().invoke(state, new Object[0]);
+                    if ( val1 instanceof DomNode  ) {
+                        applyMacro( (DomNode)val1, node, sval );
+                    } else if ( val1 instanceof String ) {
+                        String sval1= (String)val1;
+                        if ( sval1.contains( node ) ) { 
+                            sval1= sval1.replace( node, sval );  //TODO: convert %{} to regex.
+                            pds[i].getWriteMethod().invoke( state, sval1 );
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                logger.log( Level.WARNING, null, ex );
+            }
+
+        }
     }
 
 }
