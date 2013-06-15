@@ -1062,10 +1062,12 @@ public class ApplicationModel {
 
     /**
      * open the serialized DOM, apply additional modifications to the DOM, then
-     * sync the application to this.
+     * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
+     * will be applied to the vap, looking for %{PWD} or %{FILE}:
+     * <li>PWD will be set to the current working directory of the vap file.
      * @param f vap file containing the xml representation of the dom.
      * @param deltas list property name, property value pairs to apply to the
-     *   vap DOM after it's loaded.
+     *   vap DOM after it's loaded.  
      * @throws java.io.IOException
      */
     public void doOpen( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
@@ -1087,47 +1089,52 @@ public class ApplicationModel {
 //                    continue;
 //                }
 //                Class c = prop.getWriteType(state);
-                Class c;
-                try {
-                    c = DomUtil.getPropertyType(state, node);
-                } catch (IllegalAccessException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                    continue;
-                } catch (IllegalArgumentException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                    continue;
-                } catch (InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                    continue;
-                }
-                SerializeDelegate sd = SerializeRegistry.getDelegate(c);
-                if (sd == null) {
-                    System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
-                    continue;
-                }
-                Object val;
-                try {
-                    // pop off any single-quotes used to delimit strings in URLs.
-                    if ( c==String.class && sval.length()>1 && sval.startsWith("'") && sval.endsWith("'") ) {
-                        sval= sval.substring(1,sval.length()-1);
+                if ( Character.isUpperCase( node.charAt(0) ) ) {
+                    DomUtil.applyMacro( state, "%{"+node+"}", sval );
+                    
+                } else {
+                    Class c;
+                    try {
+                        c = DomUtil.getPropertyType(state, node);
+                    } catch (IllegalAccessException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        continue;
+                    } catch (IllegalArgumentException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        continue;
+                    } catch (InvocationTargetException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                        continue;
                     }
-                    val = sd.parse(sd.typeId(c), sval);
-//                    prop.setValue(state, val);
-                    DomUtil.setPropertyValue(state, node, val);
-                } catch (IllegalAccessException ex) {
-                    ex.printStackTrace();
-                    logger.log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                    logger.log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    ex.printStackTrace();
-                    logger.log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                    ex.printStackTrace();
-                    IOException ioex= new IOException( ex.getMessage() );
-                    throw ioex;
-                    //logger.log(Level.SEVERE, null, ex);
+                    SerializeDelegate sd = SerializeRegistry.getDelegate(c);
+                    if (sd == null) {
+                        System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
+                        continue;
+                    }
+                    Object val;
+                    try {
+                        // pop off any single-quotes used to delimit strings in URLs.
+                        if ( c==String.class && sval.length()>1 && sval.startsWith("'") && sval.endsWith("'") ) {
+                            sval= sval.substring(1,sval.length()-1);
+                        }
+                        val = sd.parse(sd.typeId(c), sval);
+    //                    prop.setValue(state, val);
+                        DomUtil.setPropertyValue(state, node, val);
+                    } catch (IllegalAccessException ex) {
+                        ex.printStackTrace();
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        ex.printStackTrace();
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        ex.printStackTrace();
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                        IOException ioex= new IOException( ex.getMessage() );
+                        throw ioex;
+                        //logger.log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
