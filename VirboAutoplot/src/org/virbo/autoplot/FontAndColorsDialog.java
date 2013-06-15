@@ -31,6 +31,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     /** Creates new form FontAndColorsDialog */
     public FontAndColorsDialog( java.awt.Frame parent, boolean modal, ApplicationModel app) {
         super(parent, modal);
+        setTitle("Font and Colors");
+        
         initComponents();
 
         this.app = app;
