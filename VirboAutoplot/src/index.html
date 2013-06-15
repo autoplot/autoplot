@@ -29,6 +29,7 @@
             <li>events renderer would occasionally fail because of race condition</li>
             <li>ISO8601 2013-04/2013-06 did not parse properly</li>
             <li>build up code that reduces rank2 DEPEND_1 in mageis data.</li>
+            <li>minor bugs in reporting dimensions with CDF variables.</li>
             <li>bugfix in CDAWeb where virtual variable failure because missing component variable</li>
             <li>single-jar release would fail because of old signature.</li>
             <li>RTE in CDF reader would hang the reference cache it is was enabled.</li>
@@ -56,6 +57,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>allow %{PWD} macro inside of .vap file to allow for more portable demos.</li>
+            <li>QStreams support rank 2 DEPEND_1.</li>
+            <li>Allow * and ? to be used in CDAWeb filter strings.</li>
             <li>TimeRangeTool is used in more places</li>
             <li>always bring up options dialog when tools have parameters.</li>
             <li>#308 ge and lt modifiers for version numbers in filename templates </li>
