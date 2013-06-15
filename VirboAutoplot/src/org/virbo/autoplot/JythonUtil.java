@@ -208,7 +208,7 @@ public class JythonUtil {
             tp.setSelectedIndex(1);
         }
                 
-        int result= AutoplotUtil.showConfirmDialog2( parent, tp, "run script", JOptionPane.OK_CANCEL_OPTION );
+        int result= AutoplotUtil.showConfirmDialog2( parent, tp, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
             org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
             if ( makeTool ) {
