@@ -3986,8 +3986,10 @@ APSplash.checkTime("init 240");
                 public void run() {
                     try {
                         ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
+                        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                        boolean isTool= split.path.contains(tools.toString());
                         JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                new HashMap(), true, true, mon );
+                                new HashMap(), true, !isTool, mon );
                         //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
                         logger.log(Level.SEVERE, null, ex);
