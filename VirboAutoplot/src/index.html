@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot now queries for scripts with parameters.</small></p>
+        <p><small>PngWalkTool looks at data that is not on a time axis.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,9 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>$v is ignored by default in the TimeParser.  PngWalkTool was failing to add it</li>
+            <li>off-by-one error in DataPointRecorder when selection was made at end of points.</li>
+            <li>Seth noticed problem where slightly unconventional CDFs would no longer load because new code that allows missing units</li>
             <li>cdaweb fixes after RBSP data was added, including $(v,sep) and virtual variable for DEPEND_1 coming from master file.</li>
             <li>events renderer would occasionally fail because of race condition</li>
             <li>ISO8601 2013-04/2013-06 did not parse properly</li>
