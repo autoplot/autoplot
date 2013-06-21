@@ -212,20 +212,26 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         logger.log(Level.FINE, "parseLslNew {0}", dir);
 
-        InputStream in = new FileInputStream(listing);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "US-ASCII"));
-
+        InputStream in=null;
+        FTPFile[] ret=null;
         List<String> llist= new ArrayList<String>(370);
         
-        String aline = reader.readLine();
-        while ( aline!=null ) {
-            llist.add(aline);
-            aline = reader.readLine();
-        }
-        String[] list= llist.toArray( new String[llist.size()] );
+        try {
+            in= new FileInputStream(listing);
 
-        FTPFile[] ret=null;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "US-ASCII"));
+
+            String aline = reader.readLine();
+            while ( aline!=null ) {
+                llist.add(aline);
+                aline = reader.readLine();
+            }
+        
+        } finally {
+            if ( in!=null ) in.close();
+        }
+        
+        String[] list= llist.toArray( new String[llist.size()] );
 
         // open source taken from it.sauronsoftware.ftp4j.FTPClient.java
         // Is there any already successful parser?
