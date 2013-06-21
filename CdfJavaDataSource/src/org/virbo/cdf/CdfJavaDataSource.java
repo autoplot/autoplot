@@ -618,6 +618,27 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 } else {
                     units= u;
                 }
+            } else if ( thisAttributes.containsKey("UNIT_PTR") ) {
+                String svar= (String) thisAttributes.get("UNIT_PTR");
+                if ( svar!=null ) {
+                    logger.log(Level.FINER, "found UNIT_PTR for {0}", variable.getName());
+                    QDataSet s= CdfUtil.wrapCdfHyperDataHacked( cdf, cdf.getVariable(svar), 0, 1, 1, -1, new NullProgressMonitor() );
+                    s= s.slice(0);
+                    double s1= s.value(0);
+                    boolean okay= true;
+                    for ( int i=1; i<s.length(); i++ ) {
+                        if ( s.value(i)!=s1 ) {
+                            okay= false;
+                        }
+                    }
+                    if ( okay ) {
+                        units= SemanticOps.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
+                    } else {
+                        units= SemanticOps.lookupUnits(s.slice(0).toString());
+                    }
+                } else {
+                    units= SemanticOps.getUnits(result); // do what we did before...
+                }
             } else {
                 units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
             }
