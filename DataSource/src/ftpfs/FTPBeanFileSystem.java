@@ -760,14 +760,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 bean.close();
             } catch (FtpException ex) {
-                Logger.getLogger(FTPBeanFileSystem.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             return false;
         } catch (FtpException ftpException) {
             try {
                 bean.close();
             } catch (FtpException ex) {
-                Logger.getLogger(FTPBeanFileSystem.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             return false;
         }

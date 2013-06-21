@@ -52,13 +52,13 @@ public class FtpFileObject extends WebFileObject {
                     if (list[i].name.equals(lookFor) ) {
                         return list[i].size;
                     } else if ( tinyGzFib && list[i].name.equals(lookForGz) ) {
-                        logger.fine("approximating size of gzipped file "+list[i].name+ "when it is uncompressed");
+                        logger.log(Level.FINE, "approximating size of gzipped file {0} when it is uncompressed", list[i].name);
                         return 2000*Math.round(list[i].size/2000.) * 5; // approx
                     }
                 }
                 return -1;
             } catch (IOException ex) {
-                Logger.getLogger(FtpFileObject.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return -1;
             }
         } else {
@@ -78,7 +78,7 @@ public class FtpFileObject extends WebFileObject {
             try {
                 ftpfs.listDirectory(getParent().getNameExt());
             } catch (IOException ex) {
-                Logger.getLogger(FtpFileObject.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return false;
             }
         }
@@ -94,7 +94,7 @@ public class FtpFileObject extends WebFileObject {
                 }
                 return false;
             } catch (IOException ex) {
-                Logger.getLogger(FtpFileObject.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 return false;
             }
         } else {
