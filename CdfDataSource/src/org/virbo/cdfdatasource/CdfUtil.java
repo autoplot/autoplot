@@ -646,6 +646,12 @@ public class CdfUtil {
                 for ( int ii=0; ii<qube[0]; ii++ ) {
                     sdata[ii]= new String( (byte[])odata, ii*nn, nn );
                 }
+            } else if ( odata instanceof byte[] && qube.length==2 && qube[0]==1 ) {
+                int nn= Array.getLength(odata)/qube[1];
+                sdata= new String[qube[1]];
+                for ( int ii=0; ii<qube[1]; ii++ ) {
+                    sdata[ii]= new String( (byte[])odata, ii*nn, nn );
+                }
             } else {
                 sdata = (String[]) odata;
             }
