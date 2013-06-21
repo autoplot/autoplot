@@ -35,6 +35,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -180,14 +183,18 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
      * @throws IOException
      * @throws Exception
      */
-    private synchronized void doRefreshDataSet( final String ds, final Map<String,String> args ) throws IOException, Exception {
+    private synchronized void doRefreshDataSet( final String ds, final Map<String,String> args, ProgressMonitor monitor) throws IOException, Exception {
 
         Window w= SwingUtilities.getWindowAncestor(this);
-        DasProgressPanel mon;
-        if ( w==null ) {
-            mon= DasProgressPanel.createFramed("getting master CDF");  //TODO: this message no longer appears
+        ProgressMonitor mon;
+        if ( monitor==null ) {
+            if ( w==null ) {
+                mon= DasProgressPanel.createFramed("getting master CDF");  //TODO: this message no longer appears
+            } else {
+                mon= DasProgressPanel.createFramed(w,"getting master CDF");
+            }
         } else {
-            mon= DasProgressPanel.createFramed(w,"getting master CDF");
+            mon= monitor;
         }
         currentDs= ds;
 
@@ -249,7 +256,39 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         SwingUtilities.invokeLater(run);
 
     }
+    
+    private class LabelMonitor extends NullProgressMonitor {
+        
+        LabelMonitor() {
+            repaintTimer.setRepeats(true);
+            repaintTimer.start();
+        }
+        
+        JLabel label= new JLabel();
 
+        public JLabel getLabelComponent() {
+            return label;
+        }
+        
+        Timer repaintTimer= new Timer( 300,new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                String p;
+                if ( getTaskSize()==-1 ) {
+                    p= "";
+                } else {
+                    p= "" + getTaskProgress()+"/"+getTaskSize();
+                }
+                label.setText( "<html><em><br>&nbsp;Loading file..."+p+"</em></html>" );
+            }
+        } );
+        
+        @Override
+        public void finished() {
+            repaintTimer.setRepeats(false);
+        }
+        
+    }
+    
     public synchronized void refresh(String suri) {
 
         if ( EventQueue.isDispatchThread() ) {
@@ -262,12 +301,16 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         final String ds= (String) dsidComboBox.getSelectedItem();
 
+        final LabelMonitor mon= new LabelMonitor();
+        //parameterPanel.add( mon.getLabelComponent(), BorderLayout.NORTH );
+        //parameterPanel.validate();
+                
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
                 if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
                 if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
-                messageComponent= new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
+                messageComponent= mon.getLabelComponent(); // new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
                 parameterPanel.add( messageComponent, BorderLayout.NORTH );
                 parameterPanel.validate();
             }
@@ -287,7 +330,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         
         try {
             if ( ( ds==null || ds.length()==0 ) ? currentDs != null : true ) {
-                doRefreshDataSet(ds,args);
+                doRefreshDataSet(ds,args,mon);
             } else {
                 messageComponent= new JLabel("<html><em><br>&nbsp;No dataset selected.</em></html>"); // this causes problem when droplist is used.
                 parameterPanel.add( messageComponent, BorderLayout.NORTH );
