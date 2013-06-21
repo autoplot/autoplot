@@ -274,6 +274,9 @@ public class CDAWebDataSource extends AbstractDataSource {
             if ( result!=null && result.rank()==2 ) {
                 QDataSet labels= (QDataSet) result.property(QDataSet.DEPEND_1);
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
+                if ( labelVar!=null && result.property(QDataSet.RENDER_TYPE).equals("time_series") ) {
+                    labels=null;
+                }
                 if ( labels==null && labelVar!=null ) {
                     String master= db.getMasterFile( ds.toLowerCase(), mon );
                     DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
