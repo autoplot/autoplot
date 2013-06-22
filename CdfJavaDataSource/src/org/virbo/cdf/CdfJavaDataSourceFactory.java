@@ -140,6 +140,15 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                     return true;
                 }
             }
+            String slice1= args.get("slice1");
+            if ( slice1!=null ) {
+                try {
+                    Integer.parseInt(slice1);
+                } catch ( NumberFormatException ex ) {
+                    problems.add("misformatted slice");
+                    return true;
+                }
+            }              
             File file = DataSetURI.getFile(split.resourceUri, mon);
             if (!file.isFile()) {
                 return true;

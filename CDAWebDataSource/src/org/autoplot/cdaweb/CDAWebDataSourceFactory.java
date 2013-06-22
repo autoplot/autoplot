@@ -161,6 +161,16 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         if ( params.get("id").equals("") ) return true;
         if ( params.get("ds").equals("") ) return true;
 
+        String slice1= params.get("slice1");
+        if ( slice1!=null ) {
+            try {
+                Integer.parseInt(slice1);
+            } catch ( NumberFormatException ex ) {
+                problems.add("misformatted slice");
+                return true;
+            }
+        }
+        
         return false;
     }
 
