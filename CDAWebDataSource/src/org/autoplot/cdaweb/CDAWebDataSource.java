@@ -288,6 +288,23 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
             }
 
+            // slice1 datasets should get the labels from the master if we sliced it already.
+            String slice1=getParam("slice1", "" ); 
+            if ( result!=null && slice1.length()>0 ) { 
+                int islice1= Integer.parseInt(slice1);
+                String labelVar= (String)metadata.get( "LABL_PTR_1");
+                if ( labelVar!=null ) {
+                    String master= db.getMasterFile( ds.toLowerCase(), mon );
+                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
+                    QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
+                    if ( labelDs!=null ) {
+                        if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
+                        result.putProperty( QDataSet.LABEL, DataSetUtil.getStringValue(labelDs.slice(islice1)) );
+                    }
+                }
+                
+            }
+            
             // we know the ranges for timeseriesbrowse, kludge around autorange 10% bug.
             if ( result!=null ) {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
@@ -343,10 +360,26 @@ public class CDAWebDataSource extends AbstractDataSource {
             CDAWebDB db= CDAWebDB.getInstance();
 
             String master= db.getMasterFile( ds.toLowerCase(), mon );
-
-            DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+param) );
+            master= master+"?"+param;
+            
+            DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master) );
 
             metadata= cdf.getMetadata(mon); // note this is a strange branch, because usually we have read data first.
+
+            String slice1= getParam("slice1","" ); // kludge to grab LABL_PTR_1 when slice1 is used.
+            if ( !slice1.equals("") ) {
+                metadata.remove( "LABLAXIS" );
+                String labelVar= (String)metadata.get("LABL_PTR_1");
+                if ( labelVar!=null ) {
+                    String master1= db.getMasterFile( ds.toLowerCase(), mon );
+                    DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master1+"?"+labelVar) );
+                    QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
+                    if ( labelDs!=null ) {
+                        if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
+                        metadata.put( "LABLAXIS", DataSetUtil.getStringValue(labelDs.slice(Integer.parseInt(slice1)) ) );
+                    }
+                }
+            }
         }
         return metadata;
     }
