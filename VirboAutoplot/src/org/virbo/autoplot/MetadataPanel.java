@@ -6,6 +6,14 @@
 package org.virbo.autoplot;
 
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
@@ -15,8 +23,10 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.dom.Application;
@@ -30,6 +40,7 @@ import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.AutoHistogram;
@@ -86,9 +97,37 @@ public class MetadataPanel extends javax.swing.JPanel {
         updateComponentDataSet();
         bindToPlotElement(dom.getController().getPlotElement());
 
+        MouseListener popupTrigger = createPopupTrigger();
+        metaDataTree.addMouseListener( popupTrigger );
+        
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "metadataPanel");
     }
 
+    private MouseListener createPopupTrigger() {
+        return new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    JPopupMenu menu = jPopupMenu1;
+                    if (menu != null) {
+                        menu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    JPopupMenu menu = jPopupMenu1;
+                    if (menu != null) {
+                        menu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+        };
+    }
+    
     private void bindToDataSourceFilter( DataSourceFilter dsf ) {
         if (bindToDataSourceFilter != null) {
             DataSourceController dsc = bindToDataSourceFilter.getController();
@@ -473,8 +512,19 @@ public class MetadataPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        copyMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         metaDataTree = new javax.swing.JTree();
+
+        copyMenuItem.setText("copy");
+        copyMenuItem.setToolTipText("Copy item to system clip board");
+        copyMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyMenuItemActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(copyMenuItem);
 
         jScrollPane1.setViewportView(metaDataTree);
 
@@ -490,7 +540,19 @@ public class MetadataPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void copyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyMenuItemActionPerformed
+        TreePath tp= metaDataTree.getSelectionPath();
+        StringSelection stringSelection = new StringSelection( tp.getLastPathComponent().toString() );
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, new ClipboardOwner() {
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
+    }//GEN-LAST:event_copyMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem copyMenuItem;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree metaDataTree;
     // End of variables declaration//GEN-END:variables
