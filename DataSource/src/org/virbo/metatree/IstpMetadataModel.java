@@ -319,7 +319,7 @@ public class IstpMetadataModel extends MetadataModel {
         } else {
             String label = (String) attrs.get("LABLAXIS");
             String sslice1= (String) attrs.get("slice1");
-            if ( label==null && sslice1!=null ) {
+            if ( sslice1!=null ) {
                 int islice= Integer.parseInt(sslice1);
                 QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
                 Units u= (Units) lablDs.property(QDataSet.UNITS);
