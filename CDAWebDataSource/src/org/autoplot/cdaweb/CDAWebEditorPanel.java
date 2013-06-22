@@ -132,7 +132,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     availableTextField.setText(t);
                 }
             }
-            timeRangeTextField.setText(tr.toString());
+            final String ftr= tr.toString();
+            SwingUtilities.invokeLater( 
+                new Runnable() { 
+                    public void run() { 
+                        timeRangeTextField.setText(ftr);
+                    }
+                }
+            );
         } catch (ParseException ex) {
             String t= ex.toString();
             if ( t.length()>100 ) t= t.substring(0,100)+"...";
@@ -589,7 +596,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         Map<String,String> args= URISplit.parseParams(split.params);
         this.dsidComboBox.setSelectedItem( args.get( CDAWebDataSource.PARAM_DS ) );
         String timeRange= args.get( CDAWebDataSource.PARAM_TIMERANGE );
-        if ( timeRange!=null ) this.timeRangeTextField.setText( timeRange.replaceAll("\\+", " " ) );
+        if ( timeRange!=null ) {
+            this.timeRangeTextField.setText( timeRange.replaceAll("\\+", " " ) );
+        }
 
     }
 
