@@ -25,6 +25,11 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>rebin(ds,int,int) was inconsistent with IDL rebin command, change now before people start using it</li>
+            <li>1050: problems with CDF files and RBSP data from GEM</li>
+            <li>rte_1527677511: try/finally when reading .listing file. </li>
+            <li>Slicers show up in different positions instead of always in the same position, which caused confusion.</li>
+            <li>times would occasionally show up in CDAWeb interface twice (2013-02-052013-02-05)</li>
             <li>$v is ignored by default in the TimeParser.  PngWalkTool was failing to add it</li>
             <li>off-by-one error in DataPointRecorder when selection was made at end of points.</li>
             <li>Seth noticed problem where slightly unconventional CDFs would no longer load because new code that allows missing units</li>
@@ -60,6 +65,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add copy menu item to metadata tab</li>
             <li>allow %{PWD} macro inside of .vap file to allow for more portable demos.</li>
             <li>QStreams support rank 2 DEPEND_1.</li>
             <li>Allow * and ? to be used in CDAWeb filter strings.</li>
@@ -88,7 +94,7 @@
 
         <p>Known issues:</p>
         <ul>
-            <li> <a href="https://sourceforge.net/tracker/?func=browse&group_id=199733&atid=970682">see Source Forge</a>
+            <li> <a href="https://sourceforge.net/p/autoplot/bugs/?limit=1000">see Source Forge</a>
         </ul>
         <p>This completes the feature set for the new production branch. No major features will be added before branching this version.
             A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of
