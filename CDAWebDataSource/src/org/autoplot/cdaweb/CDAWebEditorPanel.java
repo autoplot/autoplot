@@ -59,6 +59,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     private static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
     
+    boolean initializing= true;
+    
     /** Creates new form CDAWebEditorPanel */
     public CDAWebEditorPanel() {
         initComponents();
@@ -160,7 +162,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             String avail= CDAWebDB.getInstance().getTimeRange(ds);
             if ( avail.length()>100 ) avail= avail.substring(0,100)+"...";
             availableTextField.setText(avail);
-            final DatumRange dr= DatumRangeUtil.parseTimeRange( avail );
+            final DatumRange dr= DatumRangeUtil.roundSections( DatumRangeUtil.parseTimeRange( avail ), 100 );
             Runnable run= new Runnable() {
                 public void run() {
                     refreshDefaultTime(ds,dr);
@@ -215,9 +217,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         String master= fmaster;
 
                         String id= args.get("id");
-                        if ( id==null ) id= CDAWebEditorPanel.this.id; //kludge
+                        if ( id==null || id.length()==0 ) id= CDAWebEditorPanel.this.id; //kludge
                         if ( id!=null ) {
                             master= master + "?" + id;
+                        }
+                        String slice1= args.get("slice1");
+                        if ( slice1!=null ) {
+                            master= master + "&slice1="+slice1;
                         }
 
                         boolean status;
@@ -542,7 +548,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         parameterPanel.repaint();
         Runnable run= new Runnable() {
             public void run() {
-                refresh(getURI());
+                if ( !initializing ) {
+                    refresh(getURI());
+                }
             }
         };
         RequestProcessor.invokeLater(run);
@@ -588,6 +596,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     public void setURI(String uri) {
         initialize(uri);
         URISplit split= URISplit.parse(uri);
+        initializing= false;
+        refresh(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
         String filter1= args.get( CDAWebEditorPanel.PARAM_FILTER );
         if ( filter1!=null ) {
