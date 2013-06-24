@@ -539,6 +539,7 @@ public class ScriptPanelSupport {
             d.remove(0, d.getLength());
             panel.setDirty(false);
             panel.setFilename(null);
+            annotationsSupport.clearAnnotations();
             this.file= null;
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -580,6 +581,7 @@ public class ScriptPanelSupport {
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString());
                 loadFile(file);
                 panel.setFilename(file.toString());
+                annotationsSupport.clearAnnotations();
             }
 
         } catch (IOException ex) {
