@@ -1,8 +1,18 @@
-ra= floor( rand(100)* 10 )
+# The documentation doesn't look consistent with result of the uniqValues command.
+# It should not be used for now.
 
-print uniq(ra,None)
+ra= floor( randomn(4335,100)* 10 ) + 0.5
+
+print 'Here is what we will sort:'
+print ra[0]
+print ra
+
+uv= uniqValues(ra,None)
+print uv[0]
+print uv
 
 s= sort( ra )
  
-print uniq(ra,s)
-
+uv= uniqValues(ra,s)
+print uv[0]
+print uv
