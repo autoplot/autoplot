@@ -47,6 +47,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AsciiHeadersParser;
+import org.virbo.dsutil.AsciiParser.FieldParser;
 
 /**
  *
@@ -108,6 +109,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
     private double validMin = Double.NEGATIVE_INFINITY;
     private double validMax = Double.POSITIVE_INFINITY;
 
+    /**
+     * column for colors, if available.
+     */
+    int eventListColorColumn= -1;
+    
     /** Creates a new instance of AsciiTableDataSource */
     public AsciiTableDataSource(URI uri) throws FileNotFoundException, IOException {
         super(uri);
@@ -390,6 +396,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             dep0.putValue(i,1,dep0.value(i,0)+uc.convert(dep0.value(i,1)) );
                         }
                     }
+                }
+                if ( eventListColorColumn>-1 ) {
+                    vds= ArrayDataSet.copy( Ops.bundle( Ops.slice1(dep0,0), 
+                            Ops.slice1(dep0,1),
+                            Ops.slice1(ds,eventListColorColumn),
+                            vds ) );
+                    System.err.println("here");
                 }
                 vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
@@ -706,6 +719,24 @@ public class AsciiTableDataSource extends AbstractDataSource {
             EnumerationUnits eu= EnumerationUnits.create("events");
             parser.setUnits(icol,eu);
             parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
+            if ( icol>2 ) { //get the RGB color as well.
+                String[] fields = new String[parser.getRecordParser().fieldCount()];
+                String s= parser.readFirstParseableRecord(file.toString());
+                parser.getRecordParser().splitRecord(s,fields);
+                if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // kludge for RGB color third column starts with x
+                    parser.setUnits(2,Units.dimensionless);
+                    parser.setFieldParser( 2, new FieldParser() {
+                        public double parseField(String field, int columnIndex) throws ParseException {
+                            if ( field.startsWith("x") ) {
+                                return Integer.decode( "0"+field ); // kludge for Scott
+                            } else {
+                                return Integer.decode( field );
+                            }
+                        }
+                    });
+                    eventListColorColumn= 2;
+                }
+            }
         }
 
         // check to see if the depend0 or data column appear to be times.  I Promise I won't open the file again until it's read in.
