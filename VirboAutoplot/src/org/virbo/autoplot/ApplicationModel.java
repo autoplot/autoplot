@@ -47,9 +47,11 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -66,6 +68,7 @@ import org.das2.datum.Units;
 import org.das2.event.DasUpdateEvent;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.Base64;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -1312,19 +1315,18 @@ public class ApplicationModel {
         File local;
 
         local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
-        if (local != null) {
-            boolean okay= true;
-            okay= okay && Util.deleteFileTree( new File(local,"http") );
-            okay= okay && Util.deleteFileTree( new File(local,"https") );
-            okay= okay && Util.deleteFileTree( new File(local,"ftp") );
-            okay= okay && Util.deleteFileTree( new File(local,"zip") );
-            okay= okay && Util.deleteFileTree( new File(local,"vfsCache") );
-            okay= okay && Util.deleteFileTree( new File(local,"fscache") ); // future
-            return okay;
-            //return Util.deleteFileTree(local);
-        } else {
-            return true;
-        }
+        boolean okay= true;
+        Set<String> exclude= new HashSet();
+        exclude.add("ro_cache.txt");
+        exclude.add("keychain.txt");
+        okay= okay && FileUtil.deleteFileTree( new File(local,"http"), exclude );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"https"), exclude );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"ftp"), exclude );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"zip"), exclude );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"vfsCache"), exclude );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"fscache"), exclude ); // future
+        return okay;
+        //return Util.deleteFileTree(local);
     }
 
     /**
