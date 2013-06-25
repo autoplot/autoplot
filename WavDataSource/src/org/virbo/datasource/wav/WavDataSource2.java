@@ -22,6 +22,7 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.TagGenDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
@@ -107,7 +108,7 @@ public class WavDataSource2 extends AbstractDataSource {
         BinaryDataSource bds= new BinaryDataSource( lurl.toURI() );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
 
-        MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate(), Units.seconds );
+        MutablePropertyDataSet timeTags= new TagGenDataSet( frameCount, 1./audioFormat.getSampleRate(), 0., Units.seconds );
         result.putProperty( QDataSet.DEPEND_0, timeTags );
 
         return result;
