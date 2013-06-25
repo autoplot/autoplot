@@ -24,7 +24,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
-import org.virbo.autoplot.util.DateTimeDatumFormatter;
+import org.das2.datum.format.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 

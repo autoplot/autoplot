@@ -41,7 +41,7 @@ import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.autoplot.util.DateTimeDatumFormatter;
+import org.das2.datum.format.DateTimeDatumFormatter;
 import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
