@@ -19,6 +19,7 @@ import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -747,7 +748,19 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
         }
-
+        
+        Object o=props.get("UNIT_PTR");
+        if ( o!=null && o instanceof String ) {
+            try {
+                Variable uv1= cdf.getVariable((String)o);
+                MutablePropertyDataSet qds= CdfUtil.wrapCdfHyperData( uv1, 0, -1, 1 );
+                qds.putProperty( QDataSet.NAME,(String)o );
+                props.put("UNIT_PTR_VALUE",qds );
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        
         return props;
     }
 

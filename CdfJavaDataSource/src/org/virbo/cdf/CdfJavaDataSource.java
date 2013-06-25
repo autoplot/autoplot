@@ -509,6 +509,18 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
         }
 
+        Object o=props.get("UNIT_PTR");
+        if ( o!=null && o instanceof String ) {
+            try {
+                Variable uv1= cdf.getVariable((String)o);
+                Object v= CdfUtil.wrapCdfHyperDataHacked( cdf, uv1, 0, -1, 1, -1, new NullProgressMonitor() );
+                props.put( "UNIT_PTR_VALUE", v );
+
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        
         return props;
     }
 
