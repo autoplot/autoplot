@@ -14,7 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -30,6 +32,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.components.DasProgressPanel;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -87,7 +90,10 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                         }
                     } else {
                         try {
-                            okay = Util.deleteFileTree(f);
+                            Set<String> exclude= new HashSet();
+                            exclude.add("ro_cache.txt");
+                            exclude.add("keychain.txt");
+                            okay = FileUtil.deleteFileTree(f,exclude);
                         } catch (IllegalArgumentException ex1) {
                             ex = ex1;
                             okay = false;
@@ -236,7 +242,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                     for (int i = 0; i < paths.length; i++) {
                         File f = model.getFile(paths[i]);
                         try {
-                            Util.fileCopy(f, destdir);
+                            FileUtil.fileCopy(f, destdir);
                         } catch (FileNotFoundException ex1) {
                             logger.log(Level.SEVERE, null, ex1);
                             JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
