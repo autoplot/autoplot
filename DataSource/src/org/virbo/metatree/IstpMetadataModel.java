@@ -290,18 +290,23 @@ public class IstpMetadataModel extends MetadataModel {
         }
         
         if ( sunits.equals("") && attrs.containsKey("UNIT_PTR_VALUE") ) {
-            String[] ss= (String[]) attrs.get("UNIT_PTR_VALUE");
-            String s0= ss[0];
-            boolean canUse= true;
-            for ( int i=1; i<ss.length; i++ ) {
-                String s1= ss[i];
-                if ( !s1.equals(s0) ) {
-                    logger.info("unable to use units because of implementation");
-                    canUse= false;
+            QDataSet ss= (QDataSet)attrs.get("UNIT_PTR_VALUE");
+            if ( ss.rank()==1 ) {
+                double s0= ss.value(0);
+                boolean canUse= true;
+                for ( int i=1; i<ss.length(); i++ ) {
+                    double s1= ss.value(1);
+                    if ( s1!=s0 ) {
+                        logger.info("unable to use units because of implementation");
+                        canUse= false;
+                    }
                 }
-            }
-            if ( canUse ) {
-                sunits= s0;
+                if ( canUse ) {
+                    Units eu= SemanticOps.getUnits(ss);
+                    sunits= eu.createDatum(s0).toString();
+                }
+            } else {
+                logger.info("unable to use units because of rank");
             }
         }
         
