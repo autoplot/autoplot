@@ -8,6 +8,8 @@ package org.virbo.autoplot;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
@@ -15,6 +17,7 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -69,8 +72,13 @@ public class PlotStylePanel extends javax.swing.JPanel {
         public abstract void releaseElementBindings();
     }
     
+    private boolean initializing= true;
+    
     /** Creates new form PlotStylePanel */
     public PlotStylePanel(final ApplicationModel applicationModel) {
+        
+        //initializing= false;  // explore red flash bug https://sourceforge.net/p/autoplot/bugs/1055/
+        
         this.applicationModel = applicationModel;
         this.dom= applicationModel.getDocumentModel();
         
@@ -108,6 +116,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         run.run();
         AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
         AutoplotHelpSystem.getHelpSystem().registerHelpID( this, "stylePanel" );
+        initializing= false;
 
     }
 
@@ -126,7 +135,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
             @Override
             public Object convertReverse(Object t) {
-                return Color.RED; // shouldn't enter here.
+                Image image= ((ImageIcon)t).getImage();
+                int rgb= ((BufferedImage)image).getRGB( ICON_SIZE/2,ICON_SIZE/2 );
+                return new Color( rgb );// shouldn't enter here.  But it does! https://sourceforge.net/p/autoplot/bugs/1055/
             }
         };
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_FOREGROUND ), foregroundColorButton, BeanProperty.create("icon") );
@@ -489,6 +500,10 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private void foreBackColorsListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foreBackColorsListActionPerformed
         int i = foreBackColorsList.getSelectedIndex();
 
+        if ( initializing ) {
+            return;
+        }
+        
         if (i < fores.length) {
             foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
             backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
