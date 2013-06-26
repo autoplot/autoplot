@@ -28,18 +28,29 @@ public class OptionsPrefsController {
 
     private static final Logger logger= LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
-    TickleTimer flushTimer= new TickleTimer( 100, new PropertyChangeListener() {
+    TickleTimer flushTimer= new TickleTimer( 300, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
-                ex.printStackTrace();
+                logger.log(Level.FINE, null, ex);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex1) {
+
+                }                    
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex1) {
+                    logger.log(Level.SEVERE, null, ex1);
+                }
             }
         }
     });
 
     PropertyChangeListener listener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getPropertyName().equals("id") ) return;
             if ( evt.getNewValue() instanceof String ) {
                 prefs.put( evt.getPropertyName(),(String) evt.getNewValue());
             } else if ( evt.getNewValue() instanceof Boolean ) {
@@ -51,6 +62,7 @@ public class OptionsPrefsController {
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
+            logger.log( Level.FINE, "options node change requires flush: {0}={1}", new Object[] { evt.getPropertyName(), evt.getNewValue().toString()} );
             flushTimer.tickle();
         }
     };
