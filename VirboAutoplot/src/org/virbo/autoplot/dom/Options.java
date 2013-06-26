@@ -139,6 +139,10 @@ public class Options extends DomNode {
     public void setBackground(Color background) {
         Color oldBackground = this.background;
         this.background = new Color(background.getRGB()); //otherwise can't serialize
+        //TODO: The red flash comes through here. https://sourceforge.net/p/autoplot/bugs/1055/
+        if ( background.getRGB()==-65536 ) {
+            logger.fine("strange red flash caused by setting icon...");
+        }
         propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
     }
 
