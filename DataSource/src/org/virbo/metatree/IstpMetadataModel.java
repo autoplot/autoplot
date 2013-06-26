@@ -226,6 +226,8 @@ public class IstpMetadataModel extends MetadataModel {
             attrs= new HashMap(meta);
         }
 
+        String name= String.valueOf(meta.get("FIELDNAM"));
+        
         Map<String,Object> user= new LinkedHashMap<String,Object>();
 
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
@@ -286,7 +288,7 @@ public class IstpMetadataModel extends MetadataModel {
         if (attrs.containsKey("UNITS")) {
             sunits = String.valueOf( attrs.get("UNITS") );
         } else {
-            logger.log(Level.INFO, "UNITS are missing for {0}", title);
+            logger.log(Level.FINE, "UNITS are missing for {0}", name );
         }
         
         if ( sunits.equals("") && attrs.containsKey("UNIT_PTR_VALUE") ) {
@@ -297,7 +299,7 @@ public class IstpMetadataModel extends MetadataModel {
                 for ( int i=1; i<ss.length(); i++ ) {
                     double s1= ss.value(1);
                     if ( s1!=s0 ) {
-                        logger.info("unable to use units because of implementation");
+                        logger.fine("unable to use units because of implementation");
                         canUse= false;
                     }
                 }
@@ -306,7 +308,7 @@ public class IstpMetadataModel extends MetadataModel {
                     sunits= eu.createDatum(s0).toString();
                 }
             } else {
-                logger.info("unable to use units because of rank");
+                logger.fine("unable to use units because of rank");
             }
         }
         
@@ -356,7 +358,7 @@ public class IstpMetadataModel extends MetadataModel {
                 }
             }
             properties.put(QDataSet.LABEL, label);
-        }
+        }        
         properties.put(QDataSet.UNITS, units);
         
 
