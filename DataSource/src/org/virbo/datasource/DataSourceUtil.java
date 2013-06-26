@@ -423,7 +423,7 @@ public class DataSourceUtil {
                 s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$(v,sep)") );
             }
             m= Pattern.compile(version).matcher(s);
-            if ( s.indexOf(version)>-1 ) {
+            if ( m.find() ) {
                 s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$v") );
             }
             
