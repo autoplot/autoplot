@@ -432,6 +432,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     }
                     if ( okay ) {
                         units= SemanticOps.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
+                        result.putProperty( QDataSet.UNITS, units );
                     } else {
                         units= SemanticOps.getUnits(result); // do what we did before...
                     }
