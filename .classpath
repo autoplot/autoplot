@@ -46,7 +46,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/jfits-0.93.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/JFontChooser.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jython.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/metadata-extractor-2.1.0.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-contrib-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-scratchpad-3.1-FINAL-20080629.jar"/>
@@ -61,5 +60,7 @@
 	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/metadata-extractor-2.6.4.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/mailapi.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
