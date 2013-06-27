@@ -25,10 +25,10 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
@@ -255,7 +255,9 @@ public class CreatePngWalk {
         }
         ff.close();
          
-        System.err.println( build.toString() );
+        if ( !( mon instanceof NullProgressMonitor ) ) { // only show in interactive session
+            System.err.println( build.toString() );
+        }
         
         dom2.getController().waitUntilIdle();
 
@@ -370,7 +372,7 @@ public class CreatePngWalk {
 
                 ProgressMonitor mon;
                 if (ScriptContext.getViewWindow() == null) {
-                    mon = new org.das2.util.monitor.NullProgressMonitor();
+                    mon = new NullProgressMonitor();
                     System.err.println("ScriptContext.getViewWindow is null, running quietly in the background.");
                 } else {
                     mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
@@ -413,7 +415,7 @@ public class CreatePngWalk {
             
             ProgressMonitor mon;
             if (ScriptContext.getViewWindow() == null) {
-                mon = new org.das2.util.monitor.NullProgressMonitor();
+                mon = new NullProgressMonitor();
             } else {
                 mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
             }
