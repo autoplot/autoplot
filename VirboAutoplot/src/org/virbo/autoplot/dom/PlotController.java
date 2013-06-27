@@ -921,7 +921,8 @@ public class PlotController extends DomNodeController {
      */
     synchronized void removePlotElement(PlotElement p) {
         Renderer rr= p.controller.getRenderer();
-        if ( rr!=null ) dasPlot.removeRenderer(rr);
+        // setPlotId re-enters this code, so we need to rem
+        if ( rr!=null && dasPlot.containsRenderer(rr) ) dasPlot.removeRenderer(rr);
         if ( rr instanceof SpectrogramRenderer ) {
             ((SpectrogramRenderer)rr).setColorBar(null);
         } else if ( rr instanceof SeriesRenderer ) {
