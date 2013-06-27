@@ -135,7 +135,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( dep0 != null ) {
             if ( !append ) {
                 String name= nameFor(dep0);
-                addVariableRankN(dep0, name, new HashMap<String,String>(),mon);
+                Map<String,String> params1= new HashMap<String,String>();
+                params1.put( "timeType",params.get("timeType") );
+                addVariableRankN( dep0, name, params1, mon );
             }
             try {
                 depend_0 = Attribute.create(cdf, "DEPEND_0", VARIABLE_SCOPE);
@@ -222,6 +224,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         return var;
     }
 
+    /**
+     * convert the rank 1 dataset to a native array.
+     * @param ds rank 1 dataset
+     * @param uc units converter to convert the type.
+     * @param type type code, such as CDF_DOUBLE indicating how the data should be converted.
+     * @return array of this type.
+     */
     private Object doIt1( QDataSet ds, UnitsConverter uc, long type ) {
         Object export;
         QubeDataSetIterator iter = new QubeDataSetIterator(ds);
@@ -233,6 +242,15 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 dexport[i++] = uc.convert(iter.getValue(ds));
             }
             export= dexport;
+       } else if ( type==CDF_TIME_TT2000 ) {
+            long[] dexport= new long[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                dexport[i++] = (long)uc.convert(iter.getValue(ds));
+            }
+            export= dexport;
+            
         } else if ( type==CDF_FLOAT ) {
             float[] fexport= new float[ ds.length() ];
             int i = 0;
@@ -289,10 +307,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         if ( ds.rank()==1 ) {
             return doIt1( ds, uc, type );
+            
         } else if ( ds.rank()==2 ) {
 
             if ( type==CDF_DOUBLE ) {
                 oexport= new double[ds.length()][];
+            } else if ( type==CDF_TIME_TT2000 ) {
+                oexport= new long[ds.length()][];
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][];
             } else if ( type==CDF_INT4 ) {
@@ -312,6 +333,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             if ( type==CDF_DOUBLE ) {
                 oexport= new double[ds.length()][][];
+            } else if ( type==CDF_TIME_TT2000 ) {
+                oexport= new long[ds.length()][][];                
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][][];
             } else if ( type==CDF_INT4 ) {
@@ -331,6 +354,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             if ( type==CDF_DOUBLE ) {
                 oexport= new double[ds.length()][][][];
+            } else if ( type==CDF_TIME_TT2000 ) {
+                oexport= new long[ds.length()][][][];
             } else if ( type==CDF_FLOAT ) {
                 oexport= new float[ds.length()][][][];
             } else if ( type==CDF_INT4 ) {
@@ -380,9 +405,16 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         UnitsConverter uc = UnitsConverter.IDENTITY;
 
         if (units != null && UnitsUtil.isTimeLocation(units)) {
-            type = CDF_EPOCH;
-            uc = units.getConverter(Units.cdfEpoch);
-            units= Units.cdfEpoch;
+            boolean tt2000= !( "epoch".equals( params.get("timeType") ) );
+            if ( tt2000 ) {                
+                type = CDF_TIME_TT2000;
+                uc = units.getConverter(Units.cdfTT2000);
+                units= Units.cdfTT2000;
+            } else {
+                type = CDF_EPOCH;
+                uc = units.getConverter(Units.cdfEpoch);
+                units= Units.cdfEpoch;
+            }
         }
 
         Variable var;
