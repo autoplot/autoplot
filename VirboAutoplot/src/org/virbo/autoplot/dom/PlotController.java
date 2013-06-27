@@ -1004,7 +1004,7 @@ public class PlotController extends DomNodeController {
                     plot.getZaxis().setAutoRange(true);
                 }
             } else {
-                logger.warning("value is adjusting, no reset autorange");
+                logger.fine("value is adjusting, no reset autorange");
             }
 
             if ( this.plotElement!=null ) {
