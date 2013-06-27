@@ -448,6 +448,7 @@ public class CreatePngWalk {
             // verified, 20130627.
             // java -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk --vap=x --testException
             // echo $? -> 1
+            // Note, no files found does not yeild non-zero exit code!
         }
         
         Params params= new Params();
