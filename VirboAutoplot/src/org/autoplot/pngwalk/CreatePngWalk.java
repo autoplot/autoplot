@@ -445,7 +445,11 @@ public class CreatePngWalk {
 
         if ( alm.getBooleanValue("testException") ) {
             throw new RuntimeException("--textException on command line, throwing exception");
+            // verified, 20130627.
+            // java -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk --vap=x --testException
+            // echo $? -> 1
         }
+        
         Params params= new Params();
         params.createThumbs= alm.getValue("createThumbs").equals("y");
         params.outputFolder= alm.getValue("outputFolder");
