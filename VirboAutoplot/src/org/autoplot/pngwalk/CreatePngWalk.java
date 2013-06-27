@@ -440,8 +440,12 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "version", null, "version", null, "additional version string to add to each filename, like v1.0");
         alm.addBooleanSwitchArgument( "autorange", null, "autorange", "rerange dependent dimensions Y and Z");
         alm.addBooleanSwitchArgument( "update", null, "update", "only calculate missing images");
+        alm.addBooleanSwitchArgument( "testException", null, "testException", "throw a runtime exception to test exit code");
         alm.process(args);
 
+        if ( alm.getBooleanValue("testException") ) {
+            throw new RuntimeException("--textException on command line, throwing exception");
+        }
         Params params= new Params();
         params.createThumbs= alm.getValue("createThumbs").equals("y");
         params.outputFolder= alm.getValue("outputFolder");
