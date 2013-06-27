@@ -40,10 +40,16 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
 
         jLabel1 = new javax.swing.JLabel();
         typeComboBox = new javax.swing.JComboBox();
+        insertCB = new javax.swing.JCheckBox();
+        epochTimeTagsCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Type:");
 
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "double", "float", "int4", "int2", "byte" }));
+
+        insertCB.setText("Insert instead of overwriting existing cdf file");
+
+        epochTimeTagsCB.setText("Use legacy Epoch timetags instead of TT2000");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -51,10 +57,14 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(219, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(insertCB)
+                    .add(epochTimeTagsCB))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -63,12 +73,18 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(insertCB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(epochTimeTagsCB)
+                .addContainerGap(205, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox epochTimeTagsCB;
+    private javax.swing.JCheckBox insertCB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
@@ -92,7 +108,13 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         String s;
         s= getParam( args,"type","double");
         typeComboBox.setSelectedItem(s);
+        
+        s= getParam( args, "append", "F" );
+        insertCB.setSelected(s.equals("T"));
 
+        s= getParam( args, "timeType", "tt2000" );
+        epochTimeTagsCB.setSelected(s.equals("epoch"));
+        
         file= split.file;
     }
 
@@ -104,8 +126,18 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         s= (String) typeComboBox.getSelectedItem();
         if ( !s.equals("double") ) args.put( "type", s );
 
-        String sargs= URISplit.formatParams(args);
+        if ( insertCB.isSelected() ) {
+            args.put("append", "T");
+        } else {
+            args.remove("append");            
+        }
 
+        if ( epochTimeTagsCB.isSelected() ) {
+            args.put("timeType", "epoch");
+        } else {
+            args.remove("timeType");            
+        }
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);

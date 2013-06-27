@@ -18,10 +18,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="typeComboBox" min="-2" pref="123" max="-2" attributes="0"/>
-              <EmptySpace pref="219" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="typeComboBox" min="-2" pref="123" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="insertCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="epochTimeTagsCB" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -33,7 +39,11 @@
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="typeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="261" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="insertCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="epochTimeTagsCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="205" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,6 +65,16 @@
             <StringItem index="4" value="byte"/>
           </StringArray>
         </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="insertCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Insert instead of overwriting existing cdf file"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="epochTimeTagsCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Use legacy Epoch timetags instead of TT2000"/>
       </Properties>
     </Component>
   </SubComponents>
