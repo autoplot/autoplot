@@ -135,6 +135,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             if ( webService ) {
                 files= db.getFilesAndRangesFromWebService( ds.toUpperCase(), tr );
             } else {
+                logger.log(Level.FINER, "looking for files matching {0}", fsm.toString());
                 files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
             }
 
