@@ -123,7 +123,7 @@ public class FilterChainPanel extends JPanel {
         "divide(2) divide by a scalar",
         "exp10() plot pow(10,ds)",
         "fftPower(128) plot power spectrum by breaking waveform data in windows of length size.",
-        "fftPower(128,2,'Hanning') power spectrum with sliding window (2=50% 4=25% overlap).",
+        "fftPower(128,2,'Hanning') power spectrum with sliding window (1=no overlap,2=50% 4=75%).",
         "flatten() flatten a rank 2 dataset. The result is a n,3 dataset of [x,y,z]. (opposite of grid)",
         "grid() grid the rank2 buckshot but gridded data into a rank 2 table.",
         "hanning(128) run a hanning window before taking fft.",
@@ -163,7 +163,7 @@ public class FilterChainPanel extends JPanel {
 
         //if ( ps.getHeight()+100 >d.getHeight() ) {
             //Dimension v= new Dimension( Math.min( ps.width, d.width ), d.height-100 );
-            Dimension v= new Dimension( 700, Math.min( 700, d.height ) );
+            Dimension v= new Dimension( 700, Math.min( 700, d.height-100 ) );
             p.setMaximumSize(v);
             p.setPreferredSize(v);
         //}
