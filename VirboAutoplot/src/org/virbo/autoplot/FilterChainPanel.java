@@ -9,7 +9,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -114,13 +113,14 @@ public class FilterChainPanel extends JPanel {
         String[] opts= new String[] {
         "abs() return the absolute value of the data.",
         "accum() running sum of the rank 1 data. (opposite of diff).",
-        "add(1) add a scalar",
-        "collapse0() average over the zeroth dimension to reduce the dimensionality.",
+        "add(1.) add a scalar",
+        "collapse0() average over the zeroth dimension to reduce the dimensionality. (See total)",
         "collapse1() average over the first dimension to reduce the dimensionality.",
         "cos() cos of the data in radians. (No units check)",
         "dbAboveBackgroundDim1(10) show data as decibels above the 10% level",
+        "detrend(5) remove boxcar average from the rank 1 data. (See smooth)",
         "diff() finite differences between adjacent elements in the rank 1 data.",
-        "divide(2) divide by a scalar",
+        "divide(2.) divide by a scalar",
         "exp10() plot pow(10,ds)",
         "fftPower(128) plot power spectrum by breaking waveform data in windows of length size.",
         "fftPower(128,2,'Hanning') power spectrum with sliding window (1=no overlap,2=50% 4=75%).",
@@ -138,11 +138,11 @@ public class FilterChainPanel extends JPanel {
         "slice0(0) slice the data on the zeroth dimension (often time) at the given index.",
         "slice1(0) slice the data on the first dimension at the given index.",
         "slices(':',2,3) slice the data on the first and second dimensions, leaving the zeroth alone.",
-        "smooth(5) boxcar average over the rank 1 data",
+        "smooth(5) boxcar average over the rank 1 data.  (See detrend)",
         "reducex('1 hr') reduce data to 1 hr intervals",
         "toDegrees() convert the data to degrees. (No units check)",
         "toRadians() convert the data to radians. (No units check) ",
-        "total1() total over the first dimension to reduce the dimensionality.",
+        "total1() total over the first dimension to reduce the dimensionality. (See collapse0)",
         "transpose() transpose the rank 2 dataset.",
         "unbundle('Bx') unbundle a component ",
         "valid() replace data with 1 where valid, 0 where invalid",
