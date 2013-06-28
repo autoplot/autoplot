@@ -55,6 +55,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         scComboBox.setSelectedItem( "rbspa-pp" );
         resetSpacecraft("rbspa-pp");
         timeRangeTextField.addPropertyChangeListener( "text", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
                     DatumRange dr= DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
@@ -102,6 +103,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
             }
             final String forbit= orbit;
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     if ( forbit.length()>0 ) {
                         orbitComboBox.setSelectedItem(forbit);
@@ -243,6 +245,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         }
 
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 orbitComboBox.setModel( new DefaultComboBoxModel(ss.toArray(new String[ss.size()]) ) );
                 if ( orbit.length()>0 ) {
@@ -523,6 +526,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private void scComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_scComboBoxItemStateChanged
         final String sc= (String) scComboBox.getSelectedItem();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 resetSpacecraft( sc, pendingTimeRange );
             }
