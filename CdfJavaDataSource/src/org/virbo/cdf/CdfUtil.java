@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,12 +34,10 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
-import org.virbo.dataset.WeightsDataSet;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
@@ -58,7 +57,7 @@ public class CdfUtil {
     }
 
     /**
-     * returns the Entry that is convertable to double as a double.
+     * returns the Entry that is convertible to double as a double.
      * @throws NumberFormatException for strings Double.parseDouble
      */
     private static double doubleValue(Object o) {
@@ -208,7 +207,7 @@ public class CdfUtil {
         for ( int i=0; i<n; i++ ) {
             array[i]= array[ i*recInterval + recStart ];
         }
-        //long[] result= Arrays.copyOfRange( array, 0, n ); //TODO: Java6
+        //long[] result= Arrays.copyOfRange( array, 0, n ); //TODO: Java6. NOTE: I don't think Java6 improves anything.
         long[] result= new long[n];
         System.arraycopy( array, 0, result, 0, n );
         return result;
