@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.python.core.Py;
@@ -112,6 +113,9 @@ public class JythonOps {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
             return DataSetUtil.asDataSet( (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class) );
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(DatumRange.class) instanceof DatumRange ) ) {
+            return DataSetUtil.asDataSet( (DatumRange)((PyJavaInstance)arg0).__tojava__(org.das2.datum.DatumRange.class) );
+
         } else if ( arg0 instanceof PyString ) {
             try {
                return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())); //TODO: someone is going to want lookupUnits that will allocate new units.
