@@ -76,6 +76,9 @@ public class CreatePngWalk {
         return times;
     }
     
+    /**
+     * parameters specifying the creation of a pngwalk.
+     */
     public static class Params {
 
         /**
@@ -162,6 +165,16 @@ public class CreatePngWalk {
         return image;
     }
 
+    /**
+     * run the pngwalk for the list of times.  The dom argument is copied so the
+     * scientist can continue working while the pngwalk is run.
+     * @param times list of times to run.
+     * @param readOnlyDom the dom to render for each time.
+     * @param params outputFolder and spec.
+     * @param mon progress monitor to provide feedback about the run.
+     * @throws IOException
+     * @throws InterruptedException 
+     */
     public static void doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
 
         logger.log( Level.CONFIG, "CreatePngWalk.doBatch with params {0}", params);
@@ -354,6 +367,16 @@ public class CreatePngWalk {
         mon.finished();
     }
 
+    /**
+     * run the pngwalk. If the params are null, then prompt the user with a GUI.
+     * The pngwalk is run by resetting the timeRange field of the vap to each step
+     * of the sequence.
+     * @param dom the state from which a pngwalk is to be produced.
+     * @param params a parameters structure (e.g. batch processing) or null.
+     * @throws ParseException
+     * @throws IOException
+     * @throws InterruptedException 
+     */
     public static void doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
         if (params == null) {
 
@@ -426,6 +449,14 @@ public class CreatePngWalk {
 
     }
 
+    /**
+     * command-line support for creating PNGWalks.  When PNGWalks are created 
+     * interactively in Autoplot, this is used as well.
+     * @param args see the code for the argument list.
+     * @throws InterruptedException
+     * @throws ParseException
+     * @throws IOException 
+     */
     public static void main( String[] args ) throws InterruptedException, ParseException, IOException {
         
         System.err.println("CreatePngWalk 20121008");
