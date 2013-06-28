@@ -521,7 +521,6 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void scComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_scComboBoxItemStateChanged
-        System.err.println("here!!!!!!!!");
         final String sc= (String) scComboBox.getSelectedItem();
         Runnable run= new Runnable() {
             public void run() {
