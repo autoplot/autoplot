@@ -113,6 +113,13 @@ public class StatePersistence {
         saveState( new FileOutputStream(f), state, sscheme );
     }
         
+    /**
+     * Save the Object (DOM application) to a file.
+     * @param out the output stream.
+     * @param state the Object to be saved, in Autoplot's case it's the DOM.
+     * @param sscheme empty string or the name of a scheme to target, such as "1.06"
+     * @throws IOException 
+     */         
     public static void saveState( OutputStream out, Object state, String sscheme ) throws IOException {
         Document document=null;
         try {
