@@ -49,6 +49,7 @@ import org.virbo.autoplot.scriptconsole.MakeToolPanel;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
@@ -286,6 +287,8 @@ public class JythonUtil {
                             interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
                         }
                     }
+                    URISplit split= URISplit.parse(url.toString());
+                    interp.set( "PWD", split.path );                    
                     interp.execfile( new FileInputStream(file), url.toString());
                     mon.finished();
                 } catch (IOException ex) {
