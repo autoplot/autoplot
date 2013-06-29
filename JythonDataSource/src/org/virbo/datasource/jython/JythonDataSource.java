@@ -212,6 +212,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     logger.warning("done.");
                 }
 
+                interp.set("PWD",split.path);
                 interp.exec("params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
                     String s= e.getKey();
