@@ -751,6 +751,16 @@ public class URISplit {
         return (result.length() == 0) ? "" : result.substring(1);
     }
 
+    /**
+     * format the URI using vapScheme, file and params.  
+     * If file is missing but params is present, then return params:
+     *   vap+cdaweb:ds=myds
+     * If file is present, then format with file and params:
+     *   vap+cdf:file://tmp/my.cdf?myVar
+     * Else, just use the surl that is in there already. 
+     * @param split
+     * @return formatted URI.
+     */
     public static String format(URISplit split) {
         String result = "";
         if ( split.vapScheme!=null && split.vapScheme.length()>0 && !split.vapScheme.equals("vap") ) result= result + split.vapScheme + ":";
