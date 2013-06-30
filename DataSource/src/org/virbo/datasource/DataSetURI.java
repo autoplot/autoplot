@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.filesystem.FileSystemSettings;
@@ -228,6 +231,31 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * taken from unaggregate.jy in the servlet.
+     * @param resourceURI resource URI like "file://tmp/data$Y$m$d.dat"
+     * @param timeRange a timerange that will be covered by the span.
+     * @return 
+     */
+    public static String[] unaggregate( String resourceURI, DatumRange timerange ) throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
+        
+        int i= FileStorageModelNew.splitIndex( resourceURI );
+
+        String root= resourceURI.substring(0,i);     // the static part of the name
+        String template= resourceURI.substring(i);   // the templated part of the name
+
+        FileSystem fs= FileSystem.create( root );
+        FileStorageModelNew fsm= FileStorageModelNew.create( fs, template );
+
+        String[] names= fsm.getNamesFor( timerange );
+
+        List<String> result= new ArrayList<String>();
+        for ( String n: names ) {
+            result.add( root + n );
+        }
+        
+        return result.toArray( new String[result.size()] );
+    }
     /**
      * returns the URI to be interpreted by the DataSource.  This identifies
      * a file (or database) resource that can be passed to VFS.
