@@ -1293,7 +1293,7 @@ public class DataSetURI {
     /**
      * gets completions based on cached folders.
      * @param surl http://sarahandjeremy.net/
-     * @param carotpos
+     * @param carotpos the position of the carot.  Presently everything after the carot is ignored.
      * @param inclAgg include aggregations it sees.  These are a guess.
      * @param inclFiles include files as well as aggregations.
      * @param acceptPattern  if non-null, files and aggregations much match this.
@@ -1327,6 +1327,9 @@ public class DataSetURI {
 
         if (!cacheF.exists()) return Collections.emptyList();
         s = cacheF.list();
+        
+        // s could be a zip file.  Guard against null.  There should be a local listing method in FileSystem.
+        if ( s==null ) return Collections.emptyList();
 
         boolean foldCase = true;
         if (foldCase) {
