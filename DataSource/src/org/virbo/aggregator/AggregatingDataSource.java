@@ -275,7 +275,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             if ( ss.length==0 ) {
                 if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
-                    throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
+                    throw new FileNotFoundException("Unable to find representative file: No files found matching "+getFsm().toString());
                 } else {
                     throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
                 }
