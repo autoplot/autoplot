@@ -6,24 +6,19 @@ package org.autoplot.orbit;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Orbits;
-import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
-import org.virbo.dsutil.DataSetBuilder;
 
 /**
- *
+ * read in orbits as events file.
  * @author jbf
  */
 class OrbitDataSource extends AbstractDataSource {
