@@ -222,6 +222,13 @@ public class PlotController extends DomNodeController {
          }
     };
 
+    /**
+     * Create the das2 GUI components that implement the plot.  This should
+     * be called from the event thread.
+     * @param canvas the canvas containing the item
+     * @param domRow the row indicating the vertical position
+     * @param domColumn the column indicating the horizontal position
+     */
     protected void createDasPeer( Canvas canvas, Row domRow ,Column domColumn) {
 
         Application application= dom;
@@ -425,10 +432,11 @@ public class PlotController extends DomNodeController {
                     updateAxisFormatter(axis);
                 }
 
-                // we can safely ignore these events.
-                if (((DasAxis) e.getSource()).valueIsAdjusting()) {
-                    return;
-                }
+                //TODO: the following code has no effect, why was it there?
+                //// we can safely ignore these events.
+                //if (((DasAxis) e.getSource()).valueIsAdjusting()) {
+                //    return;
+                //}
 
             } else if ( e.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
 
