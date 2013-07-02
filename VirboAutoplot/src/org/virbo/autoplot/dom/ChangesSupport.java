@@ -147,8 +147,10 @@ public final class ChangesSupport {
     public static final String PROP_VALUEADJUSTING = "valueAdjusting";
 
     /**
-     * the bean state is rapidly changing.
-     * @return
+     * the bean state is rapidly changing.  This
+     * returns the lock message, or null if the value
+     * is not adjusting.
+     * @return null or a message indicating that the value is adjusting.
      */
     public String isValueAdjusting() {
         return valueIsAdjusting;
