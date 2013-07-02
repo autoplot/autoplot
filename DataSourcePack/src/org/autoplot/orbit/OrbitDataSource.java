@@ -52,8 +52,12 @@ class OrbitDataSource extends AbstractDataSource {
         QDataSet result= null;
         while ( s!=null ) {
             DatumRange dr= o.getDatumRange(s);
-            result= Ops.createEvent( result, dr.toString(), 0x808080, s );
-            s= o.next(s);
+            if ( dr.min().lt(tr.max())) {
+                result= Ops.createEvent( result, dr.toString(), 0x808080, s );
+                s= o.next(s);
+            } else {
+                break;
+            }
         }
         if ( result!=null ) {
             ((MutablePropertyDataSet)result).putProperty( QDataSet.RENDER_TYPE, "eventsBar>orbitMode=T");
