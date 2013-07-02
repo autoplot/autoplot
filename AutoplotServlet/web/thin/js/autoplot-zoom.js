@@ -356,6 +356,8 @@ function buildImgUrl(srcurl, startdate, enddate){
     outurl = outurl + enddate + '%26ext' + slt3[1];
     //alert('buildImgUrl() : outurl = ' + outurl);
     //console.log('buildImgUrl() : outurl = ' + outurl);
+    outurl= outurl + "&timeRange="+startdate + "+to+"+enddate;
+    $('#idstatus').text( "&timeRange="+startdate + "+to+"+enddate );
     return outurl;
 }
 
@@ -565,6 +567,9 @@ function echoSetup(){
 	echoGraphParams();
 }
 
+var ias;
+$('#idstatus').text( "v1133" );
+
 // *****************************************************************************
 //
 // jQuery code
@@ -601,17 +606,6 @@ $(document).ready(function () {
       			', selected area height = ' + selection.height);
       	*/
       	
-      	// validate selected graph area
-      	// check left, right, top, bottom margins
-      	if((selection.x1 < leftside) ||
-      		(selection.y1 < topside) ||
-      		(selection.x2 > rightside) ||
-      		(selection.y2 > bottomside)) {
-      		
-      		alert('imgAreaSelect() : ' + 'Selected graph area is invalid');
-      		console.log('imgAreaSelect() : ' + 'Selected graph area is invalid');
-      		
-      	} else {
       		//alert('imgAreaSelect() : ' + 'Selected graph area is valid');
       		//console.log('imgAreaSelect() : ' + 'Selected graph area is valid');
       		
@@ -640,6 +634,7 @@ $(document).ready(function () {
       			// build zoom img src url
       			zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
       			
+                        $('#idstatus').text( "loading..." );
       			//alert('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
       			console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
       			$('#idplot').attr('src', imgurl);
@@ -651,9 +646,7 @@ $(document).ready(function () {
       			imgurl = zoomurl;
       			echoSetup();
       		}
-      		
-      	}
-      	
+      		      	
       	//alert('document.ready() : ' + 'done');
       	//console.log('document.ready() : ' + 'done');
 		}
