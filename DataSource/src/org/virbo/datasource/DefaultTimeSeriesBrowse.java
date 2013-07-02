@@ -6,6 +6,7 @@
 package org.virbo.datasource;
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -34,6 +35,7 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         return this.uri;
     }
 
+    @Override
     public void setTimeRange(DatumRange dr) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -46,16 +48,38 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         timeRange= dr;
     }
 
+    @Override
     public DatumRange getTimeRange() {
         return timeRange;
     }
 
+    @Override
     public void setTimeResolution(Datum d) {
         // do nothing
     }
 
+    @Override
     public Datum getTimeResolution() {
         return null;
     }
 
+    public static boolean reject( Map map, List<String> problems ) {
+        if (!map.containsKey("timerange")) {
+            problems.add( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
+            return true;
+        }
+        String timeRange = ((String) map.get("timerange"));
+        timeRange= timeRange.replaceAll("\\+"," ");
+        if (timeRange.length() < 3) { // P2D is a valid timerange
+            problems.add( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
+            return true;
+        }
+        try {
+            DatumRange dr= DatumRangeUtil.parseTimeRange(timeRange);
+        } catch ( ParseException ex ) {
+            problems.add( TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE);
+            return true;
+        }
+        return false;
+    }
 }
