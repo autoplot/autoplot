@@ -42,7 +42,6 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.das2.datum.format.DateTimeDatumFormatter;
-import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -625,7 +624,7 @@ public class PlotController extends DomNodeController {
                 return;
             }
             
-            if ( pele.isAutoRenderType() && pp.size()==0 ) {
+            if ( pele.isAutoRenderType() && pp.isEmpty() ) {
                 PlotController.this.setAutoBinding(true);
             }
             doPlotElementDefaultsChange(pele);
@@ -1030,7 +1029,7 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( dom.getController().getPlotElementsFor(plot).size()==0 ) {
+        if ( dom.getController().getPlotElementsFor(plot).isEmpty() ) {
             //System.err.println("should this happen?  see bug 2992903");
         }
 
@@ -1122,7 +1121,7 @@ public class PlotController extends DomNodeController {
         }
 
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
-            if ( bms.size()==0 && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
+            if ( bms.isEmpty() && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
                 logger.finer("binding axis to timeRange because no one is using it");
                 dom.setTimeRange( newSettings.getXaxis().getRange() );
                 shouldBindX= true;
@@ -1190,7 +1189,7 @@ public class PlotController extends DomNodeController {
 
         if ( !shouldBindX ) {
             List<BindingModel> b= dom.getController().findBindings( dom, Application.PROP_TIMERANGE );
-            if ( b.size()==0 && UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
+            if ( b.isEmpty() && UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
                 DatumRange dr= plot.getContext();
                 dom.setTimeRange(dr);
             }
