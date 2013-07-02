@@ -1350,6 +1350,16 @@ public class PlotElementController extends DomNodeController {
                 }
             } else {
                 if ( plotElement.controller.getParentPlotElement()==null ) {
+                    String rt= (String)fillDs.property(QDataSet.RENDER_TYPE);
+                    if ( rt!=null && rt.contains(">") ) {
+                        int i= rt.indexOf(">");
+                        String control= rt.substring(i+1);
+                        try {
+                            renderer.setControl(control);
+                        } catch ( Exception ex ) {
+                            logger.log( Level.SEVERE, null, ex );
+                        }
+                    }
                     renderer.setActive(true);
                 }
             }
