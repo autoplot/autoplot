@@ -324,40 +324,10 @@ function parseImgUrlItem(srcurl, itemType){
 function buildImgUrl(srcurl, startdate, enddate){
     var outurl = '';
     var inpurl = srcurl;
-    var slt = inpurl.split('StartDate%3D');
-    /*
-    alert('buildImgUrl() : slt[0] = ' + slt[0]);
-    alert('buildImgUrl() : slt[1] = ' + slt[1]);
-    */
-    /*
-    console.log('buildImgUrl() : slt[0] = ' + slt[0]);
-    console.log('buildImgUrl() : slt[1] = ' + slt[1]);
-    */
-    outurl = slt[0] + 'StartDate%3D';
-    var slt2 = slt[1].split('%26EndDate%3D');
-    /*
-    alert('buildImgUrl() : slt2[0] = ' + slt2[0]);
-    alert('buildImgUrl() : slt2[1] = ' + slt2[1]);
-    */
-    /*
-    console.log('buildImgUrl() : slt2[0] = ' + slt2[0]);
-    console.log('buildImgUrl() : slt2[1] = ' + slt2[1]);
-    */
-    outurl = outurl + startdate + '%26EndDate%3D';
-    var slt3 = slt2[1].split('%26ext');
-    /*
-    alert('buildImgUrl() : slt3[0] = ' + slt3[0]);
-    alert('buildImgUrl() : slt3[1] = ' + slt3[1]);
-    */
-    /*
-    console.log('buildImgUrl() : slt3[0] = ' + slt3[0]);
-    console.log('buildImgUrl() : slt3[1] = ' + slt3[1]);
-    */
-    outurl = outurl + enddate + '%26ext' + slt3[1];
-    //alert('buildImgUrl() : outurl = ' + outurl);
-    //console.log('buildImgUrl() : outurl = ' + outurl);
-    outurl= outurl + "&timeRange="+startdate + "+to+"+enddate;
-    $('#idstatus').text( "&timeRange="+startdate + "+to+"+enddate );
+    
+    var slt = inpurl.split('&timeRange=');
+    outurl= slt[0] +  "&timeRange="+startdate + "+to+"+enddate;
+    
     return outurl;
 }
 
@@ -568,7 +538,7 @@ function echoSetup(){
 }
 
 var ias;
-$('#idstatus').text( "v1133" );
+$('#idstatus').text( "v1249" );
 
 // *****************************************************************************
 //
@@ -585,6 +555,7 @@ $(document).ready(function () {
 	// **************************************************************************
 	$('#idplot').imgAreaSelect({
 		handles: true,
+                autoHide: true,
         onSelectEnd: function (img, selection) { 
         
         echoSetup();
@@ -633,8 +604,9 @@ $(document).ready(function () {
       		} else {
       			// build zoom img src url
       			zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
-      			
-                        $('#idstatus').text( "loading..." );
+                        n= zoomurl.length
+      			zoomurlc= zoomurl.substring(0,30) + '...' + zoomurl.substring(n-20);
+                        $('#idstatus').text( "loading " + zoomurlc + " ...");
       			//alert('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
       			console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
       			$('#idplot').attr('src', imgurl);
