@@ -3,3 +3,4 @@ org.virbo.das2Stream.Das2StreamDataSourceFactory d2s das2Stream das2stream qds
 org.virbo.spase.SpaseRecordDataSourceFactory xml
 org.autoplot.html.HtmlTableParserFactory htm
 org.autoplot.csv.CsvDataSourceFactory csv
+org.autoplot.orbit.OrbitDataSourceFactory orbit
