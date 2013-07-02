@@ -289,20 +289,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         Map map = URISplit.parseParams(split.params);
 
         try {
-            if (!map.containsKey("timerange")) {
-                problems.add( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
-                return true;
-            }
-            String timeRange = ((String) map.get("timerange"));
-            timeRange= timeRange.replaceAll("\\+"," ");
-            if (timeRange.length() < 3) { // P2D is a valid timerange
-                problems.add( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED );
-                return true;
-            }
-            try {
-                DatumRange dr= DatumRangeUtil.parseTimeRange(timeRange);
-            } catch ( ParseException ex ) {
-                problems.add( TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE);
+            if ( DefaultTimeSeriesBrowse.reject( map, problems ) ) {
                 return true;
             }
 
