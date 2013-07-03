@@ -1,0 +1,37 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="binaryajax.js"></script>
+        <script type="text/javascript" src="imageinfo.js" ></script>        
+
+    </head>
+    <body>
+        <div>The goal is to extract the axis metadata from Autoplot images.</div>
+
+        <script>
+            // URL of the image (must be on the same domain!)
+            var file = "extractpngmetadata.png";
+            // define your own callback function
+            function mycallback() {
+                // either call the ImageInfo.getAllFields([file]) function which returns an object holding all the info
+                alert(
+                        "All info about this file: " + ImageInfo.getAllFields(file).toSource()
+                        );
+                // or call ImageInfo.getField([file], [field]) to get a specific field
+                alert(
+                        "Format: " + ImageInfo.getField(file, "format") + ", dimensions : " + ImageInfo.getField(file, "width") + "x" + ImageInfo.getField(file, "height")
+                        );
+            }
+            // finally, load the data
+            ImageInfo.loadInfo(file, mycallback);
+        </script>
+        
+        Was the script loaded???
+    </body>
+</html>
