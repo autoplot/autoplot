@@ -21,7 +21,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="variableComboBox" max="32767" attributes="0"/>
           </Group>
-          <Component id="tearoffTabbedPane1" alignment="0" max="32767" attributes="0"/>
+          <Component id="tearoffTabbedPane1" alignment="0" pref="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -80,7 +80,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="caretPositionLabel" min="-2" pref="56" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="scriptScrollPane" alignment="0" max="32767" attributes="0"/>
+                  <Component id="scriptScrollPane" alignment="0" pref="532" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">

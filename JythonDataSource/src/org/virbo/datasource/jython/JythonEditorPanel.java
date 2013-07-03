@@ -16,6 +16,8 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,6 +51,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
+import org.das2.jythoncompletion.nbadapt.Utilities;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -94,6 +97,23 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         scriptScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
         paramsScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
+        
+        textArea.addMouseListener( new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    int offs= textArea.viewToModel(e.getPoint());
+                    int[] ii= Utilities.getIdentifierBlock( textArea, offs ) ;
+                    String id= textArea.getDocument().getText(ii[0],ii[1]-ii[0]);
+                    int idx= lookupResultVariableIndex(id);
+                    if ( idx!=-1 ) variableComboBox.setSelectedIndex( idx );
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        });
     }
 
     /** This method is called from within the constructor to
@@ -603,6 +623,22 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
     }
 
+    private int lookupResultVariableIndex( String var ) {
+        for ( int jj=0; jj<variableComboBox.getItemCount(); jj++ ) {
+            String it= (String)variableComboBox.getItemAt(jj);
+            int i= it.indexOf("<span");
+            if ( i==-1 ) {
+                if ( var.equals(it) ) return jj;
+            } else {
+                int j= it.startsWith("<html>") ? 6 : 0;
+                if ( var.equals( it.substring(j,i).trim() ) ) {
+                    return jj;
+                }
+            }
+        }
+        return -1;
+    }
+    
     public String getURI() {
 
         if ( support.isDirty() && support.getFile()!=null ) {
