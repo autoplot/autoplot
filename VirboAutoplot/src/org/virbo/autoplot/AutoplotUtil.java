@@ -1998,6 +1998,7 @@ public class AutoplotUtil {
      * @param parent
      * @param message
      * @param title
+     * @param optionType.  This must be OK_CANCEL_OPTION.
      * @return 
      */
     public static int showConfirmDialog2( Component parent, Object message, String title, int optionType ) {
