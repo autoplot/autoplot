@@ -1770,7 +1770,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                     bb.remove(b);
                     Binding bimpl= bindingImpls.get(b);
                     if ( bimpl!=null ) {
-                        bimpl.unbind();
+                        try {
+                            bimpl.unbind();
+                        } catch ( IllegalStateException ex ) {
+                            logger.log(Level.WARNING,null,ex);
+                        }
                         bindingImpls.remove(b);
                     }
                     changed= true;
