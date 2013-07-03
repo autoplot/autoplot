@@ -375,6 +375,19 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * This is intended to be used with a debugger.  The developer should put
+     * a breakpoint at the out.write statement, and then call peekAt from
+     * the script.
+     *
+     * @param o any object we want to look at.
+     * @throws java.io.IOException
+     */
+    public static void peekAt(Object o) throws IOException {
+        out.write(o.toString().getBytes());
+    }
+
+    
+    /**
      * write out the current canvas to a png file.
      * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
      *  the DOM, but if it is fitted and has a container it must get size from
@@ -419,6 +432,21 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
+        
+        Image image = model.canvas.getImage( width, height );
+        
+        writeToPng( (BufferedImage)image, filename );
+    }
+
+    /**
+     * See also writeToPng( OutputStream out )
+     * @param image
+     * @param filename
+     * @throws IOException
+     * @throws InterruptedException 
+     */
+    public static void writeToPng( BufferedImage image, String filename ) throws IOException, InterruptedException {
+
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
@@ -426,30 +454,6 @@ public class ScriptContext extends PyJavaInstance {
         waitUntilIdle();
         
         maybeMakeParent(filename);
-        
-        final FileOutputStream out1 = new FileOutputStream(filename);
-
-        Image image = model.canvas.getImage( width, height );
-
-        DasPNGEncoder encoder = new DasPNGEncoder();
-        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
-        try {
-            encoder.write((BufferedImage) image, out1);
-        } catch (IOException ioe) {
-        } finally {
-            try {
-                out1.close();
-            } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
-            }
-        }
-    }
-
-    public static void writeToPng( BufferedImage image, String filename ) throws IOException, InterruptedException {
-
-        waitUntilIdle();
-        
-        maybeMakeParent(filename);
 
         final FileOutputStream out1 = new FileOutputStream(filename);
 
@@ -465,19 +469,6 @@ public class ScriptContext extends PyJavaInstance {
                 throw new RuntimeException(ioe);
             }
         }
-    }
-
-    /**
-     * This is intended to be used with a debugger.  The developer should put
-     * a breakpoint at the out.write statement, and then call peekAt from
-     * the script.
-     *
-     * @param o any object we want to look at.
-     * @throws java.io.IOException
-     */
-    public static void peekAt(Object o) throws IOException {
-        out.write(o.toString().getBytes());
-        return;
     }
 
     /**
