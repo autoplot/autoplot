@@ -157,6 +157,9 @@ public class CreatePngWalk {
             image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
             DasPNGEncoder encoder = new DasPNGEncoder(); // 20120525: tested against ImageIO.write comparable time and space.
             encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new java.util.Date().toString());
+            encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+            encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, ldom.getCanvases(0).getController().getDasCanvas().getImageMetadata() );        
+
             encoder.write(image, out);
         } finally {
             if ( out!=null ) out.close();
