@@ -22,8 +22,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -435,17 +439,21 @@ public class ScriptContext extends PyJavaInstance {
         
         Image image = model.canvas.getImage( width, height );
         
-        writeToPng( (BufferedImage)image, filename );
+        Map<String,String> meta= new LinkedHashMap<String, String>();
+        meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
+        writeToPng( (BufferedImage)image, filename, meta );
     }
 
     /**
      * See also writeToPng( OutputStream out )
-     * @param image
-     * @param filename
+     * @param image the image to write out.
+     * @param filename the name of the output file.
+     * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time" is always added.  http://englishjavadrinker.blogspot.com/2010/09/png-keywords_12.html
      * @throws IOException
      * @throws InterruptedException 
      */
-    public static void writeToPng( BufferedImage image, String filename ) throws IOException, InterruptedException {
+    public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException, InterruptedException {
 
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
@@ -459,6 +467,11 @@ public class ScriptContext extends PyJavaInstance {
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        if ( metadata!=null ) {
+            for ( Entry<String,String> m: metadata.entrySet() ) {
+                encoder.addText( m.getKey(), m.getValue() );
+            }
+        }
         try {
             encoder.write((BufferedImage) image, out1);
         } catch (IOException ioe) {
@@ -489,6 +502,8 @@ public class ScriptContext extends PyJavaInstance {
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() );        
 
         encoder.write((BufferedImage) image, out);
 
