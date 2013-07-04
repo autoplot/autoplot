@@ -239,8 +239,9 @@ public class JythonUtil {
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @return JOptionPane.OK_OPTION of the script is invoked.
      */
-    public static void invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, boolean makeTool, ProgressMonitor mon1) throws IOException {
+    public static int invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, boolean makeTool, ProgressMonitor mon1) throws IOException {
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
@@ -299,5 +300,6 @@ public class JythonUtil {
         if ( response==JOptionPane.OK_OPTION ) {
             RequestProcessor.invokeLater(run);
         }
+        return response;
     }
 }

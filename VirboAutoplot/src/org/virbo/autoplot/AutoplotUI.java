@@ -139,6 +139,7 @@ import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
+import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -3976,7 +3977,12 @@ APSplash.checkTime("init 240");
 
     }
     
-    private void runScript( String script ) {
+    /**
+     * present the "Run Script" dialog, asking the user to review the 
+     * script before running it.
+     * @param script 
+     */
+    private void runScript( final String script ) {
         try {
             final URISplit split= URISplit.parse(script);
             final File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
@@ -3988,8 +3994,16 @@ APSplash.checkTime("init 240");
                         ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
                         File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         boolean isTool= split.path.contains(tools.toString());
-                        JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
+                        int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
                                 new HashMap(), true, !isTool, mon );
+                        if ( res==JOptionPane.OK_OPTION ) {
+                            if ( scriptPanel!=null ) {
+                                if ( ! scriptPanel.isDirty() ) {
+                                    scriptPanel.loadFile(ff);
+                            }
+                        }
+                        dom.getController().getApplicationModel().addRecent(script);
+                    }
                         //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
                         logger.log(Level.SEVERE, null, ex);
