@@ -376,6 +376,10 @@ public class ScriptPanelSupport {
                                 interp= JythonUtil.createInterpreter(true, false);
                                 interp.set("dom", model.getDocumentModel() );
                                 interp.set("monitor", mon );
+                                if ( file!=null ) {
+                                    URISplit split= URISplit.parse(file.toString());
+                                    interp.set( "PWD", split.path );   
+                                }
                                 setInterruptible( interp );
                                 ts= Py.getThreadState();
                                 boolean dirty0 = panel.isDirty();
