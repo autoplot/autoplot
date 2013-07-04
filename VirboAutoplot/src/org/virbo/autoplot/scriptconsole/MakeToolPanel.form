@@ -45,13 +45,13 @@
     <Component class="javax.swing.JCheckBox" name="toolsCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Install in tools folder and menu"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;htm&gt;The script will be added to the Autoplot &quot;Tools&quot; menu,&lt;br&gt;&#xa;which invokes scripts found in HOME/autoplot_data/tools/"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;The script will be added to the Autoplot &quot;Tools&quot; menu,&lt;br&gt; which invokes scripts found in HOME/autoplot_data/tools/"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Make sure the script does not contain malicious code."/>
-        <Property name="toolTipText" type="java.lang.String" value="Scripts are run with your privileges, so be careful to make sure scripts are coming from a trusted &#xa;source and do not contain code that would harm your files."/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Scripts are run with your privileges, so be careful &lt;br&gt;&#xa;to make sure scripts are coming from a trusted source &lt;br&gt;&#xa;and do not contain code that would harm your files."/>
       </Properties>
     </Component>
   </SubComponents>
