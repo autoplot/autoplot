@@ -186,11 +186,17 @@ public class ApplicationModel {
     public static final String PROPERTY_BOOKMARKS = "bookmarks";
     private static final int MAX_RECENT = 20;
 
+    private boolean dontRecordHistory= false;
+    
     public ApplicationModel() {
 
         DataSetURI.init();
         dom = new Application();
 
+        if ( DasApplication.getDefaultApplication().isHeadless() ) {
+            logger.fine("history.txt is not being recorded in headless mode");
+            dontRecordHistory= true;
+        }
     }
 
     /**
@@ -660,6 +666,11 @@ public class ApplicationModel {
             return;
         } 
 
+        if ( dontRecordHistory ) {
+            logger.finest("Not logging URI because history is turned off");
+            return;
+        }
+        
         if ( recent==null ) recent= new ArrayList<Bookmark>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
