@@ -41,6 +41,7 @@ import org.das2.datum.Units;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.PyException;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
@@ -289,8 +290,9 @@ public class JythonUtil {
                         }
                     }
                     URISplit split= URISplit.parse(url.toString());
-                    interp.set( "PWD", split.path );                    
+                    interp.set( "PWD", split.path );   
                     interp.execfile( new FileInputStream(file), url.toString());
+                    //TODO: error annotations on the editor.
                     mon.finished();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
