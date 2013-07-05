@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
 import org.virbo.autoplot.LogNames;
 
@@ -123,7 +124,23 @@ public class ApplicationControllerSyncSupport {
                     if ( col==null ) col= application.controller.getCanvas().marginColumn;
                 }
                 logger.log( Level.FINE, "adding controller for new node {0}", p);
-                new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
+
+                final PlotController pc= new PlotController( application, p );
+                final Row frow= row;
+                final Column fcol= col;
+                Runnable run= new Runnable() { public void run() {
+                    pc.createDasPeer( frow.controller.getCanvas(), frow, fcol );
+                } };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    run.run();
+                    //try {
+                    //    SwingUtilities.invokeAndWait(run);
+                    //} catch ( Exception ex ) {
+                    //    logger.log( Level.WARNING, null, ex );
+                    //}
+                }
             }
             nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
         }
