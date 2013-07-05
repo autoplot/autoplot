@@ -60,12 +60,13 @@ ImageInfo.range = 10240;
         function getPNGITXTBlocks( data ) {
             var result= {};
             var offset= 8;
-            while ( offset<1000 ) {
+            while ( offset<data.getLength() ) {
                 var len= data.getLongAt( offset,true );
                 var chunkType= data.getStringAt( offset+4,4 );
+                alert( chunkType );
                 if ( chunkType=='tEXt' ) {
                     str= data.getStringAt( offset+8, len-4 );
-                    //alert( str );
+                    
                     i= str.indexOf('\x00');
                     result[str.substr(0,i)]= str.substr(i+1);
                 }
