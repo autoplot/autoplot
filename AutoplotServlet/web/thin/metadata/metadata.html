@@ -12,26 +12,32 @@ and open the template in the editor.
 
     </head>
     <body>
-        <div>The goal is to extract the axis metadata from Autoplot images.</div>
+        <H1>Digitizer Demo</H1>
+        <p>The goal is to extract the axis metadata from Autoplot images.</p>
 
+        <div style="font:sans-8">20130705_1028</div>
+        
+        <div id="digitizer" >digitizer</div>
         <script>
             // URL of the image (must be on the same domain!)
             var file = "extractpngmetadata.png";
+            var plotInfo=-1;
             // define your own callback function
             function mycallback() {
-                // either call the ImageInfo.getAllFields([file]) function which returns an object holding all the info
-                alert(
-                        "All info about this file: " + ImageInfo.getAllFields(file).toSource()
-                        );
-                // or call ImageInfo.getField([file], [field]) to get a specific field
-                alert(
-                        "Format: " + ImageInfo.getField(file, "format") + ", dimensions : " + ImageInfo.getField(file, "width") + "x" + ImageInfo.getField(file, "height")
-                        );
+                plotInfo= ImageInfo.getField(file, "data")['plotInfo'];
             }
             // finally, load the data
             ImageInfo.loadInfo(file, mycallback);
+            
+            function cross(subEvent) {
+                if ( plotInfo!=-1 ) {
+                    document.getElementById('digitizer').innerHTML= '' + subEvent.layerX +' '+subEvent.layerY;
+                } else {
+                    document.getElementById('digitizer').innerHTML= 'moment...';
+                }
+            }
         </script>
+        <img src="extractpngmetadata.png" onclick="cross(event)">
         
-        Was the script loaded???
     </body>
 </html>
