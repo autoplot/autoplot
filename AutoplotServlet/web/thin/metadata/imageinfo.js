@@ -57,6 +57,22 @@ ImageInfo.range = 10240;
 		};
 	}
 
+        function getPNGITXTBlocks( data ) {
+            var result= {};
+            var offset= 8;
+            while ( offset<1000 ) {
+                var len= data.getLongAt( offset,true );
+                var chunkType= data.getStringAt( offset+4,4 );
+                if ( chunkType=='tEXt' ) {
+                    str= data.getStringAt( offset+8, len-4 );
+                    //alert( str );
+                    i= str.indexOf('\x00');
+                    result[str.substr(0,i)]= str.substr(i+1);
+                }
+                offset= offset + len + 12; // 12 bytes for lenth, chunk type, and CRC
+            }
+            return result;
+        }
 
 	function readPNGInfo(data) {
 		var w = data.getLongAt(16,true);
@@ -72,6 +88,8 @@ ImageInfo.range = 10240;
 
 		var alpha = data.getByteAt(25) >= 4;
 
+                var data1 = getPNGITXTBlocks(data);
+                
 		return {
 			format : "PNG",
 			version : "",
@@ -79,6 +97,7 @@ ImageInfo.range = 10240;
 			height : h,
 			bpp : bpp,
 			alpha : alpha,
+                        data: data1,
 			exif : {}
 		}
 	}
