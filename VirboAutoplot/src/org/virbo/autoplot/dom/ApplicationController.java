@@ -521,26 +521,6 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
 
-                if ( false ) {
-                    for ( int i=0; i<ss.size(); i++ ) {
-                        String s= ss.get(i);
-                        DomNode n= DomUtil.getElementById( node, s );
-                        final Axis a= (Axis)n;
-                        final Plot p= getPlotFor(a.controller.getDasAxis());
-                        a.getController().getDasAxis().addPropertyChangeListener( DasAxis.PROPERTY_TICKS, new PropertyChangeListener() {
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                if ( a.isVisible() && a.isDrawTickLabels() ) {
-                                    if ( !p.getTicksURI().equals("") ) {
-                                        System.err.println("a="+a);
-                                    } else {
-                                        System.err.println("maybe a="+a);
-                                    }
-                                }
-                            };
-                        });
-                    }
-                }
-
                 if ( noOneListening ) {
                     logger.fine("resetting application to default time range");
                     application.setTimeRange( Application.DEFAULT_TIME_RANGE );
@@ -767,14 +747,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
             if ( dst==null ) {
+                assert src!=null;
                 src.getController().removePlotElement(p);
                 return;
             }
-            if ( src != null && dst != null ) {
+            if ( src != null ) {
                 movePlotElement(p, src, dst);
-                //if (getPlotElementsFor(src).size() == 0) {
-                //    deletePlot(src);
-                //}
                 if (getPlotElementsFor(dst).size() == 1) {
                     dst.syncTo(p.plotDefaults, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID, Plot.PROP_XAXIS, Plot.PROP_YAXIS ) );
                     List<BindingModel> bb= findBindings( dst.getXaxis(), Axis.PROP_RANGE );
@@ -943,7 +921,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
             domColumn= canvas.marginColumn;
         } else {
-            if ( ccontroller.getColumnFor(focus)==canvas.marginColumn ) {
+            if ( focus!=null && ccontroller.getColumnFor(focus)==canvas.marginColumn ) {
                 String srcColumn;
                 if ( canvas.getColumns().length>0 ) {
                     srcColumn= canvas.getColumns(0).getId();
@@ -976,7 +954,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             try {
                 SwingUtilities.invokeAndWait(run);
             } catch ( Exception ex ) {
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
             }
         }
 
@@ -1127,14 +1105,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                     PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
                     newElements.add(newp);
                     List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
-                    List<PlotElement> newKids = new ArrayList();
                     DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
                     for (PlotElement k : srcKids) {
                         if (srcElements.contains(k)) {
                             PlotElement kidp = copyPlotElement(k, newPlot, dsf1);
                             kidp.getController().setParentPlotElement(newp);
                             newElements.add(kidp);
-                            newKids.add(kidp);
                         }
                     }
                 }
@@ -1446,13 +1422,17 @@ public class ApplicationController extends DomNodeController implements RunLater
         setStatus("resetting...");
 
         DomLock lock= mutatorLock();
+        long t0= System.currentTimeMillis();
         while ( lock.isLocked() ) {
             logger.log( Level.INFO, "lock is not available: {0}", lock.toString());
-            System.err.println( changesSupport.isValueAdjusting() );
+            logger.finer( changesSupport.isValueAdjusting() );
             try {        
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if ( System.currentTimeMillis()-t0 > 10000 ) {
+                logger.log(Level.WARNING, "Unable to get canvas lock to reset application because of lock: {0}", changesSupport.isValueAdjusting());
             }
         }
         lock.lock("Reset");
