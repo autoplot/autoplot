@@ -63,9 +63,8 @@ ImageInfo.range = 10240;
             while ( offset<data.getLength() ) {
                 var len= data.getLongAt( offset,true );
                 var chunkType= data.getStringAt( offset+4,4 );
-                alert( chunkType );
                 if ( chunkType=='tEXt' ) {
-                    str= data.getStringAt( offset+8, len-4 );
+                    str= data.getStringAt( offset+8, len );
                     
                     i= str.indexOf('\x00');
                     result[str.substr(0,i)]= str.substr(i+1);
