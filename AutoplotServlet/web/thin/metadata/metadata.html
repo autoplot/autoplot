@@ -44,15 +44,20 @@ and open the template in the editor.
                                 for ( i=0; i<4; i++ ) {
                                     var p= plotInfo.plots[i];
                                     if ( p.xaxis.left<=xx && xx<p.xaxis.right && p.yaxis.top<=yy && yy<p.yaxis.bottom ) {
+                                        l= p.xaxis.right - p.xaxis.left;
                                         if ( p.xaxis.units=='UTC' ) {
                                             dmin= Date.parse(p.xaxis.min);
-                                            dmax= Date.parse(p.xaxis.max);
-                                            l= p.xaxis.right - p.xaxis.left;
+                                            dmax= Date.parse(p.xaxis.max);    
                                             datax= ( ( xx-p.xaxis.left ) * dmax + ( p.xaxis.right - xx ) * dmin ) / l;
                                             datax= new Date( datax ).toJSON();
                                         } else {
-                                            l= p.xaxis.right - p.xaxis.left;
-                                            datax= ( ( xx-p.xaxis.left ) * p.xaxis.max + ( p.xaxis.right - xx ) * p.xaxis.min ) / l;
+                                            if ( p.xaxis.type=='log' ) {
+                                                oo= ( ( p.xaxis.right - xx ) / l );
+                                                zz=  Math.log( p.xaxis.max / p.xaxis.min );
+                                                datax= Math.exp( Math.log( p.xaxis.min ) + ( ( xx - p.xaxis.left ) / l ) * Math.log( p.xaxis.max / p.xaxis.min ) );
+                                            } else {
+                                                datax= ( ( xx-p.xaxis.left ) * p.xaxis.min + ( xx - p.xaxis.left ) * p.xaxis.max ) / l;
+                                            }
                                         }
                                         l= p.yaxis.bottom - p.yaxis.top;
                                         if ( p.yaxis.type=='log' ) {
