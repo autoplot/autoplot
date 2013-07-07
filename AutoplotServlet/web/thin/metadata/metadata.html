@@ -13,6 +13,10 @@ and open the template in the editor.
 		<script type="text/javascript" src="cross.js" ></script>
 		<script type="text/javascript" src="prepimage.js" ></script>
         <script>
+			// TODO: binaryajax.js makes an AJAX request for the image which has
+			// already been loaded.  This is not necessary.  Modify binaryajax.js
+			// so that it looks to see if image has been loaded before making AJAX request.
+			
      		// Global Object that contains info about each image.		
         		var PLOTINFO = {};
 

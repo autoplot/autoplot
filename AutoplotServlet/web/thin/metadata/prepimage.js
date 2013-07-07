@@ -6,7 +6,8 @@ function prepimage(id) {
 	$('#'+id)
 		.load(function () {
 			id = $(this).attr("id"); // ID of loaded image.
-			// Load the data
+
+			// Extract the data.
 			ImageInfo.loadInfo(PLOTINFO[id].src, mycallback);
 
 			// Callback function for when metadata extracted
