@@ -4,7 +4,6 @@ function prepimage(id) {
 	PLOTINFO[id].src = $("#"+id).attr("src"); 
 	
 	$('#'+id)
-		.attr('src',PLOTINFO[id].src)
 		.load(function () {
 			id = $(this).attr("id"); // ID of loaded image.
 			// Load the data
