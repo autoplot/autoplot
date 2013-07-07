@@ -7,78 +7,35 @@ and open the template in the editor.
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script type="text/javascript" src="binaryajax.js"></script>
         <script type="text/javascript" src="imageinfo.js" ></script>        
+		<script type="text/javascript" src="cross.js" ></script>
+		<script type="text/javascript" src="prepimage.js" ></script>
+        <script>
+     		// Global Object that contains info about each image.		
+        		var PLOTINFO = {};
 
+     		// When DOM is ready (but images may not be loaded), start working.
+     		$().ready(function () {
+     			// Iterate over all images.
+	        		$('img').each(function () {
+	        			prepimage($(this).attr("id"));		        			
+	        		})
+     		})
+        </script>
     </head>
     <body>
         <H1>Digitizer Demo</H1>
         <p>This is a demonstration of how axis metadata can be extracted from Autoplot images and used for a digitizer.</p>
-
-        <small>version: 20130706_1031</small>
-
-        <div id="digitizer" >(data will be displayed here)</div>
+        <small>version: 20130706_1031</small>        
         <div>
-            <img id="canvas" src="extractpngmetadata.png" onclick="cross(event)" border="1">
+        		<div id="digitizer1">(data will be displayed here)</div>
+            <img id="canvas1" info="digitizer1" src="extractpngmetadata.png" border="1">
         </div>
-        <script>
-                // URL of the image (must be on the same domain!)
-                var file = "extractpngmetadata.png";
-                var splotInfo = -1;
-                var plotInfo = -1;
-                        // define your own callback function
-                                function mycallback() {
-                                    splotInfo = ImageInfo.getField(file, "data")['plotInfo'];
-                                    plotInfo = eval('('+splotInfo+')'); //TODO: proper JSON parser                                    
-                                }
-                        // finally, load the data
-                        ImageInfo.loadInfo(file, mycallback);
-
-                        function cross(subEvent) {
-                            var canvas = document.getElementById('canvas')
-                            if (plotInfo != -1) {
-                                var xx = subEvent.layerX - canvas.offsetLeft;
-                                var yy = subEvent.layerY - canvas.offsetTop;
-                                
-                                var found= 0;
-                                for ( i=0; i<4; i++ ) {
-                                    var p= plotInfo.plots[i];
-                                    if ( p.xaxis.left<=xx && xx<p.xaxis.right && p.yaxis.top<=yy && yy<p.yaxis.bottom ) {
-                                        l= p.xaxis.right - p.xaxis.left;
-                                        if ( p.xaxis.units=='UTC' ) {
-                                            dmin= Date.parse(p.xaxis.min);
-                                            dmax= Date.parse(p.xaxis.max);    
-                                            datax= ( ( xx-p.xaxis.left ) * dmax + ( p.xaxis.right - xx ) * dmin ) / l;
-                                            datax= new Date( datax ).toJSON();
-                                        } else {
-                                            if ( p.xaxis.type=='log' ) {
-                                                oo= ( ( p.xaxis.right - xx ) / l );
-                                                zz=  Math.log( p.xaxis.max / p.xaxis.min );
-                                                datax= Math.exp( Math.log( p.xaxis.min ) + ( ( xx - p.xaxis.left ) / l ) * Math.log( p.xaxis.max / p.xaxis.min ) );
-                                            } else {
-                                                datax= ( ( xx-p.xaxis.left ) * p.xaxis.min + ( xx - p.xaxis.left ) * p.xaxis.max ) / l;
-                                            }
-                                        }
-                                        l= p.yaxis.bottom - p.yaxis.top;
-                                        if ( p.yaxis.type=='log' ) {
-                                            datay= Math.exp( Math.log( p.yaxis.min ) + ( ( p.yaxis.bottom - yy ) / l ) * Math.log( p.yaxis.max / p.yaxis.min ) );
-                                        } else {
-                                            datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
-                                        }
-                                        document.getElementById('digitizer').innerHTML = 'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + ' datax:'+datax + ' datay:'+datay;
-                                        found=1;
-                                    }
-                                }
-                                if ( found==0 ) {
-                                    document.getElementById('digitizer').innerHTML = 'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots;
-                                }
-                                
-
-                            } else {
-                                document.getElementById('digitizer').innerHTML = 'moment...';
-                            }
-                        }
-        </script>
-
+        <div>
+        		<div id="digitizer2">(data will be displayed here)</div>
+            <img id="canvas2" info="digitizer2" src="extractpngmetadata.png" border="1">
+        </div>
     </body>
 </html>
