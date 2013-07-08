@@ -17,14 +17,16 @@ function cross(subEvent) {
 	// http://stackoverflow.com/questions/8389156/what-substitute-should-we-use-for-layerx-layery-since-they-are-deprecated-in-web
 	// Won't work if scroll.  This is why Jeremy does not like Javascript.  See last comment on page.
 	// "Horrible I know, but the internet's a horrible place."
-	var xx = subEvent.offsetX;
-	var yy = subEvent.offsetY;
+	var xx = subEvent.offsetX || subEvent.clientX;
+	var yy = subEvent.offsetY || subEvent.clientY;
 
 	var found= false;
 	for ( i=0; i<4; i++ ) {
 		var p= plotInfo.plots[i];
+		console.log(p)
 		if ( p.xaxis.left<=xx && xx<p.xaxis.right && p.yaxis.top<=yy && yy<p.yaxis.bottom ) {
 			l= p.xaxis.right - p.xaxis.left;
+			
 			if ( p.xaxis.units=='UTC' ) {
 				dmin= Date.parse(p.xaxis.min);
 				dmax= Date.parse(p.xaxis.max);    
@@ -45,6 +47,7 @@ function cross(subEvent) {
 			} else {
 				datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
 			}
+			
 			$("#"+info).html('x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + ' datax:'+datax + ' datay:'+datay);
 			found=true;
 		}
