@@ -175,7 +175,7 @@ public class IstpMetadataModel extends MetadataModel {
                 }
             }
         }
-        if ( units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
+        if ( UnitsUtil.isRatioMeasurement(units) && units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
         if ( max<min ) max= Double.MAX_VALUE; //vap+cdaweb:ds=I2_AV_AME&id=ampl&timerange=1978-01-23+7:28:21+to+7:28:22
         if ( UnitsUtil.isTimeLocation(units) ) {
             DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
@@ -338,7 +338,12 @@ public class IstpMetadataModel extends MetadataModel {
 
         boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
         if (isEpoch) {
-            units = Units.cdfEpoch;
+            if ( ofv!=null && ofv instanceof Long ) {
+                units= Units.cdfTT2000;
+                properties.put(QDataSet.FILL_VALUE, ofv );
+            } else {
+                units = Units.cdfEpoch;
+            }
         } else {
             String label = (String) attrs.get("LABLAXIS");
             String sslice1= (String) attrs.get("slice1");
