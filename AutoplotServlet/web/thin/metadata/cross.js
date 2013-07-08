@@ -10,8 +10,11 @@ function cross(subEvent) {
 		return;
 	}
 
-	var xx = subEvent.clientX - $(subEvent.target).offset().left;
-	var yy = subEvent.clientY - $(subEvent.target).offset().top;
+	//var xx = subEvent.clientX - $(subEvent.target).offset().left;
+	//var yy = subEvent.clientY - $(subEvent.target).offset().top;
+	var xx = subEvent.offsetX || ( subEvent.pageX - subEvent.target.offsetLeft );
+    var yy = subEvent.offsetY || ( subEvent.pageY - subEvent.target.offsetTop );
+
 	//console.log(subEvent);
 	var found= false;
 	for ( i=0; i<4; i++ ) {
