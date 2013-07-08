@@ -15,7 +15,8 @@ function prepimage(id) {
 				splotInfo = ImageInfo.getField(PLOTINFO[id].src, "data")['plotInfo'];
 				PLOTINFO[id] = $.parseJSON(splotInfo);
 				// When image is loaded and metadata extracted, set onclick attribute.
-				$("#"+id).attr("onclick","cross(event)");
+				//$("#"+id).attr("onclick","cross(event)");
+				$("#"+id).click(cross);
 			}
 		})
 }
