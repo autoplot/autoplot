@@ -25,7 +25,22 @@ and open the template in the editor.
      			// Iterate over all images in DOM.
 	        		$('img').each(function () {
 	        			prepimage($(this).attr("id"));		        			
-	        		})
+	        		});
+     			
+     			// Unit test.
+     			setTimeout(function () {
+     	        		var e = new jQuery.Event("click");
+	        			e.clientX = 250;
+	        			e.clientY = 250;
+	        			$("#canvas1").trigger(e);
+	        			setTimeout(function () {
+	        				var str = $("#digitizer1").text();
+	        				if (str === "x:250 y:250 np:4 ip:3 datax:12.940895754389398 datay:-1.9425581395348837") {
+	        					console.log("Test passed.")
+	        				}
+	 				},100);
+     			},1000)
+     			
      		})
         </script>
     </head>
