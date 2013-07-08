@@ -19,7 +19,7 @@ function cross(subEvent) {
 	// "Horrible I know, but the internet's a horrible place."
 	var xx = subEvent.offsetX || subEvent.clientX;
 	var yy = subEvent.offsetY || subEvent.clientY;
-
+	console.log(subEvent);
 	var found= false;
 	for ( i=0; i<4; i++ ) {
 		var p= plotInfo.plots[i];
