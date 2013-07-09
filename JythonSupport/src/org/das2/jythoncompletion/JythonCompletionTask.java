@@ -313,21 +313,26 @@ public class JythonCompletionTask implements CompletionTask {
     private void queryPackages(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
-        String eval = "targetComponents = '" + cc.contextString + "'.split('.')\n" +
-                "base = targetComponents[0]\n" +
-                "baseModule = __import__(base, globals(), locals())\n" +
-                "module = baseModule    \n" +
-                "for component in targetComponents[1:]:\n" +
-                "    module = getattr(module, component)\n" +
-                "list = dir(module)\n" +
-                "if ( '__name__' in list ): list.remove('__name__')\n" +
-                "list.append('*')\n" +
-                "list";
+        String eval = "import " + cc.contextString + "\n" +
+                "targetComponents = '" + cc.contextString + "'.split('.')\n" +
+                "base = targetComponents[0]\n" + 
+                "baseModule = __import__(base, globals(), locals(), [], -1 )\n" + 
+                "module = baseModule    \n" + 
+                "name= base\n" + 
+                "for component in targetComponents[1:]:\n" + 
+                "    name= name + '.' + component\n" + 
+                "    baseModule = __import__( name, None, None )\n" + 
+                "    module = getattr(module, component)\n" + 
+                "list = dir(module)\n" + 
+                "if ( '__name__' in list ): list.remove('__name__')\n" + 
+                "list.append('*')\n" + 
+                "list\n";
         PyList po2;
         try {
             interp.exec(eval);
         } catch ( PyException e ) {  // "no module called c" when c<TAB>
             // empty list
+            e.printStackTrace();
             return;
         }
         po2 = (PyList) interp.eval("list");
