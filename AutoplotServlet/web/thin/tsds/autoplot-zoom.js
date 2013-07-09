@@ -14,42 +14,15 @@ var width = '';
 var height = '';
 var column = '';
 var row = '';
-var startyear_str = '';
-var startmonth_str = '';
-var startday_str = '';
-var endyear_str = '';
-var endmonth_str = '';
-var endday_str = '';
 var epochdate_iso = "1970/01/01";
-var startdate_iso = '';
-var enddate_iso = '';
 var millisecondperday = 1000 * 60 * 60 * 24;
 var startdateinmilliseconds = 0.0;
 var enddateinmilliseconds = 0.0;
 var diffmilliseconds = 0.0;
-var diffseconds = 0.0;
-var diffminutes = 0.0;
-var diffhours = 0.0;
-var diffdays = 0.0;
-var diffmonths = 0.0;
-var diffyears = 0.0;
-var splitedcol1 = '';
-var splitedcol2 = '';
-var splitedcol3 = '';
-var splitedrow1 = '';
-var splitedrow2 = '';
-var splitedrow3 = '';
-var leftcolmargin = '';
-var percentcolmargin = '';
-var rightcolmargin = '';
-var toprowmargin = '';
-var percentrowmargin = '';
-var bottomrowmargin = '';
-var emperpx = 8; // 1 em = 8 px or pixel
-var leftside = 0; // parseInt(leftcolmargin) * emperpx;
-var rightside = 0; // (parseInt(width) * parseInt(percentcolmargin) / 100) + (parseInt(rightcolmargin) * emperpx);
-var topside = 0; // parseInt(toprowmargin) * emperpx;
-var bottomside = 0; // (parseInt(height) * parseInt(percentrowmargin) / 100) + (parseInt(bottomrowmargin) * emperpx);
+var leftside = 0; // These now come from plotInfo.
+var rightside = 0; 
+var topside = 0; 
+var bottomside = 0; 
 var graphwidth = 0; // rightside - leftside;
 var graphheight = 0; // bottomside - topside;
 var msecperpx = 0;
@@ -214,77 +187,14 @@ function parseImgUrl() {
     //console.log('parseImgUrl() : ' + 'StartDate = ' + startdate + ', ' + 'EndDate = ' + enddate);
 }
 
-function formatDates() {
-    // convert date in integer to string
-    startyear_str = startdate_str.substring(0, 4);
-    startmonth_str = startdate_str.substring(4, 6);
-    startday_str = startdate_str.substring(6, 8);
-    endyear_str = enddate_str.substring(0, 4);
-    endmonth_str = enddate_str.substring(4, 6);
-    endday_str = enddate_str.substring(6, 8);
-
-    // formulate date in iso format
-    startdate_iso = startyear_str + '/' + startmonth_str + '/' + startday_str;
-    enddate_iso = endyear_str + '/' + endmonth_str + '/' + endday_str;
-
-    // baseline startdate time in milliseconds since epoch date or 1970-01-01
-    startdateinmilliseconds = setAsUTC(startdate_iso) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc 
-    enddateinmilliseconds = setAsUTC(enddate_iso) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc
-
-}
-
-function calcTimeDiff() {
-    // getTimeBetweenDates
-    diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
-    
-    diffseconds = getTimeBetweenDates(startdate_iso, enddate_iso, "seconds");
-    diffminutes = getTimeBetweenDates(startdate_iso, enddate_iso, "minutes");
-    diffhours = getTimeBetweenDates(startdate_iso, enddate_iso, "hours");
-    diffdays = getTimeBetweenDates(startdate_iso, enddate_iso, "days");
-    diffmonths = getTimeBetweenDates(startdate_iso, enddate_iso, "months");
-    diffyears = getTimeBetweenDates(startdate_iso, enddate_iso, "years");
-
-}
-
-function calcGraphMargins() {
-    // extract border margins graph area
-    splitedcol1 = column.split('em,');
-    splitedcol2 = splitedcol1[1].split('%');
-    splitedcol3 = splitedcol2[1].split('e');
-    splitedrow1 = row.split('em,');
-    splitedrow2 = splitedrow1[1].split('%');
-    splitedrow3 = splitedrow2[1].split('e');
-
-    leftcolmargin = splitedcol1[0];
-    percentcolmargin = splitedcol2[0];
-    rightcolmargin = splitedcol3[0];
-    toprowmargin = splitedrow1[0];
-    percentrowmargin = splitedrow2[0];
-    bottomrowmargin = splitedrow3[0];
-
-    // compute border graph area
-    leftside = parseInt(leftcolmargin) * emperpx;
-    rightside = (parseInt(width) * parseInt(percentcolmargin) / 100) + (parseInt(rightcolmargin) * emperpx);
-    topside = parseInt(toprowmargin) * emperpx;
-    bottomside = (parseInt(height) * parseInt(percentrowmargin) / 100) + (parseInt(bottomrowmargin) * emperpx);
-    graphwidth = rightside - leftside;
-    graphheight = bottomside - topside;
-
-    // interpolate per pixel along graphwidth with diffmilliseconds
-    msecperpx = diffmilliseconds / graphwidth;
-    //alert('calcGraphMargins() : ' + 'each pixel = ' + msecperpx );
-    console.log('calcGraphMargins() : ' + 'each pixel = ' + msecperpx );
-}
-
 function echoGraphParams() {
-    $('#iddates').text('StartDate = ' + startdate + ' ,    ' + 'EndDate = ' + enddate);
+    $('#iddates').text('StartDate = ' + PLOTINFO.plots[0].xaxis.min + ' ,    ' + 'EndDate = ' + PLOTINFO.plots[0].xaxis.max );
     $('#idwidthheight').text('framewidth = ' + width + ' , ' +
             'frameheight = ' + height + ' , ' +
             'graphwidth = ' + graphwidth + ' , ' +
             'graphheight = ' + graphheight);
     $('#idcolumn').text('column = ' + column);
     $('#idrow').text('row = ' + row);
-    $('#iddifftime').text('DiffSeconds = ' + diffseconds + '     ' + 'DiffDays = ' + diffdays);
 }
 
 function echoSetup() {
@@ -292,10 +202,6 @@ function echoSetup() {
 			
     echoImgUrl();
     parseImgUrl();
-    formatDates();
-    calcTimeDiff();
-    calcGraphMargins();
-    echoGraphParams();
 }
 
 var ias;
@@ -320,6 +226,21 @@ $(document).ready(function() {
         splotInfo = ImageInfo.getField( imgurl, "data")['plotInfo'];
         PLOTINFO = $.parseJSON(splotInfo);
         
+        startdateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.min) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc 
+        enddateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.max) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc
+        diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
+        
+        
+        topside= PLOTINFO.plots[0].yaxis.top;
+        bottomside= PLOTINFO.plots[0].yaxis.bottom;
+        leftside= PLOTINFO.plots[0].xaxis.left;
+        rightside= PLOTINFO.plots[0].xaxis.right;
+        
+        graphwidth = rightside - leftside;
+        graphheight = bottomside - topside;    
+        msecperpx = diffmilliseconds / graphwidth;  
+        echoGraphParams();
+        $('#idstatus').text("ready");
     }    
 
     // **************************************************************************
