@@ -4,7 +4,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Autoplot Servlet Image Zoom</title>
 	<link rel="stylesheet" type="text/css" href="css/imgareaselect-default.css" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> 
+        <link rel="stylesheet" type="text/css" href="demo.css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> 
 </head>
 <body>
 	
@@ -12,6 +13,9 @@
 		<img id="idplot" 
 			src="http://localhost:8084/AutoplotServlet/SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em" />
 	</div>
+    <div id="divprogress">
+        <img src="spinner.gif" id="progress" alt="Busy..."></img>
+    </div>
 	
 		<p>img src url: </p>
 		<pre><div id="idechourl"></div></pre>

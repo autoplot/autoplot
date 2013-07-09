@@ -241,6 +241,8 @@ $(document).ready(function() {
         msecperpx = diffmilliseconds / graphwidth;  
         echoGraphParams();
         $('#idstatus').text("ready");
+        var p= $('#progress');
+        p.attr('src','idle-icon.png');
     }    
 
     // **************************************************************************
@@ -278,6 +280,8 @@ $(document).ready(function() {
             console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
             $('#idplot').attr('src', imgurl);
             $('#idplot').attr('src', zoomurl);
+            $('#progress').attr('src','spinner.gif');
+            
             //alert('imgAreaSelect() : ' + 'done');
             //console.log('imgAreaSelect() : ' + 'done');
 

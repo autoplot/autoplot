@@ -1,0 +1,20 @@
+/* 
+    Document   : demo
+    Created on : Jul 9, 2013, 10:57:07 AM
+    Author     : jbf
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+#progress {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: 20px;
+    height: 20px;
+    z-index:10;
+}
