@@ -392,14 +392,10 @@ public class SimpleServlet extends HttpServlet {
             logger.log( Level.FINER, "bounds: {0}", dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds());
 
             if (format.equals("image/png")) {
-                logit("waiting for image", t0, uniq, debug);
-                Image image = appmodel.canvas.getImage(width, height);
-                logit("got image", t0, uniq, debug);
-
-                DasPNGEncoder encoder = new DasPNGEncoder();
-                encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+                                
                 try {
-                    encoder.write((BufferedImage) image, out);
+                    appmodel.canvas.writeToPng( out, width, height );
+                    
                 } catch (IOException ioe) {
                 } finally {
                     try {
@@ -427,7 +423,6 @@ public class SimpleServlet extends HttpServlet {
             } else {
                 throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
             }
-
 
             out.close();
             logit("done with request", t0, uniq, debug);
