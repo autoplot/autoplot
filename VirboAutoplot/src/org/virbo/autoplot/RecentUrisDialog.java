@@ -30,8 +30,6 @@ public class RecentUrisDialog extends javax.swing.JDialog {
     /** Creates new form RecentUrisDialog */
     public RecentUrisDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        setLocationRelativeTo(parent);
-        
         initComponents();
 
         recentUrisGUI1.getTree().addMouseListener( new MouseAdapter() {
@@ -52,6 +50,9 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         } );
         recentUrisGUI1.setFilter("");
+        setLocationRelativeTo(parent);
+        
+        
     }
 
     public void setFilter( String filter ) {
