@@ -102,57 +102,6 @@ function msecondToDate(milliseconds) {
     return date;
 }
 
-function parseImgUrlItem(srcurl, itemType) {
-    var item = '';
-    var inpurl = srcurl;
-    var slt1 = '';
-    var slt2 = '';
-    var slt3 = '';
-    var slt4 = '';
-
-    switch (itemType) {
-        case "startdate":
-            slt1 = inpurl.split('StartDate%3D');
-            slt2 = slt1[1].split('%26EndDate%3D');
-            item = slt2[0];
-            break;
-        case "enddate":
-            slt1 = inpurl.split('EndDate%3D');
-            slt2 = slt1[1].split('%26ext');
-            item = slt2[0];
-            break;
-        case "width":
-            slt1 = inpurl.split('width=');
-            slt2 = slt1[1].split('&height=');
-            item = slt2[0];
-            break;
-        case "height":
-            slt1 = inpurl.split('height=');
-            slt2 = slt1[1].split('&column=');
-            item = slt2[0];
-            break;
-        case "column":
-            slt1 = inpurl.split('column=');
-            slt2 = slt1[1].split('&row=');
-            slt3 = slt2[0].split('%2C');
-            item = slt3[0];
-            slt4 = slt3[1].split('%25');
-            item = item + ',' + slt4[0] + '%' + slt4[1];
-            break;
-        case "row":
-            slt1 = inpurl.split('row=');
-            slt2 = slt1[1].split('&renderType=');
-            slt3 = slt2[0].split('%2C');
-            item = slt3[0];
-            slt4 = slt3[1].split('%25');
-            item = item + ',' + slt4[0] + '%' + slt4[1];
-            break;
-        default:
-            alert('ERROR : parseImgUrlItem() : Undefine parse item type');
-    }
-
-    return item;
-}
 
 function buildImgUrl(srcurl, startdate, enddate) {
     var outurl = '';
@@ -168,24 +117,6 @@ function echoImgUrl() {
     $('#idechourl').text(imgurl);
 }
 
-/**
- * Use this to get the initial parameters.  TODO: This needs to be redone
- * by looking at the Autoplot metadata.
- * @returns {undefined}
- */
-function parseImgUrl() {
-    startdate_str = parseImgUrlItem(imgurl, "startdate");
-    enddate_str = parseImgUrlItem(imgurl, "enddate");
-    startdate = parseInt(startdate_str);
-    enddate = parseInt(enddate_str);
-    width = parseImgUrlItem(imgurl, "width");
-    height = parseImgUrlItem(imgurl, "height");
-    column = parseImgUrlItem(imgurl, "column");
-    row = parseImgUrlItem(imgurl, "row");
-
-    //alert('parseImgUrl() : ' + 'StartDate = ' + startdate + ', ' + 'EndDate = ' + enddate);
-    //console.log('parseImgUrl() : ' + 'StartDate = ' + startdate + ', ' + 'EndDate = ' + enddate);
-}
 
 function echoGraphParams() {
     $('#iddates').text('StartDate = ' + PLOTINFO.plots[0].xaxis.min + ' ,    ' + 'EndDate = ' + PLOTINFO.plots[0].xaxis.max );
@@ -201,11 +132,79 @@ function echoSetup() {
     // Extract the data.
 			
     echoImgUrl();
-    parseImgUrl();
 }
 
+function zoomprev() {
+    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds - diffmilliseconds ) 
+}
+
+function zoomnext() {
+    setTime( startdateinmilliseconds + diffmilliseconds, enddateinmilliseconds + diffmilliseconds ) 
+}
+
+function zoomout() {
+    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds ) 
+}
+
+function setTime( startMilliseconds, endMilliseconds ) {
+        // convert milliseconds to iso date in yyyymmdd
+        zoomstartdate = msecondToDate(startMilliseconds);
+        zoomenddate = msecondToDate(endMilliseconds);
+        console.log('setTime ' + zoomstartdate + ' ' + zoomenddate );
+        //alert('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
+        //console.log('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
+        console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max );
+        zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
+        n = zoomurl.length
+        zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
+        $('#idstatus').text("loading " + zoomurlc + " ...");
+        //alert('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
+        console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
+        $('#idplot').attr('src', imgurl);
+        $('#idplot').attr('src', zoomurl);
+        $('#progress').attr('src','spinner.gif');
+
+        //alert('imgAreaSelect() : ' + 'done');
+        //console.log('imgAreaSelect() : ' + 'done');
+
+        // update imgurl
+        imgurl = zoomurl;
+        startdateinmilliseconds= startMilliseconds;
+        enddateinmilliseconds= endMilliseconds;
+        diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
+        msecperpx = diffmilliseconds / graphwidth;
+
+        ImageInfo.loadInfo( imgurl, mycallback);
+
+}
+
+// Callback function for when metadata extracted
+function mycallback() {
+    splotInfo = ImageInfo.getField( imgurl, "data")['plotInfo'];
+    PLOTINFO = $.parseJSON(splotInfo);
+
+    startdateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.min) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc 
+    enddateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.max) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc
+    diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
+
+
+    topside= PLOTINFO.plots[0].yaxis.top;
+    bottomside= PLOTINFO.plots[0].yaxis.bottom;
+    leftside= PLOTINFO.plots[0].xaxis.left;
+    rightside= PLOTINFO.plots[0].xaxis.right;
+
+    graphwidth = rightside - leftside;
+    graphheight = bottomside - topside;    
+    msecperpx = diffmilliseconds / graphwidth;  
+    echoGraphParams();
+    $('#idstatus').text("ready");
+    var p= $('#progress');
+    p.attr('src','idle-icon.png');
+}    
+
+
 var ias;
-$('#idstatus').text("v20130709_1010");
+$('#idstatus').text("v20130709_1224");
 
 var PLOTINFO;
 
@@ -220,30 +219,6 @@ $(document).ready(function() {
     echoSetup();
     
     ImageInfo.loadInfo( imgurl, mycallback);
-
-    // Callback function for when metadata extracted
-    function mycallback() {
-        splotInfo = ImageInfo.getField( imgurl, "data")['plotInfo'];
-        PLOTINFO = $.parseJSON(splotInfo);
-        
-        startdateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.min) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc 
-        enddateinmilliseconds = setAsUTC(PLOTINFO.plots[0].xaxis.max) - setAsUTC(epochdate_iso); // + millisecondperday; // adjusted for 1 day utc
-        diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
-        
-        
-        topside= PLOTINFO.plots[0].yaxis.top;
-        bottomside= PLOTINFO.plots[0].yaxis.bottom;
-        leftside= PLOTINFO.plots[0].xaxis.left;
-        rightside= PLOTINFO.plots[0].xaxis.right;
-        
-        graphwidth = rightside - leftside;
-        graphheight = bottomside - topside;    
-        msecperpx = diffmilliseconds / graphwidth;  
-        echoGraphParams();
-        $('#idstatus').text("ready");
-        var p= $('#progress');
-        p.attr('src','idle-icon.png');
-    }    
 
     // **************************************************************************
     // imgAreaSelect()
@@ -266,33 +241,7 @@ $(document).ready(function() {
             //alert('imgAreaSelect() : ' + 'x1milliseconds = ' + x1milliseconds + '   ' + 'x2milliseconds = ' + x2milliseconds);
             //console.log('imgAreaSelect() : ' + 'x1milliseconds = ' + x1milliseconds + '   ' + 'x2milliseconds = ' + x2milliseconds);
 
-            // convert milliseconds to iso date in yyyymmdd
-            zoomstartdate = msecondToDate(x1milliseconds);
-            zoomenddate = msecondToDate(x2milliseconds);
-            //alert('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
-            //console.log('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
-            console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max );
-            zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
-            n = zoomurl.length
-            zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
-            $('#idstatus').text("loading " + zoomurlc + " ...");
-            //alert('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
-            console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
-            $('#idplot').attr('src', imgurl);
-            $('#idplot').attr('src', zoomurl);
-            $('#progress').attr('src','spinner.gif');
-            
-            //alert('imgAreaSelect() : ' + 'done');
-            //console.log('imgAreaSelect() : ' + 'done');
-
-            // update imgurl
-            imgurl = zoomurl;
-            startdateinmilliseconds= x1milliseconds;
-            enddateinmilliseconds= x2milliseconds;
-            diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
-            msecperpx = diffmilliseconds / graphwidth;
-            
-            ImageInfo.loadInfo( imgurl, mycallback);
+            setTime( x1milliseconds, x2milliseconds );
             
             //alert('document.ready() : ' + 'done');
             //console.log('document.ready() : ' + 'done');
