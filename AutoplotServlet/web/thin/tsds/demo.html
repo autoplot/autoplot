@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Autoplot Servlet Image Zoom</title>
+	<link rel="stylesheet" type="text/css" href="css/imgareaselect-default.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script> 
+</head>
+<body>
+	
+	<div id="iddivimg">
+		<img id="idplot" 
+			src="http://localhost:8084/AutoplotServlet/SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em" />
+	</div>
+	
+		<p>img src url: </p>
+		<pre><div id="idechourl"></div></pre>
+		<p>Status:</p>
+                <pre><div id="idstatus"></div></pre>
+		<p>parsed url individual component: </p>
+		<pre><div id="iddates"></div></pre>
+		<pre><div id="idwidthheight"></div></pre>
+		<pre><div id="idcolumn"></div></pre>
+		<pre><div id="idrow"></div></pre>
+		<pre><div id="iddifftime"></div></pre>
+	
+	<script type="text/javascript" src="js/jquery.ui.js"></script>
+	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
+	<script type="text/javascript" src="autoplot-zoom.js"></script>
+        <script type="text/javascript" src="prepimage.js"></script>
+        <script type="text/javascript" src="binaryajax.js"></script>
+        <script type="text/javascript" src="imageinfo.js"></script>
+
+<script>
+			// TODO: binaryajax.js makes an AJAX request for the image which has
+			// already been loaded.  This is not necessary.  Modify binaryajax.js
+			// so that it looks to see if image has been loaded before making AJAX request.
+			
+     		// Global Object that contains info about each image.		
+        		var PLOTINFO = {};
+
+     		// When DOM is ready (but images may not be loaded), start working.
+     /*		$().ready(function () {
+     			// Iterate over all images in DOM.
+	        		$('img').each(function () {
+	        			prepimage($(this).attr("id"));		        			
+	        		});
+     			     			
+     		}) */
+        </script>
+</body>
+</html>
