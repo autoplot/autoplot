@@ -328,12 +328,10 @@ public class ExportDataPanel extends javax.swing.JPanel {
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
             DataSourceFormat form= DataSourceRegistry.getInstance().getFormatByExt(ss);
             if ( form!=null ) {
-                additionalOptionsButton.setEnabled(true);
                 originalDataB.setEnabled( originalDataSet!=null && form.canFormat( originalDataSet ) );
                 processedDataB.setEnabled( processedDataSet!=null && form.canFormat( processedDataSet ) );
                 processedWithinXRangeB.setEnabled( processedDataSet!=null && form.canFormat( processedDataSet ) );
             } else {
-                additionalOptionsButton.setEnabled(false);
                 originalDataB.setEnabled( true );
                 processedDataB.setEnabled( true );
                 processedWithinXRangeB.setEnabled( true );
@@ -347,6 +345,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             if ( !processedDataB.isEnabled() && processedDataB.isSelected() ) {
                 processedWithinXRangeB.setSelected(true);
             }
+            additionalOptionsButton.setEnabled( editorPanel!=null );
         }
         
 
