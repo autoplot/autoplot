@@ -1444,6 +1444,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             Plot p0= getPlotFor(application.getPlotElements(0) );
 
+            p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
+            
             for ( int i=application.getPlots().length-1; i>0; i-- ) {
                 deletePlot( application.getPlots(i) );
             }
