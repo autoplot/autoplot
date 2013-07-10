@@ -267,6 +267,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     dep0.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
                 }
             }
+            String dep0Units= getParam( "depend0Units", null );
+            if ( dep0Units!=null ) {
+                dep0.putProperty( QDataSet.UNITS, SemanticOps.lookupUnits(dep0Units) );
+            }
         }
 
         if ( bundle!=null ) {
@@ -381,7 +385,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( title!=null ) {
                 vds.putProperty( QDataSet.TITLE, title );
             }
-
+       
 
             if (dep0 != null) {
                 vds.putProperty(QDataSet.DEPEND_0, dep0);
@@ -402,7 +406,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             Ops.slice1(dep0,1),
                             Ops.slice1(ds,eventListColorColumn),
                             vds ) );
-                    System.err.println("here");
                 }
                 vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
