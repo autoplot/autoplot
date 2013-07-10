@@ -25,6 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>waitUntilIdle would fail to wait when the axis annotations were added, so test037 was failing.</li>
+            <li>improvements to getRepresentative file, allow better handling of empty folders.</li>
             <li>Mike at LANL pointed out that |multiply(-2) wouldn't work.</li>
             <li>Export panel additional options was not properly disabled when there were no options, resulting in RTE.</li>
             <li>TT2000 metadata would be misinterpreted as code would convert metadata to doubles</li>
