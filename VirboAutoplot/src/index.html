@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Slicers come up in position so they don't overlap.</small></p>
+        <p><small>Random screenshot.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,12 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>Mike at LANL pointed out that |multiply(-2) wouldn't work.</li>
+            <li>Export panel additional options was not properly disabled when there were no options, resulting in RTE.</li>
+            <li>TT2000 metadata would be misinterpreted as code would convert metadata to doubles</li>
+            <li>1059: history.txt in headless mode, don't write to history during headless batch processing.</li>
+            <li>completions in zip file systems would not work properly.</li>
+            <li>.classpath file updated for use in Eclipse, thanks Jon.</li>
             <li>1056: BackingStoreException caused by OptionsPrefsController</li>
             <li>1055: Red flash sometimes visible on startup</li>
             <li>$v was not detected in URIs with ...v01.cdf</li>
@@ -73,6 +79,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add vap+orbit:rbspa-pp to make it more trivial to add annotations</li>
+            <li>improvements to metadata in pngs to support thin clients.</li>        
+            <li>replicate( QDataSet, int ) introduced.</li>
+            <li>add square and sawtooth wave functions.  Add detrend for John B.</li>
+            <li>PWD variable introduced to Jython scripts</li>
+            <li>DatumRanges are convered to QDataSets in scripts.</li>
+            <li>reduce createPngWalk stdout noise that was messing up batch processing at LANL.</li>
             <li>for eventListColumn, look for RGB-encoded color in text field in third column</li>
             <li>add copy menu item to metadata tab</li>
             <li>allow %{PWD} macro inside of .vap file to allow for more portable demos.</li>
