@@ -56,6 +56,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skip="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
@@ -67,6 +68,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, AsciiTableDataSource.PARAM_INTERVAL_TAG+"=",
                     "indicate how measurement intervals are tagged." ) );
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Units="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fill="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "comment=",
                     "comment line prefix, default is hash (#)"));
@@ -127,6 +129,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if (paramName.equals("column")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 return result;
+            } else if (paramName.equals("units")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "units for the data"));
+                return result;
             } else if (paramName.equals("fixedColumns")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns."));
             } else if (paramName.equals("time")) {
@@ -139,6 +145,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return result;
             } else if (paramName.equals("depend0")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
+                return result;
+            } else if (paramName.equals("depend0Units")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
                 return result;
             } else if (paramName.equals("timeFormat")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
