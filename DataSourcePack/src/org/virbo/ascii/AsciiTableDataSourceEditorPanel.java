@@ -326,6 +326,10 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel11 = new javax.swing.JLabel();
         titleTextField = new javax.swing.JTextField();
         labelTextField = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        unitsTF = new javax.swing.JTextField();
+        depend0unitsTF = new javax.swing.JTextField();
 
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
@@ -374,7 +378,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(530, Short.MAX_VALUE))
+                .addContainerGap(542, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -387,7 +391,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel5))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("header", jPanel2);
@@ -436,7 +440,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(timeFormatToggleButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(guessTimeFormatToggleButton)))
-                .addContainerGap(149, Short.MAX_VALUE))
+                .addContainerGap(163, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -565,7 +569,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jToggleButton3)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(4, 4, 4)
@@ -638,6 +641,12 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         titleTextField.setText(" ");
 
+        jLabel12.setText("Units:");
+        jLabel12.setToolTipText("units for the data");
+
+        jLabel13.setText("Depend Units:");
+        jLabel13.setToolTipText("The units for the x tags");
+
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -653,19 +662,38 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel11)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(labelTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 116, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(389, Short.MAX_VALUE))
+                .add(36, 36, 36)
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(jLabel13)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel4Layout.createSequentialGroup()
+                        .add(jLabel12)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
+
+        jPanel4Layout.linkSize(new java.awt.Component[] {depend0unitsTF, unitsTF}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel4Layout.createSequentialGroup()
                 .add(6, 6, 6)
                 .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel10)
-                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel12)
+                    .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel11)
-                    .add(labelTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel11)
+                        .add(labelTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel13)
+                        .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -677,8 +705,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
+            .add(jScrollPane1)
+            .add(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1041,6 +1069,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             if (params.containsKey("label")) {
                 labelTextField.setText(params.get("label"));
             }
+            if ( params.containsKey("units") ) {
+                unitsTF.setText(params.get("units"));
+            }
+            if ( params.containsKey("depend0Units") ) {
+                depend0unitsTF.setText(params.get("depend0Units"));
+            }
             String arg0= params.get("arg_0"); // typically we're going to specify a range.
             if ( arg0!=null ) {
                 String col= ":";
@@ -1138,6 +1172,8 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
         setParam( params, "title", titleTextField.getText() );
         setParam( params, "label", labelTextField.getText() );
+        setParam( params, "units", unitsTF.getText() );
+        setParam( params, "depend0Units", depend0unitsTF.getText() );
         setParam( params, "timeFormat", timeFormatTextField.getText() );
         setParam( params, "fill", fillValueTextField.getText() );
         setParam( params, "validMin", validMinTextField.getText() );
@@ -1154,12 +1190,15 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JComboBox commentComboBox;
     public javax.swing.JComboBox dep0Columns;
     public javax.swing.JCheckBox dep0timeCheckBox;
+    public javax.swing.JTextField depend0unitsTF;
     public javax.swing.JTextField fillValueTextField;
     public javax.swing.JButton guessFillButton;
     public javax.swing.JToggleButton guessTimeFormatToggleButton;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
+    public javax.swing.JLabel jLabel12;
+    public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1186,6 +1225,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JTextField timeFormatTextField;
     public javax.swing.JToggleButton timeFormatToggleButton;
     public javax.swing.JTextField titleTextField;
+    public javax.swing.JTextField unitsTF;
     public javax.swing.JTextField validMaxTextField;
     public javax.swing.JTextField validMinTextField;
     // End of variables declaration//GEN-END:variables
