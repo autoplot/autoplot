@@ -135,15 +135,15 @@ function echoSetup() {
 }
 
 function zoomprev() {
-    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds - diffmilliseconds ) 
+    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds - diffmilliseconds );
 }
 
 function zoomnext() {
-    setTime( startdateinmilliseconds + diffmilliseconds, enddateinmilliseconds + diffmilliseconds ) 
+    setTime( startdateinmilliseconds + diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
 }
 
 function zoomout() {
-    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds ) 
+    setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
 }
 
 function setTime( startMilliseconds, endMilliseconds ) {
@@ -155,7 +155,7 @@ function setTime( startMilliseconds, endMilliseconds ) {
         //console.log('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
         console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max );
         zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
-        n = zoomurl.length
+        n = zoomurl.length;
         zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
         $('#idstatus').text("loading " + zoomurlc + " ...");
         //alert('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
@@ -249,4 +249,4 @@ $(document).ready(function() {
 
     });
 
-})
+});
