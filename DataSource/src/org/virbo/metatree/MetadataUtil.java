@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -184,7 +185,8 @@ public class MetadataUtil {
                 }
             } else if ( cmd.startsWith("|slice") ) {
                 int dim= cmd.charAt(6)-'0';
-                int idx= s.nextInt();
+                String sidx= s.next();
+                Object idx= DataSetOps.getArgumentIndex(sidx); // note we don't actually use the index.
                 properties= sliceProperties( properties, dim );
             } else if ( cmd.startsWith("|collapse") ) {
                 int dim= cmd.charAt(9)-'0';
