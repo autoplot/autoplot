@@ -27,6 +27,7 @@ import org.python.core.PyString;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
@@ -91,6 +92,11 @@ public class JythonOps {
 //        return coerceToDs( arg0 );
 //    }
 
+    /**
+     * @deprecated use dataset command.
+     * @param arg0
+     * @return 
+     */
     public static QDataSet coerceToDs( PyObject arg0 ) {
         return dataset( arg0 );
     }
@@ -118,8 +124,8 @@ public class JythonOps {
 
         } else if ( arg0 instanceof PyString ) {
             try {
-               return DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())); //TODO: someone is going to want lookupUnits that will allocate new units.
-            } catch (ParseException ex) {
+               return Ops.dataset(arg0.toString());
+            } catch (IllegalArgumentException ex) {
                throw Py.SyntaxError( "unable to parse string: "+arg0 );
             }
         } else if ( arg0 instanceof PyNone ) {
