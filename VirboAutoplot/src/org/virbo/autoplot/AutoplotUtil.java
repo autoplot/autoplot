@@ -228,7 +228,8 @@ public class AutoplotUtil {
     }
 
     /**
-     * Replace filename references within the DOM, and reset xrange.  This was the often-used ReplaceFile script
+     * Replace filename references within the DOM, and reset xrange.  This was 
+     * the often-used ReplaceFile script.  
      * @param dom
      */
     public static void replaceFile( Component parent, Application dom ) {
@@ -237,9 +238,11 @@ public class AutoplotUtil {
            JOptionPane.showMessageDialog( parent, "Nothing plotted" );
         } else {
 
-            DataSourceFilter dsf= dom.getDataSourceFilters(0);
+           DataSourceFilter dsf= dom.getDataSourceFilters(0);
            URISplit split= URISplit.parse( dsf.getUri() );
 
+           Application dom2= (Application) dom.copy();
+            
            String oldf= split.file;
 
            String newf= JOptionPane.showInputDialog( parent,
@@ -248,21 +251,18 @@ public class AutoplotUtil {
 
            if ( newf!=null ) {
 
-                dom.getOptions().setAutoranging(false);
-
-                for ( DataSourceFilter i: dom.getDataSourceFilters() ) {
+                for ( DataSourceFilter i: dom2.getDataSourceFilters() ) {
                     String oldf1= i.getUri();
                     String newf1= oldf1.replace( oldf, newf );
                     i.setUri( newf1 );
-                    
-               }
-                dom.getController().waitUntilIdle();
-                dom.getOptions().setAutoranging(true);
+                }  
+                
+                dom.syncTo(dom2);
                 dom.getController().waitUntilIdle();
 
+                // set focus and reset zoom x.
                 dom.getController().setDataSourceFilter(dsf);
-                
-                resetZoomX(dom); // assumes focus is set
+                resetZoomX(dom); 
 
             }
         }
