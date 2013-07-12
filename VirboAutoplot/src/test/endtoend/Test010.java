@@ -21,7 +21,7 @@ public class Test010 {
         URL url= DataSetURI.getWebURL( DataSetURI.toUri( suri ) );
 
         URLConnection connect= url.openConnection();
-        connect.setConnectTimeout(500);
+        connect.setConnectTimeout(3000);
 
         connect.connect();
 
