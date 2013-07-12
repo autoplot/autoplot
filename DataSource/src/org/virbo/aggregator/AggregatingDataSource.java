@@ -520,8 +520,15 @@ public final class AggregatingDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
-            Map<String, Object> retValue;
-            getDataSet(mon); // sorry, we have to read the data...
+            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile( new NullProgressMonitor() );
+            if (!sparams.equals("")) {
+                scompUrl += "?" + sparams;
+            }
+
+            URI delegateUri= DataSetURI.getURIValid(scompUrl);
+            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
+            metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
+            metadataModel= delegateDataSource.getMetadataModel();
             return metadata;
         } else {
             return metadata;
