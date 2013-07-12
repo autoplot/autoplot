@@ -176,7 +176,7 @@ public class EditorContextMenu {
         try {
             int limit= editor.getText().length();
             
-            while ( i>=0 && !editor.getText(i,1).equals("\n") ) i--;
+            while ( i>0 && !editor.getText(i,1).equals("\n") ) i--;
             if ( i>=0 && i<limit-1 && editor.getText(i,1).equals("\n") && !editor.getText(i+1,1).equals("\n") ) i++;
             while ( j<limit && !editor.getText(j,1).equals("\n" ) ) j++;
                         
