@@ -166,6 +166,15 @@ public class IstpMetadataModel extends MetadataModel {
             if (attrs.containsKey("SCALEMAX")) {
                 max = doubleValue(attrs.get("SCALEMAX"), units, VALUE_MAX );
                 min = 0; //TODO: really, this doesn't cause problems?
+            } else if ( attrs.containsKey("SCALEMIN") && "log".equalsIgnoreCase( (String)attrs.get("SCALETYP") ) ){
+                min= doubleValue(attrs.get("SCALEMIN"), units, VALUE_MIN );
+                if ( min<=0 ) return null;
+                double possibleMax= doubleValue(attrs.get("VALIDMAX"), units, VALUE_MAX );
+                if ( possibleMax/min>1e1 && possibleMax/min<1e3 ) {
+                    max= possibleMax;
+                } else {
+                    max= min * 1e3;
+                }
             } else {
                 // bug 1063 Don't use CDF valid range for typical range 
                 logger.fine("SCALEMIN and SCALEMAX are missing");
