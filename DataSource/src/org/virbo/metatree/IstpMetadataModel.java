@@ -152,8 +152,7 @@ public class IstpMetadataModel extends MetadataModel {
 
     /**
      * returns the range of the data by looking for the SCALEMIN/SCALEMAX params,
-     * or the required VALIDMIN/VALIDMAX parameters.  Checks for valid range when
-     * SCALETYP=log.
+     * Checks for valid range when SCALETYP=log.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
     private static DatumRange getRange(Map attrs, Units units) {
@@ -166,13 +165,11 @@ public class IstpMetadataModel extends MetadataModel {
         } else {
             if (attrs.containsKey("SCALEMAX")) {
                 max = doubleValue(attrs.get("SCALEMAX"), units, VALUE_MAX );
-                min = 0;
+                min = 0; //TODO: really, this doesn't cause problems?
             } else {
-                max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
-                min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN );
-                if ( min>0 && max/min>1e20 ) {
-                    return null;
-                }
+                // bug 1063 Don't use CDF valid range for typical range 
+                logger.fine("SCALEMIN and SCALEMAX are missing");
+                return null;
             }
         }
         if ( UnitsUtil.isRatioMeasurement(units) && units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
