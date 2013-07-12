@@ -767,10 +767,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     if (icol != -1) { // deal with -1 later
                         String field = fields[icol];
                         try {
-                            TimeUtil.parseTime(field);
-                            if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
-                                parser.setUnits(icol, Units.us2000);
-                                parser.setFieldParser(icol, parser.UNITS_PARSER);
+                            field= field.trim();
+                            if ( !UnitsUtil.isTimeLocation(parser.getUnits(icol)) && !field.startsWith("-") ) {
+                                TimeUtil.parseTime(field);
+                                if ( new StringTokenizer( field, ":T-/" ).countTokens()>2 ) {
+                                    parser.setUnits(icol, Units.us2000);
+                                    parser.setFieldParser(icol, parser.UNITS_PARSER);
+                                }
                             }
                         } catch (ParseException ex) {
                         }
@@ -780,10 +783,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 for ( int icol= 0; icol<fields.length && icol<2; icol++ ) {
                     String field = fields[icol];
                     try {
-                        if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
+                        field= field.trim();
+                        if ( !UnitsUtil.isTimeLocation(parser.getUnits(icol)) && !field.startsWith("-") ) {
                             TimeUtil.parseTime(field);
-                            parser.setUnits(icol, Units.us2000);
-                            parser.setFieldParser(icol, parser.UNITS_PARSER);
+                            if ( new StringTokenizer( field, ":T-/" ).countTokens()>2 ) {
+                                parser.setUnits(icol, Units.us2000);
+                                parser.setFieldParser(icol, parser.UNITS_PARSER);
+                            }
                         }
                     } catch (ParseException ex) {
                     }
