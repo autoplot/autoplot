@@ -841,7 +841,7 @@ public class PlotElementController extends DomNodeController {
      * @throws IllegalArgumentException
      */
     private void updateDataSet() throws IllegalArgumentException {
-        if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+        //if ( getRenderer()!=null ) getRenderer().setDataSet(null);
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         if (!dom.controller.isValueAdjusting()) {
             Runnable run= new Runnable() {
