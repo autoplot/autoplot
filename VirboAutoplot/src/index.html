@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Random screenshot.</small></p>
+        <p><small>Adjusting the slice index no longer has the flickering.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,11 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1061: ctrl-S in script editor allows save to cache and will cause people to loose work</li>
+            <li>replace file action reimplemented so new dom avoids resets and is closer to old dom.</li>
+            <li>don't use valid range as typical range when SCALEMIN,SCALEMAX are missing in CDF.</li>
+            <li>1065: flicker while adjusting slice index</li>
+            <li>clarify string indicating slice1 was done when DEPEND_1 was time-varying</li>
             <li>waitUntilIdle would fail to wait when the axis annotations were added, so test037 was failing.</li>
             <li>improvements to getRepresentative file, allow better handling of empty folders.</li>
             <li>Mike at LANL pointed out that |multiply(-2) wouldn't work.</li>
@@ -35,6 +40,9 @@
             <li>.classpath file updated for use in Eclipse, thanks Jon.</li>
             <li>1056: BackingStoreException caused by OptionsPrefsController</li>
             <li>1055: Red flash sometimes visible on startup</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>$v was not detected in URIs with ...v01.cdf</li>
             <li>1050: problems with CDF files and RBSP data from GEM</li>
             <li>Move DateTimeDatumFormatter to das2 so APL can use it.</li>
@@ -70,16 +78,16 @@
             <li>bugfix labels in ascii tables when units contain * / and ^.</li>
             <li>refactorings to FFTPower so that ytags are only calculated once.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Bob had a short list of bugs.</li>
-            <li>Bugfix in QStream reduction when Join dataset is reduced.</li>
-            <li>rte_1999763719: malformed CDF gave the impression problem was with Autoplot</li>
-            <li>"24 hours" / "60 minutes" works properly now (=24)</li>
-            <li>plot id changes are propagated through the rest of the vap.</li>
-            <li>rfe 3596086: CDF Java implementation now implements slice1 to save memory</li>
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>first experiments with slice0 at datum, like |slice0('2013-07-12T18:00')t</li>
+            <li>dataset('2013-07-12T18:00') handles times and datum ranges now.</li>
+            <li>recent history GUI allows wildcards, like rbsp*.vap</li>
+            <li>ascii plugin supports units and dep0units.</li>
+            <li>tweaks to rich pngs, which have metadata that allows digitizing</li>
+            <li>add replicate(ds,len)</li>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>add vap+orbit:rbspa-pp to make it more trivial to add annotations</li>
             <li>improvements to metadata in pngs to support thin clients.</li>        
@@ -105,15 +113,6 @@
             <li>New ISO8601 range parser supports "2012-02-02T02:00/04:00"</li>
             <li>New timerange field types from http://tsds.org/uri_specification, including $x, hrinterval, subsec and periodic, shift</li>
             <li>Start list of open source components in help screen, report memory sizes in 1000*1000 byte units, not 1024*1024.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Metadata veiw of dataset checks for JoinDataSets so they can be inspected, cadence is reported for each joined dataset.</li>
-            <li>interpolateGrid introduced, which performs rank 2 interpolation when for 1-D X and Y grid.</li>
-	    <li>add createEvent method to make it easy to create events datasets in scripts.</li>
-            <li>add fft that supports slide and windows but still provides access to real and imaginary components.</li>
-            <li>add setLayout and fixLayout commands to jython.</li>
-            <li>add getElementById to application controller.</li>
         </ul>
 
         <p>Known issues:</p>
