@@ -104,8 +104,10 @@ public abstract class AbstractDataSource implements DataSource {
      */
     protected Map<String, String> params;
 
+    @Override
     public abstract QDataSet getDataSet(ProgressMonitor mon) throws Exception;
 
+    @Override
     public boolean asynchronousLoad() {
         return true;
     }
@@ -115,6 +117,7 @@ public abstract class AbstractDataSource implements DataSource {
         return DataSetURI.fromUri(uri);
     }
 
+    @Override
     public String getURI() {
         return DataSetURI.fromUri(uri);
     }
@@ -198,10 +201,12 @@ public abstract class AbstractDataSource implements DataSource {
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
      */
+    @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         return new HashMap<String, Object>();
     }
 
+    @Override
     public MetadataModel getMetadataModel() {
         return MetadataModel.createNullModel();
     }
@@ -213,15 +218,19 @@ public abstract class AbstractDataSource implements DataSource {
      * but this guards against the mistake.
      * @return
      */
+    @Override
     public Map<String, Object> getProperties() {
         try {
             Map<String, Object> meta = getMetadata(new NullProgressMonitor());
             if ( meta==null || getMetadataModel()==null ) {
-                logger.log( Level.INFO, "handling case where metadata or metadataModel is null: {0}, but this should be fixed.", this);
-                return Collections.emptyMap();
-            } else {
-                return getMetadataModel().properties(meta);
+                logger.log( Level.FINE, "handling case where metadata or metadataModel is null: {0}, but this should be fixed.", this);
+                meta= getMetadata(new NullProgressMonitor());
+                //return Collections.emptyMap();
             }
+            if ( meta==null || getMetadataModel()==null ) {
+                return Collections.emptyMap();
+            }
+            return getMetadataModel().properties(meta);
         } catch (Exception e) {
             logger.log( Level.SEVERE, "exception in getProperties", e );
             return Collections.singletonMap("Exception", (Object) e);
@@ -234,6 +243,7 @@ public abstract class AbstractDataSource implements DataSource {
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
      */
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return (T) capabilities.get(clazz);
     }
