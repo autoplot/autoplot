@@ -1144,10 +1144,17 @@ public class AutoplotUtil {
                             d2 = DatumRangeUtil.normalizeLog(range, dd2);
                         }
                         if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
-                            range= DatumRangeUtil.rescaleLog( range, 0, 2 );
-                            d2= d2/2;
-                            d1= d1/2;
-                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                            range= DatumRangeUtil.rescaleLog( range, 0, 1.333 );
+                            DatumRange range2= DatumRangeUtil.rescaleLog( range, 0, 2 );
+                            d2= d2/1.333;
+                            d1= d1/1.333;
+                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 1.2");
+                            if ( d2>1.2 && d2<2.0 ) { // do what we used to do.
+                                range= range2;
+                                d2= d2*1.333/2;
+                                d1= d1*1.333/2;
+                                logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                            }
                         }
                         if ( d1<-4 && d2>0  ) { //often with log we get "1 count" averages that are very small (demo2: po_h0_hyd_$Y$m$d_v01.cdf)
                             logger.fine("rejecting statistical range because min is too small.");
