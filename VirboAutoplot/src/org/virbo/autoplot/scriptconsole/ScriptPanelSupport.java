@@ -143,6 +143,14 @@ public class ScriptPanelSupport {
         chooser.setFileFilter(getFileFilter());
         if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
+        } else {
+            chooser.setSelectedFile(file);
+            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
+            if ( !openFile.equals("") ) {
+                File dir= new File(openFile).getParentFile();
+                chooser.setCurrentDirectory( dir );
+            }
         }
         if ( file==null ) {
             Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
@@ -166,8 +174,8 @@ public class ScriptPanelSupport {
     }
 
     protected void save() throws FileNotFoundException, IOException {
-        if ( file==null ) {
-            saveAs();
+        if ( file==null || file.toString().contains( FileSystem.settings().getLocalCacheDir().toString()) ) {
+            if ( panel.isDirty() ) saveAs();
             return;
         }
         OutputStream out = null;
