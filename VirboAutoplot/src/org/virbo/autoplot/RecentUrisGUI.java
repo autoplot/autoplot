@@ -27,6 +27,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -43,6 +44,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.util.filesystem.Glob;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -212,10 +214,14 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                 LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
 
+                Pattern filtPattern= null;
                 String filt= RecentUrisGUI.this.filter;
                 if ( filt!=null && filt.length()==0 ) filt=null;
                 if ( filt!=null ) filt= filt.toLowerCase();
-
+                if ( filt!=null ) { // make into regex
+                    filt= "(?i)"+ Glob.getRegex(filt);
+                    filtPattern= Pattern.compile(filt);
+                }
                 long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
 
                 String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
@@ -238,7 +244,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
                         }
                         try {
-                            if ( filt!=null && ! containsIgnoreCase(ss[1],filt) ) {
+                            if ( filtPattern!=null && !filtPattern.matcher(ss[1]).find() ) {
                                 continue;
                             }
                             if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
