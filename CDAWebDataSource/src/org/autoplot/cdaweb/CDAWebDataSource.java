@@ -114,7 +114,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.started();
 
             try {
-                db.maybeRefresh( SubTaskMonitor.create(mon,0,10) );
+                db.maybeRefresh( SubTaskMonitor.create(mon,0,10) ); //TODO: this ain't right, what's the taskSize?
             } catch ( IOException ex ) {
                 logger.log( Level.SEVERE, null, ex );
                 mon.setProgressMessage("unable to connect via ftp");
@@ -142,6 +142,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
             mon.setTaskSize(files.length*10+10);
+            mon.setTaskProgress(0);
 
             //we need to look in the file to see if it is virtual
             mon.setProgressMessage("get metadata");
@@ -163,10 +164,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                     range1= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
                 }
 
-                mon.setTaskProgress(i*10);
+                mon.setTaskProgress((i+1)*10);
                 mon.setProgressMessage( "load "+file );
 
-                ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
+                ProgressMonitor t1= SubTaskMonitor.create( mon, (i+1)*10, (i+2)*10 );
 
                 MutablePropertyDataSet ds1=null;
                 if ( virtual!=null && !virtual.equals("") ) {
