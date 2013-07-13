@@ -378,6 +378,8 @@ public class CDAWebDB {
         
         try {
             try {
+                //TODO: poor feedback here is caused by the directory listing taking so long.
+                
                 DataSetURI.getFile(new URI(master), p );
             } catch (URISyntaxException ex) {
                 logger.log(Level.SEVERE, null, ex);
