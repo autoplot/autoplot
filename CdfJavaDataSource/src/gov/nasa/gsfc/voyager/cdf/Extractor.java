@@ -1632,7 +1632,11 @@ public class Extractor {
         for ( int i=1; i<var.getDimensions().length; i++ ) {
             otherDimensionsSize*= var.getDimensions()[i];
         }
+        logger.log(Level.FINER, "reading data from {0} locations.", locations.size());
         for (; blk < locations.size(); blk++) {
+            if ( blk>0 && blk%1000==0 ) {
+                logger.log(Level.FINER, "  read data from location {0} of {1}.", new Object[] { blk, locations.size() } );
+            }
             int [] loc = (int [])locations.elementAt(blk);
             int first = loc[0];
             int last = loc[1];
