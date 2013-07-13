@@ -824,7 +824,20 @@ public class CdfJavaDataSource extends AbstractDataSource {
 //                            }
                         }
 
-                        result.putProperty("DEPEND_" + idep, depDs);
+                        if ( slice1<0 ) {
+                            result.putProperty("DEPEND_" + idep, depDs);
+                        } else {
+                            if ( idep==1 ) {
+                                // continue
+                            } else {
+                                if ( idep>1 ) {
+                                    result.putProperty( "DEPEND_"+(idep-1), depDs );                    
+                                } else {
+                                    result.putProperty( "DEPEND_"+idep, depDs );                                                        
+                                }
+                            }                            
+                        }
+                        
                 }
 
                 if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
@@ -851,8 +864,24 @@ public class CdfJavaDataSource extends AbstractDataSource {
                                 }
                             }
                         }
-                        QDataSet bundleDs= lablDs;
-                        result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                        
+                        if ( slice1<0 ) {                            
+                            QDataSet bundleDs= lablDs;
+                            result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                        } else {
+                            if ( idep==1 ) {
+                                // continue
+                            } else {
+                                if ( idep>1 ) {
+                                    QDataSet bundleDs= lablDs;
+                                    result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );                    
+                                } else {
+                                    QDataSet bundleDs= lablDs;
+                                    result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );                                                        
+                                }
+                            }
+                    
+                        }
                 }
             }
         }
