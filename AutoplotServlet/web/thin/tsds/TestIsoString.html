@@ -1,0 +1,45 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>         
+    </head>
+    <body>
+        <p>Version: 20130715_0948</p>
+        txt1:<div id="txt1">(status is displayed here)</div>
+        txt2:<div id="txt2">(status is displayed here)</div>
+        <script>
+
+            function toLocalIsoString(date) {
+                function pad(n) {
+                    return n < 10 ? '0' + n : n
+                }
+                var localIsoString = date.getFullYear() + '-'
+                        + pad(date.getMonth() + 1) + '-'
+                        + pad(date.getDate()) + 'T'
+                        + pad(date.getHours()) + ':'
+                        + pad(date.getMinutes()) + ':'
+                        + pad(date.getSeconds());
+                if (date.getTimezoneOffset() == 0) {
+                    localIsoString += 'Z';
+                } else {
+                    localIsoString += '+' + date.getTimezoneOffset() / 60 + 'hours';
+                }
+                return localIsoString;
+            }
+            
+            d1= new Date(Date.parse("2005-07-08T00:00Z"));
+            d2= new Date(1104516000000);
+            d3= new Date(1104451200000);
+            $('#txt1').text("loading " + d3.toISOString() + " ...");
+            $('#txt2').text("loading " + toLocalIsoString( d3 ) + " ...");
+
+        </script>
+
+    </body>
+</html>

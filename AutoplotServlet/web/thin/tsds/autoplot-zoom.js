@@ -103,13 +103,15 @@ function msecondToDate(milliseconds) {
 }
 
 
-function buildImgUrl(srcurl, startdate, enddate) {
+function buildImgUrl(srcurl, start, end) {
     var outurl = '';
     var inpurl = srcurl;
-
+    var iso8601s= new Date( start ).toISOString();
+    var iso8601e= new Date( end ).toISOString(); // toLocalIsoString( end );
     var slt = inpurl.split('&timeRange=');
-    outurl = slt[0] + "&timeRange=" + startdate + "+to+" + enddate;
-
+    outurl = slt[0] + "&timeRange=" + iso8601s + "/" + iso8601e;
+    console.log( ''+ start + " - " + end + " " + new Date(start)  ) ;
+    console.log( ''+ iso8601s + "/" + iso8601e );
     return outurl;
 }
 
@@ -146,15 +148,19 @@ function zoomout() {
     setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
 }
 
+function testing() {
+    setTime( 1104451200000, 1104451200000 + 86400000 );
+}
+
 function setTime( startMilliseconds, endMilliseconds ) {
+        console.log( 'startdateinmilliseconds='+ startdateinmilliseconds );
+        console.log( 'diffmilliseconds='+ diffmilliseconds );
+        console.log( 'mod86400000/3600000= ' + ( ( startdateinmilliseconds % 86400000) /3600000 ) );
         // convert milliseconds to iso date in yyyymmdd
-        zoomstartdate = msecondToDate(startMilliseconds);
-        zoomenddate = msecondToDate(endMilliseconds);
-        console.log('setTime ' + zoomstartdate + ' ' + zoomenddate );
         //alert('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
         //console.log('imgAreaSelect() : ' + 'zoomstartdate = ' + zoomstartdate + '   ' + 'zoomenddate = ' + zoomenddate);
         console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max );
-        zoomurl = buildImgUrl(imgurl, zoomstartdate, zoomenddate);
+        zoomurl = buildImgUrl(imgurl, startMilliseconds, endMilliseconds );
         n = zoomurl.length;
         zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
         $('#idstatus').text("loading " + zoomurlc + " ...");
@@ -175,6 +181,7 @@ function setTime( startMilliseconds, endMilliseconds ) {
         msecperpx = diffmilliseconds / graphwidth;
 
         ImageInfo.loadInfo( imgurl, mycallback);
+        console.log( '--> startdateinmilliseconds='+ startdateinmilliseconds );        
 
 }
 
