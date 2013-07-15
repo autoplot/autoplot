@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +47,6 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -291,15 +291,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jLabel7)
                     .add(descriptionLabel))
                 .add(7, 7, 7)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(viewDsdfButton)
-                    .add(timeRangeTool))
+                    .add(timeRangeTool)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel3)
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(examplesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(examplesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel4)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -984,22 +985,23 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             for ( int i=2; i<tp0.length; i++ ) dataSetId += "/"+ (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject();
         }
 
-        LinkedHashMap<String,String> map= new LinkedHashMap();
+        StringBuilder params= new StringBuilder();
         String readerParams= ReaderParamsTextArea.getText();
         String[] ss= readerParams.split("\n");
-        int iargc=0;
         for ( int i=0; i<ss.length; i++ ) {
-            String s= ss[i].trim();
-            if ( s.length()==0 ) continue;
-            String[] ss2= s.split("=",-2);
-            if ( ss2.length==1 ) {
-                map.put( "arg_"+iargc,ss2[0] );
-                iargc++;
-            } else {
-                map.put( ss2[0], ss2[1] );
+            String ss1= ss[i].trim();
+            if ( ss1.length()==0 ) continue;
+            String[] ss2= ss1.split("\\s+");
+            for ( int j=0; j<ss2.length; j++ ) {
+                String[] ss3= ss2[j].split("\\s*=\\s*",-2);
+                if ( ss3.length==1 ) {
+                    params.append(ss3[0].trim());
+                } else {
+                    params.append(ss3[0].trim()).append("=").append(ss3[1].trim());
+                }
+                params.append("%20");
             }
         }
-        String params= URISplit.formatParams(map);
 
         String result= "vap+das2server:"+serverURL + "?" +
                 "dataset="+dataSetId  +
@@ -1014,7 +1016,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             result+= "&item="+ tcaItem.getText().trim();
         }
         
-        if ( params.length()>0 ) result= result + "&" + params;
+        if ( params.length()>0 ) result= result + "&" + params.substring(0,params.length()-3);
         return result;
     }
 
