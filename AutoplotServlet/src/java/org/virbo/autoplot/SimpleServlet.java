@@ -15,9 +15,15 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -161,6 +167,14 @@ public class SimpleServlet extends HttpServlet {
             if ( surl!=null ) {
                 response.setHeader( "X-Autoplot-URI", surl );
             }
+            
+            // Allow a little caching.  See https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
+            // public means multiple browsers can use the same cache, maybe useful for workshops and seems harmless.
+            // max-age means the result is valid for the next 600 seconds.  TODO: 600 seconds is too long and is used for debugging.
+            response.setHeader( "Cache-Control", "public, max-age=600" );  
+            DateFormat httpDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+            httpDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            response.setHeader( "Expires", httpDateFormat.format( new Date( System.currentTimeMillis()+600000 ) ) );
 
             if (vap != null) {
                 response.setContentType(format);
