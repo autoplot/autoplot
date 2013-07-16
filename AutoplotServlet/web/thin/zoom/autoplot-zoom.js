@@ -16,6 +16,7 @@ var bottomside = 0;
 var graphwidth = 0; // rightside - leftside;
 var graphheight = 0; // bottomside - topside;
 var msecperpx = 0;
+var center= undefined;
 
 // ****************************************************************************
 //
@@ -80,9 +81,80 @@ function zoomin() {
     setTime( startdateinmilliseconds + third, enddateinmilliseconds - third );
 }
 
+/**
+ * center to the focus position
+ */
+function centerFocus() {
+    if ( typeof center==="undefined" ) {
+        $("#info").html('click on the plot to set focus position');
+    } else {
+        half= ( enddateinmilliseconds - startdateinmilliseconds ) / 2;
+        setTime( center - half, center + half );
+    }
+}
+
+
 function testing() {
     setTime( 1104451200000, 1104451200000 + 86400000 );
 }
+
+function clickshift(subEvent) {
+    
+	plotInfo = PLOTINFO;  // there's just the one...
+
+        console.log(plotInfo);
+
+	var info = $(subEvent.target).attr("info");
+	if (plotInfo == -1) {
+		$("#info" ).html('No metadata found.');
+		return;
+	}
+
+	var xx = subEvent.offsetX || ( subEvent.pageX - subEvent.target.offsetLeft );
+        var yy = subEvent.offsetY || ( subEvent.pageY - subEvent.target.offsetTop );
+
+	//console.log(subEvent);
+	var found= false;
+	for ( i=0; i<plotInfo.plots.length; i++ ) {
+		var p= plotInfo.plots[i];
+		//console.log(p)
+		if ( p.xaxis.left<=xx && xx<p.xaxis.right && p.yaxis.top<=yy && yy<p.yaxis.bottom ) {
+			l= p.xaxis.right - p.xaxis.left;
+			
+			if ( p.xaxis.units=='UTC' ) {
+				dmin= Date.parse(p.xaxis.min);
+				dmax= Date.parse(p.xaxis.max);    
+				datax= ( ( xx-p.xaxis.left ) * dmax + ( p.xaxis.right - xx ) * dmin ) / l;
+				datax= new Date( datax ).toJSON();
+			} else {
+				if ( p.xaxis.type=='log' ) {
+					oo= ( ( p.xaxis.right - xx ) / l );
+					zz=  Math.log( p.xaxis.max / p.xaxis.min );
+					datax= Math.exp( Math.log( p.xaxis.min ) + ( ( xx - p.xaxis.left ) / l ) * Math.log( p.xaxis.max / p.xaxis.min ) );
+				} else {
+					datax= ( ( xx-p.xaxis.left ) * p.xaxis.min + ( xx - p.xaxis.left ) * p.xaxis.max ) / l;
+				}
+			}
+			l= p.yaxis.bottom - p.yaxis.top;
+			if ( p.yaxis.type=='log' ) {
+				datay= Math.exp( Math.log( p.yaxis.min ) + ( ( p.yaxis.bottom - yy ) / l ) * Math.log( p.yaxis.max / p.yaxis.min ) );
+			} else {
+				datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
+			}
+			
+			$("#info").html('datax:'+datax + ' datay:'+datay);
+                        //'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + 
+			found=true;
+		}
+	}
+	if (!found) {
+		$("#info").html('outside axis bounds');
+	} else {
+                center= new Date( datax ).getTime();
+        }
+       
+}
+
 
 function setTime( startMilliseconds, endMilliseconds ) {
         console.log( '==setTime()==' );
