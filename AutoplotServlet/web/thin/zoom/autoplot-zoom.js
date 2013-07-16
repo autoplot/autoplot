@@ -50,19 +50,34 @@ function echoSetup() {
     echoImgUrl();
 }
 
-function zoomprev() {
+/**
+ * scan to the previous interval.
+ */
+function scanprev() {
     setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds - diffmilliseconds );
 }
 
-function zoomnext() {
-    console.log( '==zoomnext()==' );
-    console.log( '    startdateinmilliseconds='+ startdateinmilliseconds );
-    console.log( '    diffmilliseconds='+ ( diffmilliseconds ) );
+/**
+ * scan to the next interval
+ */
+function scannext() {
     setTime( startdateinmilliseconds + diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
 }
 
+/**
+ * zoom out so the plotted range is 3 times the width.
+ */
 function zoomout() {
     setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
+}
+
+/**
+ * zoom in to the middle third.
+ * @returns {undefined}
+ */
+function zoomin() {
+    third= ( enddateinmilliseconds - startdateinmilliseconds ) / 3;
+    setTime( startdateinmilliseconds + third, enddateinmilliseconds - third );
 }
 
 function testing() {

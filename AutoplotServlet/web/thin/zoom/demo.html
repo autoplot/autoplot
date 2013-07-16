@@ -18,11 +18,10 @@
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
     </div>
         
-            <button onclick="zoomprev()"><< PREV</button>
+            <button onclick="scanprev()"><< PREV</button>
             <button onclick="zoomout()">Zoom Out</button>    
-            <button onclick="zoomnext()">NEXT >></button>
-            <button onclick="testing()">TESTING</button>
-            
+            <button onclick="zoomin()">Zoom In</button>    
+            <button onclick="scannext()">NEXT >></button>
             
 	
 		<p>img src url: </p>
@@ -44,6 +43,7 @@
         <script type="text/javascript" src="imageinfo.js"></script>
 
 <script>
+    
 			// TODO: binaryajax.js makes an AJAX request for the image which has
 			// already been loaded.  This is not necessary.  Modify binaryajax.js
 			// so that it looks to see if image has been loaded before making AJAX request.
