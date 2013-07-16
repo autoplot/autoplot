@@ -142,7 +142,7 @@ function clickshift(subEvent) {
 				datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
 			}
 			
-			$("#info").html('datax:'+datax + ' datay:'+datay);
+			$("#info").html('x:'+datax + ' y:'+datay);
                         //'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + 
 			found=true;
 		}
