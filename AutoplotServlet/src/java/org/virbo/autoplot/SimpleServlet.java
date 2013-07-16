@@ -164,8 +164,8 @@ public class SimpleServlet extends HttpServlet {
             
             // Allow a little caching.  See https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
             // public means multiple browsers can use the same cache, maybe useful for workshops and seems harmless.
-            // max-age means the result is valid for the next 600 seconds.  TODO: 600 seconds is too long and is used for debugging.
-            response.setHeader( "Cache-Control", "public, max-age=600" );  
+            // max-age means the result is valid for the next 10 seconds.  
+            response.setHeader( "Cache-Control", "public, max-age=10" );  
             DateFormat httpDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
             httpDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             response.setHeader( "Expires", httpDateFormat.format( new Date( System.currentTimeMillis()+600000 ) ) );
