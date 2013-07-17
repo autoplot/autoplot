@@ -471,7 +471,17 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "script:(.*)", new AbstractAction( "script") {
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
-                source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
+                String s= source.getValue();
+                if ( s.endsWith(".jy") ) {
+                    try {
+                        int res= JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
+                                new HashMap(), true, true, new NullProgressMonitor() );
+                    } catch ( IOException ex ) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
+                }
                 //do nothing
             }
         });
