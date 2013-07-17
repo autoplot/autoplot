@@ -178,27 +178,30 @@ public class Util {
             
     /**
      * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
-     * @param f
-     * @param params
+     * @param f the file containing the script.
+     * @param params map containing any settings for the variables.
      * @return 
      */
     public static FormData doVariables( File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
+        StringBuilder build= new StringBuilder();
         BufferedReader r;
         r = new BufferedReader( new FileReader(f) );
-        StringBuilder build= new StringBuilder();
-        String line= r.readLine();
-        while ( line!=null ) {
-            build.append(line);
-            line= r.readLine();
+        try {    
+            String line= r.readLine();
+            while ( line!=null ) {
+                build.append(line);
+                line= r.readLine();
+            }
+        } finally {
+            r.close();
         }
-        r.close();
         return doVariables(build.toString(),params,paramsPanel);
     }
     
     
     /**
      * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
-     * @param f
+     * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
      * @return 
      */
