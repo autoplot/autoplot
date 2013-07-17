@@ -298,6 +298,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
             bds.putProperty( QDataSet.UNITS, 2, exunits );
             notesBuilder.putProperty( QDataSet.BUNDLE_1, bds.getDataSet() );
 
+            if ( delegateDataSourceFactory==null ) {
+                throw new IllegalArgumentException("unable to identify data source");
+            }
+            
             for (int i = 0; i < ss.length; i++) {
                 String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
                 if (!sparams.equals("")) {
