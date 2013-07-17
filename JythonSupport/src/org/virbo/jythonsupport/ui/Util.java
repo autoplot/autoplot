@@ -12,8 +12,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +53,8 @@ public class Util {
     
     /**
      * scrape the script for getParameter calls.
-     * @param uri
-     * @param mon
+     * @param uri location of the script, or resourceURI with script= parameter.
+     * @param mon monitor for loading the script
      * @return
      * @throws IOException 
      */
@@ -81,6 +83,27 @@ public class Util {
 
     }
 
+    /**
+     * scrape the script for getParameter calls.
+     * @param src the script, all in one string.
+     * @param mon
+     * @return
+     * @throws IOException 
+     */
+    protected static Map<String,JythonUtil.Param> getParams( String src, ProgressMonitor mon ) throws IOException {
+
+        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new BufferedReader( new StringReader(src) ) );
+
+        Map<String,JythonUtil.Param> result= new LinkedHashMap();
+
+        for ( JythonUtil.Param r : r2 ) {
+            result.put( r.name, r );
+        }
+
+        return result;
+
+    }
+    
     /**
      * TODO: params is object?
      * @param parms
@@ -159,8 +182,27 @@ public class Util {
      * @param params
      * @return 
      */
-    public static FormData doVariables( File f, Map<String,String> params, final JPanel paramsPanel ) {
-
+    public static FormData doVariables( File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
+        BufferedReader r;
+        r = new BufferedReader( new FileReader(f) );
+        StringBuilder build= new StringBuilder();
+        String line= r.readLine();
+        while ( line!=null ) {
+            build.append(line);
+            line= r.readLine();
+        }
+        r.close();
+        return doVariables(build.toString(),params,paramsPanel);
+    }
+    
+    
+    /**
+     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
+     * @param f
+     * @param params map containing any settings for the variables.
+     * @return 
+     */
+    public static FormData doVariables( String src, Map<String,String> params, final JPanel paramsPanel ) {
         Map<String,JythonUtil.Param> parms;
 
         FormData fd= new FormData();
@@ -174,7 +216,7 @@ public class Util {
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         
         try {
-            parms= getParams( f.toURI(), new NullProgressMonitor() );
+            parms= getParams( src, new NullProgressMonitor() );
 
             paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
@@ -391,7 +433,9 @@ public class Util {
             hasVars= parms.size()>0;
 
             if ( !hasVars ) {
-                paramsPanel.add( new JLabel("<html><em>no input parameters</em></html>") );
+                JLabel l= new JLabel("<html><em>(no input parameters)</em></html>");
+                l.setToolTipText("This looks through the code for getParam calls, and no conforming calls were found");
+                paramsPanel.add( l );
             }
 
             paramsPanel.add( Box.createVerticalGlue() );
