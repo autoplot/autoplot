@@ -25,6 +25,7 @@ import it.sauronsoftware.ftp4j.FTPListParser;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -70,6 +71,9 @@ public class UnixListParser implements FTPListParser {
 		int currentYear = now.get(Calendar.YEAR);
 		FTPFile[] ret = new FTPFile[size];
 		for (int i = 0; i < size; i++) {
+                        if ( lines[i].length()==0 ) {
+                            continue; // ftp://anonymous@vgrmag-data.gsfc.nasa.gov/pub/voyager/quicklook/v1/y09/
+                        }
 			Matcher m = PATTERN.matcher(lines[i]);
 			if (m.matches()) {
 				ret[i] = new FTPFile();
@@ -154,7 +158,11 @@ public class UnixListParser implements FTPListParser {
 				throw new FTPListParseException();
 			}
 		}
-		return ret;
+                int first= 0;
+                while ( first<ret.length && ret[first]==null ) first++;
+                
+                return Arrays.copyOfRange( ret, first, ret.length );
+		
 	}
 
 }
