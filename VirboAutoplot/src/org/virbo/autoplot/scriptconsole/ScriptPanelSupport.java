@@ -420,10 +420,10 @@ public class ScriptPanelSupport {
                                         System.err.println(s);
                                     }
                                     annotationsSupport.clearAnnotations();
-                                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) ) {
+                                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                                     JPanel p= new JPanel();
                                     Map<String,String> vars= new HashMap();
-                                    org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, vars, p );
+                                    org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( panel.getEditorPanel().getText(), vars, p );
                                     if ( fd.count>0 ) {
                                         if ( JOptionPane.showConfirmDialog( panel, p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             org.virbo.jythonsupport.ui.Util.resetVariables( fd, vars );
