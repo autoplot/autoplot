@@ -57,6 +57,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         if ( delegateFactory==null ) {
             delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory( suri );
         }
+        if ( delegateFactory==null ) {
+            throw new IllegalArgumentException("Unable to identify data source for "+suri);
+        }
         AggregatingDataSource ads = new AggregatingDataSource(uri,delegateFactory);
         String surl = DataSetURI.fromUri( uri );
         FileStorageModelNew fsm = getFileStorageModel(surl);
