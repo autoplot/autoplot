@@ -777,6 +777,7 @@ public class PlotElementController extends DomNodeController {
             if (fillDs != null) {
                 final String comp= plotElement.getComponent().trim();
                 if (resetPlotElement) {
+                    if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                     if (comp.equals("")) {
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
                         //logger.fine(" fillDs:" + fillDs + "  renderType:"+ renderType );
@@ -841,7 +842,7 @@ public class PlotElementController extends DomNodeController {
      * @throws IllegalArgumentException
      */
     private void updateDataSet() throws IllegalArgumentException {
-        //if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+        //if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug 1073 bug 1065.
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         if (!dom.controller.isValueAdjusting()) {
             Runnable run= new Runnable() {
