@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Adjusting the slice index no longer has the flickering.</small></p>
+        <p><small>Fix of the flickering (1065) introduced a bug, now fixed.  Thanks George for pointing this out!</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1073: switching renderers requires reset, broken after bugfix 1065.</li>
+            <li>The highest bin wasn't copied over in fftPower.</li>
             <li>1069: slice1 wasn't been implemented properly for CDFJava </li>
             <li>1067: -3010.00 in second column of ascii file misinterpreted as year </li>
             <li>1066: axis time range clipped off when TCAs are used when running in headless mode</li>
