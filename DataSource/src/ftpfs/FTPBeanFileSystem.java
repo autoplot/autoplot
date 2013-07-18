@@ -126,6 +126,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
             host= rooturi.getHost();
         }
 
+        // pop off the password
+        int icolon= userInfoNoPassword==null ? -1 : userInfoNoPassword.indexOf(":");
+        if ( icolon>-1 ) {
+            userInfoNoPassword= userInfoNoPassword.substring(0,icolon);
+        }
+
         File local = FileSystem.settings().getLocalCacheDir();
 
         String s = rooturi.getScheme() + "/"
