@@ -162,44 +162,44 @@ hasErrors=0
 # compile key java classes.
 echo "compile sources..."
 cd temp-src
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotDataServer.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/dsutil/*.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
-#if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/util/filesystem/*.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotDataServer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/dsutil/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
+#if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/util/filesystem/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
 echo "compile AbstractIOSP and APIOServiceProvider"
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
 
 cd ..
 echo "done compile sources."
