@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.autoplot.layout.LayoutUtil;
 
 /**
@@ -56,12 +57,13 @@ public class LayoutListener implements PropertyChangeListener {
                             if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795
                                 logger.fine("do autolayout");
                                 ApplicationController applicationController= model.getDocumentModel().getController();
-                                model.dom.getController().getCanvas().getController().performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                                CanvasController cc= model.dom.getController().getCanvas().getController();
+                                cc.performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                                 model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
                                 LayoutUtil.autolayout( applicationController.getDasCanvas(),
                                         applicationController.getRow(), applicationController.getColumn() );
                                 model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                                model.dom.getController().getCanvas().getController().changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                                cc.changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                             } else {
                                 //TODO: maybe we want a changeCancelled.
                                 model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
