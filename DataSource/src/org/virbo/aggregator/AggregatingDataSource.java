@@ -56,8 +56,11 @@ import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.dsutil.Reduction;
 
 /**
- *
- * http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109
+ * Data Source that aggregates (or combines) the data from granule files containing 
+ * data for intervals.  For example, 
+ * http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v$v.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109
+ * is the aggregation of daily files from the CDAWeb.  This provides an 
+ * easy method for storing a long time series without having a fancy data server.
  * @author jbf
  */
 public final class AggregatingDataSource extends AbstractDataSource {
