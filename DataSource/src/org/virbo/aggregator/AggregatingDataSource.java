@@ -211,12 +211,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
         
-        ReferenceCache.ReferenceCacheEntry rcent=null;
+        ReferenceCache.ReferenceCacheEntry cacheEntry=null;
         if ( useReferenceCache ) {
-            rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
-            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+            cacheEntry= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
+            if ( !cacheEntry.shouldILoad( Thread.currentThread() ) ) {
                 try {
-                    QDataSet result= rcent.park( mon );
+                    QDataSet result= cacheEntry.park( mon );
                     return result;
                 } catch ( Exception ex ) {
                     throw ex;
@@ -231,7 +231,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             Datum lresolution= resolution;
 
             String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
-
+            
             boolean avail= !getParam( "avail", "F" ).equals("F");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
 
@@ -269,6 +269,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
 
             logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, lviewRange});
+            StringBuilder log= new StringBuilder( "== getDataSet will read the following ==" );
+            for ( String s : ss ) {
+                log.append("\n").append(s);
+            }
+            logger.log( Level.FINE, log.toString() );
+
+            
 
             ArrayDataSet result = null;
             JoinDataSet altResult= null; // used when JoinDataSets are found
@@ -471,10 +478,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 }
 
                 QDataSet notes= notesBuilder.getDataSet();
-                if ( altResult!=null && notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
-                if ( altResult!=null ) altResult.putProperty( QDataSet.USER_PROPERTIES, userProps );
+                if ( notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
+                altResult.putProperty( QDataSet.USER_PROPERTIES, userProps );
 
-                if ( rcent!=null ) rcent.finished(altResult);
+                if ( cacheEntry!=null ) cacheEntry.finished(altResult);
                 return altResult;
 
             } else {
@@ -489,7 +496,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 QDataSet notes= notesBuilder.getDataSet();
                 if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
                 if ( result!=null ) result.putProperty( QDataSet.USER_PROPERTIES, userProps );
-                if ( rcent!=null ) rcent.finished(result);
+                if ( cacheEntry!=null ) cacheEntry.finished(result);
                 
                 // check to see if all the notes are the same explaining the exception
                 if ( result==null && notes.length()>0 ) { 
@@ -507,7 +514,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return result;
             }
         } catch ( Exception ex ) {
-            if ( rcent!=null ) rcent.exception(ex);
+            if ( cacheEntry!=null ) cacheEntry.exception(ex);
             throw ex;
         }
 
