@@ -1,6 +1,7 @@
 
 package org.autoplot.inline;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -178,6 +179,12 @@ public class InlineDataSource extends AbstractDataSource {
 
         logger.log( Level.FINER, "create interpreter");
         interp= JythonUtil.createInterpreter(false);
+        if ( ! org.virbo.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
+            logger.log( Level.FINER, "import the stuff we don't import automatically anymore");
+            InputStream in=  org.virbo.jythonsupport.Util.class.getResource("imports.py").openStream();
+            interp.execfile( in, "imports.py");
+            in.close();
+        }
                 
         String s= getURI();
 
