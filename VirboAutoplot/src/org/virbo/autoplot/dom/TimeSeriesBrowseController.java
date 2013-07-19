@@ -109,8 +109,13 @@ public class TimeSeriesBrowseController {
                     if ( p!=null && ( p.getController().getDataSourceFilter()==null || p.getController().getDataSourceFilter().getController().getTsb() == null ) ) {
                     } else {
                         updateTsb(false);
-                        changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
-                        changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set.
+                        // little sloppy, since only one or the other is set.
+                        if ( changesSupport.whoIsChanging(PENDING_AXIS_DIRTY).size()==1 ) {
+                            changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
+                        } 
+                        if ( changesSupport.whoIsChanging(PENDING_TIMERANGE_DIRTY).size()==1 ) {
+                            changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_TIMERANGE_DIRTY ); 
+                        }
                     }
                 }
             }
@@ -151,7 +156,7 @@ public class TimeSeriesBrowseController {
             public void propertyChange(PropertyChangeEvent e) {
                 //we should have something to listen for locks.
                 if (e.getPropertyName().equals(property)) {
-                    changesSupport.registerPendingChange( this, PENDING_TIMERANGE_DIRTY );
+                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_TIMERANGE_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         setTimeRange( dr );
@@ -205,6 +210,7 @@ public class TimeSeriesBrowseController {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
             try {
+                changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
                 this.setTimeRange( tr );
                 if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
@@ -223,7 +229,7 @@ public class TimeSeriesBrowseController {
                     this.plot.getXAxis().setScanRange(null);
                 }
                 updateTsb(true);
-                changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
+                changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
             } catch ( RuntimeException e ) {
                 throw e;
             }
@@ -239,14 +245,14 @@ public class TimeSeriesBrowseController {
                     return;
                 } 
                 if (e.getPropertyName().equals("datumRange")) {
-                    changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
+                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
                 } else if ( e.getPropertyName().equals( Plot.PROP_CONTEXT ) ) {
-                    changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
+                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         setTimeRange( dr );
