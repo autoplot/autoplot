@@ -60,7 +60,7 @@ public class JythonUtil {
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         
-        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // must be in the root
+        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // must be in the root  //TODO: I don't think autoplotapp.py should be here...
         for ( String pysrc: loadClasses ) {
             URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
             if ( jarUrl!=null ) {
