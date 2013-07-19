@@ -47,7 +47,8 @@ public class JythonUtil {
      * create an interpreter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
      *   * a standard set of names are imported.
-     *   
+     * This also adds things to the python search path so imports will find them.
+     * 
      * @param sandbox limit symbols to safe symbols for server.
      * @return PythonInterpreter ready for commands.
      * @throws java.io.IOException
