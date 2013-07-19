@@ -8,13 +8,11 @@ package org.virbo.autoplot;
 import external.PlotCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -24,30 +22,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import org.das2.components.DasProgressPanel;
-import org.das2.datum.Datum;
-import org.das2.datum.TimeParser;
-import org.das2.datum.Units;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.python.core.PyException;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.scriptconsole.MakeToolPanel;
-import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
@@ -74,7 +61,9 @@ public class JythonUtil {
      */
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
         InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
-        if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
+        if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
+            if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
+        }
         interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
         return interp;
