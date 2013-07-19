@@ -56,31 +56,31 @@ public class JythonUtil {
         if ( PySystemState.cachedir==null ) {
             System.setProperty( "python.cachedir", System.getProperty("user.home")+"/autoplot_data/pycache" );
         }
-
-        //r.
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
-        URL jarUrl= InteractiveInterpreter.class.getResource("/glob.py");
-        if ( jarUrl!=null ) {
-            String jarFile= jarUrl.toString();
-
-            if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
-                int i= jarFile.indexOf("!");
-                String jar= jarFile.substring(9,i);
-                File ff= new File(jar);
-                if ( ff.exists() ) {
-                    pySys.path.insert(0, new PyString(jar));
+        
+        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // must be in the root
+        for ( String pysrc: loadClasses ) {
+            URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
+            if ( jarUrl!=null ) {
+                String jarFile= jarUrl.toString();
+                if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
+                    int i= jarFile.indexOf("!");
+                    String jar= jarFile.substring(9,i);
+                    File ff= new File(jar);
+                    if ( ff.exists() ) {
+                        pySys.path.insert(0, new PyString(jar));
+                    } else {
+                        String f= getLocalJythonLib();
+                        pySys.path.insert(0, new PyString( f ));
+                    }
                 } else {
                     String f= getLocalJythonLib();
                     pySys.path.insert(0, new PyString( f ));
                 }
             } else {
-                String f= getLocalJythonLib();
-                pySys.path.insert(0, new PyString( f ));
+                logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
             }
-            
-        } else {
-            logger.warning("Not adding Lib stuff!!!  See https://sourceforge.net/tracker/index.php?func=detail&aid=3134982&group_id=199733&atid=970682");
         }
 
         InteractiveInterpreter interp = new InteractiveInterpreter( null, pySys );
@@ -88,11 +88,13 @@ public class JythonUtil {
         boolean loadAutoplotStuff= true;
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
-            URL imports= JythonOps.class.getResource("imports.py");
-            if ( imports==null ) {
-                throw new RuntimeException("unable to locate imports.py on classpath");
+            if ( Util.isLegacyImports() ) {
+                URL imports= JythonOps.class.getResource("imports.py");
+                if ( imports==null ) {
+                    throw new RuntimeException("unable to locate imports.py on classpath");
+                }
+                interp.execfile(imports.openStream(), "imports.py");
             }
-            interp.execfile(imports.openStream(), "imports.py");
         }
 
         return interp;
