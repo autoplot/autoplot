@@ -55,7 +55,9 @@ public class RequestHandler {
         try {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
-            interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
+            if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
+                interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
+            }
             interp.setOut( out );
             interp.set("dom", model.getDocumentModel() );
             interp.set("params", new PyDictionary());
