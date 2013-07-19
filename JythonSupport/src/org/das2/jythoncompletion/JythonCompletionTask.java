@@ -515,13 +515,10 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             if (jythonInterpreterProvider != null) {
                 interp = jythonInterpreterProvider.createInterpreter();
-
-                URL imports = JythonOps.class.getResource("imports.py");
-                interp.execfile(imports.openStream());
-
             } else {
                 interp = new PythonInterpreter();
-
+            }
+            if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
                 URL imports = JythonOps.class.getResource("imports.py");
                 interp.execfile(imports.openStream());
             }
