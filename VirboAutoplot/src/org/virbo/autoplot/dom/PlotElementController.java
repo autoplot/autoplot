@@ -569,18 +569,6 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-    /**
-     * returns true for commands (executed by sprocess, see the Operations element)
-     * that cannot occur in interactive time.  They would block the AWT event thread
-     * making the GUI uncontrollable while the process is running.  
-     * Right now just the FFT processes are marked and run on a different thread.
-     *
-     * @param cmd
-     * @return
-     */
-    private boolean isAsyncProcess( String cmd ) {
-        return DataSetOps.isProcessAsync(cmd);
-    }
 
     /**
      * set the dataset that will be plotted.  If the component property is non-null, then
@@ -645,12 +633,6 @@ public class PlotElementController extends DomNodeController {
         if ( fillDs!=null && getRenderer() != null) {
             if (rendererAcceptsData(fillDs)) {
                 getRenderer().setDataSet(fillDs);
-//                setStatus("adapting to legacy data model...");
-//                org.das2.dataset.DataSet das2ds= DataSetAdapter.createLegacyDataSet(fillDs);
-//                setStatus("done, adapting to legacy data model");
-//                setStatus("pass dataset to renderer...");
-//                getRenderer().setDataSet(das2ds);
-//                setStatus("done, pass dataset to renderer");
             } else {
                 getRenderer().setDataSet(null);
                 getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
@@ -797,8 +779,6 @@ public class PlotElementController extends DomNodeController {
                             setStatus("warning: Exception in process: " + ex );
                             getRenderer().setException(getRootCause(ex));
                             renderException= ex;
-                        } finally {
-                            changePerformed( this, PENDING_UPDATE_DATASET );
                         }
                     } else {
                         if (renderer == null) maybeCreateDasPeer();
@@ -809,8 +789,6 @@ public class PlotElementController extends DomNodeController {
                             setStatus("warning: Exception in process: " + ex );
                             getRenderer().setException(getRootCause(ex));
                             renderException= ex;
-                        } finally {
-                            changePerformed( this, PENDING_UPDATE_DATASET );
                         }
                     }
                 } else if (resetRanges) {
@@ -838,12 +816,14 @@ public class PlotElementController extends DomNodeController {
 
     /**
      * get the dataset from the dataSourceFilter, and plot it possibly after
-     * slicing component.
+     * slicing component.  Changing the component (slice) will re-enter the
+     * code here.
      * @throws IllegalArgumentException
      */
     private void updateDataSet() throws IllegalArgumentException {
         //if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug 1073 bug 1065.
         registerPendingChange( this, PENDING_UPDATE_DATASET );
+        //TODO: we should hand off the dataset here instead of mucking around with it...  
         if (!dom.controller.isValueAdjusting()) {
             Runnable run= new Runnable() {
                 public void run() { // java complains about method not override.
