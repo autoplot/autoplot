@@ -476,7 +476,12 @@ public class DataSourceController extends DomNodeController {
                 return;
             }
         }
-
+        //try {
+           // Thread.sleep(1000);
+        //} catch (InterruptedException ex) {
+        //    Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+      //  }
+        
         if ( this.getTimeSeriesBrowseController()!=null && ds!=null && !isTimeSeries(ds) && this.getTimeSeriesBrowseController().isListeningToAxis() ) {
             // the dataset we get back isn't part of a time series.  So we should connect the TSB
             // to the application TimeRange property.
@@ -1162,6 +1167,7 @@ public class DataSourceController extends DomNodeController {
      *
      */
     public synchronized void update() {
+        changesSupport.registerPendingChange(this, PENDING_UPDATE);
         changesSupport.performingChange(this, PENDING_UPDATE);
 
         logger.log(Level.FINE, "request update {0}", getDataSource());
@@ -1171,19 +1177,22 @@ public class DataSourceController extends DomNodeController {
         Runnable run = new Runnable() {
 
             public void run() {
-                synchronized (DataSourceController.this) {
-                    updateImmediately();
-                    if (dataSource != null) {
-                        if (updating != null) {
-                            updating.removePropertyChangeListener(updatesListener);
-                        }
-                        updating = dataSource.getCapability(Updating.class);
-                        if (updating != null) {
-                            updating.addPropertyChangeListener(updatesListener);
+                try {
+                    synchronized (DataSourceController.this) {
+                        updateImmediately();
+                        if (dataSource != null) {
+                            if (updating != null) {
+                                updating.removePropertyChangeListener(updatesListener);
+                            }
+                            updating = dataSource.getCapability(Updating.class);
+                            if (updating != null) {
+                                updating.addPropertyChangeListener(updatesListener);
+                            }
                         }
                     }
+                } finally {
+                    changesSupport.changePerformed( DataSourceController.this, PENDING_UPDATE);
                 }
-                changesSupport.changePerformed(this, PENDING_UPDATE);
             }
             
             @Override
