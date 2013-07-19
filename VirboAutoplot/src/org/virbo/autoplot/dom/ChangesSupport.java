@@ -35,6 +35,10 @@ import org.virbo.autoplot.LogNames;
  */
 public final class ChangesSupport {
     Map<Object,Object> changesPending;
+    
+    // number of said changes, typically 1.
+    Map<Object,Integer> changeCount;
+    
     WeakReference<Object> parent;
     private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
@@ -47,6 +51,7 @@ public final class ChangesSupport {
     ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
         this.parent= new WeakReference<Object>(parent);
         this.changesPending= new HashMap<Object,Object>(); // lockObject -> client
+        this.changeCount= new HashMap<Object,Integer>();
         if ( pcs==null ) {
             pcs= new PropertyChangeSupport(parent);
         }
@@ -88,12 +93,20 @@ public final class ChangesSupport {
         if ( existingClient!=null ) {
             if ( existingClient!=client ) {
                 throw new IllegalStateException( "lock object in use: "+lockObject + ", by "+changesPending.get(lockObject) );
+            } else if ( existingClient==client ) {
+                logger.log( Level.INFO, "bug 1075: second change registered but the first was not done.");
             } else {
                 return;
             }
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.put( lockObject, client );
+        Integer count= changeCount.get(lockObject);
+        if ( count==null ) {
+            changeCount.put( lockObject, 1 );
+        } else {
+            changeCount.put( lockObject, count+1 );
+        }
         propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
@@ -122,6 +135,7 @@ public final class ChangesSupport {
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
         logger.log( Level.FINE, "clearPendingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
+        Integer count= changeCount.get(lockObject);
         Object ownerClient= changesPending.get(lockObject);
         if ( ownerClient==null ) {
            // throw new IllegalStateException( "no such lock object: "+lockObject );  //TODO: handle multiple registrations by the same client
@@ -130,7 +144,20 @@ public final class ChangesSupport {
             logger.log(Level.INFO, "change performed client object is not owner {0}", ownerClient );
         }
         boolean oldVal= this.isPendingChanges();
-        changesPending.remove(lockObject);
+        if ( count==null ) {
+            logger.log(Level.INFO, "expect value for changeCount {0}", lockObject);
+        } else {
+            count= count-1;
+            if ( count==0 ) {
+                changesPending.remove(lockObject);
+                changeCount.remove(lockObject);
+            } else if ( count>0) {
+                changeCount.put(lockObject,count);
+            } else {
+                throw new IllegalStateException("what happened here--changeCount<0!");
+            }
+        }
+
         propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
