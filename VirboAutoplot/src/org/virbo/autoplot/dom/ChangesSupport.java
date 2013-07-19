@@ -46,7 +46,7 @@ public final class ChangesSupport {
      */
     ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
         this.parent= new WeakReference<Object>(parent);
-        this.changesPending= new HashMap<Object,Object>(); // client->lock
+        this.changesPending= new HashMap<Object,Object>(); // lockObject -> client
         if ( pcs==null ) {
             pcs= new PropertyChangeSupport(parent);
         }
@@ -54,7 +54,7 @@ public final class ChangesSupport {
     }
 
     /**
-     * returns the clients who have registed the change.  Note this
+     * returns the clients who have registered the change.  Note this
      * implementation only allows for one client for each lock object.
      * @param lockObject object identifying the change.
      * @return clients who have registered the change.
@@ -105,8 +105,11 @@ public final class ChangesSupport {
      * @param lockObject an object identifying the change.  
      */
     synchronized void performingChange( Object client, Object lockObject ) {
-        Object c= changesPending.get(lockObject);
-        if ( c==null || c!=client ) {
+        Object ownerClient= changesPending.get(lockObject);
+        if ( ownerClient==null || ownerClient!=client ) {
+            if ( ownerClient!=null && ownerClient!=client ) {
+                logger.log(Level.INFO, "performingChange by client object is not owner {0}", client );
+            }
             registerPendingChange( client, lockObject );
         }
         logger.log( Level.FINE, "performingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
@@ -119,9 +122,12 @@ public final class ChangesSupport {
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
         logger.log( Level.FINE, "clearPendingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
-        if ( changesPending.get(lockObject)==null ) {
+        Object ownerClient= changesPending.get(lockObject);
+        if ( ownerClient==null ) {
            // throw new IllegalStateException( "no such lock object: "+lockObject );  //TODO: handle multiple registrations by the same client
             logger.log(Level.INFO, "no lock object found for {0}", lockObject);
+        } else if ( ownerClient!=client ) {
+            logger.log(Level.INFO, "change performed client object is not owner {0}", ownerClient );
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.remove(lockObject);
@@ -139,8 +145,8 @@ public final class ChangesSupport {
         } else {
             return false;
         }
-
     }
+    
 
     /**
      * null, "", or a description of the change
