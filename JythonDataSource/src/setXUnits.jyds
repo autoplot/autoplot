@@ -1,0 +1,6 @@
+resourceURI= getParam( 'resourceURI', 'file:///home/jbf/project/autoplot/data/dat/pw/george/WBR Raw Data 2004-175T00.txt', 'example file to load' )
+ds= getDataSet( resourceURI + '?depend0=field1&column=field3' )
+dep0= ds.property( QDataSet.DEPEND_0 )
+dep0.putProperty( QDataSet.UNITS, Units.milliseconds )
+ds.putProperty( QDataSet.DEPEND_0, dep0 )
+result= ds
