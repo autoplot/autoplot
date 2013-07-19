@@ -121,6 +121,7 @@ public final class ChangesSupport {
         logger.log( Level.FINE, "clearPendingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
         if ( changesPending.get(lockObject)==null ) {
            // throw new IllegalStateException( "no such lock object: "+lockObject );  //TODO: handle multiple registrations by the same client
+            logger.log(Level.INFO, "no lock object found for {0}", lockObject);
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.remove(lockObject);
