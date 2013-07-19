@@ -74,6 +74,9 @@ public class JythonUtil {
                         String f= getLocalJythonLib();
                         pySys.path.insert(0, new PyString( f ));
                     }
+                } else if ( jarUrl.toString().startsWith("file:/") ) {
+                    File f= new File( jarUrl.getFile() );  //TODO: test on Windows
+                    pySys.path.insert(0, new PyString( f.getParent() ));
                 } else {
                     String f= getLocalJythonLib();
                     pySys.path.insert(0, new PyString( f ));
