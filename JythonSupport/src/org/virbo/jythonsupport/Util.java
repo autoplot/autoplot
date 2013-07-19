@@ -438,7 +438,15 @@ public class Util {
 
     }
         
-
+    /**
+     * return true if we should do the imports as before, where all of Autoplot is
+     * imported with each session.  This is used to ease migration.
+     * @return 
+     */
+    public static boolean isLegacyImports() {
+        return true;
+    }
+    
     public static void main( String[] args ) throws Exception {
         DataSetURI.init();
         String uri= "file:///Users/jbf/data/rbsp-a_WFR-spectral-matrix_emfisis-Quick-Look_20120911_v1.2.6.cdf?BuBu[::40]";
