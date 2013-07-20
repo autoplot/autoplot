@@ -39,6 +39,9 @@ public final class ChangesSupport {
     // number of said changes, typically 1.
     Map<Object,Integer> changeCount;
     
+    // threads, for debugging.
+    Map<Object,String> threads;
+    
     WeakReference<Object> parent;
     private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
 
@@ -52,6 +55,7 @@ public final class ChangesSupport {
         this.parent= new WeakReference<Object>(parent);
         this.changesPending= new HashMap<Object,Object>(); // lockObject -> client
         this.changeCount= new HashMap<Object,Integer>();
+        this.threads= new HashMap<Object,String>(); // lockObject -> thread ID.
         if ( pcs==null ) {
             pcs= new PropertyChangeSupport(parent);
         }
@@ -101,6 +105,7 @@ public final class ChangesSupport {
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.put( lockObject, client );
+        threads.put( lockObject, Thread.currentThread().toString() );
         propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
@@ -156,6 +161,7 @@ public final class ChangesSupport {
         
         if ( count==0 ) {
             changesPending.remove(lockObject);
+            threads.remove( lockObject );
             changeCount.remove(lockObject);
         } else if ( count>0) {
             changeCount.put(lockObject,count);
