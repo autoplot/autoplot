@@ -45,6 +45,7 @@ public class TimeSeriesBrowseController {
 
     private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
     private static final String PENDING_TIMERANGE_DIRTY= "tsbTimerangeDirty";
+    private static final String PENDING_AXIS_OR_TIMERANGE_DIRTY= "tsbAxisOrTimerangeDirty";
 
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.tsb");
     TickleTimer updateTsbTimer;
@@ -95,27 +96,29 @@ public class TimeSeriesBrowseController {
                     List<Axis> otherAxes= getOtherBoundAxes( dom, domPlot.getXaxis() );
                     for ( Axis a: otherAxes ) {
                         if ( a.getController().getDasAxis().valueIsAdjusting() ) {
-                            updateTsbTimer.tickle();
+                            updateTsbTimer.tickle(); 
                             logger.log( Level.FINEST, "{0} is adjusting", a);
                             return;
                         }
                     }
                 }
-                
+
+                final PlotElement fpe= p;
+                final DataSourceFilter fdsf= p!=null ? p.getController().getDataSourceFilter() : null;
+                final TimeSeriesBrowse ftsb= fdsf!=null ?  p.getController().getDataSourceFilter().getController().getTsb() : null;
+
                 if ( dom.getController().isValueAdjusting() ) {
-                    updateTsbTimer.tickle();
+                    updateTsbTimer.tickle(); 
                     logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
-                    if ( p!=null && ( p.getController().getDataSourceFilter()==null || p.getController().getDataSourceFilter().getController().getTsb() == null ) ) {
-                    } else {
-                        updateTsb(false);
-                        // little sloppy, since only one or the other is set.
-                        if ( changesSupport.whoIsChanging(PENDING_AXIS_DIRTY).size()==1 ) {
-                            changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
-                        } 
-                        if ( changesSupport.whoIsChanging(PENDING_TIMERANGE_DIRTY).size()==1 ) {
-                            changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_TIMERANGE_DIRTY ); 
+                    try {
+                        changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                        if ( fpe!=null && ( fdsf==null || ftsb == null ) ) {
+                        } else {
+                            updateTsb(false);
                         }
+                    } finally {
+                        changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                     }
                 }
             }
@@ -156,14 +159,13 @@ public class TimeSeriesBrowseController {
             public void propertyChange(PropertyChangeEvent e) {
                 //we should have something to listen for locks.
                 if (e.getPropertyName().equals(property)) {
-                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_TIMERANGE_DIRTY );
+                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         setTimeRange( dr );
                     } else {
                         release();
                     }
-                    
                     updateTsbTimer.tickle();
                 }
             }
@@ -229,9 +231,10 @@ public class TimeSeriesBrowseController {
                     this.plot.getXAxis().setScanRange(null);
                 }
                 updateTsb(true);
-                changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
             } catch ( RuntimeException e ) {
                 throw e;
+            } finally {
+                changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
             }
         }
 
@@ -245,16 +248,16 @@ public class TimeSeriesBrowseController {
                     return;
                 } 
                 if (e.getPropertyName().equals("datumRange")) {
-                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
+                        changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
                 } else if ( e.getPropertyName().equals( Plot.PROP_CONTEXT ) ) {
-                    changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
+                        changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
