@@ -2228,7 +2228,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         ac.bind(application.options, "canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
     }
 
-    protected synchronized void syncTo( Application that, List<String> exclude ) {
+    protected void syncTo( Application that, List<String> exclude ) {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock( "Sync to Application" );
         Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
@@ -2262,7 +2262,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
             application.setTimeRange(that.getTimeRange());
-            
+
             syncSupport.syncBindingsNew( that.getBindings(), nameMap );
             syncSupport.syncConnectors(that.getConnectors());
 
