@@ -111,6 +111,7 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 // do nothing
             } else {
+                DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
                     logger.log(Level.WARNING, "!!! someone is changing: {0} !!!  ignoring event.", whoIsChanging); // we probably need to do something with this.
@@ -119,19 +120,24 @@ public class DataSourceController extends DomNodeController {
                     logger.log(Level.WARNING, " !! {0}", e.getOldValue());
                     return;
                 }
-                DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
-                    DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
-                    resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
-                    DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                    try {
+                        DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                        resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
+                    } finally {
+                        DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                    }
                 } else {
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true ) {
                         @Override
                         public void run() {
-                            DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
-                            if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
-                            DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                            try {
+                                DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                                if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
+                            } finally {
+                                DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
+                            }
                         }
                     };
                 }
@@ -924,13 +930,14 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * call updateFill in new thread
-     * @param delay insert this delay so other threads may complete first.
+     * @param delay insert this delay so other threads may complete first. 
      */
     private void updateFillSoon( final int delay ) {
-        changesSupport.performingChange(this, PENDING_FILL_DATASET);
+        changesSupport.registerPendingChange(this, PENDING_FILL_DATASET);
         Runnable run= new Runnable() {
             public void run() {
                 try {
+                    changesSupport.performingChange(DataSourceController.this, PENDING_FILL_DATASET);
                     if ( delay>0 ) {
                         try {
                             Thread.sleep(delay);
@@ -940,7 +947,7 @@ public class DataSourceController extends DomNodeController {
                     }
                     updateFill();
                 } finally {
-                    changesSupport.changePerformed(this, PENDING_FILL_DATASET);
+                    changesSupport.changePerformed(DataSourceController.this, PENDING_FILL_DATASET);
                 }
             }
         };
