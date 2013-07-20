@@ -556,12 +556,15 @@ public class DataSourceController extends DomNodeController {
      * return the parent sources of data, which may contain null if the reference is not found.
      * @return
      */
-    protected synchronized DataSourceFilter[] getParentSources() {
+    protected DataSourceFilter[] getParentSources() {
         if ( parentSources==null ) {
             return new DataSourceFilter[0];
         } else {
-            DataSourceFilter[] parentSources1= new DataSourceFilter[parentSources.length];
-            System.arraycopy(parentSources, 0, parentSources1, 0, parentSources.length );
+            DataSourceFilter[] parentSources1;
+            synchronized ( this ) {
+                parentSources1= new DataSourceFilter[parentSources.length];
+                System.arraycopy(parentSources, 0, parentSources1, 0, parentSources.length );
+            }
             return parentSources1;
         }
     }
