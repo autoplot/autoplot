@@ -101,12 +101,6 @@ public final class ChangesSupport {
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.put( lockObject, client );
-        Integer count= changeCount.get(lockObject);
-        if ( count==null ) {
-            changeCount.put( lockObject, 1 );
-        } else {
-            changeCount.put( lockObject, count+1 );
-        }
         propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
@@ -114,6 +108,8 @@ public final class ChangesSupport {
      * performingChange tells that the change is about to be performed.  This
      * is a place holder in case we use a mutator lock, but currently does
      * nothing.  If the change has not been registered, it will be registered implicitly.
+     * This will increment the internal count of how many times the change
+     * ought to occur.
      * @param client the object that is mutating the bean.
      * @param lockObject an object identifying the change.  
      */
@@ -125,12 +121,19 @@ public final class ChangesSupport {
             }
             registerPendingChange( client, lockObject );
         }
+        Integer count= changeCount.get(lockObject);
+        if ( count==null ) {
+            changeCount.put( lockObject, 1 );
+        } else {
+            changeCount.put( lockObject, count+1 );
+        }
+
         logger.log( Level.FINE, "performingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
     }
 
     /**
      * the change is complete, and as far as the client is concerned, the canvas
-     * is valid.
+     * is valid.  This will decrement the count of how many times the change ought to occur.
      * @param lockObject
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
@@ -145,18 +148,21 @@ public final class ChangesSupport {
         }
         boolean oldVal= this.isPendingChanges();
         if ( count==null ) {
-            logger.log(Level.INFO, "expect value for changeCount {0}", lockObject);
+            logger.log(Level.INFO, "expect value for changeCount {0}, was performingChange called?", lockObject);
+            count= 0;
         } else {
             count= count-1;
-            if ( count==0 ) {
-                changesPending.remove(lockObject);
-                changeCount.remove(lockObject);
-            } else if ( count>0) {
-                changeCount.put(lockObject,count);
-            } else {
-                throw new IllegalStateException("what happened here--changeCount<0!");
-            }
         }
+        
+        if ( count==0 ) {
+            changesPending.remove(lockObject);
+            changeCount.remove(lockObject);
+        } else if ( count>0) {
+            changeCount.put(lockObject,count);
+        } else {
+            throw new IllegalStateException("what happened here--changeCount<0!");
+        }
+
 
         propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
