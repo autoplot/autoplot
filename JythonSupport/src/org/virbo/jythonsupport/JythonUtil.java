@@ -79,8 +79,14 @@ public class JythonUtil {
                     File f= new File( jarUrl.getFile() );  //TODO: test on Windows
                     pySys.path.insert(0, new PyString( f.getParent() ));
                 } else {
-                    String f= getLocalJythonLib();
-                    pySys.path.insert(0, new PyString( f ));
+                    if ( pysrc.equals("glob.py") ) {
+                        String f= getLocalJythonLib();
+                        pySys.path.insert(0, new PyString( f ));
+                    } else if ( pysrc.equals("autoplot.py") || pysrc.equals("autoplotapp.py") ) {
+                        //TODO: danger code will surely cause problems...
+                        String f= getLocalJythonAutoplotLib();
+                        pySys.path.insert(0, new PyString( f ));
+                    }
                 }
             } else {
                 logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
@@ -117,7 +123,20 @@ public class JythonUtil {
         logger.fine("   ...done");
         return ff.toString();
     }
-
+    
+    private static String getLocalJythonAutoplotLib() throws IOException {
+        File ff2= FileSystem.settings().getLocalCacheDir();
+        File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/ap-jython-lib.jar" );
+        if ( ! ff.exists() ) {
+            logger.log(Level.WARNING, "looking for {0}, but didn''t find it.", ff);
+            logger.warning("doesn't seem like we have the right file, downloading...");
+            File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/ap-jython-lib.jar"), new NullProgressMonitor() );
+            ff= f;
+        }
+        logger.fine("   ...done");
+        return ff.toString();
+    }
+        
     /**
      * check the script that it doesn't redefine symbol names like "str"
      * @param code
