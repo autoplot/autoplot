@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
@@ -94,11 +95,25 @@ public class ScriptContext extends PyJavaInstance {
     private static synchronized void maybeInitView() {
         maybeInitModel();
         if (view == null) {
-            view = new AutoplotUI(model);
+            Runnable run= new Runnable() {
+                public void run() {
+                    view = new AutoplotUI(model);
+                    view.setVisible(true);
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(run);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
-        view.setVisible(true);
         view.setMessage( AutoplotUI.READY_MESSAGE );
-
     }
 
     /**
