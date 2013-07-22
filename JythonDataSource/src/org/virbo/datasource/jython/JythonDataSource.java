@@ -213,22 +213,22 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
 
                 interp.set("PWD",split.path);
-                interp.exec("params=dict()");
+                interp.exec("import autoplot");
+                interp.exec("autoplot.params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
                     String s= e.getKey();
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= e.getValue();
                         
                         sval= maybeQuoteString( sval );
-                        logger.log(Level.FINE, "params[''{0}'']={1}", new Object[]{s, sval});
-                        interp.exec("params['" + s + "']=" + sval);
+                        logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
+                        interp.exec("autoplot.params['" + s + "']=" + sval);
                     }
                 }
-
                 
                 if ( resourceURI!=null ) {
                     interp.set("resourceURI", resourceURI); // legacy
-                    interp.exec("params['resourceURI']="+ maybeQuoteString( resourceURI ) );
+                    interp.exec("autoplot.params['resourceURI']="+ maybeQuoteString( resourceURI ) );
                 }
 
                 mon.setProgressMessage( "executing script");
