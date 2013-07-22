@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fix of the flickering (1065) introduced a bug, now fixed.  Thanks George for pointing this out!</small></p>
+        <p><small>Bug 1074 was a strange lockup first seen at LANL on Linux.  New "status" script allows us
+                to see why it's getting locked up.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +26,10 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>bugfix where one-dataset bundle wouldn't plot as Y(T)</li>
+            <li>1076: width=0 causes runtime error dialog.</li>
+            <li>1075: changesSupport needs to keep a count</li>
+            <li>1074: lockup because of loose thread safety</li> 
             <li>1073: switching renderers requires reset, broken after bugfix 1065.</li>
             <li>The highest bin wasn't copied over in fftPower.</li>
             <li>1069: slice1 wasn't been implemented properly for CDFJava </li>
