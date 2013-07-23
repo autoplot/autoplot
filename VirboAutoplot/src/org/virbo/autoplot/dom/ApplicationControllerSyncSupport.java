@@ -70,6 +70,7 @@ public class ApplicationControllerSyncSupport {
             //application.plotElements.get(i).getController().resetRenderType( plotElements[i].getRenderType() );
             application.plotElements.get(i).setDataSourceFilterId(nameMap.get(elements[i].getDataSourceFilterId()));
             application.plotElements.get(i).getController().setDsfReset(false);
+            application.plotElements.get(i).getController().setResetPlotElement(false);
         }
     }
 
