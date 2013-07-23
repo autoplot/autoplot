@@ -758,6 +758,7 @@ public class PlotElementController extends DomNodeController {
             Exception renderException= null;
             if (fillDs != null) {
                 final String comp= plotElement.getComponent().trim();
+                logger.log(Level.FINE, "updateDataSetImmediately: {0} {1} {2}", new Object[]{plotElement, plotElement.getRenderType(), resetPlotElement});
                 if (resetPlotElement) {
                     if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                     if (comp.equals("")) {
