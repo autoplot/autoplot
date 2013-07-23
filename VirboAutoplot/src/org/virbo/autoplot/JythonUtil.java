@@ -96,9 +96,7 @@ public class JythonUtil {
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
 
-        System.err.println();
-        
-        interp.exec("params=dict()"); // untested.
+        interp.exec("import autoplot");
         int iargv=-1;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf("=");
@@ -106,7 +104,7 @@ public class JythonUtil {
                 String snam= s.substring(0,ieq).trim();
                 if ( DataSourceUtil.isJavaIdentifier(snam) ) {
                     String sval= s.substring(ieq+1).trim();
-                    interp.exec("params['" + snam + "']='" + sval+"'");
+                    interp.exec("autoplot.params['" + snam + "']='" + sval+"'");
                 } else {
                     if ( snam.startsWith("-") ) {
                         System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
@@ -115,7 +113,7 @@ public class JythonUtil {
                 }
             } else {
                 if ( iargv>=0 ) {
-                    interp.exec("params['arg_" + iargv + "']='" + s +"'" );
+                    interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );
                     iargv++;
                 } else {
                     //System.err.println("skipping parameter" + s );
