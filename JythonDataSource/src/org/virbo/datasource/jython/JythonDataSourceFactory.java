@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -80,18 +79,19 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
         interp.set("monitor", mon);
-        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
+        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py"); // import everything into default namespace.
 
         File src = DataSetURI.getFile(uri, new NullProgressMonitor());
 
         URISplit split = URISplit.parse(uri);
         Map<String, String> params = URISplit.parseParams(split.params);
         try {
-            interp.exec("params=dict()");
+            interp.exec("import autoplot");
+            interp.exec("autoplot.params=dict()");
             for ( Entry<String,String> e : params.entrySet()) {
                 String s= e.getKey();
                 if (!s.equals("arg_0")) {
-                    interp.exec("params['" + s + "']=" + e.getValue() );
+                    interp.exec("autoplot.params['" + s + "']=" + e.getValue() );
                 }
             }
 
