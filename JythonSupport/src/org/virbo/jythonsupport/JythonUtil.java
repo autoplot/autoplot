@@ -6,9 +6,12 @@ package org.virbo.jythonsupport;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -33,6 +37,7 @@ import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 
 /**
@@ -62,34 +67,40 @@ public class JythonUtil {
         
         String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // must be in the root  //TODO: I don't think autoplotapp.py should be here...
         for ( String pysrc: loadClasses ) {
-            URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
-            if ( jarUrl!=null ) {
-                String jarFile= jarUrl.toString();
-                if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
-                    int i= jarFile.indexOf("!");
-                    String jar= jarFile.substring(9,i);
-                    File ff= new File(jar);
-                    if ( ff.exists() ) {
-                        pySys.path.insert(0, new PyString(jar));
-                    } else {
-                        String f= getLocalJythonLib();
-                        pySys.path.insert(0, new PyString( f ));
-                    }
-                } else if ( jarUrl.toString().startsWith("file:/") ) {
-                    File f= new File( jarUrl.getFile() );  //TODO: test on Windows
-                    pySys.path.insert(0, new PyString( f.getParent() ));
-                } else {
-                    if ( pysrc.equals("glob.py") ) {
-                        String f= getLocalJythonLib();
-                        pySys.path.insert(0, new PyString( f ));
-                    } else if ( pysrc.equals("autoplot.py") || pysrc.equals("autoplotapp.py") ) {
-                        //TODO: danger code will surely cause problems...
-                        String f= getLocalJythonAutoplotLib();
-                        pySys.path.insert(0, new PyString( f ));
-                    }
-                }
+            if ( !pysrc.equals("glob.py") ) {
+                String f= getLocalJythonAutoplotLib();
+                pySys.path.insert(0, new PyString( f ));
             } else {
-                logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
+                URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
+                if ( jarUrl!=null ) {
+                    String jarFile= jarUrl.toString();
+                    if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
+                        int i= jarFile.indexOf("!");
+                        String jar= jarFile.substring(9,i);
+                        File ff= new File(jar);
+                        if ( ff.exists() ) {
+                            pySys.path.insert(0, new PyString(jar));
+                        } else {
+                            String f= getLocalJythonLib();
+                            pySys.path.insert(0, new PyString( f ));
+                        }
+                    } else if ( jarUrl.toString().startsWith("file:/") ) {
+                        File f= new File( jarUrl.getFile() );  //TODO: test on Windows
+                        pySys.path.insert(0, new PyString( f.getParent() ));
+                    } else {
+                        if ( pysrc.equals("glob.py") ) {
+                            String f= getLocalJythonLib();
+                            pySys.path.insert(0, new PyString( f ));
+                        } else if ( pysrc.equals("autoplot.py") || pysrc.equals("autoplotapp.py") ) {
+                            //TODO: danger code will surely cause problems...
+                            String f= getLocalJythonAutoplotLib();
+                            pySys.path.insert(0, new PyString( f ));
+                        }
+                    }
+
+                } else {
+                    logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
+                }
             }
         }
 
@@ -124,17 +135,44 @@ public class JythonUtil {
         return ff.toString();
     }
     
+    //TODO: other implementations of this exist...
+    private static void transferStream( InputStream in, OutputStream out ) throws IOException {
+        byte[] buf= new byte[2048];
+        int n= in.read(buf);
+        while ( n>-1 ) {
+            out.write(buf,0,n);
+            n= in.read(buf);
+        }
+        out.close();
+        in.close();
+    }
+    
     private static String getLocalJythonAutoplotLib() throws IOException {
-        File ff2= FileSystem.settings().getLocalCacheDir();
+        File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/ap-jython-lib.jar" );
-        if ( ! ff.exists() ) {
+        File ff3= new File( ff2.toString() + "/jython" );
+        if ( ! ff3.exists() ) {
             logger.log(Level.WARNING, "looking for {0}, but didn''t find it.", ff);
             logger.warning("doesn't seem like we have the right file, downloading...");
-            File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/ap-jython-lib.jar"), new NullProgressMonitor() );
-            ff= f;
+            InputStream in= JythonUtil.class.getResourceAsStream("/autoplot.py");
+            if ( !ff3.exists() ) {
+                if ( !ff3.mkdir() ) {
+                    throw new IOException("Unable to mkdir "+ff3);
+                }
+            }
+            FileOutputStream out= new FileOutputStream( new File( ff3, "autoplot.py" ) );
+            transferStream(in,out);
+            out.close();
+            in.close();
+            in= JythonUtil.class.getResourceAsStream("/autoplotapp.py");
+            out= new FileOutputStream( new File( ff3, "autoplotapp.py" ) );
+            transferStream(in,out);
+            out.close();
+            in.close();
+            File f= ff3;
         }
         logger.fine("   ...done");
-        return ff.toString();
+        return ff3.toString();
     }
         
     /**
