@@ -149,11 +149,10 @@ public class JythonUtil {
     
     private static String getLocalJythonAutoplotLib() throws IOException {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
-        File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/ap-jython-lib.jar" );
         File ff3= new File( ff2.toString() + "/jython" );
         if ( ! ff3.exists() ) {
-            logger.log(Level.WARNING, "looking for {0}, but didn''t find it.", ff);
-            logger.warning("doesn't seem like we have the right file, downloading...");
+            logger.log(Level.FINE, "looking for {0}, but didn''t find it.", ff3);
+            logger.log(Level.FINE,"doesn't seem like we have the right file, downloading...");
             InputStream in= JythonUtil.class.getResourceAsStream("/autoplot.py");
             if ( !ff3.exists() ) {
                 if ( !ff3.mkdir() ) {
