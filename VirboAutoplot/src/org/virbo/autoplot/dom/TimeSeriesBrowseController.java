@@ -207,6 +207,7 @@ public class TimeSeriesBrowseController {
     protected void setup( boolean valueWasAdjusting ) {
         if ( p!=null && !valueWasAdjusting ) {
             this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
+            this.domPlot.getXaxis().setAutoRange(false);
         }
         
         boolean setTsbInitialResolution = true;
