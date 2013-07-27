@@ -30,6 +30,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
@@ -51,6 +52,7 @@ import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.SourceTypesBrowser;
+import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -96,6 +98,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         delegateTextField = new javax.swing.JTextField();
+        timeRangeToolButton = new javax.swing.JButton();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
@@ -106,7 +109,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10));
+        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
         outerRangeTextField.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/aggregator/spinner_16.gif"))); // NOI18N
         outerRangeTextField.setText("listing to get available time ranges...");
 
@@ -152,6 +155,14 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegateTextField.setText("example file used for editing goes here.");
         delegateTextField.setToolTipText("this only indicates the delegate file used to edit the rest of the URI above");
 
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setToolTipText("Time Range Tool");
+        timeRangeToolButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeToolButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -160,7 +171,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 143, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(timeRangeToolButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jButton3))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(7, 7, 7)
@@ -171,13 +184,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(116, Short.MAX_VALUE))
+                .addContainerGap(142, Short.MAX_VALUE))
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
+                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
+                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
                         .add(93, 93, 93)))
                 .addContainerGap())
         );
@@ -190,7 +203,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton3))
+                    .add(jButton3)
+                    .add(timeRangeToolButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(outerRangeTextField)
                 .add(9, 9, 9)
@@ -208,7 +222,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -257,6 +271,15 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         AutoplotHelpSystem.getHelpSystem().displayHelpFromEvent(evt,this);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
+        TimeRangeTool t=new TimeRangeTool();
+        t.setSelectedRange( timeRangeTextField.getText() );//TODO: goofy
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
+            String str= t.getSelectedRange();
+            timeRangeTextField.setText( DatumRangeUtil.parseTimeRangeValid(str).toString() );
+        }
+    }//GEN-LAST:event_timeRangeToolButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox daysComboBox;
     private javax.swing.JPanel delegatePanel;
@@ -269,6 +292,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private javax.swing.JComboBox monthsComboBox;
     private javax.swing.JLabel outerRangeTextField;
     private javax.swing.JTextField timeRangeTextField;
+    private javax.swing.JButton timeRangeToolButton;
     private javax.swing.JComboBox yearsComboBox;
     // End of variables declaration//GEN-END:variables
 
