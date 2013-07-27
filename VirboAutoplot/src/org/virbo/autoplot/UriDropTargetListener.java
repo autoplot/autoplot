@@ -15,6 +15,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
@@ -60,7 +62,24 @@ public class UriDropTargetListener implements DropTargetListener {
                     item = new Bookmark.Item(data);
                 }
             }
-
+            if ( item==null ) { // how to do the drop on a Mac???     
+                dtde.getCurrentDataFlavorsAsList();
+                DataFlavor df;
+                try {
+                    df = new DataFlavor("application/x-java-url;class=java.net.URL");
+                    if ( dtde.isDataFlavorSupported( df ) ) {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        String data = String.valueOf( dtde.getTransferable().getTransferData(df) );
+                        if (data.startsWith("file://localhost/")) {
+                            data= data.substring(16); // mac at least does this...
+                        }
+                        item= new Bookmark.Item( data );
+                    }
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(UriDropTargetListener.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
             String uri=null;
             if ( item != null ) {
                 if ( item instanceof Bookmark.Item ) {
