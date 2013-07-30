@@ -62,7 +62,14 @@ public class JythonUtil {
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
         InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
-            if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
+            if ( appContext ) {
+                InputStream in= JythonUtil.class.getResource("appContextImports.py").openStream();
+                try {
+                    interp.execfile( in, "appContextImports.py" );
+                } finally {
+                    in.close();
+                }
+            }
         }
         interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
