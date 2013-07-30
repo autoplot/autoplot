@@ -186,7 +186,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("somehow the parser was misconfigured to have two different time units.");
                 }
                 if ( !u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
-                    throw new IllegalArgumentException("first two columns should have the same units");
+                    throw new IllegalArgumentException("first two columns should have the same units, or second column should be offset (e.g. seconds) from first");
                 }
             }
             dep0.putProperty( QDataSet.UNITS, parser.getUnits(0) );
