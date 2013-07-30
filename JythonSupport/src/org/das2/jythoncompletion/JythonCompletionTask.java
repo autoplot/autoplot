@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -376,6 +378,8 @@ public class JythonCompletionTask implements CompletionTask {
             while ( s!=null ) {
                 if ( s.startsWith("from ") || s.startsWith("import ") ) {
                     buf.append(s).append("\n");
+                } else if ( s.startsWith("def ") ) {
+                    buf.append(s).append("\n  pass\n");
                 }
                 s= read.readLine();
             }
@@ -408,16 +412,7 @@ public class JythonCompletionTask implements CompletionTask {
             eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         }
 
-        try {
-            Map<String,String> locals= JythonUtil.getLocals( new BufferedReader( new StringReader( eval ) ) );
-        } catch ( IOException ex ) {
-        }
-
-        // reduce eval so it doesn't call procedures like "plot" and "plotx"
-        try {
-            eval = JythonUtil.removeSideEffects( new BufferedReader( new StringReader( eval ) ) );
-        } catch ( IOException ex ) {
-        }
+        eval = JythonUtil.removeSideEffects( eval );
 
         String ss2= "def getDataSet( st, mon ):\n   return findgen(100)\n\ndef getDataSet( st ):\n   return findgen(100)\n\n";
         logger.fine(ss2);
@@ -520,7 +515,12 @@ public class JythonCompletionTask implements CompletionTask {
             }
             if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
                 URL imports = JythonOps.class.getResource("imports.py");
-                interp.execfile(imports.openStream());
+                InputStream in= imports.openStream();
+                try {
+                    interp.execfile(in);
+                } finally {
+                    in.close();
+                }
             }
             return interp;
         } catch (IOException ex) {
