@@ -395,7 +395,7 @@ public class JythonCompletionTask implements CompletionTask {
                     } else {
                         safeArg= "'" + safeArg.replaceAll("'","\"") + "'";
                     }
-                    buf.append(m.group(1)).append("="+safeArg+"\n");
+                    buf.append(m.group(1)).append("=").append(safeArg).append("\n");
                 }
                 s= read.readLine();
             }
