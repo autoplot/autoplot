@@ -98,7 +98,7 @@ public final class ChangesSupport {
             if ( existingClient!=client ) {
                 throw new IllegalStateException( "lock object in use: "+lockObject + ", by "+changesPending.get(lockObject) );
             } else if ( existingClient==client ) {
-                logger.log( Level.INFO, "bug 1075: second change registered but the first was not done.");
+                logger.log( Level.FINE, "bug 1075: second change registered but the first was not done."); // this is somewhat harmless.  Don't bug clients with this message.
             } else {
                 return;
             }
