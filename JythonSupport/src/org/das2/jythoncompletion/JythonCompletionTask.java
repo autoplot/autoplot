@@ -368,7 +368,9 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
-     * return the imports for the python script.
+     * return the imports for the python script, also the def's are 
+     * returned with a trivial definition, and assignments are converted to
+     * be a trivial assignment.
      * @param src
      * @return
      */
