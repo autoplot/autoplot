@@ -10,8 +10,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,9 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
-import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
@@ -41,7 +41,7 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 
 /**
- *
+ * Utilities to support Jython scripting.
  * @author jbf
  */
 public class JythonUtil {
@@ -65,11 +65,13 @@ public class JythonUtil {
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         
-        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // must be in the root  //TODO: I don't think autoplotapp.py should be here...
+        String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // these must be in the root of the interpretter search path.
         for ( String pysrc: loadClasses ) {
             if ( !pysrc.equals("glob.py") ) {
                 String f= getLocalJythonAutoplotLib();
-                pySys.path.insert(0, new PyString( f ));
+                if ( !pySys.path.contains( new PyString(f) ) ) {
+                    pySys.path.insert(0,new PyString(f) );
+                }
             } else {
                 URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
                 if ( jarUrl!=null ) {
@@ -88,14 +90,8 @@ public class JythonUtil {
                         File f= new File( jarUrl.getFile() );  //TODO: test on Windows
                         pySys.path.insert(0, new PyString( f.getParent() ));
                     } else {
-                        if ( pysrc.equals("glob.py") ) {
-                            String f= getLocalJythonLib();
-                            pySys.path.insert(0, new PyString( f ));
-                        } else if ( pysrc.equals("autoplot.py") || pysrc.equals("autoplotapp.py") ) {
-                            //TODO: danger code will surely cause problems...
-                            String f= getLocalJythonAutoplotLib();
-                            pySys.path.insert(0, new PyString( f ));
-                        }
+                        String f= getLocalJythonLib();
+                        pySys.path.insert(0, new PyString( f ));
                     }
 
                 } else {
@@ -122,53 +118,115 @@ public class JythonUtil {
 
     }
 
-    private static String getLocalJythonLib() throws IOException {
-        File ff2= FileSystem.settings().getLocalCacheDir();
-        File ff= new File( ff2.toString() + "/http/autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" );
-        if ( ! ff.exists() ) {
-            logger.log(Level.WARNING, "looking for {0}, but didn''t find it.", ff);
-            logger.warning("doesn't seem like we have the right file, downloading...");
-            File f= DataSetURI.getFile( new URL("http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar"), new NullProgressMonitor() );
-            ff= f;
-        }
-        logger.fine("   ...done");
-        return ff.toString();
-    }
-    
-    //TODO: other implementations of this exist...
+    /**
+     * transfer the contents of in to out.  in and out are closed after the operation.
+     * //TODO: other implementations of this exist...
+     * @param in
+     * @param out
+     * @throws IOException 
+     */
     private static void transferStream( InputStream in, OutputStream out ) throws IOException {
         byte[] buf= new byte[2048];
-        int n= in.read(buf);
-        while ( n>-1 ) {
-            out.write(buf,0,n);
+        int n=0;
+        try {
             n= in.read(buf);
+            while ( n>-1 ) {
+                out.write(buf,0,n);
+                n= in.read(buf);
+            }
+        } finally {
+            out.close();
+            in.close();
         }
-        out.close();
-        in.close();
     }
     
+    /**
+     * ensure that the file has a parent writable directory.
+     * @param file
+     * @return true if the folder could be made.
+     */
+    private static boolean makeHomeFor( File file ) {
+        File f= file.getParentFile();
+        if ( !f.exists() ) {
+            return f.mkdirs();
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * copy everything out to autoplot_data/jython without going to web again.  The old
+     * code showed issues where autoplot.org could not be resolved.
+     * @return the item to add to the python search path.
+     * @throws IOException 
+     */
+    private static String getLocalJythonLib() throws IOException {
+        File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
+        File ff3= new File( ff2.toString() + "/jython" );
+        File ff4= new File( ff2.toString() + "/jython/zlib.py" );
+        if ( ff4.exists() ) {
+            return ff3.toString();
+        }
+        if ( !ff3.exists() ) {
+            if ( !ff3.mkdirs() ) {
+                throw new IOException("Unable to mkdirs "+ff3);
+            }
+        }
+        InputStream inn= JythonUtil.class.getResourceAsStream("/pylisting.txt");
+        BufferedReader r= new BufferedReader( new InputStreamReader(inn) );
+        String s= r.readLine();
+        while ( s!=null ) {
+            File ff5= new File( ff3, s );
+            logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+            InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+            if ( s.contains("/") ) {
+                if ( !makeHomeFor( ff5 ) ) {
+                    throw new IOException("Unable to makeHomeFor "+ff5);
+                }
+            }
+            FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
+            try {
+                transferStream(in,out);
+            } finally {
+                out.close();
+                in.close();
+                new File( ff3, s ).setReadOnly();
+                new File( ff3, s ).setWritable( true, true );
+            }
+            s= r.readLine();
+        }
+        r.close();
+        logger.fine("   ...done");
+        return ff3.toString();
+    }
+        
+    /**
+     * copy the two python files specific to Autoplot into the user's autoplot_data/jython folder.
+     * @return the item to add to the python search path.
+     * @throws IOException 
+     */
     private static String getLocalJythonAutoplotLib() throws IOException {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff3= new File( ff2.toString() + "/jython" );
-        if ( ! ff3.exists() ) {
+        File ff4= new File( ff3, "autoplot.py" );
+        if ( ! ff4.exists() ) {
             logger.log(Level.FINE, "looking for {0}, but didn''t find it.", ff3);
             logger.log(Level.FINE,"doesn't seem like we have the right file, downloading...");
-            InputStream in= JythonUtil.class.getResourceAsStream("/autoplot.py");
             if ( !ff3.exists() ) {
                 if ( !ff3.mkdir() ) {
                     throw new IOException("Unable to mkdir "+ff3);
                 }
             }
-            FileOutputStream out= new FileOutputStream( new File( ff3, "autoplot.py" ) );
-            transferStream(in,out);
-            out.close();
-            in.close();
-            in= JythonUtil.class.getResourceAsStream("/autoplotapp.py");
-            out= new FileOutputStream( new File( ff3, "autoplotapp.py" ) );
-            transferStream(in,out);
-            out.close();
-            in.close();
-            File f= ff3;
+            String[] ss= new String[] { "autoplot.py", "autoplotapp.py" };
+            for ( String s: ss ) {
+                InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                FileOutputStream out= new FileOutputStream( new File( ff3, s ) );
+                transferStream(in,out);
+                out.close();
+                in.close();
+                new File( ff3, s ).setReadOnly();
+                new File( ff3, s ).setWritable( true, true );
+            }
         }
         logger.fine("   ...done");
         return ff3.toString();
@@ -429,60 +487,77 @@ public class JythonUtil {
 
     /**
      * return python code that is equivalent, except it has no side-effects like plotting.
-     * This code is not exact, for example (a,b)= (1,2) is not supported.
+     * This code is not exact, for example (a,b)= (1,2) is not supported.  This 
+     * code is run to support completions.
      * @param reader input to read.
      * @return the script as a string, with side-effects removed.
      */
-    public static String removeSideEffects( BufferedReader reader ) throws IOException {
-
-        String s = reader.readLine();
-
-        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
-        Pattern defPattern= Pattern.compile("def .*");
-        Pattern importPattern1= Pattern.compile("from .*");
-        Pattern importPattern2= Pattern.compile("import .*");
-
-        boolean inDef= false;
-
+    public static String removeSideEffects( String eval ) {
+        BufferedReader reader= new BufferedReader( new StringReader( eval ) ) ;
         StringBuilder result= new StringBuilder();
+        try {
+            String s = reader.readLine();
 
-        boolean haveResult = false;
-        while (s != null) {
+            Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+            Pattern defPattern= Pattern.compile("def .*");
+            Pattern importPattern1= Pattern.compile("from .*");
+            Pattern importPattern2= Pattern.compile("import .*");
 
-            boolean sideEffect= true;
+            boolean inDef= false;
 
-            if ( inDef==false ) {
-                Matcher defm= defPattern.matcher(s);
-                if ( defm.matches() ) {
-                    inDef= true;
-                    sideEffect= false;
+            boolean haveResult = false;
+            while (s != null) {
+
+                int comment= s.indexOf("#");
+                if ( comment>-1 ) {
+                    s= s.substring(0,comment);
                 }
-            } else {
-                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                
+                boolean sideEffect= true;
+
+                if ( inDef==false ) {
                     Matcher defm= defPattern.matcher(s);
-                    inDef=  defm.matches();
-                    if ( inDef ) sideEffect= false; //TODO: what about blank line, this isn't an "END"
+                    if ( defm.matches() ) {
+                        inDef= true;
+                        sideEffect= false;
+                    }
+                } else {
+                    if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                        Matcher defm= defPattern.matcher(s);
+                        inDef=  defm.matches();
+                        if ( inDef ) sideEffect= false; //TODO: what about blank line, this isn't an "END"
+                    }
+                    if ( inDef && s.trim().equals("pass") ) { // syntax error otherwise.
+                        sideEffect= false;
+                    }
                 }
-            }
 
-            if ( !inDef ) {
-                Matcher m= assignPattern.matcher(s);
-                if ( m.matches() ) {
-                    sideEffect= false;
-                } else if ( importPattern1.matcher(s).matches() ) {
-                    sideEffect= false;
-                } else if ( importPattern2.matcher(s).matches() ) {
-                    sideEffect= false;
+                if ( !inDef ) {
+                    Matcher m= assignPattern.matcher(s);
+                    if ( m.matches() ) {
+                        sideEffect= false;
+                    } else if ( importPattern1.matcher(s).matches() ) {
+                        sideEffect= false;
+                    } else if ( importPattern2.matcher(s).matches() ) {
+                        sideEffect= false;
+                    }
                 }
-            }
 
-            if ( !sideEffect ) {
-                result.append( s ).append("\n");
-            }
+                if ( !sideEffect ) {
+                    result.append( s ).append("\n");
+                }
 
-            s = reader.readLine();
+                s = reader.readLine();
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        } finally {
+            try {
+                reader.close();
+            } catch ( IOException ex ) {
+                logger.log( Level.WARNING, null, ex );
+            }
         }
-        reader.close();
         return result.toString();
     }
 }
