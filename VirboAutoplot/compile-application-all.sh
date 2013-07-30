@@ -131,7 +131,10 @@ for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
-
+for i in $( find * -name 'pylisting.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
 cd ..
 echo "done copy resources."
 
