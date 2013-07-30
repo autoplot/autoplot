@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
@@ -373,6 +375,8 @@ public class JythonCompletionTask implements CompletionTask {
     private static String sanitizeLeaveImports( String src ) {
         StringBuilder buf= new StringBuilder();
         BufferedReader read= new BufferedReader( new StringReader(src) );
+        Pattern assign= Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)\\s*=.*");
+        Matcher m;
         try {
             String s= read.readLine();
             while ( s!=null ) {
@@ -380,6 +384,8 @@ public class JythonCompletionTask implements CompletionTask {
                     buf.append(s).append("\n");
                 } else if ( s.startsWith("def ") ) {
                     buf.append(s).append("\n  pass\n");
+                } else if ( (m=assign.matcher(s)).matches() ) {
+                    buf.append(m.group(1)).append("=0\n");
                 }
                 s= read.readLine();
             }
