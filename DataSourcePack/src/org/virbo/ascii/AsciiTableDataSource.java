@@ -182,6 +182,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             Units u0= parser.getUnits(0);
             Units u1= parser.getUnits(1);
             if ( u0!=u1 ) {
+                if ( UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
+                    throw new IllegalArgumentException("somehow the parser was misconfigured to have two different time units.");
+                }
                 if ( !u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
                     throw new IllegalArgumentException("first two columns should have the same units");
                 }
@@ -715,7 +718,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
         o= params.get("eventListColumn");
         if ( o!=null ) {
-            parser.setUnits(0,Units.us2000); // enough of a guess that this will find a good record.
+            if ( !UnitsUtil.isTimeLocation( parser.getUnits(1) ) ) parser.setUnits(0,Units.t2000); // enough of a guess that this will find a good record.
             parser.setFieldParser(0, parser.UNITS_PARSER);
             parser.setFieldParser(1, parser.UNITS_PARSER);
             int icol = parser.getFieldIndex(o);
@@ -755,7 +758,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                         try {
                             TimeUtil.parseTime(field);
                             if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
-                                parser.setUnits(idep0, Units.us2000);
+                                parser.setUnits(idep0, Units.t2000);
                                 parser.setFieldParser(idep0, parser.UNITS_PARSER);
                             }
                         } catch (ParseException ex) {
@@ -771,7 +774,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             if ( !UnitsUtil.isTimeLocation(parser.getUnits(icol)) && !field.startsWith("-") ) {
                                 TimeUtil.parseTime(field);
                                 if ( new StringTokenizer( field, ":T-/" ).countTokens()>2 ) {
-                                    parser.setUnits(icol, Units.us2000);
+                                    parser.setUnits(icol, Units.t2000);
                                     parser.setFieldParser(icol, parser.UNITS_PARSER);
                                 }
                             }
@@ -787,7 +790,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                         if ( !UnitsUtil.isTimeLocation(parser.getUnits(icol)) && !field.startsWith("-") ) {
                             TimeUtil.parseTime(field);
                             if ( new StringTokenizer( field, ":T-/" ).countTokens()>2 ) {
-                                parser.setUnits(icol, Units.us2000);
+                                parser.setUnits(icol, Units.t2000);
                                 parser.setFieldParser(icol, parser.UNITS_PARSER);
                             }
                         }
