@@ -377,7 +377,7 @@ public class JythonCompletionTask implements CompletionTask {
     private static String sanitizeLeaveImports( String src ) {
         StringBuilder buf= new StringBuilder();
         BufferedReader read= new BufferedReader( new StringReader(src) );
-        Pattern assign= Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)\\s*=.*");
+        Pattern assign= Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)\\s*=(.*)");
         Matcher m;
         try {
             String s= read.readLine();
@@ -387,7 +387,15 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if ( s.startsWith("def ") ) {
                     buf.append(s).append("\n  pass\n");
                 } else if ( (m=assign.matcher(s)).matches() ) {
-                    buf.append(m.group(1)).append("=0\n");
+                    String safeArg= m.group(2).trim();
+                    if ( safeArg.startsWith("\'") && safeArg.endsWith("\'") ) {
+                        // do nothing, it's already a string.
+                    } else if ( safeArg.startsWith("\"") && safeArg.endsWith("\"") ) {
+                        // do nothing, it's already a string.
+                    } else {
+                        safeArg= "'" + safeArg.replaceAll("'","\"") + "'";
+                    }
+                    buf.append(m.group(1)).append("="+safeArg+"\n");
                 }
                 s= read.readLine();
             }
