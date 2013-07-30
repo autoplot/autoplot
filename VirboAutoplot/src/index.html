@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug 1074 was a strange lockup first seen at LANL on Linux.  New "status" script allows us
-                to see why it's getting locked up.</small></p>
+        <p><small>The Tear-Off Tabs code got some attention.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -26,6 +25,13 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>tearoff tabbed pane does a better job with labels for the windows.</li>
+            <li>eventListColumn was broken from v2013a_8 through v2013a_9</li>
+            <li>use the URI timerange.  Before it would be used briefly, then reset as soon as the data is loaded.</li>
+            <li>1077: first plotElement has resetPlotElement true after syncTo </li>
+            <li>lanl can't get jython files from autoplot.org, so just get them from the java path</li>
+            <li>don't quantize orbit datum ranges.  When quantizing, use much finer quanta.</li>
+            <li>drop target containing file URIs works on a mac and other platforms</li>
             <li>bugfix where one-dataset bundle wouldn't plot as Y(T)</li>
             <li>1076: width=0 causes runtime error dialog.</li>
             <li>1075: changesSupport needs to keep a count</li>
@@ -90,6 +96,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>more TimeRangeTool buttons</li>
+            <li>improvements to jython completions include def names and assignments</li>
             <li>314: support "import autoplotapp as app", cleaning up jython.  Legacy scripts are still supported.</li>
             <li>first experiments with slice0 at datum, like |slice0('2013-07-12T18:00')t</li>
             <li>dataset('2013-07-12T18:00') handles times and datum ranges now.</li>
