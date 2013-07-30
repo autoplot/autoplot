@@ -557,7 +557,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 50");
 
         setIconImage( AutoplotUtil.getAutoplotIcon() );
-
+        updateFrameTitle();
+        
         stateSupport = getPersistentStateSupport(this, applicationModel);
 
         fillFileMenu();
@@ -2998,7 +2999,7 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
 };
 
 private void updateFrameTitle() {
-    final String suri= applicationModel.getVapFile();
+     final String suri= applicationModel.getVapFile();
 
     String v= APSplash.getVersion();
     if ( v.equals("untagged_version") ) {
