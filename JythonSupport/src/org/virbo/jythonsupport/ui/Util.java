@@ -189,7 +189,7 @@ public class Util {
         try {    
             String line= r.readLine();
             while ( line!=null ) {
-                build.append(line);
+                build.append(line).append("\n");
                 line= r.readLine();
             }
         } finally {
