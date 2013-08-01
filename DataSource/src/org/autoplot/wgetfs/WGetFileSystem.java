@@ -78,6 +78,11 @@ public class WGetFileSystem extends WebFileSystem {
                 }
                 Thread.sleep(200);
                 line= err.readLine();
+                if ( monitor.isCancelled() ) {
+                    p.destroy();
+                    if ( partfile.exists() ) partfile.delete();
+                    throw new InterruptedException("user cancel");
+                }
             }
             p.waitFor();
             monitor.finished();
