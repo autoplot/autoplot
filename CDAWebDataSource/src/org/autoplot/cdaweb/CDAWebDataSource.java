@@ -129,6 +129,9 @@ public class CDAWebDataSource extends AbstractDataSource {
             String tmpl= db.getNaming(ds.toUpperCase());
             String base= db.getBaseUrl(ds.toUpperCase());
 
+            logger.log( Level.FINE, "tmpl={0}", tmpl);
+            logger.log( Level.FINE, "base={0}", base);
+            
             FileSystem fs= FileSystem.create( new URI( base ) ); // bug3055130 okay
             FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
 
