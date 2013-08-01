@@ -45,6 +45,10 @@ public class WGetFileSystem extends WebFileSystem {
         
         try {
             p.waitFor();
+            if ( p.exitValue()!=0 ) {
+                partfile.delete();
+                throw new IOException("wget returned with exit code "+p.exitValue() );
+            }
         } catch ( InterruptedException ex ) {
             throw new IOException(ex);
         }
@@ -136,13 +140,18 @@ public class WGetFileSystem extends WebFileSystem {
         }
         
     
-        String[] cmd = new String[] { wget, "-O", listingFile(directory).toString(), getRootURL().toString() + directory };
+        File listingFile= listingFile(directory);
+        String[] cmd = new String[] { wget, "-O", listingFile.toString(), getRootURL().toString() + directory };
         
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
         
         try {
             p.waitFor();
+            if ( p.exitValue()!=0 ) {
+                listingFile.delete();
+                throw new IOException("wget returned with exit code "+p.exitValue() );
+            }
         } catch ( InterruptedException ex ) {
             throw new IOException(ex);
         }
