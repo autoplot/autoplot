@@ -12,12 +12,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.HtmlUtil;
-import org.das2.util.filesystem.HttpFileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -26,7 +24,7 @@ import org.das2.util.monitor.ProgressMonitor;
  * wget-based filesystem uses unix wget command.
  * @author jbf
  */
-class WGetFileSystem extends WebFileSystem {
+public class WGetFileSystem extends WebFileSystem {
 
     String wget= "wget";
     
