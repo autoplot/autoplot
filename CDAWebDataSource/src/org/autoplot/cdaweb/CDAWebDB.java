@@ -5,13 +5,19 @@
 
 package org.autoplot.cdaweb;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +37,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -218,6 +225,21 @@ public class CDAWebDB {
     }
 
     /**
+     * Matlab uses net.sf.saxon.xpath.XPathEvaluator by default, so we explicitly look for the Java 6 one.
+     * @return com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl, probably.
+     */
+    private static XPathFactory getXPathFactory() {
+        XPathFactory xpf;
+        try {
+            xpf= XPathFactory.newInstance( XPathFactory.DEFAULT_OBJECT_MODEL_URI, "com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl", null );
+        } catch (XPathFactoryConfigurationException ex) {
+            xpf= XPathFactory.newInstance();
+            logger.log( Level.INFO, "using default xpath implementation: {0}", xpf.getClass());
+        }
+        return xpf;
+    }
+    
+    /**
      * returns the filename convention for spid, found in all.xml at /sites/datasite/dataset[@serviceprovider_ID='%s']/access
      * For AC_H2_CRIS, this combines the subdividedby and filenaming properties to get %Y/ac_h2_cris_%Y%m%d_?%v.cdf
      * @param spid the id like "AC_H2_CRIS"
@@ -228,12 +250,16 @@ public class CDAWebDB {
         if ( document==null ) {
             throw new IllegalArgumentException("document has not been read, refresh must be called first");
         }
+
         try {
             spid= spid.toUpperCase();
             if ( tmpls.containsKey(spid) ) {
                 return tmpls.get(spid);
             }
-            XPath xp = XPathFactory.newInstance().newXPath();
+            XPathFactory xpf= getXPathFactory();
+            XPath xp = xpf.newXPath();
+            
+            logger.log( Level.FINE, "getting node for {0}", spid );
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access", spid), document, XPathConstants.NODE );
             if ( node==null ) {
                 throw new IOException("unable to find node for "+spid + " in "+ dbloc );
@@ -241,6 +267,9 @@ public class CDAWebDB {
             NamedNodeMap attrs= node.getAttributes();
             String subdividedby=attrs.getNamedItem("subdividedby").getTextContent();
             String filenaming= attrs.getNamedItem("filenaming").getTextContent();
+            
+            logger.log( Level.FINE, "subdividedby={0}", subdividedby);
+            logger.log( Level.FINE, "filenamimg={0}", filenaming);
             
             if ( filenaming.contains("%Q"))
             filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
@@ -272,7 +301,8 @@ public class CDAWebDB {
             if ( bases.containsKey(spid) ) {
                 return bases.get(spid);
             }
-            XPath xp = XPathFactory.newInstance().newXPath();
+            XPathFactory xpf= getXPathFactory();
+            XPath xp = xpf.newXPath();
             String url= (String)xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access/URL/text()", spid), document, XPathConstants.STRING );
             url= url.trim();
             if ( url.contains(" ") ) {
@@ -354,7 +384,7 @@ public class CDAWebDB {
         }
         try {
             spid= spid.toUpperCase();
-            XPath xp = XPathFactory.newInstance().newXPath();
+            XPath xp = getXPathFactory().newXPath();
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']", spid), document, XPathConstants.NODE );
             if ( node==null ) {
                 throw new IllegalArgumentException("unable to find node for serviceprovider_ID="+spid);
@@ -490,7 +520,7 @@ public class CDAWebDB {
             throw new IllegalArgumentException("document has not been read, refresh must be called first");
         }
         try {
-            XPath xp = XPathFactory.newInstance().newXPath();
+            XPath xp = getXPathFactory().newXPath();
             NodeList nodes = (NodeList) xp.evaluate( "//sites/datasite/dataset", document, XPathConstants.NODESET );
 
             Map<String,String> result= new LinkedHashMap<String,String>();
