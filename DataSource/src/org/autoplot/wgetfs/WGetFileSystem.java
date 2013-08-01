@@ -4,16 +4,20 @@
  */
 package org.autoplot.wgetfs;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.filesystem.WebFileSystem;
@@ -36,6 +40,18 @@ public class WGetFileSystem extends WebFileSystem {
         return new WGetFileSystem( root, localRoot(root) );
     }
 
+    private long interpretLong( String s ) {
+        if ( s.endsWith("K") ) {
+            long mant= Long.parseLong(s.substring(0,s.length()-1));
+            return mant*1000;
+        } else if ( s.endsWith("M") ) {
+            long mant= Long.parseLong(s.substring(0,s.length()-1));
+            return mant*1000000;
+        } else {
+            long mant= Long.parseLong(s);
+            return mant;
+        }
+    }
     @Override
     protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
         String[] cmd = new String[] { wget, "-O", partfile.toString(), getRootURL().toString() + filename };
@@ -43,12 +59,33 @@ public class WGetFileSystem extends WebFileSystem {
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
         
+        BufferedReader err= new BufferedReader( new InputStreamReader( p.getErrorStream() ) );
+        
         try {
+            String line= err.readLine();
+            Pattern prog= Pattern.compile("\\s*(([0-9]+)([MK])?)", LISTING_TIMEOUT_MS);
+            while ( line!=null ) {
+                if ( line.startsWith("Length:" ) ) {
+                    int term= line.indexOf(" ",8);
+                    monitor.setTaskSize( interpretLong( line.substring(8,term) ) );
+                    monitor.setProgressMessage("monitoring wget");
+                    monitor.started();
+                }
+                System.err.println(line);
+                Matcher m= prog.matcher(line);
+                if ( m.find() && m.start()==0 && monitor.isStarted()  ) {
+                    monitor.setTaskProgress( interpretLong( m.group(1) ) );
+                }
+                Thread.sleep(200);
+                line= err.readLine();
+            }
             p.waitFor();
+            monitor.finished();
             if ( p.exitValue()!=0 ) {
                 partfile.delete();
                 throw new IOException("wget returned with exit code "+p.exitValue() );
             }
+            
         } catch ( InterruptedException ex ) {
             throw new IOException(ex);
         }
