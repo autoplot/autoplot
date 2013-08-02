@@ -481,7 +481,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( var!=null ) {
                 QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.getRecVariance(), false, -1, null );
                 Units deltaUnits= SemanticOps.getUnits(delta);
-                if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) && result.length()==delta.length() ) {
                     result.putProperty( QDataSet.BIN_PLUS, delta );
                     if ( !deltaMinus.equals(deltaPlus) ) {
                         var= cdf.getVariable((String)deltaMinus);
@@ -495,7 +495,11 @@ public class CdfFileDataSource extends AbstractDataSource {
                         logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                     }
                 } else {
-                    logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                    if ( result.length()==delta.length() ) {
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({0})", new Object[] { delta.length(), result.length() } );
+                    } else {
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
+                    }
                 }
             } else {
                 logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
