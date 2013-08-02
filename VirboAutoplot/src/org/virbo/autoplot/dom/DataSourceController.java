@@ -466,7 +466,11 @@ public class DataSourceController extends DomNodeController {
             if ( this.tsb!=null ) {
                 uri= this.tsbSuri;
             }
-            StringBuilder message = new StringBuilder("When loading "+uri+":\ndataset is invalid:\n");
+            if ( uri.length()>80 ) {
+                int n= uri.length();
+                uri= uri.substring(0,48)+" ... "+ uri.substring(n-30,n);
+            }
+            StringBuilder message = new StringBuilder("When loading "+uri+"\ndataset is invalid:\n");
             logger.log( Level.SEVERE, null, new Exception("dataset is invalid") );
             for (String s : problems) {
                 message.append(s).append("\n");
