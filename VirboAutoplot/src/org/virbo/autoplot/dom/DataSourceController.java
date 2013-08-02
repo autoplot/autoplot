@@ -33,7 +33,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
-import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
@@ -1022,7 +1022,7 @@ public class DataSourceController extends DomNodeController {
                     ds= getDataSet();
                 } else {
                     try {
-                        ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
+                        ds= DataSetOps.sprocess( filters, getDataSet(), new AlertNullProgressMonitor() );
                         setReduceDataSetString(filters);
                     } catch ( Exception ex ) {
                         setException(ex);
@@ -1436,7 +1436,7 @@ public class DataSourceController extends DomNodeController {
 
             if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
-            Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
+            Map<String,Object> props= getDataSource().getMetadata( new AlertNullProgressMonitor() );
 
             if ( result!=null && getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
