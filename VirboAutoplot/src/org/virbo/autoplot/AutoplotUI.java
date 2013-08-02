@@ -326,6 +326,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         }, FocusEvent.FOCUS_GAINED );
         }
         
+        referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
+        
         expertMenuItems.add( editDomMenuItem );
         expertMenuItems.add( editDomSeparator );
         expertMenuItems.add( inspectVapFileMenuItem );
@@ -1806,6 +1808,7 @@ APSplash.checkTime("init 52");
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         layoutPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        referenceCacheCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoMenu = new javax.swing.JMenu();
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -2187,6 +2190,15 @@ APSplash.checkTime("init 52");
         layoutPanelCheckBoxMenuItem.setToolTipText("Enables the layout panel, which shows all the plots and plot elements in thier relative positions.\n");
         enableFeatureMenu.add(layoutPanelCheckBoxMenuItem);
 
+        referenceCacheCheckBoxMenuItem.setSelected(true);
+        referenceCacheCheckBoxMenuItem.setText("Reference Caching");
+        referenceCacheCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                referenceCacheCheckBoxMenuItemActionPerformed(evt);
+            }
+        });
+        enableFeatureMenu.add(referenceCacheCheckBoxMenuItem);
+
         optionsMenu.add(enableFeatureMenu);
 
         autoMenu.setText("Auto");
@@ -2455,14 +2467,14 @@ APSplash.checkTime("init 52");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 603, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 611, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -2956,6 +2968,18 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     };
     RequestProcessor.invokeLater(run);
 }//GEN-LAST:event_resetMemoryCachesMIActionPerformed
+
+    private void referenceCacheCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceCacheCheckBoxMenuItemActionPerformed
+        if ( referenceCacheCheckBoxMenuItem.isSelected() ) {
+            System.setProperty( "enableReferenceCache", "true" );
+            setMessage( "Reference Cache is enabled" );
+        } else {
+            ReferenceCache.getInstance().printStatus();
+            ReferenceCache.getInstance().reset();
+            System.setProperty( "enableReferenceCache", "false" );
+            setMessage( "Reference Cache is disabled." );
+        }
+    }//GEN-LAST:event_referenceCacheCheckBoxMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -3627,6 +3651,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
+    private javax.swing.JCheckBoxMenuItem referenceCacheCheckBoxMenuItem;
     private javax.swing.JMenuItem reloadAllMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem replaceFileMenuItem;
