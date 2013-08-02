@@ -462,8 +462,8 @@ public class DataSourceController extends DomNodeController {
         List<String> problems = new ArrayList<String>();
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
-            StringBuilder message = new StringBuilder("data set is invalid:\n");
-            logger.log( Level.SEVERE, null, new Exception("data set is invalid") );
+            StringBuilder message = new StringBuilder("dataset is invalid:\n");
+            logger.log( Level.SEVERE, null, new Exception("dataset is invalid") );
             for (String s : problems) {
                 message.append(s).append("\n");
             }
