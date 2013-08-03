@@ -230,8 +230,8 @@ public class Test140 {
      * @throws Exception 
      */
     public static void main( String[] args ) throws Exception {
-        Logger l= LoggerManager.getLogger("apdss.das2server");
-        l.setLevel( Level.ALL );
+        //Logger l= LoggerManager.getLogger("apdss");
+        //l.setLevel( Level.ALL );
         
         if ( args.length==0 ) {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
@@ -259,10 +259,11 @@ public class Test140 {
         
         System.err.println("\n\n== Exceptions encountered ====");
         
-        for ( Entry e: exceptions.entrySet() ) {
+        for ( Entry<String,Exception> e: exceptions.entrySet() ) {
             System.err.println("==");
             System.err.println(e.getKey());
             System.err.println(e.getValue());
+            e.getValue().printStackTrace();
         }
         
         if ( exceptions.isEmpty() ) {
