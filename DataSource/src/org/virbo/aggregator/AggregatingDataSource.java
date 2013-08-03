@@ -45,6 +45,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
@@ -312,6 +313,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("unable to identify data source");
             }
             
+            boolean doThrow= false; // this will be set to true if we really do want to throw the exception instead of simply making a note of it.
+            
             for (int i = 0; i < ss.length; i++) {
                 String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
                 if (!sparams.equals("")) {
@@ -420,6 +423,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 }
                             } catch ( IllegalArgumentException ex ) {
                                 throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
+                            } catch ( Exception ex ) {
+                                doThrow= true;
+                                throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
                             }
                         }
 
@@ -429,6 +435,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
                     }
                 } catch ( Exception ex ) {
+                    if ( doThrow ) {
+                        throw ex;
+                    }
                     if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
                         logger.log(Level.FINE, "no data found in {0}", delegateUri);
                         // do nothing
@@ -437,8 +446,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     } else {
                         notesBuilder.putValue(-1,0,drex.min().doubleValue(Units.us2000));
                         notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
-                        notesBuilder.putValue(-1,2,exunits.createDatum(ex.getMessage()).doubleValue(exunits) );
+                        notesBuilder.putValue(-1,2,exunits.createDatum(DataSourceUtil.getMessage(ex)).doubleValue(exunits) );
                         notesBuilder.nextRecord();
+                        ex.printStackTrace();
                     }
                 }
                 if (ss.length > 1) {
@@ -534,14 +544,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
-            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile( new NullProgressMonitor() );
+            mon.setTaskSize(10);
+            mon.started();
+            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
             if (!sparams.equals("")) {
                 scompUrl += "?" + sparams;
             }
 
             URI delegateUri= DataSetURI.getURIValid(scompUrl);
             DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
-            metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
+            metadata = delegateDataSource.getMetadata(mon.getSubtaskMonitor(5,10,"get metadata"));
             metadataModel= delegateDataSource.getMetadataModel();
             return metadata;
         } else {
