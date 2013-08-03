@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -3774,7 +3775,7 @@ APSplash.checkTime("init 240");
             toolsMenu.add( userSep );
         }
 
-        SwingUtilities.invokeLater( new Runnable() {
+        Runnable run= new Runnable() {
             public void run() {
                 for ( Bookmark t: tools ) {
                     final Bookmark tt= t;
@@ -3800,7 +3801,20 @@ APSplash.checkTime("init 240");
                     }
                 }
             }
-        } );
+        };
+        
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
     }
 
     /**
@@ -4048,8 +4062,10 @@ APSplash.checkTime("init 240");
             };
             SwingUtilities.invokeLater(run);
         } catch (URISyntaxException ex) {
+            setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, null, ex);
         }
     }
