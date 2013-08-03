@@ -773,10 +773,15 @@ public class DataSourceUtil {
      * @return 
      */
     public static String getMessage( Exception ex ) {
+        if ( ex==null ) {
+            throw new IllegalArgumentException("Expected exception, but got null");
+        }
         if ( ex instanceof NullPointerException ) {
             return ex.toString();
         } else {
-            if ( ex.getMessage().length()<5 ) {
+            if ( ex.getMessage()==null ) {
+                return ex.toString();
+            } else if ( ex.getMessage().length()<5 ) {
                 return ex.toString() + ": " +ex.getMessage();
             } else {
                 return ex.getMessage();
