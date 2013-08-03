@@ -3563,10 +3563,20 @@ APSplash.checkTime("init 240");
         rlistener.startListening();
     }
 
+    /**
+     * set the message in the lower left corner of the application.
+     * @param message the message to display
+     */
     public void setMessage(String message) {
         setMessage( IDLE_ICON, message );
     }
     
+    /**
+     * set the message in the lower left corner of the application with the icon, such
+     * as AutoplotUI.WARNING_ICON.
+     * @param icon the icon to display to the left of the message.
+     * @param message the message to display
+     */
     public void setMessage( Icon icon, String message ) {
         if ( message==null ) message= "<null>"; // TODO: fix this later
         String myMess= message;
