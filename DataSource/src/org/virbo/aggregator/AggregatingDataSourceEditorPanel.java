@@ -273,7 +273,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         TimeRangeTool t=new TimeRangeTool();
-        t.setSelectedRange( timeRangeTextField.getText() );//TODO: goofy
+        String tr= timeRangeTextField.getText();
+        if ( tr.trim().length()==0 ) {
+            tr= "2010-01-01"; // default
+        }
+        t.setSelectedRange( tr );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
             timeRangeTextField.setText( DatumRangeUtil.parseTimeRangeValid(str).toString() );
