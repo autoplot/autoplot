@@ -368,6 +368,26 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
+     * quick-n-dirty one line parser is better than nothing.
+     * @param s
+     * @return 
+     */
+    private static String popOffComments( String s ) {
+        char inString= 0;
+        for ( int i=0; i<s.length(); i++ ) {
+            if( inString==0 && s.charAt(i)=='#' ) {
+                return s.substring(0,i);
+            } else if ( s.charAt(i)=='\'' || s.charAt(i)=='"' ){
+                if ( s.charAt(i)==inString ) {
+                    inString= 0;
+                } else {
+                    inString= s.charAt(i);
+                }
+            }
+        }
+        return s;
+    }
+    /**
      * return the imports for the python script, also the def's are 
      * returned with a trivial definition, and assignments are converted to
      * be a trivial assignment.
@@ -382,6 +402,7 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             String s= read.readLine();
             while ( s!=null ) {
+                s= popOffComments(s);
                 if ( s.startsWith("from ") || s.startsWith("import ") ) {
                     buf.append(s).append("\n");
                 } else if ( s.startsWith("def ") ) {
