@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.UnitsUtil;
+import org.das2.stream.StreamTool;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -26,6 +28,7 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.LogNames;
 import org.virbo.dsops.Ops;
+import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
  *
@@ -461,13 +464,10 @@ public class IstpMetadataModel extends MetadataModel {
      * is a quick check to detect the case.  The data can also contain
      * fill records and channels that contain all fill.
      * @param depDs 
-     * @return the rank 1 dataset.
+     * @return the rank 1 dataset or null.
      */
     public static MutablePropertyDataSet maybeReduceRank2(MutablePropertyDataSet depDs) {
         QDataSet wds= SemanticOps.weightsDataSet(depDs);
-        MutablePropertyDataSet result= null;
-        int l0=-1,l1=-1;
-        int l= wds.length(0)-1; // index of last channel
         int j= -1;
         
         int i0= depDs.length();        
@@ -479,37 +479,25 @@ public class IstpMetadataModel extends MetadataModel {
             }
         }
         
-        if ( i0==depDs.length() && j==wds.length(0) ) {
-            // we found no valid data!
-            return null;
-        }
+        ArrayDataSet resulta= ArrayDataSet.copy( depDs.slice(0) ); // get all the properties of the dataset.
         
-        // identify the lowest and highest channels containing data.
-        for ( j=0; ( l0==-1||l1==-1 ) && j<wds.length(); j++ ) {
-            if ( l0==-1 && wds.value(i0,j)>0 ) l0= j;
-            if ( l1==-1 && wds.value(i0,l-j)>0 ) l1=l-j;
-        }
-
-        if ( i0<depDs.length() ) {
-            MutablePropertyDataSet test;
+        for ( j=i0; j<wds.length(0); j++ ) {
             QDataSet ex;
-            test= DataSetOps.slice1(depDs,l0);
-            test.putProperty( QDataSet.BIN_MINUS, null );
+            ArrayDataSet test= ArrayDataSet.copy( DataSetOps.slice1(depDs,j) );
             test.putProperty( QDataSet.BIN_PLUS, null );
-            ex= Ops.extent( test );
-            if ( ex.value(0)==ex.value(1) ) {
-                result= (MutablePropertyDataSet)depDs.slice(i0);
-            }
-            test= DataSetOps.slice1(depDs,l1);
             test.putProperty( QDataSet.BIN_MINUS, null );
-            test.putProperty( QDataSet.BIN_PLUS, null );
+            test.putProperty( QDataSet.DELTA_PLUS, null );
+            test.putProperty( QDataSet.DELTA_MINUS, null );
             ex= Ops.extent( test );
             if ( ex.value(0)!=ex.value(1) ) {
-                result= null;
+                //DataSourceUtil.dumpToFile( test, "/tmp/foo.qds" );
+                return null;
+            } else {
+                resulta.putValue( j, ex.value(0) );
             }
         }
-
-        return result;
+        
+        return resulta;
     }
 
 }
