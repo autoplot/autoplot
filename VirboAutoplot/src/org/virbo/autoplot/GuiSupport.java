@@ -52,6 +52,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -82,6 +83,8 @@ import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.das2.util.Entities;
+import org.das2.util.awt.GraphicsOutput;
+import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
@@ -899,17 +902,21 @@ public class GuiSupport {
     public static Action getPrintAction( final Application app, final Component parent,final String ext) {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
             public void actionPerformed(ActionEvent e) {
-                //final DasCanvas canvas= DasCanvas.getFocusCanvas();
+                final JPanel decor;
                 final DasCanvas canvas = app.getController().getDasCanvas();
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
                 fileChooser.setFileFilter(getFileNameExtensionFilter( ext + " files", ext ));
                 Preferences prefs = Preferences.userNodeForPackage(DasCanvas.class);
                 String savedir = prefs.get("savedir", null);
-                if (savedir != null)
-                    fileChooser.setCurrentDirectory(new File(savedir));
-                if (currentFile != null)
-                    fileChooser.setSelectedFile(currentFile);
+                if (savedir != null) fileChooser.setCurrentDirectory(new File(savedir));
+                if (currentFile != null) fileChooser.setSelectedFile(currentFile);
+                if ( ext.equals("pdf") ) {
+                    decor= new PdfOptionsPanel();
+                    fileChooser.setAccessory(decor);
+                } else {
+                    decor= null;
+                }
                 int choice = fileChooser.showSaveDialog(parent);
                 if (choice == JFileChooser.APPROVE_OPTION) {
 
@@ -924,7 +931,17 @@ public class GuiSupport {
                                 if ( ext.equals("png") ) {
                                     canvas.writeToPng(ffname);
                                 } else if ( ext.equals("pdf") ) {
-                                    canvas.writeToPDF(ffname);
+                                    FileOutputStream out = new FileOutputStream(ffname);
+                                    PdfGraphicsOutput go = new PdfGraphicsOutput();
+                                    try {
+                                        PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
+                                        go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
+                                        canvas.writeToGraphicsOutput(out, go);
+                                        out.close();                                    
+                                        //canvas.writeToPDF(ffname);
+                                    } catch (IllegalAccessException ex) {
+                                        Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 } else if ( ext.equals("svg") ) {
                                     canvas.writeToSVG(ffname);
                                 }
