@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.das2.CancelledOperationException;
 import org.das2.client.Authenticator;
 import org.das2.client.DasServer;
 import org.das2.client.Key;
@@ -286,11 +287,14 @@ class Das2ServerDataSource extends AbstractDataSource {
                 StreamTool.readStream(channel, handler);
             } catch ( StreamException ex ) {
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
-                    ex.printStackTrace();
-                    //TODO CancelledOperationException
-                    throw (java.io.InterruptedIOException)ex.getCause();
+                    logger.log( Level.INFO, null, ex );
+                    if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
+                        throw new CancelledOperationException();
+                    } else {
+                        throw (java.io.InterruptedIOException)ex.getCause();
+                    }
                 } else {
-                    ex.printStackTrace();
+                    logger.log( Level.INFO, null, ex );
                     throw ex;
                 }
             }
