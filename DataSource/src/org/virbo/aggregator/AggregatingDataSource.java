@@ -208,6 +208,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         @Override
         public void setURI(String suri) throws ParseException {
             viewRange= URISplit.parseTimeRange(suri);
+            logger.log( Level.FINE, "setURI sets viewRange to {0}", viewRange);
         }
 
     }
@@ -627,6 +628,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public void setViewRange(DatumRange viewRange) {
         DatumRange oldViewRange = this.viewRange;
         this.viewRange = viewRange;
+        logger.log( Level.FINE, "setViewRange({0})", viewRange );
         propertyChangeSupport.firePropertyChange("viewRange", oldViewRange, viewRange);
     }
 
