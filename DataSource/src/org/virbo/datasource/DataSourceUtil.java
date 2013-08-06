@@ -10,6 +10,7 @@
 package org.virbo.datasource;
 
 import java.awt.Component;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,6 +47,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
+import org.virbo.qstream.SimpleStreamFormatter;
+import org.virbo.qstream.StreamException;
 
 /**
  *
@@ -805,5 +808,21 @@ public class DataSourceUtil {
      */
     public static void showMessageDialog( Component parent, String msg, String title, int messageType, Exception causeBy ) {
         JOptionPane.showMessageDialog( parent, msg, title, messageType );
+    }
+    
+    /**
+     * Used for debugging, this dumps the data out to a das2stream.
+     * @param ds
+     * @param f 
+     */
+    public static void dumpToFile( QDataSet ds, String f ) {
+        try {
+            SimpleStreamFormatter fo= new SimpleStreamFormatter();
+            fo.format( ds, new FileOutputStream(f), true);
+        } catch (StreamException ex) {
+            ex.printStackTrace();
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+        }
     }
 }
