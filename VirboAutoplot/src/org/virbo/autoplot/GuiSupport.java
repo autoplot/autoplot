@@ -933,15 +933,29 @@ public class GuiSupport {
                                 } else if ( ext.equals("pdf") ) {
                                     FileOutputStream out = new FileOutputStream(ffname);
                                     PdfGraphicsOutput go = new PdfGraphicsOutput();
-                                    try {
-                                        PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
-                                        go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
-                                        canvas.writeToGraphicsOutput(out, go);
-                                        out.close();                                    
-                                        //canvas.writeToPDF(ffname);
-                                    } catch (IllegalAccessException ex) {
-                                        Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                    
+                                    PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
+                                    go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
+                                    go.setOutputStream(out);
+                                    if ( pdecor.manualWidthCB.isSelected() ) {
+                                        double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
+                                        String units= (String)pdecor.unitsCB.getSelectedItem();
+                                        if ( units.equals("inches") ) {
+                                            mant= mant * 72;
+                                        } else if ( units.equals("centimeters")) {
+                                            mant= mant * 72 / 2.54;
+                                        }
+                                        double aspect= canvas.getHeight() / (double)canvas.getWidth();
+                                        go.setSize( (int)mant, (int)(mant*aspect) );
+                                        canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
+                                    } else {
+                                        go.setSize( canvas.getWidth(), canvas.getHeight() );
                                     }
+                                    go.start();
+                                    canvas.print(go.getGraphics());
+                                    go.finish();
+                                    out.close();                                    
+
                                 } else if ( ext.equals("svg") ) {
                                     canvas.writeToSVG(ffname);
                                 }
