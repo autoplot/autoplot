@@ -1473,6 +1473,11 @@ public class DataSourceController extends DomNodeController {
             setDataSet(null); //TODO: maybe we should allow the old dataset to stay, in case TSB....
             setStatus("interrupted");
             if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
+        } catch (org.das2.util.monitor.CancelledOperationException ex) {
+            setException(ex);
+            setDataSet(null);
+            setStatus("operation cancelled");
+            if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } catch (CancelledOperationException ex) {
             setException(ex);
             setDataSet(null);
