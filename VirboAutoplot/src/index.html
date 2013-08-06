@@ -25,6 +25,15 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1087: rank2 CDF DEPEND_1 reduce improvements</li>
+            <li>1086: strange timeranges show up with time series browse</li>
+            <li>1085: cancel in aggregation doesn't cancel properly, messing up cache </li>
+            <li>stderr noise about Find-next.png from jsyntaxpane looking for incorrect file</li>
+            <li>"submit" button on error dialog is default</li>
+            <li>rich ascii export of vector and spectrogram datasets works, moreso</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1083: garbled tools list when adding tool</li>
             <li>1082: opacity in aggregation</li>
             <li>1079: tearoff tabbed pane does a better job with labels for the windows.</li>
@@ -40,29 +49,6 @@
             <li>1076: width=0 causes runtime error dialog.</li>
             <li>1075: changesSupport needs to keep a count</li>
             <li>1074: lockup because of loose thread safety</li> 
-        </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1073: switching renderers requires reset, broken after bugfix 1065.</li>
-            <li>The highest bin wasn't copied over in fftPower.</li>
-            <li>1069: slice1 wasn't been implemented properly for CDFJava </li>
-            <li>1067: -3010.00 in second column of ascii file misinterpreted as year </li>
-            <li>1066: axis time range clipped off when TCAs are used when running in headless mode</li>
-            <li>1065: flicker while adjusting slice index</li>
-            <li>1061: ctrl-S in script editor allows save to cache and will cause people to loose work</li>
-            <li>replace file action re-implemented so new dom avoids resets and is closer to old dom.</li>
-            <li>don't use valid range as typical range when SCALEMIN,SCALEMAX are missing in CDF.</li>
-            <li>clarify string indicating slice1 was done when DEPEND_1 was time-varying</li>
-            <li>waitUntilIdle would fail to wait when the axis annotations were added, so test037 was failing.</li>
-            <li>improvements to getRepresentative file, allow better handling of empty folders.</li>
-            <li>Mike at LANL pointed out that |multiply(-2) wouldn't work.</li>
-            <li>Export panel additional options was not properly disabled when there were no options, resulting in RTE.</li>
-            <li>TT2000 metadata would be misinterpreted as code would convert metadata to doubles</li>
-            <li>1059: history.txt in headless mode, don't write to history during headless batch processing.</li>
-            <li>completions in zip file systems would not work properly.</li>
-            <li>.classpath file updated for use in Eclipse, thanks Jon.</li>
-            <li>1056: BackingStoreException caused by OptionsPrefsController</li>
-            <li>1055: Red flash sometimes visible on startup</li>
         </ul>
         <p>Features:</p>
         <ul>
