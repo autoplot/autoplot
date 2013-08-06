@@ -109,6 +109,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
+    /**
+     * 
+     * @param jo1 object to collect properties
+     * @param ds dataset which can be a bundle
+     * @param prop the property name
+     * @param i  -1 or the index of the bundled dataset.
+     * @return
+     * @throws JSONException 
+     */
     private boolean jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
         Object o;
         if ( i>-1 ) {
@@ -142,33 +151,74 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         JSONObject jo= new JSONObject();
         JSONObject jo1= new JSONObject();
         
+        int startColumn= dep0==null ? 0 : 1;  // first column of the vector
+        
         String name;
         if ( dep0!=null ) {
             name= (String) Ops.guessName(dep0);
             jsonProp( jo1, dep0, QDataSet.LABEL, -1 );
+            if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
+                jo1.put("UNITS", "UTC" );
+            } else {
+                jsonProp( jo1, dep0, QDataSet.UNITS, -1 );
+            }
+            jo1.put( "START_COLUMN", 0 );
             jo.put( name, jo1 );
         }
 
-        for ( int i=0; i<bundleDesc.length(); i++ ) {
-            name= (String) bundleDesc.property( QDataSet.NAME,i );
-            if ( name==null ) {
-                logger.info("unnamed dataset!");
-                name= "field"+i;
+        String[] elementNames= new String[bundleDesc.length()];
+        String[] elementLabels= new String[bundleDesc.length()];
+        if ( bundleDesc.length()==1 && bundleDesc.length(0)==1 ) {
+            elementNames= new String[(int)bundleDesc.value(0,0)];
+            for ( int i=0; i<bundleDesc.value(0,0); i++ ) {
+                elementNames[i]= "ch_"+i;
             }
-            jo1= new JSONObject();
-            jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
-            if ( bds!=null && !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
-                jsonProp( jo1, bds, QDataSet.UNITS, -1 );
+            elementLabels= null;
+        } else {
+            for ( int i=0; i<bundleDesc.length(); i++ ) {
+                name= (String) bundleDesc.property( QDataSet.NAME,i );
+                if ( name==null ) {
+                    logger.info("unnamed dataset!");
+                    name= "field"+i;
+                }
+                jo1= new JSONObject();
+                jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
+                if ( bds!=null && !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
+                    jsonProp( jo1, bds, QDataSet.UNITS, -1 );
+                }
+                jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
+                jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
+                jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
+                jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
+                jsonProp( jo1, bundleDesc, QDataSet.START_INDEX, i );
+                jo1.put("START_COLUMN", startColumn + i );
+                //jo.put( name, jo1 ); // only output the bundle for now.
+                elementNames[i]= name;
+                elementLabels[i]= (String)bundleDesc.property(QDataSet.LABEL,i);
             }
-            jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
-            jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
-            jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
-            jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
-            jsonProp( jo1, bundleDesc, QDataSet.START_INDEX, i );
-            jsonProp( jo1, bundleDesc, "DIMENSION", i );
-            jo.put( name, jo1 );
         }
 
+        for ( int i=0; elementLabels!=null && i<bundleDesc.length(); i++ ) {
+            if ( elementLabels[i]==null ) elementLabels=null;
+        }
+        
+        jo1= new JSONObject();
+        jo1.put( "START_COLUMN", startColumn  );
+        if ( bundleDesc.length()==1 ) { // bundle of 1 rank 2
+            jo1.put( "DIMENSION", new int[] { (int)bundleDesc.value(0,0)} );            
+        } else {                        // bundle of N rank 1
+            jo1.put( "DIMENSION", new int[] { bundleDesc.length()} );
+        }
+        jo1.put( "ELEMENT_NAMES", elementNames );
+        if ( elementLabels!=null ) {
+            jo1.put( "ELEMENT_LABELS", elementLabels );
+        }
+        jsonProp( jo1, bds, QDataSet.VALID_MIN, -1 );
+        jsonProp( jo1, bds, QDataSet.VALID_MAX, -1 );
+        jsonProp( jo1, bds, QDataSet.FILL_VALUE, -1 );
+        
+        jo.put( Ops.guessName(bds), jo1 );
+        
         String json= jo.toString( 3 );
 
         String[] lines= json.split("\n");
@@ -366,17 +416,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             try {
                 BundleDataSet bds= BundleDataSet.createRank1Bundle();  //TODO: this is just so it does something.  Fill this out.
                 DDataSet ds= DDataSet.createRank1(1);
-                ds.putProperty( QDataSet.TITLE, data.property(QDataSet.TITLE) );
-                ds.putProperty( QDataSet.LABEL, data.property(QDataSet.LABEL) );
-                ds.putProperty( QDataSet.NAME, data.property(QDataSet.NAME) );
-                ds.putProperty( QDataSet.UNITS, data.property(QDataSet.UNITS) );
-                ds.putProperty( QDataSet.VALID_MAX, data.property(QDataSet.VALID_MAX) );
-                ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
-                ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
-                ds.putProperty( QDataSet.START_INDEX, 1 );
-                ds.putProperty( "DIMENSION", data.length(0) );
+                ds.putProperty( QDataSet.TITLE, 0, data.property(QDataSet.TITLE) );
+                ds.putProperty( QDataSet.LABEL, 0, data.property(QDataSet.LABEL) );
+                ds.putProperty( QDataSet.NAME, 0, data.property(QDataSet.NAME) );
+                ds.putProperty( QDataSet.UNITS, 0, data.property(QDataSet.UNITS) );
+                ds.putProperty( QDataSet.VALID_MAX, 0, data.property(QDataSet.VALID_MAX) );
+                ds.putProperty( QDataSet.VALID_MIN, 0, data.property(QDataSet.VALID_MIN) );
+                ds.putProperty( QDataSet.FILL_VALUE, 0, data.property(QDataSet.FILL_VALUE) );
+                ds.putValue( 0, data.length(0) );
                 bds.bundle( ds );
-                formatBundleDesc( out, null, bds );
+                formatBundleDesc( out, data, bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
