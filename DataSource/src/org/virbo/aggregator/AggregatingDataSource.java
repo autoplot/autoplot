@@ -34,6 +34,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -453,7 +454,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 }
                 if (ss.length > 1) {
                     if (mon.isCancelled()) {
-                        break;
+                        throw new org.das2.CancelledOperationException("cancel pressed");
                     }
                 }
 
