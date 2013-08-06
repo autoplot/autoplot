@@ -500,7 +500,7 @@ public class DataSourceController extends DomNodeController {
             // the dataset we get back isn't part of a time series.  So we should connect the TSB
             // to the application TimeRange property.
             this.timeSeriesBrowseController.release();
-            Axis xaxis= this.getTimeSeriesBrowseController().domPlot.getXaxis();
+            Axis xaxis= this.getTimeSeriesBrowseController().getPlot().getXaxis();
             dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
             dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );//TODO: think about if this is really correct
             this.timeSeriesBrowseController.setupGen( dom, Application.PROP_TIMERANGE );
@@ -1448,10 +1448,11 @@ public class DataSourceController extends DomNodeController {
 
             if ( result!=null && getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
-                if ( timeSeriesBrowseController.domPlot==null ) {
+                Plot p= timeSeriesBrowseController.getPlot();
+                if ( p==null ) {
                     logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
                 } else {
-                    timeSeriesBrowseController.domPlot.getXaxis().setAutoRange(true);
+                    p.getXaxis().setAutoRange(true);
                 }
             }
 

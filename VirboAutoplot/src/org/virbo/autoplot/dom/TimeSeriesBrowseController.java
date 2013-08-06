@@ -484,4 +484,12 @@ public class TimeSeriesBrowseController {
     boolean isListeningToAxis() {
         return xAxis!=null;
     }
+
+    /**
+     * provide access to the TSB plot.
+     * @return 
+     */
+    Plot getPlot() {
+        return this.domPlot;
+    }
 }
