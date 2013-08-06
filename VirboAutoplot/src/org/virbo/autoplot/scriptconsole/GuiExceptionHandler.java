@@ -764,7 +764,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
             Icon icon= new ImageIcon( AutoplotUtil.getAutoplotIcon() );
             int option= JOptionPane.showOptionDialog( parent, form, "Submit Exception Report",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, choices, choices[3] )  ;
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon, choices, choices[4] )  ;
             if ( option==2 ) {
                 return;
                 
