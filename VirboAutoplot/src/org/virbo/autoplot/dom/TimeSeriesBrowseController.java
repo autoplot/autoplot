@@ -29,18 +29,19 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- *
+ * When the data source supports loading additional data when the time axis (or plot context) changes, then
+ * this is responsible for loading additional data.
  * @author jbf
  */
 public class TimeSeriesBrowseController {
 
-    PlotElement p;
-    DasAxis xAxis;
-    DasPlot plot;
-    Plot domPlot;
-    PlotElementController panelController;
-    DataSourceController dataSourceController;
-    DataSourceFilter dsf;
+    private PlotElement p;
+    private DasAxis xAxis;
+    private DasPlot plot;
+    private Plot domPlot;
+    private PlotElementController plotElementController;
+    private DataSourceController dataSourceController;
+    private DataSourceFilter dsf;
     private ChangesSupport changesSupport;
 
     private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
@@ -129,14 +130,14 @@ public class TimeSeriesBrowseController {
         if ( p!=null ) {
             this.p = p;
             this.domPlot= dsf.getController().getApplication().getController().getPlotFor(p);
-            this.panelController = p.getController();
+            this.plotElementController = p.getController();
         } else {
             logger.fine("no plotElement provided, better come back to set up from timerange.");
         }
 
         if ( p!=null ) {
-            this.plot = panelController.getDasPlot();
-            this.xAxis = panelController.getDasPlot().getXAxis();
+            this.plot = plotElementController.getDasPlot();
+            this.xAxis = plotElementController.getDasPlot().getXAxis();
         }
     }
 
@@ -248,6 +249,9 @@ public class TimeSeriesBrowseController {
                 if (plot.getXAxis().valueIsAdjusting()) {
                     return;
                 } 
+                if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) {
+                    return;
+                }
                 if (e.getPropertyName().equals("datumRange")) {
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
