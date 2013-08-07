@@ -74,6 +74,8 @@ public class CanvasLayoutPanel extends JLabel {
         return ( e0 || e1 || e2 || e3 ) && r.intersects( x-10, y-10, x+20, y+20);
     }
 
+    transient boolean handlingEvent= false;
+    
     transient MouseListener mouseListener = new MouseAdapter() {
 
         @Override
@@ -126,10 +128,12 @@ public class CanvasLayoutPanel extends JLabel {
                                     cursor= new Rectangle( (int)( e.getX() / scale ), (int)( e.getY() / scale ), 1, 1 );
                                 }
                                 repaint();
+                                handlingEvent= true;
                                 firePropertyChange(PROP_COMPONENT, null, c);
                                 if ( ( e.getModifiers() & km ) == km ) {
                                     firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
                                 }
+                                handlingEvent= false;
                             }
                         }
                     }
@@ -156,7 +160,9 @@ public class CanvasLayoutPanel extends JLabel {
                 if ( !selectedComponents.equals(newSelect) ) {
                     selectedComponents.clear();
                     selectedComponents.addAll(newSelect);
+                    handlingEvent= true;
                     firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                    handlingEvent= false;
                     repaint();
                 }
             }
@@ -179,11 +185,16 @@ public class CanvasLayoutPanel extends JLabel {
      * @return 
      */
     public void setComponent(Object component) {
+        
+        if ( handlingEvent ) return;
+        
         logger.log(Level.FINER, "setComponent({0})", component);
         Object oldComponent = this.component;
         this.component = component;
-        repaint();
+        handlingEvent= true;
         firePropertyChange(PROP_COMPONENT, oldComponent, component);
+        handlingEvent= false;
+        repaint();
     }
 
     protected List<Object> selectedComponents = new ArrayList();
@@ -202,10 +213,14 @@ public class CanvasLayoutPanel extends JLabel {
      * @param selectedComponents 
      */
     public void setSelectedComponents(List<Object> selectedComponents) {
+        if ( handlingEvent ) return;
         logger.log(Level.FINER, "setSelectedComponents({0})", selectedComponents);
         List<Object> oldSelectedComponents = this.selectedComponents;
         this.selectedComponents = new ArrayList( selectedComponents );
+        handlingEvent= true;
         propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
+        handlingEvent= false;
+        repaint();
     }
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
