@@ -7,6 +7,7 @@ package org.virbo.autoplot.util;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Event;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -52,6 +53,7 @@ public class CanvasLayoutPanel extends JLabel {
     ClassMap<Color> types;
     Timer timer;
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.layout");
+    Rectangle cursor= null; // initial click for range select.
 
     public CanvasLayoutPanel() {
         types = new ClassMap<Color>();
@@ -80,7 +82,7 @@ public class CanvasLayoutPanel extends JLabel {
 
             logger.log(Level.FINE, "mouseClicked: {0} getMenuShortcutKeyMask={1}", new Object[] { e.getModifiers(), km } );
 
-            if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers()>16 ) ) {
+            if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers() & Event.SHIFT_MASK )== 0 && ( e.getModifiers()>16 ) ) {
                 return;
             }
             if (target == null) {
@@ -93,41 +95,72 @@ public class CanvasLayoutPanel extends JLabel {
             if ( theight * scale > getHeight() ) {
                scale= (double)getHeight() / theight;
             }
-            for (int i = target.getComponentCount() - 1; i >= 0; i--) {
-                Component c = target.getComponent(i);
-                Color color = types.get(c.getClass());
-                if (color != null ) {
-                    java.awt.Rectangle bounds = ((JComponent) c).getBounds();
-                    Rectangle mbounds = new Rectangle( (int)( bounds.x * scale ),
-                            (int)( bounds.y * scale ),
-                            (int)( bounds.width * scale ),
-                            (int)( bounds.height * scale) );
-                    // if the click is on an edge of an invisible component, select it.
-                    boolean invisibleEdgeClick= !c.isVisible() && rectEdgeClicked( mbounds, e.getX(), e.getY() );
-                    if ( c.isVisible() || invisibleEdgeClick ) {
-                        if ( mbounds.contains(e.getX(), e.getY()) || invisibleEdgeClick ) {
-                            if ( ( e.getModifiers() & km ) ==km ) {
-                                if ( selectedComponents.contains(c) ) {
-                                    selectedComponents.remove(c);
-                                    component = null;
+            
+            boolean shiftClick=  ( e.getModifiers() & Event.SHIFT_MASK ) == Event.SHIFT_MASK;
+            if ( !shiftClick ) {
+                for (int i = target.getComponentCount() - 1; i >= 0; i--) {
+                    Component c = target.getComponent(i);
+                    Color color = types.get(c.getClass());
+                    if (color != null ) {
+                        java.awt.Rectangle bounds = ((JComponent) c).getBounds();
+                        Rectangle mbounds = new Rectangle( (int)( bounds.x * scale ),
+                                (int)( bounds.y * scale ),
+                                (int)( bounds.width * scale ),
+                                (int)( bounds.height * scale) );
+                        // if the click is on an edge of an invisible component, select it.
+                        boolean invisibleEdgeClick= !c.isVisible() && rectEdgeClicked( mbounds, e.getX(), e.getY() );
+                        if ( c.isVisible() || invisibleEdgeClick ) {
+                            if ( mbounds.contains(e.getX(), e.getY()) || invisibleEdgeClick ) {
+                                if ( ( e.getModifiers() & km ) ==km ) {
+                                    if ( selectedComponents.contains(c) ) {
+                                        selectedComponents.remove(c);
+                                        component = null;
+                                    } else {
+                                        selectedComponents.add(c);
+                                        component = c;
+                                    }
                                 } else {
+                                    component= c;
+                                    selectedComponents.clear();
                                     selectedComponents.add(c);
-                                    component = c;
+                                    cursor= new Rectangle( (int)( e.getX() / scale ), (int)( e.getY() / scale ), 1, 1 );
                                 }
-                            } else {
-                                component= c;
-                                selectedComponents.clear();
-                                selectedComponents.add(c);
-                            }
-                            repaint();
-                            firePropertyChange(PROP_COMPONENT, null, c);
-                            if ( ( e.getModifiers() & km ) == km ) {
-                                firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                                repaint();
+                                firePropertyChange(PROP_COMPONENT, null, c);
+                                if ( ( e.getModifiers() & km ) == km ) {
+                                    firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                                }
                             }
                         }
                     }
                 }
+            } else {
+                Rectangle m= new Rectangle( (int)( e.getX() / scale ), (int)( e.getY() / scale), 1, 1 );
+                Rectangle select= null;
+                if ( cursor==null ) {
+                    select= m;
+                } else {
+                    select= m;
+                    Rectangle.union( cursor, m, select );
+                }
+                List<Object> newSelect= new ArrayList();
+                for (int i = target.getComponentCount() - 1; i >= 0; i--) {
+                    Component c= target.getComponent(i);
+                    Color color = types.get(c.getClass());
+                    if ( color!=null ) {
+                        if ( select.intersects(c.getBounds() ) ) {
+                            newSelect.add(c);
+                        }
+                    }
+                }
+                if ( !selectedComponents.equals(newSelect) ) {
+                    selectedComponents.clear();
+                    selectedComponents.addAll(newSelect);
+                    firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                    repaint();
+                }
             }
+            
         }
     };
     protected Object component = null;
