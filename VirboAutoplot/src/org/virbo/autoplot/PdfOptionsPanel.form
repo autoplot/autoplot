@@ -81,7 +81,7 @@
             <Font component="jLabel1" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Write the characters out as lines.  This makes a portable PDF and all characters render, but the labels cannot be edited. "/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Write the characters out as shapes.  This makes a portable PDF and all characters render, but the labels cannot be edited. "/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>

@@ -37,7 +37,7 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
         fontsAsShapesCB.setText("Fonts as shapes");
 
         jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()-1f));
-        jLabel1.setText("<html>Write the characters out as lines.  This makes a portable PDF and all characters render, but the labels cannot be edited. ");
+        jLabel1.setText("<html>Write the characters out as shapes.  This makes a portable PDF and all characters render, but the labels cannot be edited. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         manualWidthCB.setText("Manually Set Page Width  (Coming Soon...)");
