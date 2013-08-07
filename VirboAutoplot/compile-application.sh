@@ -282,11 +282,13 @@ mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
-echo ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS
+echo "  use set +x to hide private info"
+set +x
 if ! ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar $ALIAS; then
    echo "Fail to sign resources!"
    exit 1
 fi
+set -x
 
 echo "=== verify the jar file..."
 ${JAVA6_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
