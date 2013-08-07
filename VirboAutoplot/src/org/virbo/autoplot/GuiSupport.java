@@ -910,7 +910,13 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(DasCanvas.class);
                 String savedir = prefs.get("savedir", null);
                 if (savedir != null) fileChooser.setCurrentDirectory(new File(savedir));
-                if (currentFile != null) fileChooser.setSelectedFile(currentFile);
+                if (currentFile != null) {
+                    if ( currentFile.toString().endsWith("."+ext) ) {
+                        fileChooser.setSelectedFile(currentFile);
+                    } else {
+                        fileChooser.setSelectedFile(new File( currentFile.toString()+"."+ext) );
+                    }
+                }
                 if ( ext.equals("pdf") ) {
                     decor= new PdfOptionsPanel();
                     fileChooser.setAccessory(decor);
