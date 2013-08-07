@@ -14,13 +14,13 @@
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/local/jdk1.6.0_16__32/
+    JAVA_HOME=/usr/local/jdk1.7.0_25/
 fi
 if [ "" = "$JAVA5_HOME" ]; then
     JAVA5_HOME=$JAVA_HOME
 fi
 if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
+    JAVA6_HOME=$JAVA_HOME
 fi
 
 if [ "" = "$TAG" ]; then
@@ -50,7 +50,9 @@ fi
 
 if [ "" = "$STOREPASS" ]; then
     echo "STOREPASS NEEDED!"
+    set +x
     STOREPASS=dolphin
+    set -x
 fi
 
 if [ "" = "$CODEBASE" ]; then
@@ -283,8 +285,9 @@ rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
 echo "  use set +x to hide private info"
+#echo  ${JAVA6_HOME}bin/jarsigner -keystore $KEYSTORE -keypass $KEYPASS -storepass $STOREPASS -storetype $STORETYPE dist/AutoplotVolatile.jar "$ALIAS"
 set +x
-if ! ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS -storetype $STORETYPE dist/AutoplotVolatile.jar $ALIAS; then
+if ! ${JAVA6_HOME}bin/jarsigner -keystore $KEYSTORE -keypass $KEYPASS -storepass $STOREPASS -storetype $STORETYPE dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
