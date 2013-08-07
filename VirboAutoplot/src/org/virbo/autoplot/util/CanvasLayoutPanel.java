@@ -81,7 +81,7 @@ public class CanvasLayoutPanel extends JLabel {
         @Override
         public void mouseClicked(MouseEvent e) {
             final int km = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
+            long t0= System.currentTimeMillis();
             logger.log(Level.FINE, "mouseClicked: {0} getMenuShortcutKeyMask={1}", new Object[] { e.getModifiers(), km } );
 
             if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers() & Event.SHIFT_MASK )== 0 && ( e.getModifiers()>16 ) ) {
@@ -166,7 +166,8 @@ public class CanvasLayoutPanel extends JLabel {
                     repaint();
                 }
             }
-            
+            long ms= System.currentTimeMillis() - t0;
+            logger.log(Level.FINE, "done in {0}ms mouseClicked: {1} getMenuShortcutKeyMask={2}", new Object[] { ms, e.getModifiers(), km } ); // this takes 700 ms to complete!!!
         }
     };
     protected Object component = null;
@@ -236,6 +237,7 @@ public class CanvasLayoutPanel extends JLabel {
 
     @Override
     protected void paintComponent(Graphics g1) {
+        logger.log(Level.FINE, "paintComponent target={0}", target);
         if (target == null) {
             return;
         }
