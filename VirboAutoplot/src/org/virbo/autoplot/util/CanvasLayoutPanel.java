@@ -51,7 +51,7 @@ public class CanvasLayoutPanel extends JLabel {
     JComponent target;
     ClassMap<Color> types;
     Timer timer;
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
     public CanvasLayoutPanel() {
         types = new ClassMap<Color>();
@@ -78,10 +78,11 @@ public class CanvasLayoutPanel extends JLabel {
         public void mouseClicked(MouseEvent e) {
             final int km = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
+            logger.log(Level.FINE, "mouseClicked: {0} getMenuShortcutKeyMask={1}", new Object[] { e.getModifiers(), km } );
+
             if ( ( e.getModifiers() & km )== 0 && ( e.getModifiers()>16 ) ) {
                 return;
             }
-            logger.log(Level.FINE, "popup: {0}", e);
             if (target == null) {
                 return;
             }
