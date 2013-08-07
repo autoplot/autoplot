@@ -857,7 +857,9 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
 
     private void panelListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_panelListComponentValueChanged
-        updateSelected();
+        if ( !evt.getValueIsAdjusting() ) {
+            updateSelected();
+        }
     }//GEN-LAST:event_panelListComponentValueChanged
 
     private void biggerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biggerMIActionPerformed
