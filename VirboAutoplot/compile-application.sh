@@ -287,7 +287,7 @@ echo "=== sign and pack the jar file..."
 echo "  use set +x to hide private info"
 #echo  ${JAVA6_HOME}bin/jarsigner -keystore $KEYSTORE -keypass $KEYPASS -storepass $STOREPASS -storetype $STORETYPE dist/AutoplotVolatile.jar "$ALIAS"
 set +x
-if ! ${JAVA6_HOME}bin/jarsigner -keystore $KEYSTORE -keypass $KEYPASS -storepass $STOREPASS -storetype $STORETYPE dist/AutoplotVolatile.jar "$ALIAS"; then
+if ! ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
