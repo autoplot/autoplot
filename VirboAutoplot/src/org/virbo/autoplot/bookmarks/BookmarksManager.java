@@ -79,7 +79,7 @@ public class BookmarksManager extends javax.swing.JDialog {
     private final static Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
     /**
-     * return the index of the node in the tree, by comparing at toString of each node.
+     * return the index of the node in the tree, by comparing at getMessage of each node.
      * @param tree
      * @param root
      * @param find
