@@ -952,7 +952,7 @@ public class GuiSupport {
                                             mant= mant * 72 / 2.54;
                                         }
                                         double aspect= canvas.getHeight() / (double)canvas.getWidth();
-                                        go.setSize( (int)mant, (int)(mant*aspect) );
+                                        go.setSize( canvas.getWidth(), canvas.getHeight() );
                                         canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
                                     } else {
                                         go.setSize( canvas.getWidth(), canvas.getHeight() );
