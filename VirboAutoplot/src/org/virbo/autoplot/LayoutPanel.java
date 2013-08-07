@@ -67,7 +67,7 @@ import org.virbo.autoplot.util.CanvasLayoutPanel;
  */
 public class LayoutPanel extends javax.swing.JPanel {
 
-    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -857,6 +857,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
 
     private void panelListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_panelListComponentValueChanged
+        logger.fine("panelListComponentValueChanged "+evt.getValueIsAdjusting());
         if ( !evt.getValueIsAdjusting() ) {
             updateSelected();
         }
