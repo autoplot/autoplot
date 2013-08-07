@@ -27,6 +27,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -70,16 +71,22 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             }
         }
         
+        boolean haveJava= DataSourceRegistry.getInstance().hasSourceByExt("cdfj");
+            
         try {
             // TODO: on Linux systems, may not be able to execute from plug-in media.
             if (cdfLib1 != null) System.loadLibrary(cdfLib1);
             if (cdfLib2 != null) System.loadLibrary(cdfLib2);
+            logger.fine("cdf binaries loaded");
         } catch ( UnsatisfiedLinkError ex ) {
-            ex.printStackTrace();
+            if ( haveJava ) {
+                logger.info("native cdf libraries not found, java implementation should be used");
+            } else {
+                logger.info("native cdf libraries not found, cdfs cannot be read");
+            }
             logger.fine( "java.library.path: " + System.getProperty("java.library.path" ));
             throw ex;
         }
-        logger.fine("cdf binaries loaded");
     }
     
     
