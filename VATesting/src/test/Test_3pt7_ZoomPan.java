@@ -18,7 +18,7 @@ import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.*;
 
 /**
- *
+ * verify the zoom pan functions of the mousewheel.
  * @author jbf
  */
 public class Test_3pt7_ZoomPan implements Scenario {
@@ -27,6 +27,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
         return Math.abs( (t-d)/t ) < 0.10;
     }
 
+    @Override
     public int runIt(Object o) {
         DatumRange dr0;
         DatumRange dr1;
