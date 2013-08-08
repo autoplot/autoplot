@@ -129,7 +129,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } catch (ParseException ex) {
                     String t= ex.toString();
                     if ( t.length()>100 ) t= t.substring(0,100)+"...";
-                    availableTextField.setText(t);
+                    availableTextField.setText("<html><span color='red'>"+t);
                 }
             }
             final String ftr= tr.toString();
@@ -143,11 +143,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         } catch (ParseException ex) {
             String t= ex.toString();
             if ( t.length()>100 ) t= t.substring(0,100)+"...";
-            availableTextField.setText(t);
+            availableTextField.setText("<html><span color='red'>"+t);
         } catch ( IOException ex ) {
             String t= ex.toString();
             if ( t.length()>100 ) t= t.substring(0,100)+"...";
-            availableTextField.setText(t);
+            availableTextField.setText("<html><span color='red'>"+t);
+            
         }
     }
 
@@ -180,7 +181,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         } catch ( ParseException ex ) {
             String t= ex.toString();
             if ( t.length()>100 ) t= t.substring(0,100)+"...";
-            availableTextField.setText(t);
+            availableTextField.setText("<html><span color='red'>"+t);
         }
 
     }
