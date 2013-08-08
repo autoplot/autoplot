@@ -1,0 +1,9 @@
+1. build the release on hudson server with the release number, let RELEASE be the release tag either v2013a_11 or 20130808b
+2. sudo wget -O dist.zip http://autoplot.org/hudson/job/autoplot-release/992/artifact/autoplot/VirboAutoplot/dist//*zip*/dist.zip
+3. sudo unzip dist.zip
+4. sudo vi dist/autoplot.jnlp  
+5. edit to make release location
+6. sudo mv dist RELEASE
+7. verify http://autoplot.org/jnlp/RELEASE
+8. update devel link
+
