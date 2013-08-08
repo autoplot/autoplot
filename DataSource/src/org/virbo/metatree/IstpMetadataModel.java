@@ -470,14 +470,7 @@ public class IstpMetadataModel extends MetadataModel {
         QDataSet wds= SemanticOps.weightsDataSet(depDs);
         int j= -1;
         
-        int i0= depDs.length();        
-        // find the first valid record.  We assume there is data in channel n/8 (32 channels, check channel 4)
-        while ( i0==depDs.length() && j<wds.length(0) ) {
-            j++;
-            for ( i0=0; i0<depDs.length(); i0++ ) {
-                if ( wds.value(i0,j)>0 ) break;
-            }
-        }
+        int i0= 0;
         
         ArrayDataSet resulta= ArrayDataSet.copy( depDs.slice(0) ); // get all the properties of the dataset.
         
