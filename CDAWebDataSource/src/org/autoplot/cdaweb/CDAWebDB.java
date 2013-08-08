@@ -129,17 +129,21 @@ public class CDAWebDB {
                     throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
                 }
                 BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
-                String ss= rr.readLine();
-                while ( ss!=null ) {
-                    int i= ss.indexOf("#");
-                    if ( i>-1 ) ss= ss.substring(0,i);
-                    if ( ss.trim().length()>0 ) {
-                        String[] sss= ss.split("\\s+");
-                        tmpls.put( sss[0], sss[2] );
+                try {
+                    String ss= rr.readLine();
+                    while ( ss!=null ) {
+                        int i= ss.indexOf("#");
+                        if ( i>-1 ) ss= ss.substring(0,i);
+                        if ( ss.trim().length()>0 ) {
+                            String[] sss= ss.split("\\s+");
+                            tmpls.put( sss[0], sss[2] );
+                            if ( sss[1].length()>1 ) bases.put( sss[0], sss[1] );
+                        }
+                        ss= rr.readLine();
                     }
-                    ss= rr.readLine();
+                } finally {
+                    rr.close();
                 }
-                rr.close();
 
                 refreshServiceProviderIds();
                 mon.setTaskProgress(3);
