@@ -24,7 +24,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 public class Test_3pt7_ZoomPan implements Scenario {
 
     private static boolean close( double t, double d ) {
-        return Math.abs( (t-d)/t ) < 0.001;
+        return Math.abs( (t-d)/t ) < 0.10;
     }
 
     public int runIt(Object o) {
