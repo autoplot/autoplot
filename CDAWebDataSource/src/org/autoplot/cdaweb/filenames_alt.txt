@@ -67,9 +67,9 @@ HELIOS2_COHO1HR_MERGED_MAG_PLASMA x %Y/helios2_coho1hr_merged_mag_plasma_%Y%m01_
 #okFILE NOT FOUND: 1979-08-27
 #I2_NEPROF_TOPIST x %Y/i2_neprof_topist_%Y%m%d_?%v.cdf
 #FILE NOT FOUND: 1984-01-04
-I8_OR_SSC x i8_or_ssc_%Y%(m,span=6)01_?%v.cdf
+I8_OR_SSC http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/orbit/or_ssc i8_or_ssc_%Y%(m,span=6)01_?%v.cdf
 #FILE NOT FOUND: 2004-06-30
-I8_H0_GME x %Y/i8_h0_gme_%Y%(m,span=6)01_?%v.cdf
+I8_H0_GME http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/particles_gme/gme_h0/ %Y/i8_h0_gme_%Y%(m,span=6)01_?%v.cdf
 #FILE NOT FOUND: 2001-10-26
 #IA_K0_ENF x %Y/ia_k0_enf_%Y%m%d_?%v.cdf
 #FILE NOT FOUND: 1997-03-28
@@ -85,7 +85,7 @@ OMNI_HRO_5MIN http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_5min/ %Y/omni_hr
 #FILE NOT FOUND: 2011-01-21
 OMNI2_H0_MRG1HR http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/ %Y/omni2_h0_mrg1hr_%Y%(m,span=6)01_?%v.cdf
 #FILE NOT FOUND: 2011-01-21
-OMNI_COHO1HR_MERGED_MAG_PLASMA x %Y/omni_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
+OMNI_COHO1HR_MERGED_MAG_PLASMA http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/coho1hr_magplasma/ %Y/omni_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2011-01-13
 PIONEER10_COHO1HR_MERGED_MAG_PLASMA x %Y/pioneer10_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
 #FILE NOT FOUND: 1995-12-31
@@ -119,7 +119,7 @@ THD_OR_SSC x %Y/thd_or_ssc_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2011-02-08
 THE_OR_SSC x %Y/the_or_ssc_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2011-02-08
-TIMED_L3A_SEE x %Y/%m/timed_l3a_see_%Y%m01_?%v.cdf
+TIMED_L3A_SEE http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/see/l3a/ %Y/%m/timed_l3a_see_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2011-02-08
 VOYAGER1_COHO1HR_MERGED_MAG_PLASMA x %Y/voyager1_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2009-12-31
