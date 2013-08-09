@@ -340,7 +340,7 @@ public class AutoplotUtil {
         javax.swing.JTextField tf= new JTextField();
         panel.add( new JLabel("<html>Experimental Tooltips documentation search.  Enter the search keyword:"));
         panel.add( tf, BorderLayout.SOUTH );
-        int i= showConfirmDialog2( aThis, panel, "Experimental Tooltips documentation search", JOptionPane.OK_CANCEL_OPTION );
+        int i= JOptionPane.showConfirmDialog( aThis, panel, "Experimental Tooltips documentation search", JOptionPane.OK_CANCEL_OPTION );
         if ( i==JOptionPane.OK_OPTION ) {
             final String search= tf.getText();
             Runnable run= new Runnable() {
@@ -365,15 +365,30 @@ public class AutoplotUtil {
                     }
 
                     JTable t= new JTable( result.size(), 2 );
-                    t.setMinimumSize( new Dimension(640,480) );
-                    t.setPreferredSize( new Dimension(640,480) );
+                    t.setCellEditor(null);
+                    t.setMinimumSize( new Dimension(800,480) );
+                    t.setPreferredSize( new Dimension(800,480) );
                     
                     TableModel m= t.getModel();
+                    t.getColumnModel().getColumn(0).setHeaderValue("Component");
+                    t.getColumnModel().getColumn(0).setPreferredWidth(120);
+                    t.getColumnModel().getColumn(0).setMaxWidth(120);
+                    t.getColumnModel().getColumn(1).setHeaderValue("ToolTip");
+                    
                     int i=0;
                     for ( Entry e: result.entrySet() ) {
                         String l= e.getKey().getClass().toString().replaceAll("class ", "" );
+                        String tooltip= e.getValue().toString();
+                        int j= l.lastIndexOf(".");
+                        l= l.substring(j+1);
                         m.setValueAt( l, i, 0 );
-                        m.setValueAt( e.getValue(), i, 1 );
+                        m.setValueAt( tooltip, i, 1 );
+                        if ( tooltip.startsWith("<html>" ) ) {
+                            int linecount= tooltip.split("<br>").length;
+                            t.setRowHeight(i,linecount*20);
+                        } else {
+                            t.setRowHeight(i,20 );
+                        }
                         i++;
                     }
                     JScrollPane sp= new JScrollPane(t);
