@@ -831,7 +831,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         };
 
-        completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
+        completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JScrollPopupMenu(), listener);
         //TODO Here's the plan: we will make the popupMenu be non-focusable, then delegate the Up,Down,Enter and Escape to it when the popup is showing.
         //completionsPopupMenu.setFocusable(true);
         
