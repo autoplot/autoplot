@@ -82,10 +82,10 @@ public class Test003 {
  // temporarily disabled 2013-08-08 email from Friedel to faden@cottagesystems.com   doit(13, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-cem-L1/rbspa_pre_ect-hope-hk-cem-L1.vap");
 
             //HOPE
-            doit(14, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-hv-L1/rbspa_pre_ect-hope-hk-hv-L1.vap");
-            doit(15, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-tv-L1/rbspa_pre_ect-hope-hk-tv-L1.vap");
+//            doit(14, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-hv-L1/rbspa_pre_ect-hope-hk-hv-L1.vap");
+//why twice?            doit(15, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-tv-L1/rbspa_pre_ect-hope-hk-tv-L1.vap");
 
-            doit(17, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts2-L1/rbspa_pre_ect-hope-sci-cnts2-L1.vap");
+//            doit(17, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts2-L1/rbspa_pre_ect-hope-sci-cnts2-L1.vap");
 
             //doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap");
             doit(16, "file:///home/jbf/ct/hudson/vap/lanl/rbspa_pre_ect-hope-sci-L2.vap");
