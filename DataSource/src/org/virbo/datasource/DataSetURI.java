@@ -1555,7 +1555,9 @@ public class DataSetURI {
                 //sagg= URISplit.removeParam( sagg, "timerange" );
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
-                    completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation ("+tr+" available)", true ) );
+                    int ie= 0;
+                    while ( ie<surl.length() && ie<sagg.length() && surl.charAt(ie)==sagg.charAt(ie) ) ie++;
+                    completions.add( new DataSetURI.CompletionResult( sagg, sagg.substring(ie), "Use aggregation ("+tr+" available)", null, true ) );
                 }
             }
         }
