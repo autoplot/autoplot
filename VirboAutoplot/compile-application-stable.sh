@@ -112,7 +112,7 @@ echo "sign the jar files..."
 echo "  use set +x to hide private info"
 set +x
 #echo $JAVA_HOME/bin/jarsigner -keystore $KEYSTORE -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" -storetype $STORETYPE dist/AutoplotStable.jar \"$ALIAS\"
-if ! $JAVA_HOME/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" -storetype $STORETYPE dist/AutoplotStable.jar "$ALIAS"; then
+if ! $JAVA_HOME/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources!"
    exit 1
 fi
@@ -122,7 +122,7 @@ echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
 #echo $JAVA_HOME/bin/jarsigner -keystore $KEYSTORE -keypass \"$KEYPASS\" -storepass \"$STOREPASS\"  -storetype $STORETYPE dist/AutoplotStable.jar \"$ALIAS\"
-if ! $JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS" -storetype $STORETYPE  dist/AutoplotStable.jar "$ALIAS"; then
+if ! $JAVA_HOME/bin/jarsigner -keypass $KEYPASS -storepass "$STOREPASS" dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources!"
    exit 1
 fi
