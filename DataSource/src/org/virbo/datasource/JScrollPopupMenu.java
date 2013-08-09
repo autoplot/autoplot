@@ -24,7 +24,7 @@ import javax.swing.JScrollBar;
  */
 public class JScrollPopupMenu extends JPopupMenu {
 
-    protected int maximumVisibleRows = 20;
+    protected int maximumVisibleRows = 30;
 
     public JScrollPopupMenu() {
         this(null);
