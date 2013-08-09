@@ -298,11 +298,13 @@ public class PlotController extends DomNodeController {
         }
         if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
-        dasPlot1.getDasMouseInputAdapter().setFeedback( new DasMouseInputAdapter.Feedback() {
+        DasMouseInputAdapter.Feedback feedback= new DasMouseInputAdapter.Feedback() {
             public void setMessage(String message) {
                 getApplication().getController().setStatus(message);
             }
-        });
+        };
+        dasPlot1.getDasMouseInputAdapter().setFeedback( feedback );
+        
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
 
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
@@ -310,12 +312,15 @@ public class PlotController extends DomNodeController {
 
         MouseModule zoomPanX = new ZoomPanMouseModule(dasPlot1.getXAxis(), dasPlot1.getXAxis(), null);
         dasPlot1.getXAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanX);
+        dasPlot1.getXAxis().getDasMouseInputAdapter().setFeedback( feedback );
 
         MouseModule zoomPanY = new ZoomPanMouseModule(dasPlot1.getYAxis(), null, dasPlot1.getYAxis());
         dasPlot1.getYAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanY);
+        dasPlot1.getYAxis().getDasMouseInputAdapter().setFeedback( feedback );
 
         MouseModule zoomPanZ = new ZoomPanMouseModule(colorbar, null, colorbar);
         colorbar.getDasMouseInputAdapter().setSecondaryModule(zoomPanZ);
+        colorbar.getDasMouseInputAdapter().setFeedback( feedback );
 
         dasCanvas.revalidate();
         dasCanvas.repaint();
