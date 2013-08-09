@@ -42,6 +42,7 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.das2.datum.format.DateTimeDatumFormatter;
+import org.das2.event.DasMouseInputAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -297,6 +298,11 @@ public class PlotController extends DomNodeController {
         }
         if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
+        dasPlot1.getDasMouseInputAdapter().setFeedback( new DasMouseInputAdapter.Feedback() {
+            public void setMessage(String message) {
+                getApplication().getController().setStatus(message);
+            }
+        });
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
 
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
