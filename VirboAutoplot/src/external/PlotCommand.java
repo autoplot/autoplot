@@ -126,7 +126,7 @@ public class PlotCommand extends PyObject {
                 "xlog", "ylog", "zlog",
                 "title",
                 "renderType",
-                "color",
+                "color", "fillColor",
                 "symsize","linewidth",
                 "symbol",
                 "isotropic",
@@ -138,7 +138,7 @@ public class PlotCommand extends PyObject {
                         False, False, False,
                         Py.None,
                         Py.None,
-                        Py.None,
+                        Py.None,Py.None,
                         Py.None,Py.None,
                         Py.None,
                         Py.None,
@@ -281,6 +281,20 @@ public class PlotCommand extends PyObject {
                        }
                        if ( c!=null ) {
                            elements.get(0).getStyle().setColor( c );
+                       } else {
+                           throw new IllegalArgumentException("unable to identify color: "+sval);
+                       }
+                    }
+                } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
+                    if ( sval!=null ) {
+                       Color c;
+                       try {
+                           c= Color.decode( sval );
+                       } catch ( NumberFormatException ex ) {
+                           c= (Color)getEnumElement( Color.class, sval );
+                       }
+                       if ( c!=null ) {
+                           elements.get(0).getStyle().setFillColor( c );
                        } else {
                            throw new IllegalArgumentException("unable to identify color: "+sval);
                        }
