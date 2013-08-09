@@ -3,137 +3,42 @@
 #
 # generated with the python script /home/jbf/ct/autoplot/script/cdaweb/listAll.jy
 AC_H3_CRIS x %Y/ac_h3_cris_%Y0101_?%v.cdf
-#AC_OR_SSC x ac_or_ssc_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2011-01-10
-#APOLLO12_SWS_1HR x apollo12_sws_1hr_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1976-03-25
-#APOLLO15_SWS_1HR x apollo15_sws_1hr_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1972-06-30
-#APOLLO15_SWS_28S x %Y/apollo15_sws_28s_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1972-06-30
-#huh?  C1_CP_FGM_SPIN x %Y/c1_cp_fgm_spin_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-01-01
-#huh?  C2_CP_FGM_SPIN x %Y/c2_cp_fgm_spin_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-01-01
-#huh?  C3_CP_FGM_SPIN x %Y/c3_cp_fgm_spin_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-01-01
-#huh?  C4_CP_FGM_SPIN x %Y/c4_cp_fgm_spin_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-01-01
-#huh?  C1_UP_FGM x %Y/c1_up_fgm_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-10-31
-#huh?  C2_UP_FGM x %Y/c2_up_fgm_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-10-31
-#huh?  C3_UP_FGM x %Y/c3_up_fgm_%Y%m%d_?%v.cdf
-#huh?  FILE NOT FOUND: 2010-10-31
-#huh?  C4_PP_EDI x %Y/c4_pp_edi_%Y%m%d_?%v.cdf
-#huh?  ERROR: /tower3/private/cdaw_data/cluster_private/st/edi
-#huh?  CL_SP_ASP x %Y/cl_sp_asp_%Y%m%d_?%v.cdf
-#huh?  ERROR: /tower3/private/cdaw_data/cluster_private/st/aux
 CL_JP_PGP x %Y/cl_jp_pgp_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C1_JP_PMP x %Y/c1_jp_pmp_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C2_JP_PMP x %Y/c2_jp_pmp_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C3_JP_PMP x %Y/c3_jp_pmp_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C4_JP_PMP x %Y/c4_jp_pmp_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C1_JP_PSE x %Y/c1_jp_pse_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C2_JP_PSE x %Y/c2_jp_pse_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C3_JP_PSE x %Y/c3_jp_pse_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 C4_JP_PSE x %Y/c4_jp_pse_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 CT_JP_PSE x %Y/ct_jp_pse_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2014-12-31
 CL_JP_PCY x %Y/cl_jp_pcy_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2015-02-01
-#ok CRRES_H0_MEA x %Y/crres_h0_mea_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1991-10-12
-#ok DN_K0_SASK x %Y/dn_k0_sask_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1999-11-04
 GENESIS_3DL2_GIM x %Y/genesis_3dl2_gim_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2004-04-30
 HELIOS1_COHO1HR_MERGED_MAG_PLASMA x %Y/helios1_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 1981-06-14
 HELIOS2_COHO1HR_MERGED_MAG_PLASMA x %Y/helios2_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 1980-03-04
-#ok burst ISS_DOSANL_TEPC x %Y/iss_dosanl_tepc_%Y%m%d%H%M_?%v.cdf
-#FILE NOT FOUND: 2010-04-29
-#okI2_NEPROF_TOPS x %Y/i2_neprof_tops_%Y%m%d_?%v.cdf
-#okFILE NOT FOUND: 1979-08-27
-#I2_NEPROF_TOPIST x %Y/i2_neprof_topist_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1984-01-04
 I8_OR_SSC http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/orbit/or_ssc i8_or_ssc_%Y%(m,span=6)01_?%v.cdf
-#FILE NOT FOUND: 2004-06-30
 I8_H0_GME http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/particles_gme/gme_h0/ %Y/i8_h0_gme_%Y%(m,span=6)01_?%v.cdf
-#FILE NOT FOUND: 2001-10-26
-#IA_K0_ENF x %Y/ia_k0_enf_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1997-03-28
-#IA_K0_ICD x %Y/ia_k0_icd_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1998-05-01
-#IA_OR_DEF x %Y/ia_or_def_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1997-06-04
 IM_ELECTRON_DENSITY_RPI x %Y/im_electron_density_rpi_%Y%m01_?%v.cdf  # Not quite...
-#FILE NOT FOUND: 2005-12-18
 OMNI_HRO_1MIN http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_1min/ %Y/omni_hro_1min_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-01-21
 OMNI_HRO_5MIN http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_5min/ %Y/omni_hro_5min_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-01-21
 OMNI2_H0_MRG1HR http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/ %Y/omni2_h0_mrg1hr_%Y%(m,span=6)01_?%v.cdf
-#FILE NOT FOUND: 2011-01-21
 OMNI_COHO1HR_MERGED_MAG_PLASMA http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/coho1hr_magplasma/ %Y/omni_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-01-13
 PIONEER10_COHO1HR_MERGED_MAG_PLASMA x %Y/pioneer10_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 1995-12-31
 PIONEERVENUS_COHO1HR_MERGED_MAG_PLASMA x %Y/pioneervenus_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 1992-12-31
-#PO_6SECEDSC_EFI x %Y/po_6secEdsc_efi_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2008-04-12
-#SO_OR_PRE x %Y/so_or_pre_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2002-10-29
-#SO_AT_DEF x %Y/so_at_def_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2002-09-22
-#STA_L1_LET x %Y/sta_l1_let_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2010-10-01
 STA_COHO1HR_MERGED_MAG_PLASMA x %Y/sta_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2010-11-30
 STB_COHO1HR_MERGED_MAG_PLASMA x %Y/stb_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2010-11-30
 SX_K0_POF x %Y/sx_k0_pof_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2004-06-30
-#okTHA_L2_FFT x %Y/tha_l2_fft_%Y%m%d_?%v.cdf
-#okFILE NOT FOUND: 2011-02-08
-#okTHE_L2_FFT x %Y/the_l2_fft_%Y%m%d_?%v.cdf
-#okFILE NOT FOUND: 2011-02-10
 THA_OR_SSC x %Y/tha_or_ssc_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 THB_OR_SSC x %Y/thb_or_ssc_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 THC_OR_SSC x %Y/thc_or_ssc_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 THD_OR_SSC x %Y/thd_or_ssc_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 THE_OR_SSC x %Y/the_or_ssc_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 TIMED_L3A_SEE http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/see/l3a/ %Y/%m/timed_l3a_see_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-02-08
 VOYAGER1_COHO1HR_MERGED_MAG_PLASMA x %Y/voyager1_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2009-12-31
 VOYAGER2_COHO1HR_MERGED_MAG_PLASMA x %Y/voyager2_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2011-01-26
 UY_COHO1HR_MERGED_MAG_PLASMA x %Y/uy_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-#FILE NOT FOUND: 2009-09-30
-#FILE NOT FOUND: 2009-06-30
 WI_H1_SWE x %Y/wi_h1_swe_%Y%m01_?%v.cdf  # sort of
-#FILE NOT FOUND: 2004-11-15
-#ok WI_H4_SWE x %Y/wi_h4_swe_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2001-07-10
-#ok WI_M2_SWE x %Y/wi_m2_swe_%Y%m%d_?%v.cdf
-#FILE NOT FOUND: 2001-07-10
 CRRES_H0_MEA x %Y/crres_h0_mea_%Y%m%(d,span=10)_?%v.cdf
 UY_1MIN_VHM x %Y/uy_1min_vhm_%Y%m%(d,span=10)_?%v.cdf  # these are 10-day files...
 TIMED_L1B_SABER http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/saber/l1bv7 %Y/%m/timed_l1bv7_saber_%Y%m%d%(H,span=4)%M_?%v.cdf
