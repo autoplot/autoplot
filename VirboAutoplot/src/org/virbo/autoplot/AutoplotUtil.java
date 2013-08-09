@@ -338,8 +338,9 @@ public class AutoplotUtil {
     static void doSearchToolTips( final Container aThis ) {
         JPanel panel= new JPanel( new BorderLayout() );
         javax.swing.JTextField tf= new JTextField();
-        panel.add( tf );
-        int i= JOptionPane.showConfirmDialog( aThis, panel, "Experimental Tooltips documentation search", JOptionPane.OK_CANCEL_OPTION );
+        panel.add( new JLabel("<html>Experimental Tooltips documentation search.  Enter the search keyword:"));
+        panel.add( tf, BorderLayout.SOUTH );
+        int i= showConfirmDialog2( aThis, panel, "Experimental Tooltips documentation search", JOptionPane.OK_CANCEL_OPTION );
         if ( i==JOptionPane.OK_OPTION ) {
             final String search= tf.getText();
             Runnable run= new Runnable() {
@@ -366,16 +367,19 @@ public class AutoplotUtil {
                     JTable t= new JTable( result.size(), 2 );
                     t.setMinimumSize( new Dimension(640,480) );
                     t.setPreferredSize( new Dimension(640,480) );
+                    
                     TableModel m= t.getModel();
                     int i=0;
                     for ( Entry e: result.entrySet() ) {
-                        m.setValueAt( e.getKey().getClass(), i, 0 );
+                        String l= e.getKey().getClass().toString().replaceAll("class ", "" );
+                        m.setValueAt( l, i, 0 );
                         m.setValueAt( e.getValue(), i, 1 );
                         i++;
                     }
                     JScrollPane sp= new JScrollPane(t);
 
-                    JOptionPane.showMessageDialog( aThis, sp, "Tooltips search results", JOptionPane.OK_OPTION );
+                    showConfirmDialog2( aThis, sp, "Tooltips search results", JOptionPane.OK_CANCEL_OPTION );
+                    
                }
             };
             new Thread(run).start();
@@ -2009,7 +2013,7 @@ public class AutoplotUtil {
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
             throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
         }
-        Window p= SwingUtilities.getWindowAncestor(parent);
+        Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
         
         dia.setLayout( new BorderLayout() );
