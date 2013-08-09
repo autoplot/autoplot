@@ -36,8 +36,9 @@ public class CompletionsList {
         
         int i = 0;
         while (i < completions.size()) {
-            int stopAt = Math.min(i + 30, completions.size());
-            while (i < stopAt) {
+            //int stopAt = Math.min(i + 30, completions.size());
+            //int stopAt= 10000;
+            while (i < completions.size() ) {
                 final CompletionResult s1 = completions.get(i);
                 if ( s1==CompletionResult.SEPARATOR ) {
                     //menuItem= new javax.swing.JButton("HELLO");
