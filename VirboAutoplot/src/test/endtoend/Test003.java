@@ -79,7 +79,7 @@ public class Test003 {
 
             doit(12, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-mageis-sci-elec-L2.vap");
 
-            doit(13, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-cem-L1/rbspa_pre_ect-hope-hk-cem-L1.vap");
+ // temporarily disabled 2013-08-08 email from Friedel to faden@cottagesystems.com   doit(13, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-cem-L1/rbspa_pre_ect-hope-hk-cem-L1.vap");
 
             //HOPE
             doit(14, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/hk-hv-L1/rbspa_pre_ect-hope-hk-hv-L1.vap");
