@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Tear-Off Tabs code got some attention.</small></p>
+        <p><small>Completions are now shown in more useful scrollable list.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,7 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
-            <li>Start to clean up the cdaweb exceptions that were never fixed after data was moved around</li>
+            <li>Clean up the cdaweb exceptions that were never fixed after data was moved around</li>
             <li>Seth's CDF which had fill in Y that would cause problems.</li>
             <li>options for PDF output allow user to substitute curves for fonts</li>
             <li>1087: rank2 CDF DEPEND_1 reduce improvements</li>
@@ -55,6 +55,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 316: completions should be in a scrollable list</li>
+            <li>Mouse modules announce themselves and indicate escape-to-cancel</li>
             <li>Taller/Shorter buttons on layout panel, shift works on layout panel to select range</li>
             <li>scary exception when no native CDF library removed</li>
             <li>more TimeRangeTool buttons</li>
