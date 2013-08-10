@@ -1756,21 +1756,29 @@ public class DataSetURI {
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
             Map params = URISplit.parseParams(split.params);
+            Map paramsArgN= URISplit.parseParams(split.params); // these do have arg_0 parameters.
             for (int i = 0; i < 3; i++) {
                 params.remove("arg_" + i);
             }
 
             int i = 0;
             for (CompletionContext cc1 : completions) {
+                boolean useArgN= false;
                 String paramName = cc1.implicitName != null ? cc1.implicitName : cc1.completable;
                 if (paramName.indexOf("=") != -1) {
                     paramName = paramName.substring(0, paramName.indexOf("="));
+                    useArgN= true;
                 }
 
                 boolean dontYetHave = !params.containsKey(paramName);
                 boolean startsWith = cc1.completable.startsWith(cc.completable);
                 if (startsWith) {
-                    LinkedHashMap paramsCopy = new LinkedHashMap(params);
+                    LinkedHashMap paramsCopy;
+                    if ( useArgN ) {
+                        paramsCopy= new LinkedHashMap(paramsArgN);
+                    } else {
+                        paramsCopy= new LinkedHashMap(params);
+                    }
                     if (cc1.implicitName != null) {
                         paramsCopy.put(cc1.implicitName, cc1.completable);
                     } else {
