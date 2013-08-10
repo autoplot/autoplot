@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -1776,6 +1777,18 @@ public class DataSetURI {
                     LinkedHashMap paramsCopy;
                     if ( useArgN ) {
                         paramsCopy= new LinkedHashMap(paramsArgN);
+                        String rm= null;
+                        for ( Object k: paramsCopy.keySet() ) {
+                            Object v= paramsCopy.get(k);
+                            if ( ((String)v).startsWith(cc.completable) ) {
+                                rm= (String)k;
+                            }
+                        }
+                        if ( rm!=null ) {
+                            paramsCopy.remove(rm);
+                        } else {
+                            logger.fine("expected to find in completions: "+cc.completable);
+                        }
                     } else {
                         paramsCopy= new LinkedHashMap(params);
                     }
