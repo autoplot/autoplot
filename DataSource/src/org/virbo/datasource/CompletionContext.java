@@ -33,18 +33,16 @@ public class CompletionContext {
     public final static Object CONTEXT_PARAMETER_NAME="paramName";
     public final static Object CONTEXT_PARAMETER_VALUE="paramValue";
 
+    /**
+     * create an empty completion proposal.
+     */
     public CompletionContext() {
     }
     
     /**
      * Object containing a completion proposal.
      * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
-     * @param completable the value to use, if the completion is accepted.
-     * @param owner the code responsible for creating the completion (not used).
-     * @param implicitName often "arg_0" for positional parameters.
-     * @param label label to use.
-     * @param doc additional information that is shown in a tooltip.
-     * @param maybePlot url should be valid if this proposal is accepted.
+     * @param completable the value to use, if the completion is accepted.  An equal sign in the completable when CONTEXT_PARAMETER_NAME indicates more is needed.
      */    
     public CompletionContext( Object context, String completable ) {
         this( context, completable, null, null, null ,null );
@@ -58,7 +56,6 @@ public class CompletionContext {
      * @param implicitName often "arg_0" for positional parameters.
      * @param label label to use.
      * @param doc additional information that is shown in a tooltip.
-     * @param maybePlot url should be valid if this proposal is accepted.
      */    
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String label, String doc ) {
         this( context, completable, owner, implicitName, label, doc, false );
@@ -78,7 +75,7 @@ public class CompletionContext {
     /**
      * Object containing a completion proposal.
      * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
-     * @param completable the value to use, if the completion is accepted.
+     * @param completable the value to use, if the completion is accepted.  
      * @param doc additional information that is shown in a tooltip.
      */
     public CompletionContext( Object context, String completable, String doc ) {
