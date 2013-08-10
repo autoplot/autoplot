@@ -1777,17 +1777,19 @@ public class DataSetURI {
                     LinkedHashMap paramsCopy;
                     if ( useArgN ) {
                         paramsCopy= new LinkedHashMap(paramsArgN);
-                        String rm= null;
-                        for ( Object k: paramsCopy.keySet() ) {
-                            Object v= paramsCopy.get(k);
-                            if ( ((String)v).startsWith(cc.completable) ) {
-                                rm= (String)k;
+                        if ( cc.completable.length()>0 ) { // TODO: there's a nasty bug here, suppose a CDF file has a parameter named "doDep"...
+                            String rm= null;
+                            for ( Object k: paramsCopy.keySet() ) {
+                                Object v= paramsCopy.get(k);
+                                if ( ((String)v).startsWith(cc.completable) ) {
+                                    rm= (String)k;
+                                }
                             }
-                        }
-                        if ( rm!=null ) {
-                            paramsCopy.remove(rm);
-                        } else {
-                            logger.fine("expected to find in completions: "+cc.completable);
+                            if ( rm!=null ) {
+                                paramsCopy.remove(rm);
+                            } else {
+                                logger.log(Level.FINE, "expected to find in completions: {0}", cc.completable);
+                            }
                         }
                     } else {
                         paramsCopy= new LinkedHashMap(params);
