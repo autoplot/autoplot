@@ -36,36 +36,84 @@ public class CompletionContext {
     public CompletionContext() {
     }
     
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param owner the code responsible for creating the completion (not used).
+     * @param implicitName often "arg_0" for positional parameters.
+     * @param label label to use.
+     * @param doc additional information that is shown in a tooltip.
+     * @param maybePlot url should be valid if this proposal is accepted.
+     */    
     public CompletionContext( Object context, String completable ) {
         this( context, completable, null, null, null ,null );
     }
     
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param owner the code responsible for creating the completion (not used).
+     * @param implicitName often "arg_0" for positional parameters.
+     * @param label label to use.
+     * @param doc additional information that is shown in a tooltip.
+     * @param maybePlot url should be valid if this proposal is accepted.
+     */    
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String label, String doc ) {
         this( context, completable, owner, implicitName, label, doc, false );
     }
     
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param owner the code responsible for creating the completion (not used).
+     * @param implicitName often "arg_0" for positional parameters.
+     */
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName ) {
         this( context, completable, owner, implicitName, null, null, false );
     }
     
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param doc additional information that is shown in a tooltip.
+     */
     public CompletionContext( Object context, String completable, String doc ) {
         this( context, completable, null, null, null, doc, false );
     }
 
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param label label to use.
+     * @param doc additional information that is shown in a tooltip.
+     */
     public CompletionContext( Object context, String completable, String label, String doc ) {
         this( context, completable, null, null, label, doc, false );
     }
 
+    /**
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param owner the code responsible for creating the completion (not used).
+     * @param implicitName often "arg_0" for positional parameters.
+     * @param doc additional information that is shown in a tooltip.
+     */
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
         this( context, completable, owner, implicitName, null, doc, false );
     }
 
     /**
-     * 
-     * @param context
-     * @param completable
-     * @param owner
-     * @param implicitName
+     * Object containing a completion proposal.
+     * @param context the position, one of CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, CONTEXT_FILESYSTEM, etc
+     * @param completable the value to use, if the completion is accepted.
+     * @param owner the code responsible for creating the completion (not used).
+     * @param implicitName often "arg_0" for positional parameters.
      * @param label label to use.
      * @param doc additional information that is shown in a tooltip.
      * @param maybePlot url should be valid if this proposal is accepted.
