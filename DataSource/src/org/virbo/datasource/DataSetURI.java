@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
@@ -80,6 +81,13 @@ public class DataSetURI {
     static {
         FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
+        if ( System.getProperty("AP_CURL")!=null || System.getProperty("AP_WGET")!=null ) { // TODO: this only handles HTTP and HTTPS. FTP should probably be handled as well, but check curl.
+            FileSystem.registerFileSystemFactory("http", new WGetFileSystemFactory() );
+            FileSystem.registerFileSystemFactory("https", new WGetFileSystemFactory() );
+            FileSystem.registerFileSystemFactory("ftp", new WGetFileSystemFactory() );
+            logger.fine("using wget implementation for http,https and ftp because AP_CURL or AP_WGET is set.");
+        }
+        
         // The following is commented out until the svn version of dasCore.jar is updated
         FileSystem.registerFileSystemFactory("sftp", new VFSFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
