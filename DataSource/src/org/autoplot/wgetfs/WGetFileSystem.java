@@ -4,6 +4,7 @@
  */
 package org.autoplot.wgetfs;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -248,30 +249,53 @@ public class WGetFileSystem extends WebFileSystem {
         }
         
         InputStream in= new FileInputStream( listingFile( directory ) );
-        
+        result= new LinkedHashMap();
         try {
-            URL[] list = HtmlUtil.getDirectoryListing(getURL(directory), in );
-            result = new LinkedHashMap();
-            int n = directory.length();
-            for (int i = 0; i < list.length; i++) {
-                URL url = list[i];
-                DirectoryEntry de1= new DirectoryEntry();
-                de1.modified= Long.MAX_VALUE;
-                de1.name= getLocalName(url).substring(n);
-                de1.type= 'f';
-                de1.size= Long.MAX_VALUE;
-                result.put(de1.name,de1);
+            if ( WGetFileSystemFactory.useCurl && getRootURL().getProtocol().equals("ftp") ) {            
+                BufferedReader bin= new BufferedReader( new InputStreamReader(in) );
+                String line= bin.readLine();
+                while ( line!=null ) {
+                    String[] ss= line.split("\\s+");
+                    if ( ss.length>8 ) {
+                        boolean dir= line.charAt(0)=='d';
+                        DirectoryEntry de1= new DirectoryEntry();
+                        de1.modified= Long.MAX_VALUE;  //danger not used 
+                        de1.name= directory + ss[8] + ( dir?"/":"" );
+                        de1.type= dir ? 'd': 'f' ;
+                        de1.size= Long.MAX_VALUE;  //not used
+                        result.put(de1.name,de1);
+                    } else {
+                        System.err.println("here line 268");
+                    }
+                    line= bin.readLine();
+                }
+            } else {
+
+                URL[] list = HtmlUtil.getDirectoryListing(getURL(directory), in );
+                int n = directory.length();
+                for (int i = 0; i < list.length; i++) {
+                    URL url = list[i];
+                    DirectoryEntry de1= new DirectoryEntry();
+                    de1.modified= Long.MAX_VALUE;
+                    de1.name= getLocalName(url).substring(n);
+                    de1.type= 'f';
+                    de1.size= Long.MAX_VALUE;
+                    result.put(de1.name,de1);
+                }
+
             }
-
-            result= addRoCacheEntries( directory, result );
-            cacheListing( directory, result.values().toArray( new DirectoryEntry[result.size()] ) );
-
-            return FileSystem.getListing(result);
-            
         } catch ( CancelledOperationException ex ) {
-            throw new IllegalArgumentException("will not happen...");
             
+        } finally {
+            in.close();
         }
+
+        result= addRoCacheEntries( directory, result );
+        cacheListing( directory, result.values().toArray( new DirectoryEntry[result.size()] ) );
+
+        return FileSystem.getListing(result);
+            
+        
     }
     
 }
