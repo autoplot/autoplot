@@ -25,12 +25,11 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
- * wget-based filesystem uses unix wget command.
+ * wget-based filesystem uses unix wget command.  This was immediately
+ * extended to add support for curl, which comes with macs.
  * @author jbf
  */
 public class WGetFileSystem extends WebFileSystem {
-
-    String wget= "wget";
     
     public WGetFileSystem(URI root, File localRoot) {
         super(root, localRoot);
@@ -42,19 +41,74 @@ public class WGetFileSystem extends WebFileSystem {
 
     private long interpretLong( String s ) {
         if ( s.endsWith("K") ) {
-            long mant= Long.parseLong(s.substring(0,s.length()-1));
-            return mant*1000;
+            double mant= Long.parseLong(s.substring(0,s.length()-1));
+            return (long)(mant*1000);
+        } else if ( s.endsWith("k") ) { //curl
+            double mant= Long.parseLong(s.substring(0,s.length()-1));
+            return (long)(mant*1000);
         } else if ( s.endsWith("M") ) {
-            long mant= Long.parseLong(s.substring(0,s.length()-1));
-            return mant*1000000;
+            double mant= Double.parseDouble(s.substring(0,s.length()-1));
+            return (long)(mant*1000000);
         } else {
             long mant= Long.parseLong(s);
             return mant;
         }
     }
+    
+    /**
+     * For wget, look for "Length:" and progress updates.  For curl, look for
+     * "00 13.5M  100 13.5M    0     0  1125k      0  0:00:12  0:00:12 --:--:-- 1125k"
+     * @param line
+     * @param monitor 
+     */
+    private void interpretProgress( String line, String filename, ProgressMonitor monitor ) {
+        if ( WGetFileSystemFactory.useCurl ) {
+            if ( !monitor.isStarted() ) {
+                String[] ss= line.split("\\s+");    
+                if ( ss.length==13 ) {
+                    try { 
+                        long l= interpretLong(ss[2]);
+                        if ( l>0 && !ss[11].startsWith("--") ) {
+                            monitor.setTaskSize( l );
+                            monitor.setProgressMessage("curl "+filename);
+                            monitor.started();                    
+                        }
+                    } catch ( NumberFormatException ex ) {
+                        // do nothing, that was a header...
+                    }
+                }
+            } else {
+                String[] ss= line.split("\\s+");
+                if ( ss.length==13 ) {
+                    monitor.setTaskProgress( interpretLong(ss[4]) );
+                }
+            }
+        } else {
+            if ( !monitor.isStarted() ) {
+                if ( line.startsWith("Length:" ) ) {
+                    int term= line.indexOf(" ",8);
+                    monitor.setTaskSize( interpretLong( line.substring(8,term) ) );
+                    monitor.setProgressMessage("wget "+filename);
+                    monitor.started();
+                }
+            } else {
+                Pattern prog= Pattern.compile("\\s*(([0-9]+)([MK])?)");
+                Matcher m= prog.matcher(line);
+                if ( m.find() && m.start()==0 && monitor.isStarted()  ) {
+                    monitor.setTaskProgress( interpretLong( m.group(1) ) );
+                }
+            }
+        }
+    }
+    
     @Override
     protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
-        String[] cmd = new String[] { wget, "-O", partfile.toString(), getRootURL().toString() + filename };
+        String[] cmd;
+        if ( WGetFileSystemFactory.useCurl ) {
+            cmd= new String[] { WGetFileSystemFactory.exe, "-o", partfile.toString(), getRootURL().toString() + filename };
+        } else {
+            cmd= new String[] { WGetFileSystemFactory.exe, "-O", partfile.toString(), getRootURL().toString() + filename };
+        }
         
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
@@ -63,19 +117,9 @@ public class WGetFileSystem extends WebFileSystem {
         
         try {
             String line= err.readLine();
-            Pattern prog= Pattern.compile("\\s*(([0-9]+)([MK])?)", LISTING_TIMEOUT_MS);
             while ( line!=null ) {
-                if ( line.startsWith("Length:" ) ) {
-                    int term= line.indexOf(" ",8);
-                    monitor.setTaskSize( interpretLong( line.substring(8,term) ) );
-                    monitor.setProgressMessage("monitoring wget");
-                    monitor.started();
-                }
-                System.err.println(line);
-                Matcher m= prog.matcher(line);
-                if ( m.find() && m.start()==0 && monitor.isStarted()  ) {
-                    monitor.setTaskProgress( interpretLong( m.group(1) ) );
-                }
+                interpretProgress( line, filename, monitor );
+                //System.err.println(line);
                 Thread.sleep(200);
                 line= err.readLine();
                 if ( monitor.isCancelled() ) {
@@ -88,7 +132,7 @@ public class WGetFileSystem extends WebFileSystem {
             monitor.finished();
             if ( p.exitValue()!=0 ) {
                 partfile.delete();
-                throw new IOException("wget returned with exit code "+p.exitValue() );
+                throw new IOException( cmd +" returned with exit code "+p.exitValue() );
             }
             
         } catch ( InterruptedException ex ) {
@@ -183,7 +227,12 @@ public class WGetFileSystem extends WebFileSystem {
         
     
         File listingFile= listingFile(directory);
-        String[] cmd = new String[] { wget, "-O", listingFile.toString(), getRootURL().toString() + directory };
+        String[] cmd;
+        if ( WGetFileSystemFactory.useCurl ) {
+            cmd= new String[] { WGetFileSystemFactory.exe, "-o", listingFile.toString(), getRootURL().toString() + directory };            
+        } else {
+            cmd= new String[] { WGetFileSystemFactory.exe, "-O", listingFile.toString(), getRootURL().toString() + directory };
+        }
         
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
