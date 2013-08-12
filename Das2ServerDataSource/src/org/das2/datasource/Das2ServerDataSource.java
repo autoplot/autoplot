@@ -196,8 +196,18 @@ class Das2ServerDataSource extends AbstractDataSource {
                         map.putAll(sd.getProperties());
                     }
                 };
-                StreamTool.readStream(channel, handler);
-                channel.close();
+                try {
+                    StreamTool.readStream(channel, handler);
+                } catch ( StreamException ex ) {
+                    if ( ex.getMessage().equals("noSuchDataSet") ) {
+                        throw new StreamException("noSuchDataSet: "+dataset );
+                    } else {
+                        throw ex;
+                    }
+                } finally {
+                    channel.close();
+                }
+                
                 dsdfParams= map;
             }
 
