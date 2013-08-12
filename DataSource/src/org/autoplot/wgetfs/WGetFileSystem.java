@@ -260,7 +260,9 @@ public class WGetFileSystem extends WebFileSystem {
                         boolean dir= line.charAt(0)=='d';
                         DirectoryEntry de1= new DirectoryEntry();
                         de1.modified= Long.MAX_VALUE;  //danger not used 
-                        de1.name= directory + ss[8] + ( dir?"/":"" );
+                        String name= ss[8];
+                        if ( name.startsWith("/") ) name= name.substring(1);                                
+                        de1.name= directory + name + ( dir?"/":"" );
                         de1.type= dir ? 'd': 'f' ;
                         de1.size= Long.MAX_VALUE;  //not used
                         result.put(de1.name,de1);
@@ -269,6 +271,7 @@ public class WGetFileSystem extends WebFileSystem {
                     }
                     line= bin.readLine();
                 }
+                //System.err.println(result);
             } else {
 
                 URL[] list = HtmlUtil.getDirectoryListing(getURL(directory), in );
