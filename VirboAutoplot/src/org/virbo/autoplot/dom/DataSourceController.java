@@ -462,7 +462,13 @@ public class DataSourceController extends DomNodeController {
         List<String> problems = new ArrayList<String>();
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
-            String uri= getDataSource().getURI();
+            String uri;
+            DataSource dss= getDataSource();
+            if ( dss==null ) {
+                uri= "vap+internal:";
+            } else {
+                uri= getDataSource().getURI();
+            }
             if ( this.tsb!=null ) {
                 uri= this.tsbSuri;
             }
