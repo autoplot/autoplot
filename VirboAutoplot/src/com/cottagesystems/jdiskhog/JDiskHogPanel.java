@@ -40,7 +40,8 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
- *
+ * Tool for cleaning up files in a local filesystem.  This has minor customizations 
+ * for Autoplot, like ro_cache.txt file handling.
  * @author  jbf
  */
 public class JDiskHogPanel extends javax.swing.JPanel {
@@ -52,7 +53,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
     boolean goPressed= false;
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jdiskhog");
 
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel(AutoplotUI model) {

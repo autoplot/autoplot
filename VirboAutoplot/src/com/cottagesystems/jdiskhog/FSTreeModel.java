@@ -29,7 +29,7 @@ import javax.swing.tree.TreePath;
 public class FSTreeModel implements TreeModel {
 
     DecimalFormat nf = new DecimalFormat();
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jdiskhog");
 
     class TreeNode {
 
@@ -252,7 +252,7 @@ public class FSTreeModel implements TreeModel {
                 ff = lff.toArray(new File[lff.size()]);
             }
 
-            System.err.println( "sorting by comparator: "+comparator );
+            logger.log(Level.FINER, "sorting by comparator: {0}", comparator);
             Arrays.sort(ff, comparator );
             listings.put(f, ff);
         }
