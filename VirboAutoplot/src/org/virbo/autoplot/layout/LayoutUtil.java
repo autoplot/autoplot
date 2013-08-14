@@ -147,13 +147,13 @@ public class LayoutUtil {
         needYmax = ymax - old;
 
         if ( needXmax<-120 ) {
-            logger.log(Level.WARNING, "needXmax: {0}", needXmax);
+            logger.log(Level.FINE, "needXmax: {0}", needXmax);
             c.getParent().resizeAllComponents();
             return;
         }
         
         if ( needYmax<-120 ) {
-            logger.log(Level.WARNING, "needYmax: {0}", needYmax);
+            logger.log(Level.FINE, "needYmax: {0}", needYmax); // this clearly doesn't matter since it happens all the time.
             c.getParent().resizeAllComponents();
             return;
         }
