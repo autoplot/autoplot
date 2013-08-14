@@ -47,7 +47,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
+import org.python.core.PyNone;
+import org.python.core.PyObject;
 import org.python.core.PySyntaxError;
+import org.python.core.PyTraceback;
 import org.python.core.ThreadState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
@@ -275,14 +278,23 @@ public class ScriptPanelSupport {
             annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
             logger.log(Level.SEVERE, null, ex);
-            annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString(),interp);
-            final int line= ex.traceback.tb_lineno-1;
+            PyObject otraceback= ex.traceback;
+            int line=0;
+            int count=0; // just in case limit to three, because of recursion, etc.
+            while ( otraceback instanceof PyTraceback && count<3 ) {
+                PyTraceback traceback= ((PyTraceback)otraceback);
+                annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
+                line=  traceback.tb_lineno-1;
+                otraceback= traceback.tb_next;
+                count++;
+            }
+            final int fline= line;
             final JEditorPane textArea= panel.getEditorPanel();
             SwingUtilities.invokeLater( new Runnable() { public void run() {
-                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,line-5)); // 5 lines of context.
+                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
                 if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
                 SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    Element element= textArea.getDocument().getDefaultRootElement().getElement(line); // 5 lines of context.
+                    Element element= textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
                     if ( element!=null ) textArea.setCaretPosition(element.getStartOffset()); 
                 } } );
             } } );
