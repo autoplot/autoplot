@@ -96,10 +96,10 @@ public class JythonCompletionTask implements CompletionTask {
             } else if (cc.contextType == CompletionContext.STRING_LITERAL_ARGUMENT) {
                 queryStringLiteralArgument(cc, arg0);
             }
-            JythonCompletionProvider.getInstance().setMessage("done getting completions");
 
         } catch (BadLocationException ex) {
         } finally {
+            JythonCompletionProvider.getInstance().setMessage("done getting completions");
             arg0.finish();
         }
     }
