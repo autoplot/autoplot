@@ -272,7 +272,7 @@ public class JythonCompletionTask implements CompletionTask {
                 String link = null;
                 if ( signature != null) {
                     if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
-                        link= "http://download.oracle.com/javase/1.5.0/docs/api/" + signature.replaceAll(",", ", ");
+                        link= "http://docs.oracle.com/javase/6/docs/api/" + signature.replaceAll(",", ", ");
                     } else if ( signature.startsWith("org/")) {
                         link= JythonCompletionProvider.getInstance().settings.getDocHome() + signature;
                     } else {
