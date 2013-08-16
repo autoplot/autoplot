@@ -1433,6 +1433,22 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
+     * add breaks to make the message more legible in labels.
+     * @param message
+     * @return 
+     */
+    private static String addHtmlBreaks( String message ) {
+        if ( message.startsWith("<html>") ) return message;
+        String[] ss= message.split(": ");
+        StringBuilder result= new StringBuilder("<html>");
+        result.append( ss[0] );
+        for ( int i=1; i<ss.length; i++ ) {
+            result.append(": <br>").append(ss[i]);
+        }
+        return result.toString();
+    }
+    
+    /**
      * load the data set from the DataSource.
      */
     private synchronized QDataSet loadDataSet() {
@@ -1538,21 +1554,21 @@ public class DataSourceController extends DomNodeController {
                 setException(ex);
                 setDataSet(null);
                 setStatus("warning: " + message);
-                String title= ex.getMessage().contains("No such file") ? "File not found" : ex.getMessage();
+                String title= ( ex.getMessage().contains("No such file") || ex instanceof FileNotFoundException )? "File not found" : ex.getMessage();
                 if ( title.contains("\n") ) {
                     title= title.substring(0,title.indexOf("\n"));
                 }
                 if ( message.contains( org.virbo.aggregator.AggregatingDataSource.MSG_NO_FILES_FOUND ) ) {
                     // this implies that there are files in other intervals, so don't have popup
                 } else {
-                    model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
+                    model.showMessage( addHtmlBreaks(message), title, JOptionPane.WARNING_MESSAGE );
                 }
             } else if ( ex.getMessage()!=null && ex.getMessage().contains("root does not exist") ) {  // bugfix 3053225
                 setException(ex);
                 setDataSet(null);
                 setStatus("warning: " + ex.getMessage() );
                 String title= ex.getMessage().contains("No such file") ? "Root does not exist" : ex.getMessage();
-                model.showMessage( ex.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+                model.showMessage( addHtmlBreaks(ex.getMessage()), title, JOptionPane.WARNING_MESSAGE );
             } else if ( ex.getMessage()==null  ) {
                 setException(ex);
                 logger.log( Level.WARNING, null, ex );
