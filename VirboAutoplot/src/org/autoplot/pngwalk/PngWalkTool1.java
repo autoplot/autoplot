@@ -464,7 +464,22 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 saveLocalCopy(tool,tool.getSelectedFile());
             }
         } );
-
+        fileMenu.add( new AbstractAction( "Show Autoplot" ) {
+            public void actionPerformed(ActionEvent ae) {
+               AppManager appman= AppManager.getInstance();
+               for ( int i=0; i< appman.getApplicationCount(); i++ ) {
+                   if ( appman.getApplication(i) instanceof AutoplotUI  ) {
+                       AutoplotUI.raiseApplicationWindow((AutoplotUI)appman.getApplication(i));
+                       return;
+                   }
+               }
+               if ( AppManager.getInstance().getApplicationCount()==1 ) {
+                   ScriptContext.createGui();
+                   Window apWindow= ScriptContext.getViewWindow();
+                   raiseApWindowSoon(apWindow);
+               }
+            }
+        } );
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
