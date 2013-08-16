@@ -36,12 +36,17 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
 
         fontsAsShapesCB.setText("Fonts as shapes");
 
-        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()-1f));
+        jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getSize()-2f));
         jLabel1.setText("<html>Write the characters out as shapes.  This makes a portable PDF and all characters render, but the labels cannot be edited. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         manualWidthCB.setText("Manually Set Page Width  (Coming Soon...)");
         manualWidthCB.setEnabled(false);
+        manualWidthCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualWidthCBActionPerformed(evt);
+            }
+        });
 
         widthTF.setText("8.5");
 
@@ -63,20 +68,21 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(fontsAsShapesCB)
-                                    .addComponent(manualWidthCB))
-                                .addGap(0, 94, Short.MAX_VALUE))
+                                .addComponent(fontsAsShapesCB)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(widthTF, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(unitsCB, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addComponent(widthTF, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(unitsCB, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(manualWidthCB))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,8 +100,15 @@ public class PdfOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap(159, Short.MAX_VALUE))
         );
 
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {fontsAsShapesCB, manualWidthCB});
+
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void manualWidthCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualWidthCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_manualWidthCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JCheckBox fontsAsShapesCB;
     private javax.swing.JLabel jLabel1;
