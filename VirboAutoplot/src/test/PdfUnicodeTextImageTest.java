@@ -8,12 +8,12 @@ import java.io.FileOutputStream;
 
 import javax.swing.JComponent;
 
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfTemplate;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.das2.util.Entities;
 
 public class PdfUnicodeTextImageTest
@@ -49,7 +49,7 @@ public class PdfUnicodeTextImageTest
             try
             {
                 document.open();
-                document.setPageSize(new com.lowagie.text.Rectangle(500,800));
+                document.setPageSize(new com.itextpdf.text.Rectangle(500,800));
                 document.newPage();
 
 
