@@ -176,6 +176,8 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
     
+    Pattern searchTextPattern = null;
+            
     protected String searchText = "";
     public static final String PROP_SEARCHTEXT = "searchText";
 
@@ -186,6 +188,11 @@ public class LogConsole extends javax.swing.JPanel {
     public void setSearchText(String searchText) {
         String oldSearchText = this.searchText;
         this.searchText = searchText;
+        if ( searchText != null && searchText.length()>0 ) {
+            searchTextPattern = Pattern.compile(searchText);
+        } else {
+            searchTextPattern = null;
+        }
         update();
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
     }
@@ -256,7 +263,7 @@ public class LogConsole extends javax.swing.JPanel {
                         // no message.  breakpoint here for debugging.
                         int i=0;
                     }
-                    if ( searchText.length()>0 && recMsg.contains(searchText) ) {
+                    if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
                         int i=0; // breakpoint here for debugging.
                     }
                     LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
@@ -364,8 +371,7 @@ public class LogConsole extends javax.swing.JPanel {
             boolean logLevels = showLevel;
             String st = searchText;
             if (st != null && st.length() == 0) st = null;
-            Pattern p = null;
-            if (st != null) p = Pattern.compile(st);
+            Pattern p = searchTextPattern;
             StyledDocument doc = logTextArea.getStyledDocument();
             doc.remove(0, doc.getLength());
             long lastT = 0;
