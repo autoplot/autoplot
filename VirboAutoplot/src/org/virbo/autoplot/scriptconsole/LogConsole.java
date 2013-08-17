@@ -256,6 +256,9 @@ public class LogConsole extends javax.swing.JPanel {
                         // no message.  breakpoint here for debugging.
                         int i=0;
                     }
+                    if ( searchText.length()>0 && recMsg.contains(searchText) ) {
+                        int i=0; // breakpoint here for debugging.
+                    }
                     LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
                     copy.setLoggerName(rec.getLoggerName());
                     copy.setMillis(rec.getMillis());
