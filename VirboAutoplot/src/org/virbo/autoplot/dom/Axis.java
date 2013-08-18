@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 
 /**
@@ -39,6 +40,10 @@ public class Axis extends DomNode {
         if ( range==null ) {
             logger.log( Level.WARNING, "range set to null!");
         }
+        //System.err.println("range="+range);
+        //if ( range.equals(DatumRangeUtil.parseTimeRangeValid("2012-10-15") ) ) {
+        //    logger.log( Level.WARNING, "range set when it ought not to have been!");
+        //}
         DatumRange oldRange = this.range;
         this.range= range;
         propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
