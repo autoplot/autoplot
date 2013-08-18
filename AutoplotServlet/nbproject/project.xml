@@ -87,7 +87,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.itext-1.2.jar}</file>
+                    <file>${file.reference.itextpdf-5.4.3.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -109,6 +109,9 @@
                 <library dirs="200">
                     <file>${file.reference.jsyntaxpane-0.9.6.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.swing-layout-1.0.3.jar}</file>
                 </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
