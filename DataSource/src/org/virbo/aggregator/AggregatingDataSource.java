@@ -211,6 +211,22 @@ public final class AggregatingDataSource extends AbstractDataSource {
             logger.log( Level.FINE, "setURI sets viewRange to {0}", viewRange);
         }
 
+        @Override
+        public String blurURI() {
+            String surl = DataSetURI.fromUri( AggregatingDataSource.this.resourceURI ) + "?";
+            if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
+
+            URISplit split = URISplit.parse(surl);
+            Map<String,String> mparams = URISplit.parseParams(split.params);
+
+            split.params = URISplit.formatParams(mparams);
+
+            URISplit split2= URISplit.parse(AggregatingDataSource.this.uri);
+            split.vapScheme= split2.vapScheme;
+
+            return URISplit.format(split);
+        }
+
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {

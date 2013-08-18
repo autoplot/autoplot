@@ -82,4 +82,14 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         }
         return false;
     }
+
+    @Override
+    public String blurURI() {
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        params.remove( URISplit.PARAM_TIME_RANGE );
+        split.params= URISplit.formatParams(params);
+        return URISplit.format(split);
+    }
+    
 }

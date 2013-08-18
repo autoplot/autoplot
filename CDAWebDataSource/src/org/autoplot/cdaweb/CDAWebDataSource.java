@@ -427,6 +427,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                     return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+");
                 }
 
+                public String blurURI() {
+                    return "vap+cdaweb:ds="+ds+"&id="+param;
+                }
+
                 public void setURI(String suri) throws ParseException {
                     URISplit split= URISplit.parse(suri);
                     Map<String,String> params= URISplit.parseParams(split.params);

@@ -81,4 +81,19 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
             resolution= Units.seconds.parse(sresolution);
         }
     }
+
+    public String blurURI() {
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+
+        params.remove( "start_time" );
+        params.remove( "end_time" );
+        params.remove("resolution");
+
+        split.params= URISplit.formatParams(params);
+
+        String suri= URISplit.format( split );
+        logger.log(Level.FINER, "tsb blurURI->{0}", suri);
+        return suri;
+    }
 }

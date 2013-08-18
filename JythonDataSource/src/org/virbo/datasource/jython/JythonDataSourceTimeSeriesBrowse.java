@@ -78,6 +78,14 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         return uri;
     }
 
+    public String blurURI() {
+        URISplit split= URISplit.parse(this.uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        params.remove(JythonDataSource.PARAM_TIMERANGE);
+        split.params= URISplit.formatParams(params);
+        return URISplit.format(split);
+    }
+    
     @Override
     public void setURI(String suri) throws ParseException {
         this.uri = suri;

@@ -86,6 +86,10 @@ public class TsdsTimeSeriesBrowse implements TimeSeriesBrowse {
             "&ppd=" + currentPpd ;
         return "vap+tsds:" + sparams;
     }
+    
+    public String blurURI() {
+        return "vap+tsds:";     // TODO: methinks getURI was never actually called...
+    }
 
     public DatumRange getTimeRange() {
         return timeRange;

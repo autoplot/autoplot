@@ -60,6 +60,13 @@ public interface TimeSeriesBrowse {
     String getURI( );
 
     /**
+     * return the URI without the timeSeriesBrowse settings, for use in .vap files and where the 
+     * timerange is set elsewhere.
+     * @return 
+     */
+    String blurURI( );
+    
+    /**
      * Added in effort to make it easier to set the timerange if we have a timerange already.  This
      * allows the timerange part of the URI to be set without having to understand the rest of it.
      * set the URI, and possibly the timerange part.

@@ -420,6 +420,12 @@ class Das2ServerDataSource extends AbstractDataSource {
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
+            public String blurURI() {
+                String sparams= "dataset="+params.get( "dataset" );
+                if ( dsParams!=null )  sparams+= "&" + dsParams;
+                return "vap+das2Server:" + resourceURI + "?" + sparams;
+            }
+            
             public DatumRange getTimeRange() {
                 return timeRange;
             }

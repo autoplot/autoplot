@@ -354,6 +354,17 @@ class TsdsDataSource extends AbstractDataSource {
                 return "vap+tsds:" + DataSetURI.fromUri( TsdsDataSource.this.resourceURI ) + "?" + sparams;
             }
 
+            public String blurURI() {
+
+                String sparams =
+                    "&ext=" + params.get("ext") +
+                    "&out=" + params.get("out") +
+                    "&param1=" + params.get("param1");
+
+                return "vap+tsds:" + DataSetURI.fromUri( TsdsDataSource.this.resourceURI ) + "?" + sparams;
+                
+            }
+            
             public DatumRange getTimeRange() {
                 return timeRange;
             }
