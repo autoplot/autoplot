@@ -716,6 +716,10 @@ public class DataSourceController extends DomNodeController {
         public void setURI(String suri) throws ParseException {
             throw new IllegalArgumentException("not implemented");
         }
+
+        public String blurURI() {
+            return this.uri;
+        }
         
     }
 
