@@ -212,7 +212,11 @@ public class DataSourceController extends DomNodeController {
         }
         int sliceDimension = i;
         if (sliceDimension == 0) {
-            return getDataSet().length();
+            if ( getDataSet().rank()==0 ) {
+                return 0; // it doesn't really matter, we just need to return something.
+            } else {
+                return getDataSet().length();
+            }
         }
         if (sliceDimension==-1 ) { // rank 0
             return 0;
