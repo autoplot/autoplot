@@ -182,17 +182,22 @@ class TsdsDataSource extends AbstractDataSource {
                 dr0 = DatumRangeUtil.parseTimeRangeValid(sto);
                 dr1 = DatumRangeUtil.parseTimeRangeValid(stf);
             } else {
-                dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
-                String sEndDate= params2.get("EndDate");
-                if ( sEndDate==null ) {
-                    dr1= dr0;
-                    hasEndDate= false;
+                String start= params2.get("StartDate");
+                if ( start!=null ) {
+                    dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
+                    String sEndDate= params2.get("EndDate");
+                    if ( sEndDate==null ) {
+                        dr1= dr0;
+                        hasEndDate= false;
+                    } else {
+                        dr1= DatumRangeUtil.parseTimeRangeValid(sEndDate);
+                        hasEndDate= true;
+                    } // EndDate is no longer required to support near-realtime
+                    timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
                 } else {
-                    dr1= DatumRangeUtil.parseTimeRangeValid(sEndDate);
-                    hasEndDate= true;
-                } // EndDate is no longer required to support near-realtime
+                    logger.fine("no timerange yet, but a good TSB doesn't need it...");
+                }
             }
-            timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
         } else {
             timeRange = quantizeTimeRange( DatumRangeUtil.parseTimeRangeValid(str) );
         }
