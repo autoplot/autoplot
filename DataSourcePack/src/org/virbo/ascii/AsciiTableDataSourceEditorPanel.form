@@ -80,7 +80,7 @@
                               <Component id="commentComboBox" min="-2" pref="109" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="542" max="32767" attributes="0"/>
+                      <EmptySpace pref="546" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -226,7 +226,7 @@
                     <StringItem index="10" value="$(milli): three-digit milliseconds"/>
                     <StringItem index="11" value="$(micro): three-digit microseconds"/>
                     <StringItem index="12" value="$(ignore): ignore this field"/>
-                    <StringItem index="13" value=" "/>
+                    <StringItem index="13" value="+: field separator"/>
                   </StringArray>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Use this droplist to select a field type, and the Select button copies the field type to the Time Format text field."/>
@@ -563,7 +563,7 @@
                               <Component id="unitsTF" linkSize="2" min="-2" pref="73" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="180" max="32767" attributes="0"/>
+                      <EmptySpace pref="182" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

@@ -378,7 +378,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(542, Short.MAX_VALUE))
+                .addContainerGap(546, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -399,7 +399,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel2.setText("Time Format:");
         jLabel2.setToolTipText("<html>Specify the format of time strings, such as \"%Y %m %d.\"<br>\nPluses join adjectent fields, and the droplist to the right<br>\ncan be used to select field types.  The Guess button attempts <br>\nto guess the format of selected fields.</html>\n");
 
-        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "$(milli): three-digit milliseconds", "$(micro): three-digit microseconds", "$(ignore): ignore this field", " " }));
+        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "$(milli): three-digit milliseconds", "$(micro): three-digit microseconds", "$(ignore): ignore this field", "+: field separator" }));
         timeFormatFieldsComboBox.setToolTipText("Use this droplist to select a field type, and the Select button copies the field type to the Time Format text field.");
         timeFormatFieldsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -672,7 +672,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel12)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(180, Short.MAX_VALUE))
+                .addContainerGap(182, Short.MAX_VALUE))
         );
 
         jPanel4Layout.linkSize(new java.awt.Component[] {depend0unitsTF, unitsTF}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
