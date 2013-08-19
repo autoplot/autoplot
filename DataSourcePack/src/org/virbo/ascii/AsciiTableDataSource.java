@@ -69,10 +69,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * handler is added to the parser.  
      */
     TimeParser timeParser;
-    /**
-     * the number of columns to combine into time
-     */
-    int timeColumns = -1;
+
     /**
      * time format of each digit
      */
@@ -137,36 +134,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
         }*/
 
-
-        // combine times if necessary
-        if (timeColumns > 1) {
-            final Units u = Units.t2000;
-            int warnCount=10;
-            // replace the first column with the datum time
-            for (int i = 0; i < ds.length(); i++) {
-                try {
-                    timeParser.resetSeconds();
-                    for (int j = 0; j < timeColumns; j++) {
-                        double d = ds.value(i, timeColumn + j);
-                        double fp = d - (int) Math.floor(d);
-                        if (fp == 0) {
-                            timeParser.setDigit(timeFormats[j], (int) d);
-                        } else {
-                            timeParser.setDigit(timeFormats[j], d);
-                        }
-                    }
-                    ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000) );
-                } catch ( IllegalArgumentException ex ) {
-                    if ( warnCount>0 ) { // prevent errors from bogging down
-                        new RuntimeException("failed to read time at record "+i, ex ).printStackTrace();
-                        warnCount--;
-                    }
-                    ds.putValue( i, timeColumn, Units.t2000.getFillDouble() );
-                }
-            }
-            parser.setUnits(timeColumn, Units.t2000);
-        }
-
+        // old code that handled timeFormats removed.  It was no longer in use.
+        
         ArrayDataSet vds = null;
         ArrayDataSet dep0 = null;
 
