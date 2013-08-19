@@ -480,7 +480,8 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
                 }
             } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN
                     || e.getKeyCode() == KeyEvent.VK_PAGE_UP || e.getKeyCode() == KeyEvent.VK_PAGE_DOWN
-                    || e.getKeyCode() == KeyEvent.VK_HOME || e.getKeyCode() == KeyEvent.VK_END) {
+                    || e.getKeyCode() == KeyEvent.VK_HOME || e.getKeyCode() == KeyEvent.VK_END
+                    || e.getKeyCode() == KeyEvent.VK_ENTER ) {
                 hideCompletion(false);                
             }
             if ( tabIsCompletion && e.getKeyCode() == KeyEvent.VK_TAB) {
