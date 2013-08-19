@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 
@@ -183,6 +184,9 @@ public class ReferenceCache {
                     logger.log( Level.FINEST, "this thread must reload garbage-collected uri" );
                 } else {
                     logger.log( Level.FINEST, "wait for another thread which is loading uri" );
+                    if ( result.monitor.isFinished() && result.status!=ReferenceCacheEntryStatus.DONE) {
+                        logger.log(Level.WARNING, "cache entry was never cleared: {0}", result.uri);
+                    }
                 }
             } else {
                 result= new ReferenceCacheEntry(uri,monitor);
@@ -215,6 +219,9 @@ public class ReferenceCache {
             if ( !( ent.monitor.isFinished() || ent.monitor.isCancelled() ) ) {
                 monitor.setTaskSize( ent.monitor.getTaskSize());
                 monitor.setTaskProgress( ent.monitor.getTaskProgress());
+            }
+            if ( ent.monitor.isFinished() && ent.status!=ReferenceCacheEntryStatus.DONE ) {
+                logger.warning("bug 1095?");
             }
             if ( ent.status==ReferenceCacheEntryStatus.DONE ) break;
         }
