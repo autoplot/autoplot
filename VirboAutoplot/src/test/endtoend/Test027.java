@@ -69,7 +69,9 @@ public class Test027 {
         try {
 
             URISplit split;
-
+            
+            doTest( 14, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0.cdf" );
+            doTest( 15, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0[1].cdf" );
             doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
             doTest( 0, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTest( 1, "vap+inline:rand(200)" );
