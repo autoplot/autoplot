@@ -101,43 +101,45 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
+        String svariable="notset";
+        
         mon.started();
-        cdfFile = getFile(mon);
-        logger.log(Level.FINE, "reading {0}", resourceURI);
-        logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
-        
-        mon.setProgressMessage("retrieving file...");
-        String fileName = cdfFile.toString();
-        //if (System.getProperty("os.name").startsWith("Windows")) {
-        //    fileName = CdfUtil.win95Name(cdfFile);
-        //}
-        Map map = getParams();
+        try {        
+            cdfFile = getFile(mon);
+            logger.log(Level.FINE, "reading {0}", resourceURI);
+            logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
 
-        mon.setProgressMessage("opening file...");
-        CDF cdf = CdfFileDataSourceFactory.getCDFFile( fileName );
+            mon.setProgressMessage("retrieving file...");
+            String fileName = cdfFile.toString();
+            //if (System.getProperty("os.name").startsWith("Windows")) {
+            //    fileName = CdfUtil.win95Name(cdfFile);
+            //}
+            Map map = getParams();
 
-        mon.setProgressMessage("done opening file");
-        
-        String svariable = (String) map.get(PARAM_ID);
+            mon.setProgressMessage("opening file...");
+            CDF cdf = CdfFileDataSourceFactory.getCDFFile( fileName );
 
-        if (svariable == null) {
-            svariable = (String) map.get("arg_0");
-        }
+            mon.setProgressMessage("done opening file");
 
-        mon.setProgressMessage("reading "+svariable);
+            svariable= (String) map.get(PARAM_ID);
 
-        if ( svariable==null ) {
-            throw new IllegalArgumentException("CDF URI needs an argument");
-        }
+            if (svariable == null) {
+                svariable = (String) map.get("arg_0");
+            }
 
-        String constraint = null;
-        int i = svariable.indexOf("[");
-        if (i != -1) {
-            constraint = svariable.substring(i);
-            svariable = svariable.substring(0, i);
-        }
+            mon.setProgressMessage("reading "+svariable);
 
-        try {
+            if ( svariable==null ) {
+                throw new IllegalArgumentException("CDF URI needs an argument");
+            }
+
+            String constraint = null;
+            int i = svariable.indexOf("[");
+            if (i != -1) {
+                constraint = svariable.substring(i);
+                svariable = svariable.substring(0, i);
+            }
+
             Variable variable = cdf.getVariable(svariable);
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
@@ -293,6 +295,9 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( rcent!=null ) rcent.exception(ex);
             throw new IllegalArgumentException("no such variable: " + svariable,ex);
         } catch ( RuntimeException ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
+        } catch ( IOException ex ) {
             if ( rcent!=null ) rcent.exception(ex);
             throw ex;
         } finally {
