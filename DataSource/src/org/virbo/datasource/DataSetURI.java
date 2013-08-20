@@ -524,6 +524,8 @@ public class DataSetURI {
                 suri = suri.replaceAll(">", "%3E");
                 //suri = suri.replaceAll("\\?", "%3F" );
                 suri = suri.replaceAll(" ", "%20");
+                suri = suri.replaceAll("\\[", "%5B"); // Windows appends these in temporary download rte_1495358356
+                suri = suri.replaceAll("\\]", "%5D");
             }
             return new URI(suri); //bug 3055130 okay
         } catch (URISyntaxException ex) {
