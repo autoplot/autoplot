@@ -1,5 +1,6 @@
 package org.virbo.datasource;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -819,6 +820,8 @@ public class URISplit {
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
         //surl = surl.replaceAll("\\?", "%3F" );
+        surl = surl.replaceAll("\\[", "%5B");
+        surl = surl.replaceAll("\\]", "%5D");
 
         return surl;
     }
