@@ -73,8 +73,8 @@ public class Test003 {
             doit(28, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ephem.jyds?R=T&L=T&MLT=T&ILT=T" );
             
             //these require a keychain.txt file.
-            doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_pre_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
-            doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_pre_ect-mageis-mr-elec-L1.vap");
+            doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
+            doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_ect-mageis-mr-elec-L1.vap");
             //doit(11, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level2/plots/sci-L2-elec/rbspa_pre_ect-mageis-sci-L2-elec.vap");
 
             doit(12, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-mageis-sci-elec-L2.vap");
@@ -93,11 +93,11 @@ public class Test003 {
             //doit(18, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap?timerange=20121101");
 
             //REPT
-            doit(19, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-bias-L1/rbspa_pre_ect-rept-hk-bias-L1.vap?timerange=20121202");
-            doit(20, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-fc-L1/rbspa_pre_ect-rept-hk-fc-L1.vap?timerange=20120918");
-            doit(21, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-tvc-L1/rbspa_pre_ect-rept-hk-tvc-L1.vap?timerange=20120919");
+            doit(19, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-bias-L1/rbspa_ect-rept-hk-bias-L1.vap?timerange=20121202");
+            doit(20, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-fc-L1/rbspa_ect-rept-hk-fc-L1.vap?timerange=20120918");
+            doit(21, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-tvc-L1/rbspa_ect-rept-hk-tvc-L1.vap?timerange=20120919");
 
-            doit(22, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/sci-all-L1/rbspa_pre_ect-rept-sci-all-L1.vap?timerange=20121004");
+            doit(22, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/sci-all-L1/rbspa_ect-rept-sci-all-L1.vap?timerange=20121004");
 
             //REPT L24            doit(23, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-L2_orbit/rbspa_pre_ect-rept-sci-L2.vap?timerange=20121010");
             //doit(24, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level2/plots/sci-elec-L2/rbspa_pre_ect-rept-sci-elec-L2.vap");
