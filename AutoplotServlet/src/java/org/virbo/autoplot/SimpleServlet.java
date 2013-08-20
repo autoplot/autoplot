@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasCanvas;
@@ -48,7 +49,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
- *
+ * SimpleServlet
+ * 
  * @author jbf
  */
 public class SimpleServlet extends HttpServlet {
@@ -141,8 +143,9 @@ public class SimpleServlet extends HttpServlet {
             String zlog = ServletUtil.getStringParameter(request, "plot.zaxis.log", "");
             String zdrawTickLabels = ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "");
             String grid= ServletUtil.getStringParameter( request, "drawGrid", "" );
+            String stamp= ServletUtil.getStringParameter( request, "stamp", "false" );  // print a stamp for debugging.  If not false, the value is printed in blue along with a timestamp.
 
-            if (debug != null && !debug.equals("false")) {
+            if ( !debug.equals("false")) {
                 for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
                     String n = (String) en.nextElement();
                     logger.log( Level.FINER, "{0}: {1}", new Object[]{n, Arrays.asList(request.getParameterValues(n))});
@@ -385,11 +388,15 @@ public class SimpleServlet extends HttpServlet {
                 logit("done with script", t0, uniq, debug);
             }
 
-            if ( false ) { // force a change in the output, useful for testing.
+            
+            if ( !stamp.equals("false") ) { // force a change in the output, useful for testing.
+                final String fstamp= stamp;
+                final Font ffont= Font.decode("sans-4-italic");
                 dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
                     public void paint(Graphics2D g) {
-                        g.setFont( Font.decode("sans-30") );
-                        g.drawString( "testSimpleServlet", 300, 300 );
+                        g.setFont( ffont );
+                        g.setColor( Color.BLUE );
+                        g.drawString( ""+fstamp+" "+ TimeUtil.now().toString(), 0, 10 );
                     }
                 });
             }
