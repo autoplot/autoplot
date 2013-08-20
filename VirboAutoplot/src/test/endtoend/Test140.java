@@ -90,10 +90,13 @@ public class Test140 {
             ScriptContext.load(uri);
             ds= getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
             tsec= (System.currentTimeMillis()-t0)/1000.;
-            MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
-            hist.putProperty( QDataSet.LABEL, label );
-            formatDataSet( hist, getUniqueFilename(label,".qds",true) );
-            
+            if ( ds!=null ) {
+                MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                hist.putProperty( QDataSet.LABEL, label );
+                formatDataSet( hist, getUniqueFilename(label,".qds",true) );
+            } else {
+                throw new IllegalArgumentException("a dataset from the vap was null: "+uri );
+            }
         } else if ( uri.startsWith("script:") ) {
             System.err.println("skipping script");
         } else if ( uri.startsWith("bookmarks:") ) {
@@ -103,42 +106,45 @@ public class Test140 {
         } else {
             ds= org.virbo.jythonsupport.Util.getDataSet( uri );
             tsec= (System.currentTimeMillis()-t0)/1000.;
-            MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
-            hist.putProperty( QDataSet.TITLE, uri );
+            if ( ds!=null ) {
+                MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                hist.putProperty( QDataSet.TITLE, uri );
 
-            hist.putProperty( QDataSet.LABEL, label );
-            formatDataSet( hist, label+".qds");
+                hist.putProperty( QDataSet.LABEL, label );
+                formatDataSet( hist, label+".qds");
 
-            QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
-            if ( dep0!=null ) {
-                MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                formatDataSet( hist2, label+".dep0.qds");
+                QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
+                if ( dep0!=null ) {
+                    MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
+                    formatDataSet( hist2, label+".dep0.qds");
+                } else {
+                    PrintWriter pw= new PrintWriter( label+".dep0.qds" );
+                    pw.println("no dep0");
+                    pw.close();
+                }
+
+                plot( ds );
+                setCanvasSize( 450, 300 );
+                int i= uri.lastIndexOf("/");
+
+                getApplicationModel().waitUntilIdle(true);
+
+                String fileUri= uri.substring(i+1);
+
+                if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+                    String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+                    fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+                }
+
+                setTitle(fileUri);
+                
             } else {
-                PrintWriter pw= new PrintWriter( label+".dep0.qds" );
-                pw.println("no dep0");
-                pw.close();
+                throw new IllegalArgumentException("uri results in null dataset: "+uri );
+                
             }
-
-            plot( ds );
-            setCanvasSize( 450, 300 );
-            int i= uri.lastIndexOf("/");
-
-            getApplicationModel().waitUntilIdle(true);
-
-            String fileUri= uri.substring(i+1);
-
-            if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-                String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-                fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
-            }
-
-            setTitle(fileUri);
-
         }
 
-        if ( ds!=null ) {
-            System.err.println( "dataset: "+ds );
-        }
+        System.err.println( "dataset: "+ds );
         
         String result;
 
