@@ -794,7 +794,7 @@ public class URISplit {
         // check for illegal characters.
         if ( surl.contains(" ") ) result= false;
         // check for encoded characters.
-        if ( Pattern.compile("%[0-9][0-9]").matcher(surl).find() ) result= true;
+        if ( Pattern.compile("%[0-9A-F][0-9A-F]").matcher(surl).find() ) result= true;
         return result;
     }
 
@@ -820,7 +820,7 @@ public class URISplit {
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
         //surl = surl.replaceAll("\\?", "%3F" );
-        surl = surl.replaceAll("\\[", "%5B");
+        surl = surl.replaceAll("\\[", "%5B"); // Windows appends these in temporary downloadf rte_1495358356
         surl = surl.replaceAll("\\]", "%5D");
 
         return surl;
@@ -851,6 +851,8 @@ public class URISplit {
         surl = surl.replaceAll("%3C", "<" );
         surl = surl.replaceAll("%3E", ">" );
         //surl = surl.replaceAll("%3F", "?" );
+        surl = surl.replaceAll("%5B", "\\[" ); // Windows appends these in temporary downloadf rte_1495358356
+        surl = surl.replaceAll("%5D", "\\]" );
 
         return surl;
     }
