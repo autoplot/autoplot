@@ -159,7 +159,8 @@ public class SimpleServlet extends HttpServlet {
             OutputStream out = response.getOutputStream();
 
             // To support load balancing, insert the actual host that resolved the request
-            response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
+            String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
+            response.setHeader( "X-Served-By", host );
             response.setHeader( "X-Server-Version", version );
             if ( surl!=null ) {
                 response.setHeader( "X-Autoplot-URI", surl );
@@ -392,11 +393,12 @@ public class SimpleServlet extends HttpServlet {
             if ( !stamp.equals("false") ) { // force a change in the output, useful for testing.
                 final String fstamp= stamp;
                 final Font ffont= Font.decode("sans-4-italic");
+                final String fhost= host;
                 dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
                     public void paint(Graphics2D g) {
                         g.setFont( ffont );
                         g.setColor( Color.BLUE );
-                        g.drawString( ""+fstamp+" "+ TimeUtil.now().toString(), 0, 10 );
+                        g.drawString( ""+fstamp+" "+ fhost + " " + TimeUtil.now().toString(), 0, 10 );
                     }
                 });
             }
