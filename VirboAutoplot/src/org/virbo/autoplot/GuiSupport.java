@@ -1642,6 +1642,15 @@ public class GuiSupport {
         chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
         chooser.setFont(app.getCanvas().getBaseFont());
         chooser.setLocationRelativeTo(parent);
+        chooser.setFontCheck( new JFontChooser.FontCheck() {
+            public String checkFont(Font c) {
+                if ( PdfGraphicsOutput.ttfFromName(c)!=null ) {
+                    return "PDF okay";
+                } else {
+                    return "Cannot be embedded in PDF";
+                }
+            }
+        });
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             return setFont( app, chooser.getFont() );
         } else {
