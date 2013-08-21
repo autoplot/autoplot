@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -123,8 +124,12 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
                     }
                     DatumRange tr= DatumRangeUtil.parseTimeRange(str);
                     tsb1.setTimeRange(tr);
-                } else if ( line.contains("timerange") && line.contains("getParam") ) {
-                    logger.warning("warning: getParam('timerange') default cannot contain spaces!"); //TODO: come on...
+                } else if ( line.contains("timerange") && line.contains("getParam(") ) {
+                    int i0= line.indexOf("timerange");
+                    int i1= line.indexOf("getParam(");
+                    if ( i1<30 && i0-i1<12 ) { // and they are sort of close...
+                        logger.log(Level.WARNING, "warning: getParam(''timerange'') default cannot contain spaces: {0}", line); //TODO: come on, this is still cheesy....
+                    }
                 }
                 line= reader.readLine();
             }
