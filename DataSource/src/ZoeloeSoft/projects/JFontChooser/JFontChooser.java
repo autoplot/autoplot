@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 
 public class JFontChooser extends JDialog {
 
@@ -65,6 +66,8 @@ public class JFontChooser extends JDialog {
         super(parent, true);
         setTitle("JFontChooser");
 
+        setResizable(true);
+        
         OPTION = JFontChooser.CANCEL_OPTION;
 
 
@@ -130,7 +133,7 @@ public class JFontChooser extends JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 txtSample.setFont(getCurrentFont());
                 if (fontCheck != null) {
-                    messageLabel.setText(fontCheck.checkFont(getCurrentFont()));
+                    updateFontCheck(getCurrentFont());
                 }
             }
         };
@@ -143,7 +146,7 @@ public class JFontChooser extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 txtSample.setFont(getCurrentFont());
                 if (fontCheck != null) {
-                    messageLabel.setText(fontCheck.checkFont(getCurrentFont()));
+                    updateFontCheck(getCurrentFont());
                 }
             }
         };
@@ -208,7 +211,7 @@ public class JFontChooser extends JDialog {
         sizeList.ensureIndexIsVisible(sizeList.getSelectedIndex());
 
         if (fontCheck != null) {
-            messageLabel.setText(fontCheck.checkFont(font));
+            updateFontCheck(font);
         }
         cbBold.setSelected(font.isBold());
         cbItalic.setSelected(font.isItalic());
@@ -243,11 +246,32 @@ public class JFontChooser extends JDialog {
     }
     private FontCheck fontCheck = null;
 
-    public interface FontCheck {
+    private void updateFontCheck( final Font font) {
+        String s= fontCheck.checkFont(font);
+        if ( s==null ) {
+            Timer t= new Timer(500,new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    updateFontCheck(getCurrentFont());
+                }
+            });
+            t.setRepeats(false);
+            t.start();
+            messageLabel.setText("");
+        } else {
+            messageLabel.setText(s);
+        }
+    }
 
+    public interface FontCheck {
         String checkFont(Font c);
     }
 
+    /**
+     * allows an arbitrary string to be indicated for any font.  For example,
+     * in Autoplot, we look to see if the font can be embedded.
+     * @param c 
+     */
     public void setFontCheck(FontCheck c) {
         this.fontCheck = c;
     }
