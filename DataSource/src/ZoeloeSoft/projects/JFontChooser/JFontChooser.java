@@ -201,7 +201,7 @@ public class JFontChooser extends JDialog {
         if (font == null) {
             font = txtSample.getFont();
         }
-
+        sizeList.setSelectedValue("" + font.getSize(), true);
         fontList.setSelectedValue(font.getName(), true);
         fontList.ensureIndexIsVisible(fontList.getSelectedIndex());
         sizeList.setSelectedValue("" + font.getSize(), true);
