@@ -1644,7 +1644,7 @@ public class GuiSupport {
             public String checkFont(Font c) {
                 String font= PdfGraphicsOutput.ttfFromNameInteractive(c);
                 if ( font==PdfGraphicsOutput.READING_FONTS ) {
-                    return "";
+                    return null;
                 } else if ( font!=null ) {
                     return "PDF okay";
                 } else {                    
