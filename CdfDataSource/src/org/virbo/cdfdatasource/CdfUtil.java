@@ -696,6 +696,32 @@ public class CdfUtil {
         return result;
     }
     
+    
+    private static Object getPrimativeSingleArray( Object odata ) {
+        Class c = odata.getClass();
+        Object newodata=null;
+        if ( c==Short.class ) {
+            newodata= Array.newInstance( short.class, 1 );
+            Array.setShort( newodata, 0, ((Number)odata).shortValue() );
+        } else if ( c==Integer.class ) {
+            newodata= Array.newInstance( int.class, 1 );
+            Array.setInt(newodata, 0, ((Number)odata).intValue() );
+        } else if ( c==Long.class ) {
+            newodata= Array.newInstance( long.class, 1 );
+            Array.setLong(newodata, 0, ((Number)odata).longValue() );
+        } else if ( c==Float.class ) {
+            newodata= Array.newInstance( float.class, 1 );
+            Array.setFloat(newodata, 0, ((Number)odata).floatValue() );
+        } else if ( c==Double.class ) {
+            newodata= Array.newInstance( double.class, 1 );
+            Array.setDouble(newodata, 0, ((Number)odata).doubleValue() );
+        } else {
+            logger.severe("No type supported");
+        }
+        return newodata;
+    }
+        
+    
     /**
      * wraps response from CDFVariable.getHyperData() into QDataSet.  The response object
      * should be float[], float[][], double[], double[][], etc.  recStart, recCount, recInterval
@@ -748,11 +774,20 @@ public class CdfUtil {
         int rank = 1;
 
         if ( !odata.getClass().isArray() && recCount==-1 ) {
-            if ( varType==CDFConstants.CDF_INT2 && dimCounts.length==1 && dimCounts[0]==1 ) {                
-                Object newodata= Array.newInstance( short.class, 1 );
-                Array.setShort(newodata, 0, ((Number)odata).shortValue());
-                odata= newodata;
-                rank= 1;
+            if ( dimCounts.length==1 && dimCounts[0]==1 ) {                
+                Object newodata= getPrimativeSingleArray(odata);
+                if ( newodata==null ) { // do what we did before
+                    result= DataSetUtil.asDataSet( ((Number)odata).doubleValue() );
+                    if (varType == Variable.CDF_EPOCH) {
+                        result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+                        result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+                    }
+                    return result;
+                } else {
+                    odata= newodata;
+                    rank= 1;
+                }
+                
             } else {
                 // data should be rank 0. rank= 0;
                 result= DataSetUtil.asDataSet( ((Number)odata).doubleValue() );
