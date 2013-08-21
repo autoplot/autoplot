@@ -748,13 +748,20 @@ public class CdfUtil {
         int rank = 1;
 
         if ( !odata.getClass().isArray() && recCount==-1 ) {
-            rank= 0;
-            result= DataSetUtil.asDataSet( ((Number)odata).doubleValue() );
-            if (varType == Variable.CDF_EPOCH) {
-                result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
-                result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            if ( varType==CDFConstants.CDF_INT2 && dimCounts.length==1 && dimCounts[0]==1 ) {                
+                Object newodata= Array.newInstance( short.class, 1 );
+                Array.setShort(newodata, 0, ((Number)odata).shortValue());
+                odata= newodata;
+                rank= 1;
+            } else {
+                // data should be rank 0. rank= 0;
+                result= DataSetUtil.asDataSet( ((Number)odata).doubleValue() );
+                if (varType == Variable.CDF_EPOCH) {
+                    result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+                    result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+                }
+                return result;
             }
-            return result;
         }
         
         Object element = Array.get(odata, 0);
