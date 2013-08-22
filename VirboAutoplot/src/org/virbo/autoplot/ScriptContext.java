@@ -45,6 +45,7 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
@@ -703,6 +704,8 @@ public class ScriptContext extends PyJavaInstance {
      * model= getApplicationModel()
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      * 
+     * @see ApplicationController.bind(Object src, String srcProp, Object dst, String dstProp), which will save the binding to a
+     * vap
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
