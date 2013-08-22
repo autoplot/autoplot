@@ -161,6 +161,7 @@ public class JythonCompletionTask implements CompletionTask {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
+                boolean notAlreadyAdded= true;
                 PyObject po;
                 try {
                     po = context.__getattr__(s);
@@ -170,7 +171,7 @@ public class JythonCompletionTask implements CompletionTask {
                     continue;
                 } catch ( IllegalArgumentException e ) {
                     logger.log( Level.SEVERE, "", e );
-            continue;
+                    continue;
                 }
                 String label = ss;
                 String signature = null;
@@ -218,16 +219,19 @@ public class JythonCompletionTask implements CompletionTask {
                         PyMethod m = (PyMethod) po;
                         Method jm;
                         try {
-                            jm = getJavaMethod(m, 0);
-                            if ( getMethodCount(m)>1 ) {
-                                jm = getJavaMethod(m, getMethodCount(m)-1); //TODO: show completions for each argument type.
+                            for ( int im=0; im<getMethodCount(m); im++ ) {
+                                jm = getJavaMethod(m, im);
+                                signature = methodSignature(jm);
+                                args = methodArgs(jm);
+                                label= ss + args;
+                                String link = getLinkForJavaSignature(signature);
+                                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                                notAlreadyAdded= false;
                             }
                         } catch ( RuntimeException ex ) {
+                            logger.fine(ex.toString());
                             continue;
                         }
-                        signature = methodSignature(jm);
-                        args = methodArgs(jm);
-                        label= ss + args;
                     } else {
                         PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
                         Class dc = peek.getInstanceClass();
@@ -269,20 +273,10 @@ public class JythonCompletionTask implements CompletionTask {
                         logger.fine("");
                     }
                 }
-                String link = null;
-                if ( signature != null) {
-                    if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
-                        link= "http://docs.oracle.com/javase/6/docs/api/" + signature.replaceAll(",", ", ");
-                    } else if ( signature.startsWith("org/")) {
-                        link= JythonCompletionProvider.getInstance().settings.getDocHome() + signature;
-                    } else {
-                        //String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
-                        //docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
-                        //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
-                        link= null;
-                    }
+                if ( notAlreadyAdded ) {
+                    String link = getLinkForJavaSignature(signature);
+                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
                 }
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
             }
         }
     }
@@ -627,5 +621,27 @@ public class JythonCompletionTask implements CompletionTask {
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
             }
         }
+    }
+
+    /**
+     * return a link to the documentation for a java signature
+     * @param signature
+     * @return 
+     */
+    private String getLinkForJavaSignature(String signature) {
+        String link = null;
+        if ( signature != null) {
+            if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
+                link= "http://docs.oracle.com/javase/6/docs/api/" + signature.replaceAll(",", ", ");
+            } else if ( signature.startsWith("org/")) {
+                link= JythonCompletionProvider.getInstance().settings.getDocHome() + signature.replaceAll(",", ", ");
+            } else {
+                //String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
+                //docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
+                //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                link= null;
+            }
+        }
+        return link;
     }
 }
