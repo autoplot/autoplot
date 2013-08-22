@@ -384,7 +384,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(fileNameTextField)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 81, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jScrollPane2)
         );
         layout.setVerticalGroup(
