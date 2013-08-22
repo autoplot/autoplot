@@ -12,9 +12,10 @@
 package org.virbo.autoplot;
 
 import java.awt.event.KeyEvent;
+import org.virbo.datasource.DataSetSelector;
 
 /**
- *
+ * Allow additional plots to be added, and plot one URI against another.
  * @author jbf
  */
 public class AddPlotElementDialog extends javax.swing.JDialog {
@@ -30,6 +31,14 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         primaryDataSetSelector.setPlotItButtonVisible(false);
         secondaryDataSetSelector.setPlotItButtonVisible(false);
         tertiaryDataSetSelector.setPlotItButtonVisible(false);
+        DataSetSelector source= null;
+        if ( parent instanceof AutoplotUI ) {
+            source= ((AutoplotUI)parent).getDataSetSelector();
+            primaryDataSetSelector.setTimeRange( source.getTimeRange() );
+            secondaryDataSetSelector.setTimeRange( source.getTimeRange() );
+            tertiaryDataSetSelector.setTimeRange( source.getTimeRange() );
+        }
+        
 
     }
 
