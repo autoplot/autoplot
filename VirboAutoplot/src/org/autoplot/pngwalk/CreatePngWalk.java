@@ -255,8 +255,10 @@ public class CreatePngWalk {
         build.append("--timeFormat='").append(params.timeFormat).append( "' ");
         ff.println( "timeRange=" + params.timeRangeStr );
         build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
-        ff.println( "batchUri=" + params.batchUri );
-        build.append("--batchUri=").append(params.batchUri).append( " ");
+        if ( params.batchUri!=null ) {
+            ff.println( "batchUri=" + params.batchUri );
+            build.append("--batchUri=").append(params.batchUri).append( " ");
+        }
         if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
             ff.println( "rescalex="+ params.rescalex );
             build.append("--rescalex=").append(params.rescalex).append( " ");
