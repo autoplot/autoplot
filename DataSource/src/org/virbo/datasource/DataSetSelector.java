@@ -370,6 +370,21 @@ public class DataSetSelector extends javax.swing.JPanel {
                             setMessage("download cancelled");
                             return;
                         }
+                        TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
+                        if ( tsb!=null ) {
+                            if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+                                try {
+                                    tsb.setURI(surl1);
+                                    tsb.setTimeRange(timeRange);
+                                    String suri= tsb.getURI();
+                                    //String suri= tsb.blurURI(); // this causes 1970-01-01 to pop up again...
+                                    logger.log( Level.FINE, "resetting timerange to {0}", timeRange);
+                                    setValue(suri);
+                                } catch ( ParseException ex ) {
+                                    logger.log( Level.SEVERE, "", ex );
+                                }
+                            }
+                        }
                         setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f));
                         firePlotDataSetURL();
                     }
@@ -669,6 +684,28 @@ public class DataSetSelector extends javax.swing.JPanel {
                             if (!dialog.isCancelled()) {
                                 logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
                                 dataSetSelector.setSelectedItem(fedit.getURI());
+                                
+                                String surl= fedit.getURI();
+                                DataSourceFactory dsf;
+                                try {
+                                    dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
+                                    TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                                    tsb.setURI(surl);
+                                    DatumRange timeRangeNew= tsb.getTimeRange();
+                                    if ( !timeRangeNew.equals(timeRange) ) {
+                                        logger.fine("resetting timerange to "+timeRangeNew);
+                                        timeRange= timeRangeNew;
+                                    }
+                                } catch (ParseException ex) {
+                                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (IllegalArgumentException ex) {
+                                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (URISyntaxException ex) {
+                                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                
                                 keyModifiers = dialog.getModifiers();
                                 maybePlot(true);
                                 pendingChanges.remove( PENDING_EDIT );
