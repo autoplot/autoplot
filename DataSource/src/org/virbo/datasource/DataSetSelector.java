@@ -302,6 +302,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
             } else {
                 try {
+                    //TODO: "plot http://autoplot.org/data.dat" has terrible feedback.
                     URI uri= DataSetURI.getURI(surl);
                     if ( uri==null ) {
                         setMessage("error: URI cannot be formed from \""+surl+"\"");
