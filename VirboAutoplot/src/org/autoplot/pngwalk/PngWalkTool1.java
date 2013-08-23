@@ -618,6 +618,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /** Creates new form PngWalkTool */
     public PngWalkTool1() {
         initComponents();
+        setNavButtonsEnabled(false);
         dataSetSelector1.setEnableDataSource(false);
         dataSetSelector1.setAcceptPattern("(?i).*(\\.gif|\\.png|\\.jpg|\\.pngwalk)");
         dataSetSelector1.setSuggestFiles(false); // only aggs.
@@ -792,6 +793,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     };
 
+    private void setNavButtonsEnabled( boolean enabled ) {
+        jumpToFirstButton.setEnabled(enabled);
+        jumpToLastButton.setEnabled(enabled);
+        prevButton.setEnabled(enabled);
+        nextButton.setEnabled(enabled);
+        nextSetButton.setEnabled(enabled);
+        prevSetButton.setEnabled(enabled);
+    }
+    
     public void setTemplate( String template ) {
 
         if ( template.contains("%") && !template.contains("$") ) {
@@ -814,8 +824,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         try {
             seq= new WalkImageSequence( surl );
+            setNavButtonsEnabled(true);
         } catch ( Exception ex ) {
             seq= null;
+            setNavButtonsEnabled(false);
             ex.printStackTrace();
         }
 
