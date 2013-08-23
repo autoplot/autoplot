@@ -98,6 +98,7 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.datasource.HtmlResponseIOException;
 /**
  * Internal model of the application to separate model from view.
@@ -1213,10 +1214,12 @@ public class ApplicationModel {
      */
     public void doAutoLayout() {
         ApplicationModel model= this;
+        CanvasController controller= model.dom.getController().getCanvas().getController();
         ApplicationController applicationController= this.getDocumentModel().getController();
-        model.dom.getController().getCanvas().getController().performingChange(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        controller.registerPendingChange(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        controller.performingChange(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
         LayoutUtil.autolayout( applicationController.getDasCanvas(), applicationController.getRow(), applicationController.getColumn() );
-        model.dom.getController().getCanvas().getController().changePerformed(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        controller.changePerformed(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
     }
 
     /**
