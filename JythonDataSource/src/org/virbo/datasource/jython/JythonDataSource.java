@@ -400,6 +400,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         MutablePropertyDataSet mres= DataSetOps.makePropertiesMutable(res);
                         mres.putProperty( QDataSet.DEPEND_0, mdep0 );
                         res= mres;
+                    } else {
+                        logger.fine("result reports cache tag: "+tag);
                     }
                 }
             }
