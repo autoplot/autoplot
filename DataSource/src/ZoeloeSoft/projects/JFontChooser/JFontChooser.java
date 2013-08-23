@@ -200,14 +200,35 @@ public class JFontChooser extends JDialog {
         pack();
     }
 
+    /**
+     * round up to the nearest available size.
+     * @param size
+     * @return 
+     */
+    int roundFontSize( int size ) {
+        System.err.println("here");
+        if ( size<=24 ) {
+            size= ( size + 1 ) / 2 * 2 ;
+            return size;
+        } else {
+            for ( int i=0; i<sizes.length; i++ ) {
+                int ii= Integer.parseInt(sizes[i]);
+                if ( ii>=size ) {
+                    return ii;
+                }
+            }
+            return 72;
+        }
+    }
+    
     public void setFont(Font font) {
         if (font == null) {
             font = txtSample.getFont();
         }
-        sizeList.setSelectedValue("" + font.getSize(), true);
+        sizeList.setSelectedValue("" + roundFontSize( font.getSize() ), true);
         fontList.setSelectedValue(font.getName(), true);
         fontList.ensureIndexIsVisible(fontList.getSelectedIndex());
-        sizeList.setSelectedValue("" + font.getSize(), true);
+        sizeList.setSelectedValue("" + roundFontSize( font.getSize() ), true);
         sizeList.ensureIndexIsVisible(sizeList.getSelectedIndex());
 
         if (fontCheck != null) {
