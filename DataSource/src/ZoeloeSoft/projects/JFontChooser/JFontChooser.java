@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
 import java.awt.Font;
 import java.awt.Frame;
 import javax.swing.event.ListSelectionEvent;
@@ -205,8 +204,7 @@ public class JFontChooser extends JDialog {
      * @param size
      * @return 
      */
-    int roundFontSize( int size ) {
-        System.err.println("here");
+    private int roundFontSize( int size ) {
         if ( size<=24 ) {
             size= ( size + 1 ) / 2 * 2 ;
             return size;
