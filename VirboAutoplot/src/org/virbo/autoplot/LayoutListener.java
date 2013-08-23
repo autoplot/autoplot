@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -73,8 +75,15 @@ public class LayoutListener implements PropertyChangeListener {
                     });
                     t.setRepeats(false);
                 }
-                model.canvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
-                t.restart();
+                Map<Object,Object> map= new HashMap();
+                model.canvas.pendingChanges(map);
+                boolean causedByAutolayout= map.containsKey( PENDING_CHANGE_AUTOLAYOUT );
+                if ( !causedByAutolayout ) {
+                    model.canvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
+                    t.restart();
+                } else {
+                    logger.finest("reenter, no need to redo.");
+                }
             }
         }
     }
