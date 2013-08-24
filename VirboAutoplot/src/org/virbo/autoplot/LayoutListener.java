@@ -75,10 +75,10 @@ public class LayoutListener implements PropertyChangeListener {
                     });
                     t.setRepeats(false);
                 }
-                Map<Object,Object> map= new HashMap();
-                model.canvas.pendingChanges(map);
-                boolean causedByAutolayout= map.containsKey( PENDING_CHANGE_AUTOLAYOUT );
-                if ( !causedByAutolayout ) {
+                //Map<Object,Object> map= new HashMap();
+                //model.canvas.pendingChanges(map);
+                //boolean causedByAutolayout= map.containsKey( PENDING_CHANGE_AUTOLAYOUT );
+                if ( true ) { // !causedByAutolayout ) {
                     model.canvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
                     t.restart();
                 } else {
