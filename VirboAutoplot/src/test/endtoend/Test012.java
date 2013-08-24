@@ -125,6 +125,9 @@ public class Test012 {
             // this is a hugeScatter.  4,072,000 points.
             doTest( testid, 20, "file:///home/jbf/ct/hudson/data.backup/cdf/pw/rbsp/rbsp-a_magnetometer_emfisis-L1_20120904_v1.2.2.cdf?Mag_UVW" );
 
+            // odd code in the java-reader deals with the odd response from this file.
+            doTest( testid, 21, "file:///home/jbf/ct/hudson/data.backup/cdf/ge_k0_lep_20111016_v01.cdf?V0");
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
