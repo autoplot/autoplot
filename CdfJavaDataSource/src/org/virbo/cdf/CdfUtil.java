@@ -214,6 +214,22 @@ public class CdfUtil {
     }
 
     /**
+     * returns effective rank.  Nand's code looks for 1-element dimensions, which messes up Seth's file rbspb_pre_ect-mageisHIGH.
+     * See files 
+     *  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+     *  vap+cdfj:file:///home/jbf/ct/autoplot/data.backup/examples/cdf/seth/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot
+     */
+    private static int getEffectiveRank( boolean[] varies ) {
+        int rank = 0;
+        for (int i = 0; i < varies.length; i++) {
+            if (!varies[i]) continue;
+            rank++;
+        }
+        return rank;
+    }
+    
+    
+    /**
      *
      * @param cdf the value of cdf
      * @param variable the value of variable
@@ -252,7 +268,7 @@ public class CdfUtil {
         int[] dimSizes = variable.getDimensions();
         boolean[] dimVaries= variable.getVarys();
 
-        if ( variable.getEffectiveRank() != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/istp/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+        if ( getEffectiveRank(variable.getVarys()) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ variable.getEffectiveRank() ];
             boolean[] varies= variable.getVarys();
             int[] dimensions= variable.getDimensions();
