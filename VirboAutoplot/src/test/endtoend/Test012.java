@@ -127,6 +127,9 @@ public class Test012 {
 
             // odd code in the java-reader deals with the odd response from this file.
             doTest( testid, 21, "file:///home/jbf/ct/hudson/data.backup/cdf/ge_k0_lep_20111016_v01.cdf?V0");
+
+            // CDF file with one index having length=1.
+            doTest( testid, 22, "file:///home/jbf/ct/hudson/data.backup/cdf/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot");
             
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
