@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Completions are now shown in more useful scrollable list.</small></p>
+        <p><small>PDF output is improved as we finally figured out how to embed fonts.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>java-based CDF library would incorrectly handle 1-element dimensions</li>
+            <li>next/prev buttons disabled in PngWalkTool when there is no pngwalk loaded</li>
             <li>rte_2025985649: NullPointerException with search and replace in the python editor</li>
             <li>1096: NOAA GOES 13 mag data can be read</li>
             <li>1095: Aggregating data source with avail=T didn't use the ReferenceCache properly.</li>
