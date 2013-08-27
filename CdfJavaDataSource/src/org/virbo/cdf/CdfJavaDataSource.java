@@ -746,7 +746,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                 if ( labl!=null ) {
                     try {
-                        lablDs= wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
+                        lablDs= wrapDataSet(cdf, labl, constraints, idep > 0, false, null);
                         if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
                         //label is not actally in the file.
@@ -781,7 +781,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, dep, -1, null);
+                        depDs = wrapDataSet(cdf, depName, constraints, reformDep, false, dep, -1, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
