@@ -131,6 +131,9 @@ public class Test012 {
             // CDF file with one index having length=1.
             doTest( testid, 22, "file:///home/jbf/ct/hudson/data.backup/cdf/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot");
             
+            // bug 1101: trim/slice wasn't properly supported with rank 2 DEPEND_1.
+            doTest( testid, 23, "file:///home/jbf/ct/hudson/data.backup/cdf/lanl/rbspb_ect-hope-sci-L2SA_20121219_v3.0.0.cdf?FPSA[0:100:5]" );
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
