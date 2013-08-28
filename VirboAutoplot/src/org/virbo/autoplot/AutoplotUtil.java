@@ -1133,7 +1133,7 @@ public class AutoplotUtil {
                 if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
     //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
     //                if ( tmin.doubleValue()<0 ) {
-                        tmin= new Double( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+                        tmin= Double.valueOf( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
     //                }
                 }
 
