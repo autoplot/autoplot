@@ -1907,43 +1907,43 @@ public class AutoplotUtil {
         return new ImageIcon( AutoplotUtil.class.getResource("/com/cottagesystems/jdiskhog/resources/cancel14.png" ) );
     }
 
-    private static int styleFromMessageType(int messageType) {
-        switch (messageType) {
-        case JOptionPane.ERROR_MESSAGE:
-            return JRootPane.ERROR_DIALOG;
-        case JOptionPane.QUESTION_MESSAGE:
-            return JRootPane.QUESTION_DIALOG;
-        case JOptionPane.WARNING_MESSAGE:
-            return JRootPane.WARNING_DIALOG;
-        case JOptionPane.INFORMATION_MESSAGE:
-            return JRootPane.INFORMATION_DIALOG;
-        case JOptionPane.PLAIN_MESSAGE:
-        default:
-            return JRootPane.PLAIN_DIALOG;
-        }
-    }
-
-   private JDialog createDialog(Component parentComponent, String title,
-            int style)
-            throws HeadlessException {
-
-        final JDialog dialog;
-
-//        Window window = JOptionPane.getWindowForComponent(parentComponent);
-//        if (window instanceof Frame) {
-//            dialog = new JDialog((Frame)window, title, true);
-//        } else {
-//            dialog = new JDialog((Dialog)window, title, true);
+//    private static int styleFromMessageType(int messageType) {
+//        switch (messageType) {
+//        case JOptionPane.ERROR_MESSAGE:
+//            return JRootPane.ERROR_DIALOG;
+//        case JOptionPane.QUESTION_MESSAGE:
+//            return JRootPane.QUESTION_DIALOG;
+//        case JOptionPane.WARNING_MESSAGE:
+//            return JRootPane.WARNING_DIALOG;
+//        case JOptionPane.INFORMATION_MESSAGE:
+//            return JRootPane.INFORMATION_DIALOG;
+//        case JOptionPane.PLAIN_MESSAGE:
+//        default:
+//            return JRootPane.PLAIN_DIALOG;
 //        }
-// 	if (window instanceof SwingUtilities.SharedOwnerFrame) {
-//	    WindowListener ownerShutdownListener =
-//		(WindowListener)SwingUtilities.getSharedOwnerFrameShutdownListener();
-// 	    dialog.addWindowListener(ownerShutdownListener);
-// 	}
-//        initDialog(dialog, style, parentComponent);
-//        return dialog;
-        return null;
-    }
+//    }
+//
+//   private JDialog createDialog(Component parentComponent, String title,
+//            int style)
+//            throws HeadlessException {
+//
+//        final JDialog dialog;
+//
+////        Window window = JOptionPane.getWindowForComponent(parentComponent);
+////        if (window instanceof Frame) {
+////            dialog = new JDialog((Frame)window, title, true);
+////        } else {
+////            dialog = new JDialog((Dialog)window, title, true);
+////        }
+//// 	if (window instanceof SwingUtilities.SharedOwnerFrame) {
+////	    WindowListener ownerShutdownListener =
+////		(WindowListener)SwingUtilities.getSharedOwnerFrameShutdownListener();
+//// 	    dialog.addWindowListener(ownerShutdownListener);
+//// 	}
+////        initDialog(dialog, style, parentComponent);
+////        return dialog;
+//        return null;
+//    }
 
     /**
      * wrapper for displaying messages.  This will eventually use the Autoplot icon, etc.
