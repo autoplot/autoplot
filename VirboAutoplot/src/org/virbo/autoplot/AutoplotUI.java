@@ -3986,18 +3986,22 @@ APSplash.checkTime("init 240");
         File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
         File cpTo= new File( tools,ff.getName() );
         try {
-        if ( !Util.copyFile( ff, cpTo ) ) {
-            setStatus("warning: unable to copy file");
-        } else {
-            setStatus("copied file to "+cpTo );
-            reloadTools();
-        }
-        File log= new File( tools, "scripts.txt" );
-        FileWriter out3 = new FileWriter( log, true );
-        TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-        Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-        out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
-        out3.close();
+            if ( !Util.copyFile( ff, cpTo ) ) {
+                setStatus("warning: unable to copy file");
+            } else {
+                setStatus("copied file to "+cpTo );
+                reloadTools();
+            }
+            FileWriter out3=null;
+            File log= new File( tools, "scripts.txt" );
+            try {
+                out3 = new FileWriter( log, true );
+                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
+            } finally {
+                if ( out3!=null ) out3.close();
+            }
         } catch ( IOException ex ) {
             logger.log( Level.WARNING,null,ex);
         }
