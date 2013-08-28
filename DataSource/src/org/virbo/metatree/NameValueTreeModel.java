@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -194,7 +195,7 @@ public class NameValueTreeModel implements TreeModel {
 
     static Object createNode(String name, Object value) {
         if ( value==null ) {
-            return new StringPropertyNode(name, String.valueOf(value) );
+            return new StringPropertyNode(name, "null" );
         } else if (value.getClass().isArray()) {
             return new ArrayPropertyNode(name, value);
         } else if (value instanceof String) {
@@ -285,9 +286,9 @@ public class NameValueTreeModel implements TreeModel {
         if ( map!=null ) {
             nodes = new ArrayList(map.size());
             
-            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
-                Object key = i.next();
-                nodes.add( createNode( (String) key, map.get(key) ) );
+            for ( Iterator i = map.entrySet().iterator(); i.hasNext();) {
+                Entry e= (Entry)i.next();
+                nodes.add( createNode( String.valueOf(e.getKey()), e.getValue() ) );
             }
         } else {
             nodes= Collections.EMPTY_LIST;
