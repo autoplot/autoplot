@@ -99,13 +99,13 @@ public final class FunctionSupport {
 
 	}
 
-	private static void checkNull(PyObject[] defaults) {
-		for (int i = 0; i < defaults.length; i++) {
-			if (defaults[i] == null) {
-				throw new NullPointerException("Null default not allowed. Use Py.None instead.");
-			}
-		}
-	}
+//	private static void checkNull(PyObject[] defaults) {
+//		for (int i = 0; i < defaults.length; i++) {
+//			if (defaults[i] == null) {
+//				throw new NullPointerException("Null default not allowed. Use Py.None instead.");
+//			}
+//		}
+//	}
 
 
 	/** Processes the arguments for a jython method invocation in a way that
