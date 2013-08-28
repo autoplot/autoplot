@@ -319,7 +319,7 @@ public class BookmarksManagerModel {
         for ( int ii=0; ii<childCount; ii++ ) {
             final Object child = model.getChild(parent, ii);
             if ( b.equals(( (DefaultMutableTreeNode)child).getUserObject()  ) ) {
-                b.equals(( (DefaultMutableTreeNode)child).getUserObject()  );
+                //b.equals(( (DefaultMutableTreeNode)child).getUserObject()  );
                 return root.pathByAddingChild(child);
             }
             if ( model.getChildCount(child)>0 ) {
