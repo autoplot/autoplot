@@ -210,7 +210,7 @@ public class Util {
 
         FormData fd= new FormData();
         
-        boolean hasVars= false;
+        boolean hasVars;
         fd.tflist= new ArrayList();
         fd.paramsList= new ArrayList();
         fd.deftsList= new ArrayList();
@@ -228,9 +228,9 @@ public class Util {
                 JythonUtil.Param parm= e.getValue();
                 
                 String vname= parm.name;                
-                String label= parm.label;
+                String label;
 
-                JComponent ctf= null;
+                JComponent ctf;
 
                 boolean isBool= isBoolean( parm.enums );
 
@@ -407,7 +407,7 @@ public class Util {
                         } else if ( ftf instanceof JComboBox ) {
                             JComboBox jcb= ((JComboBox)ftf);
                             for ( int i=0; i<jcb.getItemCount(); i++ ) {
-                                if ( fvalue.toString().equals( jcb.getItemAt(i).toString() ) ) {
+                                if ( fvalue.equals( jcb.getItemAt(i).toString() ) ) {
                                     jcb.setSelectedIndex(i);
                                 }
                             }
