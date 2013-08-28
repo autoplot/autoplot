@@ -759,25 +759,25 @@ public class AutoplotUI extends javax.swing.JFrame {
         };
     }
 
-    /**
-     * this method is disabled from WebStart version, since it doesn't work with
-     * the security model.
-     * @throws HeadlessException
-     */
-    private void addDataSource() throws HeadlessException {
-        AddDataSourcePanel add = new AddDataSourcePanel();
-        int r = JOptionPane.showConfirmDialog(this, add, "Add Data Source", JOptionPane.OK_CANCEL_OPTION);
-        if (r == JOptionPane.OK_OPTION) {
-            String jar = add.getDataSetSelector().getValue();
-            if (jar.endsWith("jar")) {
-                try {
-                    DataSourceRegistry.getInstance().registerDataSourceJar(null, new URL(jar));
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
+//    /**
+//     * this method is disabled from WebStart version, since it doesn't work with
+//     * the security model.
+//     * @throws HeadlessException
+//     */
+//    private void addDataSource() throws HeadlessException {
+//        AddDataSourcePanel add = new AddDataSourcePanel();
+//        int r = JOptionPane.showConfirmDialog(this, add, "Add Data Source", JOptionPane.OK_CANCEL_OPTION);
+//        if (r == JOptionPane.OK_OPTION) {
+//            String jar = add.getDataSetSelector().getValue();
+//            if (jar.endsWith("jar")) {
+//                try {
+//                    DataSourceRegistry.getInstance().registerDataSourceJar(null, new URL(jar));
+//                } catch (IOException ex) {
+//                    logger.log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
+//    }
 
 
     /**
@@ -4011,35 +4011,35 @@ APSplash.checkTime("init 240");
         }
     }
     
-    private void askRunScript( RunScriptPanel pp, final URI resourceUri, final File ff ) throws IOException {
-        int r = AutoplotUtil.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
-        final boolean doCpTo;
-        if ( r==JOptionPane.OK_OPTION ) {
-            if ( pp.getToolsCB().isSelected() ) {
-                doCpTo= true;
-            } else {
-                doCpTo= false;
-            }
-            if ( scriptPanel!=null ) {
-                if ( ! scriptPanel.isDirty() ) {
-                    scriptPanel.loadFile(ff);
-                }
-            }
-            applicationModel.addRecent(dataSetSelector.getValue());
-            Runnable run= new Runnable() {
-                public void run() {
-                    if ( doCpTo  ) {
-                        installTool(ff,resourceUri);
-                    } else {
-
-                    }
-                    RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
-                }
-            };
-            new Thread(run,"runScript").start();
-        }
-
-    }
+//    private void askRunScript( RunScriptPanel pp, final URI resourceUri, final File ff ) throws IOException {
+//        int r = AutoplotUtil.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+//        final boolean doCpTo;
+//        if ( r==JOptionPane.OK_OPTION ) {
+//            if ( pp.getToolsCB().isSelected() ) {
+//                doCpTo= true;
+//            } else {
+//                doCpTo= false;
+//            }
+//            if ( scriptPanel!=null ) {
+//                if ( ! scriptPanel.isDirty() ) {
+//                    scriptPanel.loadFile(ff);
+//                }
+//            }
+//            applicationModel.addRecent(dataSetSelector.getValue());
+//            Runnable run= new Runnable() {
+//                public void run() {
+//                    if ( doCpTo  ) {
+//                        installTool(ff,resourceUri);
+//                    } else {
+//
+//                    }
+//                    RunScriptPanel.runScript( applicationModel, ff, new DasProgressPanel("Running script "+ff ) );
+//                }
+//            };
+//            new Thread(run,"runScript").start();
+//        }
+//
+//    }
     
     /**
      * present the "Run Script" dialog, asking the user to review the 
