@@ -818,7 +818,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     
                     String sid= (String)map.get("USER_ID");
                     sid= safe( sid.replaceAll(" ","").replaceAll("_","") );
-                    String fname=  String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, sid );
+                    String fname=  String.format( "rte_%010d_%s_%s.xml", Integer.valueOf(rteHash), eventId, sid );
 
                     HttpClient client = new HttpClient();
                     client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
