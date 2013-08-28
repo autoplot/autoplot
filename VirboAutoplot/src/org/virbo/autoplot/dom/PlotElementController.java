@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
@@ -48,6 +49,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
+import static org.virbo.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.util.RunLaterListener;
@@ -207,15 +209,15 @@ public class PlotElementController extends DomNodeController {
             if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                 resetRanges= true;
                 if ( plotElement.getComponent().equals("") ) {
-                    resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
+                    resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType(), "");
                 } else {
                     QDataSet sliceDs= getDataSet();
                     if ( sliceDs==null ) {
                         // This happens when we load a vap.
                         sliceDs= getDataSourceFilter().getController().getFillDataSet(); // Since this is null, I suspect we can do the same behavior in either case.
-                        resetPlotElement( sliceDs, plotElement.getRenderType() );
+                        resetPlotElement( sliceDs, plotElement.getRenderType(), "" );
                     } else {
-                        resetPlotElement( sliceDs, plotElement.getRenderType()); // I'm assuming that getDataSet() has been set already, which should be the case.
+                        resetPlotElement( sliceDs, plotElement.getRenderType(), ""); // I'm assuming that getDataSet() has been set already, which should be the case.
                     }
                 }
             } else {
@@ -750,6 +752,52 @@ public class PlotElementController extends DomNodeController {
         }
         return false;
     }
+    
+    /**
+     * Resolve the renderType and renderControl for the dataset.
+     * 
+     * @param fillds 
+     * @return the render string with canonical types.  The result will always contain a greater than (>).
+     */
+    private static String resolveRenderType( QDataSet fillds ) {
+        String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
+        RenderType renderType;
+        String renderControl="";
+        if ( srenderType!=null ) {
+            int i= srenderType.indexOf(">");
+            if ( i==-1 ) {
+                renderControl= "";
+            } else {
+                renderControl= srenderType.substring(i+1);
+                srenderType= srenderType.substring(0,i);
+            }
+            if ( srenderType.equals("time_series") ) {
+                if (fillds.length() > SERIES_SIZE_LIMIT) {
+                    renderType = RenderType.hugeScatter;
+                } else {
+                    renderType = RenderType.series;
+                }
+            } else if ( srenderType.equals("waveform" ) ) {
+                renderType = RenderType.hugeScatter;
+            } else {
+                if ( srenderType.equals("spectrogram") ) {
+                    RenderType specPref= RenderType.spectrogram;
+                    Options o= new Options();
+                    Preferences prefs= Preferences.userNodeForPackage( o.getClass() );  //TODO: because this is static?
+                    boolean nn= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,o.isNearestNeighbor());
+                    if ( nn ) {
+                        specPref = RenderType.nnSpectrogram;
+                    } 
+                    renderType= specPref;
+                } else {
+                    renderType= RenderType.valueOf(srenderType);
+                }
+            }
+        } else {
+            renderType = AutoplotUtil.guessRenderType(fillds);
+        }
+        return renderType.toString() + ">" + renderControl;
+    }
 
     private void updateDataSetImmediately() throws Exception {
         performingChange( this, PENDING_UPDATE_DATASET );
@@ -762,19 +810,21 @@ public class PlotElementController extends DomNodeController {
                 if (resetPlotElement) {
                     if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                     if (comp.equals("")) {
-                        RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
-                        //logger.fine(" fillDs:" + fillDs + "  renderType:"+ renderType );
-
+                        String s= resolveRenderType( fillDs );
+                        int i= s.indexOf(">");
+                        RenderType renderType= RenderType.valueOf(s.substring(0,i));
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
-                        resetPlotElement(fillDs, renderType);
+                        resetPlotElement(fillDs, renderType, s.substring(i+1) );
                         setResetPlotElement(false);
                     } else if ( comp.startsWith("|") ) {
                         try {
                             QDataSet fillDs2 = fillDs;
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
-                            RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
+                            String s= resolveRenderType( fillDs2 );
+                            int i= s.indexOf(">");
+                            RenderType renderType= RenderType.valueOf(s.substring(0,i));
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
-                            resetPlotElement(fillDs2, renderType);
+                            resetPlotElement(fillDs2, renderType, s.substring(i+1) );
                             setResetPlotElement(false);
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
@@ -921,7 +971,7 @@ public class PlotElementController extends DomNodeController {
      * @return
      */
     private static String guessSliceSlices( QDataSet fillDs, List<Integer> slicePref ) {
-        String newResult="|slices(";
+        StringBuilder newResult= new StringBuilder( "|slices(" );
         String[] slices= new String[] { "':'", "':'", "':'", "':'", "':'" } ;
 
         List<Integer> slicePref1= new ArrayList<Integer>();
@@ -955,12 +1005,12 @@ public class PlotElementController extends DomNodeController {
         }
 
         for ( int i=0; i<ndim; i++ ) {
-            newResult+= slices[i];
-            if ( i<ndim-1 ) newResult+=",";
+            newResult.append( slices[i] );
+            if ( i<ndim-1 ) newResult.append( "," );
         }
 
-        newResult+= ")";
-        return newResult;
+        newResult.append( ")" );
+        return newResult.toString();
     }
 
     /**
@@ -1138,7 +1188,7 @@ public class PlotElementController extends DomNodeController {
      * @param fillDs
      * @param renderType
      */
-    private synchronized void resetPlotElement(QDataSet fillDs, RenderType renderType) {
+    private synchronized void resetPlotElement( QDataSet fillDs, RenderType renderType, String renderControl ) {
         logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
 
         if (fillDs != null) {
@@ -1332,16 +1382,7 @@ public class PlotElementController extends DomNodeController {
                 }
             } else {
                 if ( plotElement.controller.getParentPlotElement()==null ) {
-                    String rt= (String)fillDs.property(QDataSet.RENDER_TYPE);
-                    if ( rt!=null && rt.contains(">") ) {
-                        int i= rt.indexOf(">");
-                        String control= rt.substring(i+1);
-                        try {
-                            renderer.setControl(control);
-                        } catch ( Exception ex ) {
-                            logger.log( Level.SEVERE, null, ex );
-                        }
-                    }
+                    renderer.setControl(renderControl);
                     renderer.setActive(true);
                 }
             }
