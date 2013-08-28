@@ -15,6 +15,7 @@ import java.io.*;                    // For reading the input XML file
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -78,10 +79,11 @@ public class DOMWalker {
         }
 
         // now recurse
-        for (String key : result.keySet()) {
-            Object o = result.get(key);
+        for ( Entry<String,Object> ent : result.entrySet() ) {
+            String key= ent.getKey();
+            Object o = ent.getValue();
             if (o instanceof Node) {
-                result.put(key, getAttributes((Node) o));
+                result.put( key, getAttributes((Node)o) );
             }
         }
 
