@@ -405,7 +405,7 @@ public class LogConsole extends javax.swing.JPanel {
                     String prefix = "";
                     if ( rec.getMessage()==null ) {
                         if ( rec.getThrown()!=null ) {
-                            recMsg= recMsg + rec.getThrown().getStackTrace().toString();
+                            recMsg= recMsg + rec.getThrown().toString();
                         }
                         prefix= prefix+";";
                     }
