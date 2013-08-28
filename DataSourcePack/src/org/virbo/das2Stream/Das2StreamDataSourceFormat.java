@@ -25,7 +25,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
     public void formatData( String url, QDataSet data, ProgressMonitor mon) throws Exception {
 
-        URISplit split = URISplit.parse(url.toString());
+        URISplit split = URISplit.parse(url);
         java.util.Map<String, String> params= URISplit.parseParams(split.params);
 
         boolean binary= "binary".equals( params.get( "type" ) );
