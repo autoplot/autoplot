@@ -271,7 +271,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
     
-    private class LabelMonitor extends NullProgressMonitor {
+    private static class LabelMonitor extends NullProgressMonitor {
         
         LabelMonitor() {
             repaintTimer.setRepeats(true);
