@@ -287,7 +287,12 @@ public class JythonUtil {
                     }
                     URISplit split= URISplit.parse(url.toString());
                     interp.set( "PWD", split.path );   
-                    interp.execfile( new FileInputStream(file), url.toString());
+                    FileInputStream in= new FileInputStream(file);
+                    try {
+                        interp.execfile( in, url.toString());
+                    } finally {
+                        in.close();
+                    }
                     //TODO: error annotations on the editor.
                     mon.finished();
                 } catch (IOException ex) {
