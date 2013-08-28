@@ -80,7 +80,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
         String typeSuggest= getParam( "type", "double" );
 
-        NetcdfFileWriteable ncfile= NetcdfFileWriteable.createNew( getResourceURI().toURL().getFile().toString(), true );
+        NetcdfFileWriteable ncfile= NetcdfFileWriteable.createNew( getResourceURI().toURL().getFile(), true );
 
         String varName= nameFor(data);
 
