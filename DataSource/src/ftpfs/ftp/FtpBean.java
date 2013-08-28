@@ -484,7 +484,7 @@ public class FtpBean
         }
 
         str_content = changeLineSeparator(str_content, "\r\n", separator);
-        return str_content.toString();
+        return str_content;
     }
 
     /**
