@@ -100,7 +100,9 @@ public class Test501 {
         String name;
         if ( doTest ) {
             int h = uri.hashCode();
-            String id= String.format( "%016d",Math.abs(h));
+            if ( h==Integer.MIN_VALUE ) h=Integer.MAX_VALUE;
+            if ( h<0 ) h= -1 * h;
+            String id= String.format( "%016d",h);
             name= String.format( "test%03d_%s.png", testid, id );
             result= name;
         } else {
