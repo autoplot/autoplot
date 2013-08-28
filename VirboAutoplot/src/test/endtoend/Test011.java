@@ -94,7 +94,12 @@ public class Test011 {
 
             timer("autoHistogram of rank1");
             SimpleStreamFormatter ff = new SimpleStreamFormatter();
-            ff.format(hist, new FileOutputStream("test011_000.qds"), true);
+            FileOutputStream out= new FileOutputStream("test011_000.qds");
+            try {
+                ff.format(hist, out, true);
+            } finally {
+                out.close();
+            }
             timer("format autoHistogram of rank1");
 
             double min = Double.MAX_VALUE;
