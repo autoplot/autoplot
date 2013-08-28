@@ -110,7 +110,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     /**
-     * 
+     * Insert the property at i the index, or -1 for non-indexed property.
      * @param jo1 object to collect properties
      * @param ds dataset which can be a bundle
      * @param prop the property name
@@ -213,11 +213,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         if ( elementLabels!=null ) {
             jo1.put( "ELEMENT_LABELS", elementLabels );
         }
-        jsonProp( jo1, bds, QDataSet.VALID_MIN, -1 );
-        jsonProp( jo1, bds, QDataSet.VALID_MAX, -1 );
-        jsonProp( jo1, bds, QDataSet.FILL_VALUE, -1 );
+        if ( bds!=null ) { // I don't think the bds is ever null, but findbugs points out inconsistent code.
+            jsonProp( jo1, bds, QDataSet.VALID_MIN, -1 );
+            jsonProp( jo1, bds, QDataSet.VALID_MAX, -1 );
+            jsonProp( jo1, bds, QDataSet.FILL_VALUE, -1 );
+            jo.put( Ops.guessName(bds), jo1 );
+        }
         
-        jo.put( Ops.guessName(bds), jo1 );
         
         String json= jo.toString( 3 );
 
