@@ -937,30 +937,34 @@ public class GuiSupport {
                                 if ( ext.equals("png") ) {
                                     canvas.writeToPng(ffname);
                                 } else if ( ext.equals("pdf") ) {
-                                    FileOutputStream out = new FileOutputStream(ffname);
-                                    PdfGraphicsOutput go = new PdfGraphicsOutput();
-                                    
-                                    PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
-                                    go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
-                                    go.setOutputStream(out);
-                                    if ( pdecor.manualWidthCB.isSelected() ) {
-                                        double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
-                                        String units= (String)pdecor.unitsCB.getSelectedItem();
-                                        if ( units.equals("inches") ) {
-                                            mant= mant * 72;
-                                        } else if ( units.equals("centimeters")) {
-                                            mant= mant * 72 / 2.54;
+                                    FileOutputStream out=null;
+                                    try {
+                                        out = new FileOutputStream(ffname);
+                                        PdfGraphicsOutput go = new PdfGraphicsOutput();
+
+                                        PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
+                                        go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
+                                        go.setOutputStream(out);
+                                        if ( pdecor.manualWidthCB.isSelected() ) {
+                                            double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
+                                            String units= (String)pdecor.unitsCB.getSelectedItem();
+                                            if ( units.equals("inches") ) {
+                                                mant= mant * 72;
+                                            } else if ( units.equals("centimeters")) {
+                                                mant= mant * 72 / 2.54;
+                                            }
+                                            double aspect= canvas.getHeight() / (double)canvas.getWidth();
+                                            go.setSize( canvas.getWidth(), canvas.getHeight() );
+                                            canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
+                                        } else {
+                                            go.setSize( canvas.getWidth(), canvas.getHeight() );
                                         }
-                                        double aspect= canvas.getHeight() / (double)canvas.getWidth();
-                                        go.setSize( canvas.getWidth(), canvas.getHeight() );
-                                        canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
-                                    } else {
-                                        go.setSize( canvas.getWidth(), canvas.getHeight() );
+                                        go.start();
+                                        canvas.print(go.getGraphics());
+                                        go.finish();
+                                    } finally {
+                                        if ( out!=null ) out.close();                                    
                                     }
-                                    go.start();
-                                    canvas.print(go.getGraphics());
-                                    go.finish();
-                                    out.close();                                    
 
                                 } else if ( ext.equals("svg") ) {
                                     canvas.writeToSVG(ffname);
