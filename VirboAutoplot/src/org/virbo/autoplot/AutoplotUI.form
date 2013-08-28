@@ -58,13 +58,13 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editDomMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="EditOptions">
+            <MenuItem class="javax.swing.JMenuItem" name="editOptions">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Options..."/>
                 <Property name="toolTipText" type="java.lang.String" value="Edit user options like background colors and fonts"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="EditOptionsActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editOptionsActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="inspectVapFileMenuItem">

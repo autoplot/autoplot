@@ -1769,7 +1769,7 @@ APSplash.checkTime("init 52");
         undoMultipleMenu = new javax.swing.JMenu();
         editDomSeparator = new javax.swing.JSeparator();
         editDomMenuItem = new javax.swing.JMenuItem();
-        EditOptions = new javax.swing.JMenuItem();
+        editOptions = new javax.swing.JMenuItem();
         inspectVapFileMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
@@ -1913,14 +1913,14 @@ APSplash.checkTime("init 52");
         });
         editMenu.add(editDomMenuItem);
 
-        EditOptions.setText("Options...");
-        EditOptions.setToolTipText("Edit user options like background colors and fonts");
-        EditOptions.addActionListener(new java.awt.event.ActionListener() {
+        editOptions.setText("Options...");
+        editOptions.setToolTipText("Edit user options like background colors and fonts");
+        editOptions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                EditOptionsActionPerformed(evt);
+                editOptionsActionPerformed(evt);
             }
         });
-        editMenu.add(EditOptions);
+        editMenu.add(editOptions);
 
         inspectVapFileMenuItem.setText("Inspect Vap File...");
         inspectVapFileMenuItem.setToolTipText("View a vap file from a local disk in the property editor");
@@ -2468,14 +2468,14 @@ APSplash.checkTime("init 52");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 611, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 615, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -2892,10 +2892,10 @@ private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent
     }
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
-private void EditOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditOptionsActionPerformed
+private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editOptionsActionPerformed
     PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
     edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
-}//GEN-LAST:event_EditOptionsActionPerformed
+}//GEN-LAST:event_editOptionsActionPerformed
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
     Runnable run= new Runnable() {
@@ -3601,7 +3601,6 @@ APSplash.checkTime("init 240");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem EditOptions;
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
     private javax.swing.ButtonGroup addressBarButtonGroup;
@@ -3631,6 +3630,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem editDomMenuItem;
     private javax.swing.JSeparator editDomSeparator;
     private javax.swing.JMenu editMenu;
+    private javax.swing.JMenuItem editOptions;
     private javax.swing.JMenu enableFeatureMenu;
     private javax.swing.JMenuItem exceptionReport;
     private javax.swing.JMenu fileMenu;
