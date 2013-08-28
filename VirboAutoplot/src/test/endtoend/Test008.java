@@ -4,7 +4,6 @@
  */
 package test.endtoend;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -18,7 +17,7 @@ import org.virbo.jythonsupport.Util;
  */
 public class Test008 {
 
-    public static boolean debug= false;
+    public static final boolean debug= false;
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
