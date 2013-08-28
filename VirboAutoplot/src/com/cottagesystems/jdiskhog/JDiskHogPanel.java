@@ -44,7 +44,7 @@ import org.virbo.datasource.AutoplotSettings;
  * for Autoplot, like ro_cache.txt file handling.
  * @author  jbf
  */
-public class JDiskHogPanel extends javax.swing.JPanel {
+public final class JDiskHogPanel extends javax.swing.JPanel {
 
     AutoplotUI app;
 
@@ -260,10 +260,14 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     }
 
     private boolean writeROCacheLink( File src, File dest ) throws IOException {
-        BufferedWriter write= new BufferedWriter( new FileWriter( new File( src, "ro_cache.txt" ) ) );
-        write.append( dest.toString() );
-        write.append( "\n" );
-        write.close();
+        BufferedWriter write=null;
+        try {
+            write= new BufferedWriter( new FileWriter( new File( src, "ro_cache.txt" ) ) );
+            write.append( dest.toString() );
+            write.append( "\n" );
+        } finally {
+            if ( write!=null ) write.close();
+        }
         return true;
     }
     

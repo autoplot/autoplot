@@ -151,8 +151,6 @@ public class FSTreeModel implements TreeModel {
         File fparent = ((TreeNode) parent).getFile();
         File[] ff = listings.get(fparent);
 
-        File reportParent = null;
-
         File ff1 = ff[index];
         while (ff1.isDirectory()) {
             File[] ffs = ff1.listFiles();
@@ -161,7 +159,6 @@ public class FSTreeModel implements TreeModel {
             } else {
                 break;
             }
-            reportParent = fparent;
         }
 
         return new TreeNode(ff1, fparent);
@@ -218,7 +215,7 @@ public class FSTreeModel implements TreeModel {
         }
     };
 
-    public static Comparator alphaComparator = new Comparator() {
+    public static final Comparator alphaComparator = new Comparator() {
 
         public int compare(Object o1, Object o2) {
             File f1 = (File) o1, f2 = (File) o2;
