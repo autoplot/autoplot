@@ -11,10 +11,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -34,6 +37,8 @@ import org.virbo.dsops.Ops;
  */
 public class WavDataSourceFormat implements DataSourceFormat {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.wav");
+    
     private ByteBuffer formatRank1(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
         String type = params.get("type");
@@ -190,6 +195,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 return buf.get();
             }
 
+            @Override
             public synchronized int read(byte[] bytes, int off, int len) throws IOException {
                 // Read only what's left
                 len = Math.min(len, buf.remaining());
@@ -284,15 +290,14 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         File outFile=  new File( split.resourceUri );
         
-        if (AudioSystem.isFileTypeSupported(
-                AudioFileFormat.Type.WAVE, inFileAIS)) {
+        if ( AudioSystem.isFileTypeSupported( AudioFileFormat.Type.WAVE, inFileAIS) ) {
             // inFileAIS can be converted to AIFF.
             // so write the AudioInputStream to the
             // output file.
             int i= AudioSystem.write( inFileAIS, AudioFileFormat.Type.WAVE, outFile );
-
+            logger.log( Level.FINE, "{0} bytes written to file.", i);
             inFileAIS.close();
-            return; // All done now
+
         } else {
             throw new IllegalArgumentException("System doesn't support format to WAVE");
         }
