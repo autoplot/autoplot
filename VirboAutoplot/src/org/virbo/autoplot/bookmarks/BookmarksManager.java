@@ -868,7 +868,7 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
      */
     void doImportUrl( String url ) {
 
-        String bookmarksFile= url.toString();
+        String bookmarksFile= url;
 
         ImportBookmarksGui gui= new ImportBookmarksGui();
         gui.getBookmarksFilename().setText(bookmarksFile+" ?");
