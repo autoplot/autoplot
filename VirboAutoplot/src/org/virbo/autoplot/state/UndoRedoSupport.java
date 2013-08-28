@@ -389,8 +389,10 @@ public class UndoRedoSupport {
      * @param label
      */
     public void pushState( PropertyChangeEvent ev, String label ) {
-        if (ignoringUpdates) {
-            return;
+        synchronized ( this ) {
+            if (ignoringUpdates) {
+                return;
+            }
         }
         Application state = applicationModel.createState(false);
         BufferedImage thumb= applicationModel.getThumbnail(50);
@@ -535,7 +537,7 @@ public class UndoRedoSupport {
      * Setter for property ignoringUpdates.
      * @param ignoringUpdates New value of property ignoringUpdates.
      */
-    public void setIgnoringUpdates(boolean ignoringUpdates) {
+    public synchronized void setIgnoringUpdates(boolean ignoringUpdates) {
         this.ignoringUpdates = ignoringUpdates;
     }
 
