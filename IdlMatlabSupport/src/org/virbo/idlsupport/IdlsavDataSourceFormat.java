@@ -71,10 +71,13 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
         setUri(uri);
 
-        File f= new File( getResourceURI().toURL().getFile().toString() );
+        File f= new File( getResourceURI().toURL().getFile() );
         FileOutputStream fos= new FileOutputStream(f);
-        write.write( fos );
-        fos.close();
+        try {
+            write.write( fos );
+        } finally {
+            fos.close();
+        }
 
     }
 
