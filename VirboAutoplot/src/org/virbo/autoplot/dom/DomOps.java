@@ -246,13 +246,13 @@ public class DomOps {
         Row[] rows= canvas.getRows();
         int nrow= rows.length;
 
-        double TotalPlotHeight= 0;
+        double totalPlotHeight= 0;
         for ( int i=0; i<nrow; i++ ) {
-           Plot[] plots= DomOps.getPlotsFor( dom, rows[i], true ).toArray( new Plot[0] );
+           List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
-           if ( plots.length>0 ) {
+           if ( plots.size()>0 ) {
                DasRow dasRow= rows[i].getController().dasRow;
-               TotalPlotHeight= TotalPlotHeight + dasRow.getHeight();
+               totalPlotHeight= totalPlotHeight + dasRow.getHeight();
             }
         }
 
@@ -260,42 +260,43 @@ public class DomOps {
         double [] MaxDown= new double[ nrow ];
 
         for ( int i=0; i<nrow; i++ ) {
-            Plot[] plots= DomOps.getPlotsFor( dom, rows[i], true ).toArray( new Plot[0] );
+            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
             double MaxUpJEm= 0.;
             double MaxDownJ= 0.;
-            for ( int j=0; j<plots.length; j++ ) {
-                String title= plots[j].getTitle();
-                MaxUpJEm= plots[j].isDisplayTitle() ? lineCount(title) : 0;
+            for ( int j=0; j<plots.size(); j++ ) {
+                Plot plotj= plots.get(j);
+                String title= plotj.getTitle();
+                MaxUpJEm= plotj.isDisplayTitle() ? lineCount(title) : 0;
                 if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                Rectangle plot= plots[j].getController().getDasPlot().getBounds();
-                Rectangle axis= plots[j].getXaxis().getController().getDasAxis().getBounds();
+                Rectangle plot= plotj.getController().getDasPlot().getBounds();
+                Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
                 MaxDownJ= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + emToPixels );
                 MaxDown[i]= Math.max( MaxDown[i], MaxDownJ );
             }
         }
 
-        double [] RelativePlotHeight= new double[ nrow ];
+        double [] relativePlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
             DasRow dasRow= rows[i].getController().dasRow;
-            RelativePlotHeight[i]= 1.0 * dasRow.getHeight() / TotalPlotHeight;
+            relativePlotHeight[i]= 1.0 * dasRow.getHeight() / totalPlotHeight;
         }
 
-        double NewPlotTotalHeight= canvas.height;
+        double newPlotTotalHeight= canvas.height;
         for ( int i=0; i<nrow; i++ ) {
-            NewPlotTotalHeight = NewPlotTotalHeight - MaxUp[i] - MaxDown[i];
+            newPlotTotalHeight = newPlotTotalHeight - MaxUp[i] - MaxDown[i];
         }
 
         double [] PlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
-            PlotHeight[i]= NewPlotTotalHeight * RelativePlotHeight[i];
+            PlotHeight[i]= newPlotTotalHeight * relativePlotHeight[i];
         }
 
-        double[] NormalPlotHeight= new double[ nrow ];
+        double[] normalPlotHeight= new double[ nrow ];
 
         double height= dom.getCanvases(0).getMarginRow().getController().getDasRow().getHeight();
         for ( int i=0; i<nrow; i++ ) {
-             NormalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
+             normalPlotHeight[i]= ( PlotHeight[i] + MaxUp[i] + MaxDown[i] ) / height;
         }
 
         double position=0;
@@ -303,7 +304,7 @@ public class DomOps {
         for ( int i=0; i<nrow; i++ ) {
             String newTop=  String.format( "%.2f%%%+.1fem", 100*position, MaxUp[i] * pixelsToEm );
             rows[i].setTop( newTop );
-            position+= NormalPlotHeight[i];
+            position+= normalPlotHeight[i];
             String newBottom= String.format(   "%.2f%%%+.1fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
             rows[i].setBottom( newBottom );
 
