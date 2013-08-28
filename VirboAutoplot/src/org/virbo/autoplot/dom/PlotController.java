@@ -820,8 +820,6 @@ public class PlotController extends DomNodeController {
     }
 
 
-    private Map<String,String> pendingDefaultsChanges= new HashMap();
-
     void bindPEToColorbar( PlotElement pe ) {
         this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
     }
