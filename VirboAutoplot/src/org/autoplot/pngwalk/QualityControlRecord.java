@@ -14,6 +14,7 @@ import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -58,11 +59,11 @@ public class QualityControlRecord {
         }
         @Override
         public String toString() {return sval;}
-        public String filenameExtension() { return "." + sval.toLowerCase(); }
+        public String filenameExtension() { return "." + sval.toLowerCase(Locale.ENGLISH); }
         public static Status fromString(String s) {
-            if (s.toLowerCase().equals("ok")) return Status.OK;
-            else if (s.toLowerCase().equals("problem")) return Status.PROBLEM;
-            else if (s.toLowerCase().equals("ignore")) return Status.IGNORE;
+            if (s.toLowerCase(Locale.ENGLISH).equals("ok")) return Status.OK;
+            else if (s.toLowerCase(Locale.ENGLISH).equals("problem")) return Status.PROBLEM;
+            else if (s.toLowerCase(Locale.ENGLISH).equals("ignore")) return Status.IGNORE;
             else return Status.UNKNOWN;
         }
     }

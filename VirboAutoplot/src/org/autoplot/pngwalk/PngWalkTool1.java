@@ -443,7 +443,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
         int r= chooser.showSaveDialog(parent);
         if ( r==JFileChooser.APPROVE_OPTION ) {
-            prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent().toString() );
+            prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent() );
             try {
                 if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
                     JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
@@ -755,7 +755,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * respond to changes of the current index.
      */
-    private PropertyChangeListener indexListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener indexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             String item= seq.currentImage().getUri().toString();
 
@@ -775,7 +775,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * listen for status updates from other agents, relay the status for the view.
      */
-    private PropertyChangeListener statusListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener statusListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
            setStatus((String)evt.getNewValue());
         }

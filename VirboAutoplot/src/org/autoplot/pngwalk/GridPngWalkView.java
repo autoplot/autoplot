@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,8 +47,8 @@ public class GridPngWalkView extends PngWalkView {
 
     private int thumbSize = 100;
     private int nCols = 1;
-    private static final int MIN_THUMB_SIZE = 20;
-    private static final int MAX_THUMB_SIZE = 300;
+    //private static final int MIN_THUMB_SIZE = 20;
+    //private static final int MAX_THUMB_SIZE = 300;
 
     private JScrollPane scrollPane;
     private GridViewCanvas canvas;
@@ -73,16 +74,13 @@ public class GridPngWalkView extends PngWalkView {
         scrollPane.addMouseWheelListener( getMouseWheelListener() );
 
         MouseAdapter ma= new MouseAdapter() {
-            Point p0;
             @Override
             public void mouseClicked(MouseEvent e) {
-                p0= null;
                 if (seq == null) return;
                 selectCellAt(e.getX(), e.getY());
             }
             @Override
             public void mousePressed(MouseEvent e) {
-                p0= e.getPoint();
                 if ( e.isPopupTrigger() ) {
                     if (seq == null) return;
                     selectCellAt(e.getX(), e.getY());
@@ -219,36 +217,36 @@ public class GridPngWalkView extends PngWalkView {
         seq.setIndex(n);
     }
 
-    private void selectCellsWithin( Point p1, Point p2 ) {
-        if (p2.x > nCols * thumbSize) {
-            return;
-        }
-        int col1 = p1.x / thumbSize;
-        int row1 = p1.y / thumbSize;
-        int col2 = p2.x / thumbSize;
-        int row2 = p2.y / thumbSize;
-        if ( row2<row1 ) {
-            int t= row1;
-            row1= row2;
-            row2= t;
-        }
-        if ( col2<col1 ) {
-            int t= col1;
-            col1= col2;
-            col2= t;
-        }
-        List<Integer> sel= new ArrayList();
-        for ( int j=row1; j<=row2; j++ ) {
-            for ( int i=col1; i<=col2; i++ ) {
-                int n = j * nCols + i;
-                if ( n<seq.size() ) {
-                    sel.add(n);
-                }
-            }
-        }
-        seq.setSelectedIndeces(sel);
-        repaint();
-    }
+//    private void selectCellsWithin( Point p1, Point p2 ) {
+//        if (p2.x > nCols * thumbSize) {
+//            return;
+//        }
+//        int col1 = p1.x / thumbSize;
+//        int row1 = p1.y / thumbSize;
+//        int col2 = p2.x / thumbSize;
+//        int row2 = p2.y / thumbSize;
+//        if ( row2<row1 ) {
+//            int t= row1;
+//            row1= row2;
+//            row2= t;
+//        }
+//        if ( col2<col1 ) {
+//            int t= col1;
+//            col1= col2;
+//            col2= t;
+//        }
+//        List<Integer> sel= new ArrayList();
+//        for ( int j=row1; j<=row2; j++ ) {
+//            for ( int i=col1; i<=col2; i++ ) {
+//                int n = j * nCols + i;
+//                if ( n<seq.size() ) {
+//                    sel.add(n);
+//                }
+//            }
+//        }
+//        seq.setSelectedIndeces(sel);
+//        repaint();
+//    }
 
 
     @Override
@@ -333,8 +331,6 @@ public class GridPngWalkView extends PngWalkView {
             FontMetrics fm = g2.getFontMetrics();
 
             List<DatumRange> drs= seq.getActiveSubrange();
-
-            List<Integer> sel= seq.getSelectedIndeces();
 
             boolean outOfTime= false;
             for (int row = rowMin; row < rowMax; row++) {
@@ -422,7 +418,7 @@ public class GridPngWalkView extends PngWalkView {
                             g2.setClip(oldClip);
                         }
                         } catch ( NullPointerException ex ) {
-                            ex.printStackTrace();;
+                            logger.log( Level.WARNING, null, ex );
                         }
                     }
 

@@ -84,12 +84,12 @@ public class CreatePngWalk {
         /**
          *  output folder for the walk, e.g. /home/user/pngwalk/
          */
-        public String outputFolder;
+        public String outputFolder=null;
 
         /**
          *  timerange to cover for the walk, e.g. 2012 through 2014.
          */
-        public String timeRangeStr;
+        public String timeRangeStr=null;
 
         /**
          *  rescale to show context for each step, e.g. "0%,100%" or "0%-1hr,100%+1hr"
@@ -109,24 +109,24 @@ public class CreatePngWalk {
         /**
          * product name for the walk, e.g. product
          */
-        public String product;
+        public String product=null;
 
         /**
          * timeformat for the walk, e.g. $Y$m$d
          */
-        public String timeFormat;
+        public String timeFormat=null;
 
         /**
          * Uri that creates an events dataset, like 
          * 'http://emfisis.physics.uiowa.edu/events/rbsp-a/burst/rbsp-a_burst_times_20130201.txt?eventListColumn=3'
          * or null for automatically generating names based on template.
          */
-        public String batchUri;
+        public String batchUri=null;
         
         /*
          * if true, the also create thumbs.
          */
-        public boolean createThumbs;
+        public boolean createThumbs= true;
 
         /**
          * if true, skip over products that appear to be created already.

@@ -5,6 +5,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +97,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 } else {
                     setStatus( "warning: no files found in "+template );
                 }
-            } catch (Exception ex) {
+            } catch ( IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                setStatus("error: Error listing " + template+", "+ex.getMessage() );
+                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
+            } catch ( URISyntaxException ex) {
+                logger.log(Level.SEVERE, null, ex);
+                setStatus("error: Error listing " + template+", "+ex.getMessage() );
+                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
+            } catch ( ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
@@ -473,13 +483,13 @@ public class WalkImageSequence implements PropertyChangeListener  {
         return displayImages.size();
     }
 
-    /**
-     * returns null, True or False.
-     * @return
-     */
-    private Boolean doHaveThumbs400() {
-        return this.haveThumbs400;
-    }
+    ///**
+    // * returns null, True or False.
+    // * @return
+    // */
+    //private Boolean doHaveThumbs400() {
+    //    return this.haveThumbs400;
+    //}
 
     /**
      * things we fire events for:
@@ -556,16 +566,16 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int loadingCount=0;
         int loadedCount=0;
         int thumbLoadingCount=0;
-        int thumbLoadedCount=0;
-        int sizeThumbCount= 0;
+        //int thumbLoadedCount=0;
+        //int sizeThumbCount= 0;
         int totalCount= 0;
         for ( WalkImage i : existingImages ) {
             totalCount++;
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADING ) loadingCount++;
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
             if ( i.getStatus()==WalkImage.Status.THUMB_LOADING ) thumbLoadingCount++;
-            if ( i.getStatus()==WalkImage.Status.THUMB_LOADED ) thumbLoadedCount++;
-            if ( i.getStatus()==WalkImage.Status.SIZE_THUMB_LOADED ) sizeThumbCount++;
+            //if ( i.getStatus()==WalkImage.Status.THUMB_LOADED ) thumbLoadedCount++;
+            //if ( i.getStatus()==WalkImage.Status.SIZE_THUMB_LOADED ) sizeThumbCount++;
         }
 
 /*        if ( loadingCount>5 ) {
@@ -578,7 +588,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             new Exception().printStackTrace();
         }*/
 
-        long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
+        //long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
         if ( loadingCount==0 && thumbLoadingCount==0) {
             setStatus(""+loadedCount+" of "+totalCount + " images loaded." );
         } else {

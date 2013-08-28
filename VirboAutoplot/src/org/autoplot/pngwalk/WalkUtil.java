@@ -143,15 +143,19 @@ public class WalkUtil {
     }
 
     static String readFile(File pf) throws IOException {
-        BufferedReader read= new BufferedReader( new FileReader(pf) );
-        String s=read.readLine();
-        StringBuffer result= new StringBuffer();
-        while ( s!=null ) {
-            result.append(s);
-            result.append("\n");
-            s=read.readLine();
+        BufferedReader read=null;
+        StringBuilder result= new StringBuilder();
+        try {
+            read= new BufferedReader( new FileReader(pf) );
+            String s=read.readLine();
+            while ( s!=null ) {
+                result.append(s);
+                result.append("\n");
+                s=read.readLine();
+            }
+        } finally {
+            if ( read!=null ) read.close();
         }
-        read.close();
         return result.toString();
     }
 

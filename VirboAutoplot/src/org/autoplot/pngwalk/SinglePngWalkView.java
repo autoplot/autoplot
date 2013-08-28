@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 public class SinglePngWalkView extends PngWalkView {
 
 //    private boolean sizeValid = false;
-    private BufferedImage cacheImage;
+    private transient BufferedImage cacheImage;
 
     public SinglePngWalkView(WalkImageSequence s) {
         super(s);

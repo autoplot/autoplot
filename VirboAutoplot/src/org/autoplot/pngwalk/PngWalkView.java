@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -29,6 +30,8 @@ import org.virbo.datasource.DataSetURI;
  */
 public abstract class PngWalkView extends JPanel implements PropertyChangeListener {
 
+    static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
+    
     protected WalkImageSequence seq;
     protected boolean showCaptions = false;
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?

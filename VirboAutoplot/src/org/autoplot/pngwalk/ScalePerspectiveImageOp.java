@@ -80,22 +80,22 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         }
     }
 
-    private Shape getOutline( double x, double y ) {
-        GeneralPath path= new GeneralPath();
-        Point2D dst= new Point2D.Float();
-        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
-        path.moveTo((float)dst.getX(), (float)dst.getY());
-        dst= this.getPoint2D( new Point2D.Float(w,0), dst);
-        path.lineTo((float)dst.getX(), (float)dst.getY());
-        dst= this.getPoint2D( new Point2D.Float(w,h), dst);
-        path.lineTo((float)dst.getX(), (float)dst.getY());
-        dst= this.getPoint2D( new Point2D.Float(0,h), dst);
-        path.lineTo((float)dst.getX(), (float)dst.getY());
-        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
-        path.lineTo((float)dst.getX(), (float)dst.getY());
-        path.transform( AffineTransform.getTranslateInstance(x,y) );
-        return path;
-    }
+//    private Shape getOutline( double x, double y ) {
+//        GeneralPath path= new GeneralPath();
+//        Point2D dst= new Point2D.Float();
+//        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
+//        path.moveTo((float)dst.getX(), (float)dst.getY());
+//        dst= this.getPoint2D( new Point2D.Float(w,0), dst);
+//        path.lineTo((float)dst.getX(), (float)dst.getY());
+//        dst= this.getPoint2D( new Point2D.Float(w,h), dst);
+//        path.lineTo((float)dst.getX(), (float)dst.getY());
+//        dst= this.getPoint2D( new Point2D.Float(0,h), dst);
+//        path.lineTo((float)dst.getX(), (float)dst.getY());
+//        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
+//        path.lineTo((float)dst.getX(), (float)dst.getY());
+//        path.transform( AffineTransform.getTranslateInstance(x,y) );
+//        return path;
+//    }
 
     private int index(int i, int j) {
         int ii= i + j * nw;
@@ -193,7 +193,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                         } else if ( weight<255 ) {
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         } else {
-                            int rr1= (rr[didx] / n + AVG);
+                            //int rr1= (rr[didx] / n + AVG);
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         }
                         dest.setRGB(i, j, color);

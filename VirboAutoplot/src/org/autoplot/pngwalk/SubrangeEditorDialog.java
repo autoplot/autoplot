@@ -21,7 +21,7 @@ import org.das2.datum.DatumRange;
  */
 public class SubrangeEditorDialog extends javax.swing.JDialog {
     private int maxIndex;
-    private List<DatumRange> dateSpan;
+    private transient List<DatumRange> dateSpan;
 
     private boolean okClicked = false;
 

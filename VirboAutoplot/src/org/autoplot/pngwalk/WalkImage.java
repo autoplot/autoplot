@@ -394,56 +394,17 @@ public class WalkImage  {
         }
     }
 
-    private static void maybeStartThumbLoadingQueueRunner() {
-        if ( thumbLoadingQueueRunner!=null ) {
-            return;
-        } else {
-            Runnable r= new Runnable() {
-                public void run() {
-                    while ( WalkImage.thumbLoadingQueue.size()>0 ) {
-                        WalkImage image;
-                        synchronized ( thumbLoadingQueue ) {
-                            //String bar="=======================================================";
-                            //String b= thumbLoadingQueue.size()>bar.length() ? bar + " "+bar.length() : bar.substring(0,thumbLoadingQueue.size());
-                            //System.err.println("thumbLoadingQueueRunner: " + b );
-                            image= thumbLoadingQueue.poll();
-                        }
-                        image.getThumbnailImmediately();
-                    }
-                    synchronized ( thumbLoadingQueue ) {
-                        //System.err.println("stopping thumbLoadingQueueRunner");
-                        WalkImage.thumbLoadingQueueRunner= null;
-                    }
-                }
-            };
-            synchronized ( thumbLoadingQueue ) {
-                if ( thumbLoadingQueueRunner==null ) {
-                    //System.err.println("starting up thumbLoadingQueueRunner");
-                    thumbLoadingQueueRunner= r;
-                    RequestProcessor.invokeLater(thumbLoadingQueueRunner);
-                }
-            }
-        }
-    }
-
     private BufferedImage maybeReturnThumb(boolean loadIfNeeded) {
         if (thumb != null) return thumb;
         if (!loadIfNeeded) return null;
 
-        if ( false ) {
-            synchronized ( thumbLoadingQueue ) {
-                thumbLoadingQueue.add( this );
+        Runnable r = new Runnable() {
+            public void run() {
+                getThumbnailImmediately();
             }
-            maybeStartThumbLoadingQueueRunner();
-        } else {
-            //acquire thumbnail
-            Runnable r = new Runnable() {
-                public void run() {
-                    getThumbnailImmediately();
-                }
-            };
-            RequestProcessor.invokeLater(r);
-        }
+        };
+        RequestProcessor.invokeLater(r);
+
       //  //acquire thumbnail
       //  Runnable r = new Runnable() {
       //      public void run() {
