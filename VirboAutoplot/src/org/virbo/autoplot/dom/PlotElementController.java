@@ -763,7 +763,7 @@ public class PlotElementController extends DomNodeController {
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         RenderType renderType;
         String renderControl="";
-        if ( srenderType!=null ) {
+        if ( srenderType!=null && srenderType.trim().length()>0 ) {
             int i= srenderType.indexOf(">");
             if ( i==-1 ) {
                 renderControl= "";
@@ -790,7 +790,11 @@ public class PlotElementController extends DomNodeController {
                     } 
                     renderType= specPref;
                 } else {
-                    renderType= RenderType.valueOf(srenderType);
+                    try {
+                        renderType= RenderType.valueOf(srenderType);
+                    } catch ( IllegalArgumentException ex ) {
+                        renderType= AutoplotUtil.guessRenderType(fillds);
+                    }
                 }
             }
         } else {
