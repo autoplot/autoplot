@@ -131,7 +131,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             if (!surl.contains("?") || surl.indexOf("?") == surl.length() - 1) {
                 return true;
             }
-            URISplit split = URISplit.parse(surl.toString());
+            URISplit split = URISplit.parse(surl);
             Map<String,String> args= URISplit.parseParams( split.params );
             String param= args.get("arg_0");
             if ( param==null ) {
