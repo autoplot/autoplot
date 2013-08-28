@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.Plot;
@@ -33,7 +34,9 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class UriDropTargetListener implements DropTargetListener {
-
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot");
+    
     DataSetSelector dss;
     ApplicationModel model;
 
@@ -42,6 +45,27 @@ public class UriDropTargetListener implements DropTargetListener {
         this.dss = dss;
     }
 
+    private String getURILinux( DropTargetDropEvent dtde )  {
+        try {
+            DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
+            if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
+                dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
+                return data;
+            } else {
+                return null;
+            }
+        } catch (UnsupportedFlavorException ex ) {
+            logger.log(Level.SEVERE, null, ex);
+            return null;
+        } catch (ClassNotFoundException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return null;
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
     /**
      * I was hoping we could peek to see if it really was a URI...
      * @param dtde
@@ -74,6 +98,11 @@ public class UriDropTargetListener implements DropTargetListener {
                             data= data.substring(16); // mac at least does this...
                         }
                         item= new Bookmark.Item( data );
+                    } else {
+                        String sitem= getURILinux(dtde);
+                        if ( sitem!=null ) {
+                            item= new Bookmark.Item( sitem );
+                        }
                     }
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(UriDropTargetListener.class.getName()).log(Level.SEVERE, null, ex);
