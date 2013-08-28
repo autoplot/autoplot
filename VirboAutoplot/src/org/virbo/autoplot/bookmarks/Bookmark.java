@@ -1018,9 +1018,9 @@ public abstract class Bookmark {
             return this.remoteUrl;
         }
 
-        public static int REMOTE_STATUS_NOT_LOADED= -1;
-        public static int REMOTE_STATUS_SUCCESSFUL= 0;
-        public static int REMOTE_STATUS_UNSUCCESSFUL= 1;
+        public static final int REMOTE_STATUS_NOT_LOADED= -1;
+        public static final int REMOTE_STATUS_SUCCESSFUL= 0;
+        public static final int REMOTE_STATUS_UNSUCCESSFUL= 1;
 
         /**
          * remote status indicator.
