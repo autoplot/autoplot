@@ -41,8 +41,8 @@ import javax.swing.Timer;
 
 public class JFontChooser extends JDialog {
 
-    public static int OK_OPTION = 0;
-    public static int CANCEL_OPTION = 1;
+    public static final int OK_OPTION = 0;
+    public static final int CANCEL_OPTION = 1;
     private JList fontList, sizeList;
     private JCheckBox cbBold, cbItalic;
     private JTextArea txtSample;
