@@ -235,7 +235,7 @@ public class IstpMetadataModel extends MetadataModel {
             attrs= new HashMap(meta);
         }
 
-        String name= String.valueOf(meta.get("FIELDNAM"));
+        String name= String.valueOf(attrs.get("FIELDNAM"));
         
         Map<String,Object> user= new LinkedHashMap<String,Object>();
 
