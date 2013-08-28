@@ -102,6 +102,8 @@ import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetSelector;
@@ -320,9 +322,17 @@ public class GuiSupport {
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
                     //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
-                    dsout= SemanticOps.trim( dsout, xbounds, null );
+                    if ( SemanticOps.isRank2Waveform(dsout) ) {
+                        dsout= DataSetOps.flattenWaveform(dsout);
+                        dsout= ArrayDataSet.copy( short.class, dsout );
+                    }
+//                    dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
                 } else {
+                    if ( SemanticOps.isRank2Waveform(dsout) ) {
+                        dsout= DataSetOps.flattenWaveform(dsout);
+                        dsout= ArrayDataSet.copy( short.class, dsout );
+                    }
                     dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
                 }
