@@ -40,7 +40,6 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet ds;
     QDataSet bundleDs;
     DataSource dss;
-    Exception ex;
     QDataSet error;
     QDataSet errorNoDs;
     QDataSet nonValueDs;
@@ -68,9 +67,9 @@ public class UriTcaSource extends AbstractQFunction {
             this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
             this.dss= dss1;
             this.needToRead= true;
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
-            initialError= DataSetUtil.asDataSet( eu.createDatum(ex.toString()) );
+        } catch ( Exception lex ) {
+            logger.log( Level.WARNING, null, lex );
+            initialError= DataSetUtil.asDataSet( eu.createDatum(lex.toString()) );
         }
         
     }
@@ -175,7 +174,6 @@ public class UriTcaSource extends AbstractQFunction {
         try {
             if ( read ) {
                 doRead();
-                read= false;
             }
             if ( ds==null ) {
                 return new BundleDataSet( errorNoDs );
@@ -260,8 +258,8 @@ public class UriTcaSource extends AbstractQFunction {
             return result;
             //
 
-        } catch ( Exception ex ) {
-            ex.printStackTrace(); //TODO: user never sees this...
+        } catch ( Exception lex ) {
+            logger.log( Level.WARNING, null, lex );
             return new BundleDataSet( error );
         }
 
