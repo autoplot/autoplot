@@ -17,13 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -259,6 +258,8 @@ public class LogConsole extends javax.swing.JPanel {
                     }
                     if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
                         recMsg= rec.getThrown().toString();
+                        //rec.getThrown().printStackTrace();
+                        // This is interesting--I've wondered where the single-line-message items have been coming from...
                     } else {
                         // no message.  breakpoint here for debugging.
                         int i=0;
@@ -402,6 +403,12 @@ public class LogConsole extends javax.swing.JPanel {
                         recMsg = MessageFormat.format( msg, parms );
                     }
                     String prefix = "";
+                    if ( rec.getMessage()==null ) {
+                        if ( rec.getThrown()!=null ) {
+                            recMsg= recMsg + rec.getThrown().getStackTrace().toString();
+                        }
+                        prefix= prefix+";";
+                    }
                     if (showLoggerId) {
                         prefix += rec.getLoggerName() + " ";
                     }
