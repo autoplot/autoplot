@@ -204,27 +204,32 @@ public class Test140 {
      * @throws IOException 
      */
     private static int doHistory( File f, int iid, Map<String,Exception> exceptions ) throws IOException {
-        BufferedReader read= new BufferedReader( new FileReader(f) );
-        String s= read.readLine();
-        while ( s!=null ) {
-            int i= s.indexOf("#");
-            if ( i>-1 ) {
-                s= s.substring(0,i);
-            }
-            if ( s.trim().length()>0 ) {
-                String[] ss= s.split("\t");
-                String uri= ss[ss.length-1];
-                try {
-                    do1( uri, iid, true );
-                } catch ( Exception ex ) {
-                    exceptions.put( uri, ex );
-                } finally {
-                    iid++;                
+        BufferedReader read= null;
+        try {
+            read= new BufferedReader( new FileReader(f) );
+            String s= read.readLine();
+            while ( s!=null ) {
+                int i= s.indexOf("#");
+                if ( i>-1 ) {
+                    s= s.substring(0,i);
                 }
+                if ( s.trim().length()>0 ) {
+                    String[] ss= s.split("\t");
+                    String uri= ss[ss.length-1];
+                    try {
+                        do1( uri, iid, true );
+                    } catch ( Exception ex ) {
+                        exceptions.put( uri, ex );
+                    } finally {
+                        iid++;                
+                    }
+                }
+                s= read.readLine();
             }
-            s= read.readLine();
+            return iid;
+        } finally {
+            if ( read!=null ) read.close();
         }
-        return iid;
     }
 
     /**
