@@ -775,7 +775,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( split.file==null || split.file.equals("file:///") ) { // use UIOWA's main one by default.
             split.file= "http://www-pw.physics.uiowa.edu/das/das2Server";
         }
-        String s= split.file.toString();
+        String s= split.file;
         if ( s.equals("http://www-pw.physics.uiowa.edu/das/das2Server") ) {
             return false;
         }
