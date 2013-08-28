@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -266,12 +267,13 @@ public class InlineDataSource extends AbstractDataSource {
         for ( int idep=0; idep<4; idep++ ) {
             Map<String,String> depp= deppropn[idep];
             if ( depp==null ) continue;
-            for ( String prop: depp.keySet() ) {
+            for ( Entry<String,String> ent: depp.entrySet() ) {
+                String prop= ent.getKey();
                 MutablePropertyDataSet dep0= depn[idep];
                 if ( dep0==null ) {
                     throw new IllegalArgumentException( "DEPEND_"+idep+"."+prop+" specified, but no DEPEND_"+idep+" ds");
                 }
-                String propValue= depp.get(prop);
+                String propValue= ent.getValue();
                 if ( prop.equals("UNITS") ) {
                     dep0.putProperty( prop,SemanticOps.lookupUnits(propValue));
                 } else if ( prop.equals("FILL_VALUE" )  || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX") ) {
