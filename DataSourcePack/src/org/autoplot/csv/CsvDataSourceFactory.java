@@ -81,31 +81,33 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         FileReader fr= new FileReader(f);
         CsvReader reader= new CsvReader( fr );
 
-        String[] columns;
-        if ( reader.readHeaders() ) {
-            //int ncol= reader.getHeaderCount();
-            columns= reader.getHeaders();
-        } else {
-            columns= new String[reader.getColumnCount()];
-            for ( int i=0; i<columns.length; i++ ) {
-                columns[i]= "field"+i;
-            }
-        }
-
         List<CompletionContext> result = new ArrayList<CompletionContext>();
-        for ( int i=0; i<columns.length; i++ ) {
-            String s= columns[i];
-            String label= s;
-            //if ( ! label.equals(fields[i]) && label.startsWith("field") ) label += " ("+fields[i]+")";
+        try {
+            String[] columns;
+            if ( reader.readHeaders() ) {
+                //int ncol= reader.getHeaderCount();
+                columns= reader.getHeaders();
+            } else {
+                columns= new String[reader.getColumnCount()];
+                for ( int i=0; i<columns.length; i++ ) {
+                    columns[i]= "field"+i;
+                }
+            }
 
-            result.add(new CompletionContext(
-                    CompletionContext.CONTEXT_PARAMETER_VALUE,
-                    s,
-                    label, null ) ) ;
+            for ( int i=0; i<columns.length; i++ ) {
+                String s= columns[i];
+                String label= s;
+                //if ( ! label.equals(fields[i]) && label.startsWith("field") ) label += " ("+fields[i]+")";
+
+                result.add(new CompletionContext(
+                        CompletionContext.CONTEXT_PARAMETER_VALUE,
+                        s,
+                        label, null ) ) ;
+            }
+        } finally {
+            reader.close();
+            fr.close();
         }
-
-        reader.close();
-        fr.close();
         
         return result;
 
