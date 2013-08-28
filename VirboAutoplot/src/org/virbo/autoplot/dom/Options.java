@@ -22,7 +22,7 @@ public class Options extends DomNode {
      * try to recycle old axis settings.  If the new range is near the 
      * old range, then just use the old range.
      */
-    public static String VALUE_AUTORANGE_TYPE_RELUCTANT="reluctant";
+    public static final String VALUE_AUTORANGE_TYPE_RELUCTANT="reluctant";
 
     public Options() {
 
