@@ -2200,7 +2200,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         return canvas;
     }
 
-    public synchronized void setCanvas(Canvas canvas) {
+    public void setCanvas(Canvas canvas) {
         Canvas oldCanvas = this.canvas;
         this.canvas = canvas;
         propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
