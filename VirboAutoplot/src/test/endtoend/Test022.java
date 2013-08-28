@@ -69,7 +69,7 @@ public class Test022 {
                     JoinDataSet ds= new JoinDataSet(2);
                     for ( int i=0; i<fillDs.length(); i++ ) {
                         QDataSet qds= fillDs.slice(i);
-                        String f= new File("foo.qds").getAbsolutePath().toString();
+                        String f= new File("foo.qds").getAbsolutePath();
                         ScriptContext.formatDataSet( fillDs, f );
                         ds.join((QDataSet)fillDs.property(QDataSet.DEPEND_1,i));
                     }
