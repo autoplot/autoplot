@@ -818,7 +818,12 @@ public class DataSourceUtil {
     public static void dumpToFile( QDataSet ds, String f ) {
         try {
             SimpleStreamFormatter fo= new SimpleStreamFormatter();
-            fo.format( ds, new FileOutputStream(f), true);
+            OutputStream fout= new FileOutputStream(f);
+            try {
+                fo.format( ds, fout, true);
+            } finally {
+                fout.close();
+            }
         } catch (StreamException ex) {
             ex.printStackTrace();
         } catch ( IOException ex ) {
