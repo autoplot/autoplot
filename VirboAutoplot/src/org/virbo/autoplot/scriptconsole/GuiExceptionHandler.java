@@ -45,6 +45,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -276,7 +277,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.undoRedoSupport= undoRedoSupport;
     }
 
-    String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
+    synchronized String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
         map.put( INCLDOM, form.isAllowDom() );
         map.put( INCLSCREEN, form.isAllowScreenshot() );
         map.put( EMAIL, form.getEmailTextField().getText() );
@@ -681,7 +682,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     boolean uncaught;
     Throwable t;
 
-    private String getReport( GuiExceptionHandlerSubmitForm form ) {
+    private synchronized String getReport( GuiExceptionHandlerSubmitForm form ) {
         String id= form.getUsernameTextField().getText().replaceAll(" ","_");
         if ( id.trim().equals("") ) id= "anon";
         map.put( USER_ID, id );
@@ -774,14 +775,18 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                 JFileChooser chooser= new JFileChooser();
                 chooser.setFileFilter( this.getFileNameExtensionFilter("xml files", new String[] { ".xml" } ) );
-                String fname= String.format( "rte_%010d_%s_%s.xml", new Integer(rteHash), eventId, id );
+                String fname= String.format( "rte_%010d_%s_%s.xml", Integer.valueOf(rteHash), eventId, id );
                 chooser.setSelectedFile( new File(fname) );
                 if ( chooser.showSaveDialog(form) == JFileChooser.APPROVE_OPTION ) {
                     try {
                         File f= chooser.getSelectedFile();
-                        PrintWriter out= new PrintWriter(f);
-                        out.write(report);
-                        out.close();
+                        PrintWriter out=null;
+                        try {
+                            out= new PrintWriter(f);
+                            out.write(report);
+                        } finally {
+                            if ( out!=null ) out.close();
+                        }
                         notsent= false;
                     } catch ( IOException ex ) {
                         JOptionPane.showMessageDialog( null, ex.toString() );
@@ -819,10 +824,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                     client.getHttpConnectionManager().getParams().setConnectionTimeout(3000);
                     PostMethod postMethod = new PostMethod(url);
 
+                    Charset ch= Charset.forName("UTF-8");
                     Part[] parts= {
                         new StringPart( "secret", "secret" ),
                         new StringPart( "todo", "upload" ),
-                        new FilePart( "uploadfile", new ByteArrayPartSource( fname, report.getBytes() ) ),
+                        new FilePart( "uploadfile", new ByteArrayPartSource( fname, report.getBytes( ch ) ), "text/xml", ch.name() ),
                     };
 
                     postMethod.setRequestEntity(
