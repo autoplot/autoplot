@@ -50,7 +50,7 @@ public class BindingSupport {
         }
     }
 
-    public static Converter toStringConverter= new Converter() {
+    public static final Converter toStringConverter= new Converter() {
         @Override
         public Object convertForward(Object value) {
             return value.toString();
