@@ -12,7 +12,6 @@
 package org.virbo.datasource.jython;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,15 +19,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -224,6 +220,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private javax.swing.JComboBox variableComboBox;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -311,9 +308,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 JythonUtil.Param parm= e.getValue();
                 
                 String vname= parm.name;                
-                String label= parm.label;
+                String label;
 
-                JComponent ctf= null;
+                JComponent ctf;
 
                 boolean isBool= isBoolean( parm.enums );
 
@@ -369,6 +366,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
                     JButton filesButton= new JButton( fileIcon );
                     filesButton.addActionListener( new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             JFileChooser c= new JFileChooser();
                             URISplit split2= URISplit.parse(fval);
@@ -411,6 +409,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
                     JButton button= new JButton( fileIcon );
                     button.addActionListener( new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             TimeRangeTool tt= new TimeRangeTool();
                             tt.setSelectedRange(tf.getText());
@@ -443,7 +442,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         } else {
                             JComboBox jcb= new JComboBox(parm.enums.toArray());
                             jcb.setEditable(false);
-                            Object oval=null;
+                            Object oval;
                             if ( parm.deft instanceof Long ) {
                                 oval = Long.valueOf(val);
                             } else if ( parm.deft instanceof Integer ) {
@@ -483,13 +482,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 final String fvalue= String.valueOf(parm.deft);
                 final JComponent ftf= ctf;
                 JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                         if ( ftf instanceof DataSetSelector ) {
                             ((DataSetSelector)ftf).setValue(fvalue);
                         } else if ( ftf instanceof JComboBox ) {
                             JComboBox jcb= ((JComboBox)ftf);
                             for ( int i=0; i<jcb.getItemCount(); i++ ) {
-                                if ( fvalue.toString().equals( jcb.getItemAt(i).toString() ) ) {
+                                if ( fvalue.equals( jcb.getItemAt(i).toString() ) ) {
                                     jcb.setSelectedIndex(i);
                                 }
                             }
@@ -512,7 +512,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 deftsList.add( String.valueOf( parm.deft ) );
                 typesList.add( parm.type );
 
-                hasVars= true;
             }
                 
             hasVars= parms.size()>0;
@@ -639,6 +638,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return -1;
     }
     
+    @Override
     public String getURI() {
 
         if ( support.isDirty() && support.getFile()!=null ) {
@@ -744,6 +744,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return URISplit.format(split);
     }
 
+    @Override
     public boolean reject(String uri) throws Exception {
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.length()==0 || split.file.equals("file:///") ) {
@@ -759,6 +760,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
 
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
 
         URISplit split= URISplit.parse(uri);
@@ -767,6 +769,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return true;
     }
 
+    @Override
     public void markProblems(List<String> problems) {
         
     }
