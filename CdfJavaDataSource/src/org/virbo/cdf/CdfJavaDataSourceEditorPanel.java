@@ -383,7 +383,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.finest("close cdf");
             //cdf.close();
 
-            DefaultListModel model= new DefaultListModel();
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
             for ( String p: parameterDescriptions.keySet() ) {
                 cbmodel.addElement(p);
