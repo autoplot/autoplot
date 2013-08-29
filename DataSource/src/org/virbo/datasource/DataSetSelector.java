@@ -1086,7 +1086,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFile, acceptPattern, mon);
                         } else {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
-                            if ( completions.isEmpty() || surll.startsWith("http:") ) {
+                            if ( completions.isEmpty() || surll.startsWith("http:") || surll.startsWith("ftp:") ) {
                                 List<CompletionResult> compl1= DataSetURI.getFileSystemCacheCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
                                 mergeLocalIntoRemote( completions, compl1 );
                             }
