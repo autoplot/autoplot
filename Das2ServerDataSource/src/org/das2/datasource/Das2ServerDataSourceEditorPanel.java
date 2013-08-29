@@ -438,11 +438,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             this.viewDsdfButton.setEnabled(true);
             this.validRangeLabel.setText("<html><em>retrieving dataset info...</em></html>");
             Object[] oo= p.getPath();
-            String ds= String.valueOf( oo[1] );
+            StringBuilder ds= new StringBuilder( String.valueOf( oo[1] ) );
             for ( int i=2; i<oo.length; i++ ) {
-                ds= ds + "/" + oo[i];
+                ds.append( "/" ).append( oo[i] );
             }
-            String surl = oo[0] + "?server=dsdf&dataset=" + ds;
+            String surl = oo[0] + "?server=dsdf&dataset=" + ds.toString();
             try {
                 final URL url = new URL(surl);
                 RequestProcessor.invokeLater( new Runnable() {
@@ -585,13 +585,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             XPath xpath= (XPath) factory.newXPath();
             NodeList o= (NodeList)xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
 
-            String result= "";
+            StringBuilder result= new StringBuilder("");
             for ( int ii=0; ii<o.getLength(); ii++ ) {
-                result+=  o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue() + "\n";
+                result.append(  o.item(ii).getNodeName() ).append( "  =  " ) .append(  o.item(ii).getNodeValue() ) .append( "\n" );
             }
             in.close();
 
-            final String fresult= result;
+            final String fresult= result.toString();
 
             Runnable run= new Runnable() {
                 public void run() {
@@ -652,11 +652,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             {
                 try {
                     Object[] oo = p.getPath();
-                    String ds = String.valueOf(oo[1]);
+                    StringBuilder ds = new StringBuilder( String.valueOf(oo[1]) );
                     for (int i = 2; i < oo.length; i++) {
-                        ds = ds + "/" + oo[i];
+                        ds.append( "/" ).append( oo[i] );
                     }
-                    String surl = oo[0] + "?server=dsdf&dataset=" + ds;
+                    String surl = oo[0] + "?server=dsdf&dataset=" + ds.toString();
 
                     final URL url = new URL(surl);
 
@@ -979,10 +979,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             logger.log(Level.SEVERE, null, ex);
         }
         
-        String dataSetId="";
+        StringBuilder dataSetId= new StringBuilder("");
         if ( tp0.length>1 ) {
-            dataSetId= (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject();
-            for ( int i=2; i<tp0.length; i++ ) dataSetId += "/"+ (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject();
+            dataSetId= new StringBuilder( (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject() );
+            for ( int i=2; i<tp0.length; i++ ) dataSetId.append( "/") .append( (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject() );
         }
 
         StringBuilder params= new StringBuilder();
@@ -999,12 +999,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 } else {
                     params.append(ss3[0].trim()).append("=").append(ss3[1].trim());
                 }
-                params.append("%20");
+                params.append("%20");  //TODO: I don't think this is correct...  See https://sourceforge.net/p/autoplot/bugs/1103/
             }
         }
 
         String result= "vap+das2server:"+serverURL + "?" +
-                "dataset="+dataSetId  +
+                "dataset="+dataSetId.toString()  +
                 "&start_time="+ timeRange.min() +
                 "&end_time="+ timeRange.max();
 
