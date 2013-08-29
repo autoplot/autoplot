@@ -299,7 +299,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             String delegateSurl = getDelegateDataSourceFactoryUri(surl,mon);
             
             String avail= (String) map.get("avail");
-            if ( avail==null && !avail.equals("T") ) {
+            if ( avail==null || !avail.equals("T") ) {
                 if ( delegateFactory==null ) {
                     delegateFactory= getDelegateDataSourceFactory(surl);
                     if ( delegateFactory==null ) {
