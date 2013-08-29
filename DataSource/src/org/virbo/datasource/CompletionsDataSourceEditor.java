@@ -25,9 +25,11 @@ import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -295,10 +297,12 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         optionsPanel.add( Box.createGlue() );
     }
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
+    @Override
     public void setURI(String uri) {
         this.suri= uri;
         URISplit split= URISplit.parse(suri);
@@ -314,24 +318,25 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         }
     }
 
+    @Override
     public String getURI() {
-        String base= this.suri;
+        StringBuilder base= new StringBuilder( this.suri );
         int j= base.indexOf("?");
         if ( j!=-1 ) {
-            base= base.substring(0,j);
+            base= new StringBuilder( base.substring(0,j) );
         }
 
         boolean amp= false;
 
         if ( arg0Cbs!=null ) {
-            base += "?";
-            base += arg0Cbs.getSelectedItem();
+            base.append( "?" );
+            base.append( arg0Cbs.getSelectedItem() );
             amp= true;
         }
 
         if ( arg0ExtraTF!=null ) {
             if ( arg0ExtraTF.getText().trim().length()>0 ) {
-                base+= arg0ExtraTF.getText().trim();
+                base.append( arg0ExtraTF.getText().trim() );
             }
         }
 
@@ -344,20 +349,21 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     paramValue= paramValue.substring(0,icolon);
                 }
                 if ( amp ) {
-                    base+="&";
+                    base.append( "&" );
                 } else {
-                    base += "?";
+                    base.append( "?" );
                     amp= true;
                 }
-                base+= paramName;
-                base+= paramValue;
+                base.append( paramName ); //TODO: is there an equals here?
+                base.append( paramValue );
             }
         }
 
-        this.suri= base;
+        this.suri= base.toString();
         return this.suri;
     }
 
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         this.suri= uri;
         DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(uri), mon);
@@ -368,6 +374,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         return true;
     }
 
+    @Override
     public boolean reject(String uri) throws Exception {
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.equals("file:///") ) {
@@ -424,6 +431,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     private javax.swing.JPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void markProblems(List<String> problems) {
         
     }
