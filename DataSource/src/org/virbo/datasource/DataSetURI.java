@@ -1169,7 +1169,7 @@ public class DataSetURI {
             this.maybePlot = maybePlot;
         }
      
-        public static CompletionResult SEPARATOR= new CompletionResult("====", "Used to request a separator");
+        public static final CompletionResult SEPARATOR= new CompletionResult("====", "Used to request a separator");
     }
 
     /**
