@@ -85,9 +85,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 cc.context = CompletionContext.CONTEXT_PARAMETER_NAME;
                 cc.completable = surl1.substring(amppos + 1, carotPos);
                 cc.completablepos = carotPos - (amppos + 1);
-                if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"
-                    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(carotPos);
-                }
+                //if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"
+                //    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(carotPos);
+                //}
 
             }
         } else {
