@@ -535,14 +535,18 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( result==null && notes.length()>0 ) { 
                     Units u= ((Units)((QDataSet)notes.property(QDataSet.BUNDLE_1)).property(QDataSet.UNITS,2));
                     int n0= (int)notes.value(0,2);
-                    String nns= u.createDatum(n0).toString();
+                    StringBuilder nns= new StringBuilder( u.createDatum(n0).toString() );
                     for ( int i=1; i<notes.length(); i++ ) {
                         if ( notes.value(i,2)!=n0 ) {
-                            nns= nns+","+ u.createDatum(notes.value(i,2)).toString();
+                            nns.append(",").append(u.createDatum(notes.value(i,2)).toString());
                         }
                     }
-                    if ( nns.length()>120 ) nns=nns.substring(0,120)+"...";
-                    throw new IllegalArgumentException(nns);
+                    if ( nns.length()>120 ) {
+                        throw new IllegalArgumentException(nns.substring(0,120)+"...");
+                    } else {
+                        throw new IllegalArgumentException(nns.toString());
+                    }
+                    
                 }
                 return result;
             }
