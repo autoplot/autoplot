@@ -108,7 +108,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public void setUseDoy(boolean useDoy) {
         boolean old= this.useDoy;
         this.useDoy = useDoy;
-        DatumRangeUtil.useDoy= useDoy;
+        DatumRangeUtil.setUseDoy( useDoy );
         firePropertyChange( PROP_USE_DOY,old,useDoy);
     }
 
