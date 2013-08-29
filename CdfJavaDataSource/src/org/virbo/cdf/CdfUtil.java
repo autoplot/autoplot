@@ -781,7 +781,7 @@ public class CdfUtil {
         }
 
         for (int i = 0; i < v.length; i++) {
-            String vdescr=null;
+            StringBuilder vdescr=null;
 
             Variable var = cdf.getVariable(v[i]);
             if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
@@ -850,22 +850,23 @@ public class CdfUtil {
                                     }
                                     continue;
                                 } else {
-                                    vdescr= funct + "( ";
+                                    vdescr= new StringBuilder(funct);
+                                    vdescr.append( "( " );
                                     int icomp=0;
                                     String comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
                                     if ( comp!=null ) {
-                                        vdescr= vdescr + comp;
+                                        vdescr.append( comp );
                                         icomp++;
                                     }
                                     for ( ; icomp<5; icomp++ ) {
                                         comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
                                         if ( comp!=null ) {
-                                            vdescr= vdescr+", "+comp;
+                                            vdescr.append(", ").append(comp);
                                         } else {
                                             break;
                                         }
                                     }
-                                    vdescr= vdescr+" )";
+                                    vdescr.append(" )");
                                 }
                                 isVirtual= true;
                             }

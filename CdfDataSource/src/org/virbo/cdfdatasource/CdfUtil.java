@@ -1154,7 +1154,7 @@ public class CdfUtil {
                 long xMaxRec = -1;
                 String scatDesc = null;
                 String svarNotes = null;
-                String vdescr=null;
+                StringBuilder vdescr=null;
 
                 try {
                     if ( virtual!=null ) {
@@ -1173,22 +1173,23 @@ public class CdfUtil {
                                     }
                                     continue;
                                 } else {
-                                    vdescr= funct + "( ";
+                                    vdescr= new StringBuilder( funct );
+                                    vdescr.append( "( " );
                                     int icomp=0;
                                     String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
                                     if ( comp!=null ) {
-                                        vdescr= vdescr + comp;
+                                        vdescr.append( comp );
                                         icomp++;
                                     }
                                     for ( ; icomp<5; icomp++ ) {
                                         comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
                                         if ( comp!=null ) {
-                                            vdescr= vdescr+", "+comp;
+                                            vdescr.append( ", ").append( comp );
                                         } else {
                                             break;
                                         }
                                     }
-                                    vdescr= vdescr+" )";
+                                    vdescr.append(" )" );
                                 }
                             }
                         }
@@ -1204,22 +1205,23 @@ public class CdfUtil {
                                     }
                                     continue;
                                 } else {
-                                    vdescr= funct + "( ";
+                                    vdescr= new StringBuilder( funct );
+                                    vdescr.append( "( " );
                                     int icomp=0;
                                     String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
                                     if ( comp!=null ) {
-                                        vdescr= vdescr + comp;
+                                        vdescr.append( comp );
                                         icomp++;
                                     }
                                     for ( ; icomp<5; icomp++ ) {
                                         comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
                                         if ( comp!=null ) {
-                                            vdescr= vdescr+", "+comp;
+                                            vdescr.append( ", ").append( comp );
                                         } else {
                                             break;
                                         }
                                     }
-                                    vdescr= vdescr+" )";
+                                    vdescr.append(" )" );
                                 }
                             }
                         }
@@ -1299,9 +1301,9 @@ public class CdfUtil {
                 if (deep) {
                     StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                    String recDesc= CDFUtils.getStringDataType(var);
+                    StringBuilder recDesc= new StringBuilder( CDFUtils.getStringDataType(var) );
                     if ( dims!=null ) {
-                        recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
+                        recDesc.append("[") .append( DataSourceUtil.strjoin( dims, ",") ).append("]");
                     }
                     if (maxRec != xMaxRec)
                         if ( isVirtual ) {
