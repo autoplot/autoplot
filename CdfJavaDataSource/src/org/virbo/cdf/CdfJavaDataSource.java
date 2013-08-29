@@ -136,7 +136,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
      * file.  Now we automatically unload all the cached files.  I did look at just disabling the cache, but the file is
      * open and closed three times during the load.
      */
-    public static TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
+    public static final TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             logger.log(Level.FINER, "unloading cache to resolve bug 3605590" );
             synchronized (lock ) {
