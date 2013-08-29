@@ -297,17 +297,24 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             }
 
             String delegateSurl = getDelegateDataSourceFactoryUri(surl,mon);
-            if ( delegateFactory==null ) {
-                delegateFactory= getDelegateDataSourceFactory(surl);
+            
+            String avail= (String) map.get("avail");
+            if ( avail==null && !avail.equals("T") ) {
                 if ( delegateFactory==null ) {
-                    return true;
+                    delegateFactory= getDelegateDataSourceFactory(surl);
+                    if ( delegateFactory==null ) {
+                        return true;
+                    }
                 }
+             
+                boolean delegateRejects= delegateFactory.reject( delegateSurl, problems, mon );
+                if ( delegateRejects && problems.size()==1 && problems.get(0).equals(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED) ) {
+                    delegateRejects= false;
+                }
+                return delegateRejects;
+            } else {
+                return false;
             }
-            boolean delegateRejects= delegateFactory.reject( delegateSurl, problems, mon );
-            if ( delegateRejects && problems.size()==1 && problems.get(0).equals(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED) ) {
-                delegateRejects= false;
-            }
-            return delegateRejects;
             
         } catch (URISyntaxException e) {
             logger.log( Level.SEVERE, surl, e );
