@@ -39,13 +39,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.filesystem.FileSystemSettings;
@@ -1246,20 +1244,21 @@ public class DataSetURI {
         for (int j = 0; j < s.length; j++) {
             String scomp = foldCase ? s[j].toLowerCase() : s[j];
             if (scomp.startsWith(prefix)) {
-                String result1 = s[j] + "/";
+                StringBuilder result1 = new StringBuilder( s[j] );
+                result1.append( "/" );
                 // drill down single entries, since often the root doesn't provide a list.
-                String[] s2 = new File(cacheF, result1).list();
+                String[] s2 = new File(cacheF, result1.toString()).list();
                 if ( s2==null ) { // does not exist
                     s2= new String[0];
                 }
                 while (s2.length == 1 && new File(cacheF, result1 + "/" + s2[0]).isDirectory()) {
-                    result1 += s2[0] + "/";
-                    s2 = new File(cacheF, result1).list();
+                    result1.append( s2[0] ).append( "/" );
+                    s2 = new File(cacheF, result1.toString() ).list();
                     if ( s2==null ) { // does not exist
                         s2= new String[0];
                     }
                 }
-                completions.add(new DataSetURI.CompletionResult(surlDir + result1, result1, null, surl.substring(0, carotpos), true));
+                completions.add(new DataSetURI.CompletionResult(surlDir + result1.toString(), result1.toString(), null, surl.substring(0, carotpos), true));
             }
         }
 
@@ -1383,20 +1382,21 @@ public class DataSetURI {
                 if ( ! ff.isDirectory() ) continue;
                 if ( ff.list().length==0 ) continue;
 
-                String result1 = s[j] + "/";
+                StringBuilder result1 = new StringBuilder(s[j]);
+                result1.append( "/" );
                 // drill down single entries, since often the root doesn't provide a list.
-                String[] s2 = new File(cacheF, result1).list();
+                String[] s2 = new File(cacheF, result1.toString()).list();
                 if ( s2==null ) { // does not exist
                     s2= new String[0];
                 }
                 while (s2.length == 1 && new File(cacheF, result1 + "/" + s2[0]).isDirectory()) {
-                    result1 += s2[0] + "/";
-                    s2 = new File(cacheF, result1).list();
+                    result1.append(s2[0]).append("/");
+                    s2 = new File(cacheF, result1.toString()).list();
                     if ( s2==null ) { // does not exist
                         s2= new String[0];
                     }
                 }
-                completions.add(new DataSetURI.CompletionResult(surlDir + result1, result1, null, surl.substring(0, carotpos), true));
+                completions.add(new DataSetURI.CompletionResult(surlDir + result1.toString(), result1.toString(), null, surl.substring(0, carotpos), true));
             }
         }
 
