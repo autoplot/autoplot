@@ -367,7 +367,6 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             CdfFileDataSourceFactory.closeCDF(cdf);
             cdf= null;
 
-            DefaultListModel model= new DefaultListModel();
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
             for ( String p: parameterDescriptions.keySet() ) {
                 cbmodel.addElement(p);
