@@ -148,25 +148,18 @@ public class FilterChainPanel extends JPanel {
         "valid() replace data with 1 where valid, 0 where invalid",
         };
 
-        //Font font= Font.decode("sans-38");
-
         for ( int i=0; i<opts.length; i++ ) {
             JRadioButton cb= new JRadioButton(opts[i]);
-            //cb.setFont( font );
             group.add(cb);
             optionsPanel.add(cb);
         }
 
         JScrollPane p= new JScrollPane(optionsPanel);
         Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension ps= new Dimension( 700, 700 );
 
-        //if ( ps.getHeight()+100 >d.getHeight() ) {
-            //Dimension v= new Dimension( Math.min( ps.width, d.width ), d.height-100 );
-            Dimension v= new Dimension( 700, Math.min( 700, d.height-100 ) );
-            p.setMaximumSize(v);
-            p.setPreferredSize(v);
-        //}
+        Dimension v= new Dimension( 700, Math.min( 700, d.height-100 ) );
+        p.setMaximumSize(v);
+        p.setPreferredSize(v);
         
         p.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
 
