@@ -373,7 +373,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 if ( i!=-1 ) {
                     subset= param.substring(i);
                     param= param.substring(0,i);
-            }
+                }
             }
 
             String slice1= params.remove("slice1");
@@ -381,19 +381,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
 
             logger.finest("close cdf");
-            //cdf.close();
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
             for ( String p: parameterDescriptions.keySet() ) {
                 cbmodel.addElement(p);
             }
 
-            //TODO: clean up below with subset...
             if ( param!=null ) {
-                int i= param.indexOf("[");
-                if ( i!=-1 ) {
-                    subsetComboBox.setSelectedItem( param.substring(i) );
-                    param= param.substring(0,i);
+                if ( subset!=null ) {
+                    subsetComboBox.setSelectedItem( subset );
                 } else {
                     subsetComboBox.setSelectedItem("");
                 }
