@@ -103,7 +103,6 @@ class Das2ServerDataSource extends AbstractDataSource {
     Datum resolution;
     String dsParams;
     List<String> tcaDesc;
-    String key;
     Map dsdfParams=null;
 
     @Override
