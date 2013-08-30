@@ -75,6 +75,10 @@ public class DefaultCompletionItem implements CompletionItem  {
         CompletionImpl.get().hideCompletion();
     }
     
+    public String getComplete() {
+        return complete;
+    }
+    
     protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
         Document doc = c.getDocument();
         String textl = getInsertPrefix().toString().substring(offset);
