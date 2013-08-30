@@ -63,7 +63,7 @@ public abstract class QDataSetBridge {
      *
      * @param sunits
      */
-    public synchronized void setPreferredUnits( String sunit ) {
+    public void setPreferredUnits( String sunit ) {
         Units unit;
         if ( sunit.contains(" since ") ) {
             unit= SemanticOps.lookupUnits(sunit);
@@ -86,7 +86,7 @@ public abstract class QDataSetBridge {
         }
     }
 
-    public synchronized void clearPreferredUnits() {
+    public void clearPreferredUnits() {
         prefUnits= new ArrayList();
     }
 

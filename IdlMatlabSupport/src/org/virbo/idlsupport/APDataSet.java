@@ -40,7 +40,7 @@ public class APDataSet extends QDataSetBridge {
      * @param surl suri the dataset location, such as http://autoplot.org/data/autoplot.dat
      * @deprecated use setDataSetURI, which takes the same argument.
      */
-    public void setDataSetURL(String surl) {
+    public synchronized void setDataSetURL(String surl) {
         this.surl = surl;
         datasets.clear();
         names.clear();
@@ -50,7 +50,7 @@ public class APDataSet extends QDataSetBridge {
      * set the data source URI.  
      * @param suri the dataset URI, such as vap+dat:http://autoplot.org/data/autoplot.dat
      */
-    public void setDataSetURI(String suri) {
+    public synchronized void setDataSetURI(String suri) {
         this.surl = suri;
         datasets.clear();
         names.clear();
