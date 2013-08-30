@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
+import org.das2.jythoncompletion.support.CompletionItem;
 
 /*
  * This is the engine that does the Jython completions.  We figure out the
@@ -568,6 +569,17 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     public static void getLocalsCompletions(PythonInterpreter interp, CompletionContext cc, CompletionResultSet rs) {
+        List<DefaultCompletionItem> rr= getLocalsCompletions( interp, cc );
+        for ( DefaultCompletionItem item: rr ) {
+            rs.addItem( item );
+        }
+        
+    }
+    
+    public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
+        
+        List<DefaultCompletionItem> result= new ArrayList();
+        
         PyStringMap locals = (PyStringMap) interp.getLocals();
 
         PyList po2 = locals.keys();
@@ -618,9 +630,11 @@ public class JythonCompletionTask implements CompletionTask {
                     //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                     link = autoplotDoc + ss;
                 }
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
             }
         }
+        
+        return result;
     }
 
     /**
