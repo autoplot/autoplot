@@ -36,6 +36,33 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
         return dataSetSelector1;
     }
 
+    private static String getDescriptionFor( String ext ) {
+        if ( ext.equals("dat") || ext.equals("txt" ) ) {
+            return "Ascii table";
+        } else if ( ext.equals("csv") ) {
+            return "Comma Separated Values Ascii Table";
+        } else if ( ext.equals("cdf") ) {
+            return "NASA Common Data Format";
+        } else if ( ext.equals("cdfj") ) {
+            return "NASA Common Data Format (Java reader)";
+        } else if ( ext.equals("cdaweb") ) {
+            return "NASA CDAWeb database";
+        } else if ( ext.equals("nc") || ext.equals("ncml") ) {
+            return "NetCDF";
+        } else if ( ext.equals("h5") || ext.equals("hdf5") ) {
+            return "HDF5 data model file";
+        } else if ( ext.equals("jyds") ) {
+            return "Autoplot Jython Script";
+        } else if ( ext.equals("inline") ) {
+            return "Array literals and Jython code defining datasets";
+        } else if ( ext.equals("htm") ) {
+            return "Tables with HTML files";
+        } else {
+            return "";
+        }
+    }
+    
+    
     private void initTypes() {
         DefaultComboBoxModel model= new DefaultComboBoxModel();
         List<CompletionContext> cc= DataSourceRegistry.getInstance().getPlugins();
@@ -43,6 +70,10 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
         for ( int i=0; i<cc.size(); i++ ) {
             String label= cc.get(i).completable;
             label= label.substring(4,label.length()-1);//vap+
+            String desc= getDescriptionFor(label);
+            if ( !desc.equals("") ) {
+                label= label+": "+desc;
+            }
             model.insertElementAt(label,i);
             types.add(i,label );
         }
@@ -71,7 +102,8 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
 
         jLabel2.setText("Select File:");
 
-        jLabel3.setText("Source Types Browser");
+        jLabel3.setText("<html>Autoplot has data source plugins that are used to read in data, and the plug-in can not be identified from the file extention.  Select the data source type for the file.  ");
+        jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -79,31 +111,25 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 381, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(sourceTypesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jLabel1))
-                .addContainerGap(246, Short.MAX_VALUE))
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(jLabel2))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(jLabel2))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, sourceTypesComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(15, 15, 15)
-                .add(jLabel3)
-                .add(18, 18, 18)
+                .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 62, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sourceTypesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -111,7 +137,7 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(109, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -125,7 +151,14 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public String getUri() {
-        return "vap+"+types.get( sourceTypesComboBox.getSelectedIndex() ) + ":" + dataSetSelector1.getValue();
+        if ( sourceTypesComboBox.getSelectedIndex()==-1 ) {
+            return dataSetSelector1.getValue();
+        } else {
+            String s= types.get( sourceTypesComboBox.getSelectedIndex() );
+            int i= s.indexOf(":");
+            if ( i>-1 ) s= s.substring(0,i);
+            return "vap+"+ s + ":" + dataSetSelector1.getValue();
+        }
     }
 
 }
