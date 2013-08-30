@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
+//import java.nio.charset.Charset;
+//import java.nio.charset.CharsetDecoder;
 import java.text.ParseException;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dsutil.DataSetBuilder;
@@ -23,7 +23,7 @@ public class CefReaderData {
 
     Cef cef;
     FieldParser[] parsers;
-    CharsetDecoder charsetDecoder;
+    //CharsetDecoder charsetDecoder;
     
     // *** Define the delimeters used in the CEF file
     byte eor;
@@ -34,8 +34,8 @@ public class CefReaderData {
     boolean [] doParse= new boolean[MAX_FIELDS]; 
     
     public CefReaderData() {
-        Charset charset = Charset.availableCharsets().get("US-ASCII");
-        charsetDecoder = charset.newDecoder();
+        //Charset charset = Charset.availableCharsets().get("US-ASCII");
+        //charsetDecoder = charset.newDecoder();
         for ( int i=0; i<doParse.length; i++ ) doParse[i]=true;
     }
 
@@ -47,7 +47,7 @@ public class CefReaderData {
         doParse[i]= true;
     }
     
-    private final int countFields(ByteBuffer work_buffer) {
+    private int countFields(ByteBuffer work_buffer) {
         int n_fields = 1;
         for (int k = 0;; k++) {
 
@@ -65,7 +65,7 @@ public class CefReaderData {
      * @param work_buffer
      * @return the position of the last end-of-record, or -1 if one is not found.
      */
-    private final int getLastEor(ByteBuffer work_buffer) {
+    private int getLastEor(ByteBuffer work_buffer) {
         int pos_eor;
         for (pos_eor = work_buffer.limit() - 1; pos_eor >= 0; pos_eor--) {
             if (work_buffer.get(pos_eor) == eor) {
@@ -90,7 +90,7 @@ public class CefReaderData {
         byte comment = (byte) '!';
         byte eol = (byte) 10;
 
-        int pos_comment = 0;
+        int pos_comment;
         for (pos_comment = 0; pos_comment < work_size; pos_comment++) {
             byte ch = work_buffer.get(pos_comment);
             if (ch == comment) {
@@ -203,9 +203,8 @@ public class CefReaderData {
 
 
         // *** Set the processing state flag (1=first record, 2=subsequent records, 0 = end of file )
-        int flag = 1;     //*** set to 1 for first page, 2 for subsequent pages and 0 when read to end of file
         int trflag = 1;     //*** set to 0 if no more data required in requested time range
-        int n_fields = 0;     //*** number of fields per record
+        int n_fields;     //*** number of fields per record
 
         boolean eof = false;
 
@@ -213,7 +212,7 @@ public class CefReaderData {
 
         DataSetBuilder builder = null;
 
-        long totalBytesRead = 0;
+        //long totalBytesRead = 0;
 
         // *** Keep reading until we reach the end of the file.
         while (!eof && trflag > 0) {
@@ -229,7 +228,7 @@ public class CefReaderData {
                 break;
             }
 
-            totalBytesRead += read_size;
+            //totalBytesRead += read_size;
 
             //*** transfer this onto the end of the work buffer and update size of work buffer
             if (read_size > 0) {
@@ -296,14 +295,14 @@ public class CefReaderData {
 
             //*** keep going until there is no more file to read
             if (read_size < buffer_size) {
-                flag = 0;
+                //flag = 0;
             }
 
         } // while
 
         //*** Release memory used by the work and read buffers
-        work_buffer = null;
-        read_buffer = null;
+        //work_buffer = null;
+        //read_buffer = null;
 
 
         System.err.println("Reading of data complete");

@@ -36,8 +36,8 @@ public class CefReaderHeader {
 
     class GlobalStruct {
 
-        String name;
-        List<String> entries;
+        //String name;
+        //List<String> entries;
         String valueType;
     }
 
@@ -56,7 +56,7 @@ public class CefReaderHeader {
 
         boolean status = false;     // *** Status flag, set to 1 if complete record found
         boolean readFlag = true;     // *** used to flag multi-line records
-        StringBuffer recordBuf = new StringBuffer();
+        StringBuilder recordBuf = new StringBuilder();
 
         boolean eofReached = false;
 
@@ -66,7 +66,7 @@ public class CefReaderHeader {
         //*** Keep reading unit until got complete entry or end of file ***
         while (readFlag && !eofReached) {
 
-            StringBuffer sbuf = new StringBuffer();
+            StringBuilder sbuf = new StringBuilder();
 
             //*** read next record ***
             while (true) {
@@ -172,7 +172,7 @@ public class CefReaderHeader {
         Record record = new Record();
         KeyValue kv = new KeyValue();
 
-        int recordNumber = 0;
+        //int recordNumber = 0;
 
         // *** Keep reading until end of header information or no more records ***
         while (state != State.DATA_READ && state != State.END) {
@@ -181,7 +181,7 @@ public class CefReaderHeader {
             if (!cefReadHeadRec(c, record)) {
                 break;
             }
-            recordNumber++;
+            //recordNumber++;
 
             if ( record.data.length()>2 && ( record.data.startsWith("19") || record.data.startsWith("20") ) ) { //CFA has a bug that they don't output the "DATA_UNTIL" delimiter.
                 // C1_CP_WHI_ACTIVE__20020221_000000_20020221_050000_V120201.cef doesn't have delimiter, so trigger on a date.
@@ -205,7 +205,7 @@ public class CefReaderHeader {
                                 state = State.GLOBAL;
                                 gStru = new GlobalStruct();
                                 gName = value[0];
-                                gStru.name = value[0];
+                                //gStru.name = value[0];
                                 gStru.valueType = "CHAR";
                                 eCount = 0;
                             } else if (key.equals("START_VARIABLE")) {     //*** New parameter ***
@@ -221,12 +221,12 @@ public class CefReaderHeader {
                             // }
                             } else if (key.equals("DATA_UNTIL")) {     //*** Start of data ***
                                 state = State.DATA_READ;
-                                cef.dataUntil = value[0];
+                                //cef.dataUntil = value[0];
                             } //*** Special CEF defined items at the top level ***
                             else if (key.equals("FILE_NAME")) {
-                                cef.fileName = value[0];
+                                //cef.fileName = value[0];
                             } else if (key.equals("FILE_FORMAT_VERSION")) {
-                                cef.fileFormatVersion = value[0];
+                                //cef.fileFormatVersion = value[0];
                             } else if (key.equals("END_OF_RECORD_MARKER")) {
                                 cef.eor = (byte) value[0].charAt(0);
                             } else {
@@ -249,7 +249,7 @@ public class CefReaderHeader {
                                 if (!kv.val[0].equals(gName)) {
                                     throw new IllegalArgumentException("END_VARIABLE expected " + gName + "  got " + kv.val[0]);
                                 }
-                                gStru.entries = elements;
+                                //gStru.entries = elements;
 
                                 cef.nglobal = cef.nglobal + 1;
                                 if (gStru.valueType.equals("CHAR")) {
