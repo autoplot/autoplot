@@ -195,16 +195,8 @@ public class InlineDataSource extends AbstractDataSource {
         // this is because URISplit treats it like a file.
         URISplit split= URISplit.parse(s);
         String noFile;
-        if ( split.file!=null ) {
-            if ( split.file.startsWith("file:///") ) {
-                noFile= split.file.substring("file:///".length());
-                noFile= noFile + split.params;
-            } else {
-                noFile= split.file + split.params;
-            }
-        } else {
-            noFile= split.params;
-        }
+        noFile= split.params;
+        
         String[] ss= noFile.split("&");
 
         MutablePropertyDataSet ds= null;
