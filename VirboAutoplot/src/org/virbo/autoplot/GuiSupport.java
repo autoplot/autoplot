@@ -326,7 +326,7 @@ public class GuiSupport {
                         dsout= DataSetOps.flattenWaveform(dsout);
                         dsout= ArrayDataSet.copy( short.class, dsout );
                     }
-//                    dsout= SemanticOps.trim( dsout, xbounds, null );
+                    dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
                 } else {
                     if ( SemanticOps.isRank2Waveform(dsout) ) {
