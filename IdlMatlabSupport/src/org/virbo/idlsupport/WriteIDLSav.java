@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -112,7 +111,9 @@ public final class WriteIDLSav {
         result.putInt(s.length());
         try {
             result.put(s.getBytes("US-ASCII"));
-        } catch ( UnsupportedEncodingException ex ) { } ; // this doesn't happen with JavaSE
+        } catch ( UnsupportedEncodingException ex ) { // this doesn't happen with JavaSE
+            throw new RuntimeException(ex);
+        } 
         for ( int i=result.position(); i<result.limit(); i++  ) {
             result.put((byte)0);
         }
