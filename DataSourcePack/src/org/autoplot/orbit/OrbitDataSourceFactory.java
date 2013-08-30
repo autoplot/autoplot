@@ -45,6 +45,8 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
                         n.getKey(), this, "arg_0", n.getValue(), null, true );
                 ccresult.add(cc1);
             }
+            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "timerange to plot" );
+            ccresult.add(cc1);
             return ccresult;
         } else {
             return super.getCompletions(cc, mon); 
