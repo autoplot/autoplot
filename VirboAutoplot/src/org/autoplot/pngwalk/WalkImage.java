@@ -87,8 +87,8 @@ public class WalkImage  {
     private static BufferedImage missingImage = initMissingImage();
 
     private static final LinkedList<WalkImage> freshness= new LinkedList();
-    private static final LinkedList<WalkImage> thumbLoadingQueue= new LinkedList();
-    private static Runnable thumbLoadingQueueRunner;
+    //private static final LinkedList<WalkImage> thumbLoadingQueue= new LinkedList();
+    //private static Runnable thumbLoadingQueueRunner;
     private static final LinkedList<WalkImage> thumbFreshness= new LinkedList();
 
     //private java.util.concurrent.ThreadPoolExecutor reqProc= new ThreadPoolExecutor( 2, 4, 1, TimeUnit.MINUTES, workQueue );
@@ -229,17 +229,17 @@ public class WalkImage  {
      * @return
      */
     public BufferedImage readImage( File f ) throws IllegalArgumentException, IOException  {
-        BufferedImage im= ImageIO.read( f );
-        if ( im==null ) { // Bob had pngs on his site that returned an html document decorating.
+        BufferedImage lim= ImageIO.read( f );
+        if ( lim==null ) { // Bob had pngs on his site that returned an html document decorating.
             System.err.println("fail to read image: "+f );
             return missingImage;
         }
-        if ( im.getType()==0 ) {
-            BufferedImage imNew= new BufferedImage( im.getWidth(), im.getHeight(), BufferedImage.TYPE_INT_ARGB );
-            imNew.getGraphics().drawImage( im, 0, 0, null );
-            im= imNew;
+        if ( lim.getType()==0 ) {
+            BufferedImage imNew= new BufferedImage( lim.getWidth(), lim.getHeight(), BufferedImage.TYPE_INT_ARGB );
+            imNew.getGraphics().drawImage( lim, 0, 0, null );
+            lim= imNew;
         }
-        return im;
+        return lim;
     }
 
     /**
@@ -329,7 +329,7 @@ public class WalkImage  {
         while ( clear.size()>0 ) {
             WalkImage old= clear.poll();
             synchronized ( old ) {
-                logger.fine( "unloading thumbnail for "+old );
+                logger.log( Level.FINE, "unloading thumbnail for {0}", old);
                 old.setStatus( Status.SIZE_THUMB_LOADED );
                 old.squishedThumb= null;
                 old.thumb= null;
@@ -488,7 +488,7 @@ public class WalkImage  {
                 }
             }
 
-            BufferedImage lthumb=null;
+            BufferedImage lthumb;
             synchronized (this) {
                 lthumb= thumb;
             }
