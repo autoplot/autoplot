@@ -43,6 +43,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         String[] names = {"black on white", "white on black", "white on blue", "custom"};
         Font f = app.getCanvas().getFont();
         fontLabel.setText(DomUtil.encodeFont(f));
+        canEmbedFont(f);
         //guiFontLabel.setText( parent.getFont().toString());
         int index = 3; // custom
         for (int i = 0; i < fores.length; i++) {
@@ -80,6 +81,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         pickFontButton = new javax.swing.JButton();
         dismissButton = new javax.swing.JButton();
         fontLabel = new javax.swing.JLabel();
+        canEmbedFontTF = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -125,35 +127,43 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
         fontLabel.setText("jLabel5");
 
+        canEmbedFontTF.setFont(canEmbedFontTF.getFont().deriveFont(canEmbedFontTF.getFont().getSize()-1f));
+        canEmbedFontTF.setText("jLabel5");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
+                        .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
-                                .add(10, 10, 10)
-                                .add(jLabel2)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(10, 10, 10)
+                                        .add(jLabel2)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(jLabel1))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jLabel1))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(layout.createSequentialGroup()
+                                        .add(jLabel3)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                             .add(layout.createSequentialGroup()
-                                .add(jLabel3)
+                                .add(jLabel4)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pickFontButton))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, dismissButton)))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel4)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fontLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pickFontButton))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, dismissButton))
+                        .add(12, 12, 12)
+                        .add(canEmbedFontTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -177,7 +187,9 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
                     .add(jLabel4)
                     .add(pickFontButton)
                     .add(fontLabel))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 130, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(canEmbedFontTF)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 109, Short.MAX_VALUE)
                 .add(dismissButton)
                 .addContainerGap())
         );
@@ -194,6 +206,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
         Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), app );
         if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
+        canEmbedFont(f);
     }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
@@ -239,6 +252,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backgroundColorButton;
+    private javax.swing.JLabel canEmbedFontTF;
     private javax.swing.JButton dismissButton;
     private javax.swing.JLabel fontLabel;
     private javax.swing.JButton foregroundColorButton;
@@ -249,4 +263,13 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JButton pickFontButton;
     // End of variables declaration//GEN-END:variables
+
+    private void canEmbedFont(Font f) {
+        String s= org.das2.util.awt.PdfGraphicsOutput.ttfFromName(f);
+        if ( s!=null ) {
+            canEmbedFontTF.setText("font can be embedded in PDF");
+        } else {
+            canEmbedFontTF.setText("font can not be embedded in PDF");
+        }
+    }
 }
