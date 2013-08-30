@@ -198,8 +198,9 @@ public class InlineDataSource extends AbstractDataSource {
         if ( split.file!=null ) {
             if ( split.file.startsWith("file:///") ) {
                 noFile= split.file.substring("file:///".length());
+                noFile= noFile + split.params;
             } else {
-                noFile= split.file;
+                noFile= split.file + split.params;
             }
         } else {
             noFile= split.params;
