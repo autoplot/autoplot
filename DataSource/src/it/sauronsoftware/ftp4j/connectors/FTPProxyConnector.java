@@ -41,13 +41,13 @@ public class FTPProxyConnector extends FTPConnector {
 	 * Requires the connection to the remote host through a SITE command after
 	 * proxy authentication. Default one.
 	 */
-	public static int STYLE_SITE_COMMAND = 0;
+	public static final int STYLE_SITE_COMMAND = 0;
 
 	/**
 	 * Requires the connection to the remote host through a OPEN command without
 	 * proxy authentication.
 	 */
-	public static int STYLE_OPEN_COMMAND = 1;
+	public static final int STYLE_OPEN_COMMAND = 1;
 
 	/**
 	 * The proxy host name.
