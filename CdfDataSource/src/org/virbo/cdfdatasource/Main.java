@@ -8,16 +8,13 @@
  */
 package org.virbo.cdfdatasource;
 
-import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
-import gsfc.nssdc.cdf.CDFException;
-import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -48,9 +45,9 @@ public class Main {
 
     private static void dumpProperties() {
         Properties p = System.getProperties();
-        for (Iterator i = p.keySet().iterator(); i.hasNext();) {
-            Object k = i.next();
-            System.err.println(k + "=" + p.get(k));
+        for ( Entry e: p.entrySet() ) {
+            Object k = e.getKey();
+            System.err.println( k + "=" + e.getValue() );
         }
     }
 
