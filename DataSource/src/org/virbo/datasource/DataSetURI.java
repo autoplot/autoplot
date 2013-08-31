@@ -939,7 +939,7 @@ public class DataSetURI {
             } else {
                 File newName= result;
                 while ( newName.exists() ) {
-                    String[] ss= filename.toString().split("@",-2);
+                    String[] ss= filename.split("@",-2);
                     if ( ss.length==2 ) {
                         filename= ss[0] + "@" + ss[1] + "@0";
                     } else {
