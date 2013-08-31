@@ -280,8 +280,9 @@ public class InlineDataSource extends AbstractDataSource {
             }
         }
 
-        for ( String prop: p.keySet() ) {
-            String propValue= p.get(prop);
+        for ( Entry<String,String> e: p.entrySet() ) {
+            String prop= e.getKey();
+            String propValue= e.getValue();
             if ( prop.equals("UNITS") ) {
                 ds.putProperty( prop, SemanticOps.lookupUnits(propValue) );
             } else if ( prop.equals("FILL_VALUE" ) || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX")) {
