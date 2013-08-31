@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -1766,8 +1767,8 @@ public class DataSetURI {
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
-            Map params = URISplit.parseParams(split.params);
-            Map paramsArgN= URISplit.parseParams(split.params); // these do have arg_0 parameters.
+            Map<String,String> params = URISplit.parseParams(split.params);
+            Map<String,String> paramsArgN= URISplit.parseParams(split.params); // these do have arg_0 parameters.
             for (int i = 0; i < 3; i++) {
                 params.remove("arg_" + i);
             }
@@ -1784,13 +1785,14 @@ public class DataSetURI {
                 boolean dontYetHave = !params.containsKey(paramName);
                 boolean startsWith = cc1.completable.startsWith(cc.completable);
                 if (startsWith) {
-                    LinkedHashMap paramsCopy;
+                    LinkedHashMap<String,String> paramsCopy;
                     if ( useArgN ) {
                         paramsCopy= new LinkedHashMap(paramsArgN);
                         if ( cc.completable.length()>0 ) { // TODO: there's a nasty bug here, suppose a CDF file has a parameter named "doDep"...
                             String rm= null;
-                            for ( Object k: paramsCopy.keySet() ) {
-                                Object v= paramsCopy.get(k);
+                            for ( Entry<String,String> e: paramsCopy.entrySet() ) {
+                                String k= e.getKey();
+                                Object v= e.getValue();
                                 if ( ((String)v).startsWith(cc.completable) ) {
                                     rm= (String)k;
                                 }
