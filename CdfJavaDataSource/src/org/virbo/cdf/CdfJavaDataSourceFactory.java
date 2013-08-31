@@ -72,9 +72,9 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             //cdf.close();
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-            for ( String key:result.keySet() ) {
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        key, this, "arg_0", result.get(key), null, true );
+            for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
+                String key= e.getKey();
+                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", e.getValue(), null, true );
                 ccresult.add(cc1);
             }
 
