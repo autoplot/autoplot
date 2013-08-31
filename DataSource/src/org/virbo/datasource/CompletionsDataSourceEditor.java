@@ -21,15 +21,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
@@ -307,8 +306,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         this.suri= uri;
         URISplit split= URISplit.parse(suri);
         Map<String,String> params= URISplit.parseParams( split.params );
-        for ( String s: params.keySet() ) {
-            String v= params.get(s);
+        for ( Entry<String,String> e: params.entrySet() ) {
+            String s= e.getKey();
+            String v= e.getValue();
             for ( int i=0; i<opsCbs.size(); i++ ) {
                 if ( opsCbs.get(i).getText().equals(s+"=") ) {
                     opsCbs.get(i).setSelected(true);
