@@ -678,7 +678,7 @@ public class DataSourceRegistry {
         Map<String,Object> m = DataSourceRegistry.getInstance().dataSourcesByExt;
         for ( Entry<String,Object> e : m.entrySet() ) {
             String k = e.getKey();
-            result.add( new CompletionContext( CompletionContext.CONTEXT_AUTOPLOT_SCHEME, "vap+"+k.toString().substring(1)+":" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_AUTOPLOT_SCHEME, "vap+"+k.substring(1)+":" ) );
         }
         return result;
     }
