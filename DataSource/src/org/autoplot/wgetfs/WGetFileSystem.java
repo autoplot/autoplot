@@ -133,7 +133,7 @@ public class WGetFileSystem extends WebFileSystem {
             monitor.finished();
             if ( p.exitValue()!=0 ) {
                 partfile.delete();
-                throw new IOException( cmd +" returned with exit code "+p.exitValue() );
+                throw new IOException( cmd[0] +" returned with exit code "+p.exitValue() );
             }
             
         } catch ( InterruptedException ex ) {
