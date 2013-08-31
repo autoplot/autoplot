@@ -21,6 +21,7 @@ public class Test028 {
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
+        System.err.printf( "== %d %s ==\n", id, uri );
         long t0= System.currentTimeMillis();
         ds= Util.getDataSet( uri );
         double t= (System.currentTimeMillis()-t0)/1000.;
