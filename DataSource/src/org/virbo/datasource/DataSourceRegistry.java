@@ -650,20 +650,22 @@ public class DataSourceRegistry {
     }
 
     public static String getPluginsText() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("<html>");
         {
             buf.append("<h1>Plugins by Extension:</h1>");
-            Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
-            for (Object k : m.keySet()) {
-                buf.append("" + k + ": " + m.get(k) + "<br>");
+            Map<String,Object> m = DataSourceRegistry.getInstance().dataSourcesByExt;
+            for ( Entry<String,Object> e: m.entrySet() ) {
+                String k= e.getKey();
+                buf.append("").append(k).append(": ").append(e.getValue()).append("<br>");
             }
         }
         {
             buf.append("<h1>Plugins by Mime Type:</h1>");
-            Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
-            for (Object k : m.keySet()) {
-                buf.append("" + k + ": " + m.get(k) + "<br>");
+            Map<String,Object> m = DataSourceRegistry.getInstance().dataSourcesByMime;
+            for ( Entry<String,Object> e: m.entrySet() ) {
+                String k= e.getKey();
+                buf.append("").append(k).append(": ").append(e.getValue()).append("<br>");
             }
         }
         buf.append("</html>");
@@ -673,8 +675,9 @@ public class DataSourceRegistry {
     public static List<CompletionContext> getPlugins() {
         List<CompletionContext> result= new ArrayList();
 
-        Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
-        for (Object k : m.keySet()) {
+        Map<String,Object> m = DataSourceRegistry.getInstance().dataSourcesByExt;
+        for ( Entry<String,Object> e : m.entrySet() ) {
+            String k = e.getKey();
             result.add( new CompletionContext( CompletionContext.CONTEXT_AUTOPLOT_SCHEME, "vap+"+k.toString().substring(1)+":" ) );
         }
         return result;
@@ -683,6 +686,7 @@ public class DataSourceRegistry {
     
     /**
      * return a description of the data source, if available.
+     * TODO: in the export data gui, there's a bunch of these coded by hand.
      * @param vapext
      * @return
      */
