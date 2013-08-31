@@ -193,6 +193,7 @@ public class EditorAnnotationsSupport {
                 ann.len = i1 - i0;
                 ann.offset = i0;
                 ann.text = text;
+                ann.marker= mark;
                 annotations.put(ann.offset, ann);
                 EditorAnnotationsSupport.this.interp= interp;
             }
