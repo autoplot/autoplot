@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -253,9 +254,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                                     daysURIs.put( ss[1], ss[0] );
                                 }
                                 Datum tlocal= null;
-                                for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
-                                    String uri= ii.next();
-                                    tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                                for ( Entry<String,String> ent: daysURIs.entrySet() ) {
+                                    String uri= ent.getKey();
+                                    tlocal= tp.parse( ent.getValue() ).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
                                     uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
                                 }
                                 daysURIs= new LinkedHashMap<String,String>();
