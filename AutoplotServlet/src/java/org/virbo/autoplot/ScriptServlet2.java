@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -53,9 +54,10 @@ public class ScriptServlet2 extends HttpServlet {
      */
     private static void setParams( Map<String,String> parms, PythonInterpreter interp, boolean reset ) {
         if ( reset ) interp.exec("params=dict()");
-        for ( String s: parms.keySet() ) {
+        for ( Entry<String,String> e: parms.entrySet() ) {
+            String s= e.getKey();
             if (!s.equals("arg_0") && !s.equals("script") ) {
-                String sval= parms.get(s);
+                String sval= e.getValue();
 
                 sval= maybeQuoteString( sval );
                 interp.exec("params['" + s + "']=" + sval);
