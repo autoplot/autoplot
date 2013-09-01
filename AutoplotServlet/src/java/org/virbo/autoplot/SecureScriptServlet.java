@@ -102,10 +102,6 @@ public class SecureScriptServlet extends HttpServlet {
             String file= getServletContext().getRealPath( scriptFile );
 
             PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
-            interp.set("java",null);
-            interp.set("org",null);
-            interp.set("getFile",null);
-            interp.set("downloadResourceAsTempFile",null);
 
             interp.setOut( out );
 
