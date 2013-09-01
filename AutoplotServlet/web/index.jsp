@@ -43,6 +43,8 @@
         
         <p>The source for all of these is found at <a href="http://sourceforge.net/p/autoplot/code/12695/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
         
+        <hr>
+        
         <p>
             <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet. <br>
             <a href="script.jsp"> script.jsp</a>: web form for sending scripts to the ScriptServlet. <br>
