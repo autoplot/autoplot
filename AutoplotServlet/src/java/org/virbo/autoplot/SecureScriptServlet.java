@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,8 @@ import org.python.util.PythonInterpreter;
 public class SecureScriptServlet extends HttpServlet {
    
     private static final Logger logger= Logger.getLogger("autoplot.servlet");
+    
+    private static final String SCRIPT_FILE_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*\\.jy";
     
     private static String maybeQuoteString(String sval) {
         boolean isNumber= false;
@@ -82,21 +85,28 @@ public class SecureScriptServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
         response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
 
+        long t0= System.currentTimeMillis();
+        
+        Pattern scriptFilePattern= Pattern.compile(SCRIPT_FILE_REGEX);
+                
         PrintWriter out = response.getWriter();
         try {
 
             String scriptFile= request.getParameter("scriptFile");
             if ( scriptFile==null ) {
-                scriptFile="default.jy";
+                throw new ServletException("scriptFile parameter not specified");
             }
 
             // make sure these symbols are imported, otherwise there will be problems with imports.py.
-            Object o = new org.das2.dataset.AverageTableRebinner();
+            Object o;
+            o= new org.das2.dataset.AverageTableRebinner();
             o= org.das2.graph.SymColor.black;
-            // end, make sure these...
+            // end, make sure these symbols are imported, otherwise there will be problems with imports.py
 
-            if ( scriptFile.contains("/") ) {
-                throw new ServletException("scriptFile cannot contain /");
+            // limit security by ensuring the scriptFile parameter doesn't contain slashes, which might allow it to access
+            // other parts of the server.
+            if ( !scriptFilePattern.matcher(scriptFile).matches() ) {
+                throw new ServletException("scriptFile must match "+SCRIPT_FILE_REGEX );
             }
 
             String file= getServletContext().getRealPath( scriptFile );
@@ -136,6 +146,7 @@ public class SecureScriptServlet extends HttpServlet {
             throw ex;
         } finally { 
             out.close();
+            logger.log(Level.FINE, "time to process SecureScriptServlet: {0}", ( System.currentTimeMillis()-t0 ));
         }
     } 
 
