@@ -38,32 +38,49 @@ public class SetLogLevel extends HttpServlet {
             String level= request.getParameter("level");
             String handler= request.getParameter("handler");
             
-            Level lev= Level.parse(level);
-            Handler[] hh= Logger.getLogger(logger).getHandlers();
-            Logger l= Logger.getLogger(logger);
-            l.setLevel( lev );
+            if ( logger==null ) {
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Servlet SetLogLevel</title>");  
+                out.println("</head>");
+                out.println("<body>");
+                out.println(".../SetLogLevel?logger=autoplot.servlet&level=FINE&handler=T");
+            } else {
+
+                Handler[] hh= Logger.getLogger(logger).getHandlers();
+                Level lev= Level.parse(level);            
+                Logger l= Logger.getLogger(logger);
+                l.setLevel( lev );
+                Logger.getLogger(logger).log(lev, "reset to "+level);
+
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Servlet SetLogLevel</title>");  
+                out.println("</head>");
+                out.println("<body>");
+
+                out.println(""+l +" @ "+l.getLevel()+"<br>" );
             
-            Logger.getLogger(logger).log(lev, "reset to "+level);
-            
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet SetLogLevel</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            
-            out.println(""+l +" @ "+l.getLevel()+"<br>" );
-            
-            
-            
-            out.println("handlers:<br>");
-            for ( Handler h: hh ) {
-                if ( handler!=null ) h.setLevel(lev);
-                out.println("  "+h+" @ "+h.getLevel()+"<br>");
+                out.println("handlers:<br>");
+                for ( Handler h: hh ) {
+                    if ( handler!=null && lev!=null ) h.setLevel(lev);
+                    out.println("  "+h+" @ "+h.getLevel()+"<br>");
+                }
+                if ( hh.length==0 ) {
+                    out.println("  (no handlers)");
+                }
+                
             }
+            
             out.println("</body>");
             out.println("</html>");
+            
+            
         } catch ( Exception e ) {
             throw new RuntimeException(e);
+        } finally {
+            out.close();
+            
         }
     } 
 
