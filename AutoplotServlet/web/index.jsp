@@ -16,7 +16,7 @@
     <body>
         <h2>Autoplot Servlet</h2>
         <p>This is an example showing how Autoplot can be used to produce graphics
-        for clients via HTTP.  Request parameters are sent to the "SimpleServlet"
+        for clients via HTTP.  Request parameters are sent to the <a href="simple.jsp">"SimpleServlet"</a>
         indicating the data set URI or vap file to plot, and parameters such as
         plot size.  Autoplot then produces a static image or PDF on the server
         side, and sends the result.
@@ -29,14 +29,25 @@
             questions.
         </p>
 
-        <p>The "ScriptServlet" allows Python scripts to be sent and interpreted to produce graphics or to access
+        <p>The <a href="script.jsp">"ScriptServlet"</a> allows Python scripts to be sent and interpreted to produce graphics or to access
             Autoplot internals.  Obviously this introduces security concerns, and access is limited by the "allowhosts" file found
             by default in /tmp/autoplotservlet.  Also, scripts are logged in this location as well.
         </p>
+        
+        <p>The <a href="unaggregate.jsp">"UnaggregateServlet"</a> allows how an Autoplot script can be used to implement a service, here demonstrating
+            Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
+        </p>
+        
+        <p><a href="thin/tsds/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.            
+        </p>
+        
+        <p>The source for all of these is found at <a href="http://sourceforge.net/p/autoplot/code/12695/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
+        
         <p>
             <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet. <br>
             <a href="script.jsp"> script.jsp</a>: web form for sending scripts to the ScriptServlet. <br>
-            <a href="script2.jsp"> script2.jsp</a>: web form for running a server-side script, right now set up to do URI templates.<br>
+            <a href="unaggregate.jsp"> unaggregate.jsp</a>: demo for URI templates, and also how servlets can be made from scripts.<br>
+            <a href="thin/tsds/demo.html">thin</a>: a more fully-developed thin-client app<br>
         </p>
     </body>
 </html>
