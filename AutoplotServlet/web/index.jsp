@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="org.virbo.autoplot.SimpleServlet"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -51,5 +52,7 @@
             <a href="unaggregate.jsp"> unaggregate.jsp</a>: demo for URI templates, and also how servlets can be made from scripts.<br>
             <a href="thin/tsds/demo.html">thin</a>: a more fully-developed thin-client app<br>
         </p>
+        
+        <small><%= SimpleServlet.version %> </small>
     </body>
 </html>
