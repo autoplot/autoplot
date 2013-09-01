@@ -68,7 +68,12 @@ public class SecureScriptServlet extends HttpServlet {
                 String sval= e.getValue();
 
                 sval= maybeQuoteString( sval );
-                interp.exec("params['" + s + "']=" + sval);
+                if ( sval.contains("\n") ) {
+                    throw new IllegalArgumentException("sval contains newline");
+                }
+                String cmd= "params['" + s + "']=" + sval;
+                interp.exec(cmd);
+                logger.fine(cmd);
             }
         }
     }
