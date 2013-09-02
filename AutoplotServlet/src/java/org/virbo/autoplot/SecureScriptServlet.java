@@ -60,11 +60,9 @@ public class SecureScriptServlet extends HttpServlet {
      * @param parms
      * @param interp
      */
-    private static void setParams( Map<String,String> parms, PythonInterpreter interp, boolean reset ) {
-        if ( reset ) {
-            interp.exec("import autoplot");
-            interp.exec("autoplot.params=dict()");
-        }
+    private static void setParams( Map<String,String> parms, PythonInterpreter interp ) {
+        interp.exec("import autoplot");
+        interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e: parms.entrySet() ) {
             String s= e.getKey();
             if (!s.equals("arg_0") && !s.equals("script") ) {
@@ -111,8 +109,8 @@ public class SecureScriptServlet extends HttpServlet {
             o= org.das2.graph.SymColor.black;
             // end, make sure these symbols are imported, otherwise there will be problems with imports.py
 
-            // limit security by ensuring the scriptFile parameter doesn't contain slashes, which might allow it to access
-            // other parts of the server.
+            // limit security by ensuring the scriptFile parameter matches regular expression, 
+            // which might allow it to access other parts of the server.
             if ( !scriptFilePattern.matcher(scriptFile).matches() ) {
                 throw new ServletException("scriptFile must match "+SCRIPT_FILE_REGEX );
             }
@@ -136,7 +134,7 @@ public class SecureScriptServlet extends HttpServlet {
                     m.put( k,v );
                 }
             }
-            setParams( m, interp, true );
+            setParams( m, interp );
 
             interp.execfile( new FileInputStream(file) );
             
