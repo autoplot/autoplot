@@ -77,6 +77,7 @@ function refresh() {
  * the current URL to set.  The timerange is reset by appending to this "timeRange=" + iso8601s + "/" + iso8601e;
  */
 function resetUrl( url ) {
+    $('#progress').attr('src','spinner.gif');
     imgurl= url;
     ImageInfo.loadInfo( imgurl, mycallback);
     document.getElementById('idplot').src= imgurl;
