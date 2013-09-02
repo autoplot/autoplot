@@ -40,15 +40,9 @@ function echoImgUrl() {
     $('#idechourl').text(imgurl);
 }
 
-
 function echoGraphParams() {
     $('#iddates').text('StartDate = ' + PLOTINFO.plots[0].xaxis.min + ' ,    ' + 'EndDate = ' + PLOTINFO.plots[0].xaxis.max );
     $('#idwidthheight').text('');
-}
-
-function echoSetup() {
-    // Extract the data.	
-    echoImgUrl();
 }
 
 /**
@@ -70,6 +64,22 @@ function scannext() {
  */
 function zoomout() {
     setTime( startdateinmilliseconds - diffmilliseconds, enddateinmilliseconds + diffmilliseconds );
+}
+
+/**
+ * allow the URI to be reset
+ */
+function refresh() {
+    setTime( startdateinmilliseconds, enddateinmilliseconds );
+}
+
+/**
+ * the current URL to set.  The timerange is reset by appending to this "timeRange=" + iso8601s + "/" + iso8601e;
+ */
+function resetUrl( url ) {
+    imgurl= url;
+    ImageInfo.loadInfo( imgurl, mycallback);
+    document.getElementById('idplot').src= imgurl;
 }
 
 /**
@@ -177,7 +187,9 @@ function setTime( startMilliseconds, endMilliseconds ) {
         enddateinmilliseconds= endMilliseconds;
         diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
         msecperpx = diffmilliseconds / graphwidth;
-
+        
+        echoImgUrl();
+        
         ImageInfo.loadInfo( imgurl, mycallback);
         console.log( '--> startdateinmilliseconds='+ startdateinmilliseconds );        
 
@@ -222,7 +234,7 @@ var PLOTINFO;
 $(document).ready(function() {
     imgurl = $('#idplot').attr('src');
 
-    echoSetup();
+    echoImgUrl();
     
     ImageInfo.loadInfo( imgurl, mycallback);
 
