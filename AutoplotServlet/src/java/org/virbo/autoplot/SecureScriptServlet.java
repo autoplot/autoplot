@@ -61,7 +61,10 @@ public class SecureScriptServlet extends HttpServlet {
      * @param interp
      */
     private static void setParams( Map<String,String> parms, PythonInterpreter interp, boolean reset ) {
-        if ( reset ) interp.exec("params=dict()");
+        if ( reset ) {
+            interp.exec("import autoplot");
+            interp.exec("autoplot.params=dict()");
+        }
         for ( Entry<String,String> e: parms.entrySet() ) {
             String s= e.getKey();
             if (!s.equals("arg_0") && !s.equals("script") ) {
@@ -71,7 +74,7 @@ public class SecureScriptServlet extends HttpServlet {
                 if ( sval.contains("\n") ) {
                     throw new IllegalArgumentException("sval contains newline");
                 }
-                String cmd= "params['" + s + "']=" + sval;
+                String cmd= "autoplot.params['" + s + "']=" + sval;
                 interp.exec(cmd);
                 logger.fine(cmd);
             }
