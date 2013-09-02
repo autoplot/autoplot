@@ -50,7 +50,7 @@
             <a href="simple.jsp"> simple.jsp</a>: web form for sending requests to the SimpleServlet. <br>
             <a href="script.jsp"> script.jsp</a>: web form for sending scripts to the ScriptServlet. <br>
             <a href="unaggregate.jsp"> unaggregate.jsp</a>: demo for URI templates, and also how servlets can be made from scripts.<br>
-            <a href="thin/tsds/demo.html">thin</a>: a more fully-developed thin-client app<br>
+            <a href="thin/zoom/demo.html">thin</a>: a more fully-developed thin-client app<br>
         </p>
         
         <small><%= SimpleServlet.version %> </small>
