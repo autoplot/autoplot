@@ -14,7 +14,10 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -286,7 +289,19 @@ public class ContextFlowView extends PngWalkView {
                     height = image.getHeight();
                     width = image.getWidth();
 
-                    bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                    if ( width<400 ) {
+                        bounds = bounds(x, y, width, height, currentWidth, currentWidth * height / width, 1.0, false);
+                        
+                        BufferedImage im = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
+                        im.getGraphics().drawImage( image, 0, 0, bounds.width+1, bounds.height+1, this );
+
+                        image= im;
+                        height = image.getHeight();
+                        width = image.getWidth();
+
+                    } else {
+                        bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                    }
                 }
 
                 ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(width, height,
