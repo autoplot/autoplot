@@ -735,8 +735,11 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( support.isDirty() ) {
             try {
                 FileWriter writer = new FileWriter(support.getFile());
-                writer.write( textArea.getText() );
-                writer.close();
+                try {
+                    writer.write( textArea.getText() );
+                } finally {
+                    writer.close();
+                }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
