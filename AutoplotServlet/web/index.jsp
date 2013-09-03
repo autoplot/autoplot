@@ -39,7 +39,7 @@
             Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
         </p>
         
-        <p><a href="thin/tsds/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.            
+        <p><a href="thin/zoom/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.            
         </p>
         
         <p>The source for all of these is found at <a href="http://sourceforge.net/p/autoplot/code/12695/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
