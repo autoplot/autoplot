@@ -202,7 +202,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
             } catch (ParseException ex) { // this won't happen
                 logger.log(Level.SEVERE, null, ex);
             }
-            orb= o.next(orb);
+            o9rb= o.next(orb);
             count++;
         }
 
@@ -212,7 +212,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         if ( focus!=null ) {
             for ( int i=0; i<3;i++ ) s= o.prev(s);
             ss.add("...");
-            for ( int i=0; i<7; i++ ) {
+            for ( int i=0; s!=null && i<7; i++ ) {
                String str;
                try {
                     str = String.valueOf(o.getDatumRange(s));
