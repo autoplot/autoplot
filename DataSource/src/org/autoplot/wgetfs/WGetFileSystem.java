@@ -138,6 +138,8 @@ public class WGetFileSystem extends WebFileSystem {
             
         } catch ( InterruptedException ex ) {
             throw new IOException(ex);
+        } finally {
+            err.close();
         }
 
         partfile.renameTo(f);
@@ -253,23 +255,27 @@ public class WGetFileSystem extends WebFileSystem {
         try {
             if ( WGetFileSystemFactory.useCurl && getRootURL().getProtocol().equals("ftp") ) {            
                 BufferedReader bin= new BufferedReader( new InputStreamReader(in) );
-                String line= bin.readLine();
-                while ( line!=null ) {
-                    String[] ss= line.split("\\s+");
-                    if ( ss.length>8 ) {
-                        boolean dir= line.charAt(0)=='d';
-                        DirectoryEntry de1= new DirectoryEntry();
-                        de1.modified= Long.MAX_VALUE;  //danger not used 
-                        String name= ss[8];
-                        if ( name.startsWith("/") ) name= name.substring(1);                                
-                        de1.name= directory + name + ( dir?"/":"" );
-                        de1.type= dir ? 'd': 'f' ;
-                        de1.size= Long.MAX_VALUE;  //not used
-                        result.put(de1.name,de1);
-                    } else {
-                        System.err.println("here line 268");
+                try {
+                    String line= bin.readLine();
+                    while ( line!=null ) {
+                        String[] ss= line.split("\\s+");
+                        if ( ss.length>8 ) {
+                            boolean dir= line.charAt(0)=='d';
+                            DirectoryEntry de1= new DirectoryEntry();
+                            de1.modified= Long.MAX_VALUE;  //danger not used 
+                            String name= ss[8];
+                            if ( name.startsWith("/") ) name= name.substring(1);                                
+                            de1.name= directory + name + ( dir?"/":"" );
+                            de1.type= dir ? 'd': 'f' ;
+                            de1.size= Long.MAX_VALUE;  //not used
+                            result.put(de1.name,de1);
+                        } else {
+                            System.err.println("here line 268");
+                        }
+                        line= bin.readLine();
                     }
-                    line= bin.readLine();
+                } finally {
+                    bin.close();
                 }
                 //System.err.println(result);
             } else {
@@ -288,7 +294,8 @@ public class WGetFileSystem extends WebFileSystem {
 
             }
         } catch ( CancelledOperationException ex ) {
-            
+            //TODO: what?
+            logger.log( Level.WARNING, null, ex );
         } finally {
             in.close();
         }
