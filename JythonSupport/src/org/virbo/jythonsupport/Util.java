@@ -276,7 +276,13 @@ public class Util {
 
         ReadableByteChannel chin= Channels.newChannel(in);
         WritableByteChannel chout= new FileOutputStream(f).getChannel();
-        DataSourceUtil.transfer(chin, chout);
+        
+        try {
+            DataSourceUtil.transfer(chin, chout);
+        } finally {
+            if ( chout.isOpen() ) chout.close();
+            if ( chin.isOpen() ) chin.close();
+        }
 
         String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
         QDataSet ds= getDataSet(virtUrl,mon);
