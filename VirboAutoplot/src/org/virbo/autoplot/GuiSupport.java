@@ -324,7 +324,7 @@ public class GuiSupport {
                     //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
                     if ( SemanticOps.isRank2Waveform(dsout) ) {
                         dsout= DataSetOps.flattenWaveform(dsout);
-                        dsout= ArrayDataSet.copy( short.class, dsout );
+                        //dsout= ArrayDataSet.copy( short.class, dsout );
                     }
                     dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
