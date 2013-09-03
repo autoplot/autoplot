@@ -832,7 +832,7 @@ public final class PatchedHtmlRenderer {
                             }
                         } else if (brutalWrap) {
                             //wrap without checking word boundaries
-                            length = (new Double((w - widthPainted) / chWidth)).intValue();
+                            length = (int)( ( (w - widthPainted) / chWidth) );
                             
                             if ((pos + length) > nextTag) {
                                 length = (nextTag - pos);
