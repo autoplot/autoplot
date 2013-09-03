@@ -518,10 +518,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         logger.log( Level.FINE, "reading recent datasources from {0}", hist.toString());
 
         if ( hist.exists() ) {
+            BufferedReader r=null;
             try {
                 String seek="vap+das2server:";
                 int ttaglen= 25;
-                BufferedReader r = new BufferedReader(new FileReader(hist));
+                r = new BufferedReader(new FileReader(hist));
                 String s = r.readLine();
                 LinkedHashSet dss = new LinkedHashSet();
 
@@ -546,7 +547,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             } catch ( IOException ex ) {
                 logger.log( Level.FINE, "IOException when reading in {0}", hist );
                 JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
-
+            } finally {
+                try {
+                    if ( r!=null ) {
+                        r.close();
+                    }
+                } catch (IOException ex) {
+                    logger.log( Level.WARNING, null, ex );
+                }
             }
         } else {
             logger.log( Level.FINE, "no history file found: {0}", hist );
