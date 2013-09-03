@@ -188,21 +188,22 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
         FileOutputStream out = new FileOutputStream( new File( split.resourceUri ) );
-        
-        HSSFWorkbook wb= new HSSFWorkbook();
-        HSSFSheet sheet= wb.createSheet();
-        dateCellStyle= wb.createCellStyle();
-        dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
-        
-        if (data.rank() == 2) {
-            formatRank2(sheet, data, mon);
-        } else if (data.rank() == 1) {
-            formatRank1(sheet, data, mon);
+        try {
+            HSSFWorkbook wb= new HSSFWorkbook();
+            HSSFSheet sheet= wb.createSheet();
+            dateCellStyle= wb.createCellStyle();
+            dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
+
+            if (data.rank() == 2) {
+                formatRank2(sheet, data, mon);
+            } else if (data.rank() == 1) {
+                formatRank1(sheet, data, mon);
+            }
+
+            wb.write(out);
+        } finally {
+            out.close();
         }
-        
-        wb.write(out);
-                
-        out.close();
     }
 
     public boolean canFormat(QDataSet ds) {
