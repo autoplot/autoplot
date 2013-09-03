@@ -135,20 +135,20 @@ public class VaxFloat extends BufferDataSet {
         return vaxFloatValue2(back, offset(i0, i1, i2, i3));
     }
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        // /opt/project/isee/archive/a1977/77295.arc
-        // 77295    69197230       62470            first three are 4-byte floats.  I can read these.
-        // 3.12926e+07 -5.01478e+07  1.97070e+07    GSEX GSEY GSEZ
-
-        File f = new File("/opt/project/isee/archive/a1977/77295.arc");
-        FileChannel fc = new FileInputStream(f).getChannel();
-        ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, 0, 10000);
-        buf.order(ByteOrder.LITTLE_ENDIAN);
-        VaxFloat vf = new VaxFloat(1, 880, 12, 10, 1, 1, 1, buf);
-        System.err.println(vf.value(0));
-        Int i = new Int(1, 880, 0, 10, 1, 1, 1, buf);
-        System.err.println(i.value(0)); // verified.
-    }
+//    public static void main(String[] args) throws FileNotFoundException, IOException {
+//        // /opt/project/isee/archive/a1977/77295.arc
+//        // 77295    69197230       62470            first three are 4-byte floats.  I can read these.
+//        // 3.12926e+07 -5.01478e+07  1.97070e+07    GSEX GSEY GSEZ
+//
+//        File f = new File("/opt/project/isee/archive/a1977/77295.arc");
+//        FileChannel fc = new FileInputStream(f).getChannel();
+//        ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, 0, 10000);
+//        buf.order(ByteOrder.LITTLE_ENDIAN);
+//        VaxFloat vf = new VaxFloat(1, 880, 12, 10, 1, 1, 1, buf);
+//        System.err.println(vf.value(0));
+//        Int i = new Int(1, 880, 0, 10, 1, 1, 1, buf);
+//        System.err.println(i.value(0)); // verified.
+//    }
 
     public void putValue(double d) {
         throw new UnsupportedOperationException("Not supported yet.");
