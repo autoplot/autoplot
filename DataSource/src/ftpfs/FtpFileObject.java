@@ -158,7 +158,7 @@ public class FtpFileObject extends WebFileObject {
         }
 
         try {
-            return new FileOutputStream(getLocalFile(),append) {
+            return new FileOutputStream(getLocalFile(),append) {  // findbugs okay
                 @Override
                 public void close() throws IOException {
                     super.close();
