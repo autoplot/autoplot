@@ -189,20 +189,17 @@ public class TimeRangeTool extends javax.swing.JPanel {
         int count=1;
         boolean gotFocus= focusRange==null;
 
-        String focusOrb= null;
-
         while ( orb!=null && count<10 ) {
             try {
                 if ( !gotFocus && o.getDatumRange(orb).intersects(focusRange) ) {
                     gotFocus=true;
-                    focusOrb= orb;
                 }
                 String str = String.valueOf(o.getDatumRange(orb));
                 ss.add(orb+": "+str);
             } catch (ParseException ex) { // this won't happen
                 logger.log(Level.SEVERE, null, ex);
             }
-            o9rb= o.next(orb);
+            orb= o.next(orb);
             count++;
         }
 
@@ -210,7 +207,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         String s= focus;
         if ( focus!=null ) {
-            for ( int i=0; i<3;i++ ) s= o.prev(s);
+            for ( int i=0; s!=null && i<3;i++ ) {
+                s= o.prev(s);
+            }
+            if ( s==null ) s= o.first();
             ss.add("...");
             for ( int i=0; s!=null && i<7; i++ ) {
                String str;
