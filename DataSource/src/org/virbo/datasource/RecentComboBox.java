@@ -89,16 +89,20 @@ public class RecentComboBox extends JComboBox {
         try {
             if ( recentFile.exists() ) {
                 BufferedReader r = new BufferedReader(new FileReader(recentFile));
-                String s= r.readLine();
-                while ( s!=null ) {
-                    if ( verifier!=null ) {
-                        if ( !verifier.verify(s) ) {
-                            s= r.readLine();
-                            continue;
+                try {
+                    String s= r.readLine();
+                    while ( s!=null ) {
+                        if ( verifier!=null ) {
+                            if ( !verifier.verify(s) ) {
+                                s= r.readLine();
+                                continue;
+                            }
                         }
+                        items.add(s);
+                        s= r.readLine();
                     }
-                    items.add(s);
-                    s= r.readLine();
+                } finally {
+                    r.close();
                 }
             }
 
