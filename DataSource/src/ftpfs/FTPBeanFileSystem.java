@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -218,15 +219,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         logger.log(Level.FINE, "parseLslNew {0}", dir);
 
-        InputStream in=null;
         FTPFile[] ret=null;
         List<String> llist= new ArrayList<String>(370);
         
+        BufferedReader reader=new BufferedReader( new FileReader( listing ) );
+        
         try {
-            in= new FileInputStream(listing);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "US-ASCII"));
-
             String aline = reader.readLine();
             while ( aline!=null ) {
                 llist.add(aline);
@@ -234,7 +232,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
         
         } finally {
-            if ( in!=null ) in.close();
+            reader.close();
         }
         
         String[] list= llist.toArray( new String[llist.size()] );
