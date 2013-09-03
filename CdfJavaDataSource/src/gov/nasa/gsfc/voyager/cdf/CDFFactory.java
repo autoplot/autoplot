@@ -97,7 +97,6 @@ public class CDFFactory {
         try {
             logger.log(Level.FINER,"attempting to map the file into memory: {0}",fname);
             buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
-            fis.close();
             logger.log(Level.FINER,"successfully mapped the file into memory: {0}",fname);
         } catch ( IOException ex ) {
             logger.log(Level.FINER,"exception occurred, attempting to read into JVM memory: {0}",fname);
@@ -106,9 +105,9 @@ public class CDFFactory {
             ch.read(buf);
             buf.flip();
             logger.log(Level.FINER,"successfully read into JVM memory: {0}",fname);
+        } finally {
+            fis.close();
         }
-        
-        fis.close();
         logger.log(Level.FINE,"getCDF: got ByteBuffer and closing ({0})",fname);
         return getVersion(buf);
     }
