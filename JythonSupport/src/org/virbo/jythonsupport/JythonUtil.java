@@ -360,6 +360,14 @@ public class JythonUtil {
                  if ( !( (Call)sn).toString().contains("id=getParam,") ) { // TODO: ap.getParam()
                     looksOkay= false;
                  }
+             } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
+                 Assign a= ((Assign)sn);
+                 exprType et= a.value;
+                 if ( et instanceof Call ) {
+                     if ( !((Call)et).toString().contains("getParam,") ) {
+                         looksOkay= false;
+                     }
+                 }
              }
          }
          public boolean looksOkay() {
@@ -741,6 +749,20 @@ public class JythonUtil {
         
         String s;
         
+        String s5= "if ( sp!='omni' ):\n" +
+            "  result= getDataSet( '%s?mep_%s_%s_cps_%s%d' % ( resourceURI, sp, angle, sp[0], ch ) )\n" +
+            "else:\n" +
+            "  result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )\n";
+             
+        
+
+        System.err.println( "-- case s5-------------"); 
+        System.err.println( s5 );
+        s= simplifyScriptToGetParams(s5, false);
+        System.err.println( "----" );
+        System.err.println( s );
+        
+
         System.err.println( "-- case s3-------------"); 
         System.err.println( s3 );
         s= simplifyScriptToGetParams(s3, false);
