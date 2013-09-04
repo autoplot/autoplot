@@ -102,7 +102,7 @@ public class Util {
                 logger.log( Level.WARNING, null, ex );
             }
         }
-        if ( !buildTime.equals("???") ) {
+        if ( buildTime!=null && !buildTime.equals("???") ) {
             result.add("build time: "+buildTime);
         }
 
