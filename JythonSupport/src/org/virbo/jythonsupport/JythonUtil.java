@@ -34,7 +34,13 @@ import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PySyntaxError;
 import org.python.core.PySystemState;
+import org.python.parser.SimpleNode;
+import org.python.parser.ast.Call;
+import org.python.parser.ast.Module;
+import org.python.parser.ast.VisitorBase;
+import org.python.parser.ast.stmtType;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.AutoplotSettings;
@@ -316,6 +322,130 @@ public class JythonUtil {
         
      }
 
+     private static class MyVisitorBase<R> extends VisitorBase {
+         boolean looksOkay= true;   
+         public R visitIf(org.python.parser.ast.If node) throws Exception {
+            R ret = (R)unhandled_node(node);
+            traverse(node);
+            return ret;
+        }
+         public R visitAssign(org.python.parser.ast.Assign node) throws Exception {
+            R ret = (R)unhandled_node(node);
+            traverse(node);
+            return ret;
+        }
+         @Override
+         protected Object unhandled_node(SimpleNode sn) throws Exception {
+             return sn;
+         }
+         @Override
+         public void traverse(SimpleNode sn) throws Exception {
+             System.err.println(sn);
+             if ( sn instanceof Call ) {
+                 if ( !( (Call)sn).toString().contains("id=getParam,") ) { // TODO: ap.getParam()
+                    looksOkay= false;
+                 }
+             }
+         }
+         public boolean looksOkay() {
+             return looksOkay;
+         }
+     }
+     
+     private static boolean simplifyScriptToGetParamsOkayNoCalls( stmtType o ) {
+         
+        MyVisitorBase vb= new MyVisitorBase();
+        try {
+            o.traverse(vb);
+            return vb.looksOkay();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         return false;
+     }
+     
+     /**
+      * return true if we can include this in the script without a huge performance penalty.
+      * @param o
+      * @return 
+      */
+     private static boolean simplifyScriptToGetParamsOkay( stmtType o ) {
+         if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
+         if ( ( o instanceof org.python.parser.ast.Assign ) ) return simplifyScriptToGetParamsOkayNoCalls( o );
+         if ( ( o instanceof org.python.parser.ast.If ) )  return simplifyScriptToGetParamsOkayNoCalls(o);
+         if ( ( o instanceof org.python.parser.ast.Print ) ) return simplifyScriptToGetParamsOkayNoCalls(o);
+         System.err.println( o.getClass() );
+         return false;
+     }
+     
+     private static void maybeAppendSort( String theLine, StringBuilder result ) {
+         int i= theLine.indexOf("getParam");
+         if ( i!=-1 ) {
+             i= theLine.indexOf("=");
+             String v= theLine.substring(0,i).trim();
+             int indent= theLine.indexOf(v);
+             if ( indent>0 ) result.append( theLine.substring(0,indent) );
+             result.append("sort_.append( \'").append(v).append( "\')\n");
+         }
+     }
+     
+     /**
+      * extracts the parts of the program that get parameters.  Also, a sort order is built.
+      * @param script the entire python program
+      * @return  the python program with lengthy calls removed.
+      */
+     public static String simplifyScriptToGetParams( String script ) throws PySyntaxError {
+         String[] ss= script.split("\n");
+         int acceptLine= -1;  // first line to accept
+         StringBuilder result= new StringBuilder();
+         result.append("sort_=[]\n");
+         try {
+             Module n= (Module)org.python.core.parser.parse( script, "exec" );
+             for ( Object o: n.body ) {
+                 if ( simplifyScriptToGetParamsOkay( (stmtType)o ) ) {
+                     if ( acceptLine<0 ) acceptLine= ((stmtType)o).beginLine;
+                 } else {
+                     System.err.println("reject "+o);
+                     if ( acceptLine>-1 ) {
+                         int thisLine= ((stmtType)o).beginLine;
+                         for ( int i=acceptLine; i<thisLine; i++ ) {
+                             maybeAppendSort( ss[i-1], result );
+                             result.append(ss[i-1]).append("\n");
+                         }
+                         acceptLine= -1;
+                     }
+                 }
+             }
+             if ( acceptLine>-1 ) {
+                 int thisLine= ss.length+1;
+                 for ( int i=acceptLine; i<thisLine; i++ ) {
+                     maybeAppendSort( ss[i-1], result );
+                     result.append(ss[i-1]).append("\n");
+                 }
+             }
+             return result.toString();
+         } catch ( PySyntaxError ex ) {
+             throw ex;
+         }
+     }
+          
+     public static List<Param> getGetParams( BufferedReader reader ) throws IOException, PySyntaxError {
+        String s;
+        StringBuilder build= new StringBuilder();
+        
+        try {
+            s= reader.readLine();
+            while (s != null) {
+               build.append(s).append("\n");
+               s = reader.readLine();
+            }
+        } finally {
+            reader.close();
+        }
+        return getGetParams( build.toString() );
+         
+     }
     /**
      * <p>scrape through the script looking for getParam calls.  These are executed, and we
      * get labels and infer types from the defaults.  For example,<br>
@@ -345,34 +475,12 @@ public class JythonUtil {
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
-    public static List<Param> getGetParams( BufferedReader reader ) throws IOException {
+    public static List<Param> getGetParams( String s ) throws PySyntaxError {
         
-        String s;
-        StringBuilder build= new StringBuilder();
+        String params= s;
         
-        try {
-            s= reader.readLine();
-
-            Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
-            build.append( "sort_=[]\n");
-            while (s != null) {
-               int ic= s.indexOf("#");
-               if ( ic>-1 ) s= s.substring(0,ic);
-               Matcher m= getParamPattern.matcher(s);
-               if ( m.matches() || s.contains("getParam") ) {
-                   build.append(s).append("\n");
-                   int i= s.indexOf("=");
-                   String v= s.substring(0,i).trim();
-                   build.append("sort_.append( \'").append(v).append( "\')\n");
-               }
-               s = reader.readLine();
-            }
-        } finally {
-            reader.close();
-        }
+        params= simplifyScriptToGetParams(params);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
-        String params= build.toString();
-
         String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n";
 
         String prog= myCheat + params ;
@@ -559,5 +667,32 @@ public class JythonUtil {
             }
         }
         return result.toString();
+    }
+    
+    public static void main(String[] args ) {
+        String s1="resourceURI= getParam( 'resourceURI', 'ftp://satdat.ngdc.noaa.gov/sem/poes/data/raw/ngdc/2013/noaa19/poes_n19_20130409_raw.nc', 'example file to load' )\n" +
+"\n" +
+"sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n" +
+"\n" +
+"if ( sp!='omni' ):\n" +
+"   angle= getParam( 'angle', 'tel0', 'angle', [ 'tel0', 'tel90' ] )\n" +
+"\n" +
+"print sp  # this should now start showing up when we make dialogs.\n" +
+"\n" +
+"if ( sp=='ele' ):\n" +
+"   ch= getParam( 'ch', 1, 'channel to plot', [ 1,2,3 ] )\n" +
+"elif ( sp=='omni' ):\n" +
+"   ch= getParam( 'ch', 1, 'channel to plot', [ 6,7,8,9 ] )\n" +
+"else:\n" +
+"   ch= getParam( 'ch', 1, 'channel to plot', [ 1,2,3,4,5,6 ] )\n" +
+" \n" +
+"if ( sp!='omni' ):\n" +
+"   result= getDataSet( '%s?mep_%s_%s_cps_%s%d' % ( resourceURI, sp, angle, sp[0], ch ) )\n" +
+"else:\n" +
+"   result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )"; 
+        
+        String s2= "sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n";
+        
+        System.err.println( getGetParams( s1 ) );
     }
 }
