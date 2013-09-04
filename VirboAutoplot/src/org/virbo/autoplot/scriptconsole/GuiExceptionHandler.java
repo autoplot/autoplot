@@ -305,7 +305,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             + (t.getMessage() == null ? "" : t.getMessage());
 
         // kludge for Jython errors
-        if ( t.getClass().getName().contains("PyException" ) ) {
+        if ( t.getClass().getName().contains("PyException" ) || t.getClass().getName().contains("PySyntaxError" )) {
             String[] ss= t.toString().split("\n");
             int i=0;
             if ( ss[i].contains("Traceback") ) i++;
