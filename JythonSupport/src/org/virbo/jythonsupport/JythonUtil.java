@@ -6,6 +6,7 @@ package org.virbo.jythonsupport;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,13 +19,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
@@ -37,9 +41,12 @@ import org.python.core.PyString;
 import org.python.core.PySyntaxError;
 import org.python.core.PySystemState;
 import org.python.parser.SimpleNode;
+import org.python.parser.ast.Assign;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
+import org.python.parser.ast.Name;
 import org.python.parser.ast.VisitorBase;
+import org.python.parser.ast.exprType;
 import org.python.parser.ast.stmtType;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
@@ -291,6 +298,10 @@ public class JythonUtil {
          * Note a string with the values enumerated either T or F is treated as a boolean.
          */
         public char type;
+        @Override
+        public String toString() {
+            return name+"="+label;
+        }
     }
 
     /**
@@ -323,24 +334,28 @@ public class JythonUtil {
      }
 
      private static class MyVisitorBase<R> extends VisitorBase {
-         boolean looksOkay= true;   
-         public R visitIf(org.python.parser.ast.If node) throws Exception {
-            R ret = (R)unhandled_node(node);
-            traverse(node);
-            return ret;
+         boolean looksOkay= true; 
+         boolean visitNameFail= false;
+         
+         HashSet names= new HashSet();
+         MyVisitorBase( HashSet names ) {
+             this.names= names;
+         }
+
+        @Override
+        public Object visitName(Name node) throws Exception {
+            if ( !names.contains(node.id) ) {
+                visitNameFail= true;
+            }
+            return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
         }
-         public R visitAssign(org.python.parser.ast.Assign node) throws Exception {
-            R ret = (R)unhandled_node(node);
-            traverse(node);
-            return ret;
-        }
+        
          @Override
          protected Object unhandled_node(SimpleNode sn) throws Exception {
              return sn;
          }
          @Override
          public void traverse(SimpleNode sn) throws Exception {
-             System.err.println(sn);
              if ( sn instanceof Call ) {
                  if ( !( (Call)sn).toString().contains("id=getParam,") ) { // TODO: ap.getParam()
                     looksOkay= false;
@@ -350,17 +365,24 @@ public class JythonUtil {
          public boolean looksOkay() {
              return looksOkay;
          }
+         /**
+          * this contains a node whose name we can't resolve.
+          * @return 
+          */
+         public boolean visitNameFail() {
+             return visitNameFail;
+         }
      }
      
-     private static boolean simplifyScriptToGetParamsOkayNoCalls( stmtType o ) {
+     private static boolean simplifyScriptToGetParamsOkayNoCalls( SimpleNode o, HashSet<String> variableNames ) {
          
-        MyVisitorBase vb= new MyVisitorBase();
+        MyVisitorBase vb= new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
             return vb.looksOkay();
             
         } catch (Exception ex) {
-            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
          return false;
      }
@@ -370,12 +392,28 @@ public class JythonUtil {
       * @param o
       * @return 
       */
-     private static boolean simplifyScriptToGetParamsOkay( stmtType o ) {
+     private static boolean simplifyScriptToGetParamsOkay( stmtType o, HashSet<String> variableNames ) {
          if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
-         if ( ( o instanceof org.python.parser.ast.Assign ) ) return simplifyScriptToGetParamsOkayNoCalls( o );
-         if ( ( o instanceof org.python.parser.ast.If ) )  return simplifyScriptToGetParamsOkayNoCalls(o);
-         if ( ( o instanceof org.python.parser.ast.Print ) ) return simplifyScriptToGetParamsOkayNoCalls(o);
-         System.err.println( o.getClass() );
+         if ( ( o instanceof org.python.parser.ast.Import ) ) return true;
+         if ( ( o instanceof org.python.parser.ast.Assign ) ) {
+             Assign a= (Assign)o;
+             if ( simplifyScriptToGetParamsOkayNoCalls( a.value, variableNames ) ) {
+                 for ( int i=0; i<a.targets.length; i++ ) {
+                    exprType et= ((exprType)a.targets[i]);
+                    if ( et instanceof Name ) {
+                        String id= ((Name)a.targets[i]).id;
+                        variableNames.add(id);
+                        logger.fine("assign to variable "+id);
+                    }
+                 }
+                 return true;
+             } else {
+                 return false;
+             }
+         }
+         if ( ( o instanceof org.python.parser.ast.If ) )  return simplifyScriptToGetParamsOkayNoCalls(o,variableNames);
+         if ( ( o instanceof org.python.parser.ast.Print ) ) return simplifyScriptToGetParamsOkayNoCalls(o,variableNames);
+         logger.log( Level.FINER, "not okay to simplify: {0}", o);
          return false;
      }
      
@@ -391,26 +429,29 @@ public class JythonUtil {
      }
      
      /**
-      * extracts the parts of the program that get parameters.  Also, a sort order is built.
-      * @param script the entire python program
-      * @return  the python program with lengthy calls removed.
-      */
-     public static String simplifyScriptToGetParams( String script ) throws PySyntaxError {
+     * extracts the parts of the program that get parameters.  Also, a sort order is built.
+     *
+     * @param script the entire python program
+     * @param addSort the value of addSort
+     * @return the python program with lengthy calls removed.
+     */
+    
+     public static String simplifyScriptToGetParams( String script, boolean addSort) throws PySyntaxError {
          String[] ss= script.split("\n");
          int acceptLine= -1;  // first line to accept
          StringBuilder result= new StringBuilder();
-         result.append("sort_=[]\n");
+         if ( addSort ) result.append("sort_=[]\n");
+         HashSet variableNames= new HashSet();
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
              for ( Object o: n.body ) {
-                 if ( simplifyScriptToGetParamsOkay( (stmtType)o ) ) {
+                 if ( simplifyScriptToGetParamsOkay( (stmtType)o, variableNames ) ) {
                      if ( acceptLine<0 ) acceptLine= ((stmtType)o).beginLine;
                  } else {
-                     System.err.println("reject "+o);
                      if ( acceptLine>-1 ) {
                          int thisLine= ((stmtType)o).beginLine;
                          for ( int i=acceptLine; i<thisLine; i++ ) {
-                             maybeAppendSort( ss[i-1], result );
+                             if ( addSort ) maybeAppendSort( ss[i-1], result );
                              result.append(ss[i-1]).append("\n");
                          }
                          acceptLine= -1;
@@ -420,7 +461,7 @@ public class JythonUtil {
              if ( acceptLine>-1 ) {
                  int thisLine= ss.length+1;
                  for ( int i=acceptLine; i<thisLine; i++ ) {
-                     maybeAppendSort( ss[i-1], result );
+                     if ( addSort ) maybeAppendSort( ss[i-1], result );
                      result.append(ss[i-1]).append("\n");
                  }
              }
@@ -479,7 +520,7 @@ public class JythonUtil {
         
         String params= s;
         
-        params= simplifyScriptToGetParams(params);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        params= simplifyScriptToGetParams(params, false);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
         String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n";
 
@@ -669,7 +710,7 @@ public class JythonUtil {
         return result.toString();
     }
     
-    public static void main(String[] args ) {
+    public static void main(String[] args ) throws FileNotFoundException {
         String s1="resourceURI= getParam( 'resourceURI', 'ftp://satdat.ngdc.noaa.gov/sem/poes/data/raw/ngdc/2013/noaa19/poes_n19_20130409_raw.nc', 'example file to load' )\n" +
 "\n" +
 "sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n" +
@@ -692,7 +733,40 @@ public class JythonUtil {
 "   result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )"; 
         
         String s2= "sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n";
+        String s3= "a=1\n"
+                + "if ( a==1 ):\n"
+                + "  sp=getParam('species', 'ele', 'low spec', ['ele','ionlow'])\n"
+                + "else:\n"
+                + "  sp=getParam('species', 'ion', 'high spec', ['elehigh','ion'])\n";
         
-        System.err.println( getGetParams( s1 ) );
+        String s;
+        
+        System.err.println( "-- case s3-------------"); 
+        System.err.println( s3 );
+        s= simplifyScriptToGetParams(s3, false);
+        System.err.println( "----" );
+        System.err.println( s );
+        
+        System.err.println( "-- case s2-------------"); 
+        System.err.println( s2 );
+        s= simplifyScriptToGetParams(s2, false);
+        System.err.println( "----" );
+        System.err.println( s );
+        
+        System.err.println( "-- case s1-------------"); 
+        System.err.println( s1 );
+        s= simplifyScriptToGetParams(s1, false);
+        System.err.println( "----" );
+        System.err.println( s );
+        System.err.println( "--------------"); 
+        
+        System.err.println( "-- sebastiens file-------------"); 
+        String s4 = new Scanner( new File("/home/jbf/depascuale20130902_hfr_fuh_digitizer.jy") ).useDelimiter("\\A").next();
+        System.err.println( s4 );
+        s= simplifyScriptToGetParams(s4, false);
+        System.err.println( "----" );
+        System.err.println( s );
+        System.err.println( "--------------"); 
+        
     }
 }
