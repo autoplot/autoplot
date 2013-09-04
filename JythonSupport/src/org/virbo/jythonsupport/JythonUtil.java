@@ -238,12 +238,12 @@ public class JythonUtil {
      * @return true if an err is suspected.
      */
     public static boolean pythonLint( URI uri, List<String> errs ) throws IOException {
-        LineNumberReader reader= null;
+        LineNumberReader reader;
 
         File src = DataSetURI.getFile( uri, new NullProgressMonitor());
-
+        reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
+        
         try {
-            reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
 
             String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
 
@@ -265,14 +265,9 @@ public class JythonUtil {
                 }
                 line= reader.readLine();
             }
-            reader.close();
 
         } finally {
-            try {
-                if ( reader!=null ) reader.close();
-            } catch (IOException ex) {
-                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            reader.close();
         }
         return errs.size()>0;
 
@@ -346,30 +341,35 @@ public class JythonUtil {
      * </ul>
      * </p>
      * 
-     * @param reader A reader that has an open Jython file.
+     * @param reader A reader that has an open Jython file.  This will close the reader!
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
     public static List<Param> getGetParams( BufferedReader reader ) throws IOException {
-        String s= reader.readLine();
-
+        
+        String s;
         StringBuilder build= new StringBuilder();
-        Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
-        build.append( "sort_=[]\n");
-        while (s != null) {
-           int ic= s.indexOf("#");
-           if ( ic>-1 ) s= s.substring(0,ic);
-           Matcher m= getParamPattern.matcher(s);
-           if ( m.matches() || s.contains("getParam") ) {
-               build.append(s).append("\n");
-               int i= s.indexOf("=");
-               String v= s.substring(0,i).trim();
-               build.append("sort_.append( \'").append(v).append( "\')\n");
-           }
-           s = reader.readLine();
-        }
+        
+        try {
+            s= reader.readLine();
 
-        reader.close();
+            Pattern getParamPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=\\s*getParam\\(\\.*");
+            build.append( "sort_=[]\n");
+            while (s != null) {
+               int ic= s.indexOf("#");
+               if ( ic>-1 ) s= s.substring(0,ic);
+               Matcher m= getParamPattern.matcher(s);
+               if ( m.matches() || s.contains("getParam") ) {
+                   build.append(s).append("\n");
+                   int i= s.indexOf("=");
+                   String v= s.substring(0,i).trim();
+                   build.append("sort_.append( \'").append(v).append( "\')\n");
+               }
+               s = reader.readLine();
+            }
+        } finally {
+            reader.close();
+        }
         
         String params= build.toString();
 
