@@ -42,9 +42,11 @@ import org.python.core.PySyntaxError;
 import org.python.core.PySystemState;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
+import org.python.parser.ast.Attribute;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
+import org.python.parser.ast.Subscript;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.exprType;
 import org.python.parser.ast.stmtType;
@@ -349,6 +351,11 @@ public class JythonUtil {
             }
             return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
         }
+
+        @Override
+        public Object visitCall(Call node) throws Exception {
+            return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
+        }
         
          @Override
          protected Object unhandled_node(SimpleNode sn) throws Exception {
@@ -368,6 +375,8 @@ public class JythonUtil {
                          looksOkay= false;
                      }
                  }
+             } else if ( sn instanceof Name ) {
+                 //visitName((Name)sn).id
              }
          }
          public boolean looksOkay() {
@@ -382,36 +391,127 @@ public class JythonUtil {
          }
      }
      
+     /**
+      * inspect the node to look for function calls that are not to the function "getParam".  This is awful code that 
+      * will be rewritten when we upgrade Python to 2.7.
+      * @param o
+      * @param variableNames
+      * @return 
+      */
      private static boolean simplifyScriptToGetParamsOkayNoCalls( SimpleNode o, HashSet<String> variableNames ) {
-         
+
+         //if ( o.beginLine==19  ) {
+         //    System.err.println( "here at 19-ish");
+         //}
+        if ( o instanceof Call ) { 
+            Call c= (Call)o;
+            if ( !c.func.toString().contains("getParam,") ) {
+                logger.finer( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
+                return false;
+            }
+        }
         MyVisitorBase vb= new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
+            logger.finer( String.format( " %04d simplify->%s: %s", o.beginLine, vb.looksOkay(), o ) );
             return vb.looksOkay();
             
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        logger.finer( String.format( "!! %04d simplify->false: %s", o.beginLine, o ) );
          return false;
      }
      
+     /**
+      * can we resolve this node given the variable names we know?
+      * @param o
+      * @param variableNames
+      * @return true if the node can be resolved.
+      */
+     private static boolean simplifyScriptToGetParamsCanResolve( SimpleNode o, HashSet<String> variableNames ) {
+        //if ( o.beginLine>=617 && o.beginLine<619 ) {
+        //    System.err.println( "here at 617-ish");
+        //}
+        if ( o instanceof Name ) { 
+            Name c= (Name)o;
+            if ( !variableNames.contains( c.id ) ) {
+                logger.finer( String.format( "%04d canResolve->false: %s", o.beginLine, o.toString() ) );
+                return false;
+            }
+        }
+        if ( o instanceof Attribute ) {
+            Attribute at= (Attribute)o;
+            while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
+                if ( at.value instanceof Attribute ) {
+                    at= (Attribute)at.value;
+                } else {
+                    Subscript s= (Subscript)at.value;
+                    if ( s.value instanceof Attribute ) {
+                        at= (Attribute)s.value;
+                    } else {
+                        return false; // oh just give up...
+                    }
+                }
+            }
+            if ( at.value instanceof Name ) {
+                Name n= (Name)at.value;
+                if ( !variableNames.contains( n.id ) ) return false;
+            }
+        }
+        MyVisitorBase vb= new MyVisitorBase(variableNames);
+        try {
+            o.traverse(vb);
+            logger.finer( String.format( " %04d canResolve->%s: %s", o.beginLine,  vb.visitNameFail, o ) );
+            return !vb.visitNameFail;
+            
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        logger.finer( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
+         return false;
+     }     
      /**
       * return true if we can include this in the script without a huge performance penalty.
       * @param o
       * @return 
       */
      private static boolean simplifyScriptToGetParamsOkay( stmtType o, HashSet<String> variableNames ) {
+         //if ( o.beginLine==607 ) {
+         //    System.err.println("here at line "+o.beginLine);
+         //}
          if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Import ) ) return true;
          if ( ( o instanceof org.python.parser.ast.Assign ) ) {
              Assign a= (Assign)o;
              if ( simplifyScriptToGetParamsOkayNoCalls( a.value, variableNames ) ) {
+                 if ( !simplifyScriptToGetParamsCanResolve(a.value, variableNames ) ) {
+                     return false;
+                 }
                  for ( int i=0; i<a.targets.length; i++ ) {
                     exprType et= ((exprType)a.targets[i]);
                     if ( et instanceof Name ) {
                         String id= ((Name)a.targets[i]).id;
                         variableNames.add(id);
                         logger.fine("assign to variable "+id);
+                    } else if ( et instanceof Attribute ) {
+                        Attribute at= (Attribute)et;
+                        while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
+                            if ( at.value instanceof Attribute ) {
+                                at= (Attribute)at.value;
+                            } else {
+                                Subscript s= (Subscript)at.value;
+                                if ( s.value instanceof Attribute ) {
+                                    at= (Attribute)s.value;
+                                } else {
+                                    return false; // oh just give up...
+                                }
+                            }
+                        }
+                        if ( at.value instanceof Name ) {
+                            Name n= (Name)at.value;
+                            if ( !variableNames.contains( n.id ) ) return false;
+                        }
                     }
                  }
                  return true;
@@ -450,6 +550,7 @@ public class JythonUtil {
          StringBuilder result= new StringBuilder();
          if ( addSort ) result.append("sort_=[]\n");
          HashSet variableNames= new HashSet();
+         variableNames.add("getParam");
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
              for ( Object o: n.body ) {
@@ -528,9 +629,9 @@ public class JythonUtil {
         
         String params= s;
         
-        params= simplifyScriptToGetParams(params, false);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        params= simplifyScriptToGetParams(params, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
-        String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n";
+        String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n"; // TODO: this is nasty, because it means we can't do anything with the arguments.
 
         String prog= myCheat + params ;
 
@@ -539,6 +640,7 @@ public class JythonUtil {
             interp= new PythonInterpreter();
             interp.exec(prog);
         } catch ( PyException ex ) {
+            logger.log( Level.WARNING, null, ex );
             return new ArrayList();
         }
 
@@ -548,6 +650,7 @@ public class JythonUtil {
         for ( int i=0; i<sort.__len__(); i++ ) {
 
             PyList oo= (PyList) interp.get( (String)sort.get(i));
+            //PyList oo= (PyList) interp.get( (String)( sort.get(i) ) +"__getParam" );// TODO:
             Param p= new Param();
             p.label= (String) sort.get(i);   // should be name in the script
             if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
@@ -609,7 +712,6 @@ public class JythonUtil {
 
         Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
 
-        boolean haveResult = false;
         while (s != null) {
 
             if ( inDef==false ) {
@@ -662,7 +764,6 @@ public class JythonUtil {
 
             boolean inDef= false;
 
-            boolean haveResult = false;
             while (s != null) {
 
                 int comment= s.indexOf("#");
@@ -755,14 +856,14 @@ public class JythonUtil {
             "  result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )\n";
              
         
-
-        System.err.println( "-- case s5-------------"); 
-        System.err.println( s5 );
-        s= simplifyScriptToGetParams(s5, false);
+        System.err.println( "-- sebastiens file-------------"); 
+        String s4 = new Scanner( new File("/home/jbf/depascuale20130902_hfr_fuh_digitizer.jy") ).useDelimiter("\\A").next();
+        //System.err.println( s4 );
+        s= simplifyScriptToGetParams(s4, false);
         System.err.println( "----" );
         System.err.println( s );
-        
-
+        System.err.println( "--------------"); 
+       
         System.err.println( "-- case s3-------------"); 
         System.err.println( s3 );
         s= simplifyScriptToGetParams(s3, false);
@@ -781,14 +882,13 @@ public class JythonUtil {
         System.err.println( "----" );
         System.err.println( s );
         System.err.println( "--------------"); 
-        
-        System.err.println( "-- sebastiens file-------------"); 
-        String s4 = new Scanner( new File("/home/jbf/depascuale20130902_hfr_fuh_digitizer.jy") ).useDelimiter("\\A").next();
-        System.err.println( s4 );
-        s= simplifyScriptToGetParams(s4, false);
+       
+        System.err.println( "-- case s5-------------"); 
+        System.err.println( s5 );
+        s= simplifyScriptToGetParams(s5, false);
         System.err.println( "----" );
         System.err.println( s );
-        System.err.println( "--------------"); 
         
+
     }
 }
