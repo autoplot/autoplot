@@ -459,6 +459,12 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
+        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+            public void actionPerformed( ActionEvent ev ) {
+                runScript( dataSetSelector.getValue() );
+            }
+        });
+
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
