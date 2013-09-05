@@ -452,18 +452,33 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
-        dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-            public void actionPerformed( ActionEvent ev ) {
-                applicationModel.addRecent(dataSetSelector.getValue());
-                runScript( dataSetSelector.getValue() );
-            }
-        });
+        if ( ScriptContext.getViewWindow()==this ) {
+            dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                public void actionPerformed( ActionEvent ev ) {
+                    applicationModel.addRecent(dataSetSelector.getValue());
+                    runScript( dataSetSelector.getValue() );
+                }
+            });
 
-        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-            public void actionPerformed( ActionEvent ev ) {
-                runScript( dataSetSelector.getValue() );
-            }
-        });
+            dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                public void actionPerformed( ActionEvent ev ) {
+                    runScript( dataSetSelector.getValue() );
+                }
+            });
+        } else {
+            dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                public void actionPerformed( ActionEvent ev ) {
+                    applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
+                }
+            });
+
+            dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                public void actionPerformed( ActionEvent ev ) {
+                    applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
+                }
+            });
+            
+        }
 
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             public void actionPerformed( ActionEvent ev ) {
