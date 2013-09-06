@@ -21,7 +21,6 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class CefReaderData {
 
-    Cef cef;
     FieldParser[] parsers;
     //CharsetDecoder charsetDecoder;
     
