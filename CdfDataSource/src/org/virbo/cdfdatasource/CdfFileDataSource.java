@@ -19,7 +19,6 @@ import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -65,7 +64,6 @@ public class CdfFileDataSource extends AbstractDataSource {
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
 
-    Map properties;
     Map<String, Object> attributes;
 
     private final static Logger logger= LoggerManager.getLogger("apdss.cdfn");
