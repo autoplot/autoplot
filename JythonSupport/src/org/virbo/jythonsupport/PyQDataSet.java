@@ -211,9 +211,7 @@ public class PyQDataSet extends PyJavaInstance {
                 func= new PyReflectedFunction(m.getName());
                 binaryInfixMethods.put( m.getName(), func );
             }
-            if ( func!=null ) {
-                func.addMethod(m);
-            }
+            func.addMethod(m);
         }
     }
 
@@ -684,10 +682,6 @@ public class PyQDataSet extends PyJavaInstance {
 
         }
 
-        int qube[] = new int[iter.rank()];
-        for (int i = 0; i < iter.rank(); i++) {
-            qube[i] = iter.length(i);
-        }
         QDataSet val = coerceDsInternal(arg1);
 
         // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
@@ -780,12 +774,12 @@ public class PyQDataSet extends PyJavaInstance {
                 throw Py.TypeError("unable to coerce: " + arg0);
             }
         } else {
-            QDataSet ds = (QDataSet) o;
-            if (ds.rank() == 0) {
+            QDataSet lds = (QDataSet) o;
+            if (lds.rank() == 0) {
                 // QDataSet library handles coerce logic.
-                return ds;
+                return lds;
             } else {
-                return ds;
+                return lds;
             }
         }
 
@@ -811,9 +805,9 @@ public class PyQDataSet extends PyJavaInstance {
                 throw Py.TypeError("unable to coerce: " + arg0);
             }
         } else {
-            QDataSet ds = (QDataSet) o;
+            QDataSet lds = (QDataSet) o;
             result= (DDataSet) ArrayDataSet.copy( double.class, rods);
-            result= (DDataSet) ArrayDataSet.append( result, DDataSet.copy( ds ) );
+            result= (DDataSet) ArrayDataSet.append( result, DDataSet.copy( lds ) );
         }
 
         return new PyQDataSet(result);
@@ -866,7 +860,8 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
 
+    @Override
     public String toString() {
-        return "PyQDataSet wrapping " + rods.toString();
+        return "" + rods.toString() + " (pyqds)";
     }
 }
