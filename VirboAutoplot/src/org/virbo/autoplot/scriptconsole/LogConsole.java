@@ -375,7 +375,7 @@ public class LogConsole extends javax.swing.JPanel {
             Pattern p = searchTextPattern;
             StyledDocument doc = logTextArea.getStyledDocument();
             doc.remove(0, doc.getLength());
-            long lastT = 0;
+            //long lastT = 0; // this was used to indicate a pause in processing, but it was confusing more than anything else.
 
             MutableAttributeSet highlistAttr = new SimpleAttributeSet();
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
@@ -388,11 +388,11 @@ public class LogConsole extends javax.swing.JPanel {
             
             for (LogRecord rec : records) {
                 if (rec.getLevel().intValue() >= level) {
-                    if (lastT != 0 && rec.getMillis() - lastT > 5000) {
-                        //buf.append("\n");
-                        doc.insertString(doc.getLength(), "\n", null);
-                    }
-                    lastT = rec.getMillis();
+//                    if (lastT != 0 && rec.getMillis() - lastT > 5000) { // TODO replace this with a GUI element, like a divider line on the left.
+//                        //buf.append("\n");
+//                        doc.insertString(doc.getLength(), "\n", null);
+//                    }
+                    //lastT = rec.getMillis();
                     
                     String recMsg;
                     String msg= rec.getMessage();
@@ -413,7 +413,7 @@ public class LogConsole extends javax.swing.JPanel {
                         prefix += rec.getLoggerName() + " ";
                     }
                     if (timeStamps) {
-                        prefix += nf.format((rec.getMillis() - t) / 1000.) + " ";
+                        prefix += nf.format(( t - rec.getMillis() ) / 1000.) + " "; // the minus sign was unproductive and messed up the formatting.
                     }
                     if (logLevels) {
                         prefix += rec.getLevel() + " ";
