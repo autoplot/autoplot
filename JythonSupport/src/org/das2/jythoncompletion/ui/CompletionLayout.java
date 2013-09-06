@@ -61,6 +61,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -431,8 +432,11 @@ public final class CompletionLayout {
 
             Runnable run= new Runnable() {
                 public void run() {
-                    getDocumentationScrollPane().setData(doc);
-                    SwingUtilities.invokeLater(getUpdateRunnable(anchorOffset));
+                    DocumentationScrollPane pane= getDocumentationScrollPane() ;
+                    if ( pane!=null ) {
+                        pane.setData(doc);
+                        SwingUtilities.invokeLater(getUpdateRunnable(anchorOffset));
+                    }
                 }
             };
             new Thread(run).start();
