@@ -21,7 +21,6 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
 
     private static final Logger logger= Logger.getLogger("apdss.html");
 
-    int state;
     int tableCount = -1;
     int itable=0;
     String stable= null;
@@ -29,7 +28,6 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
     boolean inTable = false;
     List<String> currentRow;
 
-    String currentField;
     int fieldCount = -1;
     boolean inField = false;
     boolean inRow = false;
