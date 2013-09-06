@@ -169,6 +169,7 @@ public class PlotCommand extends PyObject {
             args= newArgs;
             nargs= nargs-1;
             nparm= args.length - keywords.length;
+            po0= args[0];
         }
 
         //if ( args[nargs-1] instanceof PyInteger ) {  // NEW! last positional argument can be plot position.  Where is this used?  I think it should go away.
