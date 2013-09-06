@@ -18,7 +18,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 
 /**
-/**
  *
  * @author jbf
  */
@@ -29,11 +28,6 @@ public class HtmlTableParser extends AbstractDataSource {
      */
     public static final String PARAM_COLUMN= "column";
     public static final String PARAM_TABLE= "table";
-
-    String cacheUri;
-    String stable;
-    String cacheFile=null;
-    QDataSet cacheDs=null;
 
     public HtmlTableParser(URI uri) {
         super(uri);
