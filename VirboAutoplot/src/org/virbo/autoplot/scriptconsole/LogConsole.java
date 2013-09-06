@@ -413,7 +413,7 @@ public class LogConsole extends javax.swing.JPanel {
                         prefix += rec.getLoggerName() + " ";
                     }
                     if (timeStamps) {
-                        prefix += nf.format(( t - rec.getMillis() ) / 1000.) + " "; // the minus sign was unproductive and messed up the formatting.
+                        prefix += nf.format(( t - rec.getMillis() ) / 1000.) + " "; // the minus sign was unproductive and messed up the formatting. 
                     }
                     if (logLevels) {
                         prefix += rec.getLevel() + " ";
