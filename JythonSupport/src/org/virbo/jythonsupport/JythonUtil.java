@@ -625,15 +625,13 @@ public class JythonUtil {
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
-    public static List<Param> getGetParams( String s ) throws PySyntaxError {
+    public static List<Param> getGetParams( String script ) throws PySyntaxError {
         
-        String params= s;
-        
-        params= simplifyScriptToGetParams(params, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        script= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
         String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n"; // TODO: this is nasty, because it means we can't do anything with the arguments.
 
-        String prog= myCheat + params ;
+        String prog= myCheat + script ;
 
         PythonInterpreter interp;
         try {
