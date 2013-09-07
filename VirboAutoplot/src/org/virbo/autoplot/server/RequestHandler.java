@@ -33,16 +33,17 @@ public class RequestHandler {
     public RequestHandler() {
     }
 
-    /**
-     * this is a hook to remind myself we want to filter the stream to ensure
-     * a secure sandbox.  This will be done by removing import statements and
-     * exec/eval statements.
-     * @param in
-     * @return
-     */
-    private InputStream untaint( InputStream in ) {
-        return in;
-    }
+//    /**
+//     * this is a hook to remind myself we want to filter the stream to ensure
+//     * a secure sandbox.  This will be done by removing import statements and
+//     * exec/eval statements.
+//     * @param in
+//     * @return
+//     */
+//    private InputStream untaint( InputStream in ) {
+//        return in;
+//    }
+    
     /**
      * process the python code in data.  
      * return null or in the future the data to send back.
