@@ -150,7 +150,12 @@ public class Test011 {
                 System.err.println("test011_001: " + DataSetUtil.format(mds));
 
                 ff = new SimpleStreamFormatter();
-                ff.format(bds, new FileOutputStream("test011_001.qds"), true);
+                FileOutputStream fo= new FileOutputStream("test011_001.qds");
+                try {
+                    ff.format(bds, fo, true);
+                } finally {
+                    fo.close();
+                }
             }
 
             timer("test bundle of rank 0");
