@@ -29,10 +29,8 @@ import org.virbo.autoplot.dom.CanvasUtil;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.jythonsupport.PyQDataSetAdapter;
-import org.virbo.jythonsupport.Util;
+import org.virbo.jythonsupport.JythonOps;
 
 /**
  * new implementation of the plot command allows for keywords.
@@ -45,21 +43,7 @@ public class PlotCommand extends PyObject {
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
-            if (arg0.isNumberType()) {
-                double d = (Double) arg0.__tojava__(Double.class);
-                return DataSetUtil.asDataSet(d);
-            } else if (arg0 instanceof PyString ) {
-                try {
-                    return Util.getDataSet( (String)arg0.__tojava__(String.class) );
-                } catch ( Exception ex ) {
-                    ex.printStackTrace();
-                    return null;
-                }
-            } else if (arg0.isSequenceType()) {
-                return PyQDataSetAdapter.adaptList((PyList) arg0);
-            } else {
-                throw Py.TypeError("unable to coerce: " + arg0);
-            }
+            return JythonOps.dataset(arg0);
         } else {
             QDataSet ds = (QDataSet) o;
             if (ds.rank() == 0) {
@@ -109,7 +93,7 @@ public class PlotCommand extends PyObject {
                 }
             }
         }
-        System.err.printf( "looking for %s, found %s\n", ele, lvals.toString() );
+        logger.log( Level.INFO, "looking for {0}, found {1}\n", new Object[]{ele, lvals.toString()});
         return null;
     }
 
