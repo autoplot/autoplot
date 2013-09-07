@@ -24,7 +24,16 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <ul>
+        <ul>            
+            <li>massive <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-findbugs/">findbugs</a>cleanup to get below 400 flags</li>
+            <li>rte_0851835013: data point recorder forces .dat or .txt extensions</li>
+            <li>rte_1906877305: okay press on select datasource without selection</li>
+            <li>plotx(1,uri) didn't respect TimeSeriesBrowse</li>
+            <li>script: is only allowed from first window, second window prints a warning.</li>
+            <li>autorange for many renderers didn't look for log setting, forcing result to be linear when the dataset defaults wanted log</li>            
+            <li>rte_0369904082: orbit numbers when at the end of the known orbits</li>
+            <li>ContextFlowView when image is smaller than 400 pixels in width.</li>
+            <li>rfe 314: bugfixes to scriptServlet, which was broken since jython import</li>
             <li>1102: feedback problems with slicers, rank 2 DEPEND_1 </li>
             <li>1101: trim with CDFs with rank 2 DEPEND_1.</li>
             <li>java-based CDF library would incorrectly handle 1-element dimensions</li>
@@ -71,6 +80,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
+            <li>export to wave table clips to visible range, not wave packet boundaries</li>
             <li>blurURI in TimeSeriesBrowse introduced, which will be used to clean up multiple timerange references in a vap.</li>
             <li>PNGWalk tool has a link to start up or make visible an Autoplot window</li>
             <li>rfe 316: completions should be in a scrollable list</li>
