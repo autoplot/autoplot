@@ -14,13 +14,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
-import org.das2.datum.Units;
 import org.das2.util.CombinedTreeModel;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.JPopupMenu;
@@ -28,7 +25,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
-import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -40,7 +36,6 @@ import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.AutoHistogram;
@@ -70,19 +65,21 @@ public class MetadataPanel extends javax.swing.JPanel {
         initComponents();
 
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 metaDataTree.setModel(null);
             }
         });
 
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToDataSourceFilter( dom.getController().getDataSourceFilter() );
             }
         });
 
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToPlotElement( dom.getController().getPlotElement() );
             }
@@ -105,7 +102,6 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     private MouseListener createPopupTrigger() {
         return new MouseAdapter() {
-
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -166,6 +162,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 String label = "(data source controller is null)";
                 tree = new CombinedTreeModel(label);
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         metaDataTree.setModel(tree);
                     }
@@ -185,7 +182,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 final TreeModel dsrcMeta = NameValueTreeModel.create(root, meta);
                 if (dsrcMeta != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        @Override
                         public void run() {
                             tree.mountTree(dsrcMeta, 10);
                             metaDataTree.setModel(tree);
@@ -200,6 +197,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 }
                 tree = new CombinedTreeModel(label);
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         metaDataTree.setModel(tree);
                     }
@@ -212,7 +210,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         }
     }
     transient PropertyChangeListener propertiesListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_RAWPROPERTIES)) {
                 updateProperties();
@@ -223,7 +221,7 @@ public class MetadataPanel extends javax.swing.JPanel {
      * update when the fill dataset changes.
      */
     transient PropertyChangeListener fillListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
                 //System.err.println("fillChanged: "+evt+" "+evt.getPropertyName()+" "+evt.getOldValue()+" "+evt.getNewValue());
@@ -236,7 +234,7 @@ public class MetadataPanel extends javax.swing.JPanel {
      * update when the fill dataset changes.
      */
     transient PropertyChangeListener componentListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(PlotElementController.PROP_DATASET )) {
                 updateComponentDataSet();
@@ -246,6 +244,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     private void updateComponentDataSet() {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 updateComponentDataSetPropertiesView();
             }
@@ -254,15 +253,15 @@ public class MetadataPanel extends javax.swing.JPanel {
         //RequestProcessor.invokeLater(run);
     }
 
-    private String format(double d) {
-        if (Math.abs(Math.log(d) / Math.log(10)) < 3) {
-            DecimalFormat df1 = new DecimalFormat("0.00");
-            return df1.format(d);
-        } else {
-            DecimalFormat df = new DecimalFormat("0.00E0");
-            return df.format(d);
-        }
-    }
+//    private String format(double d) {
+//        if (Math.abs(Math.log(d) / Math.log(10)) < 3) {
+//            DecimalFormat df1 = new DecimalFormat("0.00");
+//            return df1.format(d);
+//        } else {
+//            DecimalFormat df = new DecimalFormat("0.00E0");
+//            return df.format(d);
+//        }
+//    }
     boolean statisticsDirty;
 
     /**
@@ -307,7 +306,7 @@ public class MetadataPanel extends javax.swing.JPanel {
     private void updateStatistics() {
         statisticsDirty = true;
         Runnable run = new Runnable() {
-
+            @Override
             public void run() {
                 if (statisticsDirty) {
                     updateStatisticsImmediately();
@@ -317,7 +316,6 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
         };
         new Thread( run, "updateStats" ).start();
-        //RequestProcessor.invokeLater(run);
     }
 
     private synchronized void updateDataSetPropertiesView() {
@@ -342,7 +340,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         updateComponentDataSetPropertiesView();
         
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 if (unmount != null) {
                     tree.unmountTree(unmount);
@@ -392,7 +390,7 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 if (unmount != null) {
                     tree.unmountTree(unmount);
@@ -495,7 +493,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         }
 
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
             }
@@ -545,6 +543,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         StringSelection stringSelection = new StringSelection( tp.getLastPathComponent().toString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
+            @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
             }
         });
