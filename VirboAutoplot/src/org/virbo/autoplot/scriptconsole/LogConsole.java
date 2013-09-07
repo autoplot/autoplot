@@ -607,7 +607,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    fo.close();
+                    if ( fo!=null ) fo.close();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -620,14 +620,13 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             try {
                 fo = new FileOutputStream(chooser.getSelectedFile());
                 LogConsoleUtil.serializeLogRecords(records, fo);
-                fo.close();
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    fo.close();
+                    if ( fo!=null ) fo.close();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
