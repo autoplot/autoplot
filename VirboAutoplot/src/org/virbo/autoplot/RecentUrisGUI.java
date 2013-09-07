@@ -155,15 +155,6 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         }
     }
-    
-    /**
-     * @param xXx  mixed case string
-     * @param xx   lower case match
-     * @return
-     */
-    private static boolean containsIgnoreCase( String xXx, String xx ) {
-        return xXx.toLowerCase().contains(xx);
-    }
 
     final class MyTreeModel implements TreeModel {
 
