@@ -5,9 +5,7 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.XMLEncoder;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
 /**
  *
@@ -19,15 +17,15 @@ public class DomTests {
         diffsTest();
     }
 
-    private static void serializeTest() throws FileNotFoundException {
-        Application app = new Application();
-        new ApplicationController(null, app);
-        app.getController().addPlotElement(null,null);
-
-        XMLEncoder enc = new XMLEncoder(new FileOutputStream("/home/jbf/foo.xml"));
-        enc.writeObject(enc);
-        enc.close();
-    }
+//    private static void serializeTest() throws FileNotFoundException {
+//        Application app = new Application();
+//        new ApplicationController(null, app);
+//        app.getController().addPlotElement(null,null);
+//
+//        XMLEncoder enc = new XMLEncoder(new FileOutputStream("/home/jbf/foo.xml"));
+//        enc.writeObject(enc);
+//        enc.close();
+//    }
 
     public static void diffsTest() {
         Plot p1= new Plot();
