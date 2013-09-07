@@ -81,6 +81,7 @@ public class PlotController extends DomNodeController {
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
         this.plot.addPropertyChangeListener( Plot.PROP_ID, new PropertyChangeListener() {
+            @Override
             public void propertyChange( PropertyChangeEvent evt ) {
                 if ( dom.controller.isValueAdjusting() ) return;
                 DomLock lock = dom.controller.mutatorLock();
@@ -102,12 +103,14 @@ public class PlotController extends DomNodeController {
             }
         });
         dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
                 updateAxisFormatter(update);
             }
         });
         dom.options.addPropertyChangeListener( Options.PROP_MOUSEMODULE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 DasPlot p= dasPlot;
                 MouseModuleType mm= (MouseModuleType) evt.getNewValue();
@@ -131,6 +134,7 @@ public class PlotController extends DomNodeController {
     }
 
     public PropertyChangeListener rowColListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( dasPlot!=null && evt.getPropertyName().equals(Plot.PROP_ROWID) ) {
                 String id= (String)evt.getNewValue();
@@ -179,24 +183,25 @@ public class PlotController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_AUTOBINDING, oldAutoBinding, autoBinding);
     }
 
-    /**
-     * return the Canvas containing this plot, or null if this cannot be resolved.
-     * 
-     * @return
-     */
-    private Canvas getCanvasForPlot() {
-        Canvas[] cc= dom.getCanvases();
-        for ( Canvas c: cc ) {
-            for ( Row r: c.getRows() ) {
-                if ( r.getId().equals(plot.getRowId()) ) {
-                    return c;
-                }
-            }
-        }
-        return null;
-    }
+//    /**
+//     * return the Canvas containing this plot, or null if this cannot be resolved.
+//     * 
+//     * @return
+//     */
+//    private Canvas getCanvasForPlot() {
+//        Canvas[] cc= dom.getCanvases();
+//        for ( Canvas c: cc ) {
+//            for ( Row r: c.getRows() ) {
+//                if ( r.getId().equals(plot.getRowId()) ) {
+//                    return c;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
     private PropertyChangeListener labelListener= new PropertyChangeListener() {
+         @Override
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
                 plot.setAutoLabel(false);
@@ -205,6 +210,7 @@ public class PlotController extends DomNodeController {
     };
 
     private PropertyChangeListener ticksURIListener= new PropertyChangeListener() {
+         @Override
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
                 if ( ((String)evt.getNewValue()).length()>0 ) {
@@ -299,6 +305,7 @@ public class PlotController extends DomNodeController {
         if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
         DasMouseInputAdapter.Feedback feedback= new DasMouseInputAdapter.Feedback() {
+            @Override
             public void setMessage(String message) {
                 getApplication().getController().setStatus(message);
             }
@@ -425,6 +432,7 @@ public class PlotController extends DomNodeController {
         public String toString() {
             return ""+PlotController.this;
         }
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
@@ -532,7 +540,7 @@ public class PlotController extends DomNodeController {
      */
     public void resetZoom(boolean x, boolean y, boolean z) {
         List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
-        if ( elements.size()==0 ) return;
+        if ( elements.isEmpty() ) return;
         Plot newSettings = null;
 
         boolean haveTsb= false;
@@ -633,6 +641,7 @@ public class PlotController extends DomNodeController {
     }
     
     PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             PlotElement pele= (PlotElement)evt.getSource();
             List<PlotElement> pp= PlotController.this.dom.getController().getPlotElementsFor(plot);
@@ -651,6 +660,7 @@ public class PlotController extends DomNodeController {
     };
 
     PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             checkRenderType();
         }
@@ -659,6 +669,7 @@ public class PlotController extends DomNodeController {
     PlotElement plotElement;
 
     private PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String contextStr;
             String shortContextStr;
@@ -1226,6 +1237,7 @@ public class PlotController extends DomNodeController {
         final DasCanvas c= p.getCanvas();
         if ( c!=null ) {
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     c.remove(p);
                     c.remove(cb);
@@ -1234,46 +1246,12 @@ public class PlotController extends DomNodeController {
         }
     }
 
-    /**
-     * adjust the plot axes so it remains isotropic.
-     * @param axis if non-null, the axis that changed, and the other should be adjusted.
-     */
-    private void checkIsotropic(DasAxis axis) {
-        Datum scalex = dasPlot.getXAxis().getDatumRange().width().divide(dasPlot.getXAxis().getDLength());
-        Datum scaley = dasPlot.getYAxis().getDatumRange().width().divide(dasPlot.getYAxis().getDLength());
-
-        if ( ! scalex.getUnits().isConvertableTo(scaley.getUnits())
-                || dasPlot.getXAxis().isLog()
-                || dasPlot.getYAxis().isLog() ) {
-            return;
-        }
-
-        if ( axis==null ) {
-            axis= scalex.gt(scaley) ?  dasPlot.getXAxis()  : dasPlot.getYAxis() ;
-        }
-
-        if ( (axis == dasPlot.getXAxis() || axis == dasPlot.getYAxis()) ) {
-            DasAxis otherAxis = dasPlot.getYAxis();
-            if (axis == dasPlot.getYAxis()) {
-                otherAxis = dasPlot.getXAxis();
-            }
-            Datum scale = axis.getDatumRange().width().divide(axis.getDLength());
-            DatumRange otherRange = otherAxis.getDatumRange();
-            Datum otherScale = otherRange.width().divide(otherAxis.getDLength());
-            double expand = (scale.divide(otherScale).doubleValue(Units.dimensionless) - 1) / 2;
-            if (Math.abs(expand) > 0.0001) {
-                DatumRange newOtherRange = DatumRangeUtil.rescale(otherRange, 0 - expand, 1 + expand);
-                otherAxis.setDatumRange(newOtherRange);
-            }
-        }
-    }
 
     Converter contextConverter= new Converter() {
         @Override
         public Object convertForward(Object value) {
             String title= (String)value;
             if ( title.contains("%{CONTEXT}" ) ) {
-                QDataSet context;
                 String contextStr="";
                 if ( plotElement!=null && plotElement.getController()!=null ) {
                     QDataSet ds= plotElement.getController().getDataSet();
@@ -1306,7 +1284,6 @@ public class PlotController extends DomNodeController {
             public Object convertForward(Object value) {
                 String title= (String)value;
                 if ( title.contains("%{CONTEXT}" ) ) {
-                    QDataSet context;
                     String contextStr="";
                     if ( plotElement!=null && plotElement.getController()!=null ) {
                         QDataSet ds= plotElement.getController().getDataSet();
