@@ -166,18 +166,18 @@ public class Test022 {
     }
 
 
-    private static void dumpRank3Ds( QDataSet ds ) {
-        for ( int i=0; i<ds.length(); i++ ) {
-            QDataSet slice= ds.slice(i);
-            System.err.println( "--- " + slice + " ---");
-            for ( int j=0; j<slice.length(); j++ ) {
-                for ( int k=0; k<slice.length(j); k++ ) {
-                    System.err.print( " \t" + slice.value(j,k) );
-                }
-                System.err.println("");
-            }
-        }
-    }
+//    private static void dumpRank3Ds( QDataSet ds ) {
+//        for ( int i=0; i<ds.length(); i++ ) {
+//            QDataSet slice= ds.slice(i);
+//            System.err.println( "--- " + slice + " ---");
+//            for ( int j=0; j<slice.length(); j++ ) {
+//                for ( int k=0; k<slice.length(j); k++ ) {
+//                    System.err.print( " \t" + slice.value(j,k) );
+//                }
+//                System.err.println("");
+//            }
+//        }
+//    }
 
     /**
      * test code for identifying dataset schemes
