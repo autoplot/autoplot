@@ -52,7 +52,7 @@ public class AddCfaSampListener {
             }
 
             public Map processCall( HubConnection connection, String senderId, Message message ) {
-                System.err.printf( "got message: %s\n", message.toString() );
+                System.err.printf( "got message: %s%n", message.toString() );
                 String s= (String) message.getParam("url");
 
                 if ( s.startsWith( "file://localhost" ) ) s= s.substring(16);
