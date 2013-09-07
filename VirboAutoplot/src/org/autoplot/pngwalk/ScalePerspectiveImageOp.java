@@ -5,14 +5,13 @@
 package org.autoplot.pngwalk;
 
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
+import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 
 /**
  * ImageOp that draws the reflection as well as the perspective view of the data.
@@ -20,6 +19,8 @@ import java.awt.image.ColorModel;
  */
 public class ScalePerspectiveImageOp implements BufferedImageOp {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.pngwalk");
+    
     final int w;
     final int h;
     // subsample
@@ -104,9 +105,14 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         return ii;
     }
 
+    @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dest) {
 
-        dest = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
+        if ( dest!=null && dest.getWidth()==nw && dest.getHeight()==nh ) {
+            logger.fine("recycling old image");
+        } else {
+            dest = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
+        }
 
         int[] rr = new int[nw * nh];
         int[] gg = new int[nw * nh];
@@ -212,14 +218,17 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         return dest;
     }
 
+    @Override
     public Rectangle2D getBounds2D(BufferedImage src) {
         return new Rectangle2D.Double(0, 0, src.getWidth(), src.getHeight());
     }
 
+    @Override
     public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel destCM) {
         return new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
     }
 
+    @Override
     public Point2D getPoint2D(Point2D srcPt, Point2D dstPt) {
 
         double i1 = x1 + (int) (srcPt.getX() * w1 / w );
@@ -234,6 +243,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
         return dstPt;
     }
 
+    @Override
     public RenderingHints getRenderingHints() {
         return new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     }
