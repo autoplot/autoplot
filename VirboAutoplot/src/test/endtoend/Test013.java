@@ -15,6 +15,7 @@ import java.nio.channels.Channels;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Logger;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
 import org.das2.datum.EnumerationUnits;
@@ -229,7 +230,7 @@ public class Test013 {
     private static QDataSet test7() throws StreamException, IOException {
         int nrec= 190000;
 
-        long t0= System.currentTimeMillis();
+        long lt0= System.currentTimeMillis();
 
 
         FDataSet result= FDataSet.createRank1( nrec );
@@ -244,9 +245,9 @@ public class Test013 {
             planeds.putProperty( QDataSet.NAME, "myplane_"+i );
             result.putProperty( "PLANE_"+i, planeds );
         }
-        System.err.println( "generated data in  "+ ( System.currentTimeMillis()-t0) );
+        System.err.println( "generated data in  "+ ( System.currentTimeMillis()-lt0) );
 
-        t0= System.currentTimeMillis();
+        lt0= System.currentTimeMillis();
         System.err.println( "formatting... " );
 
         FileOutputStream out=null;
@@ -255,7 +256,7 @@ public class Test013 {
             SimpleStreamFormatter format = new SimpleStreamFormatter();
             format.format( result, out, false );
 
-            System.err.println( "time: "+ ( System.currentTimeMillis()-t0) );
+            System.err.println( "time: "+ ( System.currentTimeMillis()-lt0) );
         } finally {
             if ( out!=null ) out.close();
         }
@@ -306,7 +307,7 @@ public class Test013 {
             SimpleStreamFormatter format = new SimpleStreamFormatter();
 
             for (int i = 0; i < 3; i++) {
-                long t0 = System.currentTimeMillis();
+                long lt0 = System.currentTimeMillis();
 
                 String filename = ascii ? "test013_benchmark1.qds" : "test013_benchmark1.binary.qds";
                 FileOutputStream fo= null;
@@ -314,10 +315,10 @@ public class Test013 {
                     fo= new FileOutputStream(filename);
                     format.format( ds, fo, ascii );
                 } finally {
-                    fo.close();
+                    if ( fo!=null ) fo.close();
                 }
 
-                System.err.println("Time to write " + nrec + " records: " + (System.currentTimeMillis() - t0));
+                System.err.println("Time to write " + nrec + " records: " + (System.currentTimeMillis() - lt0));
             }
 
         }
@@ -333,20 +334,20 @@ public class Test013 {
         String ext= f.toString().substring(f.toString().lastIndexOf(".") ); // URI okay
 
         if ( ext.equals(".qds") ) {
-            long t0 = System.currentTimeMillis();
+            long lt0 = System.currentTimeMillis();
             InputStream in = new FileInputStream(f);
             QDataSetStreamHandler handler = new QDataSetStreamHandler();
             StreamTool.readStream(Channels.newChannel(in), handler);
             QDataSet qds = handler.getDataSet();
-            System.err.println("Time to read " + qds.length() + " records: " + (System.currentTimeMillis() - t0));
+            System.err.println("Time to read " + qds.length() + " records: " + (System.currentTimeMillis() - lt0));
 
         } else {
-            long t0 = System.currentTimeMillis();
+            long lt0 = System.currentTimeMillis();
             InputStream in = new FileInputStream(f);
             DataSetStreamHandler handler = new DataSetStreamHandler( new HashMap(), new NullProgressMonitor() );
             org.das2.stream.StreamTool.readStream(Channels.newChannel(in), handler);
             DataSet ds = handler.getDataSet();
-            System.err.println("Time to read " + ds.getXLength() + " records: " + (System.currentTimeMillis() - t0));
+            System.err.println("Time to read " + ds.getXLength() + " records: " + (System.currentTimeMillis() - lt0));
         }
     }
 
