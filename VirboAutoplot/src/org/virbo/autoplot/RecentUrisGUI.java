@@ -13,15 +13,12 @@ package org.virbo.autoplot;
 
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.SortedMap;
@@ -42,6 +39,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
@@ -61,6 +59,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     DefaultTreeModel deftree= new DefaultTreeModel( new DefaultMutableTreeNode("") );
     MyTreeModel theModel=null;
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot");
+            
     /** Creates new form RecentUrisGUI */
     public RecentUrisGUI() {
         initComponents();
@@ -69,6 +69,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         jTree1.setModel( deftree );
 
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
+            @Override
             public void valueChanged(TreeSelectionEvent e) {
                 Object o= e.getPath().getLastPathComponent();
                 if ( o instanceof String[] ) {
@@ -105,6 +106,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         jTree1.repaint();
         this.filter= filter;
         new Thread( new Runnable() {
+            @Override
             public void run() {
                 update();
             }
@@ -115,6 +117,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         theModel= new MyTreeModel();
 
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 jTree1.setModel( theModel );
                 jTree1.setCellRenderer( new MyCellRenderer() );
@@ -227,7 +230,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                 String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
                         null );
-                int iline=0;
+                //int iline=0;
                 final File f3 = new File(f2, "history.txt");
                 if ( f3.exists()&&f3.canRead() ) {
                     Scanner scan;
@@ -239,7 +242,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                     while (scan.hasNextLine()) {
                         String line = scan.nextLine();
-                        iline++;
+                        //iline++;
                         String[] ss= line.split("\\s+",2);
                         if ( ss.length<2 ) {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
@@ -267,18 +270,18 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             daysURIs.put( ss[1], ss[0] );
 
                         } catch (ParseException ex) {
-                            ex.printStackTrace();
+                            logger.log( Level.WARNING, null, ex );
                         }
                     }
                     scan.close();
 
-                    for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
+                    for ( Entry<String,String> entry: daysURIs.entrySet() ) {
                         try {
-                            String uri= ii.next();
-                            Datum tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                            String uri= entry.getKey();
+                            Datum tlocal= tp.parse(entry.getValue()).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
                             uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
                         } catch ( ParseException ex ) {
-                            ex.printStackTrace();
+                            logger.log( Level.WARNING, null, ex );
                         }
                     }
 
@@ -317,10 +320,12 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
         }
 
+        @Override
         public Object getRoot() {
             return root;
         }
 
+        @Override
         public Object getChild( Object parent, int index ) {
             if ( parent==root ) {
                 if ( empty ) {
@@ -341,6 +346,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             }
         }
 
+        @Override
         public int getChildCount( Object parent ) {
             if ( parent==root ) {
                 return list.length;
@@ -353,14 +359,17 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             }
         }
 
+        @Override
         public boolean isLeaf(Object node) {
             return ( node instanceof String[] ) || getChildCount(node)==0;
         }
 
+        @Override
         public void valueForPathChanged(TreePath path, Object newValue) {
             
         }
 
+        @Override
         public int getIndexOfChild(Object parent, Object child) {
             for ( int i=0; i<getChildCount(parent); i++ ) {
                 if ( getChild(parent,i)==child ) {
@@ -370,10 +379,12 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             return -1;
         }
 
+        @Override
         public void addTreeModelListener(TreeModelListener l) {
             
         }
 
+        @Override
         public void removeTreeModelListener(TreeModelListener l) {
             
         }
