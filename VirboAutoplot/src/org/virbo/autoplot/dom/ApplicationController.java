@@ -1061,21 +1061,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * find the plot using this renderer.
-     * @param rend
-     * @return
-     */
-    private Plot findPlot(DasPlot plot) {
-        for (Plot p : application.getPlots()) {
-            PlotController pc = p.controller;
-            if (pc.getDasPlot() == plot ) {
-                return p;
-            }
-        }
-        throw new IllegalArgumentException("unable to find plot for das plot");
-    }
-
-    /**
      * copy doplot and plotElements into a new doplot.
      * @param domPlot
      * @param dsf
