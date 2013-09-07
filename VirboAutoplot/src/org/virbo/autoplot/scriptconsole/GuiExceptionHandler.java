@@ -370,28 +370,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.focusURI= uri;
     }
 
-    // Append to the given StringBuffer an escaped version of the
-    // given text string where XML special characters have been escaped.
-    // For a null string we append "<null>"
-    // from java.util.logging.XMLFormatter
-    private void escape(StringBuffer sb, String text) {
-        if (text == null) {
-            text = "<null>";
-        }
-        for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
-            if (ch == '<') {
-                sb.append("&lt;");
-            } else if (ch == '>') {
-                sb.append("&gt;");
-            } else if (ch == '&') {
-                sb.append("&amp;");
-            } else {
-                sb.append(ch);
-            }
-        }
-    }
-
     private void formatException( Document doc, Element parent, Throwable th ) {
         Element ex= doc.createElement("exception");
         Element type= doc.createElement("type");
