@@ -5,7 +5,6 @@
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,7 +230,7 @@ public class Util {
 
                 JComponent ctf;
 
-                boolean isBool= isBoolean( parm.enums );
+                boolean isBool= parm.enums!=null && isBoolean( parm.enums );
 
                 String colon= isBool ? "" : ":";
 
