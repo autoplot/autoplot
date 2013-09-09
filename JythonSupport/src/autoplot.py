@@ -26,24 +26,30 @@ import org.das2.dataset.NoDataInIntervalException
 import org.das2.graph
 
 params= dict()
+_paramMap= dict()
+_paramSort= []
 
 import operator.isNumberType
 
-def getParam( x, default, title='', enums='' ):
-  if ( type(x).__name__=='int' ):
-     x= 'arg_%d' % i
-  if ( x=='resourceUri' ):
+def getParam( name, deflt, doc='', enums='' ):
+  print '-- paramMap --'
+  print _paramMap
+  _paramMap[ name ]= [ name, deflt, doc, enums ]
+  _paramSort.append( name )
+  if ( type(name).__name__=='int' ):
+     name= 'arg_%d' % i
+  if ( name=='resourceUri' ):
      print 'resourceURI may be used, but resourceUri cannot.'
-     x= 'resourceURI'
+     name= 'resourceURI'
   if type(params) is dict:
-     if params.has_key(x): 
-         t= type(default)  # Ed demonstrated this allows some pretty crazy things, e.g. open file, so be careful...
-         return t(params[x])
+     if params.has_key(name): 
+         t= type(deflt)  # Ed demonstrated this allows some pretty crazy things, e.g. open file, so be careful...
+         return t(params[name])
      else:
-         return default
+         return deflt
   else:
      print 'in jython script, variable params was overriden.'
-     return default
+     return deflt
 
 # invokeLater command is a scientist-friendly way to define a function that 
 # is called on a different thread.
