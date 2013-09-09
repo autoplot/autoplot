@@ -32,8 +32,6 @@ _paramSort= []
 import operator.isNumberType
 
 def getParam( name, deflt, doc='', enums='' ):
-  print '-- paramMap --'
-  print _paramMap
   _paramMap[ name ]= [ name, deflt, doc, enums ]
   _paramSort.append( name )
   if ( type(name).__name__=='int' ):
