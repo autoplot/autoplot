@@ -42,9 +42,7 @@
 	<classpathentry kind="lib" path="APLibs/lib/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/batik-util.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/beansbinding-1.2.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/itext-1.2.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jfits-0.93.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/JFontChooser.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jython.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-contrib-3.1-FINAL-20080629.jar"/>
@@ -62,5 +60,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/metadata-extractor-2.6.4.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/mailapi.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/itextpdf-5.4.3.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
