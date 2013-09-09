@@ -582,6 +582,13 @@ public class JythonUtil {
          }
      }
           
+     /**
+      * support for the old getGetParams.  Note this closes the reader.
+      * @param reader
+      * @return
+      * @throws IOException
+      * @throws PySyntaxError 
+      */
      public static List<Param> getGetParams( BufferedReader reader ) throws IOException, PySyntaxError {
         String s;
         StringBuilder build= new StringBuilder();
