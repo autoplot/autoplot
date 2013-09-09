@@ -38,9 +38,6 @@ def getParam( name, deflt, doc='', enums='' ):
   _paramSort.append( name )
   if ( type(name).__name__=='int' ):
      name= 'arg_%d' % i
-  if ( name=='resourceUri' ):
-     print 'resourceURI may be used, but resourceUri cannot.'
-     name= 'resourceURI'
   if type(params) is dict:
      if params.has_key(name): 
          t= type(deflt)  # Ed demonstrated this allows some pretty crazy things, e.g. open file, so be careful...
