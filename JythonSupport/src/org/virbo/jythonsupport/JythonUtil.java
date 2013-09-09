@@ -644,7 +644,7 @@ public class JythonUtil {
         }
         
         interp.get( "params" );
-        PyList sort= (PyList) interp.get( "paramSort" );
+        PyList sort= (PyList) interp.get( "_paramSort" );
 
         List<Param> result= new ArrayList();
         for ( int i=0; i<sort.__len__(); i++ ) {
