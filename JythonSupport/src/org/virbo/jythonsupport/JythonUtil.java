@@ -121,11 +121,16 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("imports.py");
+                URL imports= JythonOps.class.getResource("/autoplot.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 }
-                interp.execfile(imports.openStream(), "imports.py");
+                InputStream in = imports.openStream();
+                try {
+                    interp.execfile(in, "autoplot.py");
+                } finally {
+                    in.close();
+                }
             }
         }
 
@@ -540,7 +545,7 @@ public class JythonUtil {
      * extracts the parts of the program that get parameters.  Also, a sort order is built.
      *
      * @param script the entire python program
-     * @param addSort the value of addSort
+     * @param addSort if true, add parameters to keep track of the order that getParam was called.  This has no effect now.
      * @return the python program with lengthy calls removed.
      */
     
@@ -548,7 +553,6 @@ public class JythonUtil {
          String[] ss= script.split("\n");
          int acceptLine= -1;  // first line to accept
          StringBuilder result= new StringBuilder();
-         if ( addSort ) result.append("sort_=[]\n");
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");
          try {
@@ -560,7 +564,6 @@ public class JythonUtil {
                      if ( acceptLine>-1 ) {
                          int thisLine= ((stmtType)o).beginLine;
                          for ( int i=acceptLine; i<thisLine; i++ ) {
-                             if ( addSort ) maybeAppendSort( ss[i-1], result );
                              result.append(ss[i-1]).append("\n");
                          }
                          acceptLine= -1;
@@ -570,7 +573,6 @@ public class JythonUtil {
              if ( acceptLine>-1 ) {
                  int thisLine= ss.length+1;
                  for ( int i=acceptLine; i<thisLine; i++ ) {
-                     if ( addSort ) maybeAppendSort( ss[i-1], result );
                      result.append(ss[i-1]).append("\n");
                  }
              }
@@ -627,28 +629,26 @@ public class JythonUtil {
      */
     public static List<Param> getGetParams( String script ) throws PySyntaxError {
         
-        script= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
-        String myCheat= "def getParam( name, deflt, doc='', enums=[] ):\n  return [ name, deflt, doc, enums ]\n"; // TODO: this is nasty, because it means we can't do anything with the arguments.
-
-        String prog= myCheat + script ;
-
         PythonInterpreter interp;
         try {
-            interp= new PythonInterpreter();
+            interp= createInterpreter(true);
             interp.exec(prog);
         } catch ( PyException ex ) {
             logger.log( Level.WARNING, null, ex );
             return new ArrayList();
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+            return new ArrayList();            
         }
-
-        PyList sort= (PyList) interp.get( "sort_" );
+        
+        interp.get( "params" );
+        PyList sort= (PyList) interp.get( "paramSort" );
 
         List<Param> result= new ArrayList();
         for ( int i=0; i<sort.__len__(); i++ ) {
-
-            PyList oo= (PyList) interp.get( (String)sort.get(i));
-            //PyList oo= (PyList) interp.get( (String)( sort.get(i) ) +"__getParam" );// TODO:
+            PyList oo= (PyList) interp.eval( "_paramMap['"+(String)sort.get(i)+"']" );
             Param p= new Param();
             p.label= (String) sort.get(i);   // should be name in the script
             if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
@@ -817,7 +817,15 @@ public class JythonUtil {
         return result.toString();
     }
     
-    public static void main(String[] args ) throws FileNotFoundException {
+    public static void main( String[] args ) throws IOException {
+        PythonInterpreter i= createInterpreter(true);
+        System.err.println( i.eval("getParam") );
+        i.exec("x=getParam('x',-99,'doc',[-99,0,1])");
+        System.err.println( i.eval("x") );
+        System.err.println( i.eval("_paramMap") );
+    }
+    
+    public static void main_test1(String[] args ) throws FileNotFoundException {
         String s1="resourceURI= getParam( 'resourceURI', 'ftp://satdat.ngdc.noaa.gov/sem/poes/data/raw/ngdc/2013/noaa19/poes_n19_20130409_raw.nc', 'example file to load' )\n" +
 "\n" +
 "sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n" +
