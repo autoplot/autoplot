@@ -299,7 +299,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         typesList= new ArrayList();
         
         try {
-            parms= JythonDataSourceFactory.getParams( f.toURI(), new NullProgressMonitor() );
+            parms= JythonDataSourceFactory.getParams( f.toURI(), params, new NullProgressMonitor() );
 
             paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
@@ -312,7 +312,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
                 JComponent ctf;
 
-                boolean isBool= isBoolean( parm.enums );
+                boolean isBool= parm.enums!=null && isBoolean( parm.enums );
 
                 String colon= isBool ? "" : ":";
 
