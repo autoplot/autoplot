@@ -158,7 +158,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         mon.started();
 
         File jythonScript;   // script to run.
-        String resourceURI;  // optional resource URI that is argument to script, excluding script argument.
+        String lresourceURI;  // optional resource URI that is argument to script, excluding script argument.
 
         String suri= DataSetURI.fromUri(uri);
         if ( tsb!=null ) {
@@ -177,10 +177,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
             mon.setProgressMessage( "loading "+uri );
             split.params= null;
-            resourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
+            lresourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
 
         } else {
-            resourceURI= null;
+            lresourceURI= null;
             jythonScript= getFile(new NullProgressMonitor());
         }
 
@@ -226,9 +226,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                 }
                 
-                if ( resourceURI!=null ) {
-                    interp.set("resourceURI", resourceURI); // legacy
-                    interp.exec("autoplot.params['resourceURI']="+ maybeQuoteString( resourceURI ) );
+                if ( lresourceURI!=null ) {
+                    interp.set("resourceURI", lresourceURI); // legacy
+                    interp.exec("autoplot.params['resourceURI']="+ maybeQuoteString( lresourceURI ) );
                 }
 
                 mon.setProgressMessage( "executing script");
@@ -296,7 +296,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 } catch (Exception ex) {
                     throw ex;
                 }
-                reader=null;
                 
                 if (causedBy == null && allowCaching ) {
                     cacheDate = resourceDate(this.uri);
@@ -401,7 +400,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         mres.putProperty( QDataSet.DEPEND_0, mdep0 );
                         res= mres;
                     } else {
-                        logger.fine("result reports cache tag: "+tag);
+                        logger.log(Level.FINE, "result reports cache tag: {0}", tag);
                     }
                 }
             }
