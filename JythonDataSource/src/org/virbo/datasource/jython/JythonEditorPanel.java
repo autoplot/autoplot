@@ -15,6 +15,8 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -111,7 +113,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             
         });
     }
-
+    
+    private void redoVariables() {
+        paramsPanel.removeAll();
+        Map<String, String> params = getParamsFromGui();
+        doVariables( file, params );
+        paramsPanel.revalidate();
+    }
+            
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -133,6 +142,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         paramsScrollPane = new javax.swing.JScrollPane();
         paramsPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
 
@@ -153,15 +163,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         scriptPanelLayout.setHorizontalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+            .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -178,6 +188,13 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         jLabel2.setText("Select from the variables calculated by the script, 'data' or 'result' is used by default:");
         jLabel2.setMinimumSize(new java.awt.Dimension(200, 17));
 
+        jButton1.setText("update params");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -185,18 +202,21 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 474, Short.MAX_VALUE))
-            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
+                .add(variableComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 457, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jButton1))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(2, 2, 2)
-                .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -204,10 +224,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        redoVariables();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     protected javax.swing.JLabel fileNameLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -438,7 +462,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                             JCheckBox jcb= new JCheckBox( label );
                             jcb.setSelected( val.equals("T") );
                             ctf= jcb;
-
+                            jcb.addActionListener( new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    redoVariables();
+                                }
+                            });
                         } else {
                             JComboBox jcb= new JComboBox(parm.enums.toArray());
                             jcb.setEditable(false);
@@ -455,6 +484,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                                 oval = val;
                             }
                             jcb.setSelectedItem(oval);
+                            jcb.addItemListener( new ItemListener() {
+                                @Override
+                                public void itemStateChanged(ItemEvent e) {
+                                    redoVariables();
+                                }
+                            });
                             
                             ctf= jcb;
                             Dimension x= ctf.getPreferredSize();
@@ -530,6 +565,78 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
 
+    private Map<String, String> getParamsFromGui( ) throws IllegalArgumentException {
+        
+        URISplit split=  URISplit.parse(suri);
+        
+        Map<String,String> params= URISplit.parseParams(split.params);
+        String param= (String)variableComboBox.getSelectedItem();
+        int i= param.indexOf("<span");
+        if ( i==-1 ) {
+            params.put( "arg_0", param.trim() );
+        } else {
+            int j= param.startsWith("<html>") ? 6 : 0;
+            params.put( "arg_0", param.substring(j,i).trim() );
+        }
+        for ( int j=0; j<paramsList.size(); j++ ) {
+            String name= paramsList.get(j);
+            JComponent jc= tflist.get(j);
+            String value;
+            if ( jc instanceof JTextField ) {
+                value= ((JTextField)jc).getText();
+            } else if ( jc instanceof DataSetSelector ) {
+                value= ((DataSetSelector)jc).getValue();
+            } else if ( jc instanceof JComboBox ) {
+                value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
+            } else if ( jc instanceof JCheckBox ) {
+                value= ((JCheckBox)jc).isSelected() ? "T" : "F";
+            } else {
+                throw new IllegalArgumentException("the code needs attention: component for "+name+" not supported ");
+            }
+            
+            String deft= deftsList.get(j);
+            char type= typesList.get(j);
+
+            if ( name.equals( JythonDataSource.PARAM_TIMERANGE ) || ! value.equals(deft) || params.containsKey(name) ) {
+                if ( type=='A' ) {
+                    value= value.replaceAll("\'", "");
+                    //The value is escaped when the URI is formatted, so there's no reason to enquote it here.
+                    //boolean containsSpaces= value.contains(" ");
+                    //if ( containsSpaces && !( value.startsWith("'") && value.endsWith("'") ) ) {
+                    //    value=  "'" + value + "'";
+                    //}
+                    params.put( name, value );
+                } else if ( type=='R' ) {
+                    URISplit ruriSplit= URISplit.parse(value);
+                    if ( !params.containsKey("script") ) {
+                        params.put( "script", split.resourceUri.toString() );
+                    }
+                    split.resourceUri= ruriSplit.resourceUri;
+                    split.scheme= ruriSplit.scheme;
+                    split.authority= ruriSplit.authority;
+                    split.path= ruriSplit.path;
+                    split.file= ruriSplit.file;
+                    if ( split.vapScheme==null ) split.vapScheme= "vap+jyds";
+                } else {
+                    params.put( name, value );
+                }
+            } else if ( type=='R' && value.equals(deft) && ( split.resourceUri==null || !split.resourceUri.toString().equals(deft) ) ) {
+                URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
+                if (params.get("script")==null ) {
+                    params.put( "script", split.resourceUri.toString() );
+                }
+                split.resourceUri= ruriSplit.resourceUri;
+                split.scheme= ruriSplit.scheme;
+                split.authority= ruriSplit.authority;
+                split.path= ruriSplit.path;
+                split.file= ruriSplit.file;
+                if ( split.vapScheme==null ) split.vapScheme= "vap+jyds"; // DANGER--this ought-not to be hard coded, but this is all I can do for now...
+            }
+        }
+        return params;
+        
+    }
+    
     private String[] getScriptURI( URISplit split ) {
         Map<String,String> params= URISplit.parseParams(split.params);
 
@@ -554,6 +661,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             String[] furir= getScriptURI( split );
             File f = DataSetURI.getFile( furir[0], new NullProgressMonitor() );
+            file= f;
 
             Map<String,String> results= JythonDataSourceFactory.getResultParameters( f.toString(), new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
@@ -662,73 +770,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
 
         URISplit split=  URISplit.parse(suri);
-
-        Map<String,String> params= URISplit.parseParams(split.params);
-
-        String param= (String)variableComboBox.getSelectedItem();
-        int i= param.indexOf("<span");
-        if ( i==-1 ) {
-            params.put( "arg_0", param.trim() );
-        } else {
-            int j= param.startsWith("<html>") ? 6 : 0;
-            params.put( "arg_0", param.substring(j,i).trim() );
-        }
-
-        for ( int j=0; j<paramsList.size(); j++ ) {
-            String name= paramsList.get(j);
-            JComponent jc= tflist.get(j);
-            String value;
-            if ( jc instanceof JTextField ) {
-                value= ((JTextField)jc).getText();
-            } else if ( jc instanceof DataSetSelector ) {
-                value= ((DataSetSelector)jc).getValue();
-            } else if ( jc instanceof JComboBox ) {
-                value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
-            } else if ( jc instanceof JCheckBox ) {
-                value= ((JCheckBox)jc).isSelected() ? "T" : "F";
-            } else {
-                throw new IllegalArgumentException("the code needs attention: component for "+name+" not supported ");
-            }
-            
-            String deft= deftsList.get(j);
-            char type= typesList.get(j);
-
-            if ( name.equals( JythonDataSource.PARAM_TIMERANGE ) || ! value.equals(deft) || params.containsKey(name) ) {
-                if ( type=='A' ) {
-                    value= value.replaceAll("\'", "");
-                    //The value is escaped when the URI is formatted, so there's no reason to enquote it here.
-                    //boolean containsSpaces= value.contains(" ");
-                    //if ( containsSpaces && !( value.startsWith("'") && value.endsWith("'") ) ) {
-                    //    value=  "'" + value + "'";
-                    //}
-                    params.put( name, value );
-                } else if ( type=='R' ) {
-                    URISplit ruriSplit= URISplit.parse(value);
-                    if ( !params.containsKey("script") ) {
-                        params.put( "script", split.resourceUri.toString() );
-                    }
-                    split.resourceUri= ruriSplit.resourceUri;
-                    split.scheme= ruriSplit.scheme;
-                    split.authority= ruriSplit.authority;
-                    split.path= ruriSplit.path;
-                    split.file= ruriSplit.file;
-                    if ( split.vapScheme==null ) split.vapScheme= "vap+jyds";
-                } else {
-                    params.put( name, value );
-                }
-            } else if ( type=='R' && value.equals(deft) && ( split.resourceUri==null || !split.resourceUri.toString().equals(deft) ) ) {
-                URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
-                if (params.get("script")==null ) {
-                    params.put( "script", split.resourceUri.toString() );
-                }
-                split.resourceUri= ruriSplit.resourceUri;
-                split.scheme= ruriSplit.scheme;
-                split.authority= ruriSplit.authority;
-                split.path= ruriSplit.path;
-                split.file= ruriSplit.file;
-                if ( split.vapScheme==null ) split.vapScheme= "vap+jyds"; // DANGER--this ought-not to be hard coded, but this is all I can do for now...
-            }
-        }
+        
+        Map<String, String> params = getParamsFromGui();
 
         split.params= URISplit.formatParams(params);
 
