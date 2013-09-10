@@ -39,6 +39,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.ui.EditorTextPane;
+import org.virbo.jythonsupport.ui.ParametersFormPanel;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
@@ -164,7 +165,9 @@ public class JythonUtil {
     private static int showScriptDialog( Component parent, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
         JPanel p= new JPanel();
-        org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( file, fvars, p );
+        
+        ParametersFormPanel fpf= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+        ParametersFormPanel.FormData fd=  fpf.doVariables( file, fvars, p );
 
         if ( fd.count==0 && !makeTool ) {
             return JOptionPane.OK_OPTION;
@@ -208,7 +211,8 @@ public class JythonUtil {
                 
         int result= AutoplotUtil.showConfirmDialog2( parent, tp, "Run Script "+file.getName(), JOptionPane.OK_CANCEL_OPTION );
         if ( result==JOptionPane.OK_OPTION ) {
-            org.virbo.jythonsupport.ui.Util.resetVariables( fd, fvars );
+            fd=  fpf.getFormData();
+            org.virbo.jythonsupport.ui.ParametersFormPanel.resetVariables( fd, fvars );
             if ( makeTool ) {
                 if ( makeToolPanel.isInstall() ) { // the user has requested that the script be installed.
                     Window w= ScriptContext.getViewWindow();
