@@ -53,6 +53,7 @@ import org.das2.jythoncompletion.nbadapt.Utilities;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.PyException;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -117,8 +118,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private void redoVariables() {
         paramsPanel.removeAll();
         Map<String, String> params = getParamsFromGui();
-        doVariables( file, params );
-        paramsPanel.revalidate();
+        try {
+            doVariables( file, params );
+            paramsPanel.revalidate();
+        } catch ( PyException ex ) {
+            JOptionPane.showMessageDialog(this,"<html>Error:<br>"+ex);   
+        }
     }
             
     /** This method is called from within the constructor to
@@ -294,7 +299,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
      * @param params
      * @return 
      */
-    private boolean doVariables( File f, Map<String,String> params ) {
+    private boolean doVariables( File f, Map<String,String> params ) throws PyException {
 
         Map<String,JythonUtil.Param> parms;
 
