@@ -710,7 +710,7 @@ public class JythonUtil {
         PythonInterpreter interp;
         try {
             interp= createInterpreter(true);
-           // setParams( interp, params );
+            setParams( interp, params );
             interp.exec(prog);
         } catch ( PyException ex ) {
             logger.log( Level.WARNING, null, ex );
