@@ -59,6 +59,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
+import org.virbo.jythonsupport.ui.ParametersFormPanel;
 
 /**
  *
@@ -435,10 +436,11 @@ public class ScriptPanelSupport {
                                 } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                                     JPanel p= new JPanel();
                                     Map<String,String> vars= new HashMap();
-                                    org.virbo.jythonsupport.ui.Util.FormData fd=  org.virbo.jythonsupport.ui.Util.doVariables( panel.getEditorPanel().getText(), vars, p );
+                                    ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+                                    ParametersFormPanel.FormData fd=  pfp.doVariables( panel.getEditorPanel().getText(), vars, p );
                                     if ( fd.count>0 ) {
                                         if ( JOptionPane.showConfirmDialog( panel, p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                            org.virbo.jythonsupport.ui.Util.resetVariables( fd, vars );
+                                            ParametersFormPanel.resetVariables( fd, vars );
                                             for ( Entry<String,String> v: vars.entrySet() ) {
                                                 interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
                                             }
