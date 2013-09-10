@@ -23,12 +23,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
@@ -67,7 +67,8 @@ public class JythonUtil {
      * create an interpreter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
      *   * a standard set of names are imported.
-     * This also adds things to the python search path so imports will find them.
+     * This also adds things to the python search path 
+     * (see getLocalJythonAutoplotLib) so imports will find them.
      * 
      * @param sandbox limit symbols to safe symbols for server.
      * @return PythonInterpreter ready for commands.
@@ -121,18 +122,19 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("/autoplot.py");
+                URL imports= JythonOps.class.getResource("imports.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 }
                 InputStream in = imports.openStream();
                 try {
-                    interp.execfile(in, "autoplot.py");
+                    interp.execfile(imports.openStream(), "imports.py");
                 } finally {
                     in.close();
                 }
             }
         }
+
 
         return interp;
 
@@ -222,6 +224,7 @@ public class JythonUtil {
         
     /**
      * copy the two python files specific to Autoplot into the user's autoplot_data/jython folder.
+     * This reads the version from the first line of the autoplot.py.
      * @return the item to add to the python search path.
      * @throws IOException 
      */
@@ -229,9 +232,27 @@ public class JythonUtil {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff3= new File( ff2.toString() + "/jython" );
         File ff4= new File( ff3, "autoplot.py" );
-        if ( ! ff4.exists() ) {
-            logger.log(Level.FINE, "looking for {0}, but didn''t find it.", ff3);
-            logger.log(Level.FINE,"doesn't seem like we have the right file, downloading...");
+        String vers= "";
+        
+        double currentVersion= 1.1;  //rfe320 improved getParam support.
+                
+        if ( ff4.exists() ) {
+            BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
+            try {
+                String line= r.readLine();
+                Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                Matcher m= versPattern.matcher(line);
+                if ( m.matches() ) {
+                    vers= m.group(1);
+                }
+            } finally {
+                r.close();
+            }
+        }
+        
+        if ( ! ff4.exists() || vers.equals("") || Double.parseDouble(vers)<currentVersion ) {
+            logger.log(Level.FINE, "looking for version={0} of {1}, but didn''t find it.", new Object[] { currentVersion, ff4 } );
+            logger.log(Level.FINE, "doesn't seem like we have the right file, downloading...");
             if ( !ff3.exists() ) {
                 if ( !ff3.mkdir() ) {
                     throw new IOException("Unable to mkdir "+ff3);
@@ -241,9 +262,12 @@ public class JythonUtil {
             for ( String s: ss ) {
                 InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
                 FileOutputStream out= new FileOutputStream( new File( ff3, s ) );
-                transferStream(in,out);
-                out.close();
-                in.close();
+                try {
+                    transferStream(in,out);
+                } finally {
+                    out.close();
+                    in.close();
+                }
                 new File( ff3, s ).setReadOnly();
                 new File( ff3, s ).setWritable( true, true );
             }
@@ -307,7 +331,7 @@ public class JythonUtil {
         public char type;
         @Override
         public String toString() {
-            return name+"="+label;
+            return name+"="+deft;
         }
     }
 
@@ -476,6 +500,42 @@ public class JythonUtil {
         logger.finer( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
          return false;
      }     
+
+     
+     public static String maybeQuoteString(String sval) {
+        boolean isNumber= false;
+        try {
+            Double.parseDouble(sval); 
+        } catch ( NumberFormatException ex ) {
+            isNumber= false;
+        }
+
+        if ( sval.length()>0 && !isNumber && !sval.equals("True") && !sval.equals("False") ) {
+            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
+                sval= String.format( "'%s'", sval );
+            }
+        }
+        return sval;
+
+    }
+
+    public static void setParams( PythonInterpreter interp, Map<String,String> paramsl ) {
+        interp.exec("import autoplot");
+        interp.exec("autoplot.params=dict()");
+        for ( Entry<String,String> e : paramsl.entrySet()) {
+            String s= e.getKey();
+            if (!s.equals("arg_0") && !s.equals("script") ) {
+                String sval= e.getValue();
+                
+                sval= maybeQuoteString( sval );
+                logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
+                interp.exec("autoplot.params['" + s + "']=" + sval);
+            }
+        }
+        //interp.eval("autoplot.params");
+    }
+
+     
      /**
       * return true if we can include this in the script without a huge performance penalty.
       * @param o
@@ -590,6 +650,10 @@ public class JythonUtil {
       * @throws PySyntaxError 
       */
      public static List<Param> getGetParams( BufferedReader reader ) throws IOException, PySyntaxError {
+        return getGetParams( readScript(reader) );
+     }
+     
+     public static String readScript( BufferedReader reader ) throws IOException {
         String s;
         StringBuilder build= new StringBuilder();
         
@@ -602,9 +666,9 @@ public class JythonUtil {
         } finally {
             reader.close();
         }
-        return getGetParams( build.toString() );
-         
+        return build.toString();
      }
+     
     /**
      * <p>scrape through the script looking for getParam calls.  These are executed, and we
      * get labels and infer types from the defaults.  For example,<br>
@@ -634,13 +698,19 @@ public class JythonUtil {
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
-    public static List<Param> getGetParams( String script ) throws PySyntaxError {
+     public static List<Param> getGetParams( String script ) throws PySyntaxError {
+         return getGetParams(script,new HashMap<String, String>());
+         
+     }
+     
+     public static List<Param> getGetParams( String script, Map<String,String>params ) throws PySyntaxError {
         
         String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
         PythonInterpreter interp;
         try {
             interp= createInterpreter(true);
+           // setParams( interp, params );
             interp.exec(prog);
         } catch ( PyException ex ) {
             logger.log( Level.WARNING, null, ex );
@@ -650,12 +720,12 @@ public class JythonUtil {
             return new ArrayList();            
         }
         
-        interp.get( "params" );
-        PyList sort= (PyList) interp.get( "_paramSort" );
+        interp.exec("import autoplot\n");
+        PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
 
         List<Param> result= new ArrayList();
         for ( int i=0; i<sort.__len__(); i++ ) {
-            PyList oo= (PyList) interp.eval( "_paramMap['"+(String)sort.get(i)+"']" );
+            PyList oo= (PyList) interp.eval( "autoplot._paramMap['"+(String)sort.get(i)+"']" );
             Param p= new Param();
             p.label= (String) sort.get(i);   // should be name in the script
             if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
