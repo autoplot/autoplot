@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,24 +118,34 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( String suri, ProgressMonitor mon ) throws IOException {
+    protected static Map<String,JythonUtil.Param> getParams( String suri, Map<String,String> current, ProgressMonitor mon ) throws IOException {
         String furi= getScript( suri );
 
         File src = DataSetURI.getFile(furi, mon );
 
-        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new BufferedReader( new FileReader(src) ) );
+        FileReader reader= new FileReader(src);
+        try {
+            String script= JythonUtil.readScript( new BufferedReader( reader ) );
+            List<JythonUtil.Param> r2= JythonUtil.getGetParams( script, current );
 
-        Map<String,JythonUtil.Param> result= new LinkedHashMap();
+            Map<String,JythonUtil.Param> result= new LinkedHashMap();
 
-        for ( JythonUtil.Param r : r2 ) {
-            result.put( r.name, r );
+            for ( JythonUtil.Param r : r2 ) {
+                result.put( r.name, r );
+            }
+
+            return result;
+        } finally {
+            reader.close();
         }
+    }
 
-        return result;
+    protected static Map<String,JythonUtil.Param> getParams( URI uri, Map<String,String> current, ProgressMonitor mon ) throws IOException {
+        return getParams( uri.toString(), current, mon );
     }
 
     protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
-        return getParams( uri.toString(), mon );
+        return getParams( uri.toString(), null, mon );
     }
 
     @Override
@@ -196,7 +207,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         Map<String,String> uriParams= URISplit.parseParams(split.params);
         
         try {
-            Map<String,JythonUtil.Param> parms= getParams( surl, mon);
+            Map<String,JythonUtil.Param> parms= getParams( surl, new HashMap<String,String>(), mon);
             if ( parms.containsKey( JythonDataSource.PARAM_TIMERANGE ) && !uriParams.containsKey(JythonDataSource.PARAM_TIMERANGE) ) {
                 problems.add(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED);
                 return true;
