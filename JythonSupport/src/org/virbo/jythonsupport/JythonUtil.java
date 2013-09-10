@@ -698,12 +698,12 @@ public class JythonUtil {
      * @return list of parameter descriptions, in the order they were encountered in the file.
      * @throws IOException
      */
-     public static List<Param> getGetParams( String script ) throws PySyntaxError {
+     public static List<Param> getGetParams( String script ) throws PyException {
          return getGetParams(script,new HashMap<String, String>());
          
      }
      
-     public static List<Param> getGetParams( String script, Map<String,String>params ) throws PySyntaxError {
+     public static List<Param> getGetParams( String script, Map<String,String>params ) throws PyException {
         
         String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         
@@ -712,9 +712,6 @@ public class JythonUtil {
             interp= createInterpreter(true);
             setParams( interp, params );
             interp.exec(prog);
-        } catch ( PyException ex ) {
-            logger.log( Level.WARNING, null, ex );
-            return new ArrayList();
         } catch ( IOException ex ) {
             logger.log( Level.WARNING, null, ex );
             return new ArrayList();            
