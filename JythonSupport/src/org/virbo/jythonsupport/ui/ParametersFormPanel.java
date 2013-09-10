@@ -165,7 +165,7 @@ public class ParametersFormPanel {
      * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
      * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
-     * @return 
+     * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
     public FormData doVariables( final String src, Map<String,String> params, final JPanel paramsPanel ) {
         this.params= new HashMap(params);
