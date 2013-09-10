@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
@@ -117,7 +118,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( String suri, Map<String,String> current, ProgressMonitor mon ) throws IOException {
+    protected static Map<String,JythonUtil.Param> getParams( String suri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
         String furi= getScript( suri );
 
         File src = DataSetURI.getFile(furi, mon );
@@ -139,11 +140,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, Map<String,String> current, ProgressMonitor mon ) throws IOException {
+    protected static Map<String,JythonUtil.Param> getParams( URI uri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
         return getParams( uri.toString(), current, mon );
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
+    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException, PyException {
         return getParams( uri.toString(), null, mon );
     }
 
