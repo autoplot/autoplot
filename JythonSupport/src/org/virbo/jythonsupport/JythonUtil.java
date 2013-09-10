@@ -602,27 +602,40 @@ public class JythonUtil {
      }
      
      /**
-     * extracts the parts of the program that get parameters.  Also, a sort order is built.
+     * extracts the parts of the program that get parameters.  
      *
      * @param script the entire python program
      * @param addSort if true, add parameters to keep track of the order that getParam was called.  This has no effect now.
-     * @return the python program with lengthy calls removed.
+     * @return the python program with lengthy calls removed, up to the last getParam call.
      */
     
      public static String simplifyScriptToGetParams( String script, boolean addSort) throws PySyntaxError {
          String[] ss= script.split("\n");
+         
+         int lastLine= -1;
+         for ( int i=0; i<ss.length; i++ ) {
+             if ( ss[i].contains("getParam(") ) lastLine= i+1;
+         }
+         
+         if ( lastLine==-1 ) {
+             return "";
+         }
+         
          int acceptLine= -1;  // first line to accept
          StringBuilder result= new StringBuilder();
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
-             for ( Object o: n.body ) {
-                 if ( simplifyScriptToGetParamsOkay( (stmtType)o, variableNames ) ) {
-                     if ( acceptLine<0 ) acceptLine= ((stmtType)o).beginLine;
+             for ( stmtType o: n.body ) {
+                 if ( o.beginLine>lastLine ) {
+                     continue;
+                 }
+                 if ( simplifyScriptToGetParamsOkay( o, variableNames ) ) {
+                     if ( acceptLine<0 ) acceptLine= (o).beginLine;
                  } else {
                      if ( acceptLine>-1 ) {
-                         int thisLine= ((stmtType)o).beginLine;
+                         int thisLine= (o).beginLine;
                          for ( int i=acceptLine; i<thisLine; i++ ) {
                              result.append(ss[i-1]).append("\n");
                          }
@@ -631,8 +644,8 @@ public class JythonUtil {
                  }
              }
              if ( acceptLine>-1 ) {
-                 int thisLine= ss.length+1;
-                 for ( int i=acceptLine; i<thisLine; i++ ) {
+                 int thisLine= lastLine;
+                 for ( int i=acceptLine; i<=thisLine; i++ ) {
                      result.append(ss[i-1]).append("\n");
                  }
              }
