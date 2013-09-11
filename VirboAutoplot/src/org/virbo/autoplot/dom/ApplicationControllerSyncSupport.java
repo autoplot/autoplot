@@ -110,6 +110,7 @@ public class ApplicationControllerSyncSupport {
 
         for ( Plot p: application.getPlots() ) {
             if ( p.controller==null ) {
+                logger.info("I wonder if this branch is ever used...");
                 Row row;
                 if ( p.getRowId().equals("") ) {
                     row= application.controller.getCanvas().marginRow;
@@ -135,6 +136,7 @@ public class ApplicationControllerSyncSupport {
                 if ( SwingUtilities.isEventDispatchThread() ) {
                     run.run();
                 } else {
+                    logger.info("I wonder if this branch is ever used...");
                     run.run();
                     //try {
                     //    SwingUtilities.invokeAndWait(run);
