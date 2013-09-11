@@ -245,11 +245,9 @@ public class InlineDataSource extends AbstractDataSource {
 
                 interp.exec(arg);
                 
-            } else if ( arg.charAt(0)>='a' && arg.charAt(0)<='z') { // fun with jython?
-                //TODO: didn't do jython because of dependency
+            } else { 
                 ds= parseInlineDs(arg);
-            } else {
-                ds= parseInlineDs(arg);
+                
             }
         }
 
