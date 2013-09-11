@@ -234,7 +234,7 @@ public class JythonUtil {
         File ff4= new File( ff3, "autoplot.py" );
         String vers= "";
         
-        double currentVersion= 1.1;  //rfe320 improved getParam support.
+        double currentVersion= 1.2;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
