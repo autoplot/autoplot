@@ -229,8 +229,7 @@ public class JythonOps {
                 value= SemanticOps.lookupUnits(svalue);
             }
             mds.putProperty( name, value);
-        } else if ( name.equals( QDataSet.USER_PROPERTIES ) ) {
-            mds.putProperty( name, value);
+
         } else {
             mds.putProperty( name, value);
         }
