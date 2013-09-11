@@ -145,7 +145,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException, PyException {
-        return getParams( uri.toString(), null, mon );
+        return getParams( uri.toString(), new HashMap<String,String>(), mon );
     }
 
     @Override
