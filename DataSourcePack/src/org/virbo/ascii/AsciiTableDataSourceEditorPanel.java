@@ -1234,7 +1234,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         int n= jTable1.getColumnCount();
         int wide= n<5 ? 210 : 170;
         int norm= n<5 ? 100 : 70;
-        int narrow= n<5 ? 50 : 50;
+        int narrow= n<5 ? 60 : 50;
 
         for (int i = 0; i < jTable1.getColumnCount(); i++) {
             String label;
