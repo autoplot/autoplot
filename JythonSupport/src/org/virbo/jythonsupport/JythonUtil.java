@@ -716,6 +716,16 @@ public class JythonUtil {
          
      }
      
+     /**
+      * look through the script, removing expensive calls to make a script
+      * that can be executed to get a list of getParam calls.  The user
+      * can provide a list of current settings, so that the thread of execution 
+      * is matched.
+      * @param script any jython script.
+      * @param params user-specified values.
+      * @return a list of parameters.
+      * @throws PyException 
+      */
      public static List<Param> getGetParams( String script, Map<String,String>params ) throws PyException {
         
         String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
@@ -748,7 +758,7 @@ public class JythonUtil {
                 for ( int j=0; j<pyList.size(); j++ ) {
                     enums.add(j,pyList.get(j));
                 }
-                p.enums= enums;
+                p.enums= enums;                
             }
 
             if ( p.name.equals("resourceUri") ) {
