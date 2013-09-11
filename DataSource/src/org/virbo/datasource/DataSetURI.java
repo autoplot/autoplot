@@ -1869,8 +1869,6 @@ public class DataSetURI {
 
                 if (i <= 0) {
                     surlDir = surl;
-                } else if (surl.charAt(i - 1) == '/') { // '//'
-                    surlDir = surl.substring(0, i + 1);
                 } else {
                     surlDir = surl.substring(0, i + 1);
                 }
