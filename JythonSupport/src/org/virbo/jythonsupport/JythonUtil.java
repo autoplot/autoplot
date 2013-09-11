@@ -234,16 +234,18 @@ public class JythonUtil {
         File ff4= new File( ff3, "autoplot.py" );
         String vers= "";
         
-        double currentVersion= 1.2;  //rfe320 improved getParam support.
+        double currentVersion= 1.11;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
             try {
                 String line= r.readLine();
-                Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
-                Matcher m= versPattern.matcher(line);
-                if ( m.matches() ) {
-                    vers= m.group(1);
+                if ( line!=null ) {
+                    Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Matcher m= versPattern.matcher(line);
+                    if ( m.matches() ) {
+                        vers= m.group(1);
+                    }
                 }
             } finally {
                 r.close();
