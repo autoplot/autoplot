@@ -327,7 +327,6 @@ public class MetadataPanel extends javax.swing.JPanel {
             unmount = dsTree;
             dsTree= NameValueTreeModel.create("Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
             this.dsTreeDs = null;
-            //(PropertiesTreeModel( "no dataset", null );
         } else {
             if ( ds != this.dsTreeDs) {
                 unmount = dsTree;
@@ -358,34 +357,19 @@ public class MetadataPanel extends javax.swing.JPanel {
             unmount = componentDataSetTree;
             componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
             this.componentDs = null;
-            //(PropertiesTreeModel( "no dataset", null );
         } else {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds == null) {
                 unmount = componentDataSetTree;
                 componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
                 this.componentDs = null;
-                //(PropertiesTreeModel( "no dataset", null );
-            //} else if ( ds==this.dsTreeDs ) {
-            //    unmount = componentDataSetTree;
-            //    componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
             } else {
-                if ( ds != this.componentDs) {
-                    unmount = componentDataSetTree;
-                    if ( ds!=this.dsTreeDs ) {
-                        componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
-                        this.componentDs = ds;
-                    } else {
-                        componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
-                    }
+                unmount = componentDataSetTree;
+                if ( ds!=this.dsTreeDs ) {
+                    componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
+                    this.componentDs = ds;
                 } else {
-                    unmount = componentDataSetTree;
-                    if ( ds!=this.dsTreeDs ) {
-                        componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
-                        this.componentDs = ds;
-                    } else {
-                        componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
-                    }
+                    componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
                 }
             }
         }
