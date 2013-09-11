@@ -46,9 +46,7 @@ import org.virbo.datasource.DataSetURI;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
-import org.python.core.PyFrame;
 import org.python.core.PyInteger;
-import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PySyntaxError;
 import org.python.core.PyTraceback;
@@ -88,7 +86,7 @@ public class ScriptPanelSupport {
         this.annotationsSupport = panel.getEditorPanel().getEditorAnnotationsSupport();
 
         applicationController.addPropertyChangeListener(ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 maybeDisplayDataSourceScript();
             }
@@ -224,6 +222,7 @@ public class ScriptPanelSupport {
             }
             final String fs= buf.toString();
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         annotationsSupport.clearAnnotations();
@@ -245,7 +244,7 @@ public class ScriptPanelSupport {
                     }
                 }
             };
-            SwingUtilities.invokeLater(run);;
+            SwingUtilities.invokeLater(run);
         } finally {
             if (r != null) r.close();
         }
@@ -338,7 +337,7 @@ public class ScriptPanelSupport {
                         JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
                         if (factory != null) {
                             factory.addExeceptionListener(new ExceptionListener() {
-
+                                @Override
                                 public void exceptionThrown(Exception e) {
                                     if (e instanceof PyException) {
                                         PyException ex= (PyException)e;
@@ -390,7 +389,7 @@ public class ScriptPanelSupport {
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
                 applicationController.setStatus("busy: executing application script");
                 Runnable run = new Runnable() {
-
+                    @Override
                     public void run() {
                         int offset = 0;
                         //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
@@ -467,12 +466,12 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
                                 mon.finished();
-                                logger.log(Level.SEVERE, null, ex);
+                                logger.log(Level.WARNING, null, ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
                                 mon.finished();
                                 annotateError(ex, offset, interp );
-                                ex.printStackTrace();
+                                logger.log(Level.WARNING, null, ex );
                                 applicationController.setStatus("error: " + ex.toString());
                             }
                         } catch (IOException ex) {
