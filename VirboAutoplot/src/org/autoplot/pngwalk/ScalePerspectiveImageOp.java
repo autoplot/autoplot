@@ -200,7 +200,7 @@ public class ScalePerspectiveImageOp implements BufferedImageOp {
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         } else {
                             //int rr1= (rr[didx] / n + AVG);
-                            color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
+                            color = (255 << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         }
                         dest.setRGB(i, j, color);
                     } else {
