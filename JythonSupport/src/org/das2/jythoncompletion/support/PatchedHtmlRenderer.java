@@ -850,7 +850,7 @@ public final class PatchedHtmlRenderer {
 
                     if (strikethrough || underline) {
                         LineMetrics lm = fm.getLineMetrics(chars, pos, length - 1, g);
-                        int lineWidth = new Double(x + r.getWidth()).intValue();
+                        int lineWidth = (int)( x + r.getWidth() );
 
                         if (paint) {
                             if (strikethrough) {
