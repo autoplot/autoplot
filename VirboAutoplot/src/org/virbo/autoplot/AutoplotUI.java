@@ -2742,6 +2742,7 @@ private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     dia.add(panel);
     dia.pack();
     RequestProcessor.invokeLater( new Runnable() {
+        @Override
         public void run() {
             panel.scan( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) ) );
         }
@@ -2804,6 +2805,7 @@ private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
     //JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy"), applicationModel.dom, null );
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             try {
                 CreatePngWalk.doIt( applicationModel.dom, null );
@@ -2866,6 +2868,7 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         final String newv= dia.getNewDir().getText();
         if ( !newv.equals( AutoplotSettings.settings().getFscache() ) ) {
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     //String old= AutoplotSettings.settings().getFscache(); findbugs DLS_DEAD_LOCAL_STORE
                     File fnewv= new File(newv);
@@ -2920,6 +2923,7 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
         }
@@ -2948,6 +2952,7 @@ private void resetZMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceFileMenuItemActionPerformed
     final Component source= (Component)evt.getSource();
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             AutoplotUtil.replaceFile( source,dom );
         }
@@ -2982,6 +2987,7 @@ private void manageFilesystemsMIActionPerformed(java.awt.event.ActionEvent evt) 
 private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMemoryCachesMIActionPerformed
     logger.fine("Resetting FileSystems...");
     Runnable run= new Runnable() {
+        @Override
         public void run() {
            ReferenceCache.getInstance().reset(); // you just have to know this is what it is doing for now...
            FileSystem.reset();
@@ -3004,6 +3010,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     }//GEN-LAST:event_referenceCacheCheckBoxMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
+    @Override
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
             if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
@@ -3071,6 +3078,7 @@ private void updateFrameTitle() {
         }
     }
     Runnable run= new Runnable() {
+        @Override
         public void run() {
             setTitle( theTitle );
         }
@@ -3108,6 +3116,7 @@ private void updateFrameTitle() {
 
         final SingleInstanceListener sisL = new SingleInstanceListener() {
 
+            @Override
             public void newActivation(String[] argv) {
                 System.err.println( "single instance listener argv:" );
                 for ( int i=0; i<argv.length; i++ ) {
@@ -3203,6 +3212,7 @@ private void updateFrameTitle() {
                 if ( raise ) {
                     if ( frame!=null ) {
                         EventQueue.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 raiseApplicationWindow(frame);
                             }
@@ -3221,6 +3231,7 @@ private void updateFrameTitle() {
         Runnable r= new Runnable() {
             @Override
             public String toString() { return "runScriptRunnable"; }
+            @Override
             public void run() {
                 try {
                     ScriptContext.setApplicationModel(model); // initialize
@@ -3233,8 +3244,10 @@ private void updateFrameTitle() {
                     throw new IllegalArgumentException(ex);
                 } catch ( Exception ex ) {
                     if ( quit ) {
-                        ex.printStackTrace();
+                        logger.log( Level.WARNING, null, ex );
                         AppManager.getInstance().quit(1);
+                    } else {
+                        model.getExceptionHandler().handle(ex);
                     }
                 }
             }
