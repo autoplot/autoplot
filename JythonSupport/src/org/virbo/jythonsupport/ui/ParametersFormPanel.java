@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.python.core.Py;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
@@ -194,6 +195,18 @@ public class ParametersFormPanel {
 
                 boolean isBool= parm.enums!=null && isBoolean( parm.enums );
 
+                if ( parm.enums!=null ) {
+                    boolean okay=false;
+                    if ( !Py.java2py(parm.enums.get(0)).getClass().isAssignableFrom( Py.java2py(parm.deft).getClass() ) ) {
+                        logger.log(Level.WARNING, "parameter enumeration does not match type of default ("+parm.enums.get(0).getClass() +") for \"{0}\"", vname);
+                    } else {
+                        for ( Object o: parm.enums ) {
+                            if ( parm.deft.equals(o) ) okay=true;
+                        }
+                        if ( !okay ) logger.log(Level.WARNING, "parameter enumeration does contain the default for \"{0}\"", vname);
+                    }
+                }
+                        
                 String colon= isBool ? "" : ":";
 
                 if ( parm.doc==null ) {
