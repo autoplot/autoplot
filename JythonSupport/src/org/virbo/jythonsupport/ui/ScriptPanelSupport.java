@@ -175,8 +175,7 @@ public class ScriptPanelSupport {
         if ( SwingUtilities.isEventDispatchThread() ) {
             run.run();
         } else {
-            run.run();
-            //SwingUtilities.invokeLater(run);
+            SwingUtilities.invokeLater(run);
         }
     }
 
