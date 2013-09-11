@@ -208,10 +208,10 @@ public class FtpBean
     protected final static String REPLY_PER_NEG = "5";	// Permanent Negative Completion Reply
     protected final static String REPLY_UNDEF   = "0";	// Undefined reply, should not be exist.
 
-    private final String TF_MOD_ASCII = "A";
-    private final String TF_MOD_BIN   = "I";
+    private final static String TF_MOD_ASCII = "A";
+    private final static String TF_MOD_BIN   = "I";
 
-    private final String FTP_ENCODING = "US-ASCII";
+    private final static String FTP_ENCODING = "US-ASCII";
 
     private final FtpReplyResourceBundle ftpReplies = new FtpReplyResourceBundle();
 
@@ -235,7 +235,7 @@ public class FtpBean
     // Needed for some Visual tools
     private PropertyChangeSupport pcs;     // PropertyChangeSupport for visual tools
 
-    final private boolean DEBUG = false;   // True to turn on debug mode
+    private static final boolean DEBUG = false;   // True to turn on debug mode
 
     /**
      * Constructor

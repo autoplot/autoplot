@@ -112,7 +112,7 @@ public class FtpListResult
     private int index = -1;
 
     // True to turn on DEBUG mode
-    private final boolean DEBUG = false;
+    private static final boolean DEBUG = false;
 
     /*
      * File type constant: Block device
