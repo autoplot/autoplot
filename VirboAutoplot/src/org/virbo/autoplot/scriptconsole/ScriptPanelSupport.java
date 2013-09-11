@@ -46,6 +46,7 @@ import org.virbo.datasource.DataSetURI;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
+import org.python.core.PyFrame;
 import org.python.core.PyInteger;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
@@ -282,8 +283,16 @@ public class ScriptPanelSupport {
             PyObject otraceback= ex.traceback;
             int line=0;
             int count=0; // just in case limit to three, because of recursion, etc.
+            //PyFrame theFrame= null;
             while ( otraceback instanceof PyTraceback && count<3 ) {
                 PyTraceback traceback= ((PyTraceback)otraceback);
+//                if ( theFrame==null ) { //TODO: check that we don't switch files.  this code doesn't work...
+//                    theFrame= traceback.tb_frame;
+//                } else {
+//                    if ( theFrame.f_code._code!=traceback.tb_frame.f_code ) {
+//                        break;
+//                    }
+//                }
                 annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
                 line=  traceback.tb_lineno-1;
                 otraceback= traceback.tb_next;
