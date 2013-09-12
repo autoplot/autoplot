@@ -636,13 +636,19 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     QDataSet s=null;
                     try {
                         Variable unitsVar= cdf.getVariable(svar);
-                        s= CdfUtil.wrapCdfHyperDataHacked( cdf, unitsVar, 0, 1, 1, -1, new NullProgressMonitor() );
-                        s= s.slice(0);
-                        double s1= s.value(0);
-                        for ( int i=1; i<s.length(); i++ ) {
-                            if ( s.value(i)!=s1 ) {
-                                okay= false;
+                        if ( unitsVar!=null ) {
+                            s= CdfUtil.wrapCdfHyperDataHacked( cdf, unitsVar, 0, 1, 1, -1, new NullProgressMonitor() );
+                            s= s.slice(0);
+                            double s1= s.value(0);
+                            for ( int i=1; i<s.length(); i++ ) {
+                                if ( s.value(i)!=s1 ) {
+                                    logger.log( Level.INFO, null, "units are not all the same, unable to use: "+svar );
+                                    okay= false;
+                                }
                             }
+                        } else {
+                            logger.log( Level.INFO, "units variable does not exist: {0}", svar);
+                            okay= false;
                         }
                     } catch ( Exception ex ) {
                         logger.log( Level.WARNING, null, ex );
