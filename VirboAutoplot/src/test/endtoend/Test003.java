@@ -67,14 +67,14 @@ public class Test003 {
             ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
             //doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
-            doit(26, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbsp_ect-rept-lvt.jyds?timerange=2012-10-15" );
+            doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts//rbsp_ect-rept-lvt.jyds?timerange=2012-10-15" );
             //doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
-            doit(27, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbsp_ect-mageis-lvt.jyds" );
+            doit(27, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-mageis-lvt.jyds" );
             doit(28, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ephem.jyds?R=T&L=T&MLT=T&ILT=T" );
             
             //these require a keychain.txt file.
-            doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
-            doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_ect-mageis-mr-elec-L1.vap");
+            doit(9,  "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/dr-elec-L1/rbspa_rel01_ect-mageis-dr-elec-L1.vap"); //see TODO in keychain
+            doit(10, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level1/plots/mr-elec-L1/rbspa_rel01_ect-mageis-mr-elec-L1.vap");
             //doit(11, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/mageis/level2/plots/sci-L2-elec/rbspa_pre_ect-mageis-sci-L2-elec.vap");
 
             doit(12, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-mageis-sci-elec-L2.vap");
@@ -87,7 +87,7 @@ public class Test003 {
 
 //            doit(17, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts2-L1/rbspa_pre_ect-hope-sci-cnts2-L1.vap");
 
-            //doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap");
+            //doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_rel01_ect-hope-sci-L2.vap");
             doit(16, "file:///home/jbf/ct/hudson/vap/lanl/rbspa_pre_ect-hope-sci-L2.vap");
             //doit(16, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level1/plots/sci-cnts-L1/rbspa_pre_ect-hope-sci-cnts-L1.vap");
             //doit(18, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap?timerange=20121101");
