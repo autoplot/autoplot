@@ -263,6 +263,17 @@ public class CDAWebDataSource extends AbstractDataSource {
             if ( result==null ) {
                 result= accum;
             }
+            
+            if ( result!=null && result.property(QDataSet.UNITS)==null && metadata.containsKey("UNIT_PTR_VALUE" ) ) {
+                QDataSet unitss= (QDataSet) metadata.get("UNIT_PTR_VALUE");
+                boolean allSame= true;
+                for ( int i=0; i<unitss.length(); i++ ) {
+                    if ( unitss.value(i)!=unitss.value(0) ) {
+                        allSame= false;
+                    }
+                }
+                if ( allSame ) result.putProperty( QDataSet.UNITS, SemanticOps.lookupUnits(unitss.slice(0).toString()) );
+            } 
 
             if ( result!=null && result.property(QDataSet.DEPEND_1)==null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS
                 Map dep1p= (Map) metadata.get("DEPEND_1");
