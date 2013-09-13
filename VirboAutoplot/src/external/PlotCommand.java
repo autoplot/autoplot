@@ -298,8 +298,20 @@ public class PlotCommand extends PyObject {
                         throw new IllegalArgumentException("unable to identify symbol: "+sval);
                     }
                 } else if ( kw.equals("renderType") ) {
-                    RenderType rt= RenderType.valueOf(sval);
-                    elements.get(0).setRenderType(rt);
+                    String srenderType= sval;
+                    String renderControl;
+                    if ( srenderType!=null && srenderType.trim().length()>0 ) {
+                        int ii= srenderType.indexOf(">");
+                        if ( ii==-1 ) {
+                            renderControl= "";
+                        } else {
+                            renderControl= srenderType.substring(ii+1);
+                            srenderType= srenderType.substring(0,ii);
+                        }                    
+                        RenderType rt= RenderType.valueOf(srenderType);
+                        elements.get(0).setRenderType(rt);
+                        elements.get(0).setRenderControl(renderControl);
+                    }
                 } else if ( kw.equals("isotropic" ) ) {
                     plot.setIsotropic(true);
                 }
