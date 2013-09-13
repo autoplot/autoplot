@@ -14,6 +14,7 @@ package org.virbo.autoplot;
 import java.util.ArrayList;
 import java.util.List;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksManager;
 
 /**
  *
@@ -52,6 +53,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         plotButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        bookmarksButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -72,6 +74,13 @@ public class TcaElementDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Use the dataset to add additional labels to the X-axis:");
 
+        bookmarksButton.setText("Bookmarks...");
+        bookmarksButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookmarksButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -80,6 +89,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(bookmarksButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(cancelButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotButton))
@@ -97,7 +108,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(plotButton)
-                    .add(cancelButton))
+                    .add(cancelButton)
+                    .add(bookmarksButton))
                 .addContainerGap())
         );
 
@@ -113,6 +125,18 @@ public class TcaElementDialog extends javax.swing.JDialog {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         setVisible(false);
 }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void bookmarksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookmarksButtonActionPerformed
+        BookmarksManager man= new BookmarksManager( null, true );
+        man.setHidePlotButtons(true);
+        man.setPrefNode("tca","autoplot.default.tca.bookmarks", "http://autoplot.org/data/tca.demos.xml");
+        //man.setPrefNode("tca");
+        man.setVisible(true);
+        Bookmark book= man.getSelectedBookmark();
+        if ( book!=null ) {
+            primaryDataSetSelector.setValue( ((Bookmark.Item)book).getUri() );
+        }
+    }//GEN-LAST:event_bookmarksButtonActionPerformed
 
     protected int modifiers = 0;
     public static final String PROP_MODIFIERS = "modifiers";
@@ -144,6 +168,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bookmarksButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton plotButton;
