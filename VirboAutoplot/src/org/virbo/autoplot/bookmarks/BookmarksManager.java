@@ -927,18 +927,11 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     }
 
 private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
-    String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
-    if ( this.prefNode.equals("pngwalk") ) {
-        surl= AutoplotUtil.getProperty("autoplot.default.pngwalk.bookmarks", "http://autoplot.org/data/pngwalk.demos.xml");
-    }
+    String surl= defaultUrl;
     int r = JOptionPane.showConfirmDialog(this, "Reset your bookmarks to " + surl + "?", "Reset Bookmarks", JOptionPane.OK_CANCEL_OPTION );
     if (r == JOptionPane.OK_OPTION) {
         try {
-            URL url = new URL(surl);
-            Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement() );
-            model.setList(book);
-            formatToFile( bookmarksFile );
+            resetToDefault(surl);
         } catch (SAXException ex ) {
             throw new RuntimeException( "Default bookmarks are mis-formatted!  Please let the Autoplot developers know!", ex );
 
@@ -949,10 +942,9 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             new GuiExceptionHandler().handle(ex);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(rootPane, "<html>Unable to read in default bookmarks:<br>"+ex.getMessage());
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
         }
-    }
+    }    
+    
 }//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
 
 private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportMenuItemActionPerformed
@@ -1003,10 +995,8 @@ private void URLTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:even
 
 private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeInDefaultMenuItemActionPerformed
         try {
-            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
-            if ( this.prefNode.equals("pngwalk") ) {
-               surl= AutoplotUtil.getProperty("autoplot.default.pngwalk.bookmarks", "http://autoplot.org/data/pngwalk.demos.xml");
-            }
+            String surl = defaultUrl;
+            
             URL url = new URL(surl);
             Document doc = AutoplotUtil.readDoc(url.openStream());
             List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
@@ -1073,6 +1063,14 @@ private void editDescriptionButtonActionPerformed(java.awt.event.ActionEvent evt
 
 }//GEN-LAST:event_editDescriptionButtonActionPerformed
 
+/**
+ * provide a means to get the selection.
+ * @param listener 
+ */
+public Bookmark getSelectedBookmark( ) {
+    return model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
+}
+        
     private boolean maybePlot( int modifiers ) {
         Bookmark book= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
         if ( book instanceof Bookmark.Item ) {
@@ -1390,11 +1388,68 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         setPrefNode( prefNode );
     }
 
+    public void resetToDefault( String surl ) throws MalformedURLException, IOException, SAXException, BookmarksException {
+        
+        URL url = new URL(surl);
+        Document doc;
+        InputStream in= url.openStream();
+        try {
+            doc = AutoplotUtil.readDoc(in);
+        } catch ( ParserConfigurationException ex ) {
+            throw new RuntimeException(ex);
+        } finally {
+            in.close();
+        }
+        List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement() );
+        model.setList(book);
+        formatToFile( bookmarksFile );
+        
+                
+    }
+    
+    private String defaultUrl= null;
+            
+    public void setPrefNode( String nodeName, String propName, String deft ) {
+        
+        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+        if ( !f2.exists() ) {
+            boolean ok= f2.mkdirs();
+            if ( !ok ) {
+                throw new RuntimeException("unable to create folder "+ f2 );
+            }
+        }
+
+        final File f = new File( f2, nodeName + ".xml");
+        bookmarksFile= f;
+        
+        if ( !bookmarksFile.exists() ) {
+            defaultUrl= AutoplotUtil.getProperty( propName, deft );
+            try {
+                resetToDefault( defaultUrl );
+            } catch ( MalformedURLException ex ) {
+                logger.log( Level.WARNING, null, ex );
+            } catch ( IOException ex ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            } catch ( BookmarksException ex ) {
+                logger.log( Level.WARNING, null, ex );
+            } catch (SAXException ex) {
+                logger.log( Level.WARNING, null, ex );
+            }
+        }
+        
+        setPrefNode(nodeName);
+        defaultUrl= AutoplotUtil.getProperty( propName, deft );
+        
+    }
+    
     /**
      * setting this makes the manager the authority on bookmarks.
      * @param nodeName
      */
     public void setPrefNode( String nodeName ) {
+        
+        defaultUrl= AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+        
         prefNode= nodeName;
         
         BufferedReader read = null;
@@ -1645,5 +1700,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             return result;
         }
         
+    }
+
+    public void setHidePlotButtons(boolean b) {
+        overplotButton.setVisible(!b);
+        plotBelowButton.setVisible(!b);
+        plotButton.setVisible(!b);
     }
 }
