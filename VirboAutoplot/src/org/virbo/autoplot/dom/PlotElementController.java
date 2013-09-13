@@ -2018,6 +2018,14 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
+        } else if ( spec==RenderType.contour ) {
+            QDataSet qube= ContoursRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
         } else if ( spec==RenderType.eventsBar ) {
             QDataSet qube= EventsRenderer.doAutorange( fillDs );
             if ( qube==null ) {
