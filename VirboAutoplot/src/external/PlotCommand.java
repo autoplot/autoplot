@@ -134,7 +134,7 @@ public class PlotCommand extends PyObject {
         int nparm= args.length - keywords.length;
 
         if ( nparm==0 ) {
-            System.err.println("args.length=0");
+            logger.warning("args.length=0");
             return Py.None;
         }
 
@@ -187,7 +187,7 @@ public class PlotCommand extends PyObject {
                 }
 
             } catch ( InterruptedException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
                 throw new RuntimeException(ex);
             }
         }
