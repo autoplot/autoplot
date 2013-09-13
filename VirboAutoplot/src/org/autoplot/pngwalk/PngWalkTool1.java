@@ -605,7 +605,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
         man.setVisible(false);
-        man.setPrefNode("pngwalk");
+        man.setPrefNode("pngwalk","autoplot.default.pngwalk.bookmarks", "http://autoplot.org/data/pngwalk.demos.xml");
 
         man.updateBookmarks( bookmarksMenu, tool.getSelector() );
 
