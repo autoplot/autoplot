@@ -37,6 +37,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -117,7 +118,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
     }
 
-    public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
 
         ds = doReadFile(mon);
 
@@ -168,6 +169,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             logger.info("no records found when parsing ascii file!!!");
             logger.info("===========================================");
             // this may raise an exception in a future version.
+            throw new NoDataInIntervalException("no records found");
         }
 
         String group= getParam( "group", null );
