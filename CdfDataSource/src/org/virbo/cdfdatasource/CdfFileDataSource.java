@@ -708,8 +708,12 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( gattr!=null ) {
                 entries= gattr.getEntries();
                 if ( entries.size()>0 ) {
-                   String s= String.valueOf(( (Entry)gattr.getEntries().get(0)).getData() );
-                   props.put( "Source_name", s );
+                   Entry e= (Entry)entries.get(0);
+                   if ( e==null && entries.size()>1 ) e= (Entry)entries.get(entries.size()-1);
+                   if ( e!=null ) {
+                      String s= String.valueOf( e.getData() );
+                      props.put( "Source_name", s );
+                   }
                 }
             }
         } catch ( CDFException ex ) {
@@ -720,8 +724,12 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( gattr!=null ) {
                 entries= gattr.getEntries();
                 if ( entries.size()>0 ) {
-                    String s= String.valueOf(( (Entry)gattr.getEntries().get(0)).getData() );
-                    props.put( "Descriptor", s );
+                    Entry e= (Entry)entries.get(0);
+                    if ( e==null && entries.size()>1 ) e= (Entry)entries.get(entries.size()-1);
+                    if ( e!=null ) {
+                       String s= String.valueOf( e.getData() );
+                       props.put( "Descriptor", s );
+                    }
                 }
             }
         } catch ( CDFException ex ) {
