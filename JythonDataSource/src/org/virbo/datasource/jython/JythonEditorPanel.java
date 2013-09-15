@@ -119,6 +119,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         paramsPanel.removeAll();
         Map<String, String> params = getParamsFromGui();
         try {
+            if ( doDocumentation(file) ) {
+                paramsPanel.add( new JLabel("<html><br></html>") );
+            }
             doVariables( file, params );
             paramsPanel.revalidate();
         } catch ( PyException ex ) {
