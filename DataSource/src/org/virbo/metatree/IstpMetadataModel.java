@@ -241,7 +241,7 @@ public class IstpMetadataModel extends MetadataModel {
 
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
-        String title= " ";
+        String title= "";
         String s;
         s= (String)attrs.get("Source_name");
         if (  s!=null ) {
@@ -256,7 +256,7 @@ public class IstpMetadataModel extends MetadataModel {
             int i= s.indexOf(">");
             if ( i>-1 ) {
                 if ( title.length()>0 ) title= title+"/";
-                title= title + s.substring(0,i).trim() + " ";
+                title= title + s.substring(0,i).trim();
             }
         }
 
