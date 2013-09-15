@@ -121,6 +121,7 @@ public class BookmarksManager extends javax.swing.JDialog {
     public BookmarksManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(parent);
         this.model = new BookmarksManagerModel();
         this.jTree1.setModel(model.getTreeModel());
         this.jTree1.addMouseListener( createContextMenuMouseListener() );
@@ -1074,7 +1075,7 @@ public Bookmark getSelectedBookmark( ) {
     private boolean maybePlot( int modifiers ) {
         Bookmark book= (Bookmark) model.getSelectedBookmark( jTree1.getModel(), jTree1.getSelectionPath() );
         if ( book instanceof Bookmark.Item ) {
-            if ( getParent() instanceof AutoplotUI ) {
+            if ( getParent() instanceof AutoplotUI && sel!=null ) {
                 sel.setValue(((Bookmark.Item) book).getUri());
                 sel.maybePlot(modifiers);
 
@@ -1659,7 +1660,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         return item;
     }
-
+    
     public static void main( String[] args ) {
         new BookmarksManager(null, false).setPrefNode("bookmarks");
     }
