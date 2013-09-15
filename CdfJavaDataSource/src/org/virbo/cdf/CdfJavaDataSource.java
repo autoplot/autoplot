@@ -463,7 +463,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         try {
             vv= cdf.variableAttributeNames(var.getName());
         } catch ( NullPointerException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
             throw ex;
         }
 
@@ -482,7 +482,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
         for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
             for (int i = 0; i < vv.length; i++) {
                 Object attrv = cdf.getAttribute( var.getName(), vv[i]);
-                Entry entry = null;
                 boolean isDep= p.matcher(vv[i]).matches() & depth == 0;
                 if ( ipass==0 && isDep ) {
                     String name = (String) ((Vector)attrv).get(0);
