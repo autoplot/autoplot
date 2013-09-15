@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PDF output is improved as we finally figured out how to embed fonts.</small></p>
+        <p><small>The parsing of scripts to produce a GUI is more sophistocated now, allowing for branches with different get parameter calls.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,7 +25,10 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>            
-            <li>massive <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-findbugs/">findbugs</a>cleanup to get below 400 flags</li>
+            <li>massive <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-findbugs/">findbugs</a> cleanup to get below 300 flags</li>
+            <li>rte_0750582163: throw NoDataInInterval exception so that is easier to understand that the parser was not properly configured.</li>
+            <li>plotx properly supports renderType='contour&gt;levels=0.1&amp;color=blue'</li>
+            <li>vap+cdaweb:ds=RBSPA_EFW-L2_VSVY-HIRES&amp;id=vsvy_vavg correctly reads units as the single-file readers do.</li> 
             <li>rte_0851835013: data point recorder forces .dat or .txt extensions</li>
             <li>rte_1906877305: okay press on select datasource without selection</li>
             <li>plotx(1,uri) didn't respect TimeSeriesBrowse</li>
@@ -80,6 +83,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 322: Bookmarks for the Axis Annotations</li>
             <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
             <li>export to wave table clips to visible range, not wave packet boundaries</li>
             <li>blurURI in TimeSeriesBrowse introduced, which will be used to clean up multiple timerange references in a vap.</li>
