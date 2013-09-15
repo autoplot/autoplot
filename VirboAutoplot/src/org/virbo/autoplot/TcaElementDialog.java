@@ -11,8 +11,10 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 
@@ -127,7 +129,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void bookmarksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookmarksButtonActionPerformed
-        BookmarksManager man= new BookmarksManager( null, true );
+        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true );
         man.setHidePlotButtons(true);
         man.setPrefNode("tca","autoplot.default.tca.bookmarks", "http://autoplot.org/data/tca.demos.xml");
         //man.setPrefNode("tca");
