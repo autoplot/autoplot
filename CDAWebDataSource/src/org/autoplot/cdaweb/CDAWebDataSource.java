@@ -23,6 +23,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
@@ -145,6 +146,9 @@ public class CDAWebDataSource extends AbstractDataSource {
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
             mon.setTaskSize(files.length*10+10);
+            if ( mon.isCancelled() ) {
+                throw new CancelledOperationException("user cancelled task");
+            }
             mon.setTaskProgress(0);
 
             //we need to look in the file to see if it is virtual
