@@ -139,9 +139,10 @@ public class BookmarksManager extends javax.swing.JDialog {
         });*/
 
         model.addPropertyChangeListener(BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         TreeModel mod = model.getTreeModel();
                         TreePath tp= jTree1.getSelectionPath();
@@ -371,6 +372,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         TreePath tp= model.getPathFor( b, jTree1.getModel(), new TreePath(jTree1.getModel().getRoot()) );
         jTree1.setSelectionPath(tp);
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 titleTextField.requestFocusInWindow();
                 titleTextField.selectAll();
@@ -754,7 +756,6 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         }
 
         URLTextField.setEditable( b instanceof Bookmark.Item );
-        int status=0;
         String err="";
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUri());
@@ -762,6 +763,7 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         } else {
             if ( b instanceof Bookmark.Folder && ((Bookmark.Folder)b).getRemoteUrl()!=null ) {
                 String url= ((Bookmark.Folder)b).getRemoteUrl();
+                int status;
                 status= ((Bookmark.Folder)b).getRemoteStatus();
                 if ( status==Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL ) err= "<br>** Unable to connect to remote URL **";
                 URLTextField.setText(url);
@@ -869,10 +871,10 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
      */
     void doImportUrl( String url ) {
 
-        String bookmarksFile= url;
+        String lbookmarksFile= url;
 
         ImportBookmarksGui gui= new ImportBookmarksGui();
-        gui.getBookmarksFilename().setText(bookmarksFile+" ?");
+        gui.getBookmarksFilename().setText(lbookmarksFile+" ?");
         gui.getRemote().setSelected(true);
         int r = JOptionPane.showConfirmDialog( this, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
         if (r == JOptionPane.OK_OPTION) {
@@ -881,14 +883,14 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                 ProgressMonitor mon = DasProgressPanel.createFramed("importing bookmarks");
                 if ( gui.getRemote().isSelected() ) {
                     try {
-                        this.getModel().addRemoteBookmarks(bookmarksFile);
+                        this.getModel().addRemoteBookmarks(lbookmarksFile);
                     } catch ( MalformedRemoteBookmarksException ex ) {
-                        JOptionPane.showMessageDialog( this, "Malformed "+bookmarksFile+ "\n"+ex.getMessage(), "Error in remote bookmarks", JOptionPane.WARNING_MESSAGE );
+                        JOptionPane.showMessageDialog( this, "Malformed "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in remote bookmarks", JOptionPane.WARNING_MESSAGE );
                         return;
                     }
                     this.reload();
                 } else {
-                    in = DataSetURI.getInputStream(DataSetURI.getURIValid(bookmarksFile), mon);
+                    in = DataSetURI.getInputStream(DataSetURI.getURIValid(lbookmarksFile), mon);
                     ByteArrayOutputStream boas=new ByteArrayOutputStream();
                     WritableByteChannel dest = Channels.newChannel(boas);
                     ReadableByteChannel src = Channels.newChannel(in);
@@ -898,24 +900,24 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                     makeLocal(books);
                     this.getModel().importList( books );
                 }
-                JOptionPane.showMessageDialog( this, "imported bookmarks file "+bookmarksFile );
+                JOptionPane.showMessageDialog( this, "imported bookmarks file "+lbookmarksFile );
             } catch (BookmarksException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog( this, "XML error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "XML error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (FileNotFoundException ex ) {
-                JOptionPane.showMessageDialog( this, "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "File not found: "+lbookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (MalformedURLException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog( this, "Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog( this, "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( this, "I/O Error with "+lbookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } finally {
                 try {
                     if ( in!=null ) in.close();
@@ -963,7 +965,7 @@ private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
     if ( bs.size()>0 ) {
         bs= removeRemoteBookmarks( bs, jTree1.getModel(), jTree1.getSelectionPaths() );
-        if ( bs.size()==0 ) {
+        if ( bs.isEmpty() ) {
             JOptionPane.showMessageDialog(rootPane, "Part of remote bookmarks tree cannot be deleted","Remote Bookmark Delete",JOptionPane.OK_OPTION);
         } else {
             maybeDeleteBookmarks(bs);
@@ -1208,6 +1210,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     private Action addItemAction() throws HeadlessException {
         return new AbstractAction( "New Bookmark..." ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 String s = JOptionPane.showInputDialog( BookmarksManager.this, "Bookmark URL:");
                 if (s != null && !s.equals("")) {
@@ -1225,6 +1228,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     private Action newFolderAction() throws HeadlessException {
         return new AbstractAction( "New Folder..." ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 Bookmark context= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
                 String x= maybeGetRemoteBookmarkUrl( context, model, jTree1.getModel(), jTree1.getSelectionPath() );
@@ -1256,11 +1260,12 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     Action createDeleteAction() {
         return new AbstractAction("Delete") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
                 if ( bs.size()>0 ) {
                     bs= removeRemoteBookmarks( bs, jTree1.getModel(), jTree1.getSelectionPaths() );
-                    if ( bs.size()==0 ) {
+                    if ( bs.isEmpty() ) {
                         JOptionPane.showMessageDialog(rootPane, "Part of remote bookmarks tree cannot be deleted","Remote Bookmark Delete",JOptionPane.OK_OPTION);
                     } else {
                         maybeDeleteBookmarks(bs);
@@ -1272,6 +1277,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     Action createExportFolderAction() {
         return new AbstractAction("Export Items...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
                 model.doExport(BookmarksManager.this,bs);
@@ -1339,6 +1345,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
     private Runnable loadBooksRunnable( final String start, final int depthf ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     try {
@@ -1498,6 +1505,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             }
 
             model.addPropertyChangeListener( new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     formatToFile(bookmarksFile);
                 }
@@ -1580,6 +1588,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         JMenuItem mi;
 
         mi= new JMenuItem( new AbstractAction("Manage and Browse...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Container parent= BookmarksManager.this.getParent();
                 BookmarksManager.this.setLocationRelativeTo( parent );
@@ -1590,7 +1599,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         bookmarksMenu.add(mi);
 
         mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
                 setAddBookmark(bookmark);
