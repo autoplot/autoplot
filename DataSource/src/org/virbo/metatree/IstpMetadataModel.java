@@ -321,6 +321,8 @@ public class IstpMetadataModel extends MetadataModel {
             }
         }
         
+        sunits= sunits.trim();
+        
         try {
             units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
         } catch (IllegalArgumentException e) {
@@ -368,6 +370,7 @@ public class IstpMetadataModel extends MetadataModel {
                 label = sunits;
             } else {
                 if (!sunits.equals("")) {
+                    label= label.trim();
                     label += " (" + sunits + ")";
                 }
             }
