@@ -281,7 +281,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             if ( result!=null && result.property(QDataSet.DEPEND_1)==null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS
                 Map dep1p= (Map) metadata.get("DEPEND_1");
-                if ( dep1p!=null && dep1p.containsKey("NAME") ) {
+                if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
                     CdfJavaDataSource masterSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
