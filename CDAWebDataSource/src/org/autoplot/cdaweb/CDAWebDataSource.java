@@ -319,7 +319,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
-                        result.putProperty( QDataSet.LABEL, DataSetUtil.getStringValue(labelDs.slice(islice1)) );
+                        result.putProperty( QDataSet.LABEL, DataSetUtil.getStringValue(labelDs.slice(islice1)).trim() );
                     }
                 }
                 
