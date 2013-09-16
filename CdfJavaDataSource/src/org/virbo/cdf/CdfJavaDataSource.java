@@ -763,7 +763,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
 
                 if ( dep != null && qubeDims.length<=idep ) {
-                    logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
+                    if ( slice1==-1 ) {
+                        logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
+                    }
                     continue;
                 }
                 
