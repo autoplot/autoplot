@@ -42,6 +42,9 @@
             <li>rfe 314: bugfixes to scriptServlet, which was broken since jython import</li>
             <li>1102: feedback problems with slicers, rank 2 DEPEND_1 </li>
             <li>1101: trim with CDFs with rank 2 DEPEND_1.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>java-based CDF library would incorrectly handle 1-element dimensions</li>
             <li>next/prev buttons disabled in PngWalkTool when there is no pngwalk loaded</li>
             <li>rte_2025985649: NullPointerException with search and replace in the python editor</li>
@@ -66,29 +69,14 @@
             <li>"submit" button on error dialog is default</li>
             <li>rich ascii export of vector and spectrogram datasets works, moreso</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1083: garbled tools list when adding tool</li>
-            <li>1082: opacity in aggregation</li>
-            <li>1079: tearoff tabbed pane does a better job with labels for the windows.</li>
-            <li>1081: eventListColumn was broken from v2013a_8 through v2013a_9</li>
-            <li>tearoff tabbed pane does a better job with labels for the windows.</li>
-            <li>eventListColumn was broken from v2013a_8 through v2013a_9</li>
-            <li>use the URI timerange.  Before it would be used briefly, then reset as soon as the data is loaded.</li>
-            <li>1077: first plotElement has resetPlotElement true after syncTo </li>
-            <li>lanl can't get jython files from autoplot.org, so just get them from the java path</li>
-            <li>don't quantize orbit datum ranges.  When quantizing, use much finer quanta.</li>
-            <li>drop target containing file URIs works on a mac and other platforms</li>
-            <li>bugfix where one-dataset bundle wouldn't plot as Y(T)</li>
-            <li>1076: width=0 causes runtime error dialog.</li>
-            <li>1075: changesSupport needs to keep a count</li>
-            <li>1074: lockup because of loose thread safety</li> 
-        </ul>
         <p>Features:</p>
         <ul>
             <li>rfe 322: Bookmarks for the Axis Annotations</li>
             <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
             <li>export to wave table clips to visible range, not wave packet boundaries</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>blurURI in TimeSeriesBrowse introduced, which will be used to clean up multiple timerange references in a vap.</li>
             <li>PNGWalk tool has a link to start up or make visible an Autoplot window</li>
             <li>rfe 316: completions should be in a scrollable list</li>
@@ -99,15 +87,6 @@
             <li>more TimeRangeTool buttons</li>
             <li>improvements to jython completions include def names and assignments</li>
             <li>314: support "import autoplotapp as app", cleaning up jython.  Legacy scripts are still supported.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>first experiments with slice0 at datum, like |slice0('2013-07-12T18:00')t</li>
-            <li>dataset('2013-07-12T18:00') handles times and datum ranges now.</li>
-            <li>recent history GUI allows wildcards, like rbsp*.vap</li>
-            <li>ascii plugin supports units and dep0units.</li>
-            <li>tweaks to rich pngs, which have metadata that allows digitizing</li>
-            <li>add replicate(ds,len)</li>
         </ul>
 
         <p>Known issues:</p>
