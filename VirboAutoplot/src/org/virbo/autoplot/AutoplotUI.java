@@ -326,7 +326,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                         statusLabel.setIcon( BUSY_ICON );
                         String chstr="";
                         for ( Entry<Object,Object> e: changes.entrySet() ) { 
-                            String client= String.valueOf(e.getKey());
+                            String client= String.valueOf(e.getValue());
                             int ist= client.indexOf("(");
                             int ien= client.lastIndexOf(")");
                             if ( ist!=-1 ) {
