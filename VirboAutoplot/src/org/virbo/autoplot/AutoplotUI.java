@@ -66,6 +66,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -314,6 +315,44 @@ public class AutoplotUI extends javax.swing.JFrame {
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //this.setFocusableWindowState(false);
         
+        Runnable checkStatusRunnable= new Runnable() {
+            @Override
+            public void run() {
+                while ( true ) {
+                    LinkedHashMap<Object,Object> changes= new LinkedHashMap();
+                    dom.getController().pendingChanges(changes);
+                    //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
+                    if ( changes.size()>0 ) {
+                        statusLabel.setIcon( BUSY_ICON );
+                        String chstr="";
+                        for ( Entry<Object,Object> e: changes.entrySet() ) { 
+                            String client= String.valueOf(e.getKey());
+                            int ist= client.indexOf("(");
+                            int ien= client.lastIndexOf(")");
+                            if ( ist!=-1 ) {
+                                client= client.substring(0,ist)+client.substring(ien+1);
+                            }
+                            if ( chstr.equals("") ) {
+                                chstr= "* " + e.getKey() + " (" + client + ")";
+                            } else {
+                                chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
+                            }
+                        }
+                        statusLabel.setToolTipText( chstr );
+                    } else {
+                        statusLabel.setIcon( IDLE_ICON );
+                        statusLabel.setToolTipText( null );
+                    }
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        new Thread(checkStatusRunnable).start();
+                
         referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
         
         expertMenuItems.add( editDomMenuItem );
@@ -3645,7 +3684,7 @@ APSplash.checkTime("init 240");
     /**
      * set the message in the lower left corner of the application with the icon, such
      * as AutoplotUI.WARNING_ICON.
-     * @param icon the icon to display to the left of the message.
+     * @param icon the icon to display to the left of the message.  The icon is no longer used.
      * @param message the message to display
      */
     public void setMessage( Icon icon, String message ) {
@@ -3656,13 +3695,13 @@ APSplash.checkTime("init 240");
 
         final String fmyMess= myMess;
         final String fmessage= message;
-        final Icon ficon= icon;
+        //final Icon ficon= icon;
 
         SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
             @Override
             public void run() {
                 try {
-                    statusLabel.setIcon( ficon );
+                    //statusLabel.setIcon( ficon );
                     statusTextField.setText(fmyMess);
                     statusTextField.setToolTipText(fmessage);
                 } catch ( Exception e ) {
