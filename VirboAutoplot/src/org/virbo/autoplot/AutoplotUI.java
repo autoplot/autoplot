@@ -134,7 +134,6 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
@@ -181,13 +180,13 @@ public class AutoplotUI extends javax.swing.JFrame {
     private String initialBookmarksUrl= null;
 
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
-
+        @Override
         public Element serialize(Document document, ProgressMonitor monitor) {
             DOMBuilder builder = new DOMBuilder(applicationModel);
             Element element = builder.serialize(document, DasProgressPanel.createFramed("Serializing Application"));
             return element;
         }
-
+        @Override
         public void deserialize(Document document, ProgressMonitor monitor) {
             Element element = document.getDocumentElement();
             SerializeUtil.processElement(element, applicationModel);
@@ -260,6 +259,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
 
         model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
+            @Override
             public double resize(int w,int h) {
                 return resizeForCanvasSize(w, h);
             }
@@ -275,18 +275,21 @@ public class AutoplotUI extends javax.swing.JFrame {
         undoRedoSupport = new UndoRedoSupport(applicationModel);
         undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
                 SwingUtilities.invokeLater( new Runnable() { public void run() { refreshUndoRedoLabel(); } } );
             }
         });
 
         applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 updateFrameTitle();
             }
         });
 
         undoRedoSupport.addPropertyChangeListener( UndoRedoSupport.PROP_DEPTH, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 updateFrameTitle();
             }
@@ -295,6 +298,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 20");
 
         FileSystem.settings().addPropertyChangeListener( FileSystemSettings.PROP_OFFLINE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 updateFrameTitle();
             }
@@ -309,23 +313,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //this.setFocusableWindowState(false);
-          
-        if ( false ) {
-        Toolkit.getDefaultToolkit().addAWTEventListener( new AWTEventListener() {
-            Component focus;
-            public void eventDispatched(AWTEvent event) {
-                Component c= AutoplotUI.this.getFocusOwner();
-                if ( c!=focus ) {
-                    System.err.println(c);
-                    focus= c;
-                    if ( focus instanceof JButton ) {
-                        System.err.printf(">>>%s<<<\n",((JButton)focus).getText());
-                    }
-                }
-                //System.err.println( event.getSource() );
-            }
-        }, FocusEvent.FOCUS_GAINED );
-        }
         
         referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
         
@@ -346,6 +333,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         expertMenu= new JMenu("Expert");
         JMenuItem mi;
         mi= new JMenuItem( new AbstractAction( "Basic Mode") {
+           @Override
            public void actionPerformed( ActionEvent e ) {
                setExpertMode(false);
            }
@@ -353,6 +341,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi.setToolTipText("Basic mode allows for browsing products composed by data providers");
         expertMenu.add( mi );
         mi= new JMenuItem( new AbstractAction( "Expert Mode") {
+           @Override
            public void actionPerformed( ActionEvent e ) {
                setExpertMode(true);
            }
@@ -391,12 +380,14 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         dataSetSelector.setMonitorFactory( dom.getController().getMonitorFactory() );
         dataSetSelector.registerBrowseTrigger( "vap\\+internal:(.*)", new AbstractAction("internal") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 GuiSupport.editPlotElement( applicationModel, AutoplotUI.this );
             }
         });
 
         dataSetSelector.registerActionTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
                 if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
@@ -420,12 +411,14 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
             }
         });
         dataSetSelector.registerActionTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
+            @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 String pngwalk= dataSetSelector.getValue().substring("pngwalk:".length());
                 if ( pngwalk.endsWith("/") || pngwalk.endsWith(".")) { // normally reject method would trigger another completion
@@ -438,6 +431,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         dataSetSelector.registerBrowseTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" );
@@ -445,6 +439,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         dataSetSelector.registerActionTrigger( "(.*)\\.pngwalk", new AbstractAction( "pngwalk") {
+            @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
@@ -454,6 +449,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         if ( ScriptContext.getViewWindow()==this ) {
             dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                @Override
                 public void actionPerformed( ActionEvent ev ) {
                     applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( dataSetSelector.getValue() );
@@ -461,18 +457,21 @@ public class AutoplotUI extends javax.swing.JFrame {
             });
 
             dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                @Override
                 public void actionPerformed( ActionEvent ev ) {
                     runScript( dataSetSelector.getValue() );
                 }
             });
         } else {
             dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                @Override
                 public void actionPerformed( ActionEvent ev ) {
                     applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
                 }
             });
 
             dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+                @Override
                 public void actionPerformed( ActionEvent ev ) {
                     applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
                 }
@@ -481,6 +480,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
 
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 String script = dataSetSelector.getValue().substring("script:".length());
                 if ( !( script.endsWith(".jy") || script.endsWith(".JY") || script.endsWith(".py") || script.endsWith(".PY") ) ) {
@@ -493,6 +493,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         dataSetSelector.registerBrowseTrigger( "script:(.*)", new AbstractAction( "script") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 String s= source.getValue();
@@ -511,12 +512,14 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
 
         dataSetSelector.registerBrowseTrigger( "vapfile:(.*)", new AbstractAction( "vapfile") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(vap)|(vap\\.gz))$" );
             }
         });
         dataSetSelector.registerActionTrigger( "vapfile:(.*)", new AbstractAction( "valfile") {
+            @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 String vapfile= dataSetSelector.getValue().substring(8);
                 if ( !( vapfile.endsWith(".xml") ) ) {
@@ -541,6 +544,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         final ApplicationController appController= applicationModel.getDocumentModel().getController();
 
         appController.addDas2PeerChangeListener( new PropertyChangeListener() {
+            @Override
             public void propertyChange( PropertyChangeEvent e ) {
                 PlotController plotController= (PlotController) e.getNewValue();
                 ApplicationController controller= plotController.getApplication().getController();
@@ -552,6 +556,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         } );
 
         appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 SwingUtilities.invokeLater( new Runnable() { public void run() {
                     dataSetSelector.setValue( appController.getFocusUri() );
@@ -561,6 +566,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.setValue( dom.getController().getFocusUri() );
         
         appController.addPropertyChangeListener( ApplicationController.PROP_STATUS, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 setStatus(appController.getStatus());
             }
@@ -591,6 +597,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         AppManager.getInstance().addApplication(this);
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
                     ScriptContext.close();
@@ -606,13 +613,14 @@ public class AutoplotUI extends javax.swing.JFrame {
         }) );
         
         applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
+            @Override
             public void propertyChange( PropertyChangeEvent e ) {
                 stateSupport.setCurrentFile( (String)e.getNewValue() );
             }
         });
 
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
                     final List<String> urls = new ArrayList<String>();
@@ -640,7 +648,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 60");
 
         dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
                 setStatus(dataSetSelector.getMessage());
             }
@@ -693,6 +701,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         //since bookmarks can contain remote folder, get these after making the gui.
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 updateBookmarks();
             }
@@ -720,6 +729,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         run= new Runnable() {
             @Override
             public String toString() { return "addInitializePython"; }
+            @Override
             public void run() {
                 try {
                     //initialize the python interpretter
@@ -734,6 +744,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private Runnable addAxes() {
         return new Runnable() {
+            @Override
             public void run() {
   APSplash.checkTime("addAxes in");
                 final JScrollPane sp= new JScrollPane();
@@ -742,10 +753,12 @@ public class AutoplotUI extends javax.swing.JFrame {
                 invokeLater( 2500, false, new Runnable() {
                     @Override
                     public String toString() { return "addAxesRunnable"; }
+                    @Override
                     public void run() {
   APSplash.checkTime("addAxes1 in");
                         final JComponent c= new AxisPanel(applicationModel);
                         SwingUtilities.invokeLater( new Runnable() {
+                            @Override
                             public void run( ) { sp.setViewportView(c); }
                         } );
   APSplash.checkTime("addAxes1 out");
@@ -766,10 +779,12 @@ public class AutoplotUI extends javax.swing.JFrame {
                 invokeLater( 2500, false, new Runnable() {
                     @Override
                     public String toString() { return "addStyle"; }
+                    @Override                    
                     public void run() {
   APSplash.checkTime("addStyle1 in");
                         final JComponent c= new PlotStylePanel(applicationModel);
                         SwingUtilities.invokeLater( new Runnable() {
+                            @Override                    
                             public void run( ) { sp.setViewportView(c); }
                         } );
   APSplash.checkTime("addStyle1 out");
@@ -845,6 +860,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         invokeLater( 3530, false, new Runnable() {
             @Override
             public String toString() { return "addLayout"; }
+            @Override            
             public void run() {
                 //long t0= System.currentTimeMillis();
 APSplash.checkTime("init 249");
@@ -862,6 +878,7 @@ APSplash.checkTime("init 250");
         invokeLater( 3550, false, new Runnable() {
             @Override
             public String toString() { return "addDataPanel"; }
+            @Override
             public void run() {
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
 APSplash.checkTime("init 259");
@@ -879,6 +896,7 @@ APSplash.checkTime("init 260");
         invokeLater( 3570, false, new Runnable() { 
             @Override
             public String toString() { return "addMetadataPanel"; }
+            @Override
             public void run() {
 APSplash.checkTime("init 269");
                 final MetadataPanel mdp = new MetadataPanel(applicationModel);
@@ -897,6 +915,7 @@ APSplash.checkTime("init 270");
             invokeLater( 4000, true, new Runnable() {
                 @Override
                 public String toString() { return "addScriptPanel"; }
+                @Override
                 public void run() {
                     scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
@@ -924,7 +943,7 @@ APSplash.checkTime("init 270");
 
 
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
 
                 if ( dom.getController().isValueAdjusting() ) { // don't listen to property changes during state transitions.
@@ -967,6 +986,7 @@ APSplash.checkTime("init 270");
                 stateSupport.markDirty();
 
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override            
                     public void run() {
                         refreshUndoRedoLabel();
                     }
@@ -975,6 +995,7 @@ APSplash.checkTime("init 270");
         });
 
         applicationModel.dom.getController().addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent evt ) {
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.log( Level.FINER, "state change: {0}", evt);
@@ -1001,6 +1022,7 @@ APSplash.checkTime("init 270");
         //TODO: perhaps keep a track of dirty URI in dataset selector
         applicationModel.dom.getController().addPropertyChangeListener( ApplicationController.PROP_DATASOURCEFILTER,
                 new PropertyChangeListener() {
+            @Override
             public void propertyChange( PropertyChangeEvent evt ) {
                 DataSourceFilter dsf= (DataSourceFilter) evt.getNewValue();
 
@@ -1067,6 +1089,7 @@ APSplash.checkTime("init 270");
         Runnable run= new Runnable() {
             @Override
             public String toString() { return "bindings"; }
+            @Override
             public void run() {
                 BindingGroup bc = new BindingGroup();
                 bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
@@ -1088,6 +1111,7 @@ APSplash.checkTime("init 270");
                 bc.bind();
 
                 dom.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
+                    @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         BindingModel[] bms= dom.getBindings();
                         boolean isBound=false;
@@ -1112,6 +1136,7 @@ APSplash.checkTime("init 270");
         invokeLater(-1,true,run);
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                     applicationModel.setDataSourceURL(dataSetSelector.getValue());
             }
@@ -1126,6 +1151,7 @@ APSplash.checkTime("init 270");
 
     private Action getAddPanelAction() {
         return new AbstractAction("Add Plot...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 support.addPlotElement();
             }
@@ -1139,6 +1165,7 @@ APSplash.checkTime("init 270");
         result.add( new JMenuItem("looking up discoverable sources...") );
         addDataFromMenu= result;
         RequestProcessor.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 fillAddDataFromMenu();
             }
@@ -1152,6 +1179,7 @@ APSplash.checkTime("init 270");
             if ( ext.startsWith(".") ) ext= ext.substring(1);
             final String fext= ext;
             Action a= new AbstractAction( ext+"..." ) {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         String uri = "vap+" + fext + ":";
@@ -1180,6 +1208,7 @@ APSplash.checkTime("init 270");
     private void fillAddDataFromMenu() {
         final List<String> exts= DataSetURI.getDiscoverableExtensions();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 fillAddDataFromMenuImmediately(exts);
             }
@@ -1232,6 +1261,7 @@ APSplash.checkTime("init 52");
         fileMenu.add(mi);
 
         mi= new JMenuItem( new AbstractAction( "Open URI History..." ) {
+              @Override
               public void actionPerformed( ActionEvent e ) {
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
                   dia.setExpertMode( isExpertMode() );
@@ -1281,6 +1311,7 @@ APSplash.checkTime("init 52");
 
         //TODO: decorate print action to set focus.
         AbstractAction printAction= new AbstractAction( "Print...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 applicationModel.getCanvas().makeCurrent();
                 DasCanvas.PRINT_ACTION.actionPerformed(e);
@@ -1330,6 +1361,7 @@ APSplash.checkTime("init 52");
 
 
         fileMenu.add( new AbstractAction( "Close" ) {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
                     int opt= JOptionPane.showConfirmDialog( AutoplotUI.this,
@@ -1355,6 +1387,7 @@ APSplash.checkTime("init 52");
         });
 
         fileMenu.add( new AbstractAction( "Quit" ) {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 if ( AppManager.getInstance().requestQuit() ) {
                     AutoplotUI.this.dispose();
@@ -1488,6 +1521,7 @@ APSplash.checkTime("init 52");
                     p.add( new JLabel(  "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause().getMessage()+ "<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
                     JPanel p1= new JPanel( new BorderLayout() );
                     p1.add( new JButton( new AbstractAction("View Page") {
+                        @Override
                         public void actionPerformed( ActionEvent ev ) {
                             AutoplotUtil.openBrowser(link);
                         }
@@ -1680,6 +1714,7 @@ APSplash.checkTime("init 52");
             b.bind();
 
             bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     updateBookmarks();
                 }
@@ -1696,6 +1731,7 @@ APSplash.checkTime("init 52");
         if ( bookmarksManager==null ) {
             maybeCreateBookmarksManager();
             bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
                         bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
@@ -1722,7 +1758,7 @@ APSplash.checkTime("init 52");
             }
         }
 
-        Runnable run= new Runnable() { public void run() {
+        Runnable run= new Runnable() { public void run() {            
             bookmarksManager.setPrefNode("bookmarks"); 
             if ( initialBookmarksUrl!=null ) {
                 loadInitialBookmarks(initialBookmarksUrl);
@@ -1753,7 +1789,7 @@ APSplash.checkTime("init 52");
         };
 
         stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent ev) {
                 String label;
                 if (stateSupport.isCurrentFileOpened()) {
@@ -3384,7 +3420,7 @@ private void updateFrameTitle() {
             public String toString() {
                 return "initAutoplotRunnable";
             }
-
+            @Override
             public void run() {
                 //long t0= System.currentTimeMillis();
 
@@ -3459,7 +3495,7 @@ APSplash.checkTime("init 210");
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
+                    @Override
                     public void uncaughtException(Thread t, Throwable e) {
 //                        logger.severe("runtime exception: " + e);
                         logger.log(Level.SEVERE, "runtime exception: " + e, e);
@@ -3481,6 +3517,7 @@ APSplash.checkTime("init 220");
                         public String toString() {
                             return "repaintRunnable";
                         }
+                        @Override                        
                         public void run() {
                             if ( app!=null ) {
                                 app.applicationModel.canvas.repaint();
@@ -3579,7 +3616,7 @@ APSplash.checkTime("init 240");
         final RequestHandler rhandler = new RequestHandler();
 
         rlistener.addPropertyChangeListener(RequestListener.PROP_REQUESTCOUNT, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
                     if ( rlistener==null ) {
@@ -3622,6 +3659,7 @@ APSplash.checkTime("init 240");
         final Icon ficon= icon;
 
         SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
+            @Override
             public void run() {
                 try {
                     statusLabel.setIcon( ficon );
@@ -3749,6 +3787,7 @@ APSplash.checkTime("init 240");
      */
     private void invokeLater( final int delayMillis, final boolean evt, final Runnable run ) {
         Runnable sleepRun= new Runnable() {
+            @Override      
             public void run() {
                 sleep(delayMillis);
                 if ( evt ) {
@@ -3763,6 +3802,7 @@ APSplash.checkTime("init 240");
 
     private void addTools() {
         RequestProcessor.invokeLater( new Runnable() {
+            @Override            
             public void run() {
                 sleep(-1);
                 reloadTools();
@@ -3820,6 +3860,7 @@ APSplash.checkTime("init 240");
         }
 
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 for ( Bookmark t: tools ) {
                     final Bookmark tt= t;
@@ -3828,6 +3869,7 @@ APSplash.checkTime("init 240");
                     } else {
                         final String suri = ((Bookmark.Item) tt).getUri();
                         Action a= new AbstractAction(t.getTitle()) {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
                                     runTool( suri, ActionEvent.SHIFT_MASK );
@@ -3969,6 +4011,7 @@ APSplash.checkTime("init 240");
         
         final boolean fexpert= expert;
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 if ( !fexpert ) {
                     ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
@@ -4087,6 +4130,7 @@ APSplash.checkTime("init 240");
             final RunScriptPanel pp = new RunScriptPanel();
             pp.loadFile(ff);
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
