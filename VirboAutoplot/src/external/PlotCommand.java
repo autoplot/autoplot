@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.graph.DasCanvas;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.python.core.Py;
@@ -34,6 +35,10 @@ import org.virbo.jythonsupport.JythonOps;
 
 /**
  * new implementation of the plot command allows for keywords.
+ * plotx( 0, ripples(20) )
+ * plotx( 1, ripples(20), renderType='color:blue' )
+ * xx= outerProduct( 
+ * plotx( 2, ripples(20), renderType=
  * @author jbf
  */
 public class PlotCommand extends PyObject {
@@ -155,7 +160,14 @@ public class PlotCommand extends PyObject {
             nparm= args.length - keywords.length;
             po0= args[0];
         }
-
+        
+        String renderType=null;
+        for ( int i=0; i<keywords.length; i++  ) {
+            if ( keywords[i].equals("renderType" ) ) {
+                renderType= args[i+nparm].toString();
+            }
+        }
+        
         //if ( args[nargs-1] instanceof PyInteger ) {  // NEW! last positional argument can be plot position.  Where is this used?  I think it should go away.
         //    iplot= ((PyInteger)args[nargs-1]).getValue();
         //    nargs= nargs-1;
@@ -179,11 +191,11 @@ public class PlotCommand extends PyObject {
 
             try {
                 if ( nargs==1 ) {  // x
-                    ScriptContext.plot( iplot, qargs[0] );
+                    ScriptContext.plot( iplot, null, null, qargs[0], renderType );
                 } else if ( nargs==2 ) {  // x, y
-                    ScriptContext.plot( iplot, qargs[0], qargs[1] );
+                    ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType );
                 } else if ( nargs==3 ) {  // x, y, z
-                    ScriptContext.plot( iplot, qargs[0], qargs[1], qargs[2] );
+                    ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType );
                 }
 
             } catch ( InterruptedException ex ) {
@@ -211,7 +223,7 @@ public class PlotCommand extends PyObject {
 
             Plot plot= dom.getController().getPlotFor(elements.get(0));
             plot.setIsotropic(false);
-            
+
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
                 String kw= keywords[i-nparm];
                 PyObject val= args[i];
