@@ -35,7 +35,6 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
-import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
@@ -98,6 +97,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         // kludge to trigger undo/redo support.
         changesSupport.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals("status")
                         && "ready".equals(evt.getNewValue() ) ) {
@@ -189,7 +189,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     AtomicInteger eventId = new AtomicInteger();
 
     PropertyChangeListener controllerListener= new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             
             // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
@@ -202,7 +202,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     };
 
     PropertyChangeListener domListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
 
             // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
@@ -291,7 +291,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     // listen for focus changes and update the focus plot and plotElement.
     FocusAdapter focusAdapter = new FocusAdapter() {
-
         @Override
         public void focusGained(FocusEvent e) {
             super.focusGained(e);
@@ -358,7 +357,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void fillEditPlotMenu(JMenu editPlotMenu, final Plot domPlot) {
         JMenuItem item;
         item = new JMenuItem(new AbstractAction("Delete Plot") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (application.getPlots().length > 1) {
                     List<PlotElement> plotElements = getPlotElementsFor(domPlot);
@@ -383,7 +382,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         editPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 List<BindingModel> bms= new ArrayList<BindingModel>();
 
@@ -407,7 +406,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         editPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Bind Plot Context to Application Time Range") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 bind( application, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
             }
@@ -474,12 +473,11 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     private void addListeners() {
         this.addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
-
             @Override
             public String toString() {
                 return "" + ApplicationController.this;
             }
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (!isValueAdjusting()) {
                     PlotElement p = getPlotElement();
@@ -496,6 +494,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         // automatically enable layout plotElement when there are multiple plotElements.
         this.application.addPropertyChangeListener( Application.PROP_PLOT_ELEMENTS, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( application.getPlotElements().length>1 ) {
                     application.options.setLayoutVisible(true);
@@ -504,12 +503,13 @@ public class ApplicationController extends DomNodeController implements RunLater
         });
 
         this.application.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( isValueAdjusting() ) {
                     return;
                 }
 
-                List<String> ss= new ArrayList<String>();
+                //List<String> ss= new ArrayList<String>();
 
                 // is anyone listening to timerange?
                 boolean noOneListening= true;
@@ -517,7 +517,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 for ( int i=0; i<bms.length; i++ ) {
                     if ( bms[i].getSrcId().equals( application.getId() ) && bms[i].srcProperty.equals( Application.PROP_TIMERANGE ) ) {
                         noOneListening= false;
-                        ss.add( bms[i].getDstId() );
+                        //ss.add( bms[i].getDstId() );
                     }
                 }
 
@@ -731,6 +731,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             return "" + ApplicationController.this;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             PlotElement p = (PlotElement) evt.getSource();
             String srcid = (String) evt.getOldValue();
@@ -845,6 +846,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             return "" + ApplicationController.this;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             DasPlot dasPlot = (DasPlot) evt.getSource();
             Renderer r = dasPlot.getFocusRenderer();
@@ -1278,6 +1280,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             final DasColorBar cb = domPlot.controller.getDasColorBar();
             final DasCanvas lcanvas= this.getDasCanvas();
             SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
+                @Override
                 public void run() {
                     lcanvas.remove(p);
                     lcanvas.remove(cb);
@@ -1536,6 +1539,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
                     DasCanvasComponent[] dccs= canvas.controller.getDasCanvas().getCanvasComponents();
@@ -2299,15 +2303,15 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public MonitorFactory getMonitorFactory() {
         return new MonitorFactory() {
-
+            @Override
             public ProgressMonitor getMonitor(DasCanvas canvas, String string, String desc) {
                 return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(canvas, string, desc);
             }
-
+            @Override
             public ProgressMonitor getMonitor(DasCanvasComponent context, String label, String description) {
                 return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(context, label, description);
             }
-
+            @Override
             public ProgressMonitor getMonitor(String label, String description) {
                 return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(getDasCanvas(), label, description);
             }
