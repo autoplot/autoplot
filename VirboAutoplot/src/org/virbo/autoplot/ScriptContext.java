@@ -328,6 +328,23 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * plot the dataset in the specified  dataSource node.
      * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param renderType string explicitly controlling the renderType and hints.
+     * @throws java.lang.InterruptedException
+     */    
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) throws InterruptedException {
+        maybeInitModel();
+        ArrayDataSet yds= ArrayDataSet.copy(y);
+        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+        yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+        model.setDataSet( chNum, label, yds);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
+    }
+    
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
@@ -350,6 +367,32 @@ public class ScriptContext extends PyJavaInstance {
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
     }
 
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the dependent parameter
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) throws InterruptedException {
+        maybeInitModel();
+        if ( z.rank()==1 ) {
+            ArrayDataSet yds= ArrayDataSet.copy(y);
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, x );
+            yds.putProperty( QDataSet.PLANE_0, z );
+            model.setDataSet(chNum, label, yds);
+        } else {
+            ArrayDataSet zds= ArrayDataSet.copy(z);
+            zds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
+            model.setDataSet(chNum, label, zds);
+        }
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle(false);
+    }
 
     /**
      * commented codes removed that would plot(double[],double[])...  These
