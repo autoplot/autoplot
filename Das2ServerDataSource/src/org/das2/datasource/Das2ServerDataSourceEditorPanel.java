@@ -25,11 +25,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -315,6 +313,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    DatumRange validTimeRange= null; // some timerange believed to be valid.
+    
     /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
      * @param url
@@ -344,6 +344,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             Runnable run = new Runnable() {
                 public void run() {
                     try {
+                    validTimeRange= null;
+                    boolean isTca= false;
+
                     XPathFactory factory = XPathFactory.newInstance();
                     XPath xpath = (XPath) factory.newXPath();
 
@@ -363,9 +366,19 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         if (ex.getNodeName().equals("exampleRange") ) {
                             example= ex.getNodeValue();
                         }
+                        if ( ex.getNodeName().equals("items") ) {
+                            isTca= true;
+                        }
                     }
                     if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
                         Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( example );
+                    }
+                    if ( example!=null ) {
+                        try {
+                            validTimeRange= DatumRangeUtil.parseTimeRange(example);
+                        } catch (ParseException ex) {
+                            logger.info("default timerange doesn't parse!");
+                        }                        
                     }
                     if ( examples.size()>0 ) {
                         for ( int i=0; i<examples.size(); i++ ) {
@@ -391,6 +404,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
                             Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( exampleRange.getNodeValue() );
                         }
+                        if ( exampleRange!=null ) {
+                            try {
+                               validTimeRange= DatumRangeUtil.parseTimeRange(example);
+                            } catch (ParseException ex) {
+                               logger.info("default timerange doesn't parse!");
+                            }
+                        }
                     }
                     
                     Node validRange= (Node)  xpath.evaluate( "/stream/properties/@validRange", document, XPathConstants.NODE );
@@ -398,6 +418,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText( "valid range: " + validRange.getNodeValue() );
                     } else {
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
+                    }
+                    if ( isTca ) {
+                        tcaTextField.setText("60");
+                    } else {
+                        tcaTextField.setText("");
                     }
                     } catch ( XPathExpressionException ex ) {
                         logger.log(Level.SEVERE, null, ex);
@@ -575,7 +600,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 sb.append( (char)by );
                 by= in.read();
             }
-            in.close();
 
             String s= sb.toString();
             int contentLength= Integer.parseInt( s.substring(4,10) );
@@ -597,7 +621,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             for ( int ii=0; ii<o.getLength(); ii++ ) {
                 result.append(  o.item(ii).getNodeName() ).append( "  =  " ) .append(  o.item(ii).getNodeValue() ) .append( "\n" );
             }
-            in.close();
 
             final String fresult= result.toString();
 
@@ -641,7 +664,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             logger.log(Level.SEVERE, null, ex);
         } finally {
             try {
-                in.close();
+                if ( in!=null ) in.close();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -809,27 +832,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     public void setURI(String uri) {
-        URI home=null;
-        try {
-            home = new URI("http://www-pw.physics.uiowa.edu/das/das2Server");
-        } catch (URISyntaxException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
 
         URISplit split= URISplit.parse(uri);
-        if ( split.file==null || split.file.equals("file:///") ) {
-            //split.resourceUri = home;
-        }
-        List<URI> servers= new ArrayList();
-        servers.add(home);
-        try {
-            servers.add(new URI("http://cassini.physics.uiowa.edu/das/das2Server"));
-        } catch (URISyntaxException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        if ( !split.resourceUri.equals( home ) ) {
-            servers.add( split.resourceUri );
-        }
 
         String uriServerUrl= DataSetURI.fromUri( split.resourceUri );
         if ( uriServerUrl.length()>0 && !uriServerUrl.startsWith("file:/") ) {
@@ -985,12 +989,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             timeRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
             logger.log(Level.SEVERE, null, ex);
+            timeRange= this.validTimeRange;
+            if ( timeRange==null ) {
+                throw new IllegalArgumentException("No timerange for the URI."); // too bad we can't check reject and reenter the GUI...  Surely it does this...
+            }
         }
         
-        StringBuilder dataSetId= new StringBuilder("");
+        StringBuilder ldataSetId= new StringBuilder("");
         if ( tp0.length>1 ) {
-            dataSetId= new StringBuilder( (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject() );
-            for ( int i=2; i<tp0.length; i++ ) dataSetId.append( "/") .append( (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject() );
+            ldataSetId= new StringBuilder( (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject() );
+            for ( int i=2; i<tp0.length; i++ ) ldataSetId.append( "/") .append( (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject() );
         }
 
         StringBuilder params= new StringBuilder();
@@ -1011,21 +1019,23 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
 
-        String result= "vap+das2server:"+serverURL + "?" +
-                "dataset="+dataSetId.toString()  +
-                "&start_time="+ timeRange.min() +
-                "&end_time="+ timeRange.max();
-
+        StringBuilder result= new StringBuilder("vap+das2server:");
+        result.append(serverURL).append("?").append("dataset=").append(ldataSetId.toString());
+        if ( timeRange!=null ) {
+            result.append("&start_time=").append(timeRange.min()).append("&end_time=").append(timeRange.max());
+        }
         String tcaInterval= tcaTextField.getText().trim();
         if ( !tcaInterval.equals("") ) {
-            result+= "&interval="+ tcaInterval;
+            result.append("&interval=").append(tcaInterval);
         }
         if ( !tcaItem.getText().trim().equals("") ) {
-            result+= "&item="+ tcaItem.getText().trim();
+            result.append("&item=").append(tcaItem.getText().trim());
         }
         
-        if ( params.length()>0 ) result= result + "&" + params.substring(0,params.length()-3);
-        return result;
+        if ( params.length()>0 ) result.append("&").append(params.substring(0,params.length()-3));
+        
+        
+        return result.toString();
     }
 
     public void markProblems(List<String> problems) {
