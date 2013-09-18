@@ -2248,7 +2248,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             application.setTimeRange(that.getTimeRange());
 
-            syncSupport.syncBindingsNew( that.getBindings(), nameMap );
+            syncSupport.syncBindings( that.getBindings(), nameMap );
             syncSupport.syncConnectors(that.getConnectors());
 
             resetIdSequenceNumbers();

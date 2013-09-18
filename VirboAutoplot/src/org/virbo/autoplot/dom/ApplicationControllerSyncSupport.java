@@ -175,7 +175,7 @@ public class ApplicationControllerSyncSupport {
     }
 
 
-    protected void syncBindingsNew( BindingModel[] bindings ,Map<String,String> idMap) {
+    protected void syncBindings( BindingModel[] bindings ,Map<String,String> idMap) {
         List<Diff> diffs= DomUtil.getArrayDiffs( "bindings", bindings, application.getBindings() );
         for ( Diff d: diffs ) {
             if ( d instanceof ArrayNodeDiff ) {
@@ -201,39 +201,7 @@ public class ApplicationControllerSyncSupport {
     }
     
     protected void syncBindings( BindingModel[] bindings ) {
-        syncBindingsNew(bindings,new HashMap<String, String>());
-        /*
-        List<BindingModel> addBindings= new ArrayList<BindingModel>();
-        List<BindingModel> deleteBindings= new ArrayList<BindingModel>();
-
-        List<BindingModel> thisBindings= Arrays.asList(application.getBindings());
-        List<BindingModel> thatBindings= Arrays.asList(bindings);
-
-        for ( BindingModel c: thatBindings ) {
-            if ( !thisBindings.contains(c) ) addBindings.add(c);
-        }
-
-        for ( BindingModel c: application.bindings ) {
-            if ( !thatBindings.contains(c) ) deleteBindings.add(c);
-        }
-
-        for ( BindingModel c:addBindings ) {
-            DomNode src= DomUtil.getElementById(application,c.srcId);
-            DomNode dst= DomUtil.getElementById(application,c.dstId);
-            if ( src==null || dst==null ) {
-                logger.finer("node was null");
-            } else {
-                controller.bind( src, c.srcProperty, dst, c.dstProperty  );
-            }
-        }
-
-        for ( BindingModel c:deleteBindings ) {
-            DomNode src= DomUtil.getElementById(application,c.srcId);
-            DomNode dst= DomUtil.getElementById(application,c.dstId);
-            controller.deleteBinding( controller.findBinding( src, c.srcProperty, dst, c.dstProperty  ) );
-        }
-         */
-
+        syncBindings(bindings,new HashMap<String, String>());
     }
 
     protected void syncToDataSourceFilters(DataSourceFilter[] dataSourceFilters, Map<String, String> nameMap) {
