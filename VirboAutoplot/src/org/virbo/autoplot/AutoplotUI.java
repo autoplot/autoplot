@@ -322,26 +322,30 @@ public class AutoplotUI extends javax.swing.JFrame {
                     LinkedHashMap<Object,Object> changes= new LinkedHashMap();
                     dom.getController().pendingChanges(changes);
                     //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
-                    if ( changes.size()>0 ) {
-                        statusLabel.setIcon( BUSY_ICON );
-                        String chstr="";
-                        for ( Entry<Object,Object> e: changes.entrySet() ) { 
-                            String client= String.valueOf(e.getValue());
-                            int ist= client.indexOf("(");
-                            int ien= client.lastIndexOf(")");
-                            if ( ist!=-1 ) {
-                                client= client.substring(0,ist)+client.substring(ien+1);
-                            }
-                            if ( chstr.equals("") ) {
-                                chstr= "* " + e.getKey() + " (" + client + ")";
-                            } else {
-                                chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
-                            }
-                        }
-                        statusLabel.setToolTipText( chstr );
+                    if ( statusLabel.getIcon()==WARNING_ICON ) {
+                        // wait for setMessage to clear this.
                     } else {
-                        statusLabel.setIcon( IDLE_ICON );
-                        statusLabel.setToolTipText( null );
+                        if ( changes.size()>0 ) {
+                            statusLabel.setIcon( BUSY_ICON );
+                            String chstr="";
+                            for ( Entry<Object,Object> e: changes.entrySet() ) { 
+                                String client= String.valueOf(e.getValue());
+                                int ist= client.indexOf("(");
+                                int ien= client.lastIndexOf(")");
+                                if ( ist!=-1 ) {
+                                    client= client.substring(0,ist)+client.substring(ien+1);
+                                }
+                                if ( chstr.equals("") ) {
+                                    chstr= "* " + e.getKey() + " (" + client + ")";
+                                } else {
+                                    chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
+                                }
+                            }
+                            statusLabel.setToolTipText( chstr );
+                        } else {
+                            statusLabel.setIcon( IDLE_ICON );
+                            statusLabel.setToolTipText( null );
+                        }
                     }
                     try {
                         Thread.sleep(200);
@@ -3683,25 +3687,33 @@ APSplash.checkTime("init 240");
     
     /**
      * set the message in the lower left corner of the application with the icon, such
-     * as AutoplotUI.WARNING_ICON.
+     * as AutoplotUI.WARNING_ICON.  
+     * 
+     * 2013/09/18: Note only WARNING_ICON is used now, and the busy status is set by checking the application controller nodes for locks.
      * @param icon the icon to display to the left of the message.  The icon is no longer used.
      * @param message the message to display
      */
     public void setMessage( Icon icon, String message ) {
-        if ( message==null ) message= "<null>"; // TODO: fix this later
+        if ( message==null ) message= "<null>"; 
         String myMess= message;
         //if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         myMess= myMess.replaceAll("\n","");
 
         final String fmyMess= myMess;
         final String fmessage= message;
-        //final Icon ficon= icon;
+        final Icon ficon= icon;
 
         SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
             @Override
             public void run() {
                 try {
-                    //statusLabel.setIcon( ficon );
+                    if ( ficon==WARNING_ICON ) {
+                        statusLabel.setIcon( ficon );
+                    } else {
+                        if ( statusLabel.getIcon()==WARNING_ICON ) {
+                            statusLabel.setIcon(BUSY_ICON);
+                        }
+                    }
                     statusTextField.setText(fmyMess);
                     statusTextField.setToolTipText(fmessage);
                 } catch ( Exception e ) {
