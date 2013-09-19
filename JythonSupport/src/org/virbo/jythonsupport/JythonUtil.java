@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
@@ -664,22 +665,22 @@ public class JythonUtil {
       * @throws IOException
       * @throws PySyntaxError 
       */
-     public static List<Param> getGetParams( BufferedReader reader ) throws IOException, PySyntaxError {
+     public static List<Param> getGetParams( Reader reader ) throws IOException, PySyntaxError {
         return getGetParams( readScript(reader) );
      }
      
-     public static String readScript( BufferedReader reader ) throws IOException {
+     public static String readScript( Reader reader ) throws IOException {
         String s;
         StringBuilder build= new StringBuilder();
-        
+        BufferedReader breader= new BufferedReader(reader);
         try {
-            s= reader.readLine();
+            s= breader.readLine();
             while (s != null) {
                build.append(s).append("\n");
-               s = reader.readLine();
+               s = breader.readLine();
             }
         } finally {
-            reader.close();
+            breader.close();
         }
         return build.toString();
      }
