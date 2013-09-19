@@ -640,8 +640,13 @@ public class JythonUtil {
                  continue;
              }
              if ( o instanceof org.python.parser.ast.If ) {
+                 if ( acceptLine>-1 ) {
+                    for ( int i=acceptLine; i<=beginLine; i++ ) {
+                        result.append(ss[i-1]).append("\n");
+                    }
+                 }
                  If iff= (If)o;
-                 for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n");
+                 for ( int i=beginLine+1; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n");
                  int lastLine1;
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
