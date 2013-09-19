@@ -45,6 +45,7 @@ import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.Call;
+import org.python.parser.ast.If;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Subscript;
@@ -366,7 +367,28 @@ public class JythonUtil {
         return result;
         
      }
-
+     
+     //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
+     private static String[] okay= new String[] { "getParam,", "lower,", "upper," };
+     
+     /**
+      * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
+      * @param sn
+      * @return 
+      */
+     private static boolean trivialFunctionCall( SimpleNode sn ) {
+         if ( sn instanceof Call ) {
+             Call c= (Call)sn;
+             boolean klugdyOkay= false;
+             for ( String s: okay ) {
+                if ( c.func.toString().contains(s) ) klugdyOkay= true;
+             }
+             return klugdyOkay;
+         } else {
+             return false;
+         }
+     }
+             
      private static class MyVisitorBase<R> extends VisitorBase {
          boolean looksOkay= true; 
          boolean visitNameFail= false;
@@ -396,16 +418,12 @@ public class JythonUtil {
          @Override
          public void traverse(SimpleNode sn) throws Exception {
              if ( sn instanceof Call ) {
-                 if ( !( (Call)sn).toString().contains("id=getParam,") ) { // TODO: ap.getParam()
-                    looksOkay= false;
-                 }
+                 looksOkay= trivialFunctionCall(sn);
              } else if ( sn instanceof Assign ) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                  Assign a= ((Assign)sn);
                  exprType et= a.value;
                  if ( et instanceof Call ) {
-                     if ( !((Call)et).toString().contains("getParam,") ) {
-                         looksOkay= false;
-                     }
+                     looksOkay= trivialFunctionCall(et);
                  }
              } else if ( sn instanceof Name ) {
                  //visitName((Name)sn).id
@@ -431,13 +449,11 @@ public class JythonUtil {
       * @return 
       */
      private static boolean simplifyScriptToGetParamsOkayNoCalls( SimpleNode o, HashSet<String> variableNames ) {
-
-         //if ( o.beginLine==19  ) {
-         //    System.err.println( "here at 19-ish");
-         //}
+        
         if ( o instanceof Call ) { 
             Call c= (Call)o;
-            if ( !c.func.toString().contains("getParam,") ) {
+
+            if ( !trivialFunctionCall(c) ) {
                 logger.finer( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
                 return false;
             }
@@ -605,6 +621,75 @@ public class JythonUtil {
      }
      
      /**
+      * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
+      * This may call itself recursively when if blocks are encountered.
+      * See test038.
+      * @param ss
+      * @param stmts
+      * @param variableNames variable names that have been resolved.
+      * @param lastLine INCLUSIVE last line.
+      * @return 
+      */
+     public static String simplifyScriptToGetParams( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine  ) {
+         int acceptLine= -1;  // first line to accept
+         StringBuilder result= new StringBuilder();
+         for ( int istatement=0; istatement<stmts.length; istatement++ ) {
+             stmtType o= stmts[istatement];
+             if ( o.beginLine>0 ) beginLine= o.beginLine;
+             if ( beginLine>lastLine ) {
+                 continue;
+             }
+             if ( o instanceof org.python.parser.ast.If ) {
+                 If iff= (If)o;
+                 for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n");
+                 int lastLine1;
+                 if ( iff.orelse!=null && iff.orelse.length>0 ) {
+                     if ( iff.orelse[0].beginLine>0 ) {
+                         lastLine1= iff.test.beginLine;  // not sure why...
+                     } else {
+                         if ( iff.orelse[0] instanceof If ) {
+                             lastLine1= ((If)iff.orelse[0]).test.beginLine;
+                         } else {
+                             logger.warning("failure to deal with another day...");
+                             throw new RuntimeException("this case needs to be dealt with...");
+                         }
+                     }
+                 } else if ( (istatement+1)<stmts.length ) {
+                     lastLine1= stmts[istatement+1].beginLine;
+                 } else {
+                     lastLine1= lastLine+1;
+                 }
+                 String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1-1 );
+                 result.append(ss1);
+                 if ( iff.orelse!=null ) {
+                     String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1, lastLine );
+                     result.append(ss2);
+                 }
+                 acceptLine= -1;
+             } else {
+                 if ( simplifyScriptToGetParamsOkay( o, variableNames ) ) {
+                     if ( acceptLine<0 ) acceptLine= (o).beginLine;
+                 } else {
+                     if ( acceptLine>-1 ) {
+                         int thisLine= (o).beginLine;
+                         for ( int i=acceptLine; i<thisLine; i++ ) {
+                             result.append(ss[i-1]).append("\n");
+                         }
+                         acceptLine= -1;
+                     }
+                }
+             }
+         }
+         if ( acceptLine>-1 ) {
+             int thisLine= lastLine;
+             for ( int i=acceptLine; i<=thisLine; i++ ) {
+                 result.append(ss[i-1]).append("\n");
+             }
+         }
+         return result.toString();         
+     }
+     
+     /**
      * extracts the parts of the program that get parameters.  
      *
      * @param script the entire python program
@@ -624,35 +709,11 @@ public class JythonUtil {
              return "";
          }
          
-         int acceptLine= -1;  // first line to accept
-         StringBuilder result= new StringBuilder();
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
-             for ( stmtType o: n.body ) {
-                 if ( o.beginLine>lastLine ) {
-                     continue;
-                 }
-                 if ( simplifyScriptToGetParamsOkay( o, variableNames ) ) {
-                     if ( acceptLine<0 ) acceptLine= (o).beginLine;
-                 } else {
-                     if ( acceptLine>-1 ) {
-                         int thisLine= (o).beginLine;
-                         for ( int i=acceptLine; i<thisLine; i++ ) {
-                             result.append(ss[i-1]).append("\n");
-                         }
-                         acceptLine= -1;
-                     }
-                 }
-             }
-             if ( acceptLine>-1 ) {
-                 int thisLine= lastLine;
-                 for ( int i=acceptLine; i<=thisLine; i++ ) {
-                     result.append(ss[i-1]).append("\n");
-                 }
-             }
-             return result.toString();
+             return simplifyScriptToGetParams( ss, n.body, variableNames, 1, lastLine );
          } catch ( PySyntaxError ex ) {
              throw ex;
          }
