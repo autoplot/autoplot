@@ -62,9 +62,11 @@ public class Test038 {
      * @throws Exception 
      */
     public static void testGetParams() {
-        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/trivial.jy");
-        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms.jy");
-        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
+        doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
+        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
+        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
+        doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
     }
     
     public static void main( String[] args ) throws IOException {
