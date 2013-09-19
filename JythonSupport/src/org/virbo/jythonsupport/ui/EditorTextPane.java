@@ -18,9 +18,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -232,6 +236,40 @@ public class EditorTextPane extends JEditorPane {
         }
     }
 
+    String[] jumpToList( ) {
+        LineNumberReader reader= null;
+        List<String> jumpToList= new ArrayList();
+        jumpToList.add("0:top");
+        try {
+            Document d = EditorTextPane.this.getDocument();
+            String s= d.getText( 0, d.getLength() );
+            reader= new LineNumberReader( new StringReader(s) );
+            String line="";
+            
+            int length= -1;
+            try {
+                while ( line!=null ) {
+                    if ( line.startsWith("def ") ) {
+                        int i= line.indexOf("(");
+                        jumpToList.add( reader.getLineNumber() + ":" + line.substring(0,i) );
+                    }
+                    length= reader.getLineNumber();
+                    line= reader.readLine();
+                }
+            } finally {
+                reader.close();
+            }
+            jumpToList.add( String.format( "%d:bottom",(length-1) ) );
+            return jumpToList.toArray( new String[jumpToList.size()] );
+        } catch ( IOException ex ) {
+            return jumpToList.toArray( new String[jumpToList.size()] );
+        } catch (BadLocationException ex) {
+            Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+            return jumpToList.toArray( new String[jumpToList.size()] );
+        }
+        
+    }
+    
     @Override
     public void setFont(Font font) {
         super.setFont(font);
