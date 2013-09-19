@@ -72,7 +72,7 @@ public class Test038 {
         long t0= System.currentTimeMillis();
         PythonInterpreter interp= JythonUtil.createInterpreter(true);
         interp.eval("1+2");
-        System.err.println( String.format( "first initialize in %d millis\n", System.currentTimeMillis()-t0 ) );
+        System.err.println( String.format( "== first initialize in %d millis\n", System.currentTimeMillis()-t0 ) );
         
         testGetParams();
 
