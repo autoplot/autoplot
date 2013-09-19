@@ -49,7 +49,7 @@ public class Util {
 
         File src = DataSetURI.getFile(furi, mon );
 
-        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new BufferedReader( new FileReader(src) ) );
+        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new FileReader(src) );
 
         Map<String,JythonUtil.Param> result= new LinkedHashMap();
 
