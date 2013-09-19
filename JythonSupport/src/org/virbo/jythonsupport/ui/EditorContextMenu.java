@@ -9,6 +9,8 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -42,7 +44,8 @@ public class EditorContextMenu {
     private JPopupMenu menu;
     private DataSetSelector dataSetSelector;
     private JMenu examplesMenu;
-
+    private JMenu jumpToMenu;
+    
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
         maybeCreateMenu();
@@ -59,6 +62,23 @@ public class EditorContextMenu {
 
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
 
+        Runnable run= new Runnable() {
+            public void run() {
+                while ( true ) {
+                    String[] ss= editor.jumpToList();
+                    for ( int i=0; i<ss.length; i++ ) {
+                        System.err.println(ss[i]);
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        //new Thread(run).start();
+        
 //        editor.addMouseListener(new MouseAdapter() {
 //
 //            @Override
@@ -304,7 +324,13 @@ public class EditorContextMenu {
             JMenu submenu= new JMenu("Example Scripts");
             examplesMenu= submenu;
             menu.add( submenu );
+            
             JMenu actionsMenu= new JMenu("Actions");
+            
+            jumpToMenu= new JMenu( "Jump To" );
+            jumpToMenu.setToolTipText("Jump To Position in code");
+            actionsMenu.add(jumpToMenu);
+            
             JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
                 public void actionPerformed(ActionEvent e) {
                     String doThis= editor.getSelectedText();
