@@ -45,11 +45,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     Attribute formatAttr, displayTypeAttr;
 
     Map<QDataSet,String> names;
+    Map<String,QDataSet> seman;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     
     public CdfDataSourceFormat() {
         names= new HashMap<QDataSet,String>();
+        seman= new HashMap<String,QDataSet>();
     }
 
     private synchronized String nameFor(QDataSet dep0) {
@@ -66,7 +68,18 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
         
-        names.put(dep0, name);
+        if (seman.containsKey(name) ) {
+            String oname= name;
+            int i=1;
+            name= oname+"_"+i;
+            while ( seman.containsKey(name) ) {
+                i=i+1;
+                name= oname+"_"+i;
+            }
+        }
+        
+        names.put(dep0,name);
+        seman.put(name,dep0);
         
         return name;
     }
