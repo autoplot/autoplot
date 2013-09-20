@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -469,6 +468,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 String s= (String) lablPtr1.getData();
                 Variable labl= cdf.getVariable(s);
                 DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
+                Object o= labl.getRecord(0);
+                if ( !o.getClass().isArray() || !( String.class.isAssignableFrom( o.getClass().getComponentType() ) ) ) {
+                    continue;
+                }
                 String[] rec= (String[]) labl.getRecord(0);
                 for ( int i=0; i<rec.length; i++ ) {
                     String snode=  String.format("%d: %s", i, rec[i] ) ;
