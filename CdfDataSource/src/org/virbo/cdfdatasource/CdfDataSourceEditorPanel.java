@@ -468,8 +468,9 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 String s= (String) lablPtr1.getData();
                 Variable labl= cdf.getVariable(s);
                 DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
-                Object o= labl.getRecord(0);
-                if ( !o.getClass().isArray() || !( String.class.isAssignableFrom( o.getClass().getComponentType() ) ) ) {
+                Object oo= labl.getRecord(0);
+                if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
+                    logger.fine("Expected string array in element: "+s);
                     continue;
                 }
                 String[] rec= (String[]) labl.getRecord(0);

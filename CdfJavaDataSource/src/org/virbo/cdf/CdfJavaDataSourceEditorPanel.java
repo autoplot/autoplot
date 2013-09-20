@@ -488,7 +488,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     String s= lablPtr1;
                     DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
                     Object o = cdf.get(s);
-
+                    Object oo= Array.get(o,0);
+                    if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
+                       logger.log(Level.FINE, "Expected string array in element: {0}", s);
+                       continue;
+                    }
                     String[] rec= (String[])Array.get(o,0);
                     for ( int i=0; i<rec.length; i++ ) {
                         String snode=  String.format("%d: %s", i, rec[i] ) ;
