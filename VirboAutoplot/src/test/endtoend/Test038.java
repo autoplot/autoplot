@@ -39,12 +39,12 @@ public class Test038 {
             File f= new File(file);
             String fout= "./test038_"+f.getName();
             FileWriter fw= new FileWriter(fout);
-            List<Param> parms= org.virbo.jythonsupport.JythonUtil.getGetParams( script );
             try {
                 fw.append(scrip);
             } finally {
                 fw.close();
             }
+            List<Param> parms= org.virbo.jythonsupport.JythonUtil.getGetParams( script );
             for ( Param p: parms ) {
                 System.err.println(p);
             }
