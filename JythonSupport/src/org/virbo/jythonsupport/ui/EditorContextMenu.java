@@ -6,11 +6,8 @@ package org.virbo.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -27,6 +24,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Element;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.virbo.datasource.DataSetSelector;
@@ -45,6 +43,8 @@ public class EditorContextMenu {
     private DataSetSelector dataSetSelector;
     private JMenu examplesMenu;
     private JMenu jumpToMenu;
+    private int jumpToMenuPosition;
+    private JMenu actionsMenu;
     
     public EditorContextMenu( EditorTextPane edit  ) {
         this.editor = edit;
@@ -61,44 +61,46 @@ public class EditorContextMenu {
         });
 
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
+        
+        menu.addPropertyChangeListener( "visible", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                doRebuildJumpToMenu();
+            }
+        });
 
-        Runnable run= new Runnable() {
-            public void run() {
-                while ( true ) {
-                    String[] ss= editor.jumpToList();
-                    for ( int i=0; i<ss.length; i++ ) {
-                        System.err.println(ss[i]);
-                    }
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+    private void doRebuildJumpToMenu() {
+        final JMenu tree= new JMenu("Jump To");
+
+        String[] ss= editor.jumpToList();
+        for ( int i=0; i<ss.length; i++ ) {
+            final String fs= ss[i];
+            tree.add( new JMenuItem( new AbstractAction( ss[i] ) {
+                public void actionPerformed(ActionEvent e) {
+                    if ( fs.equals("top") ) {
+                        editor.setCaretPosition(0);
+                    } else if ( fs.equals("bottom") ) {
+                        editor.setCaretPosition(editor.getDocument().getLength()-1);
+                    } else {
+                       int i= fs.indexOf(":");
+                       if ( i>-1 ) {
+                           int line= Integer.parseInt(fs.substring(0,i));
+                           Element ee= editor.getDocument().getDefaultRootElement().getElement(line-1);
+                           editor.setCaretPosition(ee.getStartOffset());
+                       }
                     }
                 }
+
+            } ) );
+        }
+        Runnable run= new Runnable() {
+            public void run() {
+                actionsMenu.remove(jumpToMenuPosition);
+                actionsMenu.add( tree, jumpToMenuPosition );
             }
         };
-        //new Thread(run).start();
-        
-//        editor.addMouseListener(new MouseAdapter() {
-//
-//            @Override
-//            public void mousePressed(MouseEvent e) {
-//                if (e.isPopupTrigger()) {
-//                    if (menu != null) {
-//                        menu.show(e.getComponent(), e.getX(), e.getY());
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void mouseReleased(MouseEvent e) {
-//                if (e.isPopupTrigger()) {
-//                    if (menu != null) {
-//                        menu.show(e.getComponent(), e.getX(), e.getY());
-//                    }
-//                }
-//            }
-//        });
+        run.run();
 
     }
     
@@ -325,10 +327,11 @@ public class EditorContextMenu {
             examplesMenu= submenu;
             menu.add( submenu );
             
-            JMenu actionsMenu= new JMenu("Actions");
+            actionsMenu= new JMenu("Actions");
             
             jumpToMenu= new JMenu( "Jump To" );
             jumpToMenu.setToolTipText("Jump To Position in code");
+            jumpToMenuPosition= actionsMenu.getItemCount();
             actionsMenu.add(jumpToMenu);
             
             JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
