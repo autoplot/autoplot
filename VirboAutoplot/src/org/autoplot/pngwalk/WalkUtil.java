@@ -32,6 +32,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -127,7 +128,7 @@ public class WalkUtil {
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
                     //File f= fs.getFileObject(ss[i]).getFile();
-                    result.add( new URI( DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ) ); // make file:/// match template. // bug 3055130 suspect
+                    result.add( DataSetURI.getURI( DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ) ); // make file:/// match template. // bug 3055130 suspect
                 } else {
                     if ( ss[i].startsWith("/") ) {
                         result.add( fs.getRootURI().resolve(ss[i].substring(1)) );
