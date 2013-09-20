@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The parsing of scripts to produce a GUI is more sophistocated now, allowing for branches with different get parameter calls.</small></p>
+        <p><small>The contour routine is nearly ready to roll out.  Let us know if you have an immediate use for it.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,7 +25,9 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>            
-            <li>1108: underimplementation of new jython script handling </li>
+            <li>rte_1511776445: NullPointerException when exporting vap+inline:data_1,data_2 where data_1 is TSB.  Thanks jcf!</li>
+            <li>rte_2010191909: don't assume that the type of LABL_PTRs in CDF files are string array.  Thanks Reiner!</li>
+            <li>1108: underimplementation of new jython script handling.  Thanks Craig and Scott!</li>
             <li>1107: das2server sends everything when TCA items are specified for non-TCA dataset</li>            
             <li>clean up DEPEND_1/slice1 messages seen on stderr when plotting components of vectors.</li>
             <li>trim labels for CDF products, which sometimes contain extra spaces.</li>
@@ -73,6 +75,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 326: jump to routine in jython editor</li>
             <li>rfe 322: Bookmarks for the Axis Annotations</li>
             <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
             <li>export to wave table clips to visible range, not wave packet boundaries</li>
