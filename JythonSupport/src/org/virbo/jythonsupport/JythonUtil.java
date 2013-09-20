@@ -622,6 +622,9 @@ public class JythonUtil {
      }
      
      private static StringBuilder appendToResult( StringBuilder result, String line ) {
+         if ( line.contains("getDataSet") ) {
+             System.err.println("here626");
+         }
          result.append(line);
          return result;
      }
@@ -655,39 +658,45 @@ public class JythonUtil {
              if ( o instanceof org.python.parser.ast.If ) {
                  if ( acceptLine>-1 ) {
                     for ( int i=acceptLine; i<beginLine; i++ ) {
-                        result.append(ss[i-1]).append("\n");
+                        appendToResult( result,ss[i-1]).append("\n");
                     }
                  }
                  If iff= (If)o;
                  for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n"); // write out the 'if' part
-                 int lastLine1;  //lastLine1 is the last line of the "if" clause plus 1.
+                 int lastLine1;  //lastLine1 is the last line of the "if" clause.
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
-                         lastLine1= iff.orelse[0].beginLine-1;  // -1 is for the "else:" part.
+                         lastLine1= iff.orelse[0].beginLine-2;  // -2 is for the "else:" part.
                      } else {
                          if ( iff.orelse[0] instanceof If ) {
-                             lastLine1= ((If)iff.orelse[0]).test.beginLine;
+                             lastLine1= ((If)iff.orelse[0]).test.beginLine-1;
                          } else {
                              logger.warning("failure to deal with another day...");
                              throw new RuntimeException("this case needs to be dealt with...");
                          }
                      }
                  } else if ( (istatement+1)<stmts.length ) {
-                     lastLine1= stmts[istatement+1].beginLine;
+                     lastLine1= stmts[istatement+1].beginLine-1;
                  } else {
-                     lastLine1= lastLine+1;
+                     lastLine1= lastLine;
                  }
-                 String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1-1, depth+1 );
+                 String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1, depth+1 );
                  if ( ss1.length()==0 ) {
                      result.append("#continue\n");         
                      logger.fine("things have probably gone wrong...");
                  } else {
-                     result.append(ss1);
+                     appendToResult( result,ss1);
                  }
                  if ( iff.orelse!=null ) {
-                     result.append( ss[lastLine1-1] ).append("\n");  // write of the else or elif line
-                     String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1+1, lastLine, depth+1 );
-                     result.append(ss2);
+                     appendToResult( result,ss[lastLine1] ).append("\n");  // write of the else or elif line
+                     int lastLine2;
+                     if ( (istatement+1)<stmts.length ) {
+                        lastLine2= stmts[istatement+1].beginLine-1;
+                     } else {
+                        lastLine2= lastLine;
+                     }
+                     String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1+2, lastLine2, depth+1 );
+                     appendToResult( result,ss2);
                  }
                  acceptLine= -1;
              } else {
@@ -697,7 +706,7 @@ public class JythonUtil {
                      if ( acceptLine>-1 ) {
                          int thisLine= (o).beginLine;
                          for ( int i=acceptLine; i<thisLine; i++ ) {
-                             result.append(ss[i-1]).append("\n");
+                             appendToResult(result,ss[i-1]).append("\n");
                          }
                          acceptLine= -1;
                      }
@@ -707,7 +716,7 @@ public class JythonUtil {
          if ( acceptLine>-1 ) {
              int thisLine= lastLine;
              for ( int i=acceptLine; i<=thisLine; i++ ) {
-                 result.append(ss[i-1]).append("\n");
+                 appendToResult( result,ss[i-1]).append("\n");
              }
          }
          return result.toString();         
