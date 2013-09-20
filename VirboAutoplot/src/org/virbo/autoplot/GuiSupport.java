@@ -108,6 +108,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
@@ -305,14 +306,19 @@ public class GuiSupport {
             QDataSet ds= fds;
 
             if ( dsf.getController().getTsb()!=null ) {
-                dsf.getController().getTsb().setTimeResolution(null);
-                mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
-                ds= dsf.getController().getDataSource().getDataSet( mon );
-                if ( mon.isCancelled() ) {
-                    parent.setStatus( "export data cancelled" );
-                    return;
+                DataSource dss= dsf.getController().getDataSource();
+                if ( dss==null ) {
+                    logger.fine("looks like a TSB is used, but the data is not a time series, don't reload");
+                } else {
+                    dsf.getController().getTsb().setTimeResolution(null);
+                    mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
+                    ds= dss.getDataSet( mon );
+                    if ( mon.isCancelled() ) {
+                        parent.setStatus( "export data cancelled" );
+                        return;
+                    }
+                    mon.finished(); //why?
                 }
-                mon.finished(); //why?
             }
 
             mon= DasProgressPanel.createFramed( parent, "formatting data" );
