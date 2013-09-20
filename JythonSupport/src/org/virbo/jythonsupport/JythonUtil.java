@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -454,20 +455,20 @@ public class JythonUtil {
             Call c= (Call)o;
 
             if ( !trivialFunctionCall(c) ) {
-                logger.finer( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
+                logger.finest( String.format( "%04d simplify->false: %s", o.beginLine, o.toString() ) );
                 return false;
             }
         }
         MyVisitorBase vb= new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
-            logger.finer( String.format( " %04d simplify->%s: %s", o.beginLine, vb.looksOkay(), o ) );
+            logger.finest( String.format( " %04d simplify->%s: %s", o.beginLine, vb.looksOkay(), o ) );
             return vb.looksOkay();
             
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        logger.finer( String.format( "!! %04d simplify->false: %s", o.beginLine, o ) );
+        logger.finest( String.format( "!! %04d simplify->false: %s", o.beginLine, o ) );
          return false;
      }
      
@@ -484,7 +485,7 @@ public class JythonUtil {
         if ( o instanceof Name ) { 
             Name c= (Name)o;
             if ( !variableNames.contains( c.id ) ) {
-                logger.finer( String.format( "%04d canResolve->false: %s", o.beginLine, o.toString() ) );
+                logger.finest( String.format( "%04d canResolve->false: %s", o.beginLine, o.toString() ) );
                 return false;
             }
         }
@@ -510,13 +511,13 @@ public class JythonUtil {
         MyVisitorBase vb= new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
-            logger.finer( String.format( " %04d canResolve->%s: %s", o.beginLine,  vb.visitNameFail, o ) );
+            logger.finest( String.format( " %04d canResolve->%s: %s", o.beginLine,  vb.visitNameFail, o ) );
             return !vb.visitNameFail;
             
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        logger.finer( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
+        logger.finest( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
          return false;
      }     
 
@@ -577,7 +578,7 @@ public class JythonUtil {
                     if ( et instanceof Name ) {
                         String id= ((Name)a.targets[i]).id;
                         variableNames.add(id);
-                        logger.fine("assign to variable "+id);
+                        logger.log(Level.FINEST, "assign to variable {0}", id);
                     } else if ( et instanceof Attribute ) {
                         Attribute at= (Attribute)et;
                         while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
@@ -605,7 +606,7 @@ public class JythonUtil {
          }
          if ( ( o instanceof org.python.parser.ast.If ) )  return simplifyScriptToGetParamsOkayNoCalls(o,variableNames);
          if ( ( o instanceof org.python.parser.ast.Print ) ) return simplifyScriptToGetParamsOkayNoCalls(o,variableNames);
-         logger.log( Level.FINER, "not okay to simplify: {0}", o);
+         logger.log( Level.FINEST, "not okay to simplify: {0}", o);
          return false;
      }
      
@@ -620,37 +621,49 @@ public class JythonUtil {
          }
      }
      
+     private static StringBuilder appendToResult( StringBuilder result, String line ) {
+         result.append(line);
+         return result;
+     }
+     
      /**
       * Extracts the parts of the program that get parameters or take a trivial amount of time to execute.  
       * This may call itself recursively when if blocks are encountered.
       * See test038.
-      * @param ss
-      * @param stmts
+      * @param ss the entire script.
+      * @param stmts statements being processed.
       * @param variableNames variable names that have been resolved.
-      * @param lastLine INCLUSIVE last line.
+      * @param beginLine first line of the script being processed.
+      * @param lastLine INCLUSIVE last line of the script being processed.
+      * @param depth recursion depth, for debugging.
       * @return 
       */
-     public static String simplifyScriptToGetParams( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine  ) {
+     public static String simplifyScriptToGetParams( String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth  ) {
          int acceptLine= -1;  // first line to accept
          StringBuilder result= new StringBuilder();
          for ( int istatement=0; istatement<stmts.length; istatement++ ) {
              stmtType o= stmts[istatement];
-             if ( o.beginLine>0 ) beginLine= o.beginLine;
+             logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, o.beginLine>0 ? ss[o.beginLine-1] : "(bad line number)" } );
+             if ( o.beginLine>0 ) {
+                 beginLine= o.beginLine;
+             } else {
+                 acceptLine= beginLine; // elif clause in autoplot-test038/lastSuccessfulBuild/artifact/test038_demoParms1.jy
+             }
              if ( beginLine>lastLine ) {
                  continue;
              }
              if ( o instanceof org.python.parser.ast.If ) {
                  if ( acceptLine>-1 ) {
-                    for ( int i=acceptLine; i<=beginLine; i++ ) {
+                    for ( int i=acceptLine; i<beginLine; i++ ) {
                         result.append(ss[i-1]).append("\n");
                     }
                  }
                  If iff= (If)o;
-                 for ( int i=beginLine+1; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n");
-                 int lastLine1;
+                 for ( int i=beginLine; i<iff.body[0].beginLine; i++ ) result.append(ss[i-1]).append("\n"); // write out the 'if' part
+                 int lastLine1;  //lastLine1 is the last line of the "if" clause plus 1.
                  if ( iff.orelse!=null && iff.orelse.length>0 ) {
                      if ( iff.orelse[0].beginLine>0 ) {
-                         lastLine1= iff.test.beginLine;  // not sure why...
+                         lastLine1= iff.orelse[0].beginLine-1;  // -1 is for the "else:" part.
                      } else {
                          if ( iff.orelse[0] instanceof If ) {
                              lastLine1= ((If)iff.orelse[0]).test.beginLine;
@@ -664,10 +677,16 @@ public class JythonUtil {
                  } else {
                      lastLine1= lastLine+1;
                  }
-                 String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1-1 );
-                 result.append(ss1);
+                 String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1-1, depth+1 );
+                 if ( ss1.length()==0 ) {
+                     result.append("#continue\n");         
+                     logger.fine("things have probably gone wrong...");
+                 } else {
+                     result.append(ss1);
+                 }
                  if ( iff.orelse!=null ) {
-                     String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1, lastLine );
+                     result.append( ss[lastLine1-1] ).append("\n");  // write of the else or elif line
+                     String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1+1, lastLine, depth+1 );
                      result.append(ss2);
                  }
                  acceptLine= -1;
@@ -718,7 +737,7 @@ public class JythonUtil {
          variableNames.add("getParam");
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
-             return simplifyScriptToGetParams( ss, n.body, variableNames, 1, lastLine );
+             return simplifyScriptToGetParams( ss, n.body, variableNames, 1, lastLine, 0 );
          } catch ( PySyntaxError ex ) {
              throw ex;
          }
@@ -984,83 +1003,49 @@ public class JythonUtil {
     }
     
     public static void main( String[] args ) throws IOException {
-        PythonInterpreter i= createInterpreter(true);
-        System.err.println( i.eval("getParam") );
-        i.exec("x=getParam('x',-99,'doc',[-99,0,1])");
-        System.err.println( i.eval("x") );
-        System.err.println( i.eval("_paramMap") );
+        main_test1(args);
+    }
+    
+        /**
+     * test the getGetParams for a script, seeing if we can reduce 
+     * and run the script within interactive time.
+     * 
+     * @param file
+     * @throws Exception 
+     */
+    private static void doTestGetParams( String testId, String file ) {
+        long t0= System.currentTimeMillis();
+        System.err.println("== test "+testId+": "+ file + " ==" );
+        
+        try {
+            String script= JythonUtil.readScript( new FileReader(file) );
+            String scrip= org.virbo.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
+            File f= new File(file);
+            String fout= "./test038_"+f.getName();
+            FileWriter fw= new FileWriter(fout);
+            try {
+                fw.append(scrip);
+            } finally {
+                fw.close();
+            }
+            List<Param> parms= org.virbo.jythonsupport.JythonUtil.getGetParams( script );
+            for ( Param p: parms ) {
+                System.err.println(p);
+            }
+            System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
+        }
+
     }
     
     public static void main_test1(String[] args ) throws FileNotFoundException {
-        String s1="resourceURI= getParam( 'resourceURI', 'ftp://satdat.ngdc.noaa.gov/sem/poes/data/raw/ngdc/2013/noaa19/poes_n19_20130409_raw.nc', 'example file to load' )\n" +
-"\n" +
-"sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n" +
-"\n" +
-"if ( sp!='omni' ):\n" +
-"   angle= getParam( 'angle', 'tel0', 'angle', [ 'tel0', 'tel90' ] )\n" +
-"\n" +
-"print sp  # this should now start showing up when we make dialogs.\n" +
-"\n" +
-"if ( sp=='ele' ):\n" +
-"   ch= getParam( 'ch', 1, 'channel to plot', [ 1,2,3 ] )\n" +
-"elif ( sp=='omni' ):\n" +
-"   ch= getParam( 'ch', 1, 'channel to plot', [ 6,7,8,9 ] )\n" +
-"else:\n" +
-"   ch= getParam( 'ch', 1, 'channel to plot', [ 1,2,3,4,5,6 ] )\n" +
-" \n" +
-"if ( sp!='omni' ):\n" +
-"   result= getDataSet( '%s?mep_%s_%s_cps_%s%d' % ( resourceURI, sp, angle, sp[0], ch ) )\n" +
-"else:\n" +
-"   result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )"; 
-        
-        String s2= "sp= getParam( 'species', 'ele', 'protons or electron species', ['ele','pro','omni'] )\n";
-        String s3= "a=1\n"
-                + "if ( a==1 ):\n"
-                + "  sp=getParam('species', 'ele', 'low spec', ['ele','ionlow'])\n"
-                + "else:\n"
-                + "  sp=getParam('species', 'ion', 'high spec', ['elehigh','ion'])\n";
-        
-        String s;
-        
-        String s5= "if ( sp!='omni' ):\n" +
-            "  result= getDataSet( '%s?mep_%s_%s_cps_%s%d' % ( resourceURI, sp, angle, sp[0], ch ) )\n" +
-            "else:\n" +
-            "  result= getDataSet( '%s?mep_%s_cps_p%d' % ( resourceURI, sp, ch ) )\n";
-             
-        
-        System.err.println( "-- sebastiens file-------------"); 
-        String s4 = new Scanner( new File("/home/jbf/depascuale20130902_hfr_fuh_digitizer.jy") ).useDelimiter("\\A").next();
-        //System.err.println( s4 );
-        s= simplifyScriptToGetParams(s4, false);
-        System.err.println( "----" );
-        System.err.println( s );
-        System.err.println( "--------------"); 
-       
-        System.err.println( "-- case s3-------------"); 
-        System.err.println( s3 );
-        s= simplifyScriptToGetParams(s3, false);
-        System.err.println( "----" );
-        System.err.println( s );
-        
-        System.err.println( "-- case s2-------------"); 
-        System.err.println( s2 );
-        s= simplifyScriptToGetParams(s2, false);
-        System.err.println( "----" );
-        System.err.println( s );
-        
-        System.err.println( "-- case s1-------------"); 
-        System.err.println( s1 );
-        s= simplifyScriptToGetParams(s1, false);
-        System.err.println( "----" );
-        System.err.println( s );
-        System.err.println( "--------------"); 
-       
-        System.err.println( "-- case s5-------------"); 
-        System.err.println( s5 );
-        s= simplifyScriptToGetParams(s5, false);
-        System.err.println( "----" );
-        System.err.println( s );
-        
-
+        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
+        doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
+        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
+        doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
     }
 }
