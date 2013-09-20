@@ -9,7 +9,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
@@ -67,6 +69,7 @@ public class Test038 {
         doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
         doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
         doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
+        doTestGetParams("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
     }
     
     public static void main( String[] args ) throws IOException {
