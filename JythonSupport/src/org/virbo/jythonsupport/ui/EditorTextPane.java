@@ -239,7 +239,7 @@ public class EditorTextPane extends JEditorPane {
     String[] jumpToList( ) {
         LineNumberReader reader= null;
         List<String> jumpToList= new ArrayList();
-        jumpToList.add("0:top");
+        jumpToList.add("1:top");
         try {
             Document d = EditorTextPane.this.getDocument();
             String s= d.getText( 0, d.getLength() );
@@ -249,17 +249,17 @@ public class EditorTextPane extends JEditorPane {
             int length= -1;
             try {
                 while ( line!=null ) {
-                    if ( line.startsWith("def ") ) {
+                    if ( line.startsWith("def ") && line.contains("(") ) {
                         int i= line.indexOf("(");
                         jumpToList.add( reader.getLineNumber() + ":" + line.substring(0,i) );
                     }
-                    length= reader.getLineNumber();
+                    length= reader.getLineNumber()+1;
                     line= reader.readLine();
                 }
             } finally {
                 reader.close();
             }
-            jumpToList.add( String.format( "%d:bottom",(length-1) ) );
+            jumpToList.add( String.format( "%d:bottom",(length) ) );
             return jumpToList.toArray( new String[jumpToList.size()] );
         } catch ( IOException ex ) {
             return jumpToList.toArray( new String[jumpToList.size()] );
