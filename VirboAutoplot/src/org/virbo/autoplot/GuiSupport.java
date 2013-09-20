@@ -159,7 +159,7 @@ public class GuiSupport {
         StringSelection stringSelection = new StringSelection( DataSetURI.toUri(parent.dataSetSelector.getValue()).toASCIIString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
-
+            @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
             }
         });
@@ -167,7 +167,7 @@ public class GuiSupport {
 
     public void doCopyDataSetImage() {
         Runnable run = new Runnable() {
-
+            @Override
             public void run() {
                 ImageSelection imageSelection = new ImageSelection();
                 DasCanvas c = parent.applicationModel.canvas;
@@ -175,7 +175,7 @@ public class GuiSupport {
                 imageSelection.setImage(i);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(imageSelection, new ClipboardOwner() {
-
+                    @Override
                     public void lostOwnership(Clipboard clipboard, Transferable contents) {
                     }
                 });
@@ -367,6 +367,7 @@ public class GuiSupport {
 
     Action getDumpDataAction2( final Application dom ) {
         return new AbstractAction("Export Data...") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
@@ -448,7 +449,7 @@ public class GuiSupport {
                             if ( addExt ) {
                                 split.file= s+ext;
                             }
-                            name= URISplit.format(split);
+                            //name= URISplit.format(split);
                         }
 
                         // mimic JChooser logic.
@@ -492,6 +493,7 @@ public class GuiSupport {
                         final String uriOut= s;
 
                         Runnable run= new Runnable() {
+                            @Override
                             public void run() {
                                 try {
                                     String formatControl;
@@ -527,7 +529,7 @@ public class GuiSupport {
 
     Action getDumpDataAction() {
         return new AbstractAction("Export Data...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 final QDataSet dataSet = parent.applicationModel.dom
@@ -569,11 +571,9 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(AutoplotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
 
-                if (dataSet != null) {
-                    String name = (String) dataSet.property(QDataSet.NAME);
-                    if (name != null) {
-                        chooser.setSelectedFile(new File(name.toLowerCase()));
-                    }
+                String name = (String) dataSet.property(QDataSet.NAME);
+                if (name != null) {
+                    chooser.setSelectedFile(new File(name.toLowerCase()));
                 }
 
                 if (!currentFileString.equals("") && new File(currentFileString).exists()) {
@@ -630,6 +630,7 @@ public class GuiSupport {
 
     public Action createNewDOMAction() {
         return new AbstractAction("Reset Window...") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";
@@ -644,6 +645,7 @@ public class GuiSupport {
                     }
                 }
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         parent.dom.getController().reset();
                         parent.undoRedoSupport.resetHistory();
@@ -668,6 +670,7 @@ public class GuiSupport {
         final ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 model.addDasPeersToApp();
                 AutoplotUI view = new AutoplotUI(model);
@@ -703,6 +706,7 @@ public class GuiSupport {
         final ApplicationModel model = new ApplicationModel();
         model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 model.addDasPeersToApp();
                 model.dom.getOptions().setDataVisible( parent.applicationModel.dom.getOptions().isDataVisible() ); // options has funny sync code and these must be set before AutoplotUI is constructed.
@@ -735,6 +739,7 @@ public class GuiSupport {
     
     public Action createNewApplicationAction() {
         return new AbstractAction("New Window") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 newApplication();
             }
@@ -743,6 +748,7 @@ public class GuiSupport {
 
     public Action createCloneApplicationAction() {
         return new AbstractAction("Clone to New Window") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 cloneApplication();
             }
@@ -780,6 +786,7 @@ public class GuiSupport {
         for ( Entry<String,RenderType> ee: tt.entrySet() ) {
             final Entry<String,RenderType> fee= ee;
             mi= new JCheckBoxMenuItem(new AbstractAction(fee.getKey()) {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
                     pe.setRenderType(fee.getValue());
@@ -796,25 +803,26 @@ public class GuiSupport {
         thisPanel.getActionMap().put("UNDO", parent.undoRedoSupport.getUndoAction());
         thisPanel.getActionMap().put("REDO", parent.undoRedoSupport.getRedoAction());
         thisPanel.getActionMap().put("RESET_ZOOM", new AbstractAction() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parent.applicationModel.resetZoom();
             }
         });
         thisPanel.getActionMap().put("INCREASE_FONT_SIZE", new AbstractAction() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parent.applicationModel.increaseFontSize();
             }
         });
         thisPanel.getActionMap().put("DECREASE_FONT_SIZE", new AbstractAction() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parent.applicationModel.decreaseFontSize();
             }
         });
 
         thisPanel.getActionMap().put("NEXT_PLOT_ELEMENT", new AbstractAction() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 Application dom= parent.dom;
                 PlotElement p= dom.getController().getPlotElement();
@@ -827,6 +835,7 @@ public class GuiSupport {
         });
 
         thisPanel.getActionMap().put("PREV_PLOT_ELEMENT", new AbstractAction() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 Application dom= parent.dom;
                 PlotElement p= dom.getController().getPlotElement();
@@ -839,6 +848,7 @@ public class GuiSupport {
         });
 
         thisPanel.getActionMap().put("SAVE", new AbstractAction() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 parent.stateSupport.createSaveAction().actionPerformed(e);
             }
@@ -864,12 +874,12 @@ public class GuiSupport {
     protected void exportRecent(Component c) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-
+            @Override
             public boolean accept(File f) {
                 if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
-
+            @Override
             public String getDescription() {
                 return "bookmarks files (*.xml)";
             }
@@ -896,12 +906,12 @@ public class GuiSupport {
 
     private static FileFilter getFileNameExtensionFilter(final String description, final String ext) {
         return new FileFilter() {
-
+            @Override
             public boolean accept(File f) {
                 if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.toString().endsWith(ext);
             }
-
+            @Override
             public String getDescription() {
                 return description;
             }
@@ -912,6 +922,7 @@ public class GuiSupport {
 
     public static Action getPrintAction( final Application app, final Component parent,final String ext) {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 final JPanel decor;
                 final DasCanvas canvas = app.getController().getDasCanvas();
@@ -943,6 +954,7 @@ public class GuiSupport {
                     prefs.put("savedir", new File(ffname).getParent());
                     currentFile = new File(ffname.substring(0, ffname.length() - 4));
                     Runnable run = new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 if ( ext.equals("png") ) {
@@ -1160,6 +1172,7 @@ public class GuiSupport {
         JMenuItem item;
 
         item= new JMenuItem(new AbstractAction("Axis Properties") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PropertyEditor pp = new PropertyEditor(axis);
                 pp.showDialog(dasAxis.getCanvas());
@@ -1175,7 +1188,7 @@ public class GuiSupport {
             mouseAdapter.addMenuItem(addPlotMenu);
 
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
-
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     controller.copyPlot(plot, true, false, true);
                 }
@@ -1191,7 +1204,7 @@ public class GuiSupport {
 
         if (axis == plot.getXaxis()) {
             item = new JMenuItem(new AbstractAction("Add Binding to Application Time Range") {
-
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DatumRange dr= controller.getApplication().getTimeRange();
                     if ( dr==Application.DEFAULT_TIME_RANGE ) {
@@ -1205,6 +1218,7 @@ public class GuiSupport {
         }
 
         item = new JMenuItem(new AbstractAction("Add Binding to Plot Above") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
@@ -1216,7 +1230,7 @@ public class GuiSupport {
         });
         bindingMenu.add(item);
         item = new JMenuItem(new AbstractAction("Add Binding to Plot Below") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotBelow(plot);
                 if (dstPlot == null) {
@@ -1228,7 +1242,7 @@ public class GuiSupport {
         });
         bindingMenu.add(item);
         item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Right") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.RIGHT);
                 if (dstPlot == null) {
@@ -1240,7 +1254,7 @@ public class GuiSupport {
         });
         bindingMenu.add(item);
         item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Left") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.LEFT);
                 if (dstPlot == null) {
@@ -1253,6 +1267,7 @@ public class GuiSupport {
         bindingMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
+            @Override            
             public void actionPerformed(ActionEvent e) {
                 BindingModel[] bms= controller.getBindingsFor(axis);
                 controller.unbind(axis);  // TODO: check for application timerange
@@ -1269,6 +1284,7 @@ public class GuiSupport {
         mouseAdapter.addMenuItem(connectorMenu);
 
         item = new JMenuItem(new AbstractAction("Add Connector to Plot Above") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
@@ -1281,6 +1297,7 @@ public class GuiSupport {
         connectorMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Add Connector to Plot Below") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = controller.getPlotBelow(plot);
                 if (dstPlot == null) {
@@ -1293,6 +1310,7 @@ public class GuiSupport {
         connectorMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Connectors") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Application dom= plot.getController().getApplication();
                 for (Connector c : DomUtil.asArrayList(dom.getConnectors())) {
@@ -1310,6 +1328,7 @@ public class GuiSupport {
 
         if ( axis.getController().getDasAxis().isHorizontal() ) {
             item= new JMenuItem( new AbstractAction("Add Additional Ticks from...") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     String uri= plot.getTicksURI();
                     if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
@@ -1363,6 +1382,7 @@ public class GuiSupport {
         JMenuItem mi;
 
         mi= new JMenuItem(new AbstractAction("Plot Properties") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PropertyEditor pp = new PropertyEditor(domPlot);
                 pp.showDialog(plot.getCanvas());
@@ -1372,6 +1392,7 @@ public class GuiSupport {
         expertMenuItems.add( mi );
 
         mi= new JMenuItem(new AbstractAction("Plot Element Properties") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
@@ -1383,6 +1404,7 @@ public class GuiSupport {
 
 
         JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Plot Element Style Properties") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p.getStyle());
@@ -1397,6 +1419,7 @@ public class GuiSupport {
 
         final JMenu ezMenu= GuiSupport.createEZAccessMenu(domPlot);
         ezMenu.addMenuListener( new MenuListener() {
+            @Override
             public void menuSelected(MenuEvent e) {
                 PlotElement pe= app.dom.getController().getPlotElement();
                 QDataSet ds;
@@ -1433,12 +1456,12 @@ public class GuiSupport {
                 }
             }
 
+            @Override
             public void menuDeselected(MenuEvent e) {
-
             }
 
-            public void menuCanceled(MenuEvent e) {
-                
+            @Override
+            public void menuCanceled(MenuEvent e) {                
             }
 
         });
@@ -1449,7 +1472,7 @@ public class GuiSupport {
         plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
 
         item = new JMenuItem(new AbstractAction("Copy Plot Elements Down") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Runnable run= new Runnable() {
                     public void run() {
@@ -1478,8 +1501,10 @@ public class GuiSupport {
 //        addPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Context Overview") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         domPlot.getController().contextOverview();
                     }
@@ -1493,8 +1518,10 @@ public class GuiSupport {
         
         addPlotMenu.add(item);
         item = new JMenuItem(new AbstractAction("New Location (URI)...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         app.dom.getController().setPlot(domPlot);
                         app.support.addPlotElement();
@@ -1520,6 +1547,7 @@ public class GuiSupport {
         expertMenuItems.add(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Above") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
@@ -1536,6 +1564,7 @@ public class GuiSupport {
         expertMenuItems.add(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Below") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
@@ -1553,6 +1582,7 @@ public class GuiSupport {
         expertMenuItems.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 if (controller.getApplication().getPlotElements().length < 2) {
@@ -1569,6 +1599,7 @@ public class GuiSupport {
         expertMenuItems.add(item);
 
         item=  new JMenuItem(new AbstractAction("Move Plot Element Below Others") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PlotElement pelement = controller.getPlotElement();
                 Plot p= pelement.getController().getApplication().getController().getPlotFor(pelement);
@@ -1579,6 +1610,7 @@ public class GuiSupport {
         expertMenuItems.add(item);
 
         JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 GuiSupport.editPlotElement( controller.getApplicationModel(), plot );
             }
@@ -1590,6 +1622,7 @@ public class GuiSupport {
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
         plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 plotController.resetZoom(true, true, true);
             }
@@ -1627,6 +1660,7 @@ public class GuiSupport {
                 final Application vap = (Application) StatePersistence.restoreState( f );
                 PropertyEditor edit = new PropertyEditor(vap);
                 edit.addSaveAction( new AbstractAction("Save") {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
                             StatePersistence.saveState(f, vap);
@@ -1637,6 +1671,7 @@ public class GuiSupport {
                 });
                 edit.showDialog(this.parent);
             } catch ( Exception ex ) {
+                logger.log(Level.WARNING,null,ex);
                 JOptionPane.showMessageDialog( parent, "File does not appear to well-formatted .vap file" );
             }
 
@@ -1656,6 +1691,7 @@ public class GuiSupport {
 
         chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
         chooser.setFontCheck( new JFontChooser.FontCheck() {
+            @Override
             public String checkFont(Font c) {
                 String font= PdfGraphicsOutput.ttfFromNameInteractive(c);
                 if ( font==PdfGraphicsOutput.READING_FONTS ) {
@@ -1709,6 +1745,7 @@ public class GuiSupport {
         return new MouseAdapter() {
             private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
                 JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         String v= componentTextField.getText();
                         int i= componentTextField.getCaretPosition();
