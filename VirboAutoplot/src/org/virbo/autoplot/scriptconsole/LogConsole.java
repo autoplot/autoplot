@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -90,11 +89,11 @@ public class LogConsole extends javax.swing.JPanel {
         initComponents();
 
         commandLineTextPane1.addActionListener(new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 final String s = commandLineTextPane1.getText();
                 RequestProcessor.invokeLater(new Runnable() {
-
+                    @Override
                     public void run() {
                         try {
                             System.out.println("AP> " + s);
@@ -120,6 +119,7 @@ public class LogConsole extends javax.swing.JPanel {
 
 
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+            @Override
             public PythonInterpreter createInterpreter() throws java.io.IOException {
                 maybeInitializeInterpreter();
                 return interp;
@@ -127,6 +127,7 @@ public class LogConsole extends javax.swing.JPanel {
         });
 
         timer2 = new Timer(300, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 update();
             }
@@ -136,6 +137,7 @@ public class LogConsole extends javax.swing.JPanel {
         final javax.swing.JTextPane ftxt= this.logTextArea;
 
         this.logTextArea.getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                Font f= ftxt.getFont();
                float size= f.getSize2D();
@@ -145,6 +147,7 @@ public class LogConsole extends javax.swing.JPanel {
         } );
 
         this.logTextArea.getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                Font f= ftxt.getFont();
                float size= f.getSize2D();
@@ -247,6 +250,7 @@ public class LogConsole extends javax.swing.JPanel {
     public synchronized Handler getHandler() {
         if ( handler==null ) {
             handler = new Handler() {
+                @Override
                 public synchronized void publish(LogRecord rec) {
                     Object[] parms= rec.getParameters();
 
@@ -319,7 +323,7 @@ public class LogConsole extends javax.swing.JPanel {
      * @see turnOffConsoleHandlers
      */
     public synchronized void logConsoleMessages() {
-        Logger logger;
+        Logger llogger;
         LoggingOutputStream los;
 
         if (alreadyLoggingStdout) {
@@ -329,13 +333,13 @@ public class LogConsole extends javax.swing.JPanel {
             alreadyLoggingStdout = true;
         }
 
-        logger = org.das2.util.LoggerManager.getLogger("console.stdout");
-        los = new LoggingOutputStream(logger, Level.INFO);
+        llogger = org.das2.util.LoggerManager.getLogger("console.stdout");
+        los = new LoggingOutputStream(llogger, Level.INFO);
         oldStdOut = System.out;
         System.setOut(new PrintStream(los, true));
 
-        logger = org.das2.util.LoggerManager.getLogger("console.stderr");
-        los = new LoggingOutputStream(logger, Level.WARNING);
+        llogger = org.das2.util.LoggerManager.getLogger("console.stderr");
+        los = new LoggingOutputStream(llogger, Level.WARNING);
         oldStdErr = System.err;
         System.setErr(new PrintStream(los, true));
     }
@@ -643,7 +647,7 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         StringSelection stringSelection = new StringSelection(out.toString());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
-
+            @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
             }
         });
