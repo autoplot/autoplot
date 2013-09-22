@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -181,10 +180,8 @@ public class DomUtil {
 
     private static DatumRange round(DatumRange range) {
         Datum w = range.width();
-        String s;
-        double d;
         Datum w0 = DatumUtil.asOrderOneUnits(w);
-        Datum base = w0;
+        Datum base;
         Units hu = w0.getUnits();
         if (range.getUnits().isConvertableTo(Units.us2000)) {
             base = TimeUtil.prevMidnight(range.min());
@@ -380,7 +377,7 @@ public class DomUtil {
         for ( Object o: nodes2 ) {
             if ( indexOf( node2List, o )!=i2 ) {
                 deleteList.add( o );
-                new IllegalArgumentException("two nodes have the same ID: "+o).printStackTrace();
+                logger.log( Level.WARNING, "two nodes have the same ID: {0}", o);
             } // throw IllegalArgumentException("two nodes have the same ID: "+o);
             i2++;
         }
@@ -402,7 +399,7 @@ public class DomUtil {
         }
 
         for (int i = 0; i < addList.size(); i++) {
-            int idx=-1;
+            int idx;
             idx = indexOf(node1List, addList.get(i));
             if (nodes1[idx] instanceof DomNode) {
                 result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Insert, ((DomNode) nodes1[idx]).copy(), idx));
@@ -463,7 +460,7 @@ public class DomUtil {
                     }
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.log(Level.WARNING,null,ex);
             }
 
         }
@@ -549,7 +546,7 @@ public class DomUtil {
      * @return
      */
     public static boolean oneFamily( List<PlotElement> elementsIn ) {
-        if ( elementsIn.size()==0 ) return false;
+        if ( elementsIn.isEmpty() ) return false;
         List<PlotElement> elements= new ArrayList(elementsIn);
         PlotElement pe= elements.get(0);
         if ( pe.getController().getParentPlotElement()!=null ) {
@@ -558,7 +555,7 @@ public class DomUtil {
         elements.remove(pe);
         elements.removeAll( pe.getController().getChildPlotElements() );
 
-        if ( elements.size()==0 ) return true; else return false;
+        if ( elements.isEmpty() ) return true; else return false;
 
     }
 
@@ -623,7 +620,7 @@ public class DomUtil {
             }
         }
         
-        return problems.size()==0;
+        return problems.isEmpty();
     }
 
     /**
@@ -652,10 +649,10 @@ public class DomUtil {
     }
 
     /**
-     * This does not use controllers.
-     * @param application
-     * @param plot
-     * @return
+     * Return the plot elements that contained within a plot.
+     * @param application the dom for a plot.
+     * @param plot the plot containing plot elements.
+     * @return the plot elements contained by the plot.
      */
     public static List<PlotElement> getPlotElementsFor( Application application, Plot plot ) {
         String id = plot.getId();
@@ -678,7 +675,6 @@ public class DomUtil {
      */
     public static boolean nodeHasProperty(DomNode node1, String property) {
         String[] props = BeansUtil.getPropertyNames(node1.getClass());
-        PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(node1.getClass());
         for ( int i=0; i<props.length; i++ ) {
             if ( props[i].equals(property) ) return true;
         }
@@ -713,7 +709,7 @@ public class DomUtil {
                 i= template.indexOf("%{"+root+".",i);
             }
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
         }
         return template;
     }
@@ -730,7 +726,7 @@ public class DomUtil {
      */
     public static BindingModel findBinding( Application dom, DomNode src, String srcProp, DomNode dst, String dstProp) {
         List<BindingModel> results= findBindings( dom, src, srcProp, dst, dstProp );
-        if ( results.size()==0 ) {
+        if ( results.isEmpty() ) {
             return null;
         } else {
             return results.get(0);  // TODO: this should be a singleton.
