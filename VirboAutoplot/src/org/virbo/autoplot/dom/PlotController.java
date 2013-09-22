@@ -1019,17 +1019,7 @@ public class PlotController extends DomNodeController {
             PlotElement p= pes.get(0);
 
             if ( !plot.controller.getApplication().getController().isValueAdjusting() ) {
-                if ( !this.dom.getController().isBoundAxis(plot.getXaxis()) ) {
-                    plot.getXaxis().setAutoRange(true);
-                }
-
-                if ( !this.dom.getController().isBoundAxis(plot.getYaxis()) ) {
-                    plot.getYaxis().setAutoRange(true);
-                }
-
-                if ( !this.dom.getController().isBoundAxis(plot.getZaxis()) ) {
-                    plot.getZaxis().setAutoRange(true);
-                }
+                // I would reset the autorange property here for unbound axes before v2013a_16.  I'm not sure why...
             } else {
                 logger.fine("value is adjusting, no reset autorange");
             }
