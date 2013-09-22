@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.das2.util.LoggerManager;
-import org.virbo.autoplot.LogNames;
 import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.util.TickleTimer;
 
@@ -26,9 +25,10 @@ public class OptionsPrefsController {
     Preferences prefs;
     Options options;
 
-    private static final Logger logger= LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= LoggerManager.getLogger( "autoplot.dom" );
 
     TickleTimer flushTimer= new TickleTimer( 300, new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             try {
                 prefs.flush();
@@ -49,6 +49,7 @@ public class OptionsPrefsController {
     });
 
     PropertyChangeListener listener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals("id") ) return;
             if ( evt.getNewValue() instanceof String ) {
