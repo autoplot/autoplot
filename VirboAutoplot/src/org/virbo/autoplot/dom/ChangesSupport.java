@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.autoplot.LogNames;
 
 /**
  * Support class for encapsulating implementation of pendingChanges and mutator locks.
@@ -43,7 +42,7 @@ public final class ChangesSupport {
     Map<Object,String> threads;
     
     WeakReference<Object> parent;
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to

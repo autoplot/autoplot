@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.autoplot.LogNames;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 
 /**
@@ -27,7 +26,7 @@ import org.virbo.autoplot.dom.ChangesSupport.DomLock;
  */
 public class DomNodeController {
 
-    protected static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
+    protected static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
 
     DomNode node;
 

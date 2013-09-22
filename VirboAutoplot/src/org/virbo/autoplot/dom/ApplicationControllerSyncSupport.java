@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
-import org.virbo.autoplot.LogNames;
 
 /**
  * Support methods for synchronizing two Application trees with different
@@ -24,7 +23,7 @@ import org.virbo.autoplot.LogNames;
 public class ApplicationControllerSyncSupport {
     ApplicationController controller;
     Application application;
-    private static final Logger logger= LoggerManager.getLogger(LogNames.AUTOPLOT_DOM);
+    private static final Logger logger= LoggerManager.getLogger( "autoplot.dom");
     
     ApplicationControllerSyncSupport( ApplicationController controller ) {
         this.controller= controller;

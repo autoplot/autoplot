@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
-import org.virbo.autoplot.LogNames;
 
 /**
  *
@@ -23,7 +22,7 @@ import org.virbo.autoplot.LogNames;
  */
 public class ColumnController extends DomNodeController {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
     
     Column column;
     DasColumn dasColumn;

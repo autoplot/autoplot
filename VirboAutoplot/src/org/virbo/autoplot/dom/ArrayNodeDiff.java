@@ -14,7 +14,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.virbo.autoplot.LogNames;
 
 /**
  * represent and implement array actions like insert, delete and move node.
@@ -22,7 +21,7 @@ import org.virbo.autoplot.LogNames;
  */
 public class ArrayNodeDiff implements Diff {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger(LogNames.AUTOPLOT_DOM);
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom");
 
     String propertyName;
     Object node;
