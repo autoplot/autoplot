@@ -229,13 +229,17 @@ public class StatePersistence {
     /**
      * restore the XML file, possibly promoting it.
      * @param f
-     * @return
+     * @return the dom object.
      * @throws IOException
      */
     public static Object restoreState( File f )  throws IOException {
         InputStream in =new FileInputStream( f );
-        Object result= restoreState( in );
-        in.close();
+        Object result;
+        try {
+            result= restoreState( in );
+        } finally {
+            in.close();
+        }
         return result;
     }
 
@@ -276,7 +280,7 @@ public class StatePersistence {
 
     /**
      * restore the XML on the inputStream, possibly promoting it.
-     * @param in, an input stream that starts with the xml.  This will be left open.
+     * @param in, an input stream that starts with the xml.  This will be left open.  
      * @return
      * @throws IOException
      */
