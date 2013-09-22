@@ -71,12 +71,11 @@ public class DataSourceController extends DomNodeController {
      */
     private ProgressMonitor mon;
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
-
         @Override
         public String toString() {
             return "" + dsf + " controller updateSlicePropertyChangeListener";
         }
-
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             if ( dataSet != null ) {
                 updateFill();// this should be done quickly.  Some filters (ffts) are sub-interactive and should not be done here.
@@ -84,12 +83,11 @@ public class DataSourceController extends DomNodeController {
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
-
         @Override
         public String toString() {
             return "" + dsf + " controller updateMePropertyChangeListener";
         }
-
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             if (dataSet != null) {
                 logger.fine("change in fill or valid range ->updateFillSoon()");
@@ -100,12 +98,11 @@ public class DataSourceController extends DomNodeController {
 
     //TODO: This is the only thing listening to the dsf.uri.  
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
-
         @Override
         public String toString() {
             return "" + dsf + " controller resetMePropertyChangeListener";
         }
-
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             logger.log( Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{e.getPropertyName(), e.getOldValue(), e.getNewValue()});
             if (e.getNewValue() == null && e.getOldValue() == null) {
@@ -144,6 +141,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
     };
+    
     private TimeSeriesBrowseController timeSeriesBrowseController;
 
     /**
@@ -176,6 +174,7 @@ public class DataSourceController extends DomNodeController {
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_URI, resetMePropertyChangeListener);
         
         dsf.addPropertyChangeListener( Plot.PROP_ID, new PropertyChangeListener() {
+            @Override
             public void propertyChange( PropertyChangeEvent evt ) {
                 if ( dom.controller.isValueAdjusting() ) return;
                 ChangesSupport.DomLock lock = dom.controller.mutatorLock();
@@ -680,6 +679,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
 
+        @Override
         public void setTimeRange(DatumRange dr) {
             for ( TimeSeriesBrowse tsb: parentTsbs ) {
                 tsb.setTimeRange(dr);
@@ -688,20 +688,24 @@ public class DataSourceController extends DomNodeController {
             checkParents();
         }
 
+        @Override
         public DatumRange getTimeRange() {
             return timerange;
         }
 
+        @Override
         public void setTimeResolution(Datum d) {
             for ( TimeSeriesBrowse tsb: parentTsbs ) {
                 tsb.setTimeResolution(d);
             }
         }
 
+        @Override
         public Datum getTimeResolution() {
             return parentTsbs.get(0).getTimeResolution(); //TODO: this should probably be the coursest.
         }
 
+        @Override
         public String getURI() {
             Datum res= getTimeResolution();
             return this.uri + "?range="+getTimeRange() + ( res==null ? "" : "&resolution="+res );
@@ -713,10 +717,12 @@ public class DataSourceController extends DomNodeController {
             return "inttsb: "+getTimeRange()+" " +( res==null ? "" : "&resolution="+res );
         }
 
+        @Override
         public void setURI(String suri) throws ParseException {
             throw new IllegalArgumentException("not implemented");
         }
 
+        @Override
         public String blurURI() {
             return this.uri;
         }
@@ -761,7 +767,7 @@ public class DataSourceController extends DomNodeController {
         QDataSet x;
         QDataSet y = null;
         QDataSet z = null;
-        Map<String,Object> xprops=null,yprops=null,zprops=null;
+        Map<String,Object> xprops,yprops=null,zprops=null;
 
         QDataSet ds=null;
         Map<String,Object> props=null;
@@ -858,6 +864,7 @@ public class DataSourceController extends DomNodeController {
     }
     
     PropertyChangeListener parentListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             String prob= checkParents();
             if ( prob!=null ) {
@@ -871,6 +878,7 @@ public class DataSourceController extends DomNodeController {
     };
 
     PropertyChangeListener dsfListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             resolveParents();
         }
@@ -931,7 +939,6 @@ public class DataSourceController extends DomNodeController {
     public void doFillValidRange() {
         Object v;
 
-
         Map<String, Object> props = getProperties();
 
         if ((v = props.get(QDataSet.FILL_VALUE)) != null) {
@@ -960,6 +967,7 @@ public class DataSourceController extends DomNodeController {
     private void updateFillSoon( final int delay ) {
         changesSupport.registerPendingChange(this, PENDING_FILL_DATASET);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     changesSupport.performingChange(DataSourceController.this, PENDING_FILL_DATASET);
@@ -1155,7 +1163,7 @@ public class DataSourceController extends DomNodeController {
     }
     private Updating updating;
     private PropertyChangeListener updatesListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             QDataSet ds = (QDataSet) evt.getNewValue();
             if (ds != null) {
@@ -1207,7 +1215,7 @@ public class DataSourceController extends DomNodeController {
         setDataSet(null);
 
         Runnable run = new Runnable() {
-
+            @Override
             public void run() {
                 try {
                     synchronized (DataSourceController.this) {
@@ -1534,11 +1542,13 @@ public class DataSourceController extends DomNodeController {
                 p.add( new JLabel(  "<html>Unable to open URI: <br>" +  dsf.getUri()+"<br><br>Downloaded file appears to be HTML.<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
                 JPanel p1= new JPanel( new FlowLayout( FlowLayout.RIGHT ) );
                 p1.add( new JButton( new AbstractAction("Details") {
+                    @Override
                     public void actionPerformed( ActionEvent ev ) {
                         getApplication().controller.getApplicationModel().getExceptionHandler().handle(htmlEx);
                     }
                 }) );
                 p1.add( new JButton( new AbstractAction("View Page") {
+                    @Override
                     public void actionPerformed( ActionEvent ev ) {
                         AutoplotUtil.openBrowser(link);
                     }
