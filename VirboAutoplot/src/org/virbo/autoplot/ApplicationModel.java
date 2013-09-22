@@ -482,15 +482,12 @@ public class ApplicationModel {
                 recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
             } catch (BookmarksException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (SAXException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
                 return new ArrayList<Bookmark>();
             } catch (ParserConfigurationException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -512,21 +509,22 @@ public class ApplicationModel {
                         try {
                             prefs.flush();
                         } catch (BackingStoreException ex) {
-                            ex.printStackTrace();
+                            logger.log(Level.SEVERE,null,ex);
                         }
                     } catch (BookmarksException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE,null,e);
                         return new ArrayList<Bookmark>();
                     } catch (MalformedURLException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE,null,e);
                         return new ArrayList<Bookmark>();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE,null,e);
                         return new ArrayList<Bookmark>();
                     } catch (SAXException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE,null,e);
                         return new ArrayList<Bookmark>();
                     } catch (ParserConfigurationException e) {
+                        logger.log(Level.SEVERE,null,e);                        
                         return new ArrayList<Bookmark>();
                     }
                 } else {
@@ -536,19 +534,19 @@ public class ApplicationModel {
                 try {
                     recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
                 } catch (BookmarksException e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE,null,e);
                     return new ArrayList<Bookmark>();
 
                 } catch (SAXException e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE,null,e);
                     return new ArrayList<Bookmark>();
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE,null,e);
                     return new ArrayList<Bookmark>();
 
                 } catch (ParserConfigurationException e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE,null,e);
                     return new ArrayList<Bookmark>();
 
                 }
@@ -574,7 +572,7 @@ public class ApplicationModel {
                     URL url = new URL(surl);
                     bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE,null,e);
                     return new ArrayList<Bookmark>();
                 }
             }
@@ -582,13 +580,10 @@ public class ApplicationModel {
             try {
                 bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(sbookmark.getBytes())).getDocumentElement());
             } catch (SAXException e) {
-                System.err.println("SAXException sbookmark: "+sbookmark);
-                e.printStackTrace();
+                logger.log(Level.SEVERE,null,e);
                 return new ArrayList<Bookmark>();
-            //throw new RuntimeException(e);
             } catch (Exception e) {
-                System.err.println("Exception sbookmark: "+sbookmark);
-                e.printStackTrace();
+               logger.log(Level.SEVERE,null,e);
                 return new ArrayList<Bookmark>();
             }
         }
@@ -706,12 +701,12 @@ public class ApplicationModel {
             out= new FileOutputStream(f);
             Bookmark.formatBooks(out,newValue);
         } catch ( IOException ex ) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE,null,ex);
         } finally {
             try {
                 if ( out!=null ) out.close();
             } catch ( IOException ex ) {
-                ex.printStackTrace();
+                logger.log(Level.SEVERE,null,ex);
             }
         }
 
@@ -725,7 +720,7 @@ public class ApplicationModel {
             out3.append( tp.format( now, null) + "\t" + surl + "\n" );
             out3.close();
         } catch ( IOException ex ) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE,null,ex);
             if ( out3!=null ) try {
                 out3.close();
             } catch (IOException ex1) {
@@ -825,7 +820,7 @@ public class ApplicationModel {
     public static BufferedImage resizeImageTo( BufferedImage im, int hf ) {
         int h0= im.getHeight();
         double aspect= 1. * h0 / im.getWidth();
-        int h= h0/2;
+        int h;
 
         BufferedImage thumb=null;
 
@@ -1140,16 +1135,12 @@ public class ApplicationModel {
     //                    prop.setValue(state, val);
                         DomUtil.setPropertyValue(state, node, val);
                     } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
                         logger.log(Level.SEVERE, null, ex);
                     } catch (IllegalArgumentException ex) {
-                        ex.printStackTrace();
                         logger.log(Level.SEVERE, null, ex);
                     } catch (InvocationTargetException ex) {
-                        ex.printStackTrace();
                         logger.log(Level.SEVERE, null, ex);
                     } catch (ParseException ex) {
-                        ex.printStackTrace();
                         IOException ioex= new IOException( ex.getMessage() );
                         throw ioex;
                         //logger.log(Level.SEVERE, null, ex);
