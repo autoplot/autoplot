@@ -1084,7 +1084,7 @@ public class ApplicationModel {
      * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
      * will be applied to the vap, looking for %{PWD} or %{FILE}:
      * <li>PWD will be set to the current working directory of the vap file.
-     * @param f vap file containing the xml representation of the dom.
+     * @param in an InputStream containing a vap file xml representation of the dom.  This is not closed.
      * @param deltas list property name, property value pairs to apply to the
      *   vap DOM after it's loaded.  
      * @throws java.io.IOException
@@ -1167,7 +1167,6 @@ public class ApplicationModel {
 
         if ( this.resizeRequestListener!=null ) {
             double scale= resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
-            //TODO: scale font...
             Font f= Font.decode( state.getCanvases(0).getFont() );
             Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
             logger.log(Level.FINE, "shrinking font to {0}", newFont.toString());
