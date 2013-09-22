@@ -70,7 +70,7 @@ public class LogConsole extends javax.swing.JPanel {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
-    public static final int RECORD_SIZE_LIMIT = 1000;
+    public static final int RECORD_SIZE_LIMIT = 4000;
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
     int level = Level.ALL.intValue(); // let each logger do the filtering now.
