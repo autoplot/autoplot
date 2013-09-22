@@ -64,7 +64,7 @@ import org.virbo.autoplot.dom.Plot;
  */
 public class StatePersistence {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom.vap");
     
     private StatePersistence() {
     }
@@ -150,10 +150,8 @@ public class StatePersistence {
             try {
                 doConvert( document, scheme.getId(), sscheme );
             } catch ( TransformerException ex ) {
-                ex.printStackTrace();
-                // throw new IOException("Unable to export to version "+sscheme,ex); //TODO: JAVA1.6 will set initial cause
-                IOException result= new IOException("Unable to export to version "+sscheme );
-                result.initCause(ex);
+                logger.log( Level.WARNING, null, ex );
+                IOException result= new IOException("Unable to export to version "+sscheme,ex );
                 throw result;
             }
         }
@@ -187,7 +185,7 @@ public class StatePersistence {
             //String name = serializer.getClass().getSimpleName();
             //java.net.URL u = serializer.getClass().getResource(name + ".class");
             //System.err.println(u);
-            e2.printStackTrace();
+            logger.log( Level.WARNING, null, e2 );
         }
         serializer.write(document, output);
 
@@ -449,6 +447,7 @@ public class StatePersistence {
                 // file:///home/jbf/ct/hudson/vap/ninePanels.vap shows that old vap files often didn't have the autorange cleared
                 // when changes were made.  Now the code properly handles these, so autorange needs to be turned off when loading vaps.
                 // This showed that 1.06 files would have this problem too: file:/home/jbf/ct/hudson/vap/cassini_kp.vap
+                logger.fine("clearing autorange property when loading vap file");
                 Plot[] pp= state.getPlots();        
                 for ( int i=0; i<pp.length; i++ ) {
                     pp[i].getXaxis().setAutoRange(false);
