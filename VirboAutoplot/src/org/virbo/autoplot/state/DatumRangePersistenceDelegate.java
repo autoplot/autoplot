@@ -15,11 +15,10 @@ import java.beans.Encoder;
 import java.beans.Expression;
 import java.beans.PersistenceDelegate;
 import java.text.ParseException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.UnitsUtil;
-import org.virbo.autoplot.LogNames;
 import org.virbo.dataset.SemanticOps;
 
 /**
@@ -31,7 +30,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     public DatumRangePersistenceDelegate()  {
     }
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger( LogNames.AUTOPLOT_DOM );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
 
     private Datum abs( Datum w ) {
         return w.getUnits().createDatum( Math.abs(w.doubleValue(w.getUnits() )) );
@@ -58,21 +57,22 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
 
     @Override
     protected boolean mutatesTo(Object oldInstance, Object newInstance) {
-        logger.finest("mutatesTo("+oldInstance+","+newInstance+")");
+        logger.log(Level.FINEST, "mutatesTo({0},{1})", new Object[]{oldInstance, newInstance});
         // super checks for non-null and same class type.
         return super.mutatesTo(oldInstance, newInstance) && sloppyEquals( oldInstance,newInstance);
     }
 
 
+    @Override
     protected Expression instantiate(Object oldInstance, Encoder out) {
-        logger.finest("instantiate("+oldInstance+")");
+        logger.log(Level.FINEST, "instantiate({0})", oldInstance);
         DatumRange field= (DatumRange)oldInstance;
         Units u= field.getUnits();
-        if ( false && UnitsUtil.isTimeLocation(u) ) {
-            return new Expression( field, this.getClass(), "newTimeRange", new Object[] { field.toString() } );
-        } else {
+        //if ( false && UnitsUtil.isTimeLocation(u) ) {
+        //    return new Expression( field, this.getClass(), "newTimeRange", new Object[] { field.toString() } );
+        //} else {
             return new Expression( field, this.getClass(), "newDatumRange", new Object[] { field.min().doubleValue(u), field.max().doubleValue(u), u.toString() } );
-        }        
+        //}        
     }
 
     @Override
@@ -95,11 +95,12 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
         try {
             return DatumRangeUtil.parseTimeRange(stimeRange);
         } catch ( ParseException e ) {
-            e.printStackTrace();
+            logger.log(Level.WARNING,null,e);
             throw new IllegalArgumentException(e);
         }
     }
 
+    @Override
     protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
         super.initialize(type, oldInstance, newInstance, out);
     }
