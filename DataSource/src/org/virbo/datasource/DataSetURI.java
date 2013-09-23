@@ -1486,7 +1486,7 @@ public class DataSetURI {
                     throw new FileNotFoundException("directory does not exist: "+split.path );
                 }
             }
-            fs = FileSystem.create( DataSetURI.toUri(surlDir), mon );
+            fs = FileSystem.create( surlDir, mon );
             s = fs.listDirectory("/");
         }
 
