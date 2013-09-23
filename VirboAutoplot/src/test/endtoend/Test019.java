@@ -6,7 +6,11 @@
 package test.endtoend;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,7 @@ import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -39,7 +44,7 @@ public class Test019 {
         
         String uri;
         FileStorageModelNew fsm;
-        File[] ff;
+        File[] ff,ff2;
 
         uri= "http://autoplot.org/data/pngwalk/";
         fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
@@ -47,7 +52,7 @@ public class Test019 {
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
 
-
+        ff2= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
 
         uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
         fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
@@ -242,11 +247,54 @@ public class Test019 {
         testParse8601_1( "2008-009/2008-010", "2008-01-09T00:00:00Z/2008-01-10T00:00:00Z" );
     }
     
+    public static void testFileSystemListing() throws FileNotFoundException, FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
+        FileSystem fs= FileSystem.create("http://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+        String[] ss= fs.listDirectory("/");
+        FileObject fo= fs.getFileObject(ss[0]);
+        System.err.println( fo.getSize() );
+        File ff= fo.getFile();
+    }
+    
+
+    /**
+     * what does it do when there's a left-over .listing.part?  
+     * @throws FileNotFoundException
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws UnknownHostException
+     * @throws IOException 
+     */
+    public static void testDeadFileSystemListing() throws FileNotFoundException, FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
+        boolean makeIt= false;
+        if ( makeIt ) {
+            File f= FileSystem.settings().getLocalCacheDir();
+            File f2= new File( f.toString()+"/http/emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+            f2.mkdirs();
+            f= new File( f.toString()+"/http/emfisis-soc.physics.uiowa.edu/~jbf/20130912/.listing.part");
+            FileWriter w= new FileWriter(f);
+            try {
+                w.append("test");
+            } finally {
+                w.close();
+            }
+            try {
+                Thread.sleep(1000); // sleep 100 seconds
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Test019.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        FileSystem fs= FileSystem.create("http://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+        String[] ss= fs.listDirectory("/");
+        FileObject fo= fs.getFileObject(ss[0]);
+        System.err.println( fo.getSize() );
+    }
+
     public static void main( String[] args ) {
         try {
+            testDeadFileSystemListing();
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             tp.format( TimeUtil.now(), null);
             
+            testFileSystemListing();
             testFSMVersioning();
             
             tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
@@ -257,6 +305,8 @@ public class Test019 {
             testTimeParser();
             testRestrictedFileSystemAccess();
             testLayout();
+            testFileSystemModel();
+            FileSystem.reset();
             testFileSystemModel();
         } catch (Exception ex) {
             TestSupport.logger.log( Level.SEVERE, "error in test019", ex );
