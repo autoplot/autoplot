@@ -406,9 +406,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                         if ( exampleRange!=null ) {
                             try {
-                               validTimeRange= DatumRangeUtil.parseTimeRange(example);
+                               validTimeRange= DatumRangeUtil.parseTimeRange(exampleRange.getNodeValue());
                             } catch (ParseException ex) {
-                               logger.info("default timerange doesn't parse!");
+                               logger.info("example timerange doesn't parse!");
                             }
                         }
                     }
@@ -984,7 +984,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         Object[] tp0= tp.getPath();
 
-        DatumRange timeRange=null;
+        DatumRange timeRange;
         try {
             timeRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
