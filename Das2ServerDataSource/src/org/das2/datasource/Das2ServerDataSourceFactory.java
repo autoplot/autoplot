@@ -80,7 +80,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             BufferedReader reader = null;
             try {
                 URL url = new URL(surl + "?server=list");
-                reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                reader = new BufferedReader(new InputStreamReader(url.openStream(),"US-ASCII"));
                 String s = reader.readLine();
                 ArrayList<String> list = new ArrayList<String>();
                 while (s != null) {
