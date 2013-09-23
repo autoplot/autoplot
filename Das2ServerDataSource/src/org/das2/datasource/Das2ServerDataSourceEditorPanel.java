@@ -120,7 +120,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        ReaderParamsTextArea = new javax.swing.JTextArea();
+        readerParamsTextArea = new javax.swing.JTextArea();
         jLabel5 = new javax.swing.JLabel();
         tcaTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -161,9 +161,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel4.setText("Reader Parameters:");
         jLabel4.setToolTipText("Special parameters for the reader that implements the data source.  ");
 
-        ReaderParamsTextArea.setColumns(20);
-        ReaderParamsTextArea.setRows(5);
-        jScrollPane2.setViewportView(ReaderParamsTextArea);
+        readerParamsTextArea.setColumns(20);
+        readerParamsTextArea.setRows(5);
+        jScrollPane2.setViewportView(readerParamsTextArea);
 
         jLabel5.setText("TCA Interval (sec):");
         jLabel5.setToolTipText("<html>\nInterval (in seconds) to use for TCA (ephemeris) data.<br>\nLeave blank for most datasets.  For TCA data, specify a cadence based on the rate of change of the data.<br>\n</html>\n");
@@ -753,7 +753,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JTextArea ReaderParamsTextArea;
     public javax.swing.JComboBox das2ServerComboBox;
     public javax.swing.JLabel descriptionLabel;
     public javax.swing.JCheckBox discoveryCb;
@@ -768,6 +767,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
+    public javax.swing.JTextArea readerParamsTextArea;
     public javax.swing.JTextField tcaItem;
     public javax.swing.JTextField tcaTextField;
     public javax.swing.JTextField timeRangeTextField;
@@ -903,7 +903,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 paramsStr.append(e.getKey()).append("=").append(e.getValue()).append("\n");
             }
         }
-        ReaderParamsTextArea.setText(paramsStr.toString());
+        readerParamsTextArea.setText(paramsStr.toString());
 
         updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
         this.das2ServerComboBox.setSelectedItem(serverURL);
@@ -1014,7 +1014,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
 
         StringBuilder params= new StringBuilder();
-        String readerParams= ReaderParamsTextArea.getText();
+        String readerParams= readerParamsTextArea.getText();
         String[] ss= readerParams.split("\n");
         for ( int i=0; i<ss.length; i++ ) {
             String ss1= ss[i].trim();
