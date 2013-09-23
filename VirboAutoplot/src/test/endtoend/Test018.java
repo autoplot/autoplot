@@ -94,7 +94,7 @@ public class Test018 {
         reset();
         Application dom = getDocumentModel();
 
-        dom.getDataSourceFilters(0).setUri("vap:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc");
+        dom.getDataSourceFilters(0).setUri("file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc");
         dom.getPlots(0).getYaxis().setRange(new DatumRange(-10, 10, SemanticOps.lookupUnits("nT")));
         dom.getController().waitUntilIdle(); // wait for child plot elements to be created.
         writeToPng(testId + "_000.png");
