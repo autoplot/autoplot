@@ -517,8 +517,20 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
             return result;
                 
-        } catch ( Exception ex ) {
-            logger.log( Level.FINE, "resulted in listPeers error:"+ uri, ex);
+        } catch (MalformedURLException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return new ArrayList();
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return new ArrayList();
+        } catch (ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return new ArrayList();
+        } catch (SAXException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return new ArrayList();
+        } catch (XPathExpressionException ex) {
+            logger.log(Level.SEVERE, null, ex);
             return new ArrayList();
         }
     }
