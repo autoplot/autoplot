@@ -39,6 +39,9 @@ public class Das2ServerTimeSeriesBrowse implements TimeSeriesBrowse {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
 
+        if ( timeRange==null ) {
+            throw new IllegalArgumentException("either setTimeRange or setURI must be called to set the timeRange");
+        }
         String stime= timeRange.min().toString().replace(" ", "+");
         String etime= timeRange.max().toString().replace(" ", "+");
 
