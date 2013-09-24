@@ -296,7 +296,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 String renderType= (String)result.property(QDataSet.RENDER_TYPE);
                 if ( labelVar!=null && ( renderType==null || renderType.equals("time_series") ) ) {
-                    labels=null;
+                    labels=null; 
                 }
                 if ( labels==null && labelVar!=null ) {
                     String master= db.getMasterFile( ds.toLowerCase(), mon );
