@@ -1,0 +1,3 @@
+from org.virbo.autoplot.state import EmbedDataExperiment
+from java.io import File
+EmbedDataExperiment.save( dom, File('/tmp/foo.zip') )
