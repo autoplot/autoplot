@@ -6,22 +6,20 @@
 package test.endtoend;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
-import org.das2.util.Base64;
-import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.HtmlUtil;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -181,8 +179,6 @@ public class Test140 {
                 String uri= ((Bookmark.Item)b).getUri();
                 try {
                     if ( uri.endsWith(".vap") ) {
-                        
-                    } else {
                         do1( uri, iid, true );
                     }
                 } catch ( Exception ex ) {
@@ -193,6 +189,32 @@ public class Test140 {
             }
         }
         return iid;
+    }
+    
+    private static int doHtml( URL url, int iid, Map<String,Exception> exceptions ) throws IOException, CancelledOperationException {
+        InputStream in = url.openStream();
+        try {
+            URL[] urls= HtmlUtil.getDirectoryListing(url,in,false);
+            List<URL> result= new ArrayList();
+            for ( URL url1: urls ) {
+                if ( url1.getFile().endsWith(".vap") || url1.getFile().contains("autoplot.jnlp?") ) {
+                    result.add(url1);
+                }
+            }
+            for ( URL url1 : result ) {
+                String uri= url1.toString();
+                try {
+                    do1( url1.toString(), iid, true );
+                } catch (Exception ex) {
+                    exceptions.put( uri, ex );
+                } finally {
+                    iid++;
+                }
+            }
+            return iid;        
+        } finally {
+            in.close();
+        }
     }
     
     /**
@@ -248,7 +270,12 @@ public class Test140 {
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt", "http://www.sarahandjeremy.net/~jbf/temperatures2012.xml" };
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140.txt " };
             //args= new String[] { "140", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/test140_1.txt" };
-            args= new String[] { "140", "http://sarahandjeremy.net/jeremy/rbsp/test/test140.txt" };
+            //args= new String[] { "140", "http://sarahandjeremy.net/jeremy/rbsp/test/test140.txt" };
+            //args= new String[] { "143", "http://www.rbsp-ect.lanl.gov/science/VAP_Files.php" };
+            //args= new String[] { "144", "http://autoplot.org/developer.vapModifiers" };
+            //args= new String[] { "145", "http://sarahandjeremy.net/~jbf/" };
+            //args= new String[] { "146", "http://sarahandjeremy.net/jeremy/autoplot/tests/test140/html/RBSP%20ECT%20Data%20Products.html" };
+            args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
@@ -259,11 +286,14 @@ public class Test140 {
             String uri= args[i];
             System.err.println("\n== from "+uri+" ==");
             
-            File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
             if ( uri.endsWith(".xml") ) {
+                File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
                 iid= doBookmarks(ff,iid,exceptions);
-            } else {
+            } else if ( uri.endsWith(".txt") ) {
+                File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
                 iid= doHistory(ff,iid,exceptions);
+            } else {
+                iid= doHtml( new URL(uri),iid,exceptions );
             }
             iid= ( ( iid+1 ) / 100 + 1 ) * 100;
         }
