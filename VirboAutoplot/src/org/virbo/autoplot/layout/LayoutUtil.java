@@ -31,7 +31,7 @@ public class LayoutUtil {
         if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMaximum() - em) < 0.1 && Math.abs(norm - c.getMaximum()) < 0.001) return false;
         if ( Math.abs(em)>100 ) {
-            System.err.println("autolayout failure.");
+            logger.log(Level.SEVERE, "autolayout failure: {0}", em);
         }
         c.setMax(norm,em,pt);
         logger.log(Level.FINE, "reset maximum: {0}", c);
@@ -54,7 +54,7 @@ public class LayoutUtil {
         if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
 
         if ( Math.abs(em)>100 ) {
-            System.err.println("autolayout failure.");
+            logger.log(Level.SEVERE, "autolayout failure: {0}", em);
         }
         c.setMin(norm,em,pt);
         logger.log(Level.FINE, "reset minimum: {0}", c);
