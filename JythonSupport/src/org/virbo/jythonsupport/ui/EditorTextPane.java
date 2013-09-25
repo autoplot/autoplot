@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
@@ -237,7 +235,7 @@ public class EditorTextPane extends JEditorPane {
     }
 
     String[] jumpToList( ) {
-        LineNumberReader reader= null;
+        LineNumberReader reader;
         List<String> jumpToList= new ArrayList();
         jumpToList.add("1:top");
         try {
