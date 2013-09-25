@@ -335,6 +335,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         });
 
         caretPositionLabel.setText("1,1");
+        caretPositionLabel.setToolTipText("row,column; or the number of characters and lines selected.");
 
         textArea.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {

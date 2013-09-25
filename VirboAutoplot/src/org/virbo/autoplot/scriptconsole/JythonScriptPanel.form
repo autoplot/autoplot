@@ -107,6 +107,7 @@
     <Component class="javax.swing.JLabel" name="caretPositionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="1,1"/>
+        <Property name="toolTipText" type="java.lang.String" value="row,column; or the number of characters and lines selected."/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane2">
