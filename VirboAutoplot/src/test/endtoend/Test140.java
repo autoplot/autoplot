@@ -166,15 +166,15 @@ public class Test140 {
         return result;
     }
 
-    private static int doBookmarks( File f, int iid, Map<String,Exception> exceptions ) throws IOException, SAXException, BookmarksException {
+    private static int doBookmarks( File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, SAXException, BookmarksException {
         List<Bookmark> books= Bookmark.parseBookmarks( f.toURI().toURL() );
-        return doBookmarks( books, iid, exceptions );
+        return doBookmarks( books, iid, exceptions, exceptionNumbers );
     } 
     
-    private static int doBookmarks( List<Bookmark> books, int iid, Map<String,Exception> exceptions ) throws IOException, SAXException, BookmarksException {
+    private static int doBookmarks( List<Bookmark> books, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, SAXException, BookmarksException {
         for ( Bookmark b: books ) {
             if ( b instanceof Bookmark.Folder ) {
-                iid= doBookmarks( ((Bookmark.Folder)b).getBookmarks(), iid, exceptions );
+                iid= doBookmarks( ((Bookmark.Folder)b).getBookmarks(), iid, exceptions, exceptionNumbers );
             } else {
                 String uri= ((Bookmark.Item)b).getUri();
                 try {
@@ -191,7 +191,7 @@ public class Test140 {
         return iid;
     }
     
-    private static int doHtml( URL url, int iid, Map<String,Exception> exceptions ) throws IOException, CancelledOperationException {
+    private static int doHtml( URL url, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, CancelledOperationException {
         InputStream in = url.openStream();
         try {
             URL[] urls= HtmlUtil.getDirectoryListing(url,in,false);
@@ -207,6 +207,7 @@ public class Test140 {
                     do1( url1.toString(), iid, true );
                 } catch (Exception ex) {
                     exceptions.put( uri, ex );
+                    exceptionNumbers.put( uri, iid );
                 } finally {
                     iid++;
                 }
@@ -225,7 +226,7 @@ public class Test140 {
      * @return
      * @throws IOException 
      */
-    private static int doHistory( File f, int iid, Map<String,Exception> exceptions ) throws IOException {
+    private static int doHistory( File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException {
         BufferedReader read= null;
         try {
             read= new BufferedReader( new FileReader(f) );
@@ -242,6 +243,7 @@ public class Test140 {
                         do1( uri, iid, true );
                     } catch ( Exception ex ) {
                         exceptions.put( uri, ex );
+                        exceptionNumbers.put( uri, iid );
                     } finally {
                         iid++;                
                     }
@@ -275,12 +277,14 @@ public class Test140 {
             //args= new String[] { "144", "http://autoplot.org/developer.vapModifiers" };
             //args= new String[] { "145", "http://sarahandjeremy.net/~jbf/" };
             //args= new String[] { "146", "http://sarahandjeremy.net/jeremy/autoplot/tests/test140/html/RBSP%20ECT%20Data%20Products.html" };
-            args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
+            args= new String[] { "142", "http://jfaden.net/~jbf/autoplot/test142.txt" };
+            //args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
 
         Map<String,Exception> exceptions= new LinkedHashMap();
+        Map<String,Integer> exceptionNumbers= new LinkedHashMap();
         
         for ( int i=1; i<args.length; i++ ) {
             String uri= args[i];
@@ -288,12 +292,12 @@ public class Test140 {
             
             if ( uri.endsWith(".xml") ) {
                 File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
-                iid= doBookmarks(ff,iid,exceptions);
+                iid= doBookmarks(ff,iid,exceptions,exceptionNumbers);
             } else if ( uri.endsWith(".txt") ) {
                 File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
-                iid= doHistory(ff,iid,exceptions);
+                iid= doHistory(ff,iid,exceptions,exceptionNumbers);
             } else {
-                iid= doHtml( new URL(uri),iid,exceptions );
+                iid= doHtml( new URL(uri),iid,exceptions,exceptionNumbers );
             }
             iid= ( ( iid+1 ) / 100 + 1 ) * 100;
         }
@@ -301,9 +305,7 @@ public class Test140 {
         System.err.println("\n\n== Exceptions encountered ====");
         
         for ( Entry<String,Exception> e: exceptions.entrySet() ) {
-            System.err.println("==");
-            System.err.println(e.getKey());
-            System.err.println(e.getValue());
+            System.err.println( String.format( "== %4d: %s ==", exceptionNumbers.get(e.getKey()), e.getKey() ) );
             e.getValue().printStackTrace();
         }
         
