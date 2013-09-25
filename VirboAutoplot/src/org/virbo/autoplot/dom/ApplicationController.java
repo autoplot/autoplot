@@ -1102,16 +1102,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
 
+            for (PlotElement newp : newElements) {
+                newp.getController().setResetRanges(false);
+                newp.getController().setResetComponent(false);
+                newp.getController().setResetPlotElement(false);
+                newp.getController().setResetRenderType(false);
+                newp.getController().setDsfReset(true);
+            }
+            
         } finally {
             lock.unlock();
-        }
-
-        for (PlotElement newp : newElements) {
-            newp.getController().setResetRanges(false);
-            newp.getController().setResetComponent(false);
-            newp.getController().setResetPlotElement(false);
-            newp.getController().setResetRenderType(false);
-            newp.getController().setDsfReset(true);
         }
 
         return newPlot;
