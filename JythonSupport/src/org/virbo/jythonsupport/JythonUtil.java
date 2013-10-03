@@ -1050,7 +1050,7 @@ public class JythonUtil {
     }
     
     public static void main_test1(String[] args ) throws FileNotFoundException {
-        doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        doTestGetParams("006","/home/jbf/ct/hudson/script/test038/yab_20131003.jy"); //TODO: needs fixing
         doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
         doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
         doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
