@@ -32,6 +32,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
@@ -53,6 +54,7 @@ import org.python.core.PyTraceback;
 import org.python.core.ThreadState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.FileSystemUtil;
@@ -61,7 +63,7 @@ import org.virbo.datasource.jython.JythonDataSourceFactory;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
 
 /**
- *
+ * Error annotations, saveAs, etc.
  * @author jbf
  */
 public class ScriptPanelSupport {
@@ -447,7 +449,9 @@ public class ScriptPanelSupport {
                                     ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
                                     ParametersFormPanel.FormData fd=  pfp.doVariables( panel.getEditorPanel().getText(), vars, p );
                                     if ( fd.count>0 ) {
-                                        if ( JOptionPane.showConfirmDialog( panel, p, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                        JScrollPane pane= new JScrollPane(p);
+                                        
+                                        if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             ParametersFormPanel.resetVariables( fd, vars );
                                             for ( Entry<String,String> v: vars.entrySet() ) {
                                                 interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
