@@ -29,6 +29,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -168,7 +169,7 @@ public class ParametersFormPanel {
      * @param params map containing any settings for the variables.
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
-    public FormData doVariables( final String src, Map<String,String> params, final JPanel paramsPanel ) {
+    public FormData doVariables( final String src, Map<String,String> params, final JPanel zparamsPanel ) {
         this.params= new HashMap(params);
 
         boolean hasVars;
@@ -177,6 +178,10 @@ public class ParametersFormPanel {
         fd.deftsList= new ArrayList();
         fd.typesList= new ArrayList();
         
+        JScrollPane jp= new JScrollPane();
+        zparamsPanel.add( jp );
+        final JPanel paramsPanel= new JPanel();
+        jp.getViewport().add(paramsPanel);
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         
         try {
@@ -191,6 +196,10 @@ public class ParametersFormPanel {
                 String vname= parm.name;                
                 String label;
 
+                if ( parm.enums!=null && parm.deft.getClass()!=parm.enums.get(0).getClass() ) {
+                    logger.warning("type of enumeration doesn't match default value.");
+                }
+                
                 JComponent ctf;
 
                 boolean isBool= parm.enums!=null && isBoolean( parm.enums );
@@ -332,7 +341,7 @@ public class ParametersFormPanel {
                             jcb.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    redoVariables( src, ParametersFormPanel.this.params, paramsPanel );
+                                    redoVariables( src, ParametersFormPanel.this.params, zparamsPanel );
                                 }
                             });
                             ctf= jcb;
@@ -352,12 +361,14 @@ public class ParametersFormPanel {
                                 oval = val;
                             }
                             jcb.setSelectedItem(oval);
-                            
+                            if ( !jcb.getSelectedItem().equals(oval) ) {
+                                logger.fine("uh-oh.");
+                            }
                             ctf= jcb;
                             jcb.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    redoVariables( src, ParametersFormPanel.this.params, paramsPanel );
+                                    redoVariables( src, ParametersFormPanel.this.params, zparamsPanel );
                                 }
                             });
                             Dimension x= ctf.getPreferredSize();
