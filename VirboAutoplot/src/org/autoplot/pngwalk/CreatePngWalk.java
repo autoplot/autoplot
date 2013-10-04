@@ -36,9 +36,11 @@ import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.StatePersistence;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
@@ -47,13 +49,28 @@ import org.virbo.dataset.SemanticOps;
  */
 public class CreatePngWalk {
 
+    /**
+     * Get the list of times, which can be one of:
+     *   * rank 2 bins datasets  T[index;min,max]
+     *   * dataset with rank 2 bins datasets   Event[ T[index;min,max] ]
+     * @param params
+     * @return
+     * @throws IllegalArgumentException
+     * @throws ParseException 
+     */
     private static String[] getListOfTimes( Params params ) throws IllegalArgumentException, ParseException {
         String[] times;
         if ( params.batchUri!=null && params.batchUri.length()>0 ) {
             try {
                 QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( params.batchUri );
                 if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
-                    timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
+                    if ( (QDataSet) timesds.property(QDataSet.DEPEND_0)!=null ) {
+                        timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
+                    } else if ( SemanticOps.isBundle(timesds) ) { // See EventsRenderer.makeCanonical
+                        timesds= Ops.bundle( DataSetOps.unbundle(timesds,0), DataSetOps.unbundle(timesds,1) ); 
+                    } else {
+                        throw new IllegalArgumentException("expected [UTC,UTC] or [UTC,UTC,:]");
+                    }
                 }
                 if ( timesds.rank()!=2 ) {
                     throw new IllegalArgumentException("expected bins dataset for times");
