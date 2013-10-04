@@ -20,11 +20,13 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
@@ -53,6 +55,9 @@ public class CreatePngWalk {
      * Get the list of times, which can be one of:
      *   * rank 2 bins datasets  T[index;min,max]
      *   * dataset with rank 2 bins datasets   Event[ T[index;min,max] ]
+     * This uses params.batchUri to get the URI that is resolved to control the times.  These
+     * times then need to be formatted to filenames, 
+     * 
      * @param params
      * @return
      * @throws IllegalArgumentException
@@ -77,8 +82,24 @@ public class CreatePngWalk {
                 }
                 times= new String[timesds.length()];
                 TimeParser tp= TimeParser.create(params.timeFormat);
+                boolean jeggyMode=false;
                 for ( int i=0; i<times.length; i++ ) {
-                    times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) );
+                    if ( jeggyMode ) {
+                        times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
+                    } else {
+                        times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) );
+                        Datum w0= DataSetUtil.asDatumRange( timesds.slice(i) ).width();
+                        Datum w1= tp.parse(times[i]).getTimeRange().width();
+                        if ( w1.multiply(2).lt(w0) ) {
+                            if ( i==0 ) {
+                                logger.fine("timeformat poorly represents the time, flipping into jeggy mode...");
+                                jeggyMode= true;
+                                times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
+                            } else {
+                                throw new IllegalArgumentException("timeformat poorly represents the time.");
+                            }
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 if ( ex instanceof IllegalArgumentException ){
@@ -188,7 +209,7 @@ public class CreatePngWalk {
     /**
      * run the pngwalk for the list of times.  The dom argument is copied so the
      * scientist can continue working while the pngwalk is run.
-     * @param times list of times to run.
+     * @param times list of times to run.  If a time contains a ": ", then the first part is the label and after is the exact time.
      * @param readOnlyDom the dom to render for each time.
      * @param params outputFolder and spec.
      * @param mon progress monitor to provide feedback about the run.
@@ -262,33 +283,37 @@ public class CreatePngWalk {
         build.append( String.format( "JAVA -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk " ) );
 
         // Write out the parameters used to create this pngwalk in product.pngwalk
-        PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
+        PrintWriter ff=null;
+        try {
+            ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
 
-        build.append("--vap=").append(vap).append( " ");
-        build.append("--outputFolder=").append(params.outputFolder).append( " ");
-        ff.println( "product=" + params.product );
-        build.append("--product=").append(params.product).append( " ");
-        ff.println( "timeFormat=" + params.timeFormat );
-        build.append("--timeFormat='").append(params.timeFormat).append( "' ");
-        ff.println( "timeRange=" + params.timeRangeStr );
-        build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
-        if ( params.batchUri!=null ) {
-            ff.println( "batchUri=" + params.batchUri );
-            build.append("--batchUri=").append(params.batchUri).append( " ");
+            build.append("--vap=").append(vap).append( " ");
+            build.append("--outputFolder=").append(params.outputFolder).append( " ");
+            ff.println( "product=" + params.product );
+            build.append("--product=").append(params.product).append( " ");
+            ff.println( "timeFormat=" + params.timeFormat );
+            build.append("--timeFormat='").append(params.timeFormat).append( "' ");
+            ff.println( "timeRange=" + params.timeRangeStr );
+            build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+            if ( params.batchUri!=null ) {
+                ff.println( "batchUri=" + params.batchUri );
+                build.append("--batchUri=").append(params.batchUri).append( " ");
+            }
+            if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
+                ff.println( "rescalex="+ params.rescalex );
+                build.append("--rescalex=").append(params.rescalex).append( " ");
+            }
+            if ( params.autorange ) {
+                ff.println( "autorange="+ params.autorange );
+                build.append("--autorange=").append(params.autorange).append( " ");
+            }
+            if ( params.version!=null && params.version.trim().length()>0 ) {
+                ff.println( "version="+ params.version );
+                build.append("--version=").append( params.version);
+            }
+        } finally {
+            if ( ff!=null ) ff.close();
         }
-        if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
-            ff.println( "rescalex="+ params.rescalex );
-            build.append("--rescalex=").append(params.rescalex).append( " ");
-        }
-        if ( params.autorange ) {
-            ff.println( "autorange="+ params.autorange );
-            build.append("--autorange=").append(params.autorange).append( " ");
-        }
-        if ( params.version!=null && params.version.trim().length()>0 ) {
-            ff.println( "version="+ params.version );
-            build.append("--version=").append( params.version);
-        }
-        ff.close();
          
         if ( !( mon instanceof NullProgressMonitor ) ) { // only show in interactive session
             System.err.println( build.toString() );
@@ -305,9 +330,16 @@ public class CreatePngWalk {
 
         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
 
-        for ( String i : times ) {
+        for ( String atime : times ) {
 
-            String filename= String.format("%s%s_%s%s.png", params.outputFolder, params.product, i, vers );
+            int ic= atime.indexOf(": ");
+            String exactTime= null; 
+            if ( ic>-1 ) { // rfe batchfile time.
+                exactTime= atime.substring(ic+2);
+                atime= atime.substring(0,ic);
+            }
+            
+            String filename= String.format("%s%s_%s%s.png", params.outputFolder, params.product, atime, vers );
 
             count = count + 1;
             if (mon.isCancelled()) {
@@ -326,7 +358,12 @@ public class CreatePngWalk {
 
 
             try {
-                DatumRange dr= tp.parse(i).getTimeRange();
+                DatumRange dr;
+                if ( exactTime==null ) {
+                    dr= tp.parse(atime).getTimeRange();
+                } else {
+                    dr= DatumRangeUtil.parseTimeRange(exactTime);
+                }
                 if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
                     dr= DatumRangeUtil.rescale( dr,params.rescalex );
                 }
@@ -350,7 +387,7 @@ public class CreatePngWalk {
 
             appmodel.waitUntilIdle(false);
 
-            if ( i.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
+            if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
                 dom2.getOptions().setAutolayout(false);
                 appmodel.waitUntilIdle(false);
             }
@@ -359,7 +396,7 @@ public class CreatePngWalk {
 
             if (params.createThumbs) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, i, vers ) );
+                File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
                 File parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
                     if ( !parentf.mkdirs() ) {
@@ -370,7 +407,7 @@ public class CreatePngWalk {
                     throw new IllegalArgumentException("no appropriate writer is found");
                 }
                 BufferedImage thumb100 = ImageResize.getScaledInstance(thumb400, thumbW/4, thumbH/4, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                outf= new java.io.File(String.format("%sthumbs100/%s_%s%s.png", params.outputFolder, params.product, i, vers ) );
+                outf= new java.io.File(String.format("%sthumbs100/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
                 parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
                     if ( !parentf.mkdirs() ) {
