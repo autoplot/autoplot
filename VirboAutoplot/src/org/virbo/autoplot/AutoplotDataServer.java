@@ -293,16 +293,11 @@ public class AutoplotDataServer {
 
             DatumRange outer= DatumRangeUtil.parseTimeRange(timeRange);
             
-            // see if there's a "native" step size to be aware of
+            // see if there's a "native" step size to be aware of.  There's no way to do this the existing TSB capability, so we kludge for it to support RBSP at U. Iowa.
             DataSource dss= DataSetURI.getDataSource(suri);
             TimeSeriesBrowse tsb= dss.getCapability(TimeSeriesBrowse.class);
-            if ( tsb!=null ) {
-                tsb.setTimeRange( new DatumRange( outer.min(), outer.min() ) );
-                Datum granule= tsb.getTimeRange().width();
-                if ( granule.lt(Units.seconds.parse(step) ) ) {
-                    logger.fine("overriding step size with smaller granule size");
-                    step= granule.toString();  //e.g. "3600 sec"
-                }
+            if ( tsb!=null && suri.contains("$H") ) {
+                step= "3600s";
             }
             
             Datum first= TimeUtil.prevMidnight( outer.min() );
