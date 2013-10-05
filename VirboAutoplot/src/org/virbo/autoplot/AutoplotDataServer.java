@@ -37,8 +37,11 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
@@ -277,19 +280,31 @@ public class AutoplotDataServer {
             logger.fine("no progress available because output is not d2s stream");
         }
         
-        QDataSet ds = null;
+        QDataSet ds;
 
         boolean someValid= false;
 
         logger.log( Level.FINE, "time read args and prep={0}", ((System.currentTimeMillis() - t0)));
 
         if (!timeRange.equals("")) {
-            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
-            System.err.printf("   suri=%s\n", suri);
-            System.err.printf("   timeRange=%s\n", timeRange);
+            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange ):");
+            logger.log(Level.FINE, "   suri={0}", suri);
+            logger.log(Level.FINE, "   timeRange={0}", timeRange);
 
             DatumRange outer= DatumRangeUtil.parseTimeRange(timeRange);
-
+            
+            // see if there's a "native" step size to be aware of
+            DataSource dss= DataSetURI.getDataSource(suri);
+            TimeSeriesBrowse tsb= dss.getCapability(TimeSeriesBrowse.class);
+            if ( tsb!=null ) {
+                tsb.setTimeRange( new DatumRange( outer.min(), outer.min() ) );
+                Datum granule= tsb.getTimeRange().width();
+                if ( granule.lt(Units.seconds.parse(step) ) ) {
+                    logger.fine("overriding step size with smaller granule size");
+                    step= granule.toString();  //e.g. "3600 sec"
+                }
+            }
+            
             Datum first= TimeUtil.prevMidnight( outer.min() );
             Datum next= first.add( Units.seconds.parse(step) );
 
