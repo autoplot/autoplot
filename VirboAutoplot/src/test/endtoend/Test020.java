@@ -5,11 +5,13 @@
 
 package test.endtoend;
 
+import org.das2.datum.Datum;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.IndexListDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -19,15 +21,63 @@ import org.virbo.dsops.Ops;
 public class Test020 {
     
     public static void main( String[] args ) {
+        
+        for ( int i=0; i<5; i++ ) {
+            testValid();
+        }
+        
+        for ( int i=0; i<5; i++ ) {
+            testValidSlow();
+        }
+
+        for ( int i=0; i<5; i++ ) {
+            testClosestIndex();
+        }
+
         testArrayIndexing();
+
         for ( int i=0; i<10; i++ ) {
             testRank1DDatasetAccess(i>5);
         }
+        
         for ( int i=0; i<10; i++ ) {
             testRank2DDatasetAccess(i>5);
         }
+        
     }
 
+    private static void testValid() {
+        final int SIZE=10000000;
+        WritableDataSet ds= Ops.copy( Ops.findgen(SIZE) );
+        long t0= System.currentTimeMillis();
+        QDataSet wds= Ops.valid(ds);
+        System.err.println("  valid returns "+wds.getClass() );
+        QDataSet r= Ops.where( wds );
+        System.err.println("testValid (millis): "+ ( System.currentTimeMillis()-t0 ) );
+    }
+    
+    private static void testValidSlow() {
+        final int SIZE=10000000;
+        WritableDataSet ds= Ops.copy( Ops.findgen(SIZE) );
+        ds.putProperty( QDataSet.VALID_MIN, 0 );     // these severely affect performance, because we must check for fill.
+        ds.putProperty( QDataSet.VALID_MAX, SIZE ); 
+        long t0= System.currentTimeMillis();
+        QDataSet wds= Ops.valid(ds);
+        System.err.println("  valid returns "+wds.getClass() );
+        QDataSet r= Ops.where( wds );
+        System.err.println("testValidSlow (millis): "+ ( System.currentTimeMillis()-t0 ) );
+    }
+
+    private static void testClosestIndex() {
+        final int SIZE=10000000;
+        WritableDataSet ds= Ops.copy( Ops.findgen(SIZE) );
+        ds.putProperty( QDataSet.VALID_MIN, 0 );     // these severely affect performance, because we must check for fill.
+        ds.putProperty( QDataSet.VALID_MAX, SIZE ); 
+        long t0= System.currentTimeMillis();
+        int i0= DataSetUtil.closestIndex( ds, Datum.create(SIZE*2/3) );
+        System.err.println("closest index time (millis): "+  ( System.currentTimeMillis()-t0 )  );
+    }
+    
     private static void testRank1DDatasetAccess(boolean print) {
         final int SIZE=1000000;
 
