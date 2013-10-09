@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk Tool is used to quickly find the minute where the power meter rolled over.</small></p>
+        <p><small>vap+inline data source used to mark a time.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>      
+            <li>1112: poor adapt of legacy TableDataSet from das2server</li>
             <li>1104: new cache problems, in-memory cache limited to 5 seconds.</li>
             <li>1106: contours render, copy plot elements down. </li>
             <li>1109: vap setting of zaxis range not respected</li>
@@ -80,6 +81,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataSetAnnotations allows us to cache repeat operations more easily</li>
+            <li>rfe 327: pngwalks from event lists</li>
             <li>rfe 326: jump to routine in jython editor</li>
             <li>rfe 322: Bookmarks for the Axis Annotations</li>
             <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
