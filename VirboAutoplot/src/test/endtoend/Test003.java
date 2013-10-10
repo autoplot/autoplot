@@ -93,7 +93,7 @@ public class Test003 {
             //doit(18, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/hope/level2/plots/sci-L2/rbspa_pre_ect-hope-sci-L2.vap?timerange=20121101");
 
             //REPT
-            doit(19, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-bias-L1/rbspa_rel01_ect-rept-hk-bias-L1.vap?timerange=20121202");
+            doit(19, "file:///home/jbf/ct/hudson/vap/lanl/rbspa_rel01_ect-rept-hk-bias-L1.vap?timerange=20121202");
             doit(20, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-fc-L1/rbspa_rel01_ect-rept-hk-fc-L1.vap?timerange=20120918");
             doit(21, "http://ectsoc@www.rbsp-ect.lanl.gov/data_prot/rbspa/rept/level1/plots/hk-tvc-L1/rbspa_rel01_ect-rept-hk-tvc-L1.vap?timerange=20120919");
 
