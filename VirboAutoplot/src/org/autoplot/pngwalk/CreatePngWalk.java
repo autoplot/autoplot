@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.das2.DasApplication;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -497,7 +498,11 @@ public class CreatePngWalk {
             
             ProgressMonitor mon;
             if (ScriptContext.getViewWindow() == null) {
-                mon = new NullProgressMonitor();
+                if ( "true".equals( System.getProperty("java.awt.headless","false") ) ) {
+                    mon = new NullProgressMonitor();
+                } else {
+                    mon = DasProgressPanel.createFramed( "running batch" );
+                }
             } else {
                 mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
             }
