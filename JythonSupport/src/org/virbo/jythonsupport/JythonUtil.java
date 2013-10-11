@@ -682,7 +682,10 @@ public class JythonUtil {
                  }
                  String ss1= simplifyScriptToGetParams( ss, iff.body, variableNames, -1, lastLine1, depth+1 );
                  if ( ss1.length()==0 ) {
-                     result.append("#continue\n");         
+                     String line= ss[iff.beginLine];
+                     String[] ss2= line.split("\\S",-2);
+                     String indent= ss2[0];
+                     result.append(indent+"continue\n");  
                      logger.fine("things have probably gone wrong...");
                  } else {
                      appendToResult( result,ss1);
