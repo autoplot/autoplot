@@ -685,13 +685,22 @@ public class JythonUtil {
                      String line= ss[iff.beginLine];
                      String[] ss2= line.split("\\S",-2);
                      String indent= ss2[0];
-                     result.append(indent+"continue\n");  
+                     result.append(indent).append("continue\n");  
                      logger.fine("things have probably gone wrong...");
                  } else {
                      appendToResult( result,ss1);
                  }
                  if ( iff.orelse!=null ) {
-                     appendToResult( result,ss[lastLine1] ).append("\n");  // write of the else or elif line
+                     int len= result.length();
+                     appendToResult( result,ss[lastLine1] );
+                     if ( len==result.length()-ss[lastLine1].length() ) { // we didn't add anything...
+                         String line= ss[iff.beginLine];
+                         String[] ss2= line.split("\\S",-2);
+                         String indent= ss2[0];
+                         result.append("\n").append(indent).append("continue\n");  
+                     } else {
+                         result.append("\n");  // write of the else or elif line
+                     }
                      int lastLine2;
                      if ( (istatement+1)<stmts.length ) {
                         lastLine2= stmts[istatement+1].beginLine-1;
