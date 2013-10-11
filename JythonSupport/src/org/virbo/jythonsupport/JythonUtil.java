@@ -690,27 +690,13 @@ public class JythonUtil {
                      }
                      String[] ss2= line.split("\\S",-2);
                      String indent= ss2[0];
-                     result.append(indent).append("continue\n");  
+                     result.append(indent).append("pass\n");  
                      logger.fine("things have probably gone wrong...");
                  } else {
                      appendToResult( result,ss1);
                  }
                  if ( iff.orelse!=null ) {
-                     int len= result.length();
                      appendToResult( result,ss[lastLine1] );
-                     if ( len==result.length()-ss[lastLine1].length() ) { // we didn't add anything...
-                         String line;
-                         if ( iff.beginLine==0 && beginLine>0 && iff.body[0].beginLine>0 ) {
-                            line= ss[iff.body[0].beginLine-1]; 
-                         } else {
-                            line= ss[iff.beginLine];
-                         }
-                         String[] ss2= line.split("\\S",-2);
-                         String indent= ss2[0];
-                         result.append("\n").append(indent).append("continue\n");  
-                     } else {
-                         result.append("\n");  // write of the else or elif line
-                     }
                      int lastLine2;
                      if ( (istatement+1)<stmts.length ) {
                         lastLine2= stmts[istatement+1].beginLine-1;
@@ -718,7 +704,19 @@ public class JythonUtil {
                         lastLine2= lastLine;
                      }
                      String ss2= simplifyScriptToGetParams( ss, iff.orelse, variableNames, lastLine1+2, lastLine2, depth+1 );
+                     if ( ss2.length()>0 ) {
+                         result.append("\n");
+                     }
                      appendToResult( result,ss2);
+                     if ( ss2.length()==0  ) { // we didn't add anything...
+                         String line;
+                         line= ss[iff.orelse[0].beginLine-1];
+                         String[] ss3= line.split("\\S",-2);
+                         String indent= ss3[0];
+                         result.append("\n").append(indent).append("pass\n");  
+                     } else {
+                         result.append("\n");  // write of the else or elif line
+                     }
                  }
                  acceptLine= -1;
              } else {
