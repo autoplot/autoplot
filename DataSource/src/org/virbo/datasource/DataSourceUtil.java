@@ -74,6 +74,9 @@ public class DataSourceUtil {
             }
             s = URLDecoder.decode(s, "UTF-8");
             s = s.replaceAll("\\&amp;","&");
+            if ( s.startsWith("vap ")) {
+                s= "vap+"+s.substring(4);
+            }
             return s;
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
