@@ -70,6 +70,7 @@ public class Test038 {
         doTestGetParams("003","/home/jbf/ct/hudson/script/test038/demoParms.jy");
         doTestGetParams("004","/home/jbf/ct/hudson/script/test038/rbsp/emfisis/background_removal_wfr.jyds");
         doTestGetParams("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
+        doTestGetParams("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds");
     }
     
     public static void main( String[] args ) throws IOException {
