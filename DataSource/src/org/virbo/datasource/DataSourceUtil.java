@@ -62,7 +62,7 @@ public class DataSourceUtil {
      * remove escape sequences like %20 to create a human-editable string
      * This contains a kludge that looks for single spaces that are the result of
      * cut-n-pasting on Linux.  If there is a space and a "%3A", then single spaces
-     * are removed.
+     * are removed.  <tt>&amp;</tt> is replaced with <tt>&</tt>.
      * @param s
      * @return
      */
@@ -73,6 +73,7 @@ public class DataSourceUtil {
                 s= s.replaceAll(" ", "");
             }
             s = URLDecoder.decode(s, "UTF-8");
+            s = s.replaceAll("\\&amp;","&");
             return s;
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
