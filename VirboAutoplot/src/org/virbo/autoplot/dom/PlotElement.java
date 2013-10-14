@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.virbo.autoplot.RenderType;
 
@@ -299,6 +300,12 @@ public class PlotElement extends DomNode {
         return controller;
     }
 
+    @Override
+    public List<DomNode> childNodes() {
+        return Collections.singletonList((DomNode)style);
+    }
+
+    
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
