@@ -297,6 +297,16 @@ public class GuiSupport {
 
     }
 
+    /**
+     * dump the data using the DataSourceFormat object.
+     * @param fds the dataset in its original form.
+     * @param dsf the data source filter.
+     * @param pe the plot element.
+     * @param format format object.
+     * @param uriOut output location, must be a local file.
+     * @param dscontrol "plotElementTrim": load the data and trim to xaxis settings. "plotElement" data processed to make visible.
+     * @throws IOException 
+     */
     private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, String dscontrol  ) throws IOException {
 
         logger.log(Level.FINE, "exporting data to {0} using format {1}", new Object[]{uriOut, format});
@@ -492,19 +502,22 @@ public class GuiSupport {
                         final QDataSet fds= ds;
                         final String uriOut= s;
 
+                        final String formatControl;
+                        if ( edp.isFormatPlotElement() ) {
+                            formatControl= "plotElement";
+                        } else if ( edp.isFormatPlotElementAndTrim() ) {
+                            formatControl= "plotElementTrim";
+                        } else if ( edp.isOriginalData() ) {
+                            formatControl= "dataSourceFilter";
+                        } else {
+                            JOptionPane.showMessageDialog(parent, "Selected data cannot be exported to this format " + ext );
+                            return;
+                        }
+                        
                         Runnable run= new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    String formatControl;
-                                    if ( edp.isFormatPlotElement() ) {
-                                        formatControl= "plotElement";
-                                    } else if ( edp.isFormatPlotElementAndTrim() ) {
-                                        formatControl= "plotElementTrim";
-                                    } else {
-                                        formatControl= "dataSourceFilter";
-                                    }
-
                                     doDumpData( fds,dsf,pe,format,uriOut,formatControl );
                                 } catch ( IOException ex ) {
                                     parent.applicationModel.getExceptionHandler().handle(ex);
