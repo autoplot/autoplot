@@ -67,8 +67,12 @@ public class ExportDataPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * return the processed data within the plot element.
+     * @return 
+     */
     public boolean isFormatPlotElement() {
-        return processedDataB.isSelected();
+        return processedDataB.isSelected() && processedWithinXRangeB.isEnabled();
     }
 
     /**
@@ -76,7 +80,15 @@ public class ExportDataPanel extends javax.swing.JPanel {
      * @return
      */
     public boolean isFormatPlotElementAndTrim() {
-        return processedWithinXRangeB.isSelected();
+        return processedWithinXRangeB.isSelected() && processedWithinXRangeB.isEnabled();
+    }
+    
+    /**
+     * format the original data for the plot element.
+     * @return
+     */    
+    public boolean isOriginalData() {
+        return originalDataB.isSelected() && originalDataB.isEnabled();
     }
 
     /** This method is called from within the constructor to
