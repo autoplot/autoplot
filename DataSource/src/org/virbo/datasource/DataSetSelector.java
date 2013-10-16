@@ -103,7 +103,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 keyModifiers= e.getModifiers();
                 
@@ -114,11 +114,11 @@ public class DataSetSelector extends javax.swing.JPanel {
         addAbouts();
         
         maybePlotTimer = new Timer(100, new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 // some DataSource constructors do not return in interactive time, so create a new thread for now.
                 Runnable run = new Runnable() {
-
+                    @Override
                     public void run() {
                         try {
                             maybePlotImmediately();
@@ -499,6 +499,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             r.add( new JLabel( msg ) );
             JPanel se= new JPanel( new BorderLayout() );
             se.add( new JButton( new AbstractAction("View Page") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DataSourceUtil.openBrowser(link);
                 }
@@ -562,7 +563,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
         boolean wasRejected= false;
-        DataSourceEditorPanel edit = null;
+        DataSourceEditorPanel edit;
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
             if ( edit!=null && edit.reject(surl) ) {
@@ -606,6 +607,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
             
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     String surl= fsurl;
                     if ( timeRange!=null && UnitsUtil.isTimeLocation(timeRange.getUnits()) ) {
@@ -664,6 +666,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     final String fsurl= surl;
 
                     Runnable run= new Runnable() {
+                        @Override
                         public void run() {
                             DataSourceEditorDialog dialog;
 
@@ -699,7 +702,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         tsb.setURI(surl);
                                         DatumRange timeRangeNew= tsb.getTimeRange();
                                         if ( !timeRangeNew.equals(timeRange) ) {
-                                            logger.fine("resetting timerange to "+timeRangeNew);
+                                            logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
                                             timeRange= timeRangeNew;
                                         }
                                     } catch (ParseException ex) {
@@ -863,7 +866,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showCompletionsGui( final String labelPrefix, List<CompletionResult> completions ) {
 
         CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
-
+            @Override
             public void itemSelected(CompletionResult s1) {
                 if ( s1==CompletionResult.SEPARATOR ) return; // this was a mistake
                 //dataSetSelector.setSelectedItem(s1.completion);
@@ -881,7 +884,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         setMessage("done getting completions");
 
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 try {
                     int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
@@ -914,9 +917,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showTypesCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
-
+            @Override
             public void run() {
-
                 String labelPrefix= "";
                 List<CompletionResult> completions;
                 try {
@@ -925,9 +927,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (Exception ex) {
                     Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
-                    return;
                 }
-
                 
             }
         } );
@@ -942,11 +942,11 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showHostCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
-
+            @Override
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
-                List<CompletionResult> completions = null;
+                List<CompletionResult> completions;
 
                 URISplit split = URISplit.parse(surl);
                 String surlDir = split.path;
@@ -993,11 +993,11 @@ public class DataSetSelector extends javax.swing.JPanel {
         final int carotpos= this.editor.getCaretPosition();
         
         calcAndShowCompletions( new Runnable() {
-
+            @Override
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
-                List<CompletionResult> completions = null;
+                List<CompletionResult> completions;
 
                 String labelPrefix = surl.substring(0, carotpos);
 
@@ -1055,11 +1055,11 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
-
+            @Override
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
-                List<CompletionResult> completions = null;
+                List<CompletionResult> completions;
 
                 String labelPrefix = surl.substring(0, carotpos);
 
@@ -1133,6 +1133,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         p.add( new JLabel( msg ), BorderLayout.CENTER );
         JPanel buttons= new JPanel( );
         buttons.add( new JButton( new AbstractAction("Details...") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 FileSystem.getExceptionHandler().handle(ex);
             }
@@ -1148,7 +1149,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showFactoryCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
-
+            @Override
             public void run() {
 
                 List<DataSetURI.CompletionResult> completions2;
@@ -1202,7 +1203,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         ActionMap map = dataSetSelector.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
-
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 String context= (String) dataSetSelector.getEditor().getItem();
                 //String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
@@ -1223,7 +1224,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         });
 
         map.put("plot", new AbstractAction("plotUrl") {
-
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 setValue(getEditor().getText());
                 keyModifiers = ev.getModifiers();
@@ -1234,7 +1235,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setActionMap(map);
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dataSetSelector.setSelectedItem(tf.getText());
                 keyModifiers = e.getModifiers();
@@ -1255,10 +1256,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         needToAddKeys = false;
     }
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
-
+        @Override
         public void actionPerformed(ActionEvent e) {
             String about = DataSetSelectorSupport.getPluginsText();
-
             JOptionPane.showMessageDialog(DataSetSelector.this, about);
         }
     };
@@ -1266,7 +1266,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     public final void addAbouts() {
         final String regex = "about:(.*)";
         registerActionTrigger(regex, new AbstractAction() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String ss = DataSetSelector.this.getValue();
                 Pattern p = Pattern.compile(regex);
@@ -1438,6 +1438,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     if (FileSystemUtil.resourceExists(context)  && FileSystemUtil.resourceIsFile(context) ) {
                         if ( !FileSystemUtil.resourceIsLocal(context) ) {
                             Runnable run= new Runnable() {
+                                @Override
                                 public void run() {
                                     ProgressMonitor mon= DasProgressPanel.createFramed(
                                         SwingUtilities.getWindowAncestor(DataSetSelector.this),
@@ -1872,6 +1873,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         JMenu fontMenu= new JMenu( "Font Size" );
 
         fontMenu.add( new AbstractAction( "Big" ) {
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 Font f= getEditor().getFont();
                 int size= 16;
@@ -1883,6 +1885,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         });
 
         fontMenu.add( new AbstractAction( "Normal" ) {
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 Font f= getEditor().getFont();
                 int size= getParent().getFont().getSize();
@@ -1894,6 +1897,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         });
 
         fontMenu.add( new AbstractAction( "Small" ) {
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 Font f= getEditor().getFont();
                 int size= 8;
@@ -1909,6 +1913,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         if ( this.alternatePeerCard!=null ) {
             result.add( new JSeparator() );
             result.add( new AbstractAction( alternatePeer ) {
+                @Override
                 public void actionPerformed(ActionEvent ev) {
                     Container trp= DataSetSelector.this.getParent();
                     ((CardLayout)DataSetSelector.this.getParent().getLayout()).show( trp, alternatePeerCard );
