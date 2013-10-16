@@ -180,12 +180,12 @@ public class ScriptPanelSupport {
     }
 
     /**
-     *
-     * @param ex
+     * mark the error in the editor by looking at the python exception to get the line number.
+     * @param ex the python exception
      * @param offset line offset from beginning of file where execution began.
      * @throws javax.swing.text.BadLocationException
      */
-    private void annotateError(PyException ex, int offset) throws BadLocationException {
+    public void annotateError(PyException ex, int offset) throws BadLocationException {
         if (ex instanceof PySyntaxError) {
             logger.log(Level.SEVERE, null, ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
