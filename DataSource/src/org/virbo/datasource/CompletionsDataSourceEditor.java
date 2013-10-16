@@ -90,7 +90,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             }
         } else {
-            throw new IllegalArgumentException("we aren't in the query section");
+            //throw new IllegalArgumentException("we aren't in the query section");
         }
 
         return cc;
@@ -178,70 +178,73 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
             CompletionContext cc2= prepareContext(  ss, pos>-1 ? pos : ss.length() );
 
-            List<CompletionContext> second= getCompletions( dsf, ss, cc2, mon );
+            if ( cc2.context!=null ) {
+                List<CompletionContext> second= getCompletions( dsf, ss, cc2, mon );
 
-            List options= new ArrayList();
+                List options= new ArrayList();
 
-            String key= cc1.completable;
-            if ( key!=null ) {
-                int ii= key.indexOf("=");
-                if (ii>-1 ) key= key.substring(0,ii);
-            }
-            String val= map.get( key );
-            if ( val!=null ) {
-                //jcheckBox.setSelected(true);
-            }
+                String key= cc1.completable;
+                if ( key!=null ) {
+                    int ii= key.indexOf("=");
+                    if (ii>-1 ) key= key.substring(0,ii);
+                }
+                String val= map.get( key );
+                if ( val!=null ) {
+                    //jcheckBox.setSelected(true);
+                }
 
-            String sel= null;
-            int isel= -1;
-            String deft=null;
+                String sel= null;
+                int isel= -1;
+                String deft=null;
 
-            for ( int ii=0; ii<second.size(); ii++ ) {
-                CompletionContext cc3= second.get(ii);
-                String ss2= CompletionContext.insert( cc2, cc3 );
-                if ( cc3.completable.equals(val) ) isel= ii;
-                if ( cc3.label.startsWith( cc3.completable+":" ) ) {
-                    options.add( cc3.label );
-                } else {
-                    if ( cc3.completable.equals(cc3.label ) ) {
+                for ( int ii=0; ii<second.size(); ii++ ) {
+                    CompletionContext cc3= second.get(ii);
+                    String ss2= CompletionContext.insert( cc2, cc3 );
+                    if ( cc3.completable.equals(val) ) isel= ii;
+                    if ( cc3.label.startsWith( cc3.completable+":" ) ) {
                         options.add( cc3.label );
                     } else {
-                        options.add( cc3.completable + ": " + cc3.label );
+                        if ( cc3.completable.equals(cc3.label ) ) {
+                            options.add( cc3.label );
+                        } else {
+                            options.add( cc3.completable + ": " + cc3.label );
+                        }
+                    }
+                    if ( cc3.completable.startsWith("<double")
+                            || cc3.completable.startsWith("<int") ) {
+                        deft= "";
+                        jcheckBox.setToolTipText( ( cc1.doc!=null ? (cc1.doc+" ") : "" ) + cc3.completable );
+                    }
+
+                }
+
+                final JComboBox jopts=  new JComboBox( new Vector(options) );
+                jopts.setEditable(true);
+                optPanel.add( BorderLayout.CENTER, jopts );
+                if ( isel!=-1 ) {
+                    jopts.setSelectedIndex(isel);
+                    jcheckBox.setSelected(true);
+                } else {
+                    if ( deft!=null ) {
+                        jopts.setSelectedItem(deft);
                     }
                 }
-                if ( cc3.completable.startsWith("<double")
-                        || cc3.completable.startsWith("<int") ) {
-                    deft= "";
-                    jcheckBox.setToolTipText( ( cc1.doc!=null ? (cc1.doc+" ") : "" ) + cc3.completable );
-                }
 
+                jcheckBox.addItemListener( new ItemListener() {
+                    public void itemStateChanged(ItemEvent e) {
+                        jopts.setEnabled( jcheckBox.isSelected());
+                    }
+                } );
+                jopts.setEnabled( jcheckBox.isSelected());
+
+                opsComboBoxes.add(jopts);
+
+                optPanel.setMaximumSize( new Dimension(10000,16) );
+
+                optionsPanel.add( optPanel );
+                optionsPanel.add( Box.createVerticalStrut(8) );
             }
-
-            final JComboBox jopts=  new JComboBox( new Vector(options) );
-            jopts.setEditable(true);
-            optPanel.add( BorderLayout.CENTER, jopts );
-            if ( isel!=-1 ) {
-                jopts.setSelectedIndex(isel);
-                jcheckBox.setSelected(true);
-            } else {
-                if ( deft!=null ) {
-                    jopts.setSelectedItem(deft);
-                }
-            }
-
-            jcheckBox.addItemListener( new ItemListener() {
-                public void itemStateChanged(ItemEvent e) {
-                    jopts.setEnabled( jcheckBox.isSelected());
-                }
-            } );
-            jopts.setEnabled( jcheckBox.isSelected());
-
-            opsComboBoxes.add(jopts);
-
-            optPanel.setMaximumSize( new Dimension(10000,16) );
-
-            optionsPanel.add( optPanel );
-            optionsPanel.add( Box.createVerticalStrut(8) );
+            
         }
 
         if ( arg0.size()>0 ) {
@@ -366,7 +369,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         this.suri= uri;
-        DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(uri), mon);
+        DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), mon);
         if ( dsf==null ) {
             throw new UnrecognizedDataSourceException(uri);
         }
