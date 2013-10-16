@@ -54,6 +54,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
+import org.python.core.PySyntaxError;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -684,18 +685,29 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             Map<String,String> ffparams= new HashMap( params );
 
             if ( furir[1]!=null ) ffparams.put( "resourceURI", furir[1] );
-            hasVariables= doVariables( f,ffparams );
-
-            if ( hasVariables ) {
-                tearoffTabbedPane1.setSelectedIndex(1);
-            }
-
+            
             support.loadFile(f);
 
             if ( FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), support.getFile() ) || !support.getFile().canWrite() ) {
                 support.setReadOnly();
             }
 
+            try {
+                hasVariables= doVariables( f,ffparams );
+            } catch ( PyException e ) {
+                hasVariables= false;
+                try {
+                    support.annotateError( e,0 );
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                paramsPanel.add( new JLabel("<html>Script contains errors.</html>") );
+            }
+
+            if ( hasVariables ) {
+                tearoffTabbedPane1.setSelectedIndex(1);
+            }
+            
             List<String> errs= new ArrayList();
             if ( JythonUtil.pythonLint( f.toURI(), errs) ) {
                 EditorAnnotationsSupport esa= textArea.getEditorAnnotationsSupport();
