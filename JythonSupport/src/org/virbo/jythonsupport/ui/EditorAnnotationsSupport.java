@@ -173,6 +173,14 @@ public class EditorAnnotationsSupport {
         } );
     }
 
+    /**
+     * 
+     * @param i0 char offset for the beginning
+     * @param i1 char offset for the end.
+     * @param name ANNO_WARNING, ANNO_ERROR, ANNO_PROGRAM_COUNTER
+     * @param text text to further explain
+     * @param interp allow for further queries by resetting the interpreter.
+     */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
