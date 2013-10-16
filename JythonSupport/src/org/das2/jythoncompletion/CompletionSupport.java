@@ -241,7 +241,11 @@ public class CompletionSupport {
                     return null;
                 }
             } else if ( tokens.get(0).kind==PythonGrammarConstants.NAME ) {
-                return new CompletionContext( CompletionContext.DEFAULT_NAME, null, completable );
+                if ( tokens.size()==3 ) {
+                    return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
+                } else {
+                    return new CompletionContext( CompletionContext.DEFAULT_NAME, null, completable );
+                }
             }
         }
         
