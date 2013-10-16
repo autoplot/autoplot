@@ -35,20 +35,16 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         List<CompletionContext> result= new ArrayList();
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            if ( cc.completable.length()==0 ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "", "enter at least one character" ) );
-            } else {
-                PythonInterpreter interp = JythonUtil.createInterpreter(false);
-                URL imports = JythonOps.class.getResource("imports.py");
-                interp.execfile(imports.openStream());
-                String frag= cc.completable;
-                org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
-                List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
-                
-                for ( DefaultCompletionItem item: r ) {
-                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, item.getComplete() ) );
-                }   
-            }
+            PythonInterpreter interp = JythonUtil.createInterpreter(false);
+            URL imports = JythonOps.class.getResource("imports.py");
+            interp.execfile(imports.openStream());
+            String frag= cc.completable;
+            org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
+            List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
+
+            for ( DefaultCompletionItem item: r ) {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, item.getComplete(), this, "arg_0" ) );
+            }   
         }
         
         return result;
