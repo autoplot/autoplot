@@ -72,7 +72,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.OrbitDatumRange;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
