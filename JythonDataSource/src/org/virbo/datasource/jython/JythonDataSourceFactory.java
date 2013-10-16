@@ -215,6 +215,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         } catch ( IOException ex ) {
             problems.add(ex.toString());
             return true;
+        } catch ( PyException ex ) {
+            problems.add(ex.toString());
+            return true;            
         }
         
         if (surl.contains("?")) {
