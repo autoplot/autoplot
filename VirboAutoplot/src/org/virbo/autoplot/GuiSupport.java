@@ -122,7 +122,7 @@ import org.xml.sax.SAXException;
  */
 public class GuiSupport {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.guisupport");
 
     AutoplotUI parent;
 
@@ -338,25 +338,33 @@ public class GuiSupport {
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
                     //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                    long t0= System.currentTimeMillis();
                     if ( SemanticOps.isRank2Waveform(dsout) ) {
                         dsout= DataSetOps.flattenWaveform(dsout);
-                        //dsout= ArrayDataSet.copy( short.class, dsout );
+                        //dsout= ArrayDataSet.copy( dsout );
                     }
                     dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
+                    logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
                 } else {
-                    if ( SemanticOps.isRank2Waveform(dsout) ) {
+                    long t0= System.currentTimeMillis();
+                    if ( SemanticOps.isRank2Waveform(dsout) ) { // TODO: rough trim first, then precise trim would be much faster.
                         dsout= DataSetOps.flattenWaveform(dsout);
-                        dsout= ArrayDataSet.copy( short.class, dsout );
+                        //dsout= ArrayDataSet.copy( dsout );
                     }
                     dsout= SemanticOps.trim( dsout, xbounds, null );
                     format.formatData( uriOut, dsout, mon );
+                    logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
                 }
             } else if ( dscontrol.equals("plotElement") ) {
+                long t0= System.currentTimeMillis();
                 QDataSet dsout=  pe.getController().getDataSet();
                 format.formatData( uriOut, dsout, mon );
+                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
             } else {
+                long t0= System.currentTimeMillis();
                 format.formatData( uriOut, ds, mon );
+                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
             }
             parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
         } catch ( IllegalArgumentException ex ) {
