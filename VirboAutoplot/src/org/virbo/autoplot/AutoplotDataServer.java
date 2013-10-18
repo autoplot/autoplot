@@ -59,6 +59,109 @@ public class AutoplotDataServer {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
+    private static void doService( String timeRange, String suri, String step, boolean stream, String format, ProgressMonitor mon, final PrintStream out, boolean ascii, Set outEmpty ) throws Exception {
+        
+        long t0= System.currentTimeMillis();
+
+        QDataSet ds;
+
+        boolean someValid= false;
+
+        if (!timeRange.equals("")) {
+            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange ):");
+            logger.log(Level.FINE, "   suri={0}", suri);
+            logger.log(Level.FINE, "   timeRange={0}", timeRange);
+
+            DatumRange outer= DatumRangeUtil.parseTimeRange(timeRange);
+            
+            // see if there's a "native" step size to be aware of.  There's no way to do this the existing TSB capability, so we kludge for it to support RBSP at U. Iowa.
+            DataSource dss= DataSetURI.getDataSource(suri);
+            TimeSeriesBrowse tsb= dss.getCapability(TimeSeriesBrowse.class);
+            if ( tsb!=null && suri.contains("$H") ) {
+                step= "3600s";
+            }
+            
+            Datum first= TimeUtil.prevMidnight( outer.min() );
+            Datum next= first.add( Units.seconds.parse(step) );
+
+            List<DatumRange> drs;
+            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) ) {
+                drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
+            } else {
+                // dat xls cannot stream...
+                drs= Collections.singletonList(outer);
+            }
+
+            int i=0;
+            mon.setTaskSize(10*drs.size());
+
+            mon.setTaskProgress( 5 );
+            for ( DatumRange dr: drs ) {
+                logger.log( Level.FINER, "time at read start read of {0}= {1}", new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
+
+                //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
+                //TODO: find a way to test for this and give a good error message.
+                logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
+                QDataSet ds1= null;
+                try {
+                    ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                } catch ( Exception ex ) {
+                    logger.log( Level.WARNING, "execption when trying to read "+dr, ex ); 
+                }
+                logger.log( Level.FINE, "  --> {0} )", ds1 );
+                if ( ds1!=null ) {
+                    if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
+                        logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
+                        ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                        logger.log( Level.FINE, "  --> {0} )", ds1 );
+                        writeData( format, out, ds1, ascii );
+                        someValid= true;
+                        break;
+                    }
+                    if ( ds1.rank()==1 ) {
+                        QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
+                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, xrange});
+                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
+                    } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
+                        QDataSet range= DataSetOps.dependBounds( ds1 );
+                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
+                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
+                    }
+                    writeData( format, out, ds1, ascii );
+                    outEmpty.add("out is no longer empty");
+                    someValid= true;
+                }
+                i++;
+                mon.setTaskProgress(i*10);
+                logger.log( Level.FINER, "time at write to output channel {0}= {1}\n",  new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
+
+            }
+            mon.finished();
+
+        } else {
+            // TODO: consider the virtue of allowing this, where a timerange is not specified.
+            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
+            logger.log( Level.FINE, "   suri={0}\n", suri );
+
+            ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
+            logger.log(Level.FINE, "loaded ds={0}", ds);
+            
+            if ( ds!=null ) {
+                writeData( format, out, ds, false );
+                someValid= true;
+            }
+        }
+
+        logger.log( Level.FINE, "time done read all= {0}", System.currentTimeMillis()-t0 );
+
+        if ( !someValid ) {
+             if ( format.equals(FORM_D2S) ) {
+                 String s= String.format( "<exception message='%s'/>\n", "no data found" );
+                 out.printf( String.format( "[00]%06d%s", s.length(), s ) );
+             }
+        }
+    }
+
     public AutoplotDataServer() {
         throw new IllegalArgumentException("AutoplotDataServer should not be instantiated");
     }
@@ -165,8 +268,6 @@ public class AutoplotDataServer {
     }
 
     public static void main(String[] args) throws Exception {
-
-        long t0= System.currentTimeMillis();
 
         System.err.println("org.virbo.autoplot.AutoplotDataServer 20130110 (Autoplot version " + APSplash.getVersion() + ")" );
 
@@ -280,104 +381,7 @@ public class AutoplotDataServer {
             logger.fine("no progress available because output is not d2s stream");
         }
         
-        QDataSet ds;
-
-        boolean someValid= false;
-
-        logger.log( Level.FINE, "time read args and prep={0}", ((System.currentTimeMillis() - t0)));
-
-        if (!timeRange.equals("")) {
-            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange ):");
-            logger.log(Level.FINE, "   suri={0}", suri);
-            logger.log(Level.FINE, "   timeRange={0}", timeRange);
-
-            DatumRange outer= DatumRangeUtil.parseTimeRange(timeRange);
-            
-            // see if there's a "native" step size to be aware of.  There's no way to do this the existing TSB capability, so we kludge for it to support RBSP at U. Iowa.
-            DataSource dss= DataSetURI.getDataSource(suri);
-            TimeSeriesBrowse tsb= dss.getCapability(TimeSeriesBrowse.class);
-            if ( tsb!=null && suri.contains("$H") ) {
-                step= "3600s";
-            }
-            
-            Datum first= TimeUtil.prevMidnight( outer.min() );
-            Datum next= first.add( Units.seconds.parse(step) );
-
-            List<DatumRange> drs;
-            if ( stream && ( format.equals(FORM_D2S) || format.equals(FORM_QDS) ) ) {
-                drs= DatumRangeUtil.generateList( outer, new DatumRange( first, next ) );
-            } else {
-                // dat xls cannot stream...
-                drs= Collections.singletonList(outer);
-            }
-
-            int i=0;
-            mon.setTaskSize(10*drs.size());
-
-            mon.setTaskProgress( 5 );
-            for ( DatumRange dr: drs ) {
-                logger.log( Level.FINER, "time at read start read of {0}= {1}", new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
-
-                //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
-                //TODO: find a way to test for this and give a good error message.
-                logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
-                QDataSet ds1= null;
-                try {
-                    ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
-                } catch ( Exception ex ) {
-                    logger.log( Level.WARNING, "execption when trying to read "+dr, ex ); 
-                }
-                logger.log( Level.FINE, "  --> {0} )", ds1 );
-                if ( ds1!=null ) {
-                    if ( !SemanticOps.isTimeSeries(ds1) ) { //automatically fall back to -nostream
-                        logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
-                        ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
-                        logger.log( Level.FINE, "  --> {0} )", ds1 );
-                        writeData( format, out, ds1, ascii );
-                        someValid= true;
-                        break;
-                    }
-                    if ( ds1.rank()==1 ) {
-                        QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
-                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, xrange});
-                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
-                    } else if ( ds1.rank()==2 || ds1.rank()==3 ) {
-                        QDataSet range= DataSetOps.dependBounds( ds1 );
-                        logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
-                        logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
-                    }
-                    writeData( format, out, ds1, ascii );
-                    outEmpty.add("out is no longer empty");
-                    someValid= true;
-                }
-                i++;
-                mon.setTaskProgress(i*10);
-                logger.log( Level.FINER, "time at write to output channel {0}= {1}\n",  new Object[] { dr.toString(), System.currentTimeMillis()-t0 } );
-
-            }
-            mon.finished();
-
-        } else {
-            // TODO: consider the virtue of allowing this, where a timerange is not specified.
-            logger.fine("org.virbo.jythonsupport.Util.getDataSet( suri ):");
-            logger.log( Level.FINE, "   suri={0}\n", suri );
-
-            ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
-            logger.log(Level.FINE, "loaded ds={0}", ds);
-            
-            if ( ds!=null ) {
-                writeData( format, out, ds, false );
-                someValid= true;
-            }
-        }
-
-        logger.log( Level.FINE, "time done read all= {0}", System.currentTimeMillis()-t0 );
-
-        if ( !someValid ) {
-             if ( format.equals(FORM_D2S) ) {
-                 out.printf("[00]%06d<exception message='%s'/>\n", outfile.length() + 32, "no data found" );
-             }
-        }
+        doService( timeRange, suri, step, stream, format, mon, out, ascii, outEmpty );
         
         if ( !alm.getBooleanValue("noexit") ) System.exit(0); else return;
 
