@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>vap+inline data source used to mark a time.</small></p>
+        <p><small>Happy Fall!</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,10 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>      
+            <li>rte_0530313353: script window shows error locations again</li>
+            <li>minor correction to completions in script editor when no characters constrain."x=&lt;COMP&gt;" </li>
+            <li>export to .wav would truncate data to ints before rescaling</li>
+            <li>harmless warnings caused by failed find style node cleaned up</li>
             <li>1076: width=0 causes runtime error dialog (this is probably fixed, I couldn't demo the bug)</li>
             <li>rte_0956688396: ArrayIndexOutOfBounds with reset zoom</li> 
             <li>rte_1219433822: Runtime error with export data when no option can be selected but "okay" is pressed.</li>
@@ -62,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>createPngWalk command line now returns success/fail exit codes</li>
             <li>experimental "now" allowed in timeranges like "2001-01-01/now"</li>
             <li>DataSetAnnotations allows us to cache repeat operations more easily</li>
             <li>rfe 327: pngwalks from event lists</li>
