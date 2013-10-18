@@ -30,6 +30,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ArgumentList;
+import org.das2.util.ExceptionHandler;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -207,6 +208,8 @@ public class CreatePngWalk {
         return image;
     }
 
+    private static boolean didFail= false;
+    
     /**
      * run the pngwalk for the list of times.  The dom argument is copied so the
      * scientist can continue working while the pngwalk is run.
@@ -214,11 +217,14 @@ public class CreatePngWalk {
      * @param readOnlyDom the dom to render for each time.
      * @param params outputFolder and spec.
      * @param mon progress monitor to provide feedback about the run.
+     * @return 0 if any were successful, nonzero otherwise.
      * @throws IOException
      * @throws InterruptedException 
      */
-    public static void doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
+    public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
 
+        boolean allFail= true;
+        
         logger.log( Level.CONFIG, "CreatePngWalk.doBatch with params {0}", params);
         if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
             params.outputFolder= params.outputFolder + "/";
@@ -331,8 +337,24 @@ public class CreatePngWalk {
 
         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
 
+        
+        appmodel.setExceptionHandler( new ExceptionHandler() {
+            @Override
+            public void handle(Throwable t) {
+                t.printStackTrace();
+                didFail= true;
+            }
+            @Override
+            public void handleUncaught(Throwable t) {
+                t.printStackTrace();
+                didFail= true;
+            }
+        });
+        
         for ( String atime : times ) {
 
+            didFail= false;
+            
             int ic= atime.indexOf(": ");
             String exactTime= null; 
             if ( ic>-1 ) { // rfe batchfile time.
@@ -395,6 +417,10 @@ public class CreatePngWalk {
             
             BufferedImage image = myWriteToPng( filename, appmodel, dom2, w0, h0);
 
+            if ( !didFail ) {
+                allFail= false;
+            }
+            
             if (params.createThumbs) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
@@ -425,6 +451,8 @@ public class CreatePngWalk {
             mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec)", imagesPerSec));
         }
         mon.finished();
+        
+        return allFail ? 1 : 0;
     }
 
     /**
@@ -437,7 +465,9 @@ public class CreatePngWalk {
      * @throws IOException
      * @throws InterruptedException 
      */
-    public static void doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
+    public static int doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
+        int status= 0;
+        
         if (params == null) {
 
             CreatePngWalkDialog p = new CreatePngWalkDialog();
@@ -464,12 +494,12 @@ public class CreatePngWalk {
                 TimeParser tp= TimeParser.create(params.timeFormat);
                 if ( !tp.isNested() ) {
                     JOptionPane.showMessageDialog( ScriptContext.getViewWindow(), "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not "+params.timeFormat + " ." );
-                    return;
+                    return -1;
                 }
 
                 String[] times = getListOfTimes( params );
 
-                doBatch( times, dom, params, mon );
+                status= doBatch( times, dom, params, mon );
 
                 String url;
                 if (!mon.isCancelled()) {
@@ -507,10 +537,10 @@ public class CreatePngWalk {
                 mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
             }
 
-            doBatch(times, dom, params, mon);
+            status= doBatch(times, dom, params, mon);
 
         }
-
+        return status;
     }
 
     /**
@@ -562,8 +592,8 @@ public class CreatePngWalk {
         String vap= alm.getValue("vap");
         ScriptContext.plot(vap);
 
-        doIt( ScriptContext.getDocumentModel(), params );
+        int status= doIt( ScriptContext.getDocumentModel(), params );
 
-        System.exit(0); // something starts up thread that prevents java from exiting.
+        System.exit(status); // something starts up thread that prevents java from exiting.
     }
 }
