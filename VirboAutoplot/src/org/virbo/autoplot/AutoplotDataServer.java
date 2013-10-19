@@ -59,7 +59,20 @@ public class AutoplotDataServer {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.server");
 
-    private static void doService( String timeRange, String suri, String step, boolean stream, String format, ProgressMonitor mon, final PrintStream out, boolean ascii, Set outEmpty ) throws Exception {
+    /**
+     * Perform the data service.
+     * @param timeRange the time range to send out, such as "May 2003"
+     * @param suri the data source to read in.  If this has TimeSeriesBrowse, then we can stream the data.
+     * @param step step size, such as "24 hr" or "3600s".  If the URI contains $H, "3600s" is used.
+     * @param stream if true, send data out the as it is read.
+     * @param format FORM_QDS, FORM_D2S
+     * @param mon progress monitor to monitor the stream.
+     * @param out 
+     * @param ascii if true, use ascii types for qstreams and das2streams.
+     * @param outEmpty for the streaming library, so we don't put progress out until we've output the initial header.
+     * @throws Exception 
+     */
+    public static void doService( String timeRange, String suri, String step, boolean stream, String format, final PrintStream out, boolean ascii, Set outEmpty, ProgressMonitor mon ) throws Exception {
         
         long t0= System.currentTimeMillis();
 
@@ -381,7 +394,7 @@ public class AutoplotDataServer {
             logger.fine("no progress available because output is not d2s stream");
         }
         
-        doService( timeRange, suri, step, stream, format, mon, out, ascii, outEmpty );
+        doService( timeRange, suri, step, stream, format,out, ascii, outEmpty, mon );
         
         if ( !alm.getBooleanValue("noexit") ) System.exit(0); else return;
 
