@@ -12,6 +12,7 @@ import org.das2.datum.DatumUtil;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsConverter;
 import static org.das2.datum.DatumRangeUtil.*;
+import org.das2.datum.TimeUtil;
 
 /**
  * Tests of time parsing.  A little testing appears in Test019, but this
@@ -162,6 +163,16 @@ public class Test026 {
 
             testTimeRangeFormatParse(); // these are tests that used to be in test009.
 
+            Datum now= TimeUtil.now();
+            System.err.println("now= "+now );
+            int micros= 60000000;
+            doTest(40, "P1D", new DatumRange( now.subtract(1,Units.days), now ).toString(), micros );
+            doTest(41, "PT1H", new DatumRange( now.subtract(1,Units.hours), now ).toString(), micros );
+            doTest(42, "orbit:rbspa-pp:403", "2013-01-27T18:58:17.392Z to 2013-01-28T03:57:01.358Z", micros );
+            doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros );
+            doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1,Units.days), micros );
+            doTest(45, "now-P10D/now-P1D", new DatumRange( now.subtract(10,Units.days), now.subtract(1,Units.days) ).toString(), micros );
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
