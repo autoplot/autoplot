@@ -20,6 +20,8 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -230,7 +232,9 @@ public class EditorAnnotationsSupport {
             String eval= editorPanel.getSelectedText();
             if ( interp!=null ) {
                 try {
-                    String peek= interp.eval(eval).toString();
+                    PyObject po= interp.eval(eval);
+                    String peek;
+                    peek= String.valueOf( po.__str__() );
                     return peek;
                 } catch ( Exception ex ) {
                     return ""+ex.toString();
