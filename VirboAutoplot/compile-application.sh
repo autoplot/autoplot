@@ -132,7 +132,7 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-volatile-src/MANIFEST.MF
+printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA
