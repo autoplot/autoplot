@@ -1456,6 +1456,7 @@ public class DataSourceController extends DomNodeController {
     private static String addHtmlBreaks( String message ) {
         if ( message.startsWith("<html>") ) return message;
         String[] ss= message.split(": ");
+        if ( ss.length==1 ) return message;
         StringBuilder result= new StringBuilder("<html>");
         result.append( ss[0] );
         for ( int i=1; i<ss.length; i++ ) {
