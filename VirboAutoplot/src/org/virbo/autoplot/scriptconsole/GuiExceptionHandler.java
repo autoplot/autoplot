@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.Thread.State;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -475,6 +477,35 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     }
 
+    /**
+     * format thread states and stack traces.
+     * @param doc
+     * @param parent 
+     */
+    private void formatThreads( Document doc, Element parent ) {
+        Element ele= doc.createElement("threads");
+        Map<Thread,StackTraceElement[]> threads= Thread.getAllStackTraces();
+        for ( Entry<Thread,StackTraceElement[]> ent: threads.entrySet() ) {
+            Thread thread= ent.getKey();
+            if ( thread.getName().matches("RequestProcessor\\[\\d+\\]") && thread.getState()==State.WAITING ) {
+                continue;
+            }
+            Element ele1= doc.createElement("thread");
+            ele1.setAttribute( "name", thread.getName() );
+            ele1.setAttribute( "state", thread.getState().toString() );
+            Element ste= doc.createElement("stackTrace");
+            ele1.appendChild( ste );
+            StackTraceElement[] st= ent.getValue();
+            StringBuilder b= new StringBuilder();
+            for ( int i=0; i<st.length; i++ ) {
+                b.append( st[i].toString() ).append("\n");
+            }
+            ste.appendChild( doc.createTextNode( b.toString() ) );
+            ele.appendChild(ele1);
+        }
+        parent.appendChild(ele);
+    }
+    
     private void formatUndos( Document doc, Element parent, UndoRedoSupport undo ) {
         Element ele= doc.createElement("states");
         for ( int i= undo.getDepth()-1; i>0; i-- ) {
@@ -560,6 +591,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                 }
 
+                formatThreads(doc,e);
+                
                 if ( undoRedoSupport!=null ) {
                     formatUndos( doc, e, undoRedoSupport );
                 }
