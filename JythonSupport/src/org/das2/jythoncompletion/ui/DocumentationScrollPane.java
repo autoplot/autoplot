@@ -46,6 +46,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -243,6 +245,9 @@ public class DocumentationScrollPane extends JScrollPane {
         } else if (url != null) {
             try {
                 view.setPage(url);
+                if ( view.getDocument().getLength()==0 ) { // tested on a mac
+                    view.setText("Unable to load "+url );
+                }
             } catch ( java.net.UnknownHostException ioe ) {
                 view.setContent( ioe.toString(), null );
             } catch ( FileNotFoundException ex ) {
