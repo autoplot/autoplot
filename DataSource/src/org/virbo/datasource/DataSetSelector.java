@@ -466,6 +466,21 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     /**
+     * there are two places in the code where FileNotFound messages 
+     * are passed in with just the file name.  
+     * @param s
+     * @return 
+     */
+    public static String maybeAddFileNotFound( String msg ) {
+        if ( msg.startsWith("file:/") || msg.startsWith("http://") || msg.startsWith("https://" ) ) {  
+            msg= FILE_NOT_FOUND + ": "+msg;
+        }
+        return msg;
+    }
+    
+    public static final String FILE_NOT_FOUND= "File not found";
+    
+    /**
      * Some exceptions can be handled by the user, and the error needs to be 
      * communicated to them.  Typically this is going to present a friendlier
      * dialog to the user instead of the catch-all Runtime Exception Dialog.
@@ -478,18 +493,19 @@ public class DataSetSelector extends javax.swing.JPanel {
         msg= msg.trim();
         if ( msg==null ) msg="";
         if ( ex instanceof FileNotFoundException && msg.length()==0 ) {
-            msg= "File not found"; // this may never happen, but to be sure...
+            msg= FILE_NOT_FOUND; // this may never happen, but to be sure...
         }
         if ( ( ex instanceof FileNotFoundException
                 || ex.toString().contains("file not found")
                 || ex.toString().contains("root does not exist") )
               && msg.length()>0 ) {
-            if ( msg.startsWith("File not found: ") ) {
+            msg= maybeAddFileNotFound(msg);
+            setMessage(msg);
+            if ( msg.startsWith( FILE_NOT_FOUND + ": ") ) {
                 String[] ss= msg.split(":",2);
                 msg= "<html>"+ss[0]+":<br>"+ss[1]+"</html>";
             }
             JOptionPane.showMessageDialog( DataSetSelector.this, msg, "No Such File", JOptionPane.WARNING_MESSAGE );
-            setMessage("" + ex.getMessage());
             return true;
         } else if ( ex instanceof HtmlResponseIOException ) {
             JPanel r= new javax.swing.JPanel( new BorderLayout() );
