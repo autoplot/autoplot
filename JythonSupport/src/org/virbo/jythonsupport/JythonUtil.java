@@ -370,7 +370,7 @@ public class JythonUtil {
      }
      
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
-     private static String[] okay= new String[] { "getParam,", "lower,", "upper," };
+     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper," };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
