@@ -35,6 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import org.autoplot.help.AutoplotHelpSystem;
+import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -59,6 +60,7 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= Logger.getLogger("apdss.ascii");
     AsciiTableTableModel model;
     Map<Integer, String> columns;
     AsciiParser parser;
@@ -853,6 +855,15 @@ private void guessTimeFormatButtonAP( ) {
     int curr= TimeUtil.YEAR;
     StringBuilder template= new StringBuilder();
     boolean giveUp= false;
+    if ( ss.length==1 ) {
+        try {
+            String s= TimeParser.iso8601String(ss[0]);
+            timeFormatTextField.setText("ISO8601");
+            return;
+        } catch ( IllegalArgumentException ex ) {
+            logger.fine( "time does not appear to be iso8601" );
+        }
+    }
     for ( int i=0; i<ss.length; i++ ) {
         String s= ss[i];
         boolean isInt= true;
@@ -1174,7 +1185,11 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         setParam( params, "label", labelTextField.getText() );
         setParam( params, "units", unitsTF.getText() );
         setParam( params, "depend0Units", depend0unitsTF.getText() );
-        setParam( params, "timeFormat", timeFormatTextField.getText() );
+        if ( !timeFormatTextField.getText().equals("ISO8601") ) {
+            setParam( params, "timeFormat", timeFormatTextField.getText() );
+        } else {
+            params.remove("timeFormat");
+        }
         setParam( params, "fill", fillValueTextField.getText() );
         setParam( params, "validMin", validMinTextField.getText() );
         setParam( params, "validMax", validMaxTextField.getText() );
