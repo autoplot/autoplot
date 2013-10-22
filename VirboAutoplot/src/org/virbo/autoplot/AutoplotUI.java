@@ -355,7 +355,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 }
             }
         };
-        new Thread(checkStatusRunnable).start();
+        new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
                 
         referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
         
