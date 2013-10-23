@@ -18,6 +18,7 @@ import org.das2.util.DasProgressMonitorInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -185,6 +186,8 @@ class Das2ServerDataSource extends AbstractDataSource {
                 String dsdfURL= this.resourceURI + "?server=dsdf&dataset=" + dataset;
                 URL url3= new URL( dsdfURL );
                 logger.log(Level.FINE, "opening {0}", url3);
+                //URLConnection c= url3.openConnection();
+                //c.setRequestProperty( "User-agent", "" );
                 InputStream in = url3.openStream();
 
                 ReadableByteChannel channel = Channels.newChannel(in);
