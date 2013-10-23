@@ -277,6 +277,11 @@ public class DataSetSelector extends javax.swing.JPanel {
             return;
         }
 
+        if ( surl.contains(".vap&") && !surl.contains("?") ) {
+            JOptionPane.showMessageDialog( getEditor(), "URI contains \".vap&\" and no ?, try \".vap?\"..." );
+            return;
+        }
+        
         URISplit split= URISplit.parse(surl);
 
         String file= split.file;
@@ -786,6 +791,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
     
     private void showCompletions(String surl1, int carotpos1) {
+        logger.log(Level.FINE, "showCompletions({0},{1})", new Object[]{surl1, carotpos1});
         String surl2= surl1.trim();
         int off= surl1.indexOf(surl2);
         String surl= surl2;
@@ -1069,6 +1075,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
+        logger.log(Level.FINE, "entering showFileSystemCompletions({0},{1})", new Object[]{surl, carotpos});
         calcAndShowCompletions( new Runnable() {
             @Override
             public void run() {
@@ -1162,6 +1169,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * get the completions from the plug-in factory..
      */
     private void showFactoryCompletions(final String surl, final int carotpos) {
+        logger.log(Level.FINE, "entering showFactoryCompletions({0},{1})", new Object[]{surl, carotpos});
 
         calcAndShowCompletions( new Runnable() {
             @Override
