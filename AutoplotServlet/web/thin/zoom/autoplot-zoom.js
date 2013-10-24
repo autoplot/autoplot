@@ -99,7 +99,7 @@ function centerFocus() {
     if ( typeof center==="undefined" ) {
         $("#info").html('click on the plot to set focus position');
     } else {
-        sdatax= $('textarea#xclick').val();
+        sdatax= $('#xclick').val();
         $("#info" ).html(sdatax);
         datax= new Date( sdatax ).toJSON();
         center= new Date( datax ).getTime();
@@ -156,7 +156,7 @@ function clickshift(subEvent) {
 				datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
 			}
 			
-                        $("#xclick").html(datax);
+                        $("#xclick").val(datax);
 			$("#info").html('x:'+datax + ' y:'+datay );
                         //'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + 
 			found=true;
