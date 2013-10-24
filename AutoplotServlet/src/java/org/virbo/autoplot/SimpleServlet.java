@@ -7,6 +7,7 @@ package org.virbo.autoplot;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.io.File;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.FileHandler;
@@ -45,6 +47,7 @@ import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
@@ -253,8 +256,24 @@ public class SimpleServlet extends HttpServlet {
             logit("set canvas parameters", t0, uniq, debug);
 
             if (vap != null) {
-                appmodel.resetDataSetSourceURL( vap, new NullProgressMonitor() );
-                //appmodel.doOpen(new File(vap));
+                File openable = DataSetURI.getFile(vap,new NullProgressMonitor());
+                URISplit split= URISplit.parse(vap);
+                if (split.params != null) {
+                    LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
+                    if ( params.containsKey("timerange") && !params.containsKey("timeRange") ) {
+                        params.put("timeRange", params.remove("timerange") );
+                    }
+                    params.put("PWD",split.path);
+                    appmodel.doOpen(openable, params);
+                } else {
+                    LinkedHashMap<String, String> params = new LinkedHashMap();
+                    params.put("PWD",split.path);
+                    if ( stimeRange.trim().length()>0 ) {
+                        params.put( "timeRange", stimeRange );
+                    }
+                    appmodel.doOpen(openable, params);
+                }
+                //appmodel.resetDataSetSourceURL( vap, new NullProgressMonitor() );
                 logit("opened vap", t0, uniq, debug);
                 width = appmodel.dom.getCanvases(0).getWidth();
                 height = appmodel.dom.getCanvases(0).getHeight();
