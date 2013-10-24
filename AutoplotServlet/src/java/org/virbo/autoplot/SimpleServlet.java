@@ -264,6 +264,9 @@ public class SimpleServlet extends HttpServlet {
                         params.put("timeRange", params.remove("timerange") );
                     }
                     params.put("PWD",split.path);
+                    if ( stimeRange.trim().length()>0 ) {
+                        params.put( "timeRange", stimeRange );
+                    }
                     appmodel.doOpen(openable, params);
                 } else {
                     LinkedHashMap<String, String> params = new LinkedHashMap();
