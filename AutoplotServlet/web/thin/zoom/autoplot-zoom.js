@@ -227,7 +227,7 @@ function mycallback() {
 
 
 var ias;
-$('#idstatus').text("v20130709_1224");
+$('#idstatus').text("v20131024_1138");
 
 var PLOTINFO;
 
