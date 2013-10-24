@@ -31,14 +31,15 @@
             <button onclick="zoomin();">Zoom In</button>    
             
 	
-		<p><button onclick="centerFocus();">Center</button> at: <div id="info"></div></p>
-		<p>parsed url individual component: </p>
-		<pre><div id="iddates"></div></pre>
-		<pre><div id="idwidthheight"></div></pre>
-		<pre><div id="idcolumn"></div></pre>
-		<pre><div id="idrow"></div></pre>
-		<pre><div id="iddifftime"></div></pre>
-	
+            <p><button onclick="centerFocus();">Center</button> at x=<textarea id="xclick" rows="1" cols="27"></textarea></p>
+            <div id="info"></div>
+               
+		<!--<pre><div id="iddates"></div></pre> -->
+		<!--<pre><div id="idwidthheight"></div></pre>-->
+		<!--<pre><div id="idcolumn"></div></pre>-->
+		<!--<pre><div id="idrow"></div></pre>-->
+		<!--<pre><div id="iddifftime"></div></pre>-->
+                
 	<script type="text/javascript" src="js/jquery.ui.js"></script>
 	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
 	<script type="text/javascript" src="autoplot-zoom.js"></script>
@@ -67,5 +68,6 @@
 
 <a href="#" onclick="resetUrl('../../SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em');">demo1</a>
 <a href="#" onclick="resetUrl('../../SimpleServlet?url=vap%2Bdas2server%3Ahttp%3A%2F%2Femfisis.physics.uiowa.edu%2Fdas%2Fdas2Server%3Fdataset%3Drbsp%2FRBSP-A%2FHFR_spectra.dsdf%26start_time%3D2012-09-25T00%3A00%3A00.000Z%26end_time%3D2012-09-26T00%3A00%3A00.000Z');">demo2</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?vap=http://autoplot.org/data/autoplot-applet.vap');">demo3</a>
 </body>
 </html>

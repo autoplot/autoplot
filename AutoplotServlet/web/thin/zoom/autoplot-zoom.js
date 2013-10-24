@@ -41,8 +41,8 @@ function echoImgUrl() {
 }
 
 function echoGraphParams() {
-    $('#iddates').text('StartDate = ' + PLOTINFO.plots[0].xaxis.min + ' ,    ' + 'EndDate = ' + PLOTINFO.plots[0].xaxis.max );
-    $('#idwidthheight').text('');
+    //$('#iddates').text('StartDate = ' + PLOTINFO.plots[0].xaxis.min + ' ,    ' + 'EndDate = ' + PLOTINFO.plots[0].xaxis.max );
+    //$('#idwidthheight').text('');
 }
 
 /**
@@ -99,6 +99,10 @@ function centerFocus() {
     if ( typeof center==="undefined" ) {
         $("#info").html('click on the plot to set focus position');
     } else {
+        sdatax= $('textarea#xclick').val();
+        $("#info" ).html(sdatax);
+        datax= new Date( sdatax ).toJSON();
+        center= new Date( datax ).getTime();
         half= ( enddateinmilliseconds - startdateinmilliseconds ) / 2;
         setTime( center - half, center + half );
     }
@@ -115,7 +119,6 @@ function clickshift(subEvent) {
 
         console.log(plotInfo);
 
-	var info = $(subEvent.target).attr("info");
 	if (plotInfo == -1) {
 		$("#info" ).html('No metadata found.');
 		return;
@@ -153,7 +156,8 @@ function clickshift(subEvent) {
 				datay= ( ( yy-p.yaxis.top ) * p.yaxis.min + ( p.yaxis.bottom - yy ) * p.yaxis.max ) / l;
 			}
 			
-			$("#info").html('x:'+datax + ' y:'+datay);
+                        $("#xclick").html(datax);
+			$("#info").html('x:'+datax + ' y:'+datay );
                         //'x:' + xx + ' y:' + yy + ' np:' + plotInfo.numberOfPlots + ' ip:'+i + 
 			found=true;
 		}
