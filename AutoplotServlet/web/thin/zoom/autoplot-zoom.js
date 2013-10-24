@@ -257,7 +257,9 @@ $(document).ready(function() {
             x1milliseconds = (selection.x1 - leftside) * msecperpx + startdateinmilliseconds; // exclude leftside margin pixels
             x2milliseconds = (selection.x2 - leftside) * msecperpx + startdateinmilliseconds; // exclude leftside margin pixels
 
-            setTime( x1milliseconds, x2milliseconds );
+            if ( selection.x2-selection.x1 > 20 ) {  // make sure it's deliberate
+                setTime( x1milliseconds, x2milliseconds );
+            }
             
         }
 
