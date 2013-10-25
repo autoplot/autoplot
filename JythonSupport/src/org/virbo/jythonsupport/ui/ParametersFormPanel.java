@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
+import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
@@ -79,6 +80,26 @@ public class ParametersFormPanel {
         ArrayList<String> deftsList;
         ArrayList<Character> typesList;
         public int count;
+        
+        /**
+         * T (TimeRange), A (String), F (Double or Integer), or R (URI)
+         */
+        public void implement( PythonInterpreter interp, String param, String value ) {
+            for ( int i=0; i<paramsList.size(); i++ ) {
+                
+                if ( paramsList.get(i).equals(param) ) {
+                   
+                    if ( typesList.get(i).equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
+                        value= "'"+value+"'";
+                    }
+                    interp.exec( String.format("params['%s']=%s", param, value ) );
+                    break;
+                }
+                
+            }
+            
+            logger.log(Level.WARNING, "unable to find variable ''{0}''", param);
+        }        
     }
     
     /**
