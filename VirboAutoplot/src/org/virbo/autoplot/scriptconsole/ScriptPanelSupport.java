@@ -454,7 +454,7 @@ public class ScriptPanelSupport {
                                         if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             ParametersFormPanel.resetVariables( fd, vars );
                                             for ( Entry<String,String> v: vars.entrySet() ) {
-                                                interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
+                                                fd.implement( interp, v.getKey(), v.getValue() );
                                             }
                                             interp.exec(panel.getEditorPanel().getText());
                                         }
