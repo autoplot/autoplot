@@ -93,7 +93,7 @@ public class ParametersFormPanel {
                         value= "'"+value+"'";
                     }
                     interp.exec( String.format("params['%s']=%s", param, value ) );
-                    break;
+                    return;
                 }
                 
             }
