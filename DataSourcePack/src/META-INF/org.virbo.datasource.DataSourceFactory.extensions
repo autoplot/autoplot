@@ -1,5 +1,5 @@
 org.virbo.ascii.AsciiTableDataSourceFactory dat txt
-org.virbo.das2Stream.Das2StreamDataSourceFactory d2s das2Stream das2stream qds
+org.virbo.das2Stream.Das2StreamDataSourceFactory d2s d2t das2Stream das2stream qds qdst
 org.virbo.spase.SpaseRecordDataSourceFactory xml
 org.autoplot.html.HtmlTableParserFactory htm
 org.autoplot.csv.CsvDataSourceFactory csv
