@@ -254,7 +254,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
             
-            boolean avail= !getParam( "avail", "F" ).equals("F");
+            boolean avail= getParam( "avail", "F" ).equals("T");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
 
             if ( avail ) {
@@ -408,9 +408,25 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
 
                     if ( reduce && lresolution!=null && ds1.rank()<3 && SemanticOps.isTimeSeries(ds1) ) {
-                        logger.info("reducing resolution to save memory");
-                        mon1.setProgressMessage("reducing resolution");
-                        ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
+                        logger.fine("reducing resolution to save memory");
+                        QDataSet dep0= (QDataSet) ds1.property(QDataSet.DEPEND_0);
+                        if ( dep0!=null ) {
+                            if ( DataSetUtil.isMonotonic(dep0) ) {
+                                mon1.setProgressMessage("trim to visible: "+lviewRange );
+                                int imin= DataSetUtil.closestIndex( dep0, lviewRange.min() );
+                                int imax= DataSetUtil.closestIndex( dep0, lviewRange.max() );
+                                imax= imax+1;
+                                if ( imin>0 || imax<ds1.length() ) {
+                                    ds1= ds1.trim(imin,imax+1);
+                                }
+                                logger.log(Level.FINER, "dataset trimmed to {0}", ds1);
+                            }
+                            mon1.setProgressMessage("reducing resolution");
+                            ds1= Reduction.reducex( ds1, DataSetUtil.asDataSet(lresolution) );
+                            logger.log(Level.FINER, "dataset reduced to {0}", ds1);
+                        } else {
+                            logger.fine("data is not time series, cannot reduce");
+                        }
                     }
 
                     if (result == null && altResult==null ) {
