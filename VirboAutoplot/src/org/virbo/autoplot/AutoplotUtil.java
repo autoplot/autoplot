@@ -1319,11 +1319,21 @@ public class AutoplotUtil {
         delta = (QDataSet) ds.property(QDataSet.DELTA_PLUS);
         if (delta != null) {
             max = Ops.add(ds, delta);
+        } else {
+            delta=  (QDataSet) ds.property(QDataSet.BIN_PLUS);
+            if ( delta!=null ) {
+                max = Ops.add(ds, delta);
+            }
         }
 
         delta = (QDataSet) ds.property(QDataSet.DELTA_MINUS);
         if (delta != null) {
             min = Ops.subtract(ds, delta);
+        } else {
+            delta=  (QDataSet) ds.property(QDataSet.BIN_MINUS);
+            if ( delta!=null ) {
+                min = Ops.subtract(ds, delta);
+            }
         }
 
         QDataSet wmin = DataSetUtil.weightsDataSet(min);
