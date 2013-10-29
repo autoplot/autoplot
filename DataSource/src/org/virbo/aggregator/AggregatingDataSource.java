@@ -157,7 +157,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
         @Override
         public void setTimeRange(DatumRange dr) {
-            viewRange = quantize(dr);
+            if ( getParam( "reduce", "F" ).equals("F") ) {
+                viewRange = quantize(dr);
+            } else {
+                viewRange = dr;
+            }
             logger.log(Level.FINE, "set timerange={0}", viewRange);
         }
 
@@ -417,7 +421,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 int imax= DataSetUtil.closestIndex( dep0, lviewRange.max() );
                                 imax= imax+1;
                                 if ( imin>0 || imax<ds1.length() ) {
-                                    ds1= ds1.trim(imin,imax+1);
+                                    ds1= ds1.trim(imin,imax);
                                 }
                                 logger.log(Level.FINER, "dataset trimmed to {0}", ds1);
                             }
