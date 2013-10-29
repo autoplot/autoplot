@@ -310,6 +310,9 @@ public class CDAWebDB {
             if ( url.startsWith("/tower3/public/pub/istp/") ) {
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/public/".length() );
             }
+            if ( url.startsWith("/tower5/public/pub/istp/") ) {
+                url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower5/public/".length() );
+            }
             if ( url.startsWith("/tower3/private/cdaw_data/cluster_private/st") ) {  //get all the cluster stuff
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/private/".length() );
             }
