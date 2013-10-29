@@ -3537,20 +3537,23 @@ APSplash.checkTime("init 210");
                     model.getDocumentModel().getOptions().setServerEnabled(true);
                 }
 
-                Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                    @Override
-                    public void uncaughtException(Thread t, Throwable e) {
-//                        logger.severe("runtime exception: " + e);
-                        logger.log(Level.SEVERE, "runtime exception: " + e, e);
+                boolean doCatchUncaughtExceptions= true; // for debugging, this can be turned off.  Note the requestProcessor system also catches exceptions.
+                if ( doCatchUncaughtExceptions ) {
+                    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                        @Override
+                        public void uncaughtException(Thread t, Throwable e) {
+    //                        logger.severe("runtime exception: " + e);
+                            logger.log(Level.SEVERE, "runtime exception: " + e, e);
 
-                        app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
-                        if (e instanceof InconvertibleUnitsException) {
-                            // do nothing!!!  this is associated with the state change
-                            return;
+                            app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
+                            if (e instanceof InconvertibleUnitsException) {
+                                // do nothing!!!  this is associated with the state change
+                                return;
+                            }
+                            model.getExceptionHandler().handleUncaught(e);
                         }
-                        model.getExceptionHandler().handleUncaught(e);
-                    }
-                });
+                    });
+                }
 
 APSplash.checkTime("init 220");
                 if ( !headless ) {
