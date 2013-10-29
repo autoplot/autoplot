@@ -34,7 +34,6 @@ import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -128,7 +127,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         addCability(TimeSeriesBrowse.class, tsb );
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
         if ( stimeRange!=null ) {
-            if ( super.params.get("timeRange")!=null && stimeRange==null ) {
+            if ( super.params.get("timeRange")!=null ) {
                 stimeRange= super.params.get("timeRange");
             }
             if ( stimeRange==null ) {
@@ -229,6 +228,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     }
     
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
@@ -381,7 +381,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     QDataSet ds1 = delegateDataSource.getDataSet(mon1);
                     if ( ds1==null ) {
                         logger.warning("delegate returned null");
-                        ds1 = delegateDataSource.getDataSet(mon1);
+                        //ds1 = delegateDataSource.getDataSet(mon1);
                         continue;
                     }
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
@@ -468,7 +468,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
                         notesBuilder.putValue(-1,2,exunits.createDatum(DataSourceUtil.getMessage(ex)).doubleValue(exunits) );
                         notesBuilder.nextRecord();
-                        ex.printStackTrace();
+                        logger.log( Level.WARNING,null,ex );
                     }
                 }
                 if (ss.length > 1) {
@@ -481,8 +481,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     List<String> problems= new ArrayList();
                     if ( !DataSetUtil.validate( result, problems) ) {
                         for ( String p: problems ) {
-                            System.err.println("problem in aggregation: "+p);
-                            logger.warning("problem in aggregation: "+p);
+                            logger.log(Level.WARNING, "problem in aggregation: {0}", p);
                         }
                     }
                 }
@@ -502,7 +501,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     dep0= (ArrayDataSet) altResult.property(QDataSet.JOIN_0);
                     QDataSet d= (QDataSet) altResult.property(QDataSet.DEPEND_0,0);
                     if ( d!=null ) dep0units= SemanticOps.getUnits(d);
-                    dep0.putProperty(QDataSet.UNITS, dep0units );
+                    if ( dep0!=null ) dep0.putProperty(QDataSet.UNITS, dep0units );
                 }
                 if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
                     dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1,reduce?lresolution:null));
