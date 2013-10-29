@@ -16,14 +16,14 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="delegatePanel" alignment="0" pref="599" max="32767" attributes="0"/>
+          <Component id="delegatePanel" alignment="0" pref="707" max="32767" attributes="0"/>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="delegatePanel" pref="260" max="32767" attributes="0"/>
+              <Component id="delegatePanel" pref="255" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -50,7 +50,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="timeRangeTextField" min="-2" pref="215" max="-2" attributes="0"/>
+                  <Component id="timeRangeTextField" min="-2" pref="247" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
@@ -65,15 +65,19 @@
                   <Component id="daysComboBox" min="-2" pref="72" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="142" max="32767" attributes="0"/>
+                  <EmptySpace pref="244" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="delegateTextField" alignment="0" pref="571" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="outerRangeTextField" pref="478" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="93" max="-2" attributes="0"/>
+                      <Component id="delegateTextField" alignment="0" pref="679" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="outerRangeTextField" pref="548" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="availabilityCB" min="-2" max="-2" attributes="0"/>
+                              <Component id="reduceCB" alignment="0" min="-2" pref="119" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -90,13 +94,19 @@
                       <Component id="timeRangeToolButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="outerRangeTextField" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="yearsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="monthsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="daysComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="outerRangeTextField" min="-2" max="-2" attributes="0"/>
+                      <Component id="reduceCB" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="yearsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="monthsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="daysComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="availabilityCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="delegateTextField" min="-2" max="-2" attributes="0"/>
@@ -212,6 +222,21 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeToolButtonActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="reduceCB">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="reduce"/>
+            <Property name="toolTipText" type="java.lang.String" value="Reduce data by averaging as it is loaded"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="availabilityCB">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="availability"/>
+            <Property name="toolTipText" type="java.lang.String" value="Show data availability instead of loading data.  This simply shows if granule files are found or not, so empty or near-empty granules still are marked as available.&#xa;"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="availabilityCBActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

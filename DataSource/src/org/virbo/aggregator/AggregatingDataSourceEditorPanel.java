@@ -99,6 +99,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         jButton3 = new javax.swing.JButton();
         delegateTextField = new javax.swing.JTextField();
         timeRangeToolButton = new javax.swing.JButton();
+        reduceCB = new javax.swing.JCheckBox();
+        availabilityCB = new javax.swing.JCheckBox();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
@@ -163,6 +165,17 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
         });
 
+        reduceCB.setText("reduce");
+        reduceCB.setToolTipText("Reduce data by averaging as it is loaded");
+
+        availabilityCB.setText("availability");
+        availabilityCB.setToolTipText("Show data availability instead of loading data.  This simply shows if granule files are found or not, so empty or near-empty granules still are marked as available.\n");
+        availabilityCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                availabilityCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -170,7 +183,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 247, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeToolButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -184,14 +197,17 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(244, Short.MAX_VALUE))
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-                        .add(93, 93, 93)))
+                    .add(delegateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(availabilityCB)
+                            .add(reduceCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 119, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -206,13 +222,17 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .add(jButton3)
                     .add(timeRangeToolButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(outerRangeTextField)
-                .add(9, 9, 9)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(yearsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(monthsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton1))
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(outerRangeTextField)
+                    .add(reduceCB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(yearsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(monthsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jButton1))
+                    .add(availabilityCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(delegateTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -222,13 +242,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -284,7 +304,12 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
     }//GEN-LAST:event_timeRangeToolButtonActionPerformed
 
+    private void availabilityCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_availabilityCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_availabilityCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox availabilityCB;
     private javax.swing.JComboBox daysComboBox;
     private javax.swing.JPanel delegatePanel;
     private javax.swing.JTextField delegateTextField;
@@ -295,6 +320,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private javax.swing.JPanel jPanel1;
     private javax.swing.JComboBox monthsComboBox;
     private javax.swing.JLabel outerRangeTextField;
+    private javax.swing.JCheckBox reduceCB;
     private javax.swing.JTextField timeRangeTextField;
     private javax.swing.JButton timeRangeToolButton;
     private javax.swing.JComboBox yearsComboBox;
@@ -512,8 +538,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
             timeRangeTextField.setText(timeRange);
 
-            //String reduce= params.get("reduce");
-            //reduceCB.setSelected( "T".equals(reduce) );
+            String reduce= params.get("reduce");
+            reduceCB.setSelected( "T".equals(reduce) );
+            
+            String avail= params.get("avail");
+            availabilityCB.setSelected( "T".equals(avail) );
 
             String delegateUrl = null;
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, null);
@@ -642,11 +671,16 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
         }
         allParams.put("timerange", tr);
-        //if ( reduceCB.isSelected() ) {
-        //    allParams.put("reduce","T"); // warning--this is going to become the default.
-        //} else {
-        //    allParams.remove("reduce");
-        //}
+        if ( reduceCB.isSelected() ) {
+            allParams.put("reduce","T"); // warning--this is going to become the default.
+        } else {
+            allParams.remove("reduce");
+        }
+        if ( availabilityCB.isSelected() ) {
+            allParams.put("avail","T"); // warning--this is going to become the default.
+        } else {
+            allParams.remove("avail");
+        }
         split.params = URISplit.formatParams(allParams);
         if ( vapScheme==null ) {
             split.vapScheme= dsplit.vapScheme;
