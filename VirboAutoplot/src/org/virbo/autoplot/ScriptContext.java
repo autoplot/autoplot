@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +44,7 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
-import org.virbo.autoplot.dom.DomNode;
+import org.das2.datum.InconvertibleUnitsException;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
@@ -56,7 +55,11 @@ import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 
 /**
- *
+ * ScriptContext provides the API to perform abstract functions with 
+ * the application.  For example, <tt>
+ *   ScriptContext.load('http://autoplot.org/data/somedata.dat')
+ *   ScriptContext.writeToPdf('/tmp/foo.pdf')
+ * </tt>
  * @author jbf
  */
 public class ScriptContext extends PyJavaInstance {
@@ -66,10 +69,31 @@ public class ScriptContext extends PyJavaInstance {
     private static ApplicationModel model = null;
     private static Application dom= null;
 
+    /**
+     * set up the uncaught exception handler for headless applications, like CreatePngWalk.
+     */
+    private static void setUpHeadlessExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                logger.log(Level.SEVERE, "runtime exception: " + e, e);
+                if (e instanceof InconvertibleUnitsException) {
+                    // do nothing!!!  this is associated with the state change.  TODO: this should probably not be here, and it should be caught elsewhere.
+                    return;
+                }
+                model.getExceptionHandler().handleUncaught(e);
+            }
+        });
+    }
+    
+    /**
+     * initialize the model and view.
+     */
     private static synchronized void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
             model.setExceptionHandler( new ExitExceptionHandler() );
+            setUpHeadlessExceptionHandler();
             model.addDasPeersToAppAndWait();
             dom= model.getDocumentModel();
         }
