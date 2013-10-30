@@ -4,23 +4,29 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.ExceptionHandler;
+import org.das2.util.LoggerManager;
 
 /**
- * Exception handler introduced for Hudson.  Prints the exception and exits.
+ * Exception handler introduced for Hudson.  (TODO: huh? Hudson?  I thought we never want to call System.exit in Hudson.)  
+ * Prints the exception and exits.
  * @author jbf
  */
 public class ExitExceptionHandler implements ExceptionHandler {
 
+    static final Logger logger= LoggerManager.getLogger("autoplot");
+    
+    @Override
     public void handle(Throwable t) {
-        System.err.println("exception occurred.");
-        t.printStackTrace();
+        logger.log( Level.WARNING, "exception occurred.", t );
         System.exit(1);  // findbugs OKAY
     }
 
+    @Override
     public void handleUncaught(Throwable t) {
-        System.err.println("uncaught exception occurred.");
-        t.printStackTrace();
+        logger.log( Level.WARNING, "uncaught exception occurred.", t );
         System.exit(1);  // findbugs OKAY
     }
 }
