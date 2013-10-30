@@ -208,7 +208,7 @@ public class CreatePngWalk {
         return image;
     }
 
-    private static boolean didFail= false;
+    private static int returnCode1= 0;
     
     /**
      * run the pngwalk for the list of times.  The dom argument is copied so the
@@ -217,13 +217,13 @@ public class CreatePngWalk {
      * @param readOnlyDom the dom to render for each time.
      * @param params outputFolder and spec.
      * @param mon progress monitor to provide feedback about the run.
-     * @return 0 if any were successful, nonzero otherwise.
+     * @return 0 if any were successful, 10 otherwise.
      * @throws IOException
      * @throws InterruptedException 
      */
     public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
 
-        boolean allFail= true;
+        int returnCodeAll= 10;
         
         logger.log( Level.CONFIG, "CreatePngWalk.doBatch with params {0}", params);
         if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
@@ -342,18 +342,18 @@ public class CreatePngWalk {
             @Override
             public void handle(Throwable t) {
                 t.printStackTrace();
-                didFail= true;
+                returnCode1= 11;
             }
             @Override
             public void handleUncaught(Throwable t) {
                 t.printStackTrace();
-                didFail= true;
+                returnCode1= 12;
             }
         });
         
         for ( String atime : times ) {
 
-            didFail= false;
+            returnCode1= 0;
             
             int ic= atime.indexOf(": ");
             String exactTime= null; 
@@ -417,8 +417,10 @@ public class CreatePngWalk {
             
             BufferedImage image = myWriteToPng( filename, appmodel, dom2, w0, h0);
 
-            if ( !didFail ) {
-                allFail= false;
+            if ( returnCode1==0 ) {
+                returnCodeAll= 0;
+            } else if ( returnCodeAll==10 ) {
+                returnCodeAll= returnCode1;
             }
             
             if (params.createThumbs) {
@@ -452,7 +454,7 @@ public class CreatePngWalk {
         }
         mon.finished();
         
-        return allFail ? 1 : 0;
+        return returnCodeAll;
     }
 
     /**
@@ -461,6 +463,7 @@ public class CreatePngWalk {
      * of the sequence.
      * @param dom the state from which a pngwalk is to be produced.
      * @param params a parameters structure (e.g. batch processing) or null.
+     * @return an integer exit code where 0=success, 10=bad time format, 11=caught exception, 12=uncaught exception
      * @throws ParseException
      * @throws IOException
      * @throws InterruptedException 
