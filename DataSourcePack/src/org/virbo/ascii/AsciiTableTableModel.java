@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
+import org.das2.util.LoggerManager;
 import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AsciiParser.RecordParser;
 
@@ -34,6 +35,8 @@ import org.virbo.dsutil.AsciiParser.RecordParser;
  */
 public class AsciiTableTableModel extends AbstractTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss");
+    
     String[] lines;
     int lineStart; // line number of the first line.
     int lineCount; // number of lines in the current buffer
@@ -138,12 +141,12 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
             lineStart = lineNumber;
             lineCount = count;
         } catch (IOException ex) {
-            Logger.getLogger(AsciiTableTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
-                reader.close();
+                if ( reader!=null ) reader.close();
             } catch (IOException ex) {
-                Logger.getLogger(AsciiTableTableModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -175,12 +178,12 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
             }
             return lineCount1;
         } catch (IOException ex) {
-            Logger.getLogger(AsciiTableTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
-                reader.close();
+                if ( reader!=null ) reader.close();
             } catch (IOException ex) {
-                Logger.getLogger(AsciiTableTableModel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         return -1;

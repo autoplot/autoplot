@@ -50,7 +50,7 @@ public class CsvDataSource extends AbstractDataSource {
             try {
                 result.putValue(u.parse(sval).doubleValue(u));
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             return result;
         } else {

@@ -12,15 +12,11 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
@@ -28,8 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -46,6 +42,8 @@ import org.virbo.dsutil.QDataSetTableModel;
  */
 public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss");
+    
     Map<Integer, String> columns;
     boolean focusDepend0 = false;
     Map<String, String> params;
@@ -532,7 +530,7 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             resetTable();
             
         } catch (IOException ex) {
-            Logger.getLogger(HtmlTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

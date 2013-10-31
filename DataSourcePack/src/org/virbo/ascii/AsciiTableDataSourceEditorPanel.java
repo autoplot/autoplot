@@ -1119,7 +1119,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             checkHeaders();
 
         } catch (IOException ex) {
-            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             ex.printStackTrace();
             throw new RuntimeException(ex);
         }
@@ -1292,7 +1292,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     for ( int i=0; i<columns1.length; i++ )  columns1[i]="";
                     AsciiHeadersParser.parseMetadata(p.header,columns1,columns1);
                 } catch (ParseException ex) {
-                    Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     richHeaderWarn = ex;
                 }
             }
@@ -1303,7 +1303,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                         JOptionPane.OK_OPTION );
             }
         } catch (IOException ex) {
-            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -1363,7 +1363,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 }

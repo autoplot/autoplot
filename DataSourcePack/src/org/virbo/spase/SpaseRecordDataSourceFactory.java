@@ -9,9 +9,7 @@
 
 package org.virbo.spase;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -19,24 +17,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
  * @author jbf
  */
 public class SpaseRecordDataSourceFactory implements DataSourceFactory {
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss");
     
     /** Creates a new instance of SpaseRecordDataSourceFactory */
     public SpaseRecordDataSourceFactory() {
@@ -93,7 +90,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
             }
             
         } catch ( Exception ex) {
-            Logger.getLogger(SpaseRecordDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return true;
         }
     }

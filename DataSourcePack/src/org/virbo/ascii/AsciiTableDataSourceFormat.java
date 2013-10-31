@@ -54,8 +54,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             try {
                 tformat = new TimeDatumFormatter(ft0);
             } catch (ParseException ex) {
-                Logger.getLogger(AsciiTableDataSourceFormat.class.getName()).log(Level.SEVERE, null, ex);
-                ex.printStackTrace(); // this is going to happen a lot I'm sure...
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 try {
                     tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
                 } catch (ParseException ex1) {

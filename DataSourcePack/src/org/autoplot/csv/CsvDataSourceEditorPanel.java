@@ -376,7 +376,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             model.setRecParser(p);
             //parser.setRecordParser(  );
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -397,7 +397,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     breader.readLine();
                 }
             } catch ( Exception ex ) {
-                logger.log( Level.WARNING, "Exception", ex );
+                logger.log( Level.WARNING,  ex.getMessage(), ex );
             } }
 
             loadTable(breader,ff); // use the AsciiTableReader's parser
@@ -411,7 +411,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     breader.readLine();
                 }
             } catch ( Exception ex ) {
-                logger.log( Level.WARNING, "Exception", ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             } }
             CsvReader reader= new CsvReader( breader );
 
@@ -461,7 +461,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             dtm.setValueAt( "no records found", 0, 0 );
             this.jTable1.setModel( dtm );
 
-            logger.log( Level.WARNING, "IOException", ex );
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
         
 
@@ -581,7 +581,7 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             resetTable();
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

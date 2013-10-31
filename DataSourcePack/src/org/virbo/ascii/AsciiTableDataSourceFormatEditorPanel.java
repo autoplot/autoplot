@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.URISplit;
 
@@ -27,6 +28,7 @@ import org.virbo.datasource.URISplit;
  */
 public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss");
     String file;
 
     /** Creates new form AsciiTableDataSourceFormatEditorPanel */
@@ -193,7 +195,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
             try {
                 args.put("format", URLEncoder.encode(numberFormatSpecifierTF.getText(), "UTF-8"));
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(AsciiTableDataSourceFormatEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             String ts= String.valueOf( timesFormatTF.getSelectedItem() );
 //            if ( includeZ.isSelected() ) {
