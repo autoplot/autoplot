@@ -382,7 +382,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     DatumRange dr1 = getFsm().getRangeFor(ss[i]);
                     drex= dr1;
 
+                    logger.log(Level.FINER, "delegate URI: {0}", new Object[]{ delegateDataSource.getURI() } );
+                    
                     QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                    logger.log(Level.FINER, "  read: {0}", new Object[]{ ds1 } );
+                    
                     if ( ds1==null ) {
                         logger.warning("delegate returned null");
                         //ds1 = delegateDataSource.getDataSet(mon1);
