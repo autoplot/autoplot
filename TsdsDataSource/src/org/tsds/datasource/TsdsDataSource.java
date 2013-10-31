@@ -110,12 +110,12 @@ class TsdsDataSource extends AbstractDataSource {
             parameterPpd = currentPpd;
 
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             exceptionFromConstruct = ex;
         } catch (SAXException ex) {
-            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
     /**
@@ -495,7 +495,7 @@ class TsdsDataSource extends AbstractDataSource {
             parameterRange = new DatumRange(dr0.min(), dr1.max());
 
         } catch (XPathExpressionException ex) {
-            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -534,7 +534,7 @@ class TsdsDataSource extends AbstractDataSource {
             parameterRange = new DatumRange(dr0.min(), dr1.max());
 
         } catch (XPathExpressionException ex) {
-            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
