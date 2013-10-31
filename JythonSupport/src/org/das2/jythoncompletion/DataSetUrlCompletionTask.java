@@ -68,11 +68,9 @@ class DataSetUrlCompletionTask implements CompletionTask {
                 arg0.addItem( new DataSetUrlCompletionItem(rs1) );
             }
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
