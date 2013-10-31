@@ -431,7 +431,17 @@ public class DataSourceController extends DomNodeController {
         setDataSetInternal( ds, null , this.dom.controller.isValueAdjusting() );
     }
 
+    /**
+     * return true if the dataset is rank 1 or greater, and has
+     * timetags for the xtagsDataSet.  This will often be DEPEND_0, but
+     * for JoinDataSets which are like an array of datasets, each dataset would
+     * have DEPEND_0.
+     * 
+     * @param ds any dataset
+     * @return true if the dataset is rank 1 or greater, and has timetags for the xtagsDataSet.
+     */
     public static boolean isTimeSeries( QDataSet ds ) {
+        if ( ds.rank()==0 ) return false;
         QDataSet dep0= SemanticOps.xtagsDataSet(ds);
         if ( dep0!=null ) {
             Units u= SemanticOps.getUnits(dep0);
@@ -1485,7 +1495,7 @@ public class DataSourceController extends DomNodeController {
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata( new AlertNullProgressMonitor() );
 
-            if ( result!=null && getTsb()!=null && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
+            if ( result!=null && getTsb()!=null && result.rank()>0 && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
                 Plot p= timeSeriesBrowseController.getPlot();
                 if ( p==null ) {
