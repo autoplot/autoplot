@@ -68,7 +68,7 @@ public class CreateAggUtil {
                         }
                     }
                 } catch (ParseException ex) {
-                    Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 if ( usable ) {
                     s= s1;

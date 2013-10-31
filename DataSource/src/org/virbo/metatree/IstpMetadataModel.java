@@ -423,7 +423,7 @@ public class IstpMetadataModel extends MetadataModel {
 
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
         } catch (IllegalArgumentException ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
 
         }
 

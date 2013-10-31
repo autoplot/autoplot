@@ -107,7 +107,7 @@ public class AggregationPollUpdating implements Updating {
                     try {
                         Thread.sleep( pollCyclePeriodSeconds*1000 );
                     } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     try {
                         long dirHash1= dirHash(dr);

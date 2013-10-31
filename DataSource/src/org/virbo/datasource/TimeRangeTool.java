@@ -197,7 +197,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 String str = String.valueOf(o.getDatumRange(orb));
                 ss.add(orb+": "+str);
             } catch (ParseException ex) { // this won't happen
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             orb= o.next(orb);
             count++;
@@ -218,9 +218,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     str = String.valueOf(o.getDatumRange(s));
                     ss.add(s+":"+str );
                     s= o.next(s);
-             } catch (ParseException ex) {
-                    Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
-             }
+               } catch (ParseException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+               }
             }
         }
 
@@ -232,7 +232,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     String str = String.valueOf(o.getDatumRange(orb));
                     lastOrbits.add( 0, orb+": "+str );
                 } catch (ParseException ex) { // this won't happen
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 
                 orb= o.prev(orb);

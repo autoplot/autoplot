@@ -207,7 +207,7 @@ public class DataSourceUtil {
             } catch (ParseException ex) {
                 continue;
             } catch ( IllegalArgumentException ex ) {
-                logger.log( Level.SEVERE, null, ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
                 continue; // bad format code "N" from "file:///c:/WINDOWS/$NtUninstallKB2079403$/"
             }
             dr = tp.getTimeRange();
@@ -302,7 +302,7 @@ public class DataSourceUtil {
                     dr = DatumRangeUtil.union(dr, tp.getTimeRange());
                 } catch (ParseException ex) {
                     okay= false;
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
             if ( okay==false ) {
@@ -312,7 +312,7 @@ public class DataSourceUtil {
             }
             
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return surl;
         }
 

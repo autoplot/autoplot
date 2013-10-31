@@ -8,7 +8,6 @@ package org.virbo.datasource.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
+import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSourceFactory;
@@ -30,6 +30,8 @@ import org.virbo.datasource.DataSourceFactory;
  */
 public class ParamsTextArea extends JTextArea {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.gui");
+    
     DataSourceFactory dsf= null;
     List<String> excludeParams= new ArrayList();
 
@@ -97,7 +99,7 @@ public class ParamsTextArea extends JTextArea {
             popup.show(this, e.getX(), e.getY() );
             
         } catch (Exception ex) {
-            Logger.getLogger(ParamsTextArea.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

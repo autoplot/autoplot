@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import org.das2.datum.LoggerManager;
 
 /**
  * decorate a comboBox so that it remembers recent entries.  This listens for ActionEvents from a JComboBox
@@ -39,6 +40,8 @@ public class RecentComboBox extends JComboBox {
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
 
+    private final static Logger logger= LoggerManager.getLogger("apdss.uri");
+    
     public RecentComboBox() {
         setEditable(true);
         addItemListener( new ItemListener() {
@@ -122,7 +125,7 @@ public class RecentComboBox extends JComboBox {
             setModel( new DefaultComboBoxModel( items.toArray() ) );
             saveRecent(items);
         } catch (IOException ex) {
-            Logger.getLogger(RecentComboBox.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -150,7 +153,7 @@ public class RecentComboBox extends JComboBox {
             try {
                 if ( w!=null ) w.close();
             } catch (IOException ex) {
-                Logger.getLogger(RecentComboBox.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -185,7 +188,7 @@ public class RecentComboBox extends JComboBox {
             try {
                 if ( w!=null ) w.close();
             } catch (IOException ex) {
-                Logger.getLogger(RecentComboBox.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         loadRecent();

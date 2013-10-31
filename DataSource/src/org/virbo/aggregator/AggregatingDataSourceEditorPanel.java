@@ -379,7 +379,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         try {
             selectedRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         if (updateYear) {
@@ -609,7 +609,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             }
 
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             RuntimeException ex2 = new RuntimeException("Unable to create example file for aggregation", ex);
             throw ex2;
         }

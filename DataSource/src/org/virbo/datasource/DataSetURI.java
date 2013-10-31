@@ -617,12 +617,12 @@ public class DataSetURI {
                 }
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
                 if ( fi!=null ) fi.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         if ( ex2!=null ) throw ex2;
@@ -757,7 +757,7 @@ public class DataSetURI {
         } catch ( URIException ex ) {
             throw new IOException(ex); 
         } catch ( IllegalArgumentException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {
@@ -985,7 +985,7 @@ public class DataSetURI {
                             throw new InterruptedIOException("cancel pressed");
                         }
                     } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             } finally {

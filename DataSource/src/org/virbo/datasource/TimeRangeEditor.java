@@ -364,10 +364,10 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                     wasRejected= true;
                 }
             } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 edit= null;
             } catch ( Exception ex ) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 edit= null;
             }
             if ( edit==null ) {

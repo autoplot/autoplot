@@ -227,7 +227,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                     file= names[0];
                 }
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 

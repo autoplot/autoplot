@@ -68,7 +68,7 @@ public class DataSourceRegistry {
             Object result = constructor.newInstance(new Object[]{});
             return result;
         } catch ( Exception e ) {
-            logger.log( Level.SEVERE, null, e );
+            logger.log( Level.SEVERE, e.getMessage(), e );
             return null;
         }
     }
@@ -144,21 +144,22 @@ public class DataSourceRegistry {
                                 extensions = (List<String>) m.invoke(f, new Object[0]);
                             } catch (NoSuchMethodException ex) {
                             } catch (InvocationTargetException ex) {
-                                logger.log( Level.SEVERE, null, ex );
+                                logger.log( Level.SEVERE, ex.getMessage(), ex );
                             }
                             try {
                                 Method m = c.getMethod("mimeTypes", new Class[0]);
                                 mimeTypes = (List<String>) m.invoke(f, new Object[0]);
                             } catch (NoSuchMethodException ex) {
+                                logger.log( Level.SEVERE, ex.getMessage(), ex );
                             } catch (InvocationTargetException ex) {
-                                logger.log( Level.SEVERE, null, ex );
+                                logger.log( Level.SEVERE, ex.getMessage(), ex );
                             }
                         } catch (ClassNotFoundException ex) {
-                            logger.log( Level.SEVERE, null, ex );
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         } catch (InstantiationException ex) {
-                            logger.log( Level.SEVERE, null, ex );
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         } catch (IllegalAccessException ex) {
-                            logger.log( Level.SEVERE, null, ex );
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
 
                         if (extensions != null) {
@@ -178,7 +179,7 @@ public class DataSourceRegistry {
                 reader.close();
             }
         } catch (IOException e) {
-            logger.log( Level.SEVERE, null, e );
+            logger.log( Level.SEVERE, e.getMessage(), e );
         }
     }
 
@@ -358,7 +359,7 @@ public class DataSourceRegistry {
                 reader.close();
             }
         } catch (IOException e) {
-            logger.log( Level.SEVERE, null, e );
+            logger.log( Level.SEVERE, e.getMessage(), e );
         }
 
     }

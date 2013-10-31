@@ -214,7 +214,7 @@ public class ReferenceCache {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             if ( !( ent.monitor.isFinished() || ent.monitor.isCancelled() ) ) {
                 monitor.setTaskSize( ent.monitor.getTaskSize());

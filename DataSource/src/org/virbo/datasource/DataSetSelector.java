@@ -358,12 +358,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 } catch ( ParseException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
-                                    logger.log( Level.SEVERE, "", ex );
+                                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     return;
                                 } catch ( IllegalArgumentException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
-                                    logger.log( Level.SEVERE, "", ex );
+                                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     return;
                                 }
                             }
@@ -388,7 +388,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         logger.log( Level.FINE, "resetting timerange to {0}", timeRange);
                                         setValue(suri);
                                     } catch ( ParseException ex ) {
-                                        logger.log( Level.SEVERE, "", ex );
+                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     }
                                 }
                             }
@@ -402,19 +402,19 @@ public class DataSetSelector extends javax.swing.JPanel {
                     showCompletions(surl, carotpos);
                 } catch (IllegalArgumentException ex) {
                     setMessage(ex.getMessage());
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     firePlotDataSetURL();
                 } catch (URISyntaxException ex) {
                     setMessage(ex.getMessage());
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     firePlotDataSetURL();
                 }
             }
         } catch (IllegalArgumentException ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             setMessage(ex.getMessage());
         } catch (IOException ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             setMessage(ex.getMessage());
         }
 
@@ -608,10 +608,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
             
         } catch (URISyntaxException ex) {
-            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             edit= null;
         } catch ( Exception ex ) {
-            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             edit= null;
         }
 
@@ -654,13 +654,13 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 }
                             }
                         } catch (ParseException ex ){
-                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         } catch (IOException ex) {
-                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         } catch (IllegalArgumentException ex) {
-                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         } catch (URISyntaxException ex) {
-                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
                     }
 
@@ -726,13 +726,13 @@ public class DataSetSelector extends javax.swing.JPanel {
                                             timeRange= timeRangeNew;
                                         }
                                     } catch (ParseException ex) {
-                                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     } catch (IOException ex) {
-                                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     } catch (IllegalArgumentException ex) {
-                                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     } catch (URISyntaxException ex) {
-                                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     }
                                 }
                                 keyModifiers = dialog.getModifiers();
@@ -922,7 +922,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     completionsRunnable = null;
                     
                 } catch (NullPointerException ex) {
-                    logger.log( Level.SEVERE, "", ex ); // TODO: look into this
+                    logger.log( Level.SEVERE, ex.getMessage(), ex ); // TODO: look into this
 
                 }
             }
@@ -946,7 +946,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     completions = DataSetURI.getTypesCompletions(surl, carotpos, getMonitor());
                     showCompletionsGui( labelPrefix, completions );
                 } catch (Exception ex) {
-                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                 }
                 
@@ -1025,17 +1025,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions = DataSetURI.getFileSystemCompletions( surl, carotpos, suggestFsAgg, suggestFiles, acceptRegex, mon);
                 } catch (UnknownHostException ex ) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (IOException ex) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -1115,17 +1115,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     }
                 } catch (UnknownHostException ex ) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
                     showUserExceptionDialog( DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (IOException ex) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage(ex.toString());
                     showUserExceptionDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage(ex.toString());
                     showUserExceptionDialog( DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;

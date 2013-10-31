@@ -48,7 +48,7 @@ public class FilePollUpdating implements Updating {
                     try {
                         Thread.sleep(pollCyclePeriodMillis);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(FilePollUpdating.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(FilePollUpdating.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     if ( lpollFile.exists() ) {
                         if ( lpollFile.length()!=pollMsize || lpollFile.lastModified()!=pollMtime ) {
