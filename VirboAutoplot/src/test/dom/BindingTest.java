@@ -65,15 +65,15 @@ public class BindingTest {
             Method apcl = p.getClass().getMethod("addPropertyChangeListener", String.class, PropertyChangeListener.class);
             apcl.invoke(p, destProp, propListener(master,bp,c,false) );
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (NoSuchMethodException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SecurityException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         //Object value= bp.getValue(master);
         //dbp.setValue( p, value );

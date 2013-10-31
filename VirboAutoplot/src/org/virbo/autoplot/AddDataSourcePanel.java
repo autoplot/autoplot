@@ -57,14 +57,11 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
                 }
                 dataSetSelector1.setRecent(urls);
             } catch (BookmarksException ex) {
-                ex.printStackTrace();
-                Util.logger.log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (SAXException ex) {
-                ex.printStackTrace();
-                Util.logger.log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
-                ex.printStackTrace();
-                Util.logger.log(Level.SEVERE, null, ex);
+                Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         } else {
             String[] recent= new String[] { "(no recent entries)" };

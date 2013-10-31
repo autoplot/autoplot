@@ -132,9 +132,9 @@ public class ScriptContext extends PyJavaInstance {
                 try {
                     SwingUtilities.invokeAndWait(run);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }
@@ -817,7 +817,7 @@ public class ScriptContext extends PyJavaInstance {
             SimpleStreamFormatter f= new SimpleStreamFormatter();
             f.format( ds, out, ascii );
         } catch (StreamException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

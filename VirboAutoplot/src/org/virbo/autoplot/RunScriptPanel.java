@@ -72,7 +72,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
             }
             mon.finished();
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

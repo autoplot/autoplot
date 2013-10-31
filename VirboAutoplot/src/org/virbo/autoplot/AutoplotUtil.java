@@ -474,13 +474,13 @@ public class AutoplotUtil {
                     System.setProperty( (String)p.getKey(), (String)p.getValue() );
                 }
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 if ( in!=null ) {
                     try {
                         in.close();
                     } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             }

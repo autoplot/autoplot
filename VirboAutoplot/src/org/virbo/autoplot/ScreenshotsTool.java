@@ -236,7 +236,7 @@ public class ScreenshotsTool extends EventQueue {
             pnt_w1 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_w1.png"));
             pnt_w2 = ImageIO.read(ScreenshotsTool.class.getResource("/resources/pointer_w2.png"));
         } catch (IOException ex) {
-            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
     static int ptrXOffset= 7;
@@ -475,7 +475,7 @@ public class ScreenshotsTool extends EventQueue {
         try {
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
         } catch (AWTException ex) {
-            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
@@ -591,7 +591,7 @@ public class ScreenshotsTool extends EventQueue {
             logFile.write(String.format("%08.1f %1d %5d %s\n", dt / 100., reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
             logFile.flush();
         } catch (IOException ex) {
-            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         if ( theEvent instanceof MouseEvent ) {

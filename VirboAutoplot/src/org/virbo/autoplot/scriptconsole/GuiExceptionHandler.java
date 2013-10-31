@@ -728,7 +728,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         try {
             bis = AboutUtil.getBuildInfos();
         } catch (IOException ex) {
-            org.virbo.autoplot.Util.logger.log(Level.SEVERE, null, ex);
+            org.virbo.autoplot.Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         recs=null;

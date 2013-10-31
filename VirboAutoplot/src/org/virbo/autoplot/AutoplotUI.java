@@ -441,7 +441,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
                     if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
@@ -778,7 +778,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     //initialize the python interpretter
                     JythonUtil.createInterpreter(true, false);
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         };
@@ -852,7 +852,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 //                try {
 //                    DataSourceRegistry.getInstance().registerDataSourceJar(null, new URL(jar));
 //                } catch (IOException ex) {
-//                    logger.log(Level.SEVERE, null, ex);
+//                    logger.log(Level.SEVERE, ex.getMessage(), ex);
 //                }
 //            }
 //        }
@@ -1234,7 +1234,7 @@ APSplash.checkTime("init 270");
                             dataSetSelector.maybePlot( true );
                         }
                     } catch (Exception ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             };
@@ -1524,7 +1524,7 @@ APSplash.checkTime("init 52");
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } catch (URISyntaxException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                         String s= "<li>scheme:arguments</li>"
                                 + "vap+cdaweb:ds=AC_H3_SWI&id=SW_type<br>"
                                 + "<li>scheme:URL?scheme-arguments</li>"
@@ -2742,7 +2742,7 @@ APSplash.checkTime("init 52");
             AutoplotUtil.showMessageDialog(this, pane, "About Autoplot "+AboutUtil.getReleaseTag(), JOptionPane.INFORMATION_MESSAGE );
 
         } catch (IOException ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
 
     }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
@@ -2891,9 +2891,9 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
             } catch ( IOException ex ) {
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
-                logger.log( Level.SEVERE, "", ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             } catch ( Exception ex) {
-                logger.log( Level.SEVERE, "", ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
             }
@@ -3323,7 +3323,7 @@ private void updateFrameTitle() {
                     throw new IllegalArgumentException(ex);
                 } catch ( Exception ex ) {
                     if ( quit ) {
-                        logger.log( Level.WARNING, null, ex );
+                        logger.log( Level.WARNING, ex.getMessage(), ex );
                         AppManager.getInstance().quit(1);
                     } else {
                         model.getExceptionHandler().handle(ex);
@@ -3407,7 +3407,7 @@ private void updateFrameTitle() {
             }
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         System.err.println(welcome);
@@ -3452,7 +3452,7 @@ private void updateFrameTitle() {
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-                logger.log( Level.SEVERE, "", e );
+                logger.log( Level.SEVERE, e.getMessage(), e );
             }
         }
 
@@ -3625,7 +3625,7 @@ APSplash.checkTime("init 240");
         try {
             dropTarget.addDropTargetListener( dropListener );
         } catch (TooManyListenersException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         applicationModel.getCanvas().setDropTarget(dropTarget);
         for ( DasCanvasComponent cc: applicationModel.getCanvas().getCanvasComponents() ) {
@@ -3635,7 +3635,7 @@ APSplash.checkTime("init 240");
                 try {
                     dropTarget1.addDropTargetListener( dropListener );
                 } catch (TooManyListenersException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 cc.setDropTarget(dropTarget1);
             }
@@ -3673,7 +3673,7 @@ APSplash.checkTime("init 240");
                     logger.log(Level.FINE, "connection from {0}", socket);
                     rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
                 } catch (IOException ex) {
-                    logger.log( Level.SEVERE, "", ex );
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         });
@@ -3720,7 +3720,7 @@ APSplash.checkTime("init 240");
                     statusTextField.setText(fmyMess);
                     statusTextField.setToolTipText(fmessage);
                 } catch ( Exception e ) {
-                    logger.log( Level.SEVERE, "", e ); // rte_0759798375_20121111_205149_*.xml
+                    logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
                 }
             }
         });
@@ -3828,7 +3828,7 @@ APSplash.checkTime("init 240");
             if ( millis==-1 ) millis= 500;
             Thread.sleep(millis);
         } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -3929,9 +3929,9 @@ APSplash.checkTime("init 240");
                                     runTool( suri, ActionEvent.SHIFT_MASK );
                                     //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
                                 } catch (MalformedURLException ex) {
-                                    logger.log(Level.SEVERE, null, ex);
+                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                                 } catch (IOException ex ) {
-                                    logger.log(Level.SEVERE, null, ex);
+                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                                 }
                             }
                         };
@@ -3949,9 +3949,9 @@ APSplash.checkTime("init 240");
             try {
                 SwingUtilities.invokeAndWait(run);
             } catch (InterruptedException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (InvocationTargetException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         
@@ -3989,8 +3989,8 @@ APSplash.checkTime("init 240");
                             s = reader.readLine();
                         }
                         reader.close();
-                    } catch (IOException iOException) {
-                        logger.log( Level.SEVERE, "", iOException );
+                    } catch (IOException ex) {
+                        logger.log( Level.SEVERE, ex.getMessage(), ex );
                     }
                     book.setTitle(toolLabel);
                     tools.add(book);
@@ -4103,7 +4103,7 @@ APSplash.checkTime("init 240");
             mm.mergeList(b,l);
             mm.setList(l);
         } catch (Exception ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             applicationModel.getExceptionHandler().handleUncaught(ex);
         }
     }
@@ -4134,7 +4134,7 @@ APSplash.checkTime("init 240");
                 if ( out3!=null ) out3.close();
             }
         } catch ( IOException ex ) {
-            logger.log( Level.WARNING,null,ex);
+            logger.log( Level.WARNING,ex.getMessage(),ex);
         }
         Window w= ScriptContext.getViewWindow();
         if ( w instanceof AutoplotUI ) {
@@ -4202,17 +4202,17 @@ APSplash.checkTime("init 240");
                     }
                         //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             };
             SwingUtilities.invokeLater(run);
         } catch (URISyntaxException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

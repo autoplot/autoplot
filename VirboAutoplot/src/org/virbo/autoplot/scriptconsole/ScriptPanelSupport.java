@@ -133,10 +133,10 @@ public class ScriptPanelSupport {
             panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
             panel.setFilename(file.toString());
         } catch (NullPointerException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         }
 
@@ -275,12 +275,12 @@ public class ScriptPanelSupport {
      */
     private void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
         if (ex instanceof PySyntaxError) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             PyObject otraceback= ex.traceback;
             int line=0;
             int count=0; // just in case limit to three, because of recursion, etc.
@@ -555,7 +555,7 @@ public class ScriptPanelSupport {
                     out.close();
                 }
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         return result;
@@ -580,7 +580,7 @@ public class ScriptPanelSupport {
             annotationsSupport.clearAnnotations();
             this.file= null;
         } catch (BadLocationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

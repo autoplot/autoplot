@@ -418,7 +418,7 @@ public class GridPngWalkView extends PngWalkView {
                             g2.setClip(oldClip);
                         }
                         } catch ( NullPointerException ex ) {
-                            logger.log( Level.WARNING, null, ex );
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
 

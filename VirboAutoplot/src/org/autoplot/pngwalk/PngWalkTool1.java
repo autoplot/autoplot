@@ -188,9 +188,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
             template= t;
         } catch (FileSystemOfflineException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (URISyntaxException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("File does not exist: "+template);
         } catch (IOException ex) {
@@ -258,11 +258,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             deft = Bookmark.parseBookmarks(sdeft);
 
         } catch (BookmarksException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
@@ -285,10 +285,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 try {
                     return WalkUtil.fileExists(productFile);
                 } catch (FileSystemOfflineException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     return false;
                 } catch (URISyntaxException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     return false;
                 }
             }
@@ -364,7 +364,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                             }
                             raiseApWindowSoon(apWindow);
                         } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
                 };

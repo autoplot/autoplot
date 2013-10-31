@@ -213,7 +213,7 @@ public class PersistentStateSupport {
                 }
                 chooser.setSelectedFile( child );
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 
@@ -340,7 +340,7 @@ public class PersistentStateSupport {
                             save(new File(getCurrentFile()),"");
                         }
                     } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             }

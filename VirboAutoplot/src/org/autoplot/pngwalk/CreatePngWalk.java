@@ -393,7 +393,7 @@ public class CreatePngWalk {
                 dom2.setTimeRange(dr);
 
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             mon.setProgressMessage( String.format("write %s", filename ) );
             logger.log( Level.FINE, String.format("write %s", filename ) );

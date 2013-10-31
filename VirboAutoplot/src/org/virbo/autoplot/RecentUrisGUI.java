@@ -261,7 +261,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             daysURIs.put( ss[1], ss[0] );
 
                         } catch (ParseException ex) {
-                            logger.log( Level.WARNING, null, ex );
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
                     }
                     scan.close();
@@ -272,7 +272,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             Datum tlocal= tp.parse(entry.getValue()).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
                             uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
                         } catch ( ParseException ex ) {
-                            logger.log( Level.WARNING, null, ex );
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
                     }
 

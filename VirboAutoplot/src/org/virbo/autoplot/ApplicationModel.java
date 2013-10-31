@@ -136,15 +136,15 @@ public class ApplicationModel {
                 m.invoke(eh, this);
                 //((GuiExceptionHandler)eh).setApplicationModel(this);
             } catch (IllegalAccessException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (InvocationTargetException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (NoSuchMethodException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (SecurityException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -481,16 +481,16 @@ public class ApplicationModel {
             try {
                 recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
             } catch (BookmarksException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return new ArrayList<Bookmark>();
             } catch (SAXException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return new ArrayList<Bookmark>();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return new ArrayList<Bookmark>();
             } catch (ParserConfigurationException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return new ArrayList<Bookmark>();
             }
 
@@ -509,22 +509,22 @@ public class ApplicationModel {
                         try {
                             prefs.flush();
                         } catch (BackingStoreException ex) {
-                            logger.log(Level.SEVERE,null,ex);
+                            logger.log(Level.SEVERE,ex.getMessage(),ex);
                         }
                     } catch (BookmarksException e) {
-                        logger.log(Level.SEVERE,null,e);
+                        logger.log(Level.SEVERE,e.getMessage(),e);
                         return new ArrayList<Bookmark>();
                     } catch (MalformedURLException e) {
-                        logger.log(Level.SEVERE,null,e);
+                        logger.log(Level.SEVERE,e.getMessage(),e);
                         return new ArrayList<Bookmark>();
                     } catch (IOException e) {
-                        logger.log(Level.SEVERE,null,e);
+                        logger.log(Level.SEVERE,e.getMessage(),e);
                         return new ArrayList<Bookmark>();
                     } catch (SAXException e) {
-                        logger.log(Level.SEVERE,null,e);
+                        logger.log(Level.SEVERE,e.getMessage(),e);
                         return new ArrayList<Bookmark>();
                     } catch (ParserConfigurationException e) {
-                        logger.log(Level.SEVERE,null,e);                        
+                        logger.log(Level.SEVERE,e.getMessage(),e);                        
                         return new ArrayList<Bookmark>();
                     }
                 } else {
@@ -534,19 +534,19 @@ public class ApplicationModel {
                 try {
                     recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
                 } catch (BookmarksException e) {
-                    logger.log(Level.SEVERE,null,e);
+                    logger.log(Level.SEVERE,e.getMessage(),e);
                     return new ArrayList<Bookmark>();
 
                 } catch (SAXException e) {
-                    logger.log(Level.SEVERE,null,e);
+                    logger.log(Level.SEVERE,e.getMessage(),e);
                     return new ArrayList<Bookmark>();
 
                 } catch (IOException e) {
-                    logger.log(Level.SEVERE,null,e);
+                    logger.log(Level.SEVERE,e.getMessage(),e);
                     return new ArrayList<Bookmark>();
 
                 } catch (ParserConfigurationException e) {
-                    logger.log(Level.SEVERE,null,e);
+                    logger.log(Level.SEVERE,e.getMessage(),e);
                     return new ArrayList<Bookmark>();
 
                 }
@@ -572,7 +572,7 @@ public class ApplicationModel {
                     URL url = new URL(surl);
                     bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE,null,e);
+                    logger.log(Level.SEVERE,e.getMessage(),e);
                     return new ArrayList<Bookmark>();
                 }
             }
@@ -580,10 +580,10 @@ public class ApplicationModel {
             try {
                 bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(sbookmark.getBytes())).getDocumentElement());
             } catch (SAXException e) {
-                logger.log(Level.SEVERE,null,e);
+                logger.log(Level.SEVERE,e.getMessage(),e);
                 return new ArrayList<Bookmark>();
             } catch (Exception e) {
-               logger.log(Level.SEVERE,null,e);
+                logger.log(Level.SEVERE,e.getMessage(),e);
                 return new ArrayList<Bookmark>();
             }
         }
@@ -632,15 +632,15 @@ public class ApplicationModel {
                 out3.close();
 
             } catch ( IOException ex ) {
-                logger.log( Level.SEVERE, surl, ex );
+                logger.log( Level.SEVERE, "exception: "+surl, ex );
                 if ( out3!=null ) try {
                     out3.close();
                 } catch (IOException ex1) {
-                    logger.log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, "exception: "+ex1.getMessage(), ex1);
                 }
             }
         } catch ( Exception ex ) {
-            logger.log( Level.SEVERE, surl, ex );
+            logger.log( Level.SEVERE, "exception: "+surl, ex );
 
         }
     }
@@ -701,12 +701,12 @@ public class ApplicationModel {
             out= new FileOutputStream(f);
             Bookmark.formatBooks(out,newValue);
         } catch ( IOException ex ) {
-            logger.log(Level.SEVERE,null,ex);
+            logger.log(Level.SEVERE,ex.getMessage(),ex);
         } finally {
             try {
                 if ( out!=null ) out.close();
             } catch ( IOException ex ) {
-                logger.log(Level.SEVERE,null,ex);
+                logger.log(Level.SEVERE,ex.getMessage(),ex);
             }
         }
 
@@ -720,11 +720,11 @@ public class ApplicationModel {
             out3.append( tp.format( now, null) + "\t" + surl + "\n" );
             out3.close();
         } catch ( IOException ex ) {
-            logger.log(Level.SEVERE,null,ex);
+            logger.log(Level.SEVERE,ex.getMessage(),ex);
             if ( out3!=null ) try {
                 out3.close();
             } catch (IOException ex1) {
-                logger.log(Level.SEVERE, null, ex1);
+                logger.log(Level.SEVERE, ex1.getMessage(), ex1);
             }
         }
 
@@ -1111,13 +1111,13 @@ public class ApplicationModel {
                     try {
                         c = DomUtil.getPropertyType(state, node);
                     } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                         continue;
                     } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                         continue;
                     } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                         continue;
                     }
                     SerializeDelegate sd = SerializeRegistry.getDelegate(c);
@@ -1135,15 +1135,15 @@ public class ApplicationModel {
     //                    prop.setValue(state, val);
                         DomUtil.setPropertyValue(state, node, val);
                     } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (ParseException ex) {
                         IOException ioex= new IOException( ex.getMessage() );
                         throw ioex;
-                        //logger.log(Level.SEVERE, null, ex);
+                        //logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             }
@@ -1260,9 +1260,9 @@ public class ApplicationModel {
             embedDs = new String(data);
             embedDsDirty = false;
         } catch (StreamException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -1291,7 +1291,7 @@ public class ApplicationModel {
             getDataSourceFilterController().setDataSetInternal(handler.getDataSet());
 
         } catch (org.virbo.qstream.StreamException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

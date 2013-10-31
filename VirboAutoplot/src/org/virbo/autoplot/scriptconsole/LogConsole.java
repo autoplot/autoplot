@@ -106,7 +106,7 @@ public class LogConsole extends javax.swing.JPanel {
                             }
                             commandLineTextPane1.setText("");
                         } catch (IOException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                             commandLineTextPane1.setText("");
                         } catch (PyException ex) {
                             System.err.println(ex.toString());
@@ -438,7 +438,7 @@ public class LogConsole extends javax.swing.JPanel {
                         recMsg += "\n";
                         doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.   
                     } catch (BadLocationException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             }
@@ -460,7 +460,7 @@ public class LogConsole extends javax.swing.JPanel {
 //                        
             
         } catch (BadLocationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -602,18 +602,18 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 fo = new FileInputStream(chooser.getSelectedFile());
                 records = LogConsoleUtil.deserializeLogRecords(fo);
             } catch (ParserConfigurationException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (SAXException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (FileNotFoundException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 try {
                     if ( fo!=null ) fo.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }
@@ -625,14 +625,14 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 fo = new FileOutputStream(chooser.getSelectedFile());
                 LogConsoleUtil.serializeLogRecords(records, fo);
             } catch (FileNotFoundException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 try {
                     if ( fo!=null ) fo.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }

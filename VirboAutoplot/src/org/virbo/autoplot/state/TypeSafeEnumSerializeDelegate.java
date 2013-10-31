@@ -46,7 +46,7 @@ public class TypeSafeEnumSerializeDelegate implements SerializeDelegate {
             }
 
         } catch (ClassNotFoundException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         throw new ParseException("unable to find type-safe enum field for "+description,0 );

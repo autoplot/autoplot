@@ -181,7 +181,7 @@ public class PlotCommand extends PyObject {
             try {
                 ScriptContext.plot(((PyString) po0).toString());
             } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         } else {
             for ( int i=0; i<nargs; i++ ) {
@@ -199,7 +199,7 @@ public class PlotCommand extends PyObject {
                 }
 
             } catch ( InterruptedException ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new RuntimeException(ex);
             }
         }

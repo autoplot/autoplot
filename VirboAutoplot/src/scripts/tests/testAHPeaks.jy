@@ -1,6 +1,8 @@
 # Demonstrate another lost feature of AutoHistogram, where it identifies 
 # peaks.  I don't think this was ever used in production, but it could be 
 # useful.
+reset()
+setLayout(4)
 
 n= 1000
 dist=  randomn(12345,20*n)*.35 + 4.34
@@ -21,4 +23,6 @@ plot(1,'Histogram', hist)
 
 plot(2,'Peak ID', ah.peakIds(hist) )
 
-plot(3,'Peaks', ah.peaks(hist) )
+pks= ah.peaks(hist)
+plotx(3, pks, ones( pks.length() ), title='Peaks', renderType='scatter' )
+#plot(3,'Peaks', ah.peaks(hist) )

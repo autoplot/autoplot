@@ -280,7 +280,7 @@ public class Test017 {
                     writeToPng(id + ".png");
 
                 } catch (Exception ex) {
-                    TestSupport.logger.log(Level.SEVERE, null, ex);
+                    TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         };

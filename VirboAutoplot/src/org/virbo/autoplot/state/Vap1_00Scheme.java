@@ -28,7 +28,7 @@ public class Vap1_00Scheme extends AbstractVapScheme {
         try {
             value = SerializeUtil.getLeafNode(element);
         } catch (ParseException ex) {
-            org.virbo.autoplot.Util.logger.log(Level.SEVERE, null, ex);
+            org.virbo.autoplot.Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         }
 

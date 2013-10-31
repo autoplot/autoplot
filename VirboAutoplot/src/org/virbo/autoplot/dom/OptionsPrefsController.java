@@ -33,7 +33,7 @@ public class OptionsPrefsController {
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
-                logger.log(Level.FINE, null, ex);
+                logger.log(Level.FINE, ex.getMessage(), ex);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex1) {
@@ -42,7 +42,7 @@ public class OptionsPrefsController {
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex1) {
-                    logger.log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex1);
                 }
             }
         }
@@ -115,7 +115,7 @@ public class OptionsPrefsController {
         try {
             options.setMouseModule( MouseModuleType.valueOf( prefs.get(Options.PROP_MOUSEMODULE, options.mouseModule.toString() ) ) );
         } catch ( IllegalArgumentException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
@@ -159,7 +159,7 @@ public class OptionsPrefsController {
         try {
             options.setMouseModule( MouseModuleType.valueOf( prefs.get(Options.PROP_MOUSEMODULE, options.mouseModule.toString() ) ) );
         } catch ( IllegalArgumentException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );

@@ -187,7 +187,7 @@ public class Test021 {
                         QDataSet ds = Util.getDataSet(s);
                         System.err.println(ds);
                     } catch (Exception ex1) {
-                        TestSupport.logger.log(Level.SEVERE, null, ex1);
+                        TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex1);
                     }
                 }
             }

@@ -95,7 +95,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
         try {
             return DatumRangeUtil.parseTimeRange(stimeRange);
         } catch ( ParseException e ) {
-            logger.log(Level.WARNING,null,e);
+            logger.log(Level.WARNING,e.getMessage(),e);
             throw new IllegalArgumentException(e);
         }
     }

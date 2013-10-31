@@ -68,7 +68,7 @@ public class UriTcaSource extends AbstractQFunction {
             this.dss= dss1;
             this.needToRead= true;
         } catch ( Exception lex ) {
-            logger.log( Level.WARNING, null, lex );
+            logger.log( Level.WARNING, lex.getMessage(), lex );
             initialError= DataSetUtil.asDataSet( eu.createDatum(lex.toString()) );
         }
         
@@ -259,7 +259,7 @@ public class UriTcaSource extends AbstractQFunction {
             //
 
         } catch ( Exception lex ) {
-            logger.log( Level.WARNING, null, lex );
+            logger.log( Level.WARNING, lex.getMessage(), lex );
             return new BundleDataSet( error );
         }
 

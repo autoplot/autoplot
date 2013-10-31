@@ -28,7 +28,7 @@ public class JarRelauncher {
             try {
                 Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar org.virbo.autoplot.AutoplotUI");
             } catch (IOException ex) {
-                Logger.getLogger(JarRelauncher.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(JarRelauncher.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }

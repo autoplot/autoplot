@@ -452,7 +452,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             try {
                 Thread.sleep(30);
             } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -955,7 +955,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             try {
                 SwingUtilities.invokeAndWait(run);
             } catch ( Exception ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
 
@@ -1416,7 +1416,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             try {        
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             if ( System.currentTimeMillis()-t0 > 10000 ) {
                 logger.log(Level.WARNING, "Unable to get canvas lock to reset application because of lock: {0}", changesSupport.isValueAdjusting());
@@ -1575,9 +1575,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                     SwingUtilities.invokeAndWait(run);
                 }
             } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (InvocationTargetException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
 
@@ -1743,7 +1743,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                         try {
                             bimpl.unbind();
                         } catch ( IllegalStateException ex ) {
-                            logger.log(Level.WARNING,null,ex);
+                            logger.log(Level.WARNING,ex.getMessage(),ex);
                         }
                         bindingImpls.remove(b);
                     }

@@ -333,11 +333,11 @@ public class PlotElementController extends DomNodeController {
             try {
                 DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
             } catch (IllegalAccessException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (InvocationTargetException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     };
@@ -885,7 +885,7 @@ public class PlotElementController extends DomNodeController {
                     try {
                         updateDataSetImmediately();
                     } catch ( Exception ex ) {
-                        logger.log( Level.WARNING, null, ex ); // wrapping somehow didn't show original exception.
+                        logger.log( Level.WARNING, ex.getMessage(), ex ); // wrapping somehow didn't show original exception.
                         throw new IllegalArgumentException(ex);
                     }
                 }
@@ -1214,7 +1214,7 @@ public class PlotElementController extends DomNodeController {
                 try {
                     sliceDs = DataSetOps.sprocess( existingComponent, fillDs, new NullProgressMonitor() );
                 } catch (Exception ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
 
@@ -2499,9 +2499,9 @@ public class PlotElementController extends DomNodeController {
                 try {
                     SwingUtilities.invokeAndWait(run);
                 } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
 

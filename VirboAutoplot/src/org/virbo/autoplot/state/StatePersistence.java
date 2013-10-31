@@ -125,7 +125,7 @@ public class StatePersistence {
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
 
@@ -150,7 +150,7 @@ public class StatePersistence {
             try {
                 doConvert( document, scheme.getId(), sscheme );
             } catch ( TransformerException ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
                 IOException result= new IOException("Unable to export to version "+sscheme,ex );
                 throw result;
             }
@@ -185,7 +185,7 @@ public class StatePersistence {
             //String name = serializer.getClass().getSimpleName();
             //java.net.URL u = serializer.getClass().getResource(name + ".class");
             //System.err.println(u);
-            logger.log( Level.WARNING, null, e2 );
+            logger.log( Level.WARNING, e2.getMessage(), e2 );
         }
         serializer.write(document, output);
 
@@ -459,10 +459,10 @@ public class StatePersistence {
             return state;
 
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (SAXException ex) {
             throw new RuntimeException(ex);

@@ -86,11 +86,11 @@ public class DemoPngWalk {
                     List<Bookmark> books = Bookmark.parseBookmarks(srecent);
                     tool.setTemplate( ((Bookmark.Item)books.get(0)).getUri() );
                 } catch (BookmarksException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (SAXException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
             }
@@ -110,10 +110,10 @@ public class DemoPngWalk {
                 try {
                     return WalkUtil.fileExists(productFile);
                 } catch (FileSystemOfflineException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     return false;
                 } catch (URISyntaxException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     return false;
                 }
             }
@@ -148,7 +148,7 @@ public class DemoPngWalk {
                             ScriptContext.plot(suri);
                             ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
                         } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
                 };

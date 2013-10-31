@@ -35,11 +35,11 @@ public class PropertyChangeDiff implements Diff {
             }
             DomUtil.setPropertyValue( node, propertyName, newVal );
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

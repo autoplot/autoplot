@@ -64,18 +64,18 @@ public class BookmarksManagerModel {
 
             } catch (SAXException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
 
             } catch (ParserConfigurationException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
 
             } catch (BookmarksException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
 
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -108,12 +108,12 @@ public class BookmarksManagerModel {
                 Bookmark.formatBooks( out, list );
                 
             } catch (IOException e) {
-                logger.log(Level.SEVERE, null, e);
+                logger.log(Level.SEVERE, e.getMessage(), e);
             } finally {
                 if ( out!=null ) try {
                     out.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }

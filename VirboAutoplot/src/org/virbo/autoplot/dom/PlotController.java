@@ -387,7 +387,7 @@ public class PlotController extends DomNodeController {
             try {
                 dropTarget.addDropTargetListener( canvas.controller.getDropTargetListener() );
             } catch (TooManyListenersException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             dasPlot.setDropTarget(dropTarget);
         }

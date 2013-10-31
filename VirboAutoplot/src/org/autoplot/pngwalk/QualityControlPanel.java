@@ -145,14 +145,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 loginButton.setEnabled(true);
                 
             } catch (FileNotFoundException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }

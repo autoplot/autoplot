@@ -86,15 +86,15 @@ public class EmbedDataExperiment {
                             try {
                                 result.add( new URI( r ) );
                             } catch (URISyntaxException ex) {
-                                Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                             }
                         }
                     } catch (FileSystem.FileSystemOfflineException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (UnknownHostException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (IOException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 } else {
                     result.add( split.resourceUri );

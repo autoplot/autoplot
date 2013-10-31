@@ -73,7 +73,7 @@ public class RequestListener {
                                 }
                                 setData(buf.toString());
                             } catch (IOException ex) {
-                                logger.log(Level.SEVERE, null, ex);
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);
                             }
                         }
 
@@ -82,7 +82,7 @@ public class RequestListener {
                     }
                 } catch (IOException ex) {
                     listening = false;
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
             }

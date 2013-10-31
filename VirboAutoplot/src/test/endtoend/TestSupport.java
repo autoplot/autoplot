@@ -66,7 +66,7 @@ public class TestSupport {
             xx.putProperty(QDataSet.NAME, "Time" );
             rank1Rand.putProperty(QDataSet.DEPEND_0, xx );
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         Random r= new Random(-12345);
         // simulate data dropout.

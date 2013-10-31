@@ -235,7 +235,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
             this.support.loadInputStream(url.openStream());
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

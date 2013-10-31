@@ -114,7 +114,7 @@ public class FSTreeModel implements TreeModel {
             try {
                 prefs.flush();
             } catch ( BackingStoreException ex ) {
-                logger.log( Level.SEVERE, null, ex );
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             System.err.println("reset comparator to "+c );
             listings = new HashMap<File, File[]>();

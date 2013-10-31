@@ -99,7 +99,7 @@ public class Util {
                 buildTime = reader.readLine();
                 reader.close();
             } catch (IOException ex) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
         if ( buildTime!=null && !buildTime.equals("???") ) {

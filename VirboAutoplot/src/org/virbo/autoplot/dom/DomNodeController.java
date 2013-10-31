@@ -108,11 +108,11 @@ public class DomNodeController {
             Method m= n.getClass().getMethod( "getController" );
             return (DomNodeController) m.invoke( n );
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch ( NoSuchMethodException ex ) {
         }
         return null;

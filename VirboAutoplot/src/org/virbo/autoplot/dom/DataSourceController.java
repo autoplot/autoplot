@@ -490,7 +490,7 @@ public class DataSourceController extends DomNodeController {
                 uri= uri.substring(0,48)+" ... "+ uri.substring(n-30,n);
             }
             StringBuilder message = new StringBuilder("When loading "+uri+"\ndataset is invalid:\n");
-            logger.log( Level.SEVERE, null, new Exception("dataset is invalid") );
+            logger.log( Level.SEVERE,"dataset is invalid", new Exception("dataset is invalid") );
             for (String s : problems) {
                 message.append(s).append("\n");
             }
@@ -985,7 +985,7 @@ public class DataSourceController extends DomNodeController {
                         try {
                             Thread.sleep(delay);
                         } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
                     updateFill();
@@ -1111,7 +1111,7 @@ public class DataSourceController extends DomNodeController {
                 vmax = vminMaxFill[1];
                 fill = vminMaxFill[2];
             } catch (ParseException ex) {
-                logger.log( Level.SEVERE, "", ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
             // check the dataset for fill data, inserting canonical fill values.
             AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
@@ -1165,7 +1165,7 @@ public class DataSourceController extends DomNodeController {
             }
             if ( dataSet!=null ) setStatus("ready");
         } catch (RuntimeException ex) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             setStatus("error: " + ex);
             model.getExceptionHandler().handleUncaught(ex);
         }
@@ -1600,7 +1600,7 @@ public class DataSourceController extends DomNodeController {
                 model.showMessage( addHtmlBreaks(ex.getMessage()), title, JOptionPane.WARNING_MESSAGE );
             } else if ( ex.getMessage()==null  ) {
                 setException(ex);
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
                 setDataSet(null);
                 setStatus("error: " + ex.getClass() );
                 handleException(ex);
@@ -1614,7 +1614,7 @@ public class DataSourceController extends DomNodeController {
         } catch (Exception ex) {
             setException(ex);
             setDataSet(null);
-            logger.log( Level.WARNING, null, ex );
+            logger.log( Level.WARNING, ex.getMessage(), ex );
             setStatus("error: " + ex.getMessage());
             handleException(ex);
             if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
@@ -1678,7 +1678,7 @@ public class DataSourceController extends DomNodeController {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         String surl = dsf.getUri();
@@ -1727,7 +1727,7 @@ public class DataSourceController extends DomNodeController {
                 mon.setProgressMessage("done getting data source");
 
             } catch (Exception e) {
-                logger.log( Level.WARNING, null, e );
+                logger.log( Level.WARNING, e.getMessage(), e );
                 throw new RuntimeException(e);
             } finally {
                 mon.finished();
@@ -1817,7 +1817,7 @@ public class DataSourceController extends DomNodeController {
 
     private void handleException(Exception e) {
         if ( model.getExceptionHandler()==null ) {
-            logger.log( Level.WARNING, null, e );
+            logger.log( Level.WARNING, e.getMessage(), e );
         } else if ( e.getMessage()!=null && e.getMessage().contains("nsupported protocol") ) { //unsupport protocol
             model.showMessage( e.getMessage(), "Unsupported Protocol", JOptionPane.ERROR_MESSAGE );
         } else {

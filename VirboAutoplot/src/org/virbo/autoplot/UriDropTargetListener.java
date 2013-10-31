@@ -56,13 +56,13 @@ public class UriDropTargetListener implements DropTargetListener {
                 return null;
             }
         } catch (UnsupportedFlavorException ex ) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         } catch (ClassNotFoundException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }
@@ -105,7 +105,7 @@ public class UriDropTargetListener implements DropTargetListener {
                         }
                     }
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(UriDropTargetListener.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
             

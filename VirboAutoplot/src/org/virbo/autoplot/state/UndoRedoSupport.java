@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
@@ -50,6 +51,7 @@ import org.virbo.datasource.AutoplotSettings;
  */
 public class UndoRedoSupport {
 
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom.vap");
     ApplicationModel applicationModel;
 
     /** Creates a new instance of UndoRedoSupport */
@@ -415,7 +417,7 @@ public class UndoRedoSupport {
 
             if (elephant != null) {
                 List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
-                if ( diffss.size()==0 ) return;
+                if ( diffss.isEmpty() ) return;
                 element= describeChanges( diffss, element );
                 if ( label!=null && element.deltaDesc.endsWith(" changes" ) ) {
                     element.deltaDesc= label;
@@ -450,7 +452,7 @@ public class UndoRedoSupport {
                 StatePersistence.saveState( out, state, "");
                 out.close();
             } catch (IOException ex) {
-                Logger.getLogger(UndoRedoSupport.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
             System.err.println( String.format( "saved state file in %d ms", ( System.currentTimeMillis()-t0 ) ) );

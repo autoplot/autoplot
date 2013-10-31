@@ -29,7 +29,7 @@ public class QualityControlSequence {
         try {
             QualityControlRecord.getRecord(walkImageSequence.imageAt(0).getUri(), qcFolder);
         } catch (UnknownHostException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         refreshQCTotals();
     }
@@ -76,10 +76,10 @@ public class QualityControlSequence {
                 rec = QualityControlRecord.getRecord( imageURI, qcFolder);
             }
         } catch (UnknownHostException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             rec = null;
         } catch(IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             rec = null;
         }
         return rec;

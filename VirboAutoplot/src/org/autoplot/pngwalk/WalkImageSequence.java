@@ -98,15 +98,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     setStatus( "warning: no files found in "+template );
                 }
             } catch ( IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
             } catch ( URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
             } catch ( ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
             }
@@ -261,7 +261,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 pcs.firePropertyChange(PROP_BADGE_CHANGE, -1, i);
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             setStatus("warning: "+ ex.toString());
             throw new RuntimeException(ex);
         }

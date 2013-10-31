@@ -245,10 +245,10 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                         try {
                             FileUtil.fileCopy(f, destdir);
                         } catch (FileNotFoundException ex1) {
-                            logger.log(Level.SEVERE, null, ex1);
+                            logger.log(Level.SEVERE, ex1.getMessage(), ex1);
                             JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
                         } catch (IOException ex1) {
-                            logger.log(Level.SEVERE, null, ex1);
+                            logger.log(Level.SEVERE, ex1.getMessage(), ex1);
                             JOptionPane.showMessageDialog(jtree, "Error Occurred:\n" + ex1.getLocalizedMessage());
                         }
                     }
@@ -300,7 +300,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                             nn= fs.listDirectory("/");
 
                         } catch ( IOException ex ) {
-                            logger.log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
 

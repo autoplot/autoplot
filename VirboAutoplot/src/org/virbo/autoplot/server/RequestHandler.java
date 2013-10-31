@@ -90,7 +90,7 @@ public class RequestHandler {
             return null;
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
     }

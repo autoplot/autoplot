@@ -307,7 +307,7 @@ public abstract class Bookmark {
             try {
                 err.setIcon( new ImageIcon( ImageIO.read( Bookmark.class.getResource( "/org/virbo/autoplot/resources/warning-icon.png" ) ) ) );
             } catch (IOException ex2) {
-                logger.log( Level.SEVERE, null, ex2 );
+                logger.log( Level.SEVERE, ex2.getMessage(), ex2 );
             }
             result.statusMsg= ex.toString();
             contents.add( err );
@@ -318,7 +318,7 @@ public abstract class Bookmark {
                 try {
                     in.close();
                 } catch ( IOException ex ) {
-                    logger.log( Level.SEVERE, null, ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                 }
             }
         }
@@ -609,12 +609,12 @@ public abstract class Bookmark {
                 try {
                     parseBookmark( n, vers, remoteLevel );
                 } catch (UnsupportedEncodingException ex1) {
-                    logger.log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
                 } catch (IOException ex1) {
-                    logger.log(Level.SEVERE, null, ex1);
+                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
                 }
                 logger.log(Level.FINE, "## bookmark number={0}", i);
-                logger.log( Level.SEVERE, null, ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
                 logger.log(Level.FINE, "last bookmark parsed:{0}", lastBook);
                 //continue;
                 throw new BookmarksException(ex);
@@ -692,7 +692,7 @@ public abstract class Bookmark {
                 //String name = serializer.getClass().getSimpleName();
                 //java.net.URL u = serializer.getClass().getResource(name+".class");
                 //logger.fine(u);
-                logger.log( Level.SEVERE, null, error );
+                logger.log( Level.SEVERE, error.getMessage(), error );
             }
             serializer.write(doc, output);
 

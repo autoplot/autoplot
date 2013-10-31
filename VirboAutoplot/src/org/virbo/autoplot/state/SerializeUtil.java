@@ -104,13 +104,13 @@ public class SerializeUtil {
                 try {
                     value = readMethod.invoke(node, new Object[0]);
                 } catch (IllegalAccessException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     continue;
                 } catch (IllegalArgumentException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     continue;
                 } catch (InvocationTargetException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     continue;
                 }
                 if (value == null) {
@@ -171,19 +171,19 @@ public class SerializeUtil {
             }
             return element;
         } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (InstantiationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
             
@@ -356,16 +356,16 @@ public class SerializeUtil {
             return node;
 
         } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (InstantiationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
     }

@@ -55,13 +55,13 @@ public class Util {
                 recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
                 setRecent(sel,recent);
             } catch (BookmarksException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (SAXException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (ParserConfigurationException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
         } else {
@@ -72,7 +72,7 @@ public class Util {
                 Bookmark.formatBooks(fout,getRecent(sel));
                 fout.close();
             } catch (FileNotFoundException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 if ( fout!=null ) fout.close();
             }
@@ -86,7 +86,7 @@ public class Util {
                     Bookmark.formatBooks(fout,getRecent(sel));
                     fout.close();
                 } catch (FileNotFoundException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } finally {
                     if ( fout!=null ) fout.close();
                 }
@@ -104,7 +104,7 @@ public class Util {
                     Bookmark.formatBooks(fout,result);
                     fout.close();
                 } catch (FileNotFoundException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } finally {
                     if ( fout!=null ) fout.close();
                 }

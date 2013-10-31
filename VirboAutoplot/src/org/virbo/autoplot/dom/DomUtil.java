@@ -460,7 +460,7 @@ public class DomUtil {
                     }
                 }
             } catch (Exception ex) {
-                logger.log(Level.WARNING,null,ex);
+                logger.log(Level.WARNING,ex.getMessage(),ex);
             }
 
         }
@@ -709,7 +709,7 @@ public class DomUtil {
                 i= template.indexOf("%{"+root+".",i);
             }
         } catch ( Exception ex ) {
-            logger.log( Level.WARNING, null, ex );
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
         return template;
     }
@@ -824,7 +824,7 @@ public class DomUtil {
                     }
                 }
             } catch (Exception ex) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
 
         }

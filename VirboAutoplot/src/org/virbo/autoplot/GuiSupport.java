@@ -145,9 +145,9 @@ public class GuiSupport {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException ex) {
                 //highly unlikely since we are using a standard DataFlavor
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             } catch (IOException ex) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
         if (result != null) {
@@ -370,15 +370,15 @@ public class GuiSupport {
         } catch ( IllegalArgumentException ex ) {
             parent.applicationModel.getExceptionHandler().handle(ex);
             logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
-            logger.log(Level.SEVERE, uriOut, ex );
+            logger.log(Level.SEVERE, "exception "+uriOut, ex );
         } catch (RuntimeException ex ) {
             parent.applicationModel.getExceptionHandler().handleUncaught(ex);
             logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
-            logger.log(Level.SEVERE, uriOut, ex );
+            logger.log(Level.SEVERE,  "exception "+uriOut, ex );
         } catch (Exception ex) {
             parent.applicationModel.getExceptionHandler().handle(ex);
             logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
-            logger.log(Level.SEVERE, uriOut, ex );
+            logger.log(Level.SEVERE,  "exception "+uriOut, ex );
         }
         if ( mon!=null ) mon.finished();
     }
@@ -920,7 +920,7 @@ public class GuiSupport {
                     if ( out!=null ) out.close();
                 }
             } catch (IOException e) {
-                logger.log( Level.WARNING, null, e );
+                logger.log( Level.WARNING, e.getMessage(), e );
             }
         }
     }
@@ -1052,7 +1052,7 @@ public class GuiSupport {
                 dom.getController().changePerformed( d, lock );
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -1085,23 +1085,23 @@ public class GuiSupport {
                 }
                 parent.setMessage( "imported bookmarks file "+bookmarksFile );
             } catch (BookmarksException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 parent.applicationModel.showMessage( "Semantic Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 parent.applicationModel.showMessage( "XML Error parsing "+bookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (FileNotFoundException ex ) {
                 parent.applicationModel.showMessage( "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 parent.applicationModel.showMessage( "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }
@@ -1692,7 +1692,7 @@ public class GuiSupport {
                 });
                 edit.showDialog(this.parent);
             } catch ( Exception ex ) {
-                logger.log(Level.WARNING,null,ex);
+                logger.log(Level.WARNING,ex.getMessage(),ex);
                 JOptionPane.showMessageDialog( parent, "File does not appear to well-formatted .vap file" );
             }
 

@@ -279,7 +279,7 @@ public class Test019 {
             try {
                 Thread.sleep(1000); // sleep 100 seconds
             } catch (InterruptedException ex) {
-                Logger.getLogger(Test019.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Test019.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         FileSystem fs= FileSystem.create("http://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");

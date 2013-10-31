@@ -179,9 +179,9 @@ public class JythonUtil {
         try {
             textArea.loadFile(file);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         
         ScriptPanelSupport support;
@@ -264,7 +264,7 @@ public class JythonUtil {
             try {
                 uri= url.toURI();
             } catch (URISyntaxException ex) {
-                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
             response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars, makeTool, uri );
@@ -300,7 +300,7 @@ public class JythonUtil {
                     //TODO: error annotations on the editor.
                     mon.finished();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         };

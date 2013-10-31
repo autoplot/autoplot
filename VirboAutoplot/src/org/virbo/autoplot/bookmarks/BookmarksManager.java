@@ -173,7 +173,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         try {
             dropTarget.addDropTargetListener(trans.createDropTargetListener());
         } catch (TooManyListenersException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         jTree1.setDropTarget(dropTarget);
         dragSource.createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY_OR_MOVE, trans.createDragGestureListener());
@@ -902,27 +902,27 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                 }
                 JOptionPane.showMessageDialog( this, "imported bookmarks file "+lbookmarksFile );
             } catch (BookmarksException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (SAXException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showMessageDialog( this, "XML error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (FileNotFoundException ex ) {
                 JOptionPane.showMessageDialog( this, "File not found: "+lbookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (MalformedURLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showMessageDialog( this, "Error parsing "+lbookmarksFile+ "\n"+ex.getMessage(), "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showMessageDialog( this, "I/O Error with "+lbookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }
@@ -1351,7 +1351,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     try {
                         Thread.sleep(1000); // sleep 1000 milliseconds before making second pass
                     } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     List<Bookmark> book = Bookmark.parseBookmarks(start, depthf);
                     model.setList(book);
@@ -1374,13 +1374,13 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     //    System.err.println(b);
                     //}
                 } catch (BookmarksException ex ) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     showMessage( "Semantic error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 } catch (SAXException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     showMessage( "IO error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
                 }
             }
@@ -1435,13 +1435,13 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             try {
                 resetToDefault( defaultUrl );
             } catch ( MalformedURLException ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             } catch ( IOException ex ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             } catch ( BookmarksException ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             } catch (SAXException ex) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
         
@@ -1524,7 +1524,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             try {
                 if ( read!=null ) read.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -1561,12 +1561,12 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             Bookmark.formatBooks(out,model.getList());
             out.close();
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
                 if ( out!=null ) out.close();
             } catch ( IOException ex ) {
-                logger.log( Level.SEVERE, null, ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
         }
     }
@@ -1658,7 +1658,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
-                logger.log( Level.SEVERE, null, ex );
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
         } else {
             // should already have a listener
