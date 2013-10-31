@@ -174,13 +174,13 @@ public class EditorTextPane extends JEditorPane {
                     out.write( ( cmd + "\n").getBytes() );
                     out.close();
                 } catch (StreamException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (IOException ex) {
                     if ( ex instanceof ConnectException ) {
                         JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
                         return;
                     }
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
             } else {
@@ -224,7 +224,7 @@ public class EditorTextPane extends JEditorPane {
                             d.remove( 0, d.getLength() );
                             d.insertString( 0, s, null );
                         } catch (BadLocationException ex) {
-                            Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
                     }
                 });
@@ -262,7 +262,7 @@ public class EditorTextPane extends JEditorPane {
         } catch ( IOException ex ) {
             return jumpToList.toArray( new String[jumpToList.size()] );
         } catch (BadLocationException ex) {
-            Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return jumpToList.toArray( new String[jumpToList.size()] );
         }
         

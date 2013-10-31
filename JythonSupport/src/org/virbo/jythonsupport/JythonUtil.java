@@ -466,7 +466,7 @@ public class JythonUtil {
             return vb.looksOkay();
             
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         logger.finest( String.format( "!! %04d simplify->false: %s", o.beginLine, o ) );
          return false;
@@ -515,7 +515,7 @@ public class JythonUtil {
             return !vb.visitNameFail;
             
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         logger.finest( String.format( "!! %04d canResolve->false: %s", o.beginLine, o ) );
          return false;
@@ -853,7 +853,7 @@ public class JythonUtil {
             setParams( interp, params );
             interp.exec(prog);
         } catch ( IOException ex ) {
-            logger.log( Level.WARNING, null, ex );
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();            
         }
         
@@ -1020,12 +1020,12 @@ public class JythonUtil {
                 s = reader.readLine();
             }
         } catch ( IOException ex ) {
-            logger.log( Level.WARNING, null, ex );
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
                 reader.close();
             } catch ( IOException ex ) {
-                logger.log( Level.WARNING, null, ex );
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         return result.toString();

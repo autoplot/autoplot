@@ -22,6 +22,8 @@ import org.virbo.datasource.DataSetURI.CompletionResult;
  */
 class DataSetUrlCompletionTask implements CompletionTask {
 
+    private static final Logger logger= Logger.getLogger("jython.editor");
+    
     JTextComponent editor;
     
     public DataSetUrlCompletionTask(JTextComponent arg1) {
@@ -67,10 +69,10 @@ class DataSetUrlCompletionTask implements CompletionTask {
             }
         } catch (BadLocationException ex) {
             ex.printStackTrace();
-            Logger.getLogger(DataSetUrlCompletionTask.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             ex.printStackTrace();
-            Logger.getLogger(DataSetUrlCompletionTask.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

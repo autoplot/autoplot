@@ -458,7 +458,7 @@ public class EditorContextMenu {
         try {
             editor.getDocument().insertString(editor.getCaretPosition(), code, null);
         } catch (BadLocationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

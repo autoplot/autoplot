@@ -463,7 +463,7 @@ public class ParametersFormPanel {
             fd.count= fd.paramsList.size();
                     
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         return fd;
 

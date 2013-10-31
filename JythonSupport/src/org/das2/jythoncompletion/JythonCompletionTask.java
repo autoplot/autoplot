@@ -154,7 +154,7 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             po2= (PyList) context.__dir__();
         } catch ( PyException e ) {
-            logger.log( Level.SEVERE, "", e );
+            logger.log( Level.SEVERE, e.getMessage(), e );
             return;
         }
         
@@ -168,10 +168,10 @@ public class JythonCompletionTask implements CompletionTask {
                     po = context.__getattr__(s);
                 } catch (PyException e) {
                     logger.log(Level.FINE, "PyException from \"{0}\":", ss);
-                    logger.log( Level.SEVERE, "", e );
+                    logger.log( Level.SEVERE, e.getMessage(), e );
                     continue;
                 } catch ( IllegalArgumentException e ) {
-                    logger.log( Level.SEVERE, "", e );
+                    logger.log( Level.SEVERE, e.getMessage(), e );
                     continue;
                 }
                 String label = ss;
@@ -416,7 +416,7 @@ public class JythonCompletionTask implements CompletionTask {
                 s= read.readLine();
             }
         } catch ( IOException ex ) {
-            logger.log( Level.SEVERE, "", ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         } finally {
             try {
                 read.close();

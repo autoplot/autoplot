@@ -38,7 +38,7 @@ public class CompletionSettings {
         try {
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
     }
 
@@ -58,7 +58,7 @@ public class CompletionSettings {
             prefs.putBoolean( PROP_TAB_IS_COMPLETION, tabIsCompletion );
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
         CompletionImpl.get().setTabIsCompletion(tabIsCompletion);
     }
@@ -78,7 +78,7 @@ public class CompletionSettings {
         try {
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
     }
     
@@ -98,7 +98,7 @@ public class CompletionSettings {
         try {
             prefs.flush();
         } catch ( BackingStoreException ex ) {
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
     }
 
