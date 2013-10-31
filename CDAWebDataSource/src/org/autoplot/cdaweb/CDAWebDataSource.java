@@ -66,7 +66,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         try {
             tr = DatumRangeUtil.parseTimeRange(timerange);
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new IllegalArgumentException(ex);
         }
         ds= getParam( "ds","ac_k0_epm" );
@@ -117,7 +117,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             try {
                 db.maybeRefresh( SubTaskMonitor.create(mon,0,10) ); //TODO: this ain't right, what's the taskSize?
             } catch ( IOException ex ) {
-                logger.log( Level.SEVERE, null, ex );
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 mon.setProgressMessage("unable to connect via ftp");
                 Thread.sleep(1000);
                 throw ex;

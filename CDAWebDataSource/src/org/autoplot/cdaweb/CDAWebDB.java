@@ -154,13 +154,13 @@ public class CDAWebDB {
                 mon.finished();
             }
         //} catch (XPathExpressionException ex) {
-        //    logger.log(Level.SEVERE, null, ex);
+        //    logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (URISyntaxException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -209,13 +209,13 @@ public class CDAWebDB {
         } catch (IOException ex) {
             throw ex;
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } catch (XPathExpressionException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } finally {
             if ( ins!=null ) ins.close();
@@ -357,7 +357,7 @@ public class CDAWebDB {
                 }
 
             } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 width= Units.hours.createDatum(24);
 
             }
@@ -413,7 +413,7 @@ public class CDAWebDB {
                 
                 DataSetURI.getFile(new URI(master), p );
             } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
         } catch ( IOException ex ) {
@@ -432,7 +432,7 @@ public class CDAWebDB {
             try {
                 dr = DatumRangeUtil.parseTimeRange(avail);
             } catch (ParseException ex1) {
-                logger.log(Level.SEVERE, null, ex1);
+                logger.log(Level.SEVERE, ex1.getMessage(), ex1);
                 master= fsm.getRepresentativeFile(p);
                 dr= fsm.getRangeFor(master);
             }

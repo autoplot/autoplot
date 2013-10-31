@@ -400,13 +400,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             logger.log( Level.FINE, "done in {0} millis\n", t0 );
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             dsidComboBox.setModel( new DefaultComboBoxModel( new String[] { "error in parsing history.txt" } ) );
         } finally {
             try {
                 if ( r!=null ) r.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 
@@ -623,7 +623,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             Thread.sleep(1000);
                         }
                     } catch (InterruptedException ex) {
-                       logger.log(Level.SEVERE, null, ex);
+                       logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
