@@ -207,7 +207,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 return ! result.containsKey(param);
             }
         } catch (CDFException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         } catch (IOException ex) {
             return false;

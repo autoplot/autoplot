@@ -1227,7 +1227,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    logger.log( Level.SEVERE, "", e );
+                    logger.log( Level.SEVERE, e.getMessage(), e );
                 }
 
                 try {

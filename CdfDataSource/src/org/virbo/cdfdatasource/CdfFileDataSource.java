@@ -430,7 +430,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                             }
                         }
                     } catch ( CDFException ex ) {
-                        logger.log( Level.WARNING, null, ex );
+                        logger.log( Level.WARNING, ex.getMessage(), ex );
                         okay= false;
                     }
                     if ( okay ) {
@@ -773,7 +773,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 qds.putProperty( QDataSet.NAME,(String)o );
                 props.put("UNIT_PTR_VALUE",qds );
             } catch (Throwable ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         

@@ -194,7 +194,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( dep1!=null ) Entry.create( depend_1, var.getID(), CDF_CHAR, nameFor(dep1) );
             if ( dep2!=null ) Entry.create( depend_2, var.getID(), CDF_CHAR, nameFor(dep2) );
         } catch ( CDFException ex ) {
-            logger.log(Level.SEVERE,null,ex);
+            logger.log(Level.SEVERE,ex.getMessage(),ex);
         }
 
         cdf.close();

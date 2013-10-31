@@ -399,7 +399,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             DasExceptionHandler.handle( ex );
         } catch (IllegalArgumentException ex) {
             DasExceptionHandler.handle( ex );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
