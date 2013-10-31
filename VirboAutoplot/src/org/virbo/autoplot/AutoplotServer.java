@@ -1,11 +1,15 @@
 
 package org.virbo.autoplot;
 
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.Application;
 
 
@@ -20,6 +24,13 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
 
+        if ( false ) {
+            Logger l= LoggerManager.getLogger("apdss.agg");
+            l.setLevel(Level.ALL);
+            l.addHandler( new ConsoleHandler() );
+            l.log(Level.FINE, "Logging at {0}", l.getLevel());
+        }
+        
         System.err.println("org.virbo.autoplot.AutoplotServer 20120922");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
