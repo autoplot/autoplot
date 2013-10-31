@@ -123,7 +123,7 @@ public class AutoplotApplet extends JApplet {
             try {
                 getAppletContext().showDocument(new URL("javascript:" + statusCallback + "(\"" + val + "\")"));
             } catch (MalformedURLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
     }
@@ -133,7 +133,7 @@ public class AutoplotApplet extends JApplet {
             try {
                 getAppletContext().showDocument(new URL("javascript:" + timeCallback + "(\"" + val + "\")"));
             } catch (MalformedURLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
     }
@@ -146,7 +146,7 @@ public class AutoplotApplet extends JApplet {
             String jscall = String.format("%s('%s','%s','%s',%d,%d,%d )", clickCallback, plotid, xdatum, ydatum, e.getX(), e.getY(), e.getID());
             getAppletContext().showDocument(new URL("javascript:" + jscall));
         } catch (MalformedURLException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         }
     }
 
@@ -242,13 +242,13 @@ public class AutoplotApplet extends JApplet {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         } catch (InstantiationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         } catch (UnsupportedLookAndFeelException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         }
 
         String fontParam = getParameter("font");
@@ -298,12 +298,12 @@ public class AutoplotApplet extends JApplet {
 
         model = new ApplicationModel();
         model.setExceptionHandler(new ExceptionHandler() {
-            public void handle(Throwable t) {
-                logger.log(Level.SEVERE, null, t);
+            public void handle(Throwable ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
-            public void handleUncaught(Throwable t) {
-                logger.log(Level.SEVERE, null, t);
+            public void handleUncaught(Throwable ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         });
 
@@ -319,7 +319,7 @@ public class AutoplotApplet extends JApplet {
         try {
             logger.log(Level.FINE, "Formatters: {0}", DataSourceRegistry.getInstance().getFormatterExtensions());
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         }
 
         ApplicationModel appmodel = model;
@@ -389,14 +389,14 @@ public class AutoplotApplet extends JApplet {
                 height= getIntParameter( "height", cc.getHeight() );
                 logger.log(Level.FINE, "output height, width= {0},{1}", new Object[]{width, height});
             } catch ( InterruptedException ex ) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             } catch ( IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             } finally {
                 try {
                     if ( in!=null ) in.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);;
                 }
             }
         }
@@ -539,7 +539,7 @@ public class AutoplotApplet extends JApplet {
                     appmodel.waitUntilIdle(true);
                     logger.log(Level.FINE, "done wait for idle @ {0} msec", (System.currentTimeMillis() - t0));
                 } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);;
                 }
                 if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
                     dom.setTimeRange(timeRange1);
@@ -567,7 +567,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(xrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
         if (!xlog.equals("")) {
@@ -587,7 +587,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(yrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
         if (!ylog.equals("")) {
@@ -607,7 +607,7 @@ public class AutoplotApplet extends JApplet {
                 DatumRange newRange = DatumRangeUtil.parseDatumRange(zrange, u);
                 axis.setRange(newRange);
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
         if (!zlog.equals("")) {
@@ -623,7 +623,7 @@ public class AutoplotApplet extends JApplet {
                 RenderType renderType = RenderType.valueOf(srenderType);
                 dom.getController().getPlotElement().setRenderType(renderType);
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);;
             }
         }
 
@@ -742,7 +742,7 @@ public class AutoplotApplet extends JApplet {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);;
                     }
                     dom.getController().waitUntilIdle();
                     doSetOverview(true);
@@ -790,9 +790,9 @@ public class AutoplotApplet extends JApplet {
 //                s = r.readLine();
 //            }
 //        } catch (URISyntaxException ex) {
-//            logger.log(Level.SEVERE, null, ex);
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);;
 //        } catch (IOException ex) {
-//            logger.log(Level.SEVERE, null, ex);
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);;
 //        }
 //
 //
@@ -846,7 +846,7 @@ public class AutoplotApplet extends JApplet {
                 }
             });
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);;
         }
     }
     protected String timeRange;
@@ -919,7 +919,7 @@ public class AutoplotApplet extends JApplet {
                     Object o = DomUtil.getPropertyValue(dom, node);
                     logger.log(Level.FINE, "dom.{0}={1}", new Object[]{node, o});
                 } catch (Exception ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);;
                 }
             }
         };
@@ -947,9 +947,9 @@ public class AutoplotApplet extends JApplet {
                     getAppletContext().showStatus("dom." + node + "=" + DomUtil.getPropertyValue(dom, node) );
                     logger.log(Level.FINE, "dom.{0}={1}", new Object[]{node, DomUtil.getPropertyValue(dom, node)});
                 } catch (ParseException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);;
                 } catch (Exception ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);;
                 }
             }
         };
@@ -1027,7 +1027,7 @@ public class AutoplotApplet extends JApplet {
                     y.putProperty(QDataSet.DEPEND_0, DataSetOps.slice1(data, 0));
                     model.setDataSet(y);
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
             }

@@ -141,7 +141,7 @@ public class TestApplet002 {
             System.err.println("saving to " + new File(".").getAbsolutePath() + "/autoplot-applet-002.png");
             applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("autoplot-applet-002.png");
         } catch (IOException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

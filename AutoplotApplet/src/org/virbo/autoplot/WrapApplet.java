@@ -70,7 +70,7 @@ public class WrapApplet extends JApplet {
         try {
             applet.stop();
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -79,7 +79,7 @@ public class WrapApplet extends JApplet {
         try {
             applet.start();
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -88,7 +88,7 @@ public class WrapApplet extends JApplet {
         try {
             applet.showStatus(msg);
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -103,7 +103,7 @@ public class WrapApplet extends JApplet {
             validate();
             
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -112,7 +112,7 @@ public class WrapApplet extends JApplet {
         try {
             applet.destroy();
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
