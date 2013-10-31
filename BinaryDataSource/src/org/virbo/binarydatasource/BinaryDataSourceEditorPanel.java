@@ -132,7 +132,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
             this.jTable1.setModel(model);
 
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -151,7 +151,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
             paramsTextArea1.setFactory( new BinaryDataSourceFactory(), new ArrayList<String>() );
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
