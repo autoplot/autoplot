@@ -484,6 +484,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     } else if ( ss.length==1 ) {
                         throw ex;
                     } else {
+                        if ( drex==null ) {
+                            throw new RuntimeException("internal error where drex is null because the name didn't belong to the aggregation.");
+                        }
                         notesBuilder.putValue(-1,0,drex.min().doubleValue(Units.us2000));
                         notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
                         notesBuilder.putValue(-1,2,exunits.createDatum(DataSourceUtil.getMessage(ex)).doubleValue(exunits) );
