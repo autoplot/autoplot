@@ -1101,7 +1101,7 @@ public abstract class CDFImpl implements java.io.Serializable {
             }
         } catch(Exception ex) {
             logger.log(Level.SEVERE, "getNumberAttribute: {0}", vbuf);
-            logger.log( Level.SEVERE, null, ex );
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return null;
         }
 

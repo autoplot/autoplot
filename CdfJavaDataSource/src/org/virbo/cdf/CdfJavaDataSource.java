@@ -463,7 +463,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         try {
             vv= cdf.variableAttributeNames(var.getName());
         } catch ( NullPointerException ex ) {
-            logger.log( Level.WARNING, null, ex );
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw ex;
         }
 
@@ -514,7 +514,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 props.put( "UNIT_PTR_VALUE", v );
 
             } catch (Throwable ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         
@@ -650,7 +650,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             okay= false;
                         }
                     } catch ( Exception ex ) {
-                        logger.log( Level.WARNING, null, ex );
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                         okay= false;
                     }
                     if ( okay ) {

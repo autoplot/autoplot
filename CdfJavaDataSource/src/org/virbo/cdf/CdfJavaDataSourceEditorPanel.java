@@ -410,13 +410,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         } catch (IOException ex) {
             DasExceptionHandler.handle( ex );
-            Logger.getLogger(CdfJavaDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IllegalArgumentException ex) {
             DasExceptionHandler.handle( ex );
-            Logger.getLogger(CdfJavaDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (Exception ex) {
             DasExceptionHandler.handle( ex );
-            Logger.getLogger(CdfJavaDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
