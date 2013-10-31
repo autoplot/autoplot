@@ -69,7 +69,7 @@ public class DataSetUrlCompletionItem implements CompletionItem {
 		throw new IllegalArgumentException("implementation problem, completion ("+rs.completion+") must start with completable ("+rs.completable+")");
 	    }
         } catch (BadLocationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
