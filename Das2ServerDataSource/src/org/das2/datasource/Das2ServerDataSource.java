@@ -302,14 +302,14 @@ class Das2ServerDataSource extends AbstractDataSource {
                 StreamTool.readStream(channel, handler);
             } catch ( StreamException ex ) {
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
-                    logger.log( Level.INFO, null, ex );
+                    logger.log( Level.INFO, ex.getMessage(), ex );
                     if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
                         throw new CancelledOperationException();
                     } else {
                         throw (java.io.InterruptedIOException)ex.getCause();
                     }
                 } else {
-                    logger.log( Level.INFO, null, ex );
+                    logger.log( Level.INFO, ex.getMessage(), ex );
                     throw ex;
                 }
             }

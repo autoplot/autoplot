@@ -89,13 +89,13 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 }
                 datasetsList.put( surl, list );
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new RuntimeException(ex);
             } finally {
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
         }

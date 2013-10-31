@@ -425,7 +425,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         tcaTextField.setText("");
                     }
                     } catch ( XPathExpressionException ex ) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             };
@@ -433,21 +433,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         } catch (SAXException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (ParserConfigurationException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (MalformedURLException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
                 if ( in!=null ) in.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -476,7 +476,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                 });
             } catch ( MalformedURLException ex ) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 JOptionPane.showConfirmDialog( this, "Internal Error: "+ex.toString() ); // give a message
             }
         }
@@ -518,19 +518,19 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             return result;
                 
         } catch (MalformedURLException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
         } catch (XPathExpressionException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
         }
     }
@@ -590,7 +590,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         r.close();
                     }
                 } catch (IOException ex) {
-                    logger.log( Level.WARNING, null, ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                 }
             }
         } else {
@@ -664,21 +664,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         } catch (XPathExpressionException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SAXException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (ParserConfigurationException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(examplesComboBox, "Unable to parse dsdf: "+ ex.getMessage() );
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
                 if ( in!=null ) in.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 
@@ -710,7 +710,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     } );
                     
                 } catch ( MalformedURLException ex ) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     JOptionPane.showConfirmDialog( this, "Internal Error: "+ex.toString() ); // give a message
                 }
             }
@@ -872,7 +872,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 startTime= tr.min().toString();
                 endTime= tr.max().toString();
             } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         if ( startTime!=null && endTime!=null ) {
@@ -945,13 +945,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     
                 } catch (DasException ex) {
 
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
 
                     javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss + ", \n" + ex );
                     jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
 
                 } catch (MalformedURLException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                     DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
                 }
 
@@ -1000,7 +1000,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         try {
             timeRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
         } catch (ParseException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             timeRange= this.validTimeRange;
             if ( timeRange==null ) {
                 throw new IllegalArgumentException("No timerange for the URI."); // too bad we can't check reject and reenter the GUI...  Surely it does this...
