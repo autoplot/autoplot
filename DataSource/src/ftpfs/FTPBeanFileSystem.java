@@ -68,7 +68,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         try {
             bean.setSocketTimeout(FileSystem.settings().getConnectTimeoutMs());
         } catch (SocketException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         bean.setPassiveModeTransfer(true);
         return bean;
@@ -562,7 +562,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         } catch (RuntimeException ex) {
 
-            logger.log( Level.SEVERE, null, ex );
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
             if (ex.getCause() instanceof IOException) {
                 throw (IOException) ex.getCause();
             } else {
@@ -656,12 +656,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     done= true;
                     
                 } catch (RuntimeException ex) {
-                    logger.log( Level.SEVERE, null, ex );
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
                     if (ex.getCause() instanceof IOException) {
                         throw (IOException) ex.getCause();
                     } else {
-                        IOException tex= new IOException(ex.toString()); // TODO Java 1.6 will fix this
-                        tex.initCause(ex);
+                        IOException tex= new IOException(ex);
                         throw tex;
                     }
                 } catch (FtpException ex) {
@@ -673,7 +672,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         KeyChain.getDefault().clearUserPassword(url);
                         // loop for them to try again.
                     } else {
-                        throw new IOException(ex.getMessage()); //JAVA5
+                        throw new IOException(ex);
                     }
 
                 } catch ( CancelledOperationException ex ) {
@@ -713,7 +712,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         try {
             result= maybeUpdateDirectoryEntry( filename, false );
         } catch ( IOException ex ) {
-            logger.log(Level.SEVERE,null,ex);// shouldn't happen when force=false.
+            logger.log(Level.SEVERE,ex.getMessage(),ex);// shouldn't happen when force=false.
         }
         if ( result==null && this.isOffline() ) {
             File localfile= new File( getLocalRoot(), filename );
@@ -764,14 +763,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 bean.close();
             } catch (FtpException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             return false;
         } catch (FtpException ftpException) {
             try {
                 bean.close();
             } catch (FtpException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             return false;
         }

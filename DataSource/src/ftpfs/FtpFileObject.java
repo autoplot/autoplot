@@ -58,7 +58,7 @@ public class FtpFileObject extends WebFileObject {
                 }
                 return -1;
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return -1;
             }
         } else {
@@ -78,7 +78,7 @@ public class FtpFileObject extends WebFileObject {
             try {
                 ftpfs.listDirectory(getParent().getNameExt());
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return false;
             }
         }
@@ -94,7 +94,7 @@ public class FtpFileObject extends WebFileObject {
                 }
                 return false;
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return false;
             }
         } else {

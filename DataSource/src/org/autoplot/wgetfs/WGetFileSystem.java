@@ -295,7 +295,7 @@ public class WGetFileSystem extends WebFileSystem {
             }
         } catch ( CancelledOperationException ex ) {
             //TODO: what?
-            logger.log( Level.WARNING, null, ex );
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         } finally {
             in.close();
         }

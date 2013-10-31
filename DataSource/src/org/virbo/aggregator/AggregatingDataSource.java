@@ -488,7 +488,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         notesBuilder.putValue(-1,1,drex.max().doubleValue(Units.us2000));
                         notesBuilder.putValue(-1,2,exunits.createDatum(DataSourceUtil.getMessage(ex)).doubleValue(exunits) );
                         notesBuilder.nextRecord();
-                        logger.log( Level.WARNING,null,ex );
+                        logger.log( Level.WARNING,ex.getMessage(),ex );
                     }
                 }
                 if (ss.length > 1) {

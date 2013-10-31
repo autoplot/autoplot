@@ -652,7 +652,7 @@ public class FTPClient {
 				try {
 					communication.changeCharset(pickCharset());
 				} catch (IOException e) {
-                                    logger.log( Level.SEVERE, null, e );
+                                    logger.log( Level.SEVERE, e.getMessage(), e );
 				}
 			}
 		}
