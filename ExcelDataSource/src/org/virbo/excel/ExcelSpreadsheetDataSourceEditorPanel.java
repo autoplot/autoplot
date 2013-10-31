@@ -35,6 +35,7 @@ import org.apache.poi.hssf.contrib.view.SVTableModel;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.das2.datum.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -44,11 +45,13 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.ui.TableRowHeader;
 
 /**
- *
+ * Read data from Excel spreadsheets.  This supports .xls, but not .xlsx.
  * @author  jbf
  */
 public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss");
+    
     HSSFWorkbook wb;
     Map<Integer, String> columns;
     boolean focusDepend0 = false;
@@ -424,7 +427,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             }
             jTable1.getTableHeader().repaint();
         } catch (IOException ex) {
-            Logger.getLogger(ExcelSpreadsheetDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         String column= (String) columnsComboBox.getSelectedItem();
         String dep0= (String) dep0Columns.getSelectedItem();
@@ -575,7 +578,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
             firstRowTextField.setValue(getIntValue(PROP_FIRST_ROW, 1));
 
         } catch (IOException ex) {
-            Logger.getLogger(ExcelSpreadsheetDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
