@@ -82,6 +82,7 @@ import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
+import org.das2.system.RequestProcessor;
 import org.das2.util.Entities;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.awt.PdfGraphicsOutput;
@@ -874,6 +875,14 @@ public class GuiSupport {
                 parent.stateSupport.createSaveAction().actionPerformed(e);
             }
         });
+        thisPanel.getActionMap().put("RELOAD_ALL", new AbstractAction() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+               RequestProcessor.invokeLater( new Runnable() { public void run() {
+                    AutoplotUtil.reloadAll(parent.dom);
+                } } );
+            }
+        });
 
         InputMap map = new ComponentInputMap(thisPanel);
 
@@ -888,6 +897,7 @@ public class GuiSupport {
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PLOT_ELEMENT");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PLOT_ELEMENT");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, tk.getMenuShortcutKeyMask() ), "SAVE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, tk.getMenuShortcutKeyMask() ), "RELOAD_ALL");
         thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
 
     }
