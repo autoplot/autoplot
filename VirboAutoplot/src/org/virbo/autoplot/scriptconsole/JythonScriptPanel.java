@@ -53,7 +53,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
-    File file;
     ApplicationModel model;
     ApplicationController applicationController;
     DataSetSelector selector;
@@ -255,9 +254,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     void setContext(int context) {
         int oldContext= this.context;
-        if ( oldContext!=context ) {
-            this.file= null;
-        }
         this.context = context;
         this.contextSelector.setSelectedIndex(context);
         if (context == CONTEXT_APPLICATION) {
