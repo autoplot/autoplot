@@ -109,7 +109,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     int idx= lookupResultVariableIndex(id);
                     if ( idx!=-1 ) variableComboBox.setSelectedIndex( idx );
                 } catch (BadLocationException ex) {
-                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
             
@@ -277,12 +277,12 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
 
         } catch (IOException ex ) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             if ( reader!=null ) try {
                 reader.close();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         return hasDoc;
@@ -550,7 +550,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             paramsPanel.revalidate();
 
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         return hasVars;
 
@@ -699,7 +699,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 try {
                     support.annotateError( e,0 );
                 } catch (BadLocationException ex) {
-                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 paramsPanel.add( new JLabel("<html>Script contains errors.</html>") );
             }
@@ -719,7 +719,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         doc= doc.replaceAll(">", "&gt;");
                         esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
                     } catch (BadLocationException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
 
@@ -728,7 +728,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -786,7 +786,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     writer.close();
                 }
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         return URISplit.format(split);

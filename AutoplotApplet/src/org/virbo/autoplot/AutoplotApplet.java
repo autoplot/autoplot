@@ -866,7 +866,7 @@ public class AutoplotApplet extends JApplet {
                     //dom.setTimeRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
                     firePropertyChange(PROP_TIMERANGE, oldv, timeRange);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, null, e);
+                    logger.log(Level.SEVERE, e.getMessage(), e);
                 }
             }
         };
@@ -889,7 +889,7 @@ public class AutoplotApplet extends JApplet {
                     model.getCanvas().repaint();
                     firePropertyChange(PROP_FONT, oldFont, font);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, null, e);
+                    logger.log(Level.SEVERE, e.getMessage(), e);
                 }
             }
         };

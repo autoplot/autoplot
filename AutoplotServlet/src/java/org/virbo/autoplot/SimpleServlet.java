@@ -74,9 +74,9 @@ public class SimpleServlet extends HttpServlet {
             if (handler != null) handler.close();
             handler = h;
         } catch (IOException ex) {
-            Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -467,7 +467,7 @@ public class SimpleServlet extends HttpServlet {
             logit("done with request", t0, uniq, debug);
 
         } catch (Exception e) {
-            logger.log( Level.WARNING, null, e );
+            logger.log( Level.WARNING, e.getMessage(), e );
             throw new ServletException(e);
         }
 

@@ -254,7 +254,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 reader.close();
                 return !haveResult;
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
                 return true;
             }
         }
