@@ -574,6 +574,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
                     
                 }
+                
+                if ( reduce && result!=null && result.rank()==1 ) { // we need to use the series renderer if we have reduced the data.  It shows error bars.
+                    result.putProperty( QDataSet.RENDER_TYPE, "series" );
+                }
+                
                 return result;
             }
         } catch ( Exception ex ) {
