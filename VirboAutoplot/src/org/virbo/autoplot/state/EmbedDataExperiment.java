@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.dom.Application;
@@ -30,10 +31,12 @@ import org.virbo.datasource.URISplit;
 
 /**
  * Embed data and vap in a zip file.  Now that we have PWD, this will
- * be straight-forward
+ * be straight-forward.
  * @author jbf
  */
 public class EmbedDataExperiment {
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot");
     
     private static void writeToZip( ZipOutputStream out, String name, File f ) throws FileNotFoundException, IOException {
         ZipEntry e= new ZipEntry( name ) ;
@@ -86,15 +89,15 @@ public class EmbedDataExperiment {
                             try {
                                 result.add( new URI( r ) );
                             } catch (URISyntaxException ex) {
-                                Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);
                             }
                         }
                     } catch (FileSystem.FileSystemOfflineException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (UnknownHostException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     } catch (IOException ex) {
-                        Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 } else {
                     result.add( split.resourceUri );

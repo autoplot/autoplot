@@ -52,9 +52,9 @@ public class Test003 {
                 KeyChain.getDefault().getUserInfo( new URL("http://ectmageis@www.rbsp-ect.lanl.gov/") );
                 KeyChain.getDefault().getUserInfo( new URL("http://ecthope@www.rbsp-ect.lanl.gov/") );
             } catch (CancelledOperationException ex) {
-                Logger.getLogger(Test003.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (MalformedURLException ex) {
-                Logger.getLogger(Test003.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         
