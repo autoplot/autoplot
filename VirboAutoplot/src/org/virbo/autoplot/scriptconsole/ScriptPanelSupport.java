@@ -543,6 +543,12 @@ public class ScriptPanelSupport {
                 //    model.setDataSourceURL(file.toString());
                 //    model.getDataSourceFilterController().update(true, true);
                 //}
+                
+                if ( file.toString().endsWith(".jyds") ) {
+                    panel.setContext( JythonScriptPanel.CONTEXT_DATA_SOURCE );
+                } else {
+                    panel.setContext( JythonScriptPanel.CONTEXT_APPLICATION );
+                }
 
             }
 
