@@ -350,7 +350,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             }

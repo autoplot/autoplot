@@ -470,12 +470,12 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
                                 mon.finished();
-                                logger.log(Level.WARNING, null, ex);
+                                logger.log(Level.WARNING, ex.getMessage(), ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
                                 mon.finished();
                                 annotateError(ex, offset, interp );
-                                logger.log(Level.WARNING, null, ex );
+                                logger.log(Level.WARNING, ex.getMessage(), ex );
                                 applicationController.setStatus("error: " + ex.toString());
                             }
                         } catch (IOException ex) {

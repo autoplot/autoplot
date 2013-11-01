@@ -80,6 +80,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.das2.datum.LoggerManager;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.Base64;
@@ -117,6 +118,8 @@ import org.w3c.dom.ls.LSSerializer;
  * @author  jbf
  */
 public final class GuiExceptionHandler implements ExceptionHandler {
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot.util");
     
     private static final String CUSTODIAN = "faden@cottagesystems.com";
 
@@ -728,7 +731,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         try {
             bis = AboutUtil.getBuildInfos();
         } catch (IOException ex) {
-            org.virbo.autoplot.Util.logger.log(Level.SEVERE, ex.getMessage(), ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
         recs=null;

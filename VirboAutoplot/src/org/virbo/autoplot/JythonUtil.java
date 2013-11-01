@@ -264,7 +264,7 @@ public class JythonUtil {
             try {
                 uri= url.toURI();
             } catch (URISyntaxException ex) {
-                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
             response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars, makeTool, uri );
