@@ -13,6 +13,7 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.virbo.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
@@ -24,6 +25,8 @@ import static org.virbo.autoplot.ScriptContext.*;
  */
 public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     public int runIt(Object param) {
         try {
             createGui();
@@ -52,10 +55,10 @@ public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
 
             return 0;
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt8_CopyPlotElementsDown.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt8_CopyPlotElementsDown.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
         }
     }

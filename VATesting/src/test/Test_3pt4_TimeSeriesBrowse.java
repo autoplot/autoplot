@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasAxis;
+import org.das2.util.LoggerManager;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -27,6 +28,8 @@ import util.RegexComponentChooser;
  */
 public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     public int runIt(Object o) {
 
         try {
@@ -68,7 +71,7 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
                 return 1;
             }
         } catch ( Exception ex ) {
-            Logger.getLogger(Test_3pt4_TimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -1;
         }        
     }

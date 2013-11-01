@@ -11,6 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -23,6 +24,8 @@ import static org.virbo.autoplot.ScriptContext.*;
  */
 public class Test_3pt7_ZoomPan implements Scenario {
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     private static boolean close( double t, double d ) {
         return Math.abs( (t-d)/t ) < 0.10;
     }
@@ -70,10 +73,10 @@ public class Test_3pt7_ZoomPan implements Scenario {
             }
             
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt7_ZoomPan.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt7_ZoomPan.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
         }
 

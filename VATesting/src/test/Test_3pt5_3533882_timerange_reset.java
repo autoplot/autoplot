@@ -11,6 +11,7 @@ import org.das2.datum.DatumRangeUtil;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 import org.das2.graph.DasAxis;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
@@ -30,6 +31,8 @@ import static org.virbo.autoplot.ScriptContext.*;
  */
 public class Test_3pt5_3533882_timerange_reset implements Scenario {
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     public int runIt(Object o) {
 
         try {
@@ -75,13 +78,13 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt8_CopyPlotElementsDown.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
         } catch (ParseException ex) {
-            Logger.getLogger(Test_3pt5_3533882_timerange_reset.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -2;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt5_3533882_timerange_reset.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -1;
         }
         

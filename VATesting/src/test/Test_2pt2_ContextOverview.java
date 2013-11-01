@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.*;
@@ -25,6 +26,8 @@ import util.RegexComponentChooser;
  */
 public class Test_2pt2_ContextOverview implements Scenario {
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     @Override
     public int runIt(Object o) {
 
@@ -93,10 +96,10 @@ public class Test_2pt2_ContextOverview implements Scenario {
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(Test_2pt2_ContextOverview.class.getName()).log(Level.SEVERE, null, ex);
+           logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -2;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_2pt2_ContextOverview.class.getName()).log(Level.SEVERE, null, ex);
+           logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -1;
         }
         
