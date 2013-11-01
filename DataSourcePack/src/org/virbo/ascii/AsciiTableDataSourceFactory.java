@@ -57,6 +57,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ordinal=fpe,fuh"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
