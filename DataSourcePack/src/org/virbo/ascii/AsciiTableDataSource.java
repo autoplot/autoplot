@@ -117,8 +117,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         super(uri);
 
     }
-
-    public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
+ 
+   public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
 
         ds = doReadFile(mon);
 
@@ -789,7 +789,22 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 parser.setFieldParser(icol, parser.UNITS_PARSER);
             }
         }
-
+        
+        o= params.get("ordinal");
+        if (o!=null ) {
+            String sunits = o;
+            EnumerationUnits u = EnumerationUnits.create("default");
+            String[] ss= sunits.split(",");
+            for ( String s : ss ) {
+                u.createDatum(s);
+            }
+            if (column != null) {
+                int icol = parser.getFieldIndex(column);
+                parser.setUnits(icol, u);
+                parser.setFieldParser(icol, parser.UNITS_PARSER);
+            }
+        }
+        
         // --- done configuration, now read ---
         DDataSet ds1;
         o = params.get("tail");
