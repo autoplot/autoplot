@@ -205,7 +205,7 @@ public class VOTableReader {
         t0= System.currentTimeMillis();
         OutputStream out= new FileOutputStream("/tmp/vospase.qds");
         try {
-            new BundleStreamFormatter().format( ds, out, false );
+            new BundleStreamFormatter().format( ds, out, true );
             System.err.println( String.format( "Write in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
         } catch (StreamException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
