@@ -24,7 +24,6 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.qstream.BundleStreamFormatter;
-import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -61,6 +60,9 @@ public class VOTableReader {
      */
     private final String STATE_RECORD= "record";
     
+    /**
+     * expecting the characters within a field.
+     */
     private final String STATE_FIELD= "field";
     
     int ncolumn;
@@ -78,6 +80,9 @@ public class VOTableReader {
      */
     int index; 
     
+    /**
+     * 
+     */
     private final String UNIT_UTC= "time.epoch";
 
     private final String DATATYPE_UTC= "time.epoch";
@@ -92,7 +97,6 @@ public class VOTableReader {
             public void startDocument() throws SAXException {
                 state= STATE_OPEN;
             }
-            
             
             /**
              * As elements come in, we go through the state transitions to keep track of
@@ -125,7 +129,7 @@ public class VOTableReader {
                     }    
                     if ( sunit==null ) {
                         units.add(Units.dimensionless);
-                    } else if ( sunit.equals("time.epoch") ) {
+                    } else if ( sunit.equals( UNIT_UTC ) ) {
                         units.add(Units.cdfTT2000);
                     } else {
                         units.add( SemanticOps.lookupUnits( sunit) );
@@ -141,7 +145,6 @@ public class VOTableReader {
                 } else if ( localName.equals("TD") && state.equals(STATE_RECORD) ) {
                     state= STATE_FIELD;
                 }
-                //super.startElement(uri, localName, qName, attributes); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
