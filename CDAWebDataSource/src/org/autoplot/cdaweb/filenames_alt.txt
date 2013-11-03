@@ -1,7 +1,8 @@
 # This table is used when the templates are not correct, for example AC_H3_CRIS should be named
 # with %Y0101 not %Y%m%d so that the span is correct.  Note the location column is no longer used.
 #
-# generated with the python script /home/jbf/ct/autoplot/script/cdaweb/listAll.jy
+# Originally generated with the python script sftp://jbf@jfaden.net/home/jbf/ct/autoplot/script/cdaweb/listAll.jy
+#   and hand-tweaked since then.
 AC_H3_CRIS x %Y/ac_h3_cris_%Y0101_?%v.cdf
 CL_JP_PGP x %Y/cl_jp_pgp_%Y%m01_?%v.cdf
 C1_JP_PMP x %Y/c1_jp_pmp_%Y%m01_?%v.cdf
@@ -42,3 +43,4 @@ WI_H1_SWE x %Y/wi_h1_swe_%Y%m01_?%v.cdf  # sort of
 CRRES_H0_MEA x %Y/crres_h0_mea_%Y%m%(d,span=10)_?%v.cdf
 UY_1MIN_VHM x %Y/uy_1min_vhm_%Y%m%(d,span=10)_?%v.cdf  # these are 10-day files...
 TIMED_L1B_SABER http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/saber/l1bv7 %Y/%m/timed_l1bv7_saber_%Y%m%d%(H,span=4)%M_?%v.cdf
+DE_VS_EICS  ftp://cdaweb.gsfc.nasa.gov/pub/data/de/de1/particles_eics/vs_eics_cdaweb %Y/%y%j_eics_de_96s_v%v.cdf
