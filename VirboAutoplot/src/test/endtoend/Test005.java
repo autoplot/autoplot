@@ -107,13 +107,12 @@ public class Test005 {
                 out.close();
             }
             xxx("demo11");
-            {
+ 
             plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
             getDocumentModel().getDataSourceFilters(0).setFilters("|slice0(2)");
             getDocumentModel().getPlotElements(0).setComponent("");
-            getDocumentModel().getPlots(0).getZaxis().setRange(DatumRange.newDatumRange(-20e4, 20e4, Units.dimensionless));
             writeToPng("test005_demo12.png");
-            }
+
             xxx("demo12");
 
             plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
