@@ -13,6 +13,7 @@ import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -41,13 +42,13 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
                         CompletionContext.CONTEXT_PARAMETER_NAME,
                         "", this, "arg_0",
                         "", "default dataset", true ) );
-                List<String> params= getNames( cc, mon );
-                for ( String s: params ) {
+                Map<String,String> params= getNames( cc, mon );
+                for ( Entry<String,String> e: params.entrySet() ) {
                     //result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s ) );
                     result.add( new CompletionContext(
                         CompletionContext.CONTEXT_PARAMETER_NAME,
-                        s, this, "arg_0",
-                        s, null, true ) );
+                        e.getKey(), this, "arg_0",
+                        e.getValue(), null, true ) );
                 }
             }
         }
@@ -63,17 +64,15 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
     }
     
     
-    private List<String> getNames( CompletionContext cc, ProgressMonitor mon ) throws IOException, StreamException {
+    private Map<String,String> getNames( CompletionContext cc, ProgressMonitor mon ) throws IOException, StreamException {
         
-        Map params= URISplit.parseParams( cc.params );
-        Object o;
         File file= DataSetURI.getFile( cc.resourceURI, mon  );
         
         QDataSetStreamHandler h= new QDataSetStreamHandler();
         h.setReadPackets(false); // don't read any records, just scan for datasets.
         org.virbo.qstream.StreamTool.readStream( Channels.newChannel(new FileInputStream(file) ), h );
             
-        return h.getDataSetNames();
+        return h.getDataSetNamesAndDescriptions();
         
     }
 
