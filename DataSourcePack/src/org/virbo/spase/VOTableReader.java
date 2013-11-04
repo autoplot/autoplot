@@ -180,6 +180,7 @@ public class VOTableReader {
             head.putProperty( QDataSet.NAME, ii, ids.get(ii) );
             head.putProperty( QDataSet.LABEL, ii, names.get(ii) ); 
             head.putProperty( QDataSet.UNITS, ii, units.get(ii) ); 
+            if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ii, ids.get(0) );
         }
         dataSetBuilder.putProperty( QDataSet.BUNDLE_1, head.getDataSet() );
         return dataSetBuilder.getDataSet();
