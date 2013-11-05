@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The tooltip in the editor shows the selected value.</small></p>
+        <p><small>Handling of large data sets by the SeriesRenderer is more useful.  This dataset has 5M points.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,10 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>Horizontal slice works again with spectrograms with rank 2 Y and some records containing all fill, thanks Joe!</li>
+            <li>UVI images were mistaken for waveform data, thanks Len!</li>
+            <li>1119: exceptions thrown with no message</li>
+            <li>correct the selection area with events renderer orbit mode and gantt mode.</li>
             <li>1118: default uncaught exception handler not set for CreatePngWalk</li>
             <li>1117: .jy parameters panel would mess up timeranges</li>
             <li>put in access information into manifest to remove warning about missing permissions manifest attribute.</li>
@@ -69,6 +73,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>1120: Series mode has a more useful rendering of data when there are &gt; 200000 points.</li>
+            <li>1093: Warning messages are turned off in printing.</li>
+            <li>Orbit files updated to Nov 20.</li>
+            <li>automatically switch contexts in Jython editor when .jyds extension is used.</li>
+            <li>Add ctrl-L shortcut for reload all.</li>
+            <li>add buttons for availability and reduce in aggregation GUI</li>
             <li>slice windows have slope slicer</li>
             <li>.d2t and .qdst extensions resolve to the das2 stream/qstream reader to support the text extension.</li>
             <li>createPngWalk command line now returns success/fail exit codes</li>
