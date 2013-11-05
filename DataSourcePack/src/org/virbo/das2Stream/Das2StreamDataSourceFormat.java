@@ -14,6 +14,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.VectorDataSetAdapter;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 
@@ -33,10 +34,10 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
             FileOutputStream fo=null;
             try {
                 fo= new FileOutputStream( new File( split.resourceUri ) );
-                if ( binary ) {
-                    new org.virbo.qstream.SimpleStreamFormatter().format( data, fo, false );
+                if ( SemanticOps.isBundle(data) ) {
+                    new org.virbo.qstream.BundleStreamFormatter().format( data, fo, !binary );
                 } else {
-                    new org.virbo.qstream.SimpleStreamFormatter().format( data, fo, true );
+                    new org.virbo.qstream.SimpleStreamFormatter().format( data, fo, !binary );
                 }
             } finally {
                 if ( fo!=null ) fo.close();
