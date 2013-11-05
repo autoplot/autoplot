@@ -27,10 +27,10 @@ public class AutoplotServer {
         if ( false ) {
             Logger l= LoggerManager.getLogger("apdss.agg");
             l.setLevel(Level.ALL);
-            l.addHandler( new ConsoleHandler() );
+            l.addHandler( new ConsoleHandler() );  // I'm not sure when we need this.  This morning I was getting double messages.
             l.log(Level.FINE, "Logging at {0}", l.getLevel());
         }
-        
+          
         System.err.println("org.virbo.autoplot.AutoplotServer 20120922");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
