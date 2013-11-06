@@ -1151,6 +1151,7 @@ APSplash.checkTime("init 270");
                 // be more precise about this now.  bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                 bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
                 bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, timeRangeEditor, "useDoy" );
+                bind( bc, dom.getOptions(), Options.PROP_PRINTINGTAG, dom.getCanvases(0).getController().getDasCanvas(), "printingTag" ); 
                 bc.bind();
 
                 dom.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
