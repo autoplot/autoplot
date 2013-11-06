@@ -474,7 +474,7 @@ public class Options extends DomNode {
     /**
      * the level of messages that are displayed.
      */
-    protected Level printingLogLevel = Level.OFF;
+    protected Level printingLogLevel = Level.ALL;
     public static final String PROP_PRINTINGLOGLEVEL = "printingLogLevel";
 
     public Level getPrintingLogLevel() {
