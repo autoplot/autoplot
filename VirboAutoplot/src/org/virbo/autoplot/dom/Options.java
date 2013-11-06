@@ -452,9 +452,26 @@ public class Options extends DomNode {
         this.sliceRebinnedData = sliceRebinnedData;
         propertyChangeSupport.firePropertyChange(PROP_SLICEREBINNEDDATA, oldSliceRebinnedData, sliceRebinnedData);
     }
+    
+    /**
+     * the tag printed on plots to indicate the date when it was created.
+     */    
+    protected String printingTag = "";
+    
+    public static final String PROP_PRINTINGTAG = "printingTag";
 
-    // Note these are weird: I'm not sure if I've just forgotten items or this was intensional.
-    // I suspect that it is intensional that a subset of the options are treated this way.  Seems like
+    public String getPrintingTag() {
+        return printingTag;
+    }
+
+    public void setPrintingTag(String printingTag) {
+        String oldPrintingTag=  this.printingTag;
+        this.printingTag = printingTag;
+        propertyChangeSupport.firePropertyChange(PROP_PRINTINGTAG, oldPrintingTag, printingTag);
+    }
+
+    // Note these are weird: I'm not sure if I've just forgotten items or this was intentional.
+    // I suspect that it is intentional that a subset of the options are treated this way.  Seems like
     // there was an issue with colors if I didn't do this.  Anyway, we sync useTimeRangeEditor because
     // of the use case where a product is turned over to a person who doesn't want to see URIs.
     @Override
