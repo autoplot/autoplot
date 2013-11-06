@@ -60,6 +60,8 @@ public class OptionsPrefsController {
                 prefs.put( evt.getPropertyName(), DomUtil.encodeColor((Color)evt.getNewValue() ) );
             } else if ( evt.getNewValue() instanceof Enum ) {
                 prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
+            } else if ( evt.getNewValue() instanceof Level ) {
+                prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
@@ -120,7 +122,7 @@ public class OptionsPrefsController {
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
         options.setPrintingTag( prefs.get(Options.PROP_PRINTINGTAG, options.printingTag ) );
-
+        options.setPrintingLogLevel( Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) ) );
     }
 
     public void loadPreferences() {
@@ -165,5 +167,6 @@ public class OptionsPrefsController {
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
         options.printingTag= prefs.get(Options.PROP_PRINTINGTAG, options.printingTag );
+        options.printingLogLevel= Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) );
     }
 }
