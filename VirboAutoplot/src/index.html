@@ -25,6 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>export bundle to qds now uses specialized formatter for efficient output.  Before it would have to use the same encoding for all datasets.</li>
             <li>Horizontal slice works again with spectrograms with rank 2 Y and some records containing all fill, thanks Joe!</li>
             <li>UVI images were mistaken for waveform data, thanks Len!</li>
             <li>1119: exceptions thrown with no message</li>
@@ -73,6 +74,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>330: Timestamp on PDF and PNG output </li>
+            <li>Henry's CubicRoot solver</li>
             <li>1120: Series mode has a more useful rendering of data when there are &gt; 200000 points.</li>
             <li>1093: Warning messages are turned off in printing.</li>
             <li>Orbit files updated to Nov 20.</li>
