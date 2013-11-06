@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1023,9 +1024,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             for ( int j=0; j<ss2.length; j++ ) {
                 String[] ss3= ss2[j].split("\\s*=\\s*",-2);
                 if ( ss3.length==1 ) {
-                    params.append(ss3[0].trim());
+                    params.append( URLEncoder.encode(ss3[0].trim()) );
                 } else {
-                    params.append(ss3[0].trim()).append("=").append(ss3[1].trim());
+                    params.append( URLEncoder.encode(ss3[0].trim())).append("=").append( URLEncoder.encode(ss3[1].trim() ));
                 }
                 params.append("%20");  //TODO: I don't think this is correct...  See https://sourceforge.net/p/autoplot/bugs/1103/
             }
