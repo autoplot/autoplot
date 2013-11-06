@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.virbo.autoplot.MouseModuleType;
 
 /**
@@ -469,6 +470,23 @@ public class Options extends DomNode {
         this.printingTag = printingTag;
         propertyChangeSupport.firePropertyChange(PROP_PRINTINGTAG, oldPrintingTag, printingTag);
     }
+    
+    /**
+     * the level of messages that are displayed.
+     */
+    protected Level printingLogLevel = Level.OFF;
+    public static final String PROP_PRINTINGLOGLEVEL = "printingLogLevel";
+
+    public Level getPrintingLogLevel() {
+        return printingLogLevel;
+    }
+
+    public void setPrintingLogLevel(Level printingLogLevel) {
+        Level oldPrintingLogLevel = this.printingLogLevel;
+        this.printingLogLevel = printingLogLevel;
+        propertyChangeSupport.firePropertyChange(PROP_PRINTINGLOGLEVEL, oldPrintingLogLevel, printingLogLevel);
+    }
+
 
     // Note these are weird: I'm not sure if I've just forgotten items or this was intentional.
     // I suspect that it is intentional that a subset of the options are treated this way.  Seems like
