@@ -112,7 +112,6 @@ public class PlotController extends DomNodeController {
                 DasPlot p= dasPlot;
                 MouseModuleType mm= (MouseModuleType) evt.getNewValue();
                 MouseModule m= null;
-                String l= null;
                 if ( mm==MouseModuleType.boxZoom ) {
                     m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
                 } else if ( mm==MouseModuleType.crosshairDigitizer ) {
