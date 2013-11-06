@@ -119,6 +119,7 @@ public class OptionsPrefsController {
         }
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
+        options.setPrintingTag( prefs.get(Options.PROP_PRINTINGTAG, options.printingTag ) );
 
     }
 
@@ -163,5 +164,6 @@ public class OptionsPrefsController {
         }
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
+        options.printingTag= prefs.get(Options.PROP_PRINTINGTAG, options.printingTag );
     }
 }
