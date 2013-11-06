@@ -201,20 +201,20 @@ public class LogConsole extends javax.swing.JPanel {
     }
 
 
-    public synchronized void setShowLoggerId(boolean selected) {
+    public void setShowLoggerId(boolean selected) {
         this.showLoggerId= selected;
     }
 
-    public synchronized void setShowTimeStamps( boolean selected ) {
+    public void setShowTimeStamps( boolean selected ) {
         this.showTimeStamps= selected;
     }
 
 
-    public synchronized void setShowLevel( boolean selected ) {
+    public void setShowLevel( boolean selected ) {
         this.showLevel= selected;
     }
 
-    public synchronized void setLevel( int level ) {
+    public void setLevel( int level ) {
         this.level= level;
     }
 
@@ -369,7 +369,8 @@ public class LogConsole extends javax.swing.JPanel {
 
     /**
      * note this is generally called from a timer that coalesces events.  But
-     * may be called explicitly in response to a user event as well.
+     * may be called explicitly in response to a user event as well.  
+     * This should be called on the event thread!
      */
     public void update() {
         List<LogRecord> lrecords;
