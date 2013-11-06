@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -276,6 +277,9 @@ public class LogConsole extends javax.swing.JPanel {
                     copy.setMillis(rec.getMillis());
                     synchronized (LogConsole.this) {
                         records.add(copy);
+                        while (records.size() > RECORD_SIZE_LIMIT) {
+                            records.remove(0);
+                        }
                         timer2.restart();
                         if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
                             eventThreadId = rec.getThreadID();
@@ -367,11 +371,15 @@ public class LogConsole extends javax.swing.JPanel {
      * note this is generally called from a timer that coalesces events.  But
      * may be called explicitly in response to a user event as well.
      */
-    public synchronized void update() {
+    public void update() {
+        List<LogRecord> lrecords;
+        synchronized ( this ) {
+            lrecords= new ArrayList<LogRecord>(records);
+        }
         try {
             //long t0= System.currentTimeMillis();
-            int n = records.size();
-            long t = n == 0 ? 0 : records.get(n - 1).getMillis();
+            int n = lrecords.size();
+            long t = n == 0 ? 0 : lrecords.get(n - 1).getMillis();
             boolean timeStamps = showTimeStamps;
             boolean logLevels = showLevel;
             String st = searchText;
@@ -383,16 +391,10 @@ public class LogConsole extends javax.swing.JPanel {
 
             MutableAttributeSet highlistAttr = new SimpleAttributeSet();
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
-
-            while (records.size() > RECORD_SIZE_LIMIT) {
-                records.remove(0);
-            }
             
-            //int nrec= records.size();
-            
-            for (LogRecord rec : records) {
+            for (LogRecord rec : lrecords) {
                 if (rec.getLevel().intValue() >= level) {
-//                    if (lastT != 0 && rec.getMillis() - lastT > 5000) { // TODO replace this with a GUI element, like a divider line on the left.
+//                    if (lastT != 0 && rec.getMillis() - lastT > 5000) { // TODO replace this with a GUI element, like a divider line on the right.
 //                        //buf.append("\n");
 //                        doc.insertString(doc.getLength(), "\n", null);
 //                    }
@@ -441,23 +443,7 @@ public class LogConsole extends javax.swing.JPanel {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
-            }
-            
-//            FileWriter w=null;
-//            try {
-//                File ff= new File("/tmp/logconsole.txt");
-//                w=new FileWriter( ff,true );
-//                w.write( String.format( "%d records %d ms\n", nrec, System.currentTimeMillis()-t0 ) );
-//            } catch (IOException ex) {
-//                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-//            } finally {
-//                try {
-//                    if ( w!=null ) w.close();
-//                } catch ( IOException ex ) {
-//                    // do nothing
-//                }
-//            }
-//                        
+            }        
             
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
