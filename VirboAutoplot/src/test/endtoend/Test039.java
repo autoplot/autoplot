@@ -70,6 +70,8 @@ public class Test039 {
         canvas.add( plot, DasRow.create( canvas, null, "0%+2em", "100%-5em" ),
                 DasColumn.create( canvas, null, "0%+14em", "100%-4em" ) );
 
+        canvas.setPrintingTag("APL $Y"); // this will cause a failure once per year...
+        
         canvas.writeToPng("test039_tca.png");
         
     }
