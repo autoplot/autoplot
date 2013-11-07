@@ -18,6 +18,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.GraphUtil;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
+import org.das2.util.AboutUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import test.graph.QFunctionLarry;
@@ -77,6 +78,11 @@ public class Test039 {
     }
     
     public static void main( String[] args ) throws Exception {
+        String s= AboutUtil.getAboutHtml();
+        String[] ss= s.split("\\<br\\>");
+        for ( String sss : ss ) {
+            System.err.println( sss );
+        }
         testTCA();
         System.exit(0);
     }
