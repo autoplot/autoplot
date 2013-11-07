@@ -286,9 +286,9 @@ rm dist/AutoplotVolatile1.jar
 echo "=== sign and pack the jar file..."
 echo "  use set +x to hide private info"
 #echo  ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS -keystore $KEYSTORE -storetype $STORETYPE dist/AutoplotVolatile.jar "$ALIAS"
-echo ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
+echo ${JAVA6_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
 set +x
-if ! ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
+if ! ${JAVA6_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
