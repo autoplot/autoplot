@@ -17,7 +17,7 @@ import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
 
 /**
- *
+ * Test of Jython features.
  * @author jbf
  */
 public class Test038 {
