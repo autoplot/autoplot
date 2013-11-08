@@ -19,6 +19,7 @@ import org.das2.graph.GraphUtil;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.util.AboutUtil;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import test.graph.QFunctionLarry;
@@ -83,6 +84,9 @@ public class Test039 {
         for ( String sss : ss ) {
             System.err.println( sss );
         }
+        
+        LoggerManager.getLogger("das2.graphics.axis").setLevel(Level.ALL);
+        
         testTCA();
         System.exit(0);
     }
