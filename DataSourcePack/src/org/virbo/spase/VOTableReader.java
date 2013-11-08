@@ -20,6 +20,8 @@ import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
+import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSetBuilder;
@@ -70,15 +72,21 @@ public class VOTableReader {
     int ncolumn;
     QDataSet bds;
     
-    List<String> ids;
-    List<String> datatypes; // we only support double and UTC then the ucd is time.epoch.
-    List<String> names;
-    List<String> sunits; // Equal to UTC for time types.  Can be null.
-    List<Units> units;
-    List<String> fillValues; // the fill value representation
-    
+    List<String> ids= new ArrayList<String>();
+    List<String> datatypes= new ArrayList<String>(); // we only support double and UTC then the ucd is time.epoch.
+    List<String> names= new ArrayList<String>();
+    List<String> sunits= new ArrayList<String>(); // Equal to UTC for time types.  Can be null.
+    List<Units> units= new ArrayList<Units>();
+    List<String> fillValues= new ArrayList<String>(); // the fill value representation
+    List<Boolean> stopEnumerations= new ArrayList<Boolean>();  // if true, don't attempt to preserve enumerations.
+                    
     DataSetBuilder dataSetBuilder;
     
+    /**
+     * the number of unique values allowed to be represented by an enumeration.
+     */
+    private static final int UNIQUE_ENUMERATION_VALUES_LIMIT = 200;
+
     /**
      * the index within each record.
      */
@@ -117,12 +125,7 @@ public class VOTableReader {
             public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                 if ( localName.equals("TABLE")&& state.equals(STATE_OPEN)  ) {
                     state= STATE_HEADER;
-                    ids= new ArrayList<String>();
-                    datatypes= new ArrayList<String>();
-                    names= new ArrayList<String>();
-                    units= new ArrayList<Units>();
-                    fillValues= new ArrayList<String>();
-                    
+
                 } else if ( localName.equals("FIELD") && state.equals(STATE_HEADER) ) {
                     String id= attributes.getValue("ID");
                     String name= attributes.getValue("name");
@@ -155,6 +158,7 @@ public class VOTableReader {
                         units.add( SemanticOps.lookupUnits( sunit) );
                     }
                     fillValues.add(null);
+                    stopEnumerations.add(Boolean.FALSE);
                 } else if ( localName.equals("VALUES") ) {
                     String fill= attributes.getValue("null");
                     if ( fill!=null ) {
@@ -196,7 +200,7 @@ public class VOTableReader {
             public void characters(char[] ch, int start, int length) throws SAXException {
                 if ( STATE_FIELD.equals(state) ) {
                     String s= new String( ch, start, length );
-                    logger.info( "index:"+index+ " s:"+s );
+                    //logger.finest( "index:"+index+ " s:"+s );
                     if ( s.trim().length()>0 ) {
                         if ( s.equals(fillValues.get(index) ) ) {
                             dataSetBuilder.putValue( -1, index, FILL_VALUE );      
@@ -205,7 +209,14 @@ public class VOTableReader {
                                 Units u=  units.get(index);
                                 Datum d;
                                 if ( u instanceof EnumerationUnits ) {
-                                    d= ((EnumerationUnits)u).createDatum( s );
+                                    if ( stopEnumerations.get(index) ) {
+                                        d= u.createDatum( 1 );
+                                    } else {
+                                        d= ((EnumerationUnits)u).createDatum( s );
+                                        if ( d.doubleValue(u) > UNIQUE_ENUMERATION_VALUES_LIMIT ) {
+                                            stopEnumerations.set(index,true);
+                                        }
+                                    }
                                 } else {
                                     d= u.parse( s );
                                 }
@@ -235,7 +246,18 @@ public class VOTableReader {
             if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ii, ids.get(0) );
         }
         dataSetBuilder.putProperty( QDataSet.BUNDLE_1, head.getDataSet() );
-        return dataSetBuilder.getDataSet();
+        DDataSet result= dataSetBuilder.getDataSet();
+        
+        for ( int jj=0; jj<ids.size(); jj++ ) {
+            if ( stopEnumerations.get(jj)==Boolean.TRUE ) {
+                logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
+                for ( int ii=0; ii<result.length(); ii++ ) {
+                    result.putValue( ii, jj, FILL_VALUE );
+                    ((MutablePropertyDataSet)result.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS, jj, null );
+                }
+            }
+        }
+        return result;
     }
     
     public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
@@ -251,8 +273,9 @@ public class VOTableReader {
         long t0= System.currentTimeMillis();
         
         //xmlReader.parse( new File("/home/jbf/ct/autoplot/votable/DATA_2012_2012_FGM_KRTP_1M.xml").toURI().toString() );
-        xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );
+        //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );
         
+        xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
         QDataSet ds= t.getDataSet();
         System.err.println( String.format( "Read in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
         
