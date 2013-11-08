@@ -107,7 +107,11 @@ cd ..
 echo "done make jumbo jar file..."
 
 echo "normalize jar file for signing..."
-$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable1.jar dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable2.jar dist/AutoplotStable1.jar
+mv dist/AutoplotStable2.jar dist/AutoplotStable.jar
+rm dist/AutoplotStable1.jar
+
 echo "sign the jar files..."
 echo "  use set +x to hide private info"
 #set +x
@@ -116,7 +120,7 @@ if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $J
    echo "Failed to sign resources!"
    exit 1
 fi
-set -x
+#set -x
 
 echo "repeat normalize/sign (workaround for known bug with large files...)"
 echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
