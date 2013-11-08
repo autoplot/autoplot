@@ -13,6 +13,7 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.Column;
 import org.virbo.cdfdatasource.CdfFileDataSourceFactory;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
@@ -34,6 +35,9 @@ public class Test005 {
         try {
             CdfFileDataSourceFactory.loadCdfLibraries();
 
+            Column mc= getDocumentModel().getCanvases(0).getMarginColumn();
+            System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
+            
             setCanvasSize(800, 600);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
@@ -51,6 +55,8 @@ public class Test005 {
                 Axis axis = getDocumentModel().getPlots(0).getXaxis();
                 axis.setRange(DatumRangeUtil.rescale(axis.getRange(), -1, 2));
                 writeToPng("test005_demo2.png");
+                mc= getDocumentModel().getCanvases(0).getMarginColumn();
+                System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
             }
 
             xxx("demo2");
