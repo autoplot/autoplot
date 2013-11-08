@@ -74,6 +74,7 @@ public class VOTableReader {
     
     List<String> ids= new ArrayList<String>();
     List<String> datatypes= new ArrayList<String>(); // we only support double and UTC then the ucd is time.epoch.
+    List<Integer> arraysizes= new ArrayList<Integer>(); // support for 2-D arrays.  -1,0 or N  -2 means *, -1 means scalar, positive means 2-D array
     List<String> names= new ArrayList<String>();
     List<String> sunits= new ArrayList<String>(); // Equal to UTC for time types.  Can be null.
     List<Units> units= new ArrayList<Units>();
@@ -88,9 +89,19 @@ public class VOTableReader {
     private static final int UNIQUE_ENUMERATION_VALUES_LIMIT = 200;
 
     /**
-     * the index within each record.
+     * the data index within each record.  This might not be the same as the number of fields.
      */
     int index; 
+    
+    /**
+     * the number of fields per record.
+     */
+    int nelements;
+    
+    /**
+     * element index within a record, used to index the output array.
+     */
+    int ielement;
     
     /**
      * use TimeLocationUnits like us2000 or CDFTT2000
@@ -106,7 +117,11 @@ public class VOTableReader {
     
     private final double FILL_VALUE= -1e31;
     
+    private final int ARRAYSIZE_ANY= -2;
+    private final int ARRAYSIZE_SCALAR= -1;
+    
     public VOTableReader() {
+        
         this.sax = new DefaultHandler() {
 
             /**
@@ -125,7 +140,7 @@ public class VOTableReader {
             public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                 if ( localName.equals("TABLE")&& state.equals(STATE_OPEN)  ) {
                     state= STATE_HEADER;
-
+                    nelements= 0;
                 } else if ( localName.equals("FIELD") && state.equals(STATE_HEADER) ) {
                     String id= attributes.getValue("ID");
                     String name= attributes.getValue("name");
@@ -137,6 +152,8 @@ public class VOTableReader {
                     String dt= attributes.getValue("datatype");
                     String ucd= attributes.getValue("ucd");
                     String sunit= attributes.getValue("unit");
+                    String arraysize= attributes.getValue("arraysize");
+                    
                     if ( dt.equals("char") ) {
                         if ( ( ucd!=null && ucd.equals("time.epoch") ) || ( sunit!=null && sunit.equals("DateTime") ) ) {
                             sunit= UNIT_UTC;
@@ -147,7 +164,22 @@ public class VOTableReader {
                         }
                     } else {
                         datatypes.add( dt );
-                    }    
+                    }
+                    if ( arraysize!=null ) {
+                        if ( arraysize.equals("*") ) {
+                            arraysizes.add( ARRAYSIZE_ANY );
+                            if ( !dt.equals("char") ) {
+                                throw new IllegalArgumentException("only char can have variable length");
+                            }
+                            nelements+= 1;
+                        } else {
+                            arraysizes.add( Integer.parseInt(arraysize) );
+                            nelements+= Integer.parseInt(arraysize);
+                        }
+                    } else {
+                        arraysizes.add( ARRAYSIZE_SCALAR );
+                        nelements+= 1;
+                    }
                     if ( sunit==null ) {
                         units.add(Units.dimensionless);
                     } else if ( sunit.equals( UNIT_UTC ) ) {
@@ -167,7 +199,7 @@ public class VOTableReader {
                     //TODO: there is MIN and MAX that could be interpretted, find a demo.
                 } else if ( localName.equals("DATA") ) {
                     state= STATE_DATA;
-                    dataSetBuilder= new DataSetBuilder( 2, 100, names.size() );
+                    dataSetBuilder= new DataSetBuilder( 2, 100, nelements );
                 } else if ( localName.equals("TR") && state.equals(STATE_DATA) ) {
                     state= STATE_RECORD;
                     index= 0;
@@ -187,6 +219,7 @@ public class VOTableReader {
                     dataSetBuilder.nextRecord();
                     state= STATE_DATA;
                     index=0;
+                    ielement=0;
                 } else if ( localName.equals("FIELD")  ) {
                     assert state.equals(STATE_HEADER);
                     index++; // counting up items.
@@ -202,48 +235,81 @@ public class VOTableReader {
                     String s= new String( ch, start, length );
                     //logger.finest( "index:"+index+ " s:"+s );
                     if ( s.trim().length()>0 ) {
-                        if ( s.equals(fillValues.get(index) ) ) {
-                            dataSetBuilder.putValue( -1, index, FILL_VALUE );      
-                        } else {
-                            try {
-                                Units u=  units.get(index);
-                                Datum d;
-                                if ( u instanceof EnumerationUnits ) {
-                                    if ( stopEnumerations.get(index) ) {
-                                        d= u.createDatum( 1 );
-                                    } else {
-                                        d= ((EnumerationUnits)u).createDatum( s );
-                                        if ( d.doubleValue(u) > UNIQUE_ENUMERATION_VALUES_LIMIT ) {
-                                            stopEnumerations.set(index,true);
-                                        }
-                                    }
-                                } else {
-                                    d= u.parse( s );
-                                }
-                                dataSetBuilder.putValue( -1, index, d.doubleValue(u) );                            
-                            } catch (ParseException ex) {
-                                Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
-                                dataSetBuilder.putValue( -1, index, FILL_VALUE );
+                        int arraysize= arraysizes.get(index);
+                        if ( arraysize>0 ) { // note zero-length array not supported.
+                            Units u=  units.get(index);
+                            String[] ss= s.trim().split("\\s+");
+                            if ( ss.length!=arraysize ) {
+                                throw new IllegalArgumentException("values in votable don't match arraysize");
                             }
+                            for ( int jj=0; jj<arraysize; jj++ ) {
+                                try {
+                                    dataSetBuilder.putValue( -1, ielement, u.parse( ss[jj] ).doubleValue(u) );
+                                    ielement++;
+                                } catch (ParseException ex) {
+                                    throw new IllegalArgumentException("unable to parse: "+ss[jj]);
+                                }
+                            }
+                        } else {
+                            if ( s.equals(fillValues.get(index) ) ) {
+                                dataSetBuilder.putValue( -1, ielement, FILL_VALUE );      
+                            } else {
+                                try {
+                                    Units u=  units.get(index);
+                                    Datum d;
+                                    if ( u instanceof EnumerationUnits ) {
+                                        if ( stopEnumerations.get(index) ) {
+                                            d= u.createDatum( 1 );
+                                        } else {
+                                            d= ((EnumerationUnits)u).createDatum( s );
+                                            if ( d.doubleValue(u) > UNIQUE_ENUMERATION_VALUES_LIMIT ) {
+                                                stopEnumerations.set(index,true);
+                                            }
+                                        }
+                                    } else {
+                                        d= u.parse( s );
+                                    }
+                                    dataSetBuilder.putValue( -1, ielement, d.doubleValue(u) );                            
+                                } catch (ParseException ex) {
+                                    Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
+                                    dataSetBuilder.putValue( -1, ielement, FILL_VALUE );
+                                }
+                            }
+                            ielement++;
                         }
                     }
                 }
             }
-            
         }; 
     }
     
     public QDataSet getDataSet() {
         SparseDataSetBuilder head= new SparseDataSetBuilder(2);
-        head.setQube( new int[] { ids.size(), 0 } ); // all datasets are rank 1.
+        head.setQube( new int[] { nelements, 0 } ); // all datasets must be or are made to be rank 1.
+        
+        int ielement=0;
         for ( int ii=0; ii<ids.size(); ii++ ) {
-            head.putProperty( QDataSet.NAME, ii, ids.get(ii) );
-            head.putProperty( QDataSet.LABEL, ii, names.get(ii) ); 
-            head.putProperty( QDataSet.UNITS, ii, units.get(ii) ); 
-            if ( fillValues.get(ii)!=null ) {
-                head.putProperty( QDataSet.FILL_VALUE, ii, FILL_VALUE ); 
+            if ( arraysizes.get(ii)>0 ) {
+                for ( int jj=0; jj<arraysizes.get(ii); jj++ ) {
+                    head.putProperty( QDataSet.NAME, ielement, ids.get(ii)+"_"+ielement );
+                    head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
+                    head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
+                    if ( fillValues.get(ii)!=null ) {
+                        head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
+                    }
+                    ielement++;
+                }
+                
+            } else {
+                head.putProperty( QDataSet.NAME, ielement, ids.get(ii) );
+                head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
+                head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
+                if ( fillValues.get(ii)!=null ) {
+                   head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
+                }
+                ielement++;
             }
-            if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ii, ids.get(0) );
+            if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
         }
         dataSetBuilder.putProperty( QDataSet.BUNDLE_1, head.getDataSet() );
         DDataSet result= dataSetBuilder.getDataSet();
@@ -273,9 +339,10 @@ public class VOTableReader {
         long t0= System.currentTimeMillis();
         
         //xmlReader.parse( new File("/home/jbf/ct/autoplot/votable/DATA_2012_2012_FGM_KRTP_1M.xml").toURI().toString() );
-        //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );
+        //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );        
+        //xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
+        xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_PWS_SA_48S.xml").toURI().toString() );
         
-        xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
         QDataSet ds= t.getDataSet();
         System.err.println( String.format( "Read in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
         
