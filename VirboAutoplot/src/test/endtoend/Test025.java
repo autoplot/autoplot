@@ -54,7 +54,10 @@ public class Test025 {
             setCanvasSize(750, 300);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-
+            getDocumentModel().getCanvases(0).getMarginColumn().setLeft("0%+5em");
+            getDocumentModel().getCanvases(0).getMarginRow().setTop("0%+2em");
+            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-3em");
+            
             doTest( 0, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds1" );
             doTest( 1, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds2" );
             setCanvasSize(500,500);
