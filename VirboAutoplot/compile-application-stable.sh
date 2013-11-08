@@ -115,28 +115,28 @@ rm dist/AutoplotStable1.jar
 echo "sign the jar files..."
 echo "  use set +x to hide private info"
 #set +x
-echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
-if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"; then
-   echo "Failed to sign resources!"
-   exit 1
-fi
+#echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
+#if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"; then
+#   echo "Failed to sign resources!"
+#   exit 1
+#fi
 #set -x
 
 echo "=== verify the jar file..."
 ${JAVA6_HOME}bin/jarsigner -verify -verbose dist/AutoplotStable.jar | head -10
 
 #echo "repeat normalize/sign (workaround for known bug with large files...)"
-#echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-#$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-#
-#echo "sign a second time (again with set +x to hide info...)"
-##set +x
-#echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
-#if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"; then
-#   echo "Failed to sign resources!"
-#   exit 1
-#fi
-##set -x
+echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
+
+echo "sign a second time (again with set +x to hide info...)"
+#set +x
+echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
+if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"; then
+   echo "Failed to sign resources!"
+   exit 1
+fi
+#set -x
 
 echo "pack the jar file..."
 $JAVA_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
