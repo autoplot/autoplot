@@ -124,7 +124,7 @@ $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
 echo "sign a second time (again with set +x to hide info...)"
 set +x
-#echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
+echo $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"
 if ! $JAVA_HOME/bin/jarsigner -keypass \"$KEYPASS\" -storepass \"$STOREPASS\" $JARSIGNER_OPTS dist/AutoplotStable.jar \"$ALIAS\"; then
    echo "Failed to sign resources!"
    exit 1
