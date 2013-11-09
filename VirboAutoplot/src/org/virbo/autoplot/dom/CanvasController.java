@@ -251,8 +251,8 @@ public class CanvasController extends DomNodeController {
 
         for (int i = 0; i < rows.size(); i++) {
             try {
-                double nmin = DasDevicePosition.parseFormatStr(rows.get(i).getTop())[0];
-                double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
+                double nmin = DasDevicePosition.parseLayoutStr(rows.get(i).getTop())[0];
+                double nmax = DasDevicePosition.parseLayoutStr(rows.get(i).getBottom())[0];
                 if ( rows.get(i).getController().dasRow.getParent().getHeight()<10 ) {
                         //TODO: why don't we do this right off the bat?  Hudson test autoplot-test034
                         dom.controller.getDasCanvas().setSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getHeight() );
@@ -342,8 +342,8 @@ public class CanvasController extends DomNodeController {
         int totalWeight = 0;
         for (int i = 0; i < columns.size(); i++) {
             try {
-                double nmin = DasDevicePosition.parseFormatStr(columns.get(i).getRight())[0];
-                double nmax = DasDevicePosition.parseFormatStr(columns.get(i).getLeft())[0];
+                double nmin = DasDevicePosition.parseLayoutStr(columns.get(i).getRight())[0];
+                double nmax = DasDevicePosition.parseLayoutStr(columns.get(i).getLeft())[0];
                 weights[i] = (int) Math.round((nmax - nmin) * 1000);
 
             } catch (ParseException ex) {
