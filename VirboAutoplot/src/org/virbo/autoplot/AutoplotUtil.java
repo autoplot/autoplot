@@ -1514,8 +1514,8 @@ public class AutoplotUtil {
         int i = spec.indexOf(",");
         if (i == -1)
             throw new IllegalArgumentException("spec must contain one comma");
-        double[] ddmin = DasDevicePosition.parseFormatStr(spec.substring(0, i));
-        double[] ddmax = DasDevicePosition.parseFormatStr(spec.substring(i + 1));
+        double[] ddmin = DasDevicePosition.parseLayoutStr(spec.substring(0, i));
+        double[] ddmax = DasDevicePosition.parseLayoutStr(spec.substring(i + 1));
         row.setMinimum(ddmin[0]);
         row.setEmMinimum(ddmin[1]);
         row.setPtMinimum((int) ddmin[2]);
