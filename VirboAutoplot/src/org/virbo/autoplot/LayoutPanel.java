@@ -12,9 +12,7 @@ package org.virbo.autoplot;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Event;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -27,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -75,7 +74,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     public LayoutPanel() {
         initComponents();
         canvasLayoutPanel1.addPropertyChangeListener(CanvasLayoutPanel.PROP_COMPONENT, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 Plot plot = app.getController().getPlotFor((Component) canvasLayoutPanel1.getComponent());
                 List<Object> p= canvasLayoutPanel1.getSelectedComponents();
@@ -125,7 +124,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     Map<Component, JPopupMenu> contextMenus = null;
 
     Action removeBindingsAction= new AbstractAction("Remove Bindings") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Plot domPlot = app.getController().getPlot();
                 List<PlotElement> elements = app.getController().getPlotElementsFor(domPlot);
@@ -138,7 +137,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
 
         Action deletePlotAction= new AbstractAction("Delete Plot") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 List<Object> os= canvasLayoutPanel1.getSelectedComponents();
                 for ( Object o: os ) {
@@ -165,7 +164,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         };
 
         Action addPlotsAction= new AbstractAction("Add Plots...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 AddPlotsDialog dia= new AddPlotsDialog();
                 dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
@@ -202,7 +201,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         JPopupMenu panelContextMenu = new JPopupMenu();
 
         item = new JMenuItem(new AbstractAction("Edit Plot Element Properties") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Object[] os= panelListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)panelListComponent.getSelectedValue();
@@ -223,7 +222,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         panelContextMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Edit Plot Element Style Properties") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Object[] os= panelListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)panelListComponent.getSelectedValue();
@@ -245,7 +244,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         panelContextMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Object[] os= panelListComponent.getSelectedValues();
                 for ( Object o : os ) {
@@ -262,7 +261,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     }
     transient ListSelectionListener plotElementSelectionListener = new ListSelectionListener() {
-
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             if ( panelListComponent.getValueIsAdjusting() ) return;
             if (panelListComponent.getSelectedValues().length == 1) {
@@ -284,12 +283,14 @@ public class LayoutPanel extends javax.swing.JPanel {
     Application app;
     
     transient PropertyChangeListener plotElementsListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updatePlotElementList();
         }
     };
 
     transient PropertyChangeListener bindingsListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateBindingList();
         }
@@ -297,7 +298,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
 
     transient private PropertyChangeListener plotListener = new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             Plot plot= app.getController().getPlot();
             if ( plot==null ) {
@@ -314,6 +315,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
 
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     logger.finer("enter plotListener");
                     panelListComponent.setSelectedIndices(iindices);
@@ -329,12 +331,14 @@ public class LayoutPanel extends javax.swing.JPanel {
         }
     };
     transient private PropertyChangeListener plotElementListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             PlotElement p = app.getController().getPlotElement();
             List<PlotElement> allElements = Arrays.asList(app.getPlotElements());
 
             final int index= allElements.indexOf(p);
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     panelListComponent.setSelectedIndex(index);
                 }
@@ -402,6 +406,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         javax.swing.Icon icon= rend.getListIcon();
                         label.setIcon(icon);
                         rend.addPropertyChangeListener( new PropertyChangeListener() {
+                            @Override
                             public void propertyChange(PropertyChangeEvent evt) {
                                 panelListComponent.repaint();
                             }
@@ -416,9 +421,11 @@ public class LayoutPanel extends javax.swing.JPanel {
     private void updatePlotElementListImmediately() {
         final Object[] foo= app.getPlotElements();
         final AbstractListModel elementsList = new AbstractListModel() {
+            @Override
             public int getSize() {
                 return foo.length;
             }
+            @Override
             public Object getElementAt(int index) {
                 return foo[index];
             }
@@ -454,15 +461,18 @@ public class LayoutPanel extends javax.swing.JPanel {
     private void updateBindingList() {
         final List bindingList= new ArrayList( Arrays.asList( app.getBindings() ) );
         List rm= getSublist( bindingList, new Comparator() {
+            @Override
             public int compare(Object o1, Object o2) {
                 return ((BindingModel)o1).getDstProperty().equals("colortable") ? 0 : 1;
             }
         }, null );
         bindingList.removeAll(rm);
         AbstractListModel elementsList = new AbstractListModel() {
+            @Override
             public int getSize() {
                 return bindingList.size();
             }
+            @Override
             public Object getElementAt(int index) {
                 return bindingList.get(index);
             }
@@ -821,7 +831,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             final String lock = "Add hidden plot";
 
             List<Plot> plots= getSelectedPlots();
-            if ( plots.size()==0 ) return;
+            if ( plots.isEmpty() ) return;
 
             app.getController().registerPendingChange( this, lock);
             app.getController().performingChange( this, lock);
@@ -926,7 +936,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
 
     private void panelListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_panelListComponentValueChanged
-        logger.fine("panelListComponentValueChanged "+evt.getValueIsAdjusting());
+        logger.log(Level.FINE, "panelListComponentValueChanged {0}", evt.getValueIsAdjusting());
         if ( !evt.getValueIsAdjusting() ) {
             updateSelected();
         }
