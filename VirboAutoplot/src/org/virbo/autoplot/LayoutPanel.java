@@ -941,8 +941,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         
         for ( Row r: rows ) {
             try {
-                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
-                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                double[] d1= DasDevicePosition.parseLayoutStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 1.25;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
@@ -967,8 +967,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         // calculate the average size
         for ( Row r: rows ) {
             try {
-                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
-                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                double[] d1= DasDevicePosition.parseLayoutStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 size= size + ( d2[0]-d1[0] );
                 emMaxBottom= Math.max( emMaxBottom, d2[1] );
                 emMaxTop= Math.max( emMaxTop, d2[1] );
@@ -980,8 +980,8 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         for ( Row r: rows ) {
             try {
-                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
-                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                double[] d1= DasDevicePosition.parseLayoutStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 d2[0]= d1[0] + size;
                 d2[1]= emMaxBottom;
                 d1[1]= emMaxTop;
@@ -1003,8 +1003,8 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         for ( Row r: rows ) {
             try {
-                double[] d1= DasDevicePosition.parseFormatStr( r.getTop() );
-                double[] d2= DasDevicePosition.parseFormatStr( r.getBottom() );
+                double[] d1= DasDevicePosition.parseLayoutStr( r.getTop() );
+                double[] d2= DasDevicePosition.parseLayoutStr( r.getBottom() );
                 d2[0]= d1[0] + ( d2[0]-d1[0] ) * 0.80;
                 r.setBottom( DasDevicePosition.formatFormatStr(d2) );
             } catch ( ParseException ex ) {}
