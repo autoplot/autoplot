@@ -40,6 +40,7 @@ public class ColumnController extends DomNodeController {
         final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
         final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
         PropertyChangeListener list= new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( maxList.contains( evt.getPropertyName() ) ) {
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
@@ -50,9 +51,10 @@ public class ColumnController extends DomNodeController {
         };
         dasColumn.addPropertyChangeListener(list);
         list= new PropertyChangeListener() {
+            @Override            
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    double[] dd= DasDevicePosition.parseFormatStr((String)evt.getNewValue());
+                    double[] dd= DasDevicePosition.parseLayoutStr((String)evt.getNewValue());
                     if ( evt.getPropertyName().equals(Column.PROP_LEFT) ) {
                         dasColumn.setMin( dd[0], dd[1], (int) dd[2] );
                     } else if ( evt.getPropertyName().equals(Column.PROP_RIGHT) ) {
