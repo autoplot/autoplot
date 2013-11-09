@@ -93,7 +93,7 @@ public class CanvasController extends DomNodeController {
         ApplicationController ac = application.controller;
 
         dasCanvas.addComponentListener(new ComponentListener() {
-
+            @Override
             public void componentResized(ComponentEvent e) {
                 if (CanvasController.this.canvas.getWidth() != dasCanvas.getWidth()) {
                     CanvasController.this.canvas.setWidth(dasCanvas.getWidth());
@@ -102,25 +102,25 @@ public class CanvasController extends DomNodeController {
                     CanvasController.this.canvas.setHeight(dasCanvas.getHeight());
                 }
             }
-
+            @Override
             public void componentMoved(ComponentEvent e) {
             }
-
+            @Override
             public void componentShown(ComponentEvent e) {
             }
-
+            @Override
             public void componentHidden(ComponentEvent e) {
             }
         });
 
         this.canvas.addPropertyChangeListener(Canvas.PROP_WIDTH, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 dasCanvas.setPreferredWidth( Math.min( 4000, CanvasController.this.canvas.getWidth()) );
             }
         });
         this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 dasCanvas.setPreferredHeight( Math.min( 4000, CanvasController.this.canvas.getHeight()) );
             }
@@ -397,7 +397,7 @@ public class CanvasController extends DomNodeController {
         try {
             List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
-            int ipos = 0;
+            int ipos;
             if (position == LayoutConstants.BELOW) {
                 ipos = rows.indexOf(trow) + 1;
             } else {
@@ -429,7 +429,7 @@ public class CanvasController extends DomNodeController {
         try {
             List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
-            int ipos = 0;
+            int ipos;
             if (position == LayoutConstants.BELOW) {
                 ipos = columns.indexOf(tcolumn) + 1;
             } else {
@@ -719,6 +719,7 @@ public class CanvasController extends DomNodeController {
         }
         
         final Painter p= new Painter() {
+            @Override
             public void paint(Graphics2D g) {
                 long t0= System.currentTimeMillis();
                 
@@ -750,9 +751,11 @@ public class CanvasController extends DomNodeController {
         };
 
         SwingUtilities.invokeLater(  new Runnable() {
+            @Override
             public void run() {
                 dasCanvas.addTopDecorator( p );
                 Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         dasCanvas.removeTopDecorator( p );
                         currentSelectionItems= null;
