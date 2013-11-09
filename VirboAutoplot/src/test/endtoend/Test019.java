@@ -113,17 +113,17 @@ public class Test019 {
     
     public static void testLayout( ) throws ParseException {
         double [] res0, res1, res2;
-        res0= DasDevicePosition.parseFormatStr("100 % -5 em +4 px");
-        res0= DasDevicePosition.parseFormatStr("100% -5em +4px");
-        res1= DasDevicePosition.parseFormatStr("100%-5em+4pt");
-        res2= DasDevicePosition.parseFormatStr("+4pt-5em+100%");
+        res0= DasDevicePosition.parseLayoutStr("100 % -5 em +4 px");
+        res0= DasDevicePosition.parseLayoutStr("100% -5em +4px");
+        res1= DasDevicePosition.parseLayoutStr("100%-5em+4pt");
+        res2= DasDevicePosition.parseLayoutStr("+4pt-5em+100%");
         for ( int i=0; i<3; i++ ) {
             if ( res0[i]!=res1[i] ) throw new IllegalArgumentException("layout parsing res0!=res1");
             if ( res0[i]!=res2[i] ) throw new IllegalArgumentException("layout parsing res0!=res2");
         }
-        res0= DasDevicePosition.parseFormatStr("100%");
-        res0= DasDevicePosition.parseFormatStr("0%");
-        res0= DasDevicePosition.parseFormatStr(""); // should be same as "0%"
+        res0= DasDevicePosition.parseLayoutStr("100%");
+        res0= DasDevicePosition.parseLayoutStr("0%");
+        res0= DasDevicePosition.parseLayoutStr(""); // should be same as "0%"
     }
 
     public static void testFileSystemModel() throws Exception {
