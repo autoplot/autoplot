@@ -15,22 +15,16 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.print.attribute.HashAttributeSet;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
-import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.graph.DasDevicePosition;
-import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import static test.datum.TestDatumRangeUtil.testParse8601_1;
 
 /**
