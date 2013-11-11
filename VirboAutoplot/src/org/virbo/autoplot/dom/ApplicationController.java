@@ -1467,8 +1467,6 @@ public class ApplicationController extends DomNodeController implements RunLater
             for ( int i=application.getBindings().length-1; i>=0; i-- ) {
                 deleteBinding( application.getBindings(i) );
             }
-
-            // return canvas to ground state.  This is margin row, margin column, and
             // one row within.
             Canvas c= application.getCanvases(0);
 
@@ -1529,6 +1527,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             //clean up controllers after seeing the junk left behind in the profiler.
             for ( PlotElement pe :application.getPlotElements() ) {
                 pe.getController().dataSet=null;
+                pe.getController().getRenderer().setDataSet(null); // after seeing junk leftover in sftp://jbf@jfaden.net/home/jbf/ct/autoplot/script/test/stress/testServletSimulation.jy
             }
             for ( DataSourceFilter dsf :application.getDataSourceFilters() ) {
                 dsf.getController().dataSet=null;
@@ -1687,6 +1686,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
+    public BindingSupport peekBindingSupport() {
+        return this.bindingSupport;
+    }
+    
     /**
      * bind the dom node to another object.
      * @param src
