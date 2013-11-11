@@ -37,7 +37,7 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="../../../../../../autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
+        <jar href="AutoplotStable.jar" />
         <!--<jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20130822.jar" /> -->
 
         <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" >
