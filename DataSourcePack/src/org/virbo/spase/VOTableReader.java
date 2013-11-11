@@ -30,6 +30,7 @@ import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.qstream.BundleStreamFormatter;
 import org.virbo.qstream.StreamException;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -158,6 +159,12 @@ public class VOTableReader {
                         if ( ( ucd!=null && ucd.equals("time.epoch") ) || ( sunit!=null && sunit.equals("DateTime") ) ) {
                             sunit= UNIT_UTC;
                             datatypes.add( DATATYPE_UTC );
+                        } else if ( ( ucd!=null && ucd.equals("time.start") ) ) {
+                            sunit= UNIT_UTC;
+                            datatypes.add( DATATYPE_UTC );
+                        } else if ( ( ucd!=null && ucd.equals("time.stop") ) ) {
+                            sunit= UNIT_UTC;
+                            datatypes.add( DATATYPE_UTC );
                         } else {
                             sunit= UNIT_ENUM;
                             datatypes.add( dt );
@@ -283,9 +290,17 @@ public class VOTableReader {
         }; 
     }
     
+    /**
+     * Get the dataset.
+     * @return 
+     */
     public QDataSet getDataSet() {
         SparseDataSetBuilder head= new SparseDataSetBuilder(2);
         head.setQube( new int[] { nelements, 0 } ); // all datasets must be or are made to be rank 1.
+        
+        if ( dataSetBuilder==null ) {
+            throw new IllegalArgumentException("table has not been read!");
+        }
         
         int ielement=0;
         for ( int ii=0; ii<ids.size(); ii++ ) {
@@ -326,7 +341,7 @@ public class VOTableReader {
         return result;
     }
     
-    public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
+    public QDataSet readTable( String s ) throws IOException, SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         SAXParser saxParser = spf.newSAXParser();
@@ -336,17 +351,23 @@ public class VOTableReader {
         
         xmlReader.setContentHandler(t.sax);
         
-        long t0= System.currentTimeMillis();
+        xmlReader.parse( s );
+        
+        QDataSet ds= t.getDataSet();
+        
+        return ds;
+    }
+    
+    public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
         
         //xmlReader.parse( new File("/home/jbf/ct/autoplot/votable/DATA_2012_2012_FGM_KRTP_1M.xml").toURI().toString() );
         //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );        
         //xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
-        xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_PWS_SA_48S.xml").toURI().toString() );
-        
-        QDataSet ds= t.getDataSet();
+
+        String s= new File("/home/jbf/project/autoplot/pdsppi/data/DATA_PWS_SA_48S.xml").toURI().toString();
+        long t0= System.currentTimeMillis();
+        QDataSet ds= new VOTableReader().readTable( s );
         System.err.println( String.format( "Read in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
-        
-        t0= System.currentTimeMillis();
         OutputStream out= new FileOutputStream("/tmp/vospase.qds");
         try {
             new BundleStreamFormatter().format( ds, out, true );
@@ -356,5 +377,6 @@ public class VOTableReader {
         } finally {
             out.close();
         }
+                
     }
 }
