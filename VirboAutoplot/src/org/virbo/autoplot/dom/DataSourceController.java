@@ -1084,7 +1084,7 @@ public class DataSourceController extends DomNodeController {
                 QDataSet dep= (QDataSet) fillDs.property("DEPEND_"+i);
                 if ( dep!=null ) {
                     dep= DataSetOps.makePropertiesMutable(dep);
-                    if ( i==0 ) {
+                    if ( i==0 && dep.rank()==1 ) {
                         guessCadence( (MutablePropertyDataSet) dep,fillDs);
                     } else {
                         if ( dep.rank()==1 ) {
