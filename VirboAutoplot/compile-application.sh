@@ -81,13 +81,18 @@ rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
 echo "copy jar file classes using wget -q..."
-${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
-${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
-#TODO: check exit status, and stop if it fails.
-if [ $? -ne 0 ]; then
-   echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
-   exit -1
+if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
+   ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
+   ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
+   if [ $? -ne 0 ]; then
+      echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
+      exit -1
+   fi
+else
+   cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar .
+   cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar.pack.gz  .
 fi
+
 echo "done copy jar file classes."
 
 echo "=== look for plugins, META-INF/org.virbo.datasource.DataSourceFactory.extensions etc =="
