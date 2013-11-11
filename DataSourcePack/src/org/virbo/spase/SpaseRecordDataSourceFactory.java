@@ -9,23 +9,18 @@
 
 package org.virbo.spase;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 /**
  *
@@ -53,40 +48,16 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     
     
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) throws IllegalArgumentException {
-
-        DocumentBuilder builder= null;
         
         try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            File f= DataSetURI.getFile( surl, mon);
+            
+            Object type= new XMLTypeCheck().calculateType(f);
 
-            URISplit split = URISplit.parse( surl );
-
-            URL url= new URL( split.file );
-
-            InputStream in=  url.openStream() ;
-            InputSource source = new InputSource(in );
-            Document document = builder.parse(source);
-            in.close();
-
-            //String[] lookFor= new String[] { "Spase", "NumericalData", "AccessInformation", "AccessURL", "URL" };
-
-            Node n= document.getDocumentElement();
-
-            //String localName= n.getLocalName();  //TODO: why doesn't this work?
-            String localName= n.getNodeName();
-            int i= localName.indexOf(":");
-            if ( i>-1  ) {
-                localName= localName.substring(i+1);
-            }
-
-            if ( localName.equals("Spase") ) {  // Spase record
-                return false;
-            } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
-                return false;
-            } else if ( localName.equals("VOTABLE")) {  // VOTABLE from VxOs and AMDA
-                return false;
-            } else {
+            if ( type==null ) {
                 return true;
+            } else {
+                return false;
             }
             
         } catch ( Exception ex) {
