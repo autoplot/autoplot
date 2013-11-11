@@ -9,15 +9,19 @@
 
 package org.virbo.spase;
 
+import java.io.File;
+import java.io.FileInputStream;
 import org.virbo.metatree.SpaseMetadataModel;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -28,13 +32,17 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,10 +62,6 @@ import org.xml.sax.SAXException;
 public class SpaseRecordDataSource extends AbstractDataSource {
 
     private static final Logger logger= Logger.getLogger("apdss.spase");
-
-    protected static final Object TYPE_HELM = "HELM";
-    protected static final Object TYPE_SPASE = "SPASE";
-    protected static final Object TYPE_VOTABLE = "VOTABLE";
     
     /**
      * the DataSource URL found within Bob's SPASE record.
@@ -126,15 +130,23 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         mon.started();
         mon.setProgressMessage( "parse xml file");
         
-        readXML();
+        File f= DataSetURI.getFile( uri, mon );
+        type= new XMLTypeCheck().calculateType(f);
+        
+        if ( type!=XMLTypeCheck.TYPE_VOTABLE ) {  // this type uses a SAX parser.
+            readXML(mon); // creates the document object...
+        } else {
+            document= null;
+        }
 
         String surl=null;
 
         try {
+            
             XPathFactory factory= XPathFactory.newInstance();
             XPath xpath= factory.newXPath();
 
-            if ( type==TYPE_SPASE ) {
+            if ( type==XMLTypeCheck.TYPE_SPASE ) {
                 surl= (String) xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
                 //surl= findSurl();
                 delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
@@ -146,7 +158,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 mon.finished();
                 return result;
 
-            } else if ( type==TYPE_HELM ) {
+            } else if ( type==XMLTypeCheck.TYPE_HELM ) {
 
                 NodeList nl= (NodeList) xpath.evaluate( "//Eventlist/Event", document, XPathConstants.NODESET );
 
@@ -195,72 +207,58 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 
                 return dd;
 
-            } else if ( type==TYPE_VOTABLE ) {
+            } else if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
 
-                NodeList nl= (NodeList) xpath.evaluate( "//VOTABLE/RESOURCE/TABLE/DATA/TABLEDATA/TR", document, XPathConstants.NODESET );
-
-                DataSetBuilder timespans= new DataSetBuilder(2,100,2);
-                DataSetBuilder description= new DataSetBuilder(1,100);
-
-                EnumerationUnits eu= new EnumerationUnits("eventDesc");
-
-                description.putProperty(QDataSet.UNITS,eu );
-                timespans.putProperty(QDataSet.UNITS, Units.us2000 );
-                timespans.putProperty(QDataSet.BINS_1,"min,max");
-
-                mon.setTaskSize(nl.getLength());
-                mon.setProgressMessage( "reading events from votable" );
-
-                String column= getParam("arg_0","");
-                int icol= -1;
-
-                NodeList nodes = (NodeList) xpath.evaluate("//FIELD/@name", document, XPathConstants.NODESET );
-
-                if ( column.equals("") ) {
-                    icol= nodes.getLength()-1;
+                VOTableReader r= new VOTableReader();
+                
+                QDataSet result= r.readTable( f.toString(), mon );
+                
+                QDataSet bds= (QDataSet) result.property(QDataSet.BUNDLE_1);
+                
+                QDataSet ttag;
+                QDataSet data= null;
+                
+                // allow for the second column to be the timetags.
+                Units u0= (Units) bds.property(QDataSet.UNITS,0);
+                Units u1= null;
+                if ( bds.length()>0 ) {
+                    u1= (Units) bds.property(QDataSet.UNITS,1);
+                }
+                
+                int ii= 0;
+                if ( ( u0==null || !UnitsUtil.isTimeLocation( u0 ) ) && ( u1!=null && UnitsUtil.isTimeLocation(u1) ) ) {
+                    if ( bds.length()>1 ) {
+                        ii=1;
+                        u0= u1;
+                        if ( bds.length()>2 ) {
+                            u1= (Units)bds.property(QDataSet.UNITS,2 );
+                        }
+                    }
+                }
+                
+                if ( bds.length()>1 ) {
+                    if ( u0!=null && u1!=null && UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
+                        MutablePropertyDataSet wttag= DataSetOps.applyIndex( result, 1, Ops.linspace(ii,ii+1,2), false );
+                        wttag.putProperty(QDataSet.BINS_1,QDataSet.VALUE_BINS_MIN_MAX);
+                        wttag.putProperty(QDataSet.BUNDLE_1,null); // TODO: Really???
+                        wttag.putProperty(QDataSet.UNITS,u0);
+                        
+                        ttag= wttag;
+                        if ( bds.length()==(ii+2) ) {
+                            data= Ops.zeros(ttag.length());
+                        }
+                    } else {
+                        ttag= DataSetOps.unbundle( result,0 );
+                    }
                 } else {
-                    for ( int i=0; i<nodes.getLength(); i++ ) {
-                        if ( nodes.item(i).getNodeValue().equals(column) ) icol= i;
-                    }
+                    ttag= DataSetOps.unbundle( result,0 );
                 }
-
-                for ( int j=0; j<nl.getLength(); j++ ) {
-                    Node item= nl.item(j);
-                    mon.setTaskProgress(j);
-                    if ( mon.isCancelled() ) throw new CancelledOperationException("User pressed cancel");
-
-                    String desc;
-                    nodes = (NodeList) xpath.evaluate("TD", item, XPathConstants.NODESET );
-
-                    Node col= nodes.item(icol);
-                    desc= col.getTextContent().trim();
-                    String startDate= (String) xpath.evaluate( "TD[1]/text()", item, XPathConstants.STRING );
-                    String stopDate= (String) xpath.evaluate( "TD[2]/text()", item, XPathConstants.STRING );
-
-                    if ( startDate.compareTo(stopDate)>0 ) {
-                        //throw new IllegalArgumentException("startDate is after stopDate");
-                        Exception e= new IllegalArgumentException("StartDate is after StopDate: "+startDate );
-                        e.printStackTrace();
-                        timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                        timespans.putValue(j, 1, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                        description.putValue(j,eu.createDatum(e.getMessage()).doubleValue(eu) );
-                        continue;
-                    }
-                    description.putValue(j,eu.createDatum( desc ).doubleValue(eu) );
-                    timespans.putValue(j, 0, Units.us2000.parse(startDate).doubleValue(Units.us2000) );
-                    timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
+                
+                if ( data==null ) {
+                    data= DataSetOps.unbundle( result,bds.length()-1 );
                 }
-
-                mon.finished();
-
-                DDataSet dd= description.getDataSet();
-                dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
-
-                String title= (String)xpath.evaluate("//VOTABLE/RESOURCE/@name", document, XPathConstants.STRING );
-                dd.putProperty( QDataSet.TITLE,title );
-
-                return dd;
-
+                
+                return Ops.link( ttag, data );
 
             } else {
                 throw new IllegalArgumentException( "Unsupported XML type, root node should be Spase or Eventlist"); // see else above
@@ -275,43 +273,47 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         }
     }
     
-    private void readXML() throws IOException, SAXException {
+    /**
+     *
+     * @param monitor the value of monitor
+     * @throws IOException
+     * @throws SAXException
+     */
+    private void readXML( ProgressMonitor mon ) throws IOException, SAXException {
         DocumentBuilder builder= null;
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
-        InputSource source = new InputSource( url.openStream() );
-        document = builder.parse(source);
+        File f= DataSetURI.getFile( uri, mon );
+        InputStream in= new FileInputStream(f);
+        
+        try {
+            InputSource source = new InputSource( in );
+            document = builder.parse(source);
 
-        Node n= document.getDocumentElement();
+            Node n= document.getDocumentElement();
 
-        //String localName= n.getLocalName();  //TODO: why doesn't this work?
-        String localName= n.getNodeName();
-        int i= localName.indexOf(":");
-        if ( i>-1  ) {
-            localName= localName.substring(i+1);
-        }
+            String localName= n.getNodeName();
+            int i= localName.indexOf(":");
+            if ( i>-1  ) {
+                localName= localName.substring(i+1);
+            }
 
-        if ( localName.equals("Spase") ) {
-            type= TYPE_SPASE;
-        } else if ( localName.equals("Eventlist")) {  // HELM from Goddard SPDF
-            type= TYPE_HELM;
-        } else if ( localName.equals("VOTABLE") ) { // Virtual Observatories / AMDA VOTABLE event tables.
-            type= TYPE_VOTABLE;
-        } else {
-            throw new IllegalArgumentException("Unsupported XML type, root node should be Spase or Eventlist");
-        }
-
+        } finally {
+            in.close();
+        } 
         
     }
     
     @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
 
-        if ( document==null ) {
-            readXML();
+        if ( type.equals(XMLTypeCheck.TYPE_VOTABLE) ) {
+            return new HashMap<String, Object>();
+        } else if ( document==null ) {
+            readXML(mon);
         }
 
         // If we're using a DOM Level 2 implementation, then our Document
@@ -357,7 +359,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if ( type==TYPE_SPASE ) {
+        if ( type==XMLTypeCheck.TYPE_SPASE ) {
             return new SpaseMetadataModel();
         } else {
             return null;
