@@ -20,6 +20,8 @@ import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -69,6 +71,8 @@ public class VOTableReader {
      * expecting the characters within a field.
      */
     private final String STATE_FIELD= "field";
+    
+    private ProgressMonitor monitor;
     
     int ncolumn;
     QDataSet bds;
@@ -131,6 +135,7 @@ public class VOTableReader {
             @Override
             public void startDocument() throws SAXException {
                 state= STATE_OPEN;
+                monitor.started();
             }
             
             /**
@@ -205,6 +210,7 @@ public class VOTableReader {
                     }
                     //TODO: there is MIN and MAX that could be interpretted, find a demo.
                 } else if ( localName.equals("DATA") ) {
+                    monitor.setProgressMessage("reading data");
                     state= STATE_DATA;
                     dataSetBuilder= new DataSetBuilder( 2, 100, nelements );
                 } else if ( localName.equals("TR") && state.equals(STATE_DATA) ) {
@@ -221,6 +227,10 @@ public class VOTableReader {
                     assert state.equals(STATE_FIELD);
                     state= STATE_RECORD;
                     index++;
+                    int nrec= dataSetBuilder.getLength();
+                    if ( nrec % 1000 == 0 ) {
+                        monitor.setProgressMessage("reading data, "+nrec+" records");
+                    }
                 } else if ( localName.equals("TR") ) {
                     assert state.equals(STATE_RECORD);
                     dataSetBuilder.nextRecord();
@@ -341,21 +351,44 @@ public class VOTableReader {
         return result;
     }
     
-    public QDataSet readTable( String s ) throws IOException, SAXException, ParserConfigurationException {
+    /**
+     * read the table from the stream s.
+     * @param s String reference to a local file.
+     * @param monitor progress monitor will provide line number updates.
+     * @return the bundle dataset loaded.
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException 
+     */
+    public QDataSet readTable( String s, ProgressMonitor monitor ) throws IOException, SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         SAXParser saxParser = spf.newSAXParser();
         XMLReader xmlReader = saxParser.getXMLReader();
         
-        VOTableReader t= new VOTableReader();
+        this.monitor= monitor;
         
-        xmlReader.setContentHandler(t.sax);
+        xmlReader.setContentHandler(this.sax);
         
         xmlReader.parse( s );
         
-        QDataSet ds= t.getDataSet();
+        QDataSet ds= getDataSet();
+        
+        monitor.finished();
         
         return ds;
+    }
+       
+    /**
+     * read the table from the stream s.
+     * @param s String reference to a local file.
+     * @return the bundle dataset loaded.
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException 
+     */
+    public QDataSet readTable( String s ) throws IOException, SAXException, ParserConfigurationException {
+        return readTable( s, new NullProgressMonitor() );
     }
     
     public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
