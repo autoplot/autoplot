@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
@@ -73,7 +74,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
+    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException, NoDataInIntervalException {
         File cdfFile;
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
@@ -305,7 +306,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     }
 
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon) throws CDFException, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon) throws CDFException, ParseException, NoDataInIntervalException {
         return wrapDataSet(  cdf, svariable, constraints, reform, depend, -1, mon );
     }
 
@@ -321,7 +322,7 @@ public class CdfFileDataSource extends AbstractDataSource {
      * @throws CDFException
      * @throws ParseException
      */
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, int slice1, ProgressMonitor mon ) throws CDFException, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, int slice1, ProgressMonitor mon ) throws CDFException, ParseException, NoDataInIntervalException {
         Variable variable = cdf.getVariable(svariable);
 
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
@@ -374,7 +375,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
                 return DDataSet.maybeCopy(c0);
             } else {
-                throw new IllegalArgumentException("variable " + svariable + " contains no records!");
+                throw new org.das2.dataset.NoDataInIntervalException("variable " + svariable + " contains no records!");
             }
         }
 

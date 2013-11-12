@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -580,7 +581,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
                 return DDataSet.maybeCopy(c0);
             } else {
-                throw new IllegalArgumentException("variable " + svariable + " contains no records!");
+                throw new NoDataInIntervalException("variable " + svariable + " contains no records!");
             }
         }
 
