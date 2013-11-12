@@ -42,6 +42,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 import org.w3c.dom.Document;
@@ -255,7 +256,9 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 }
                 
                 if ( data==null ) {
-                    data= DataSetOps.unbundle( result,bds.length()-1 );
+                    URISplit split= URISplit.parse(this.uri);
+                    Map<String,String> args= URISplit.parseParams(split.params);
+                    data= DataSetOps.unbundle( result, args.get(URISplit.PARAM_ARG_0) ); // typical route
                 }
                 
                 return Ops.link( ttag, data );
