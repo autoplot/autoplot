@@ -126,10 +126,10 @@ public class OptionsDialog extends javax.swing.JPanel {
         jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
         jLabel6.setText("New plots will have this mouse module enabled");
 
-        printingLogLevelCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "NONE: show no bubbles", "WARNING: show only warning messages", "ALL: show all messages", " " }));
+        printingLogLevelCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "NONE: print no message bubbles", "WARNING: print only warning messages", "ALL: print all message bubbles", " " }));
 
         jLabel7.setFont(jLabel7.getFont().deriveFont(jLabel7.getFont().getSize()-1f));
-        jLabel7.setText("Suppress warning bubbles (e.g. no data)");
+        jLabel7.setText("Suppress warning bubbles (e.g. no data) when printing to PDF or PNG, or the printer\n");
 
         jLabel8.setText("Printing Tag (Time stamp):");
 
@@ -192,7 +192,7 @@ public class OptionsDialog extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(printingLogLevelCB, 0, 304, Short.MAX_VALUE)))
+                        .addComponent(printingLogLevelCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

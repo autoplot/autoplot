@@ -63,7 +63,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel5" min="-2" pref="133" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="printingLogLevelCB" pref="304" max="32767" attributes="0"/>
+                      <Component id="printingLogLevelCB" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -189,9 +189,9 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
-            <StringItem index="0" value="NONE: show no bubbles"/>
-            <StringItem index="1" value="WARNING: show only warning messages"/>
-            <StringItem index="2" value="ALL: show all messages"/>
+            <StringItem index="0" value="NONE: print no message bubbles"/>
+            <StringItem index="1" value="WARNING: print only warning messages"/>
+            <StringItem index="2" value="ALL: print all message bubbles"/>
             <StringItem index="3" value=" "/>
           </StringArray>
         </Property>
@@ -204,7 +204,7 @@
             <Font component="jLabel7" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
-        <Property name="text" type="java.lang.String" value="Suppress warning bubbles (e.g. no data)"/>
+        <Property name="text" type="java.lang.String" value="Suppress warning bubbles (e.g. no data) when printing to PDF or PNG, or the printer&#xa;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
