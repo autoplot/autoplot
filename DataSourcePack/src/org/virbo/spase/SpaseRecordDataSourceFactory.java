@@ -12,15 +12,20 @@ package org.virbo.spase;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -39,7 +44,31 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     }
     
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
-        return java.util.Collections.emptyList();
+        
+            File f= DataSetURI.getFile( cc.surl, mon );
+            
+            Object type= new XMLTypeCheck().calculateType(f);
+
+            if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
+                QDataSet bds= new VOTableReader().readHeader(f.toString(), mon);
+                URISplit split= URISplit.parse(cc.surl);
+                Map<String,String> parms= URISplit.parseParams(split.params);
+                if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
+                    List<CompletionContext> result= new ArrayList<CompletionContext>();
+                    for ( int i=0; i<bds.length(); i++ ) {
+                        String label= (String)bds.property(QDataSet.LABEL,i);
+                        String name= (String)bds.property(QDataSet.NAME,i);
+                        CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, name, this, "arg_0", label, label, true );
+                        result.add( cc1 );
+                    }
+                    return result;
+                } else {
+                    return Collections.emptyList();
+                }
+            } else {
+                return Collections.emptyList();                
+            }
+            
     }
     
     public String editPanel(String surl) throws Exception {
@@ -57,7 +86,17 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
             if ( type==null ) {
                 return true;
             } else {
-                return false;
+                if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
+                    URISplit split= URISplit.parse(surl);
+                    Map<String,String> parms= URISplit.parseParams(split.params);
+                    if ( parms.get( URISplit.PARAM_ARG_0 )==null ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             }
             
         } catch ( Exception ex) {
