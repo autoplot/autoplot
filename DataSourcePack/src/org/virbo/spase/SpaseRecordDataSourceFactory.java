@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
@@ -88,7 +90,27 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
                     URISplit split= URISplit.parse(surl);
                     Map<String,String> parms= URISplit.parseParams(split.params);
                     if ( parms.get( URISplit.PARAM_ARG_0 )==null ) {
-                        return true;
+                        QDataSet bds= new VOTableReader().readHeader(f.toString(), mon);
+                        // check for VOTable that is events file, for backward compatibility.
+                        int ifirstTimeStart=-1;
+                        int ifirstTimeStop=-1;
+                        for ( int i=0; i<bds.length(); i++ ) {
+                            if ( bds.property(QDataSet.UNITS,i)!=null && UnitsUtil.isTimeLocation( (Units)bds.property(QDataSet.UNITS,i) ) ) {
+                                if ( ifirstTimeStart==-1 ) {
+                                    ifirstTimeStart=i;
+                                } else {
+                                    if ( i==ifirstTimeStart+1 ) {
+                                        ifirstTimeStop= ifirstTimeStart+1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if ( ifirstTimeStop>-1 ) {
+                            return false; // this is an "events" file, used in Autoplot for quite a while.
+                        } else {
+                            return true;
+                        }
                     } else {
                         return false;
                     }
