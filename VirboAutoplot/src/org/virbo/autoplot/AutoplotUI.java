@@ -2998,8 +2998,14 @@ private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
 private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editOptionsActionPerformed
-    PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
-    edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
+    OptionsDialog p= new OptionsDialog();
+    p.setOptions( applicationModel.dom.getOptions() );
+    if ( JOptionPane.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+        p.copyOptions( applicationModel.dom.getOptions() );
+    }
+    
+    //PropertyEditor edit= new PropertyEditor(applicationModel.dom.getOptions());
+    //edit.showDialog(this,"DOM User Options",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 }//GEN-LAST:event_editOptionsActionPerformed
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
