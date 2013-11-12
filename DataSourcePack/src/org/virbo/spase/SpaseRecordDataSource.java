@@ -166,7 +166,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 DataSetBuilder timespans= new DataSetBuilder(2,100,2);
                 DataSetBuilder description= new DataSetBuilder(1,100);
 
-                EnumerationUnits eu= new EnumerationUnits("eventDesc");
+                EnumerationUnits eu= EnumerationUnits.create("eventDesc");
 
                 description.putProperty(QDataSet.UNITS,eu );
                 timespans.putProperty(QDataSet.UNITS, Units.us2000 );
@@ -241,12 +241,15 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                     if ( u0!=null && u1!=null && UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
                         MutablePropertyDataSet wttag= DataSetOps.applyIndex( result, 1, Ops.linspace(ii,ii+1,2), false );
                         wttag.putProperty(QDataSet.BINS_1,QDataSet.VALUE_BINS_MIN_MAX);
-                        wttag.putProperty(QDataSet.BUNDLE_1,null); // TODO: Really???
+                        wttag.putProperty(QDataSet.BUNDLE_1,null); // TODO: Really, I have to delete this???
                         wttag.putProperty(QDataSet.UNITS,u0);
                         
                         ttag= wttag;
                         if ( bds.length()==(ii+2) ) {
-                            data= Ops.zeros(ttag.length());
+                            EnumerationUnits eu= EnumerationUnits.create("eventDesc");
+                            MutablePropertyDataSet mdata= Ops.replicate( eu.createDatum("").doubleValue(eu), ttag.length() );
+                            mdata.putProperty(QDataSet.UNITS,eu);
+                            data= mdata;
                         }
                     } else {
                         ttag= DataSetOps.unbundle( result,0 );
