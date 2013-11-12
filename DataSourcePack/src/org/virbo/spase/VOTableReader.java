@@ -125,6 +125,8 @@ public class VOTableReader {
     private final int ARRAYSIZE_ANY= -2;
     private final int ARRAYSIZE_SCALAR= -1;
     
+    private boolean justHeader= false;
+            
     public VOTableReader() {
         
         this.sax = new DefaultHandler() {
@@ -210,6 +212,9 @@ public class VOTableReader {
                     }
                     //TODO: there is MIN and MAX that could be interpretted, find a demo.
                 } else if ( localName.equals("DATA") ) {
+                    if ( justHeader ) {
+                        throw new RuntimeException("we're all done reading the header and dont need the data.");
+                    }
                     monitor.setProgressMessage("reading data");
                     state= STATE_DATA;
                     dataSetBuilder= new DataSetBuilder( 2, 100, nelements );
@@ -242,7 +247,7 @@ public class VOTableReader {
                     index++; // counting up items.
                 } else if ( localName.equals("DATA") ) {
                     assert state.equals(STATE_HEADER);
-                }
+                } 
             }
             
             
@@ -305,12 +310,32 @@ public class VOTableReader {
      * @return 
      */
     public QDataSet getDataSet() {
-        SparseDataSetBuilder head= new SparseDataSetBuilder(2);
-        head.setQube( new int[] { nelements, 0 } ); // all datasets must be or are made to be rank 1.
-        
         if ( dataSetBuilder==null ) {
             throw new IllegalArgumentException("table has not been read!");
         }
+                
+        dataSetBuilder.putProperty( QDataSet.BUNDLE_1, formBundleDescriptor() );
+        DDataSet result= dataSetBuilder.getDataSet();
+        
+        for ( int jj=0; jj<ids.size(); jj++ ) {
+            if ( stopEnumerations.get(jj)==Boolean.TRUE ) {
+                logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
+                for ( int ii=0; ii<result.length(); ii++ ) {
+                    result.putValue( ii, jj, FILL_VALUE );
+                    ((MutablePropertyDataSet)result.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS, jj, null );
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * create the bundle descriptor for the data.
+     * @return 
+     */
+    private QDataSet formBundleDescriptor() {
+        SparseDataSetBuilder head= new SparseDataSetBuilder(2);
+        head.setQube( new int[] { nelements, 0 } ); // all datasets must be or are made to be rank 1.
         
         int ielement=0;
         for ( int ii=0; ii<ids.size(); ii++ ) {
@@ -336,19 +361,34 @@ public class VOTableReader {
             }
             if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
         }
-        dataSetBuilder.putProperty( QDataSet.BUNDLE_1, head.getDataSet() );
-        DDataSet result= dataSetBuilder.getDataSet();
+        return head.getDataSet();
+    }
+    
+    public QDataSet readHeader( String s, ProgressMonitor monitor ) throws IOException, SAXException, ParserConfigurationException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+        SAXParser saxParser = spf.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
         
-        for ( int jj=0; jj<ids.size(); jj++ ) {
-            if ( stopEnumerations.get(jj)==Boolean.TRUE ) {
-                logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
-                for ( int ii=0; ii<result.length(); ii++ ) {
-                    result.putValue( ii, jj, FILL_VALUE );
-                    ((MutablePropertyDataSet)result.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS, jj, null );
-                }
-            }
+        this.monitor= monitor;
+        
+        xmlReader.setContentHandler(this.sax);
+        
+        this.justHeader= true;
+        
+        try {
+            xmlReader.parse( s );
+        } catch ( RuntimeException ex ) {
+            // this is expected.
         }
-        return result;
+        
+        
+        QDataSet bds= formBundleDescriptor();
+        
+        monitor.finished();
+        
+        return bds;
+        
     }
     
     /**
