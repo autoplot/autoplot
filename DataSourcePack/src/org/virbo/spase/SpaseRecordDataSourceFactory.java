@@ -51,8 +51,6 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
 
             if ( type==XMLTypeCheck.TYPE_VOTABLE ) {
                 QDataSet bds= new VOTableReader().readHeader(f.toString(), mon);
-                URISplit split= URISplit.parse(cc.surl);
-                Map<String,String> parms= URISplit.parseParams(split.params);
                 if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
                     List<CompletionContext> result= new ArrayList<CompletionContext>();
                     for ( int i=0; i<bds.length(); i++ ) {
