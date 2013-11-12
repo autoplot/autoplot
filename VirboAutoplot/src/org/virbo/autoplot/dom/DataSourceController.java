@@ -1062,7 +1062,7 @@ public class DataSourceController extends DomNodeController {
                     ds= getDataSet();
                 } else {
                     try {
-                        ds= DataSetOps.sprocess( filters, getDataSet(), new AlertNullProgressMonitor() );
+                        ds= DataSetOps.sprocess( filters, getDataSet(), new AlertNullProgressMonitor("sprocess "+filters) );
                         setReduceDataSetString(filters);
                     } catch ( Exception ex ) {
                         setException(ex);
@@ -1493,7 +1493,7 @@ public class DataSourceController extends DomNodeController {
 
             if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
-            Map<String,Object> props= getDataSource().getMetadata( new AlertNullProgressMonitor() );
+            Map<String,Object> props= getDataSource().getMetadata( new AlertNullProgressMonitor("getMetadata") );
 
             if ( result!=null && getTsb()!=null && result.rank()>0 && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
