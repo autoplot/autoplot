@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import javax.swing.Box;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -262,7 +264,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             int isel=-1;
             List<String> arg0options= new ArrayList();
             for ( int ii=0; ii<arg0.size(); ii++ ) {
-                arg0options.add( arg0.get(ii).completable );
+               // if ( arg0.get(ii).label!=null ) {
+               //     arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
+               // } else {
+                    arg0options.add( arg0.get(ii).completable );
+               // }
                 if ( arg0.get(ii).completable.equals(val) ) {
                     isel= ii;
                 }
