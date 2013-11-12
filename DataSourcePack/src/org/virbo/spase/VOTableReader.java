@@ -127,6 +127,8 @@ public class VOTableReader {
     
     private boolean justHeader= false;
             
+    private StringBuilder valueBuilder= new StringBuilder();
+    
     public VOTableReader() {
         
         this.sax = new DefaultHandler() {
@@ -223,6 +225,7 @@ public class VOTableReader {
                     index= 0;
                 } else if ( localName.equals("TD") && state.equals(STATE_RECORD) ) {
                     state= STATE_FIELD;
+                    valueBuilder.delete(0, valueBuilder.length() );
                 }
             }
 
@@ -230,6 +233,52 @@ public class VOTableReader {
             public void endElement(String uri, String localName, String qName) throws SAXException {
                 if ( localName.equals("TD") ) {
                     assert state.equals(STATE_FIELD);
+                    String s= valueBuilder.toString();
+                    //logger.finest( "index:"+index+ " s:"+s );
+
+                    int arraysize= arraysizes.get(index);
+                    if ( arraysize>0 ) { // note zero-length array not supported.
+                        Units u=  units.get(index);
+                        String[] ss= s.trim().split("\\s+");
+                        if ( ss.length!=arraysize ) {
+                            throw new IllegalArgumentException("values in votable don't match arraysize");
+                        }
+                        for ( int jj=0; jj<arraysize; jj++ ) {
+                            try {
+                                dataSetBuilder.putValue( -1, ielement, u.parse( ss[jj] ).doubleValue(u) );
+                                ielement++;
+                            } catch (ParseException ex) {
+                                throw new IllegalArgumentException("unable to parse: "+ss[jj]);
+                            }
+                        }
+                    } else {
+                        if ( s.equals(fillValues.get(index) ) ) {
+                            dataSetBuilder.putValue( -1, ielement, FILL_VALUE );      
+                        } else {
+                            try {
+                                Units u=  units.get(index);
+                                Datum d;
+                                if ( u instanceof EnumerationUnits ) {
+                                    if ( stopEnumerations.get(index) ) {
+                                        d= u.createDatum( 1 );
+                                    } else {
+                                        d= ((EnumerationUnits)u).createDatum( s );
+                                        if ( d.doubleValue(u) > UNIQUE_ENUMERATION_VALUES_LIMIT ) {
+                                            stopEnumerations.set(index,true);
+                                        }
+                                    }
+                                } else {
+                                    d= u.parse( s );
+                                }
+                                dataSetBuilder.putValue( -1, ielement, d.doubleValue(u) );                            
+                            } catch (ParseException ex) {
+                                Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
+                                dataSetBuilder.putValue( -1, ielement, FILL_VALUE );
+                            }
+                        }
+                        ielement++;
+                    }
+                    
                     state= STATE_RECORD;
                     index++;
                     int nrec= dataSetBuilder.getLength();
@@ -254,52 +303,7 @@ public class VOTableReader {
             @Override
             public void characters(char[] ch, int start, int length) throws SAXException {
                 if ( STATE_FIELD.equals(state) ) {
-                    String s= new String( ch, start, length );
-                    //logger.finest( "index:"+index+ " s:"+s );
-                    if ( s.trim().length()>0 ) {
-                        int arraysize= arraysizes.get(index);
-                        if ( arraysize>0 ) { // note zero-length array not supported.
-                            Units u=  units.get(index);
-                            String[] ss= s.trim().split("\\s+");
-                            if ( ss.length!=arraysize ) {
-                                throw new IllegalArgumentException("values in votable don't match arraysize");
-                            }
-                            for ( int jj=0; jj<arraysize; jj++ ) {
-                                try {
-                                    dataSetBuilder.putValue( -1, ielement, u.parse( ss[jj] ).doubleValue(u) );
-                                    ielement++;
-                                } catch (ParseException ex) {
-                                    throw new IllegalArgumentException("unable to parse: "+ss[jj]);
-                                }
-                            }
-                        } else {
-                            if ( s.equals(fillValues.get(index) ) ) {
-                                dataSetBuilder.putValue( -1, ielement, FILL_VALUE );      
-                            } else {
-                                try {
-                                    Units u=  units.get(index);
-                                    Datum d;
-                                    if ( u instanceof EnumerationUnits ) {
-                                        if ( stopEnumerations.get(index) ) {
-                                            d= u.createDatum( 1 );
-                                        } else {
-                                            d= ((EnumerationUnits)u).createDatum( s );
-                                            if ( d.doubleValue(u) > UNIQUE_ENUMERATION_VALUES_LIMIT ) {
-                                                stopEnumerations.set(index,true);
-                                            }
-                                        }
-                                    } else {
-                                        d= u.parse( s );
-                                    }
-                                    dataSetBuilder.putValue( -1, ielement, d.doubleValue(u) );                            
-                                } catch (ParseException ex) {
-                                    Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
-                                    dataSetBuilder.putValue( -1, ielement, FILL_VALUE );
-                                }
-                            }
-                            ielement++;
-                        }
-                    }
+                    valueBuilder.append( ch, start, length );
                 }
             }
         }; 
