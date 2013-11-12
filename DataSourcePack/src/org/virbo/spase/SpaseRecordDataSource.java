@@ -261,7 +261,12 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 if ( data==null ) {
                     URISplit split= URISplit.parse(this.uri);
                     Map<String,String> args= URISplit.parseParams(split.params);
-                    data= DataSetOps.unbundle( result, args.get(URISplit.PARAM_ARG_0) ); // typical route
+                    String arg0= args.get(URISplit.PARAM_ARG_0);
+                    if ( arg0==null ) {
+                        data= DataSetOps.unbundle( result, result.length(0)-1 );
+                    } else {
+                        data= DataSetOps.unbundle( result, args.get(URISplit.PARAM_ARG_0) ); // typical route
+                    }
                 }
                 
                 return Ops.link( ttag, data );
