@@ -264,11 +264,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             int isel=-1;
             List<String> arg0options= new ArrayList();
             for ( int ii=0; ii<arg0.size(); ii++ ) {
-               // if ( arg0.get(ii).label!=null ) {
-               //     arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
-               // } else {
+                if ( arg0.get(ii).label!=null ) {
+                    arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
+                } else {
                     arg0options.add( arg0.get(ii).completable );
-               // }
+                }
                 if ( arg0.get(ii).completable.equals(val) ) {
                     isel= ii;
                 }
@@ -339,7 +339,10 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         if ( arg0Cbs!=null ) {
             base.append( "?" );
-            base.append( arg0Cbs.getSelectedItem() );
+            String s= String.valueOf( arg0Cbs.getSelectedItem() );
+            int i= s.indexOf(": ");
+            if ( i>-1 ) s= s.substring(0,i);
+            base.append( s );
             amp= true;
         }
 
