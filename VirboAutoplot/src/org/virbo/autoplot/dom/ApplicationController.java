@@ -1797,9 +1797,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         Binding b = bindingImpls.get(binding);
         if ( b==null ) {
             logger.log(Level.SEVERE, "didn''t find the binding implementation for {0}, ignoring", binding);
-            return; //TODO: why?
+        } else if ( b.isBound() ) { // https://sourceforge.net/p/autoplot/bugs/1126/
+            b.unbind();
         }
-        b.unbind();
         bindingImpls.remove(binding);
 
         List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
