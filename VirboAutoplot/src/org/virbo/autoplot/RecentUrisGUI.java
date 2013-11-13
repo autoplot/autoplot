@@ -156,6 +156,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             if (value instanceof String[]) {
                 tooltip= ((String[])value)[0];
                 value= ((String[])value)[1];
+                //value= tooltip + " " + ((String[])value)[1];
             } else if ( value instanceof DatumRange ) {
                 tooltip= ((DatumRange)value).toString();               
                 int count= tree.getModel().getChildCount(value);
