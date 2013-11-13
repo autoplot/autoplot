@@ -82,6 +82,7 @@ public class BindingSupport {
             this.pprop= pprop;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
                 try {
                     if (c == null) {
@@ -153,7 +154,6 @@ public class BindingSupport {
                 bi.dstSetter = setter;
                 bi.dstGetter = getter;
             }
-            return;
         } catch (IntrospectionException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -308,5 +308,10 @@ public class BindingSupport {
                 implBindingContexts.put( master, list2 );
             }
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "== BindingSupport: ==\n"+implBindingContexts.size() ;
     }
 }
