@@ -1466,6 +1466,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
                 deleteDataSourceFilter( application.getDataSourceFilters(i) );
             }
+            TimeSeriesBrowseController tsbc= application.getDataSourceFilters(0).getController().getTimeSeriesBrowseController(); //TODO: clearing the URI should do this as well...
+            if ( tsbc!=null ) tsbc.release();
 
             application.getPlotElements(0).setId("plotElement_0");
 
