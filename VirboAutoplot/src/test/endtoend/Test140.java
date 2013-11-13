@@ -240,7 +240,8 @@ public class Test140 {
                 if ( i>-1 ) {
                     s= s.substring(0,i);
                 }
-                if ( s.trim().length()>0 ) {
+                s= s.trim();
+                if ( s.length()>0 ) {
                     String[] ss= s.split("\t");
                     String uri= ss[ss.length-1];
                     try {
