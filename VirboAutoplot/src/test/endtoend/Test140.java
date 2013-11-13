@@ -319,10 +319,10 @@ public class Test140 {
         }
         
         if ( exceptions.isEmpty() ) {
-            System.err.println("(none)");
+            System.err.println("(none)\n\n");
             System.exit(0);  // TODO: something is firing up the event thread
         } else {
-            System.err.println("("+exceptions.size()+" exceptions)");
+            System.err.println("("+exceptions.size()+" exceptions)\n\n");
             System.exit(1);
         }
         
