@@ -411,6 +411,7 @@ public class TimeSeriesBrowseController {
     void release() {
         if (  isListeningToAxis() ) {
             this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
+            this.domPlot.removePropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
             this.xAxis= null;
         } else {
             if ( listenNode!=null ) {
