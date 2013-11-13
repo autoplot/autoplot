@@ -1271,6 +1271,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         unbind(domPlot.getXaxis());
         unbind(domPlot.getYaxis());
         unbind(domPlot.getZaxis());
+        unbindImpl(domPlot); //TODO: I need to remind myself why there are two types of bindings...
+        unbindImpl(domPlot.getXaxis());
+        unbindImpl(domPlot.getYaxis());
+        unbindImpl(domPlot.getZaxis());
 
         if ( domPlot.controller==null ) {
             logger.warning("domPlot.controller is null, this shouldn't happen");
@@ -1782,7 +1786,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             }
         }
-
+        
     }
 
     /**
