@@ -1253,7 +1253,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
         for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
             if (c.getPlotA().equals(domPlot.getId()) || c.getPlotB().equals(domPlot.getId())) {
-                deleteConnector(c);
+                deleteConnector(c); // TODO: this has remove that occurs off the event thread.
             }
         }
 
@@ -1282,11 +1282,17 @@ public class ApplicationController extends DomNodeController implements RunLater
             final DasPlot p = domPlot.controller.getDasPlot();
             final DasColorBar cb = domPlot.controller.getDasColorBar();
             final DasCanvas lcanvas= this.getDasCanvas();
+            final ArrayList<Component> deleteKids= new ArrayList();
+            deleteKids.add( p );
+            deleteKids.add( cb );
+            deleteKids.add( domPlot.controller.getDasPlot().getXAxis() );
+            deleteKids.add( domPlot.controller.getDasPlot().getYAxis() );
             SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
                 @Override
                 public void run() {
-                    lcanvas.remove(p);
-                    lcanvas.remove(cb);
+                    for ( Component c: deleteKids ) {
+                        lcanvas.remove(c);
+                    }
                 }
             } );
         }
@@ -1310,6 +1316,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 cc.removeGaps();
             }
         }
+        
+        domPlot.getController().getDasPlot().releaseAll();
+        
         lock.unlock();
 
     }
