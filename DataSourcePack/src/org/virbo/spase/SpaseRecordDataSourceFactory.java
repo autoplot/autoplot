@@ -28,6 +28,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -58,8 +59,14 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
                     for ( int i=0; i<bds.length(); i++ ) {
                         String label= (String)bds.property(QDataSet.LABEL,i);
                         String name= (String)bds.property(QDataSet.NAME,i);
-                        CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, name, this, "arg_0", label, label, true );
-                        result.add( cc1 );
+                        String title= (String)bds.property(QDataSet.TITLE,i);
+                        if ( Ops.safeName(label).equals(label) ) {
+                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, label, this, "arg_0", label+" ("+name+")", title, true );
+                            result.add( cc1 );
+                        } else {
+                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, name, this, "arg_0", label, title, true );
+                            result.add( cc1 );
+                        }
                     }
                     return result;
                 } else {
