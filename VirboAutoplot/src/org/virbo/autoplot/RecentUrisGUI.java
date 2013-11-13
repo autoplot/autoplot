@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -47,6 +48,11 @@ import org.das2.util.filesystem.Glob;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
+ * This presents the URI history in a useful dialog where URIs are
+ * sorted into today, yesterday, last week, etc.  The URI history is
+ * stored in ~/autoplot_data/bookmarks/history.txt.  Times in the history file
+ * in UT, not the local time.
+ * 
  * This useful dialog needs to be rewritten.  
  * See https://sourceforge.net/tracker/index.php?func=detail&aid=3609545&group_id=199733&atid=970682
  * @author jbf
@@ -146,13 +152,21 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            String tooltip= null;
             if (value instanceof String[]) {
-                value = ((String[])value)[1];
+                tooltip= ((String[])value)[0];
+                value= ((String[])value)[1];
             } else if ( value instanceof DatumRange ) {
+                tooltip= ((DatumRange)value).toString();               
                 int count= tree.getModel().getChildCount(value);
                 value= String.format( "%s (%d)", theModel.nameFor((DatumRange)value), count );
             }
-            return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            Component c= super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            if ( c instanceof JLabel ) {
+                JLabel l= (JLabel)c;
+                l.setToolTipText(tooltip); // this doesn't work on Linux...
+            }
+            return c;
         }
     }
 
