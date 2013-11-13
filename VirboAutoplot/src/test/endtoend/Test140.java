@@ -83,7 +83,7 @@ public class Test140 {
         tsec= t0; // for non-vap non-uri
         
         QDataSet ds=null;
-        if ( uri.endsWith(".vap") ) {
+        if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
             // for vap files, load the vap and grab the first dataset.
             ScriptContext.load(uri);
             ds= getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
@@ -167,6 +167,10 @@ public class Test140 {
         System.err.printf( "wrote to file: %s\n", name1 );
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", tsec, label, uri );
 
+        if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
+            reset();
+        }
+        
         return result;
     }
 
