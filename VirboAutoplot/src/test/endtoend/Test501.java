@@ -192,6 +192,11 @@ public class Test501 {
                     iis++;
                     continue;
                 }
+                if ( id.contains("juno/waves/em/svt") ) {
+                    System.err.println( "Kludge for skipping Chris' Juno stuff (juno/waves/em/svt): " + id );
+                    iis++;
+                    continue;
+                }
                 if ( id.contains("/van_allen_probes/") ) {
                     System.err.println( "Kludge for skipping Chris' Van Allen stuff " + id );
                     iis++;
