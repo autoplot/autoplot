@@ -162,7 +162,9 @@ public class Test501 {
                     System.err.println("skipping /test/: "+id);
                     continue;
                 }
-                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) skip.add(count);
+                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
+                    skip.add(count);
+                }
                 count++;
             }
 
@@ -185,7 +187,11 @@ public class Test501 {
                     iis++;
                     continue;
                 }
-                
+                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
+                    System.err.println("skipping juno/waves housekeeping.dsdf");
+                    iis++;
+                    continue;
+                }
                 if ( skip.contains(iis) ) {
                     iis++;
                     System.err.println( "test marked for skipping in Test501.java: " + id );
