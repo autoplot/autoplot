@@ -244,7 +244,7 @@ public class Test501 {
 
                     String testRange= (String) dsdf.getProperty("testRange"); // this is a more thorough test, and should not change
                     if ( testRange!=null ) {
-
+                        System.err.println("testRange parameter found: "+testRange);
                         ic= testRange.indexOf("|");
                         if ( ic>-1 ) {
                             testRange= testRange.substring(0,ic);
