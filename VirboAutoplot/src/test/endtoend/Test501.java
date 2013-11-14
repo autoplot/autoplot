@@ -188,10 +188,21 @@ public class Test501 {
                     continue;
                 }
                 if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
-                    System.err.println("skipping juno/waves housekeeping.dsdf");
+                    System.err.println( "Kludge for skipping Chris' Juno stuff: " + id );
                     iis++;
                     continue;
                 }
+                if ( id.contains("/van_allen_probes/") ) {
+                    System.err.println( "Kludge for skipping Chris' Van Allen stuff " + id );
+                    iis++;
+                    continue;
+                }
+                if ( id.contains("freq/f_") ) {
+                    System.err.println( "Kludge for skipping Jeremy's FCE freq stuff, which is redundant and slow " + id );
+                    iis++;
+                    continue;
+                }
+
                 if ( skip.contains(iis) ) {
                     iis++;
                     System.err.println( "test marked for skipping in Test501.java: " + id );
