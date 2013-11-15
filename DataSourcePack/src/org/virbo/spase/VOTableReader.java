@@ -189,8 +189,13 @@ public class VOTableReader {
                             }
                             nelements+= 1;
                         } else {
-                            arraysizes.add( Integer.parseInt(arraysize) );
-                            nelements+= Integer.parseInt(arraysize);
+                            if ( dt.equals("char") ) {
+                                arraysizes.add( ARRAYSIZE_SCALAR );
+                                nelements+= 1;
+                            } else {
+                                arraysizes.add( Integer.parseInt(arraysize) );
+                                nelements+= Integer.parseInt(arraysize);
+                            }
                         }
                     } else {
                         arraysizes.add( ARRAYSIZE_SCALAR );
@@ -291,6 +296,9 @@ public class VOTableReader {
                     state= STATE_DATA;
                     index=0;
                     ielement=0;
+                    if ( monitor.isCancelled() ) {
+                        throw new RuntimeException("reading is interrupted");
+                    }
                 } else if ( localName.equals("FIELD")  ) {
                     assert state.equals(STATE_HEADER);
                     index++; // counting up items.
