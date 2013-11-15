@@ -63,6 +63,14 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
+                    <file>${reference.CDAWebDataSource.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${reference.PDSPPIDataSource.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${reference.dasCore.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -132,6 +140,14 @@
                 <id>jar</id>
             </reference>
             <reference>
+                <foreign-project>CDAWebDataSource</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
                 <foreign-project>CdfJavaDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
@@ -189,6 +205,14 @@
             </reference>
             <reference>
                 <foreign-project>JythonSupport</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>PDSPPIDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
