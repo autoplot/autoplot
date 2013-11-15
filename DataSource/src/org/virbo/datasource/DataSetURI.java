@@ -417,11 +417,6 @@ public class DataSetURI {
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
-        if ( resourceUri==null ) {
-            // rte_1512402504_20121004_002144.xml  I don't see how he was able to get here.
-            throw new NullPointerException("URI caused null pointer exception: "+uri );
-        }
-
         // rte_1512402504_20121004_002144.xml: actually I think it was the parens on the next expression.
         if (factory == null && ( resourceUri.getScheme()!=null && ( resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https") ) ) ) { // get the mime type
             URL url = resourceUri.toURL();
@@ -788,7 +783,10 @@ public class DataSetURI {
     }
 
     /**
-     * @see DataSetURI.downloadResourceAsTempFile
+     * This loads the URL to a local temporary file.  If the temp file
+     * is already downloaded and less than 10 seconds old, it will be used.  
+     * 
+     * @see DataSetURI.downloadResourceAsTempFile.  
      * @param url the address to download.
      * @param mon a progress monitor.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
@@ -1435,7 +1433,6 @@ public class DataSetURI {
         String[] s;
 
         if ( surlDir.equals("file:" ) || surlDir.equals("file://" ) ) {  //TODO: could go ahead and list
-            surlDir="file:///";
             CompletionResult t0;
             if ( split.vapScheme!=null ) {
                 t0= new CompletionResult( split.vapScheme + ":" + "file:///","need three slashes");
