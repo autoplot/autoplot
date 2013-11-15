@@ -69,7 +69,7 @@ for i in \
   NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
-  CdfDataSource CdfJavaDataSource CDAWebDataSource \
+  CdfDataSource CdfJavaDataSource CDAWebDataSource PDSPPIDataSource \
   VirboAutoplot; do
     echo rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
     rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
