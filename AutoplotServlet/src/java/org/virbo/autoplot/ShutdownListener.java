@@ -11,7 +11,8 @@ import javax.servlet.ServletContextListener;
 import org.das2.system.RequestProcessor;
 
 /**
- *
+ * Lister shuts down resources used by das2, such as its 
+ * "RequestProcessor" thread pool.
  * @author jbf
  */
 public class ShutdownListener implements ServletContextListener {
