@@ -112,7 +112,7 @@ public class SimpleServlet extends HttpServlet {
         String debug = request.getParameter("debug");
         if ( debug==null ) debug= "true";
 
-        logit("-- new request " + uniq, t0, uniq, debug);
+        logit("-- new request " + uniq + " --", t0, uniq, debug);
         try {
 
             String surl = request.getParameter("url");
@@ -120,7 +120,6 @@ public class SimpleServlet extends HttpServlet {
             if ( suri!=null ) surl= suri;
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
-            String script = ServletUtil.getStringParameter(request, "script", "");
             int width = ServletUtil.getIntParameter(request, "width", -1);
             int height = ServletUtil.getIntParameter(request, "height", -1);
             String scanvasAspect = ServletUtil.getStringParameter(request, "canvas.aspect", "");
@@ -278,7 +277,6 @@ public class SimpleServlet extends HttpServlet {
                     }
                     appmodel.doOpen(openable, params);
                 }
-                //appmodel.resetDataSetSourceURL( vap, new NullProgressMonitor() );
                 logit("opened vap", t0, uniq, debug);
                 width = appmodel.dom.getCanvases(0).getWidth();
                 height = appmodel.dom.getCanvases(0).getHeight();
@@ -401,18 +399,6 @@ public class SimpleServlet extends HttpServlet {
             }
 
             logit("done with setStyle", t0, uniq, debug);
-            if (!script.equals("")) {
-                URL url = new URL(request.getRequestURL().toString());
-                URL scriptUrl = new URL(url, script);
-
-                //can't do anything more until script context is not static
-                PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-
-                interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
-
-                logit("done with script", t0, uniq, debug);
-            }
-
             
             if ( !stamp.equals("false") ) { // force a change in the output, useful for testing.
                 final String fstamp= stamp;
@@ -438,6 +424,8 @@ public class SimpleServlet extends HttpServlet {
                     appmodel.canvas.writeToPng( out, width, height );
                     
                 } catch (IOException ioe) {
+                    logger.log( Level.SEVERE, ioe.toString(), ioe );
+                    
                 } finally {
                     try {
                         out.close();
@@ -490,6 +478,7 @@ public class SimpleServlet extends HttpServlet {
      * @param request servlet request
      * @param response servlet response
      */
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -500,6 +489,7 @@ public class SimpleServlet extends HttpServlet {
      * @param request servlet request
      * @param response servlet response
      */
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -508,6 +498,7 @@ public class SimpleServlet extends HttpServlet {
     /** 
      * Returns a short description of the servlet.
      */
+    @Override
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
