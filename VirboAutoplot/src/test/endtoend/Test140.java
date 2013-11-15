@@ -149,10 +149,14 @@ public class Test140 {
         String name;
         if ( doTest ) {            
             String id= URLEncoder.encode( uri, "US-ASCII" );
-            id= id.replaceAll("%","_"); // make more human-ledgible, it doesn't need to be absolutely unique
-            id= id.replaceAll("\\.","_");
-            if ( id.length()>200 ) { // ext4 filename length limits...
-                id= id.substring(0,200) + "..." + String.format( "%016d", id.hashCode() );
+            id= id.replaceAll("%3A", "" );
+            id= id.replaceAll("%2F%2F", "_" );
+            id= id.replaceAll("%2F","_");
+            id= id.replaceAll("%3F","_");
+            id= id.replaceAll("%3D","=");
+            id= id.replaceAll("%26","_");
+            if ( id.length()>150 ) { // ext4 filename length limits...
+                id= id.substring(0,150) + "..." + String.format( "%016d", id.hashCode() );
             }
             name= String.format( "test%03d_%s", testid, id );
             result= name;
