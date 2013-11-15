@@ -37,6 +37,9 @@ public class PDSPPIDataSource extends AbstractDataSource {
     public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String id= (String) getParams().get("id");
         String param= (String) getParams().get("ds");
+        if ( id==null ) throw new IllegalArgumentException("id not specified");
+        if ( param==null ) throw new IllegalArgumentException("ds not specified");
+        
         String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         VOTableReader read= new VOTableReader();
         mon.setProgressMessage("downloading data");
