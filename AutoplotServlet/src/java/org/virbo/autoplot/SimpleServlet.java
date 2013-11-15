@@ -52,14 +52,16 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
- * SimpleServlet
+ * SimpleServlet produces PNG,PDF, and SVG products for
+ * .vap files and Autoplot URIs.  A simple set on controls is provided
+ * to tweak layout when automatic settings are not satisfactory.
  * 
  * @author jbf
  */
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20130901.0817z";
+    public static final String version= "v20131115.0728a";
 
     static FileHandler handler;
 
@@ -473,6 +475,14 @@ public class SimpleServlet extends HttpServlet {
 
 
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        logger.warning("SimpleServlet uses no resources.");
+    }
+    
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
