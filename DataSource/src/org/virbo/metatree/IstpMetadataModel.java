@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.UnitsUtil;
-import org.das2.stream.StreamTool;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -28,7 +27,6 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.LogNames;
 import org.virbo.dsops.Ops;
-import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
  *
