@@ -28,9 +28,11 @@ public class PDSPPIDataSource extends AbstractDataSource {
     public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String id= (String) getParams().get("id");
         String param= (String) getParams().get("ds");
-        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id="+id;
+        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         VOTableReader read= new VOTableReader();
-        File f= DataSetURI.downloadResourceAsTempFile( new URL(url), mon );
+        mon.setProgressMessage("downloading data");
+        File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
+        mon.setProgressMessage("reading data");
         QDataSet ds= read.readTable( f.toString(), mon );
         return DataSetOps.unbundle( ds, param );
         

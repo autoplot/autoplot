@@ -49,9 +49,9 @@ public class PDSPPIDataSourceFactory implements DataSourceFactory {
             } else if ( param.equals("id") ) {
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 ArrayList<String> keys= new ArrayList();
-                keys.add("pds://PPI/MESSMAGDATA_3001/DATA/SCIENCE_DATA/RTN/2009/AUG/MAGRTNSCIAVG09213_05_V05");
-                keys.add("pds://PPI/GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO");
-                keys.add("pds://PPI/VG_1502/DATA/MAG/HG_1_92S_I");
+                keys.add("MESSMAGDATA_3001/DATA/SCIENCE_DATA/RTN/2009/AUG/MAGRTNSCIAVG09213_05_V05");
+                keys.add("GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO");
+                keys.add("PPI/VG_1502/DATA/MAG/HG_1_92S_I");
                 for ( String key: keys ) {
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, key, true  );
                     ccresult.add(cc1);
@@ -73,7 +73,7 @@ public class PDSPPIDataSourceFactory implements DataSourceFactory {
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        if ( !( params.containsKey("ds") && params.containsKey("id" )&& params.containsKey("timerange") ) ) return true;
+        if ( !( params.containsKey("ds") && params.containsKey("id") ) ) return true;
         
         return false;
     }
