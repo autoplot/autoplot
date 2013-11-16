@@ -115,6 +115,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.started();
 
             try {
+                mon.setProgressMessage("refreshing database");
                 db.maybeRefresh( SubTaskMonitor.create(mon,0,10) ); //TODO: this ain't right, what's the taskSize?
             } catch ( IOException ex ) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -152,7 +153,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.setTaskProgress(0);
 
             //we need to look in the file to see if it is virtual
-            mon.setProgressMessage("get metadata");
+            mon.setProgressMessage("getting metadata for "+ds);
             getMetadata( SubTaskMonitor.create( mon,0,10) );
 
             String virtual= (String) metadata.get( "VIRTUAL" );
