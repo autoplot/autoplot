@@ -59,7 +59,10 @@ import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 
 /**
- *
+ * The ApplicationController, one per dom, is in charge of managing the 
+ * application as a whole, for example, adding and deleting plots,
+ * managing bindings, and managing focus.
+ * 
  * @author jbf
  */
 public class ApplicationController extends DomNodeController implements RunLaterListener.PropertyChange {
@@ -415,6 +418,11 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
+    /**
+     * return the Plot corresponding to the das2 component.  
+     * @param c Das2 component such as DasPlot or DasAxis.
+     * @return 
+     */
     public Plot getPlotFor(Component c) {
         Plot plot1 = null;
         for (Plot p : application.getPlots()) {
@@ -695,6 +703,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
+    /**
+     * delete the connector between two plot X axes.
+     * @param connector 
+     */
     public void deleteConnector(Connector connector) {
         logger.log( Level.FINE, "deleteConnector({0})", connector);
         ColumnColumnConnector impl = connectorImpls.get(connector);
@@ -879,6 +891,16 @@ public class ApplicationController extends DomNodeController implements RunLater
         return addPlot( focus, direction );
     }
 
+    /**
+     * add a plot to the canvas.  Direction is with respect to given
+     * focus plot, and currently only LayoutConstants.ABOVE and LayoutConstants.BELOW
+     * are supported.
+     * 
+     * @param direction LayoutConstants.ABOVE, LayoutConstants.BELOW, or null.  
+     * Null indicates the layout will be done elsewhere, and the new plot will
+     * be on top of the old.
+     * @return
+     */
     public synchronized Plot addPlot( final Plot focus, Object direction ) {
 
         if ( !SwingUtilities.isEventDispatchThread() ) {
@@ -995,10 +1017,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         return domPlot;
     }
 
-    public Plot addPlot(Row get, Column get0) {
+    /**
+     * add a plot to the canvas to the row and column.
+     * @return
+     */
+    public Plot addPlot(Row row, Column column) {
         Plot p= addPlot(null);
-        p.setRowId( get.getId() );
-        p.setColumnId( get0.getId() );
+        p.setRowId( row.getId() );
+        p.setColumnId( column.getId() );
         return p;
     }
 
