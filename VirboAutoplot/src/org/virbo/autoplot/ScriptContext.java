@@ -439,17 +439,27 @@ public class ScriptContext extends PyJavaInstance {
      * @param label the label for the component.
      * @param c the component to add.
      */
-    public static void addTab( String label, JComponent c  ) {
-        maybeInitView();
-        int n= view.getTabs().getComponentCount();
-        for ( int i=0; i<n; i++ ) {
-            final String titleAt = view.getTabs().getTitleAt(i);
-            if ( titleAt.equals(label) || titleAt.equals("("+label+")") ) { //DANGER view is model
-                view.getTabs().remove( i );
-                break;
+    public static void addTab( final String label, final JComponent c  ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                maybeInitView();
+                int n= view.getTabs().getComponentCount();
+                for ( int i=0; i<n; i++ ) {
+                    final String titleAt = view.getTabs().getTitleAt(i);
+                    if ( titleAt.equals(label) || titleAt.equals("("+label+")") ) { //DANGER view is model
+                        view.getTabs().remove( i );
+                        break;
+                    }
+                }
+                view.getTabs().add(label,c);        
             }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
         }
-        view.getTabs().add(label,c);
+
     }
     
     /**
