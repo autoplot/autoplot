@@ -443,25 +443,25 @@ public class VOTableReader {
         return readTable( s, new NullProgressMonitor() );
     }
     
-    public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
-        
-        //xmlReader.parse( new File("/home/jbf/ct/autoplot/votable/DATA_2012_2012_FGM_KRTP_1M.xml").toURI().toString() );
-        //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );        
-        //xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
-
-        String s= new File("/home/jbf/project/autoplot/pdsppi/data/DATA_PWS_SA_48S.xml").toURI().toString();
-        long t0= System.currentTimeMillis();
-        QDataSet ds= new VOTableReader().readTable( s );
-        System.err.println( String.format( "Read in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
-        OutputStream out= new FileOutputStream("/tmp/vospase.qds");
-        try {
-            new BundleStreamFormatter().format( ds, out, true );
-            System.err.println( String.format( "Write in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
-        } catch (StreamException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } finally {
-            out.close();
-        }
-                
-    }
+//    public static void main( String[] args ) throws SAXException, ParserConfigurationException, IOException {
+//        
+//        //xmlReader.parse( new File("/home/jbf/ct/autoplot/votable/DATA_2012_2012_FGM_KRTP_1M.xml").toURI().toString() );
+//        //xmlReader.parse( new File("/home/jbf/ct/autoplot/data/spase/vo-table/Draft_VOTable_EventLList_Std.xml").toURI().toString() );        
+//        //xmlReader.parse( new File("/home/jbf/project/autoplot/pdsppi/data/DATA_MAG_HG_1_92S_I.xml").toURI().toString() );
+//
+//        String s= new File("/home/jbf/project/autoplot/pdsppi/data/DATA_PWS_SA_48S.xml").toURI().toString();
+//        long t0= System.currentTimeMillis();
+//        QDataSet ds= new VOTableReader().readTable( s );
+//        System.err.println( String.format( "Read in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
+//        OutputStream out= new FileOutputStream("/tmp/vospase.qds");
+//        try {
+//            new BundleStreamFormatter().format( ds, out, true );
+//            System.err.println( String.format( "Write in %d millis: %s", System.currentTimeMillis()-t0, ds ) );
+//        } catch (StreamException ex) {
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);
+//        } finally {
+//            out.close();
+//        }
+//                
+//    }
 }
