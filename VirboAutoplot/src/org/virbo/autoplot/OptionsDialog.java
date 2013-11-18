@@ -7,7 +7,6 @@ package org.virbo.autoplot;
 import java.util.logging.Level;
 import javax.swing.JComboBox;
 import org.virbo.autoplot.dom.Options;
-import ucar.nc2.iosp.nexrad2.Level2VolumeScan;
 
 /**
  * Custom GUI for editing options.  This should be
@@ -110,25 +109,29 @@ public class OptionsDialog extends javax.swing.JPanel {
         jLabel1.setText("Autorange Type");
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-1f));
+        jLabel2.setForeground(new java.awt.Color(128, 128, 128));
         jLabel2.setText("\"reluctant\" will enable the experimental reluctant mode");
 
         flipColorbarLabelCB.setText("Flip Colorbar Label");
 
         jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
+        jLabel3.setForeground(new java.awt.Color(128, 128, 128));
         jLabel3.setText("if checked, the colorbar label will be flipped to match Y-axis label");
 
         jLabel4.setText("Default Mouse Module:");
 
-        mouseModuleCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "boxZoom: drag out a box to zoom in on the region", "crosshairDigitizer: click to read X and Y coordinates.", "zoomX: zoom in X only", " " }));
+        mouseModuleCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "boxZoom: drag out a box to zoom in on the region", "crosshairDigitizer: click to read X and Y coordinates.", "zoomX: zoom in X only" }));
 
         jLabel5.setText("Printing Log Level:");
 
         jLabel6.setFont(jLabel6.getFont().deriveFont(jLabel6.getFont().getSize()-1f));
+        jLabel6.setForeground(new java.awt.Color(128, 128, 128));
         jLabel6.setText("New plots will have this mouse module enabled");
 
-        printingLogLevelCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "NONE: print no message bubbles", "WARNING: print only warning messages", "ALL: print all message bubbles", " " }));
+        printingLogLevelCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "OFF: print no message bubbles", "WARNING: print only warning messages", "INFO: print informational message bubbles", "ALL: print all message bubbles" }));
 
         jLabel7.setFont(jLabel7.getFont().deriveFont(jLabel7.getFont().getSize()-1f));
+        jLabel7.setForeground(new java.awt.Color(128, 128, 128));
         jLabel7.setText("Suppress warning bubbles (e.g. no data) when printing to PDF or PNG, or the printer\n");
 
         jLabel8.setText("Printing Tag (Time stamp):");
@@ -136,11 +139,13 @@ public class OptionsDialog extends javax.swing.JPanel {
         printingTagTF.setText("jTextField2");
 
         jLabel9.setFont(jLabel9.getFont().deriveFont(jLabel9.getFont().getSize()-1f));
+        jLabel9.setForeground(new java.awt.Color(128, 128, 128));
         jLabel9.setText("Stamp this tag, which can include $Y$m$d,etc for local time");
 
         sliceRebinnedDataCB.setText("Slice Rebinned Data");
 
         jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getSize()-1f));
+        jLabel10.setForeground(new java.awt.Color(128, 128, 128));
         jLabel10.setText("Vertical and Horizontal slices are of pixels, not original measurements");
 
         jLabel11.setText("Tick Length:");
@@ -148,6 +153,7 @@ public class OptionsDialog extends javax.swing.JPanel {
         tickLengthTF.setText("jTextField3");
 
         jLabel12.setFont(jLabel12.getFont().deriveFont(jLabel12.getFont().getSize()-1f));
+        jLabel12.setForeground(new java.awt.Color(128, 128, 128));
         jLabel12.setText("Positive ems is outward, negative is inward, units are em or px");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -190,9 +196,9 @@ public class OptionsDialog extends javax.swing.JPanel {
                                 .addComponent(tickLengthTF, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(printingLogLevelCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(printingLogLevelCB, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -61,9 +61,9 @@
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel5" min="-2" pref="133" max="-2" attributes="0"/>
+                      <Component id="jLabel5" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="printingLogLevelCB" max="32767" attributes="0"/>
+                      <Component id="printingLogLevelCB" min="-2" pref="389" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -133,6 +133,9 @@
             <Font component="jLabel2" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="&quot;reluctant&quot; will enable the experimental reluctant mode"/>
       </Properties>
     </Component>
@@ -150,6 +153,9 @@
             <Font component="jLabel3" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="if checked, the colorbar label will be flipped to match Y-axis label"/>
       </Properties>
     </Component>
@@ -161,11 +167,10 @@
     <Component class="javax.swing.JComboBox" name="mouseModuleCB">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
+          <StringArray count="3">
             <StringItem index="0" value="boxZoom: drag out a box to zoom in on the region"/>
             <StringItem index="1" value="crosshairDigitizer: click to read X and Y coordinates."/>
             <StringItem index="2" value="zoomX: zoom in X only"/>
-            <StringItem index="3" value=" "/>
           </StringArray>
         </Property>
       </Properties>
@@ -182,6 +187,9 @@
             <Font component="jLabel6" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="New plots will have this mouse module enabled"/>
       </Properties>
     </Component>
@@ -189,10 +197,10 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
-            <StringItem index="0" value="NONE: print no message bubbles"/>
+            <StringItem index="0" value="OFF: print no message bubbles"/>
             <StringItem index="1" value="WARNING: print only warning messages"/>
-            <StringItem index="2" value="ALL: print all message bubbles"/>
-            <StringItem index="3" value=" "/>
+            <StringItem index="2" value="INFO: print informational message bubbles"/>
+            <StringItem index="3" value="ALL: print all message bubbles"/>
           </StringArray>
         </Property>
       </Properties>
@@ -203,6 +211,9 @@
           <FontInfo relative="true">
             <Font component="jLabel7" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Suppress warning bubbles (e.g. no data) when printing to PDF or PNG, or the printer&#xa;"/>
       </Properties>
@@ -224,6 +235,9 @@
             <Font component="jLabel9" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
         </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Stamp this tag, which can include $Y$m$d,etc for local time"/>
       </Properties>
     </Component>
@@ -238,6 +252,9 @@
           <FontInfo relative="true">
             <Font component="jLabel10" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Vertical and Horizontal slices are of pixels, not original measurements"/>
       </Properties>
@@ -258,6 +275,9 @@
           <FontInfo relative="true">
             <Font component="jLabel12" property="font" relativeSize="true" size="-1"/>
           </FontInfo>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="80" green="80" red="80" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Positive ems is outward, negative is inward, units are em or px"/>
       </Properties>
