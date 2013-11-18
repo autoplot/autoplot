@@ -122,7 +122,6 @@ class Das2ServerDataSource extends AbstractDataSource {
         //&ascii=1'
 
         mon.started();
-        mon.setProgressMessage("sending request");
         
         Map<String,String> params2 = new LinkedHashMap();
         Map<String,String> otherParams= new LinkedHashMap( params );
@@ -165,6 +164,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         if ( dataset==null ) {
             dataset= params.get("arg_0");
         }
+        mon.setProgressMessage("request "+dataset );
 
         if ( interval!=null ) { // TCAs use interval parameter
             logger.fine("dataset is a TCA, so do not use resolution");
@@ -257,6 +257,8 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         QDataSet result1;
 
+        mon.setProgressMessage("reading "+dataset);
+        
         if ( qds ) {
 
             try {
