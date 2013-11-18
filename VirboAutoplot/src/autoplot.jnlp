@@ -8,6 +8,7 @@
     <information> 
         <title>Autoplot (#{tag})</title>
         <vendor>http://virbo.org/</vendor>
+	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
         <icon href="logo16x16.gif" width="16" height="16" />
@@ -16,8 +17,7 @@
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
         <offline-allowed/>
-        <shortcut online="true">
-            <desktop />
+        <shortcut online="true" install="true">
             <menu submenu="autoplot" />
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
