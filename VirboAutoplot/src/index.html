@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Handling of large data sets by the SeriesRenderer is more useful.  This dataset has 5M points.</small></p>
+        <p><small>New options panel explains what options are, and removes redundant and obsolete controls.  Also, slicing is cleaned up.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1128: horizontal and vertical slices need to go away when data goes away</li>
+            <li>1129: renderers can get out of sync with axes, fail to repaint</li>
             <li>1095: Seth showed experimental handling of reference cache was causing problems.</li>
             <li>empty CDF files now trigger NoDataInIntervalException when a variable contains no records, rather than IllegalArgumentException, to support use in scripts.</li>
             <li>1124: reproducible deadlock on mac when printing to PDF</li>
@@ -77,6 +79,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Options panel replaced with custom GUI, old and redundant controls removed, explanations added</li>
             <li>introductory support for VOTables.</li>
             <li>331: DataSetAnnotations allows operations to be recycled. </li>
             <li>1093: printingLogLevel preference allows messages to be turned off when printing.</li>
