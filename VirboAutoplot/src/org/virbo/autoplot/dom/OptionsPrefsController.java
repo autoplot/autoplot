@@ -62,6 +62,10 @@ public class OptionsPrefsController {
                 prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
             } else if ( evt.getNewValue() instanceof Level ) {
                 prefs.put( evt.getPropertyName(), evt.getNewValue().toString() );
+            } else if ( evt.getNewValue() instanceof Integer ) {
+                prefs.putInt(evt.getPropertyName(), ((Integer)evt.getNewValue()).intValue() );
+            } else if ( evt.getNewValue() instanceof Double ) {
+                prefs.putDouble(evt.getPropertyName(), ((Double)evt.getNewValue()).doubleValue() );
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
@@ -123,6 +127,8 @@ public class OptionsPrefsController {
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
         options.setPrintingTag( prefs.get(Options.PROP_PRINTINGTAG, options.printingTag ) );
         options.setPrintingLogLevel( Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) ) );
+        options.setDisplayLogLevel( Level.parse( prefs.get(Options.PROP_DISPLAYLOGLEVEL, options.displayLogLevel.toString() ) ) );
+        options.setLogMessageTimeoutSec( prefs.getInt( Options.PROP_LOGMESSAGETIMEOUTSEC, options.logMessageTimeoutSec ) );
     }
 
     public void loadPreferences() {
@@ -168,5 +174,7 @@ public class OptionsPrefsController {
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
         options.printingTag= prefs.get(Options.PROP_PRINTINGTAG, options.printingTag );
         options.printingLogLevel= Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) );
+        options.displayLogLevel= Level.parse( prefs.get(Options.PROP_DISPLAYLOGLEVEL, options.displayLogLevel.toString() ) );
+        options.logMessageTimeoutSec= prefs.getInt( Options.PROP_LOGMESSAGETIMEOUTSEC, options.logMessageTimeoutSec );
     }
 }

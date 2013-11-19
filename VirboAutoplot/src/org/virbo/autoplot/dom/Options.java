@@ -472,7 +472,7 @@ public class Options extends DomNode {
     }
     
     /**
-     * the level of messages that are displayed.
+     * the level of messages that are displayed when printing.
      */
     protected Level printingLogLevel = Level.ALL;
     public static final String PROP_PRINTINGLOGLEVEL = "printingLogLevel";
@@ -486,6 +486,40 @@ public class Options extends DomNode {
         this.printingLogLevel = printingLogLevel;
         propertyChangeSupport.firePropertyChange(PROP_PRINTINGLOGLEVEL, oldPrintingLogLevel, printingLogLevel);
     }
+    
+    /**
+     * the level of messages that are shown on the display.
+     */
+    protected Level displayLogLevel = Level.ALL;
+    public static final String PROP_DISPLAYLOGLEVEL = "displayLogLevel";
+
+    public Level getDisplayLogLevel() {
+        return displayLogLevel;
+    }
+
+    public void setDisplayLogLevel(Level displayLogLevel) {
+        Level oldDisplayLogLevel = this.displayLogLevel;
+        this.displayLogLevel = displayLogLevel;
+        propertyChangeSupport.firePropertyChange(PROP_DISPLAYLOGLEVEL, oldDisplayLogLevel, displayLogLevel);
+    }
+
+    /**
+     * the number of seconds the message bubbles are shown.  300 or more seconds 
+     * will mean the message bubble is not erased.
+     */
+    protected int logMessageTimeoutSec = 20;
+    public static final String PROP_LOGMESSAGETIMEOUTSEC = "logMessageTimeoutSec";
+
+    public int getLogMessageTimeoutSec() {
+        return logMessageTimeoutSec;
+    }
+
+    public void setLogMessageTimeoutSec(int logMessageTimeoutSec) {
+        int oldLogMessageTimeoutSec = this.logMessageTimeoutSec;
+        this.logMessageTimeoutSec = logMessageTimeoutSec;
+        propertyChangeSupport.firePropertyChange(PROP_LOGMESSAGETIMEOUTSEC, oldLogMessageTimeoutSec, logMessageTimeoutSec);
+    }
+
 
 
     // Note these are weird: I'm not sure if I've just forgotten items or this was intentional.
