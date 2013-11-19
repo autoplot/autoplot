@@ -137,6 +137,8 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
+cp -r temp-volatile-src/JNLP-INF temp-volatile-classes/JNLP-INF/
+
 printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
