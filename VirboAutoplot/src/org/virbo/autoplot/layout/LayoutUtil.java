@@ -132,6 +132,7 @@ public class LayoutUtil {
         }
         int old;
 
+        // these are the additional pixels needed in each direction.
         int needXmin, needXmax, needYmin, needYmax;
 
         old = c.getDMinimum();
@@ -157,7 +158,7 @@ public class LayoutUtil {
             c.getParent().resizeAllComponents();
             return;
         }
-
+        
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
        
         changed = changed | maybeSetMinimum(c, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
