@@ -1019,7 +1019,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public static final String PROP_DEP0 = "dep0";
 
     public String getDep0() {
-        return dep0;
+        int i= dep0.indexOf(": "); // allow DEPEND_0 to contain : label for consistency.
+        if ( i>-1 ) {
+            return dep0.substring(0,i);
+        } else {
+            return dep0;
+        }
     }
 
     public void setDep0(String dep0) {
