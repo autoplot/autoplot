@@ -42,6 +42,7 @@ import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.ReplicateDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
@@ -799,17 +800,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         if ( idep==0 ) { //TODO: check for spareness property.  
                             if ( variable.getNumberOfValues()==1 && depDs.length()>1 ) {
                                 MutablePropertyDataSet nresult;
-                                if ( result.rank()==2 ) {
-                                    //vap+cdfj:http://tau.physics.uiowa.edu/rocket/charm_40025/autoplot/40025_eepaa2_test.cdf?PA_bin
-                                    nresult= (MutablePropertyDataSet)Ops.outerProduct( Ops.ones(depDs.length()), result.slice(0) );
-                                } else if ( result.rank()==1 ) {
-                                    //vap+cdfj:http://cdaweb.gsfc.nasa.gov/sp_phys/data/messenger/rtn/2011/messenger_mag_rtn_20110518_v01.cdf?Quality_Flag
-                                    nresult= (MutablePropertyDataSet)Ops.multiply( Ops.ones(depDs.length()), result.slice(0) );
-                                } else {
-                                    // TODO: not implemented for high-rank, fall back to old behavior.
-                                    nresult= result;
-                                }
-                                DataSetUtil.putProperties( DataSetUtil.getProperties(result), nresult );
+                                nresult= new ReplicateDataSet( result.slice(0), depDs.length() );
                                 result= nresult;
                             }
                         }
