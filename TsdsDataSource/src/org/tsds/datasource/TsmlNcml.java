@@ -30,6 +30,7 @@ import java.util.zip.InflaterInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -106,7 +107,7 @@ public class TsmlNcml {
         return result;
 
     }
-    private static final Logger logger = Logger.getLogger("virbo.tsds.datasource");
+    private static final Logger logger = LoggerManager.getLogger("apdss.tsds");
 
     private MutablePropertyDataSet aggregation(Node aggr) throws MalformedURLException, IOException {
         NodeList kids = aggr.getChildNodes();

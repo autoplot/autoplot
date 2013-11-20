@@ -36,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -131,7 +132,7 @@ class TsdsDataSource extends AbstractDataSource {
      */
     int currentPpd = -1;
     private static final int SIZE_DOUBLE = 8;
-    private static final Logger logger = Logger.getLogger("virbo.tsds.datasource");
+    private static final Logger logger = LoggerManager.getLogger("apdss.tsds");
     Document initialDocument;
     DatumRange parameterRange = null; // extent of the parameter.
     int parameterPpd = -1; // max resolution of the parameter.
