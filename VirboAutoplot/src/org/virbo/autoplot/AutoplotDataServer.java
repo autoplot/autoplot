@@ -165,7 +165,7 @@ public class AutoplotDataServer {
             }
         }
 
-        logger.log( Level.FINE, "time done read all= {0}", System.currentTimeMillis()-t0 );
+        logger.log( Level.INFO, "time to read (ms): {0}", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
              if ( format.equals(FORM_D2S) ) {
