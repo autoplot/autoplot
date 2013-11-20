@@ -77,6 +77,9 @@ echo "special handling of META-INF stuff..."
 rm temp-classes/META-INF/*.RSA
 rm temp-classes/META-INF/*.SF
 
+# remove CDF APPLICATION.JNLP
+rm -r temp-classes/JNLP-INF/
+
 # end, special handling of the META-INF stuff.
 echo "done special handling of META-INF stuff."
 
