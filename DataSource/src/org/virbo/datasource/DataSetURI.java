@@ -51,6 +51,7 @@ import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
+import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dsops.Ops;
 
@@ -1618,6 +1619,13 @@ public class DataSetURI {
             }
         }
 
+        if ( fs instanceof WebFileSystem ) {
+            WebFileSystem wfs= (WebFileSystem)fs;
+            if ( wfs.isOffline() ) {
+                completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toASCIIString(), "(FileSystem is offline)", "The filesystem is offline.  Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toASCIIString(), false ) );
+            }
+        }
+        
         return completions;
     }
 
