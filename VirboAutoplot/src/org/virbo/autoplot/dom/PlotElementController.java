@@ -546,7 +546,7 @@ public class PlotElementController extends DomNodeController {
             if ( fillDs.rank()==1 ) {
                 return true;
             } else if ( fillDs.rank()==2 ) {
-                return SemanticOps.isBundle(fillDs);
+                return SemanticOps.isBundle(fillDs) || SemanticOps.isRank2Waveform(fillDs);
             } else {
                 return false;
             }
@@ -1220,7 +1220,7 @@ public class PlotElementController extends DomNodeController {
 
 
             boolean isWaveform= false;
-            if ( renderType==RenderType.hugeScatter && fillDs.rank()==2 ) {
+            if ( SemanticOps.isRank2Waveform(fillDs) ) {
                 QDataSet dep0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
                 QDataSet dep1= (QDataSet) fillDs.property(QDataSet.DEPEND_1);
                 if ( dep0!=null && dep1!=null ) {
