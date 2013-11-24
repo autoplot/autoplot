@@ -88,7 +88,7 @@ public class Test002 {
             int count = Integer.parseInt(s.substring(0, 4).trim());
             s = s.substring(4);
 
-            System.err.printf( "=== test %s ===\n", s );
+            System.err.printf( "=== test002_%03d %s ===\n", count, s );
 
             String label = String.format("test002_%03d", count);
 
