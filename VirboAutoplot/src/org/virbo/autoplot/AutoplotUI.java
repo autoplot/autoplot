@@ -1915,6 +1915,7 @@ APSplash.checkTime("init 52");
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        additionalOptionsMI = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         toolsMenu = new javax.swing.JMenu();
         cacheMenu = new javax.swing.JMenu();
@@ -2327,6 +2328,14 @@ APSplash.checkTime("init 52");
 
         optionsMenu.add(autoMenu);
 
+        additionalOptionsMI.setText("Additional Options...");
+        additionalOptionsMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                additionalOptionsMIActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(additionalOptionsMI);
+
         jMenuBar1.add(optionsMenu);
 
         bookmarksMenu.setText("Bookmarks");
@@ -2570,14 +2579,14 @@ APSplash.checkTime("init 52");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 631, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 638, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 624, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -3095,6 +3104,14 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             setMessage( "Reference Cache is disabled." );
         }
     }//GEN-LAST:event_referenceCacheCheckBoxMenuItemActionPerformed
+
+    private void additionalOptionsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsMIActionPerformed
+        OptionsDialog p= new OptionsDialog();
+        p.setOptions( applicationModel.dom.getOptions() );
+        if ( JOptionPane.showConfirmDialog( this, p, "Additional Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+            p.copyOptions( applicationModel.dom.getOptions() );
+        }
+    }//GEN-LAST:event_additionalOptionsMIActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
@@ -3737,6 +3754,7 @@ APSplash.checkTime("init 240");
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
+    private javax.swing.JMenuItem additionalOptionsMI;
     private javax.swing.ButtonGroup addressBarButtonGroup;
     private javax.swing.JMenu addressBarMenu;
     private javax.swing.JSeparator aggSeparator;

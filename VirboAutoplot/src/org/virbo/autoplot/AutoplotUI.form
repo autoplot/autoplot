@@ -438,6 +438,14 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <MenuItem class="javax.swing.JMenuItem" name="additionalOptionsMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Additional Options..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="additionalOptionsMIActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="bookmarksMenu">
@@ -729,7 +737,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangePanel" min="-2" pref="31" max="-2" attributes="0"/>
-              <EmptySpace pref="634" max="32767" attributes="0"/>
+              <EmptySpace pref="638" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="statusTextField" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -738,7 +746,7 @@
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-                  <Component id="tabbedPanelContainer" pref="624" max="32767" attributes="0"/>
+                  <Component id="tabbedPanelContainer" pref="631" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
           </Group>
