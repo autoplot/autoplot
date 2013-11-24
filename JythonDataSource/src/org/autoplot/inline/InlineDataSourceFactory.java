@@ -8,6 +8,8 @@ package org.autoplot.inline;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.DefaultCompletionItem;
@@ -42,8 +44,15 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
             List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
 
+            Collections.sort(r,new Comparator<DefaultCompletionItem>() {
+                @Override
+                public int compare(DefaultCompletionItem o1, DefaultCompletionItem o2) {
+                    return o1.getComplete().compareTo(o2.getComplete());
+                }
+            });
+            
             for ( DefaultCompletionItem item: r ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, item.getComplete(), this, "arg_0" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, item.getComplete(), this, "arg_0" ) );
             }   
         }
         
