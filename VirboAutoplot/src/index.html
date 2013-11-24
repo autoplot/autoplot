@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New options panel explains what options are, and removes redundant and obsolete controls.  Also, slicing is cleaned up.</small></p>
+        <p><small>New options panel explains what options are, and removes redundant and obsolete controls.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -31,6 +31,7 @@
             <li>1130: bugfix in java cdf, where outerProduct was used to replicate a non-varying record, replacing invalid measurements with fill value, so valid range could not be corrected.</li>
             <li>addTab is run on event thread, could cause deadlock</li>
             <li>reference in DataSource to QStream removed because it was not necessary and caused compile problems.</li>
+            <li>clean up after vertical and horizontal spectrogram slicers when spectrogram is removed</li>
             <li>1095: Seth showed experimental handling of reference cache was causing problems.</li>
             <li>empty CDF files now trigger NoDataInIntervalException when a variable contains no records, rather than IllegalArgumentException, to support use in scripts.</li>
         </ul>
