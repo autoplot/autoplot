@@ -25,10 +25,17 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>check rich ascii dep0 for colon splitting name from description</li>
             <li>1128: horizontal and vertical slices need to go away when data goes away</li>
             <li>1129: renderers can get out of sync with axes, fail to repaint</li>
+            <li>1130: bugfix in java cdf, where outerProduct was used to replicate a non-varying record, replacing invalid measurements with fill value, so valid range could not be corrected.</li>
+            <li>addTab is run on event thread, could cause deadlock</li>
+            <li>reference in DataSource to QStream removed because it was not necessary and caused compile problems.</li>
             <li>1095: Seth showed experimental handling of reference cache was causing problems.</li>
             <li>empty CDF files now trigger NoDataInIntervalException when a variable contains no records, rather than IllegalArgumentException, to support use in scripts.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1124: reproducible deadlock on mac when printing to PDF</li>
             <li>export bundle to qds now uses specialized formatter for efficient output.  Before it would have to use the same encoding for all datasets.</li>
             <li>Horizontal slice works again with spectrograms with rank 2 Y and some records containing all fill, thanks Joe!</li>
@@ -52,37 +59,18 @@
             <li>1109: vap setting of zaxis range not respected</li>
             <li>1110: allow cdaweb master file to override LABL_PTR_1 </li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>bugfix: new checks on http file size had a bug, since early Sept</li>
-            <li>rte_1511776445: NullPointerException when exporting vap+inline:data_1,data_2 where data_1 is TSB.  Thanks jcf!</li>
-            <li>rte_2010191909: don't assume that the type of LABL_PTRs in CDF files are string array.  Thanks Reiner!</li>
-            <li>1108: underimplementation of new jython script handling.  Thanks Craig and Scott!</li>
-            <li>1107: das2server sends everything when TCA items are specified for non-TCA dataset</li>            
-            <li>clean up DEPEND_1/slice1 messages seen on stderr when plotting components of vectors.</li>
-            <li>trim labels for CDF products, which sometimes contain extra spaces.</li>
-            <li>massive <a href="http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-findbugs/">findbugs</a> cleanup to get below 300 flags</li>
-            <li>rte_0750582163: throw NoDataInInterval exception so that is easier to understand that the parser was not properly configured.</li>
-            <li>rte_0750582163: tweak the guess columns code so that it is able to see the columns GOES 13 files from NOAA.</li>
-            <li>plotx properly supports renderType='contour&gt;levels=0.1&amp;color=blue'</li>
-            <li>vap+cdaweb:ds=RBSPA_EFW-L2_VSVY-HIRES&amp;id=vsvy_vavg correctly reads units as the single-file readers do.</li> 
-            <li>rte_0851835013: data point recorder forces .dat or .txt extensions</li>
-            <li>rte_1906877305: okay press on select datasource without selection</li>
-            <li>plotx(1,uri) didn't respect TimeSeriesBrowse</li>
-            <li>script: is only allowed from first window, second window prints a warning.</li>
-            <li>autorange for many renderers didn't look for log setting, forcing result to be linear when the dataset defaults wanted log</li>            
-            <li>rte_0369904082: orbit numbers when at the end of the known orbits</li>
-            <li>ContextFlowView when image is smaller than 400 pixels in width.</li>
-            <li>rfe 314: bugfixes to scriptServlet, which was broken since jython import</li>
-            <li>1102: feedback problems with slicers, rank 2 DEPEND_1 </li>
-            <li>1101: trim with CDFs with rank 2 DEPEND_1.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>add DasPlot options for plot background color, grid color, etc</li>
+            <li>properly signed jnlp application allows launching without excessive security dialogs</li>
+            <li>Also, message bubble timeout preference introduced as well as displayLogLevel</li>
+            <li>1093: printingLogLevel preference allows messages to be turned off when printing.</li>
             <li>Options panel replaced with custom GUI, old and redundant controls removed, explanations added</li>
             <li>introductory support for VOTables.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>331: DataSetAnnotations allows operations to be recycled. </li>
-            <li>1093: printingLogLevel preference allows messages to be turned off when printing.</li>
             <li>330: Timestamp on PDF and PNG output </li>
             <li>Henry's CubicRoot solver</li>
             <li>1120: Series mode has a more useful rendering of data when there are &gt; 200000 points.</li>
@@ -96,13 +84,6 @@
             <li>experimental "now" allowed in timeranges like "2001-01-01/now"</li>
             <li>DataSetAnnotations allows us to cache repeat operations more easily</li>
             <li>rfe 327: pngwalks from event lists</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>rfe 326: jump to routine in jython editor</li>
-            <li>rfe 322: Bookmarks for the Axis Annotations</li>
-            <li>rfe 320: Jython automatic gui based on Jython Syntax tree, allowing more sophistocated scripts</li>
-            <li>export to wave table clips to visible range, not wave packet boundaries</li>
         </ul>
 
         <p>Known issues:</p>
