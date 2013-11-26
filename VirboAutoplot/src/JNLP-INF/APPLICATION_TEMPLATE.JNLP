@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?> 
-<!--
-<jnlp 
-    spec="1.0+"
-    codebase="*"
-    href="autoplot.jnlp">
--->   
 <jnlp 
     spec="1.0+"
     codebase="*"
@@ -22,7 +16,8 @@
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
         <offline-allowed/>
-        <shortcut online="true" install="true">
+        <shortcut online="true">
+            <desktop />
             <menu submenu="autoplot" />
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
