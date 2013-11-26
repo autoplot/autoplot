@@ -141,6 +141,7 @@ if [ "" == "$AUTOPLOT_NO_JNLP_TEMPLATE" ]; then
    cp -r temp-volatile-src/JNLP-INF temp-volatile-classes/JNLP-INF/
 else 
    echo "Not copying JNLP-INF because AUTOPLOT_NO_JNLP_TEMPLATE is set"
+   rm -rf temp-volatile-classes/JNLP-INF/
 fi
 
 printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\n" > temp-volatile-src/MANIFEST.MF
