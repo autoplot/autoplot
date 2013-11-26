@@ -137,7 +137,7 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-if ( "" == "$AUTOPLOT_NO_JNLP_TEMPLATE" ); then   
+if [ "" == "$AUTOPLOT_NO_JNLP_TEMPLATE" ]; then   
    cp -r temp-volatile-src/JNLP-INF temp-volatile-classes/JNLP-INF/
 else 
    echo "Not copying JNLP-INF because AUTOPLOT_NO_JNLP_TEMPLATE is set"
