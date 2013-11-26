@@ -66,5 +66,6 @@
 
     <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <!-- see http://autoplot.org//developer#Command-Line_Arguments -->
+        <argument></argument>  <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
 </jnlp> 
