@@ -3387,6 +3387,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
 
         alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with the Cluster Final Archive");
+        alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
            if ( args[i].equals("-open") ) args[i]="--open";
