@@ -273,6 +273,8 @@ fi
 #mkdir temp-volatile-classes/JNLP-INF
 #cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
 
+exit 0 
+
 echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
