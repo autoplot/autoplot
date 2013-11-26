@@ -11,7 +11,7 @@
     href="autoplot.jnlp">
    
     <information> 
-        <title>Autoplot (#{tag})</title>
+        <title>Autoplot (v2013b)</title>
         <vendor>http://virbo.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
@@ -66,6 +66,6 @@
 
     <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <!-- see http://autoplot.org//developer#Command-Line_Arguments -->
-        <argument></argument>  <!-- this is to support the jnlp-server, which can insert a starting value -->
+        <argument> </argument>  <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
 </jnlp> 
