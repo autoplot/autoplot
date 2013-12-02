@@ -240,7 +240,7 @@ public class DataSourceUtil {
                 for ( int i=0; i<moveUs.size(); i++ ) {
                     try {
                         DatumRange drtest= tp1.parse(moveUs.get(i)).getTimeRange();
-                        if ( ! tp1.format(drtest).equals(moveUs.get(i)) ) {
+                        if ( tp1.format(drtest).equals(moveUs.get(i)) ) {
                             fail= true;
                             break;
                         }
