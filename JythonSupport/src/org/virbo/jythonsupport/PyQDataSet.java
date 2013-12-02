@@ -669,6 +669,7 @@ public class PyQDataSet extends PyJavaInstance {
                     fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
                 } else if ( a.isNumberType() && ! ( a instanceof PyQDataSet ) ) {
+                    if ( a instanceof PyFloat ) throw new IllegalArgumentException("float used to index array");
                     int idx = (Integer) a.__tojava__(Integer.class);
                     fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
                 } else {
