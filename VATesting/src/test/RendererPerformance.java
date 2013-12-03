@@ -13,7 +13,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.util.LoggerManager;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
@@ -21,13 +20,14 @@ import org.virbo.autoplot.dom.PlotElementController;
 import test.endtoend.Test009;
 
 /**
- *
+ * Introduce test to keep track of rendering performace.
  * @author jbf
  */
 public class RendererPerformance {
     
     private static void waitForPaint( final DasCanvas c ) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait( new Runnable() {
+            @Override
             public void run() {
                 c.repaint();
             }
