@@ -364,6 +364,14 @@ public class DataSourceRegistry {
 
     }
 
+    /**
+     * Register a data source at runtime, allowing the user to 
+     * override the internal extentions.  This allows, for example, a new version
+     * of a data source to be compared to the production.
+     * @param ext if non-null, use this extension instead.
+     * @param jarFile the jar file, which must contain META-INF/org.virbo.datasource.DataSourceFactory.extensions.
+     * @throws IOException 
+     */
     public void registerDataSourceJar( String ext, URL jarFile ) throws IOException {
         URLClassLoader loader= new URLClassLoader( new URL[] {jarFile}, DataSourceRegistry.class.getClassLoader() );
 
@@ -405,11 +413,22 @@ public class DataSourceRegistry {
     }
 
 
+    /**
+     * return true if the source is registered.
+     * @param ext, for example ".cdf"
+     * @return 
+     */
     public boolean hasSourceByExt(String ext) {
         if ( ext==null ) return false;
         return dataSourcesByExt.get(getExtension(ext))!=null;
     }
 
+    /**
+     * return true if the source is registered by mime type.  This
+     * is not used much.
+     * @param mime, for example "application/x-das2stream"
+     * @return 
+     */
     public boolean hasSourceByMime(String mime) {
         if ( mime==null ) return false;
         return dataSourcesByMime.get(mime)!=null;
