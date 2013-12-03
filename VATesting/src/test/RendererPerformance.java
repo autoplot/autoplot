@@ -13,7 +13,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.system.DasLogger;
 import org.das2.util.LoggerManager;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
@@ -36,6 +35,7 @@ public class RendererPerformance {
     }
             
     private static void setUp( String uri ) {
+        System.err.println("uri: "+uri);
         try {
             ScriptContext.plot( uri );
         } catch (InterruptedException ex) {
@@ -59,6 +59,7 @@ public class RendererPerformance {
             pec.getRenderer().resetCounters();
 
             int nstep=40;
+            System.err.println("nstep: "+nstep);
             for ( int i=0; i<nstep; i++ ) {
                 dom.getController().getPlot().getXaxis().setRange( r2 );
                 c.waitUntilIdle();
@@ -74,53 +75,87 @@ public class RendererPerformance {
         } catch (InvocationTargetException ex) {
             Logger.getLogger(RendererPerformance.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.err.println( " update: " + pec.getRenderer().getUpdateCount() +" render: "+pec.getRenderer().getRenderCount() );
+        System.err.println( "update: " + pec.getRenderer().getUpdateCount() );
+        System.err.println( "render: "+pec.getRenderer().getRenderCount() );
 
     }
             
     private static void performance() {
-        // test series renderer performance
         
         int nn;
-        
-        LoggerManager.setEnableTimers(true);
+        long t0;
 
         Application dom= ScriptContext.getDocumentModel();
         ScriptContext.createGui();
 
+        System.err.println("---------------------");
         nn= 400;    
         setUp( String.format( "vap+inline:n=%d&t=linspace(0,4*PI,n)&t,t*(sin(t)+randn(n)/10)", nn ) );
-        LoggerManager.resetTimer("series renderer performance");    
+        t0= System.currentTimeMillis();
         stressIt();
-        LoggerManager.markTime("performance.series");
+        System.err.println("performance.series (ms):"+(System.currentTimeMillis()-t0) );
             
+        System.err.println("---------------------");
         nn= 400000;    
         setUp( String.format( "vap+inline:n=%d&t=linspace(0,4*PI,n)&t,t*(sin(t)+randn(n)/10)", nn ) );
         dom.getPlotElements(0).setRenderType(RenderType.series);
-        LoggerManager.resetTimer("huge series");    
+        t0= System.currentTimeMillis();
         stressIt();
-        LoggerManager.markTime("performance.huge.series");
+        System.err.println("performance.huge.series (ms): "+(System.currentTimeMillis()-t0) );
         
+        System.err.println("---------------------");
+        nn= 100;    
+        setUp( String.format( "vap+inline:ripplesWaveformTimeSeries(%d)", nn ) );
+        t0= System.currentTimeMillis();
+        stressIt();
+        System.err.println("performance.waveform.series (ms): "+(System.currentTimeMillis()-t0));
+
+        System.err.println("---------------------");
+        nn= 1000;    
+        setUp( String.format( "vap+inline:ripplesWaveformTimeSeries(%d)", nn ) );
+        t0= System.currentTimeMillis();
+        stressIt();
+        System.err.println("performance.waveform.huge.series (ms): "+(System.currentTimeMillis()-t0));
+        
+        System.err.println("---------------------");
+        nn= 100;    
+        setUp( String.format( "vap+inline:ripplesWaveformTimeSeries(%d)", nn ) );
+        dom.getPlotElements(0).setRenderType(RenderType.series);
+        t0= System.currentTimeMillis();
+        stressIt();
+        System.err.println("performance.waveform.series (ms): "+(System.currentTimeMillis()-t0));
+
+        System.err.println("---------------------");
+        nn= 1000;    
+        setUp( String.format( "vap+inline:ripplesWaveformTimeSeries(%d)", nn ) );
+        dom.getPlotElements(0).setRenderType(RenderType.series);
+        t0= System.currentTimeMillis();
+        stressIt();
+        System.err.println("performance.waveform.huge.series (ms): "+(System.currentTimeMillis()-t0));
+
+        System.err.println("---------------------");
         nn= 400000;    
         setUp( String.format( "vap+inline:n=%d&t=linspace(0,4*PI,n)&t,t*(sin(t)+randn(n)/10)", nn ) );
         dom.getPlotElements(0).setRenderType(RenderType.hugeScatter);
-        LoggerManager.resetTimer("huge scatter");    
+        t0= System.currentTimeMillis();
         stressIt();
-        LoggerManager.markTime("performance.hugescatter");
+        System.err.println("performance.hugescatter (ms): "+(System.currentTimeMillis()-t0));
         
+        System.err.println("---------------------");
         nn= 100;
         setUp( String.format( "vap+inline:ripples(%d,%d)", nn, nn ) );
         dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
-        LoggerManager.resetTimer("spectrogram renderer performance");    
+        t0= System.currentTimeMillis();
         stressIt();
-        LoggerManager.markTime("performance.spectrogram");
+        System.err.println("performance.spectrogram (ms): "+(System.currentTimeMillis()-t0));
 
+        System.err.println("---------------------");
         nn= 100;
         setUp( String.format( "vap+inline:ripples(%d,%d)", nn, nn ) );
         dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor );
-        LoggerManager.resetTimer("spectrogram lanlNN renderer performance");    
+        t0= System.currentTimeMillis();
         stressIt();
-        LoggerManager.markTime("performance.lanlNN.spectrogram");
+        System.err.println("performance.lanlNN.spectrogram (ms): "+(System.currentTimeMillis()-t0));
         
     }
     
