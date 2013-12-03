@@ -90,6 +90,14 @@ public class RendererPerformance {
 
         System.err.println("---------------------");
         nn= 400;    
+        setUp( String.format( "vap+inline:ripples(%d,%d)", nn,nn ) );
+        dom.getPlotElements(0).setRenderType(RenderType.contour);
+        t0= System.currentTimeMillis();
+        stressIt();
+        System.err.println("performance.contour (ms):"+(System.currentTimeMillis()-t0) );
+        
+        System.err.println("---------------------");
+        nn= 400;    
         setUp( String.format( "vap+inline:n=%d&t=linspace(0,4*PI,n)&t,t*(sin(t)+randn(n)/10)", nn ) );
         t0= System.currentTimeMillis();
         stressIt();
