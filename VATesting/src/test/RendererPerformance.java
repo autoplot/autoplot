@@ -20,7 +20,7 @@ import org.virbo.autoplot.dom.PlotElementController;
 import test.endtoend.Test009;
 
 /**
- * Introduce test to keep track of rendering performace.
+ * Introduce test to keep track of rendering performance.
  * @author jbf
  */
 public class RendererPerformance {
