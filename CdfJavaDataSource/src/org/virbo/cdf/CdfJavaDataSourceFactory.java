@@ -80,6 +80,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "interpMeta=", "control interpretation of metadata"));
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "doDep=", "control dependencies between variables"));
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "where=", "only return variables where the condition is true"));            
 
             return ccresult;
             
@@ -117,6 +118,31 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 return Arrays.asList(
                         new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "yes", "use dependency tags (default)" ),
                         new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "no", "inhibit use of dependency tags" ) );
+            } else if ( parmname.equals("where") ) {
+                String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
+                
+                File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                DataSetURI.checkLength(cdfFile);
+
+                String fileName= cdfFile.toString();
+                
+                CDF cdf;
+                try {
+                    cdf = CdfJavaDataSource.getCdfFile(fileName);
+                } catch (Throwable ex) {
+                    throw new RuntimeException(ex);
+                }
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 1 );
+                                
+                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                for ( Map.Entry<String,String> e:result.entrySet() ) {
+                    String key= e.getKey();
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key+".eq(0)", this, null, key+".eq(0)", e.getValue(), true  );
+                    ccresult.add(cc1);
+                }
+                return ccresult;
+                
+                
             } else {
                 return Collections.emptyList();
             }
