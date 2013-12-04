@@ -511,7 +511,9 @@ public class CdfFileDataSource extends AbstractDataSource {
         boolean doPlusMinus= depend==false;
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
-        if ( doPlusMinus && ( deltaPlus!=null && deltaPlus instanceof String ) && (  deltaMinus!=null && deltaMinus instanceof String ) ) {
+        if ( doPlusMinus 
+                && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
+                && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
             Variable var=null;
             try {
                 var= cdf.getVariable((String)deltaPlus);
