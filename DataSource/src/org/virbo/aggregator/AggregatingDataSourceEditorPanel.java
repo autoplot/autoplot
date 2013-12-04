@@ -659,7 +659,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
         URISplit dsplit = URISplit.parse(delegateUrl);
         Map<String, String> allParams = new LinkedHashMap<String, String>();
-        allParams.putAll(params);
+        //allParams.putAll(params);
         allParams.putAll(URISplit.parseParams(dsplit.params));
         String tr = timeRangeTextField.getText();
         tr= tr.replaceAll(" ","+");
