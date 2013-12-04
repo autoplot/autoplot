@@ -384,6 +384,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         throw new NoDataInIntervalException("'where' argument removes all data");
                     } else {
                         result= DataSetOps.applyIndex( result, 0, r, true );
+                        //TODO: check to see if rank 2 depend can now be rank 1.
                     }
                 }
             }
