@@ -101,6 +101,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         plotBelowButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
         editUriButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Recent History");
@@ -164,21 +165,29 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton1.setText(".vap files");
+        jButton1.setToolTipText("Show just the .vap product files.");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(322, Short.MAX_VALUE)
+                .addContainerGap(362, Short.MAX_VALUE)
                 .add(cancelButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(overplotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(editUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotBelowButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 65, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 95, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(editUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 92, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .addContainerGap()
@@ -187,22 +196,22 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                 .add(filterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(updateButton)
-                .addContainerGap(427, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 781, Short.MAX_VALUE)
+                .add(18, 18, 18)
+                .add(jButton1)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
         );
-
-        layout.linkSize(new java.awt.Component[] {editUriButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(filterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(updateButton))
+                    .add(updateButton)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .add(recentUrisGUI1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 394, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(plotButton)
@@ -210,7 +219,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                     .add(cancelButton)
                     .add(overplotButton)
                     .add(editUriButton))
-                .addContainerGap())
+                .add(6, 6, 6))
         );
 
         pack();
@@ -252,6 +261,11 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_editUriButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        filterTextField.setText(".vap");
+        setFilter( filterTextField.getText() );
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public void setExpertMode( boolean expert ) {
         editUriButton.setVisible(expert);
         overplotButton.setVisible(expert);
@@ -279,6 +293,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton editUriButton;
     private javax.swing.JTextField filterTextField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
