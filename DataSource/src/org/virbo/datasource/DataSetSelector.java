@@ -582,6 +582,16 @@ public class DataSetSelector extends javax.swing.JPanel {
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
+        // hooks for browsing, such as "vap+internal"
+        for (String browseTriggerRegex : browseTriggers.keySet()) {
+            if (Pattern.matches(browseTriggerRegex, surl )) {
+                logger.finest("matches browse trigger");
+                Action action = browseTriggers.get(browseTriggerRegex);
+                action.actionPerformed( new ActionEvent(this, 123, "dataSetSelect") );
+                return;
+            }
+        }
+        
         boolean wasRejected= false;
         DataSourceEditorPanel edit;
         try {
