@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New options panel explains what options are, and removes redundant and obsolete controls.</small></p>
+        <p><small>New where parameter for CDF makes it easier to filter by mode.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,11 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>isConstant uses equivalent function now, instead of .equals.</li>
+            <li>A CDF variable's DELTA_PLUS_VAR could point to itself, cause infinite recursion and crashing Java</li>
+            <li>improve support for rank 2 energies, supporting ds[:,0:2,:] so DEPEND_2 is preserved.</li>
+            <li>the delegate editor with aggregation could not remove parameters.</li>
+            <li>DataSourceEditor browseSourceType handles plugins like script:... properly, avoiding runtime error.</li>
             <li>Edit->Options copied to Options->Additional Options, Edit-Options will be removed after AGU.</li>
             <li>check rich ascii dep0 for colon splitting name from description</li>
             <li>1128: horizontal and vertical slices need to go away when data goes away</li>
@@ -63,6 +68,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>CDF data source allows &amp;where=mode.eq(1)</li>
+            <li>slice1 allows slicing at a datum like "1000 eV"</li>
+            <li>history dialog has .vap button for convenience and example filter.</li>
             <li>waveform data supported in the series renderer, allowing finer control.</li>
             <li>add DasPlot options for plot background color, grid color, etc</li>
             <li>properly signed jnlp application allows launching without excessive security dialogs</li>
