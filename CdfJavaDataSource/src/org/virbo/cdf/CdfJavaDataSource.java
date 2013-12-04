@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.DatumRange;
@@ -356,16 +357,29 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
             String w= (String)map.get( PARAM_WHERE );
             if ( w!=null && w.length()>0 ) {
-                int ieq= w.indexOf(".eq(");
-                if ( ieq==-1 ) {
-                    throw new IllegalArgumentException("where can only contain .eq");
+                Pattern p= Pattern.compile("\\.([elg][qte])\\(");
+                Matcher m= p.matcher(w);
+                int ieq;
+                if ( !m.find() ) {
+                    throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
                 } else {
+                    ieq= m.start();
+                    String op= m.group(1);
                     String sval= w.substring(ieq+4);
                     if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
                     double d= Double.parseDouble(sval);
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, attr1 );
-                    QDataSet r= Ops.where( Ops.eq( parm,d ) );
+                    QDataSet r;
+                    if ( op.equals("gt" ) ){
+                        r= Ops.where( Ops.gt( parm,d ) );
+                    } else if ( op.equals("lt") ) {
+                        r= Ops.where( Ops.lt( parm,d ) );
+                    } else if ( op.equals("eq") ) {
+                        r= Ops.where( Ops.eq( parm,d ) );
+                    } else {
+                        throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
+                    }
                     if ( r.length()==0 ) {
                         throw new NoDataInIntervalException("'where' argument removes all data");
                     } else {
