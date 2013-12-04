@@ -384,7 +384,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         throw new NoDataInIntervalException("'where' argument removes all data");
                     } else {
                         result= DataSetOps.applyIndex( result, 0, r, true );
-                        //TODO: check to see if rank 2 depend can now be rank 1.
+                        // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
+                        for ( int ii=1; ii<result.rank(); ii++ ) {
+                            String sdep= "DEPEND_"+ii;
+                            QDataSet dep= (QDataSet) result.property(sdep);
+                            if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
+                                result.putProperty(sdep,dep.slice(0) );
+                            }
+                        }
                     }
                 }
             }
