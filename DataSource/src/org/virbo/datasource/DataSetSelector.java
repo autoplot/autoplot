@@ -579,7 +579,6 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param problems we're entering this GUI because of problems with the URI, so mark these problems.  See DataSourceFactory.reject.
      */
     public void browseSourceType( final List<String> problems ) {
-        setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
         // hooks for browsing, such as "vap+internal"
@@ -591,6 +590,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 return;
             }
         }
+
+        setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         
         boolean wasRejected= false;
         DataSourceEditorPanel edit;
