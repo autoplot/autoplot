@@ -149,7 +149,7 @@
                               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="whereParamList" pref="123" max="32767" attributes="0"/>
+                                      <Component id="whereParamList" pref="128" max="32767" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
                                       <Component id="whereOp" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -175,13 +175,13 @@
                               <Component id="subsetComboBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="whereCB" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="whereParamList" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="whereOp" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="whereTF" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace pref="15" max="32767" attributes="0"/>
                               <Component id="interpretMetadataLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
@@ -245,7 +245,6 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="whereCB">
                       <Properties>
-                        <Property name="selected" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="Only load data where:"/>
                         <Property name="toolTipText" type="java.lang.String" value="return only the records where the condition is true"/>
                       </Properties>
