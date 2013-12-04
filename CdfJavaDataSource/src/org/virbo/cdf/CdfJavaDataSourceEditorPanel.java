@@ -462,7 +462,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 int i= where.indexOf(".");
                 if ( i>-1 ) {
                     whereParamList.setSelectedItem(where.substring(0,i)); 
-                    whereOp.setSelectedItem(where.substring(i+1,i+3) ); // DANGER assumes 2 chars
+                    whereOp.setSelectedItem(where.substring(i,i+3) ); // DANGER assumes 2 chars
                     whereTF.setText(where.substring(i+4,where.length()-1));
                 }
             } else {
