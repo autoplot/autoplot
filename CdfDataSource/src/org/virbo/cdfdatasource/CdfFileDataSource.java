@@ -61,6 +61,7 @@ import org.virbo.metatree.MetadataUtil;
 public class CdfFileDataSource extends AbstractDataSource {
 
     protected static final String PARAM_DODEP = "doDep";
+    protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
@@ -189,6 +190,26 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
 
+            String w= (String)map.get( PARAM_WHERE );
+            if ( w!=null && w.length()>0 ) {
+                int ieq= w.indexOf(".eq(");
+                if ( ieq==-1 ) {
+                    throw new IllegalArgumentException("where can only contain .eq");
+                } else {
+                    String sval= w.substring(ieq+4);
+                    if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                    double d= Double.parseDouble(sval);
+                    String sparm= w.substring(0,ieq);
+                    QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, new NullProgressMonitor() );
+                    QDataSet r= Ops.where( Ops.eq( parm,d ) );
+                    if ( r.length()==0 ) {
+                        throw new NoDataInIntervalException("'where' argument removes all data");
+                    } else {
+                        result= DataSetOps.applyIndex( result, 0, r, true );
+                    }
+                }
+            }
+            
             CdfFileDataSourceFactory.closeCDF(cdf);
 
             if ( !doDep ) {
