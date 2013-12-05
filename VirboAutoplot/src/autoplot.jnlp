@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?> 
+<!-- <jnlp 
+    spec="1.0+"
+    codebase="http://www-pw.physics.uiowa.edu/das2/autoplot/production/"
+    href="autoplot.jnlp"> -->
 <jnlp 
     spec="1.0+"
     codebase="#{codebase}"
