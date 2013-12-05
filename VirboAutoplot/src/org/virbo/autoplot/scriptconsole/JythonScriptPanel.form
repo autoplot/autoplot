@@ -17,7 +17,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="savePlotButton" min="-2" pref="124" max="-2" attributes="0"/>
+              <Component id="executeButton" min="-2" pref="124" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="interruptButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="savePlotButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="executeButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="contextSelector" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="saveAsButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -60,7 +60,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JButton" name="savePlotButton">
+    <Component class="javax.swing.JButton" name="executeButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/autoplot/go.png"/>
@@ -69,7 +69,7 @@
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Execute script.  &lt;br&gt;Alt modifier enters editor GUI.  &lt;br&gt;Ctrl modifier attempts to trace program location.  &lt;br&gt;Shift modifier will being up parameters gui."/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="savePlotButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="executeButtonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="saveAsButton">

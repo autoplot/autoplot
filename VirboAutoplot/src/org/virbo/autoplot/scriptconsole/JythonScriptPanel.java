@@ -46,7 +46,7 @@ import org.virbo.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 
 /**
- *
+ * GUI for editing and running Jython scripts.
  * @author  jbf
  */
 public class JythonScriptPanel extends javax.swing.JPanel {
@@ -82,7 +82,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         this.textArea.setFont( Font.decode(JythonCompletionProvider.getInstance().settings().getEditorFont() ) );
         
         this.textArea.addCaretListener(new CaretListener() {
-
+            @Override
             public void caretUpdate(CaretEvent e) {
                 int pos = textArea.getCaretPosition();
                 Element root = textArea.getDocument().getDefaultRootElement();
@@ -106,22 +106,22 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
 
         dirtyListener= new DocumentListener() {
-
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 setDirty(true);
             }
-
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 setDirty(true);
             }
-
+            @Override
             public void changedUpdate(DocumentEvent e) {
             }
         };
 
         this.textArea.getDocument().addDocumentListener(dirtyListener);
         this.textArea.addPropertyChangeListener( "document", new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getOldValue()!=null ) {
                     ((Document)evt.getOldValue()).removeDocumentListener(dirtyListener);
@@ -132,6 +132,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         });
 
         this.textArea.getActionMap().put( "save", new AbstractAction( "save" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 try {
                     support.save();
@@ -148,40 +149,47 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
 
         menu.addExampleAction( new AbstractAction("makePngWalk.jy") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/scripts/pngwalk/makePngWalk.jy" );
             }
         });
         menu.addExampleAction( new AbstractAction("addDigitizer.jy") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/scripts/addDigitizer.jy" );
             }
         });
         menu.addExampleAction( new AbstractAction("splineDemo.jy") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/scripts/splineDemo.jy" );
             }
         });
 
         menu.addExampleAction( new AbstractAction("More Jython Scripts...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/" );
             }
         });
 
         menu.addExampleAction( new AbstractAction("mashup.jyds") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/mashup.jyds" );
             }
         });
 
         menu.addExampleAction( new AbstractAction("rheology.jyds") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadExample( "/rheology.jyds" );
             }
         });
 
         menu.addExampleAction( new AbstractAction("More Jython Data Source Scripts...") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonDataSource/src/" );
             }
@@ -190,12 +198,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.setDataSetSelector(selector);
 
         JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 applicationController.setStatus(JythonCompletionProvider.getInstance().getMessage());
             }
         });
 
-        support.addPropertyChangeListener(support.PROP_INTERRUPTABLE,new PropertyChangeListener() {
+        support.addPropertyChangeListener(ScriptPanelSupport.PROP_INTERRUPTABLE,new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getNewValue()==null ) {
                     //interruptButton.setIcon(
@@ -203,14 +213,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     //        getClass().getResource(
                     //        "/org/virbo/autoplot/resources/stop-icon-disabled.png")) );
                     interruptButton.setEnabled(false);
-                    savePlotButton.setEnabled(true);
+                    executeButton.setEnabled(true);
                 } else {
                     //interruptButton.setIcon(
                     //        new javax.swing.ImageIcon(
                     //        getClass().getResource(
                     //        "/org/virbo/autoplot/resources/stop-icon.png")) );
                     interruptButton.setEnabled(true);
-                    savePlotButton.setEnabled(false);
+                    executeButton.setEnabled(false);
                 }
             }
         } );
@@ -252,12 +262,12 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         return context;
     }
 
-    void setContext(int context) {
-        int oldContext= this.context;
+    protected final void setContext(int context) {
         this.context = context;
         this.contextSelector.setSelectedIndex(context);
         if (context == CONTEXT_APPLICATION) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+                @Override
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
                     interp.set("dom", model.getDocumentModel() );
@@ -268,6 +278,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             });
         } else if (context == CONTEXT_DATA_SOURCE) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+                @Override
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     PythonInterpreter interp = JythonUtil.createInterpreter(false,false);
                     interp.set("params", new PyDictionary());
@@ -286,7 +297,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        savePlotButton = new javax.swing.JButton();
+        executeButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
         contextSelector = new javax.swing.JComboBox();
@@ -297,12 +308,12 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         interruptButton = new javax.swing.JButton();
         fileNameTextField = new javax.swing.JTextField();
 
-        savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
-        savePlotButton.setText("Execute");
-        savePlotButton.setToolTipText("<html>Execute script.  <br>Alt modifier enters editor GUI.  <br>Ctrl modifier attempts to trace program location.  <br>Shift modifier will being up parameters gui.");
-        savePlotButton.addActionListener(new java.awt.event.ActionListener() {
+        executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
+        executeButton.setText("Execute");
+        executeButton.setToolTipText("<html>Execute script.  <br>Alt modifier enters editor GUI.  <br>Ctrl modifier attempts to trace program location.  <br>Shift modifier will being up parameters gui.");
+        executeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                savePlotButtonActionPerformed(evt);
+                executeButtonActionPerformed(evt);
             }
         });
 
@@ -367,7 +378,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(savePlotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(executeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(interruptButton)
                 .add(7, 7, 7)
@@ -388,7 +399,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(savePlotButton)
+                    .add(executeButton)
                     .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(saveAsButton)
                     .add(openButton)
@@ -402,10 +413,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
-        layout.linkSize(new java.awt.Component[] {interruptButton, newScriptButton, openButton, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {executeButton, interruptButton, newScriptButton, openButton, saveAsButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
-    private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
+    private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
         if ( dirty && support.file!=null ) {
             try {
                 support.save(); 
@@ -414,7 +425,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         support.executeScript( evt.getModifiers() );
-    }//GEN-LAST:event_savePlotButtonActionPerformed
+    }//GEN-LAST:event_executeButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
         support.saveAs();
@@ -445,13 +456,13 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;
+    private javax.swing.JButton executeButton;
     private javax.swing.JTextField fileNameTextField;
     private javax.swing.JButton interruptButton;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
-    private javax.swing.JButton savePlotButton;
     private org.virbo.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
