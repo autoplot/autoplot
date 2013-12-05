@@ -224,7 +224,11 @@ public class URISplit {
         } else if (i0 == 1) { // one letter scheme is assumed to be windows drive letter.
             scheme = "";
         } else {
-            scheme = surl.substring(0, i0);
+            if ( surl.substring(0,i0).contains("/") ) {
+                scheme = "";
+            } else {
+                scheme = surl.substring(0, i0);
+            }
         }
 
         if ( scheme.startsWith("vap") || otherSchemes.contains(scheme) ) {
