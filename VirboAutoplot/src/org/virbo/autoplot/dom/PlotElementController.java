@@ -2500,7 +2500,7 @@ public class PlotElementController extends DomNodeController {
                                     public void actionPerformed(ActionEvent e) {
                                         logger.warning("adding slice below");
                                         final QDataSet ds= hmm.getSlicer().getDataSet();
-                                        final Datum y= hmm.getSlicer().getY();
+                                        final Datum y= hmm.getSlicer().getSliceY();
                                         RequestProcessor.invokeLater( new Runnable() {
                                             @Override
                                             public void run() {
