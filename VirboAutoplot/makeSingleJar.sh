@@ -24,6 +24,8 @@ cd ..
 cat ../starterScript.sh > autoplot.jar
 cat autoplot.jar.1 >> autoplot.jar
 
+chmod 755 autoplot.jar
+
 # clean up temporary files
 rm autoplot.jar.1
 rm -r tjar
