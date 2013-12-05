@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -19,14 +20,20 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.event.DataPointSelectionEvent;
+import org.das2.event.DataPointSelectionListener;
+import org.das2.event.HorizontalSlicerMouseModule;
+import org.das2.event.MouseModule;
 import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
@@ -51,7 +58,9 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import static org.virbo.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -2398,6 +2407,30 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * see button added to the slicer.
+     * @param ds 
+     */
+    private void addPlotBelow( QDataSet ds, Datum y ) {
+        ApplicationController controller= dom.getController();
+        DomLock lock= mutatorLock();
+        lock.lock("adding slice below");
+        try {
+            Plot focus= controller.getPlotFor(plotElement);
+            Plot p= controller.addPlot( focus, LayoutConstants.BELOW );
+            PlotElement pe=controller.addPlotElement( p, null );
+            DataSourceFilter dsfl= controller.getDataSourceFilterFor( pe );
+            dsfl.getController().setDataSetInternal(ds); // setDataSet doesn't autorange, etc.
+            p.getYaxis().syncTo(focus.zaxis);
+            List<BindingModel> bms= controller.findBindings( dom, Application.PROP_TIMERANGE, focus.getXaxis(), Axis.PROP_RANGE );
+            if ( bms.size()>0 && UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
+                controller.bind( controller.getApplication(), Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
+            }
+            p.setTitle( focus.getTitle() + " @ " + y );
+        } finally {
+            lock.unlock();
+        }
+    }
+    /**
      * create the peer that will actually do the painting.  This may be called from either the event thread or off the event thread,
      * but work will be done on the event thread in either case using SwingUtilities.invokeAndWait.
      *
@@ -2460,6 +2493,23 @@ public class PlotElementController extends DomNodeController {
                         synchronized ( dom ) {
                             if ( newRenderer instanceof SpectrogramRenderer ) {
                                 plot.addRenderer(0,newRenderer);
+                                MouseModule mm= plot.getDasMouseInputAdapter().getModuleByLabel("Horizontal Slice");
+                                final HorizontalSlicerMouseModule hmm= ((HorizontalSlicerMouseModule)mm);
+                                hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        logger.warning("adding slice below");
+                                        final QDataSet ds= hmm.getSlicer().getDataSet();
+                                        final Datum y= hmm.getSlicer().getY();
+                                        RequestProcessor.invokeLater( new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                addPlotBelow(ds,y);
+                                            }
+                                        });
+                                    }
+                                });
+                                
                             } else {
                                 Renderer[] rends= plot.getRenderers();
                                 int best=-1;
