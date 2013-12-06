@@ -233,6 +233,10 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         if ( slice1!=null ) {
                             master= master + "&slice1="+slice1;
                         }
+                        String where= args.get("where");
+                        if ( where!=null ) {
+                            master= master + "&where="+where;
+                        }
 
                         boolean status;
                         status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), new NullProgressMonitor() );
