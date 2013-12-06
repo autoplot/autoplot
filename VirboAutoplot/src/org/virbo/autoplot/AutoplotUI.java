@@ -1202,6 +1202,13 @@ APSplash.checkTime("init 270");
         };
     }
 
+    /**
+     * make this public before AGU.  Set the editor to the URI, then call this.
+     */
+    public void enterAddPlotElementDialog() {
+        support.addPlotElement();
+    }
+        
     JMenu addDataFromMenu= null;
 
     private synchronized JMenu getAddDataFromMenu( ) {
@@ -1277,8 +1284,10 @@ APSplash.checkTime("init 270");
         mi.setToolTipText("Loading initial bookmarks file...");
         bookmarksMenu.add(mi);
 
-        mi= new JMenuItem(" ");
-        bookmarksMenu.add(mi);
+        for ( int i=0; i<5; i++ ) {
+            mi= new JMenuItem(" ");
+            bookmarksMenu.add(mi);
+        }
 
     }
 
@@ -1778,7 +1787,7 @@ APSplash.checkTime("init 52");
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this.dataSetSelector );
+                        bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this, AutoplotUI.this.dataSetSelector );
                     } } );
                 }
             });
