@@ -77,6 +77,10 @@ echo "special handling of META-INF stuff..."
 rm temp-classes/META-INF/*.RSA
 rm temp-classes/META-INF/*.SF
 
+# add permissions attribute
+rm temp-classes/META-INF/MANIFEST.MF
+printf "Permissions: all-permissions\n" > temp-classes/META-INF/MANIFEST.MF
+
 # remove CDF APPLICATION.JNLP
 rm -r temp-classes/JNLP-INF/
 
@@ -105,7 +109,7 @@ echo "make jumbo jar file..."
 cd temp-classes
 
 mkdir -p ../dist/
-$JAVA_HOME/bin/jar cf ../dist/AutoplotStable.jar *
+$JAVA_HOME/bin/jar cmf META-INF/MANIFEST.MF ../dist/AutoplotStable.jar *
 cd ..
 echo "done make jumbo jar file..."
 
