@@ -25,6 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1138: don't mistake "/c" for protocol in "/c:/"</li>
             <li>isConstant uses equivalent function now, instead of .equals.</li>
             <li>A CDF variable's DELTA_PLUS_VAR could point to itself, cause infinite recursion and crashing Java</li>
             <li>improve support for rank 2 energies, supporting ds[:,0:2,:] so DEPEND_2 is preserved.</li>
@@ -68,6 +69,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>length render shows equation of the line</li>
+            <li>"Plot Below" button on horizontal slicer copies the data onto the canvas.</li>            
             <li>CDF data source allows &amp;where=mode.eq(1)</li>
             <li>slice1 allows slicing at a datum like "1000 eV"</li>
             <li>history dialog has .vap button for convenience and example filter.</li>
