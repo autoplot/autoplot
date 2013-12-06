@@ -449,6 +449,7 @@ public class URISplit {
         int h = surl.indexOf(":"); // "c:" should be "file:///c:"
 
         String scheme = surl.substring(0, h);
+        
 
         if (scheme.startsWith("vap")) {
             result.vapScheme = scheme;
@@ -464,8 +465,8 @@ public class URISplit {
                 // do nothing, this field may be null.
             }
         } else {
-            if (scheme.contains(".")) {
-                logger.log( Level.FINE, "URI scheme contains .: {0} converting from vap.xxx to vap+xxx", surl);
+            if ( scheme.length()<20 && scheme.matches("[a-z.]+") && scheme.contains(".")) { // handle legacy schemes like cdf.http://...
+                logger.log( Level.WARNING, "URI scheme contains .: {0} converting from vap.xxx to vap+xxx", surl);
                 int j = scheme.indexOf(".");
                 result.vapScheme = "vap+" + scheme.substring(0, j);
                 result.surl = result.surl.substring(j + 1);
