@@ -650,12 +650,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     public String getURI() {
         String id=null;
         String slice1= "";
+        String where= null;
         if ( paramEditor!=null ) {
             id= paramEditor.getURI();
             URISplit split= URISplit.parse(id);
             Map<String,String> args= URISplit.parseParams(split.params);
             id= args.get("arg_0");
             slice1= args.get("slice1");
+            where= args.get("where");
         }
         if ( id!=null ) this.id= id;
         if ( id==null && this.id!=null ) id=this.id;
@@ -675,6 +677,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         if ( slice1!=null && slice1.length()>0 ) {
             result+= "&slice1="+slice1;
+        }
+        if ( where!=null ) {
+            result+= "&where="+where;
         }
         return result +"&timerange="+timeRange;
     }
