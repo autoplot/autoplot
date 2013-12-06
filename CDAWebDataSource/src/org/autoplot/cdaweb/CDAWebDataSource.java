@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -178,66 +179,70 @@ public class CDAWebDataSource extends AbstractDataSource {
                 ProgressMonitor t1= SubTaskMonitor.create( mon, (i+1)*10, (i+2)*10 );
 
                 MutablePropertyDataSet ds1=null;
-                if ( virtual!=null && !virtual.equals("") ) {
-                    int nc=0;
-                    List<QDataSet> comps= new ArrayList();
-                    String function= (String)metadata.get( "FUNCTION" );
-                    if ( function==null ) {
-                        function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
-                    }
-                    if ( function!=null ) {
-                        String comp= (String)metadata.get( "COMPONENT_"  + nc );
-                        while ( comp!=null ) {
-                            Map<String,String> fileParams= new HashMap(getParams());
-                            fileParams.remove( PARAM_TIMERANGE );
-                            fileParams.remove( PARAM_DS );
-                            fileParams.put( PARAM_ID, comp );
-                            URI file1;
-                            if ( webService ) {
-                                file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
-                            } else {
-                                file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
-                            }
-                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                            try {
-                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
-                            } catch ( Exception ex ) {
-                                ds1= null; // !!!!
-                            }
-                            comps.add( ds1 );
-                            nc++;
-                            comp= (String) metadata.get( "COMPONENT_"  + nc );
+                try {
+                    if ( virtual!=null && !virtual.equals("") ) {
+                        int nc=0;
+                        List<QDataSet> comps= new ArrayList();
+                        String function= (String)metadata.get( "FUNCTION" );
+                        if ( function==null ) {
+                            function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
                         }
-                        boolean missingComponent= false;
-                        for ( int j=0; j<comps.size(); j++ ) {
-                            if ( comps.get(j)==null ) {
-                                missingComponent= true;
+                        if ( function!=null ) {
+                            String comp= (String)metadata.get( "COMPONENT_"  + nc );
+                            while ( comp!=null ) {
+                                Map<String,String> fileParams= new HashMap(getParams());
+                                fileParams.remove( PARAM_TIMERANGE );
+                                fileParams.remove( PARAM_DS );
+                                fileParams.put( PARAM_ID, comp );
+                                URI file1;
+                                if ( webService ) {
+                                    file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                                } else {
+                                    file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
+                                }
+                                CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                                try {
+                                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
+                                } catch ( Exception ex ) {
+                                    ds1= null; // !!!!
+                                }
+                                comps.add( ds1 );
+                                nc++;
+                                comp= (String) metadata.get( "COMPONENT_"  + nc );
                             }
-                        }
-                        if ( !missingComponent ) {
-                            try {
-                                Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
-                                ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
-                            } catch (IllegalArgumentException ex ){
-                                throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                            boolean missingComponent= false;
+                            for ( int j=0; j<comps.size(); j++ ) {
+                                if ( comps.get(j)==null ) {
+                                    missingComponent= true;
+                                }
                             }
+                            if ( !missingComponent ) {
+                                try {
+                                    Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
+                                    ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
+                                } catch (IllegalArgumentException ex ){
+                                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                                }
+                            }
+                        } else {
+                        throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
                         }
                     } else {
-                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
+                        Map<String,String> fileParams= new HashMap(getParams());
+                        fileParams.remove( PARAM_TIMERANGE );
+                        fileParams.remove( PARAM_DS );
+                        URI file1;
+                        if ( webService ) {
+                            file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+                        } else {
+                            file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
+                        }
+                        logger.log( Level.FINE, "loading {0}", file1);
+                        CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                        ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                     }
-                } else {
-                    Map<String,String> fileParams= new HashMap(getParams());
-                    fileParams.remove( PARAM_TIMERANGE );
-                    fileParams.remove( PARAM_DS );
-                    URI file1;
-                    if ( webService ) {
-                        file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
-                    } else {
-                        file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
-                    }
-                    logger.log( Level.FINE, "loading {0}", file1);
-                    CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                } catch ( NoDataInIntervalException ex ) {
+                    // thrown by where clause...
                 }
 
                 if ( ds1!=null ) {
