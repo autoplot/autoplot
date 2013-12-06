@@ -33,9 +33,7 @@ public class DelayMenu extends JMenu {
     final static int TRIM_TAIL_LEN = 10;
 
 
-    final DataSetSelector sel;
-
-    protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel ) {
+    protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final AutoplotUI ui ) {
         List<Bookmark> content= bookmarks;
         for ( int i=0; i<content.size(); i++ ) {
             final Bookmark book= content.get(i);
@@ -48,9 +46,11 @@ public class DelayMenu extends JMenu {
 
                 } else {
                     JMenuItem mi = new JMenuItem(new AbstractAction(title) {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
-                            sel.setValue(((Bookmark.Item) book).getUri());
-                            sel.maybePlot(e.getModifiers());
+                            //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject any, enter the dialog.
+                            ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
+                            ui.enterAddPlotElementDialog();
                         }
                     });
                     mi.setToolTipText( ((Bookmark.Item) book).getUri() );
@@ -96,7 +96,7 @@ public class DelayMenu extends JMenu {
                     if ( titl.length()>MAX_LABEL_LEN && treeDepth>0 ) {
                         titl= titl.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ titl.substring( titl.length()-TRIM_TAIL_LEN,titl.length() );
                     }
-                    final JMenu subMenu = new DelayMenu( titl, folder.getBookmarks(), treeDepth+1, sel );
+                    final JMenu subMenu = new DelayMenu( titl, folder.getBookmarks(), treeDepth+1, ui );
                     subMenu.setIcon(icon);
 
                     if ( tooltip.contains("%{URL}") ) {
@@ -120,16 +120,15 @@ public class DelayMenu extends JMenu {
 
     }
 
-    DelayMenu( final String label, final List<Bookmark> bookmarks, final int treeDepth, DataSetSelector lsel ) {
+    protected DelayMenu( final String label, final List<Bookmark> bookmarks, final int treeDepth, final AutoplotUI ui ) {
         super(label);
-        this.sel= lsel;
 
         addMenuListener( new MenuListener() {
 
             public void menuSelected(MenuEvent e) {
                 logger.log(Level.FINEST, "resolving menu {0}...", label);
                 DelayMenu.this.removeAll();
-                calculateMenu( DelayMenu.this, bookmarks, treeDepth, sel );
+                calculateMenu( DelayMenu.this, bookmarks, treeDepth, ui );
             }
 
             public void menuDeselected(MenuEvent e) {
