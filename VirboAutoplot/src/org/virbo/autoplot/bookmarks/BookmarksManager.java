@@ -385,10 +385,16 @@ public class BookmarksManager extends javax.swing.JDialog {
      * data sources, since it shows the descriptions, but I need to focus on getting this cleaned up first.  I'm leaving this as
      * a reminder.  
      */
-    private boolean doPlay= false;
+    private boolean isPlay= false;
 
     public boolean isPlay() {
-        return doPlay;
+        return isPlay;
+    }
+    
+    private boolean isEdit= false;
+    
+    public boolean isEdit() {
+        return isEdit;
     }
     
     /** This method is called from within the constructor to
@@ -415,6 +421,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         plotBelowButton = new javax.swing.JButton();
         overplotButton = new javax.swing.JButton();
         viewDetailsButton = new javax.swing.JButton();
+        editButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -438,7 +445,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         });
         jScrollPane1.setViewportView(jTree1);
 
-        dismissButton.setText("OK");
+        dismissButton.setText("Cancel");
         dismissButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dismissButtonActionPerformed(evt);
@@ -542,6 +549,14 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
+        editButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/fileMag.png"))); // NOI18N
+        editButton.setText("Edit");
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+
         jMenu1.setText("File");
 
         importMenuItem.setText("Import...");
@@ -638,13 +653,15 @@ public class BookmarksManager extends javax.swing.JDialog {
                         .add(0, 0, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(0, 0, Short.MAX_VALUE)
+                        .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(overplotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 83, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotBelowButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 103, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 75, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 103, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(editButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(URILabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -664,7 +681,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        layout.linkSize(new java.awt.Component[] {overplotButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {editButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -672,7 +689,7 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(titleLabel)
@@ -692,7 +709,8 @@ public class BookmarksManager extends javax.swing.JDialog {
                     .add(dismissButton)
                     .add(plotButton)
                     .add(plotBelowButton)
-                    .add(overplotButton))
+                    .add(overplotButton)
+                    .add(editButton))
                 .addContainerGap())
         );
 
@@ -702,7 +720,8 @@ public class BookmarksManager extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
-    doPlay= false;
+    isPlay= false;
+    isEdit= false;
     if ( dirtyBookmark!=null ) {
         dirtyBookmark.setTitle(titleTextField.getText());
         if ( dirtyBookmark instanceof Bookmark.Item ) {
@@ -1115,6 +1134,10 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     reload();
 }//GEN-LAST:event_reloadMenuItemActionPerformed
 
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        maybePlot(KeyEvent.ALT_MASK);
+    }//GEN-LAST:event_editButtonActionPerformed
+
 //    /**
 //    * @param args the command line arguments
 //    */
@@ -1142,6 +1165,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JTextField descriptionTextField;
     private javax.swing.JButton dismissButton;
+    private javax.swing.JButton editButton;
     private javax.swing.JButton editDescriptionButton;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exportMenuItem;
