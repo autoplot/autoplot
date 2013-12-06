@@ -1597,8 +1597,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         }
     }
 
-
     public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
+        updateBookmarks( bookmarksMenu, null, dataSetSelector );
+    }
+
+    public void updateBookmarks( JMenu bookmarksMenu, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
 
         if ( this.isVisible() ) {
             menuIsDirty= true;
@@ -1641,16 +1644,24 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             bookmarks= Collections.emptyList();
         }
 
-        addBookmarks( bookmarksMenu, bookmarks, 0, dataSetSelector );
+        addBookmarks( bookmarksMenu, bookmarks, 0, app, dataSetSelector );
 
         menuIsDirty= false;
     }
 
-    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, final DataSetSelector select ) {
+    /**
+     *
+     * @param bookmarksMenu the value of bookmarksMenu
+     * @param bookmarks the value of bookmarks
+     * @param treeDepth the value of treeDepth
+     * @param app the value of app
+     * @param select the value of select
+     */
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, int treeDepth, AutoplotUI app, final DataSetSelector select) {
 
         this.sel= select;
 
-        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, select );
+        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, app );
         if ( bookmarksMenu.isPopupMenuVisible() ) {
             select.setMessage("Bookmarks updated");
         }
