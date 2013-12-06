@@ -128,7 +128,9 @@ public class WalkUtil {
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
                     //File f= fs.getFileObject(ss[i]).getFile();
-                    result.add( DataSetURI.getURI( DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ) ); // make file:/// match template. // bug 3055130 suspect
+                    String suri= DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ;
+                    String[] ss1= suri.split(":",2);
+                    result.add( new URI( ss1[0], ss1[1], null ) ); // make file:/// match template. // bug 3055130 suspect
                 } else {
                     if ( ss[i].startsWith("/") ) {
                         result.add( fs.getRootURI().resolve(ss[i].substring(1)) );
