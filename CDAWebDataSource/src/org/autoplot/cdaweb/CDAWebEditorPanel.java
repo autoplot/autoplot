@@ -273,6 +273,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     
     private static class LabelMonitor extends NullProgressMonitor {
         
+        int ndot= 2;
+        
         LabelMonitor() {
             repaintTimer.setRepeats(true);
             repaintTimer.start();
@@ -284,7 +286,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             return label;
         }
         
-        Timer repaintTimer= new Timer( 300,new ActionListener() {
+        Timer repaintTimer= new Timer( 333,new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 String p;
                 if ( getTaskSize()==-1 ) {
@@ -292,7 +294,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } else {
                     p= "" + getTaskProgress()+"/"+getTaskSize();
                 }
-                label.setText( "<html><em><br>&nbsp;Loading file..."+p+"</em></html>" );
+                ndot++;
+                if ( ndot==4 ) ndot=1;
+                label.setText( "<html><em><br>&nbsp;Loading file" + "...".substring(0,ndot)+p+"</em></html>" );
             }
         } );
         
