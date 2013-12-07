@@ -18,6 +18,7 @@ import javax.swing.event.MenuListener;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetURI;
 
 /**
  * JMenu that delays creating children until the folder is exposed.  Otherwise we would have thousands of
@@ -49,14 +50,20 @@ public class DelayMenu extends JMenu {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject any, enter the dialog.
-                            ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
-                            ui.enterAddPlotElementDialog();
+                            boolean oldLogic= true;
+                            if ( oldLogic ) {
+                                ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
+                                ui.getDataSetSelector().maybePlot(e.getModifiers());
+                            } else {
+                                ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
+                                ui.enterAddPlotElementDialog();
+                            }
                         }
                     });
                     mi.setToolTipText( ((Bookmark.Item) book).getUri() );
                     if (book.getIcon() != null) {
                         mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
-                    }
+                    }       
                     menu.add(mi); //TODO: this should not happen off the event thread.  Instead we should keep a separate model that is used to populate the GUI.
                 }
 
