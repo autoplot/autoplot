@@ -70,6 +70,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         jPanel1.add( recentComboBox, BorderLayout.CENTER );
         recentComboBox.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parseRange();
             }
         });
@@ -326,10 +327,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         setRange( range.next() );
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         setRange( range.previous() );
     }//GEN-LAST:event_prevButtonActionPerformed
 
@@ -341,6 +344,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         if ( peer!=null ) {
             String surl = (String) peer.getLastValue().trim();//TODO:check
             peer.setValue(surl);
@@ -379,6 +383,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }//GEN-LAST:event_browseButtonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange(getRange().toString());//TODO: goofy
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {

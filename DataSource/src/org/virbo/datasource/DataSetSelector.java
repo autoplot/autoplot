@@ -103,8 +103,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                keyModifiers= e.getModifiers();
+            public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);            
+                keyModifiers= ev.getModifiers();
                 
             }
         });
@@ -521,6 +522,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             se.add( new JButton( new AbstractAction("View Page") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
                     DataSourceUtil.openBrowser(link);
                 }
             }), BorderLayout.EAST );
@@ -1168,6 +1170,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         buttons.add( new JButton( new AbstractAction("Details...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 FileSystem.getExceptionHandler().handle(ex);
             }
         } ), BorderLayout.EAST );
@@ -1239,6 +1242,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         map.put("complete", new AbstractAction("completionsPopup") {
             @Override
             public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 String context= (String) dataSetSelector.getEditor().getItem();
                 //String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
                 if ( context==null ) context= "";
@@ -1260,6 +1264,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         map.put("plot", new AbstractAction("plotUrl") {
             @Override
             public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 setValue(getEditor().getText());
                 keyModifiers = ev.getModifiers();
                 maybePlot(true);
@@ -1270,9 +1275,10 @@ public class DataSetSelector extends javax.swing.JPanel {
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 dataSetSelector.setSelectedItem(tf.getText());
-                keyModifiers = e.getModifiers();
+                keyModifiers = ev.getModifiers();
                 maybePlot(true);
             }
         });
@@ -1292,6 +1298,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
         @Override
         public void actionPerformed(ActionEvent e) {
+            org.das2.util.LoggerManager.logGuiEvent(e);            
             String about = DataSetSelectorSupport.getPluginsText();
             JOptionPane.showMessageDialog(DataSetSelector.this, about);
         }
@@ -1302,6 +1309,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         registerActionTrigger(regex, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 String ss = DataSetSelector.this.getValue();
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(ss);
@@ -1435,12 +1443,14 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);            
         keyModifiers = evt.getModifiers();
         setValue(getEditor().getText());
         maybePlot(true);
     }//GEN-LAST:event_plotItButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);            
         String context = ((String) dataSetSelector.getEditor().getItem()).trim();
         if ( context==null ) context= "";
         if ( context.startsWith("vap ") ) context= "vap+"+context.substring(4);
@@ -1909,6 +1919,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         fontMenu.add( new AbstractAction( "Big" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);            
                 Font f= getEditor().getFont();
                 int size= 16;
                 if ( size>4 && size<18 ) {
@@ -1921,6 +1932,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         fontMenu.add( new AbstractAction( "Normal" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);            
                 Font f= getEditor().getFont();
                 int size= getParent().getFont().getSize();
                 if ( size>4 && size<18 ) {
@@ -1933,6 +1945,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         fontMenu.add( new AbstractAction( "Small" ) {
             @Override
             public void actionPerformed(ActionEvent ev) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);            
                 Font f= getEditor().getFont();
                 int size= 8;
                 if ( size>4 && size<18 ) {
@@ -1949,6 +1962,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             result.add( new AbstractAction( alternatePeer ) {
                 @Override
                 public void actionPerformed(ActionEvent ev) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                
                     Container trp= DataSetSelector.this.getParent();
                     ((CardLayout)DataSetSelector.this.getParent().getLayout()).show( trp, alternatePeerCard );
                 }
