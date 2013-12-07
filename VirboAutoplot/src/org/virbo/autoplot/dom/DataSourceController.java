@@ -1560,12 +1560,14 @@ public class DataSourceController extends DomNodeController {
                 p1.add( new JButton( new AbstractAction("Details") {
                     @Override
                     public void actionPerformed( ActionEvent ev ) {
+                        org.das2.util.LoggerManager.logGuiEvent(ev);        
                         getApplication().controller.getApplicationModel().getExceptionHandler().handle(htmlEx);
                     }
                 }) );
                 p1.add( new JButton( new AbstractAction("View Page") {
                     @Override
                     public void actionPerformed( ActionEvent ev ) {
+                        org.das2.util.LoggerManager.logGuiEvent(ev);        
                         AutoplotUtil.openBrowser(link);
                     }
                 }) );

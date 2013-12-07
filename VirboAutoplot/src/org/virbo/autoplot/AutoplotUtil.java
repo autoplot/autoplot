@@ -504,6 +504,7 @@ public class AutoplotUtil {
         JPanel p1= new JPanel( new BorderLayout() );
         p1.add( new JButton( new AbstractAction("View Exception") {
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);        
                 exh.handleUncaught(ex);
             }
         }), BorderLayout.EAST );
@@ -2049,6 +2050,7 @@ public class AutoplotUtil {
         pc.add( Box.createGlue() );
         pc.add( new JButton( new AbstractAction("Cancel") {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                        
                 result.add( JOptionPane.CANCEL_OPTION );
                 dia.setVisible(false);
             }
@@ -2056,6 +2058,7 @@ public class AutoplotUtil {
         pc.add( Box.createHorizontalStrut(7) );
         pc.add( new JButton( new AbstractAction("Okay") {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 result.add( JOptionPane.OK_OPTION );
                 dia.setVisible(false);
             }

@@ -107,6 +107,7 @@ import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.KeyChain;
@@ -378,6 +379,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi= new JMenuItem( new AbstractAction( "Basic Mode") {
            @Override
            public void actionPerformed( ActionEvent e ) {
+               org.das2.util.LoggerManager.logGuiEvent(e);               
                setExpertMode(false);
            }
         });
@@ -386,6 +388,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi= new JMenuItem( new AbstractAction( "Expert Mode") {
            @Override
            public void actionPerformed( ActionEvent e ) {
+               org.das2.util.LoggerManager.logGuiEvent(e);                              
                setExpertMode(true);
            }
         });
@@ -425,6 +428,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "vap\\+internal:(.*)", new AbstractAction("internal") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 GuiSupport.editPlotElement( applicationModel, AutoplotUI.this );
             }
         });
@@ -432,6 +436,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
                 if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
                     DataSetSelector source= (DataSetSelector)ev.getSource();
@@ -456,6 +461,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
             }
@@ -463,6 +469,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
             @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 String pngwalk= dataSetSelector.getValue().substring("pngwalk:".length());
                 if ( pngwalk.endsWith("/") || pngwalk.endsWith(".")) { // normally reject method would trigger another completion
                     DataSetSelector source= (DataSetSelector)ev.getSource();
@@ -476,6 +483,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" );
                 //do nothing
@@ -484,6 +492,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "(.*)\\.pngwalk", new AbstractAction( "pngwalk") {
             @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
                 applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
                 PngWalkTool1.start( pngwalk, AutoplotUI.this);
@@ -494,6 +503,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
                 @Override
                 public void actionPerformed( ActionEvent ev ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( dataSetSelector.getValue() );
                 }
@@ -502,6 +512,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
                 @Override
                 public void actionPerformed( ActionEvent ev ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     runScript( dataSetSelector.getValue() );
                 }
             });
@@ -509,6 +520,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
                 @Override
                 public void actionPerformed( ActionEvent ev ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
                 }
             });
@@ -516,6 +528,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
                 @Override
                 public void actionPerformed( ActionEvent ev ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
                 }
             });
@@ -525,6 +538,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
                 String script = dataSetSelector.getValue().substring("script:".length());
                 if ( !( script.endsWith(".jy") || script.endsWith(".JY") || script.endsWith(".py") || script.endsWith(".PY") ) ) {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
@@ -538,6 +552,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "script:(.*)", new AbstractAction( "script") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 String s= source.getValue();
                 if ( s.endsWith(".jy") ) {
@@ -557,6 +572,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "vapfile:(.*)", new AbstractAction( "vapfile") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
                 DataSetSelector source= (DataSetSelector)ev.getSource();
                 source.showFileSystemCompletions( false, true, "[^\\s]+(\\.(?i)(vap)|(vap\\.gz))$" );
             }
@@ -564,6 +580,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "vapfile:(.*)", new AbstractAction( "valfile") {
             @Override
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
                 String vapfile= dataSetSelector.getValue().substring(8);
                 if ( !( vapfile.endsWith(".xml") ) ) {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
@@ -642,6 +659,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                                    
                 if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
                     ScriptContext.close();
                 }
@@ -1197,6 +1215,7 @@ APSplash.checkTime("init 270");
         return new AbstractAction("Add Plot...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 support.addPlotElement();
             }
         };
@@ -1232,6 +1251,7 @@ APSplash.checkTime("init 270");
             Action a= new AbstractAction( ext+"..." ) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                                
                     try {
                         String uri = "vap+" + fext + ":";
                         String refuri= (String) dataSetSelector.getEditor().getText();
@@ -1316,6 +1336,7 @@ APSplash.checkTime("init 52");
         mi= new JMenuItem( new AbstractAction( "Open URI History..." ) {
               @Override
               public void actionPerformed( ActionEvent e ) {
+                  org.das2.util.LoggerManager.logGuiEvent(e);                                
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
                   dia.setExpertMode( isExpertMode() );
                   dia.setVisible(true);
@@ -1366,6 +1387,7 @@ APSplash.checkTime("init 52");
         AbstractAction printAction= new AbstractAction( "Print...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                                
                 applicationModel.getCanvas().makeCurrent();
                 DasCanvas.PRINT_ACTION.actionPerformed(e);
             }
@@ -1442,6 +1464,7 @@ APSplash.checkTime("init 52");
         fileMenu.add( new AbstractAction( "Quit" ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 if ( AppManager.getInstance().requestQuit() ) {
                     AutoplotUI.this.dispose();
                     AppManager.getInstance().quit();
@@ -1483,6 +1506,8 @@ APSplash.checkTime("init 52");
         Logger.getLogger("jython").addHandler(h);
         Logger.getLogger("console").setLevel(Level.INFO);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
+        Logger.getLogger("gui").setLevel(Level.INFO);                 //TODO: this doesn't seem right.  Can't we just set it for ""?
+        Logger.getLogger("gui").addHandler(h);
 
         setMessage("log console added");
        // tabs.addTab("console", null, logConsole,
@@ -1576,6 +1601,7 @@ APSplash.checkTime("init 52");
                     p1.add( new JButton( new AbstractAction("View Page") {
                         @Override
                         public void actionPerformed( ActionEvent ev ) {
+                            org.das2.util.LoggerManager.logGuiEvent(ev);                
                             AutoplotUtil.openBrowser(link);
                         }
                     }), BorderLayout.EAST );
@@ -2604,18 +2630,22 @@ APSplash.checkTime("init 52");
         pack();
     }// </editor-fold>//GEN-END:initComponents
     private void copyImageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyImageMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         support.doCopyDataSetImage();
     }//GEN-LAST:event_copyImageMenuItemActionPerformed
 
     private void copyDataSetURLMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyDataSetURLMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         support.doCopyDataSetURL();
     }//GEN-LAST:event_copyDataSetURLMenuItemActionPerformed
 
     private void pasteDataSetURLMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteDataSetURLMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         support.doPasteDataSetURL();
     }//GEN-LAST:event_pasteDataSetURLMenuItemActionPerformed
 
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         String uri= (String) dataSetSelector.getValue();
         ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setFocusURI(uri);
         if ( this.isExpertMode() ) {
@@ -2633,18 +2663,21 @@ APSplash.checkTime("init 52");
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void zoomOutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         DasPlot p= dom.getController().getPlot().getController().getDasPlot();
         DatumRange dr = DatumRangeUtil.rescale( p.getXAxis().getDatumRange(), -0.333, 1.333);
         p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomOutMenuItemActionPerformed
 
     private void zoomInMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         DasPlot p= dom.getController().getPlot().getController().getDasPlot();
         DatumRange dr = DatumRangeUtil.rescale(p.getXAxis().getDatumRange(), 0.25, 0.75);
         p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomInMenuItemActionPerformed
 
     private void resetZoomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZoomMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         dom.getController().getPlot().getController().resetZoom(true, true, true);
         if ( !AutoplotUtil.resetZoomX(dom)) {
             System.err.println("unable to zoom x");
@@ -2658,23 +2691,28 @@ APSplash.checkTime("init 52");
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         if (fontAndColorsDialog == null) fontAndColorsDialog = new FontAndColorsDialog(this, false, applicationModel);
         fontAndColorsDialog.setVisible(true);
     }//GEN-LAST:event_fontsAndColorsMenuItemActionPerformed
 
     private void specialEffectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_specialEffectsMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         applicationModel.getDocumentModel().getOptions().setSpecialEffects(specialEffectsMenuItem.isSelected());
     }//GEN-LAST:event_specialEffectsMenuItemActionPerformed
 
     private void drawAntiAliasMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawAntiAliasMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         applicationModel.getDocumentModel().getOptions().setDrawAntiAlias(drawAntiAliasMenuItem.isSelected());
     }//GEN-LAST:event_drawAntiAliasMenuItemActionPerformed
 
     private void textAntiAliasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textAntiAliasActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         applicationModel.getDocumentModel().getOptions().setTextAntiAlias(textAntiAlias.isSelected());
     }//GEN-LAST:event_textAntiAliasActionPerformed
 
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         try {
             StringBuilder buffy = new StringBuilder();
 
@@ -2768,18 +2806,22 @@ APSplash.checkTime("init 52");
     }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
 
     private void aboutDas2MenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutDas2MenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         AutoplotUtil.openBrowser("http://das2.org");
     }//GEN-LAST:event_aboutDas2MenuItemActionPerformed
 
     private void autoplotHomepageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHomepageButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         AutoplotUtil.openBrowser("http://autoplot.org/");
 }//GEN-LAST:event_autoplotHomepageButtonActionPerformed
 
     private void helpMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         // TODO add your handling code here:
     }//GEN-LAST:event_helpMenuActionPerformed
 
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
         jythonScriptPanel= new JPanel( new BorderLayout() );
@@ -2796,6 +2838,7 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(logConsoleMenuItem.isSelected());
     if ( logConsoleMenuItem.isSelected() && logConsolePanel == null) {
         logConsolePanel= new JScrollPane();
@@ -2816,6 +2859,7 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
 private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverCheckBoxMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     applicationModel.getDocumentModel().getOptions().setServerEnabled(serverCheckBoxMenuItem.isSelected());
     if (applicationModel.getDocumentModel().getOptions().isServerEnabled()) {
         initServer();
@@ -2828,14 +2872,17 @@ private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent ev
 }//GEN-LAST:event_serverCheckBoxMenuItemActionPerformed
 
 private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     applicationModel.increaseFontSize();
 }//GEN-LAST:event_jMenuItem1ActionPerformed
 
 private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     applicationModel.decreaseFontSize();
 }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     final JDiskHogPanel panel = new JDiskHogPanel( this );
     JDialog dia = new JDialog(this, "Manage Cache", true);
     dia.add(panel);
@@ -2855,10 +2902,12 @@ private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem3ActionPerformed
 
 private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     clearCache();
 }//GEN-LAST:event_jMenuItem4ActionPerformed
 
 private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     try {
         String release = AboutUtil.getReleaseTag();
         if (release != null) {
@@ -2873,6 +2922,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem5ActionPerformed
 
 private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDomMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     PropertyEditor edit= new PropertyEditor(applicationModel.dom);
     edit.showDialog(this,"DOM Properties",new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 }//GEN-LAST:event_editDomMenuItemActionPerformed
@@ -2884,24 +2934,29 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
 }//GEN-LAST:event_statusLabelMouseClicked
 
 private void inspectVapFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectVapFileMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     this.support.doInspectVap();
 }//GEN-LAST:event_inspectVapFileMenuItemActionPerformed
 
 private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLayoutCheckBoxMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( autoLayoutCheckBoxMenuItem.isSelected() ) {
         applicationModel.doAutoLayout();
     }
 }//GEN-LAST:event_autoLayoutCheckBoxMenuItemActionPerformed
 
 private void autoplotHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHelpMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     helpSystem.displayHelpFromEvent(evt);
 }//GEN-LAST:event_autoplotHelpMenuItemActionPerformed
 
 private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
    PngWalkTool1.start( null, this);
 }//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
 private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     //JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy"), applicationModel.dom, null );
     Runnable run= new Runnable() {
         @Override
@@ -2923,6 +2978,7 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
 }//GEN-LAST:event_createPngWalkMenuItemActionPerformed
 
 private void aggregateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aggregateMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     AggregateUrisDialog dia= new AggregateUrisDialog( dom, dataSetSelector );
     //JOptionPane.showConfirmDialog( rootPane, dia, "Aggregate URIs", JOptionPane.OK_CANCEL_OPTION ); //TODO: OKAY button is confusing, but how to hide it?
     dia.showDialog();
@@ -2933,6 +2989,7 @@ private void aggregateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_aggregateMenuItemActionPerformed
 
 private void decodeURLItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decodeURLItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     String s = dataSetSelector.getEditor().getText();
     s = org.virbo.datasource.DataSourceUtil.unescape(s);
     dataSetSelector.getEditor().setText(s);
@@ -2943,6 +3000,7 @@ private void statusTextFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-F
 }//GEN-LAST:event_statusTextFieldMouseClicked
 
 private void gettingStartedMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gettingStartedMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     GettingStartedPanel gettingStartedPanel= new GettingStartedPanel();
 
     int result= JOptionPane.showConfirmDialog( this, gettingStartedPanel, "Getting Started", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
@@ -2953,6 +3011,7 @@ private void gettingStartedMenuItemActionPerformed(java.awt.event.ActionEvent ev
 }//GEN-LAST:event_gettingStartedMenuItemActionPerformed
 
 private void exceptionReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exceptionReportActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     ExceptionHandler eh= applicationModel.getExceptionHandler();
     if ( eh==null || !( eh instanceof GuiExceptionHandler ) ) {
         new GuiExceptionHandler().submitRuntimeException(new RuntimeException("user-generated comment"), false);
@@ -2962,6 +3021,7 @@ private void exceptionReportActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_exceptionReportActionPerformed
 
 private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     MoveCacheDialog dia= new MoveCacheDialog();
     if ( JOptionPane.showConfirmDialog( this, dia, "Move Cache", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
         final String newv= dia.getNewDir().getText();
@@ -2986,6 +3046,7 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem7ActionPerformed
 
 private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canvasSizeMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     CanvasSizePanel p= new CanvasSizePanel();
     p.getResizeRadioButton().setSelected( dom.getCanvases(0).isFitted() );
     p.getHeightTextField().setValue( dom.getCanvases(0).getHeight() );
@@ -3002,6 +3063,7 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
 private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( dataSetSelectorMenuItem.isSelected() ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
         dom.getOptions().setUseTimeRangeEditor(false);
@@ -3009,6 +3071,7 @@ private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent e
 }//GEN-LAST:event_dataSetSelectorMenuItemActionPerformed
 
 private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeSelectorMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( timeRangeSelectorMenuItem.isSelected() ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
         dom.getOptions().setUseTimeRangeEditor(true);
@@ -3016,6 +3079,7 @@ private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
 private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editOptionsActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     OptionsDialog p= new OptionsDialog();
     p.setOptions( applicationModel.dom.getOptions() );
     if ( JOptionPane.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
@@ -3027,6 +3091,7 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_editOptionsActionPerformed
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     Runnable run= new Runnable() {
         @Override
         public void run() {
@@ -3037,24 +3102,28 @@ private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_fixLayoutMenuItemActionPerformed
 
 private void resetXMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetXMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( !AutoplotUtil.resetZoomX(dom)) {
         System.err.println("unable to zoom x");
     }
 }//GEN-LAST:event_resetXMenuItemActionPerformed
 
 private void resetYMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetYMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( !AutoplotUtil.resetZoomY(dom)) {
         System.err.println("unable to zoom y");
     }
 }//GEN-LAST:event_resetYMenuItemActionPerformed
 
 private void resetZMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( !AutoplotUtil.resetZoomZ(dom)) {
         System.err.println("unable to zoom z");
     }
 }//GEN-LAST:event_resetZMenuItemActionPerformed
 
 private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceFileMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     final Component source= (Component)evt.getSource();
     Runnable run= new Runnable() {
         @Override
@@ -3066,6 +3135,7 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_replaceFileMenuItemActionPerformed
 
 private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
    // Reload All Data
     RequestProcessor.invokeLater( new Runnable() { public void run() {
         AutoplotUtil.reloadAll(dom);
@@ -3073,6 +3143,7 @@ private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workOfflineCheckBoxMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     final boolean workOffline= workOfflineCheckBoxMenuItem.isSelected();
     FileSystem.settings().setOffline( workOffline );
     RequestProcessor.invokeLater( new Runnable() { public void run() {
@@ -3082,14 +3153,17 @@ private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEve
 }//GEN-LAST:event_workOfflineCheckBoxMenuItemActionPerformed
 
 private void searchToolTipsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchToolTipsMenuItemActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     AutoplotUtil.doSearchToolTips(this);
 }//GEN-LAST:event_searchToolTipsMenuItemActionPerformed
 
 private void manageFilesystemsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageFilesystemsMIActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     AutoplotUtil.doManageFilesystems(this);
 }//GEN-LAST:event_manageFilesystemsMIActionPerformed
 
 private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMemoryCachesMIActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     logger.fine("Resetting FileSystems...");
     Runnable run= new Runnable() {
         @Override
@@ -3103,6 +3177,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_resetMemoryCachesMIActionPerformed
 
     private void referenceCacheCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceCacheCheckBoxMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         if ( referenceCacheCheckBoxMenuItem.isSelected() ) {
             System.setProperty( "enableReferenceCache", "true" );
             setMessage( "Reference Cache is enabled" );
@@ -3115,6 +3190,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     }//GEN-LAST:event_referenceCacheCheckBoxMenuItemActionPerformed
 
     private void additionalOptionsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         OptionsDialog p= new OptionsDialog();
         p.setOptions( applicationModel.dom.getOptions() );
         if ( JOptionPane.showConfirmDialog( this, p, "Additional Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
@@ -3377,6 +3453,14 @@ private void updateFrameTitle() {
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueueJMX());
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueue());
 
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            public void eventDispatched(AWTEvent event) {
+                if ( event instanceof ActionEvent ) {
+                    LoggerManager.logGuiEvent((ActionEvent)event);
+                }
+            }
+        }, AWTEvent.KEY_EVENT_MASK );
+        
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");

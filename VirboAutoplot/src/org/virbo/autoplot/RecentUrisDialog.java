@@ -226,42 +226,50 @@ public class RecentUrisDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         setFilter( filterTextField.getText() );
 }//GEN-LAST:event_updateButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         setVisible(false);
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overplotButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         setModifiers( KeyEvent.SHIFT_MASK );
         cancelled= false;
         setVisible(false);
 }//GEN-LAST:event_overplotButtonActionPerformed
 
     private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         cancelled= false;
         setModifiers( KeyEvent.CTRL_MASK );
         setVisible(false);
 }//GEN-LAST:event_plotBelowButtonActionPerformed
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         cancelled= false;
         setModifiers( evt.getModifiers() );
         setVisible(false);
 }//GEN-LAST:event_plotButtonActionPerformed
 
     private void filterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTextFieldActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         setFilter( filterTextField.getText() );
     }//GEN-LAST:event_filterTextFieldActionPerformed
 
     private void editUriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editUriButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         cancelled= false;
         setModifiers( KeyEvent.ALT_MASK );
         setVisible(false);
     }//GEN-LAST:event_editUriButtonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         filterTextField.setText(".vap");
         setFilter( filterTextField.getText() );
     }//GEN-LAST:event_jButton1ActionPerformed

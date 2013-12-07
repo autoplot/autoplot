@@ -2499,6 +2499,7 @@ public class PlotElementController extends DomNodeController {
                                     hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
+                                            org.das2.util.LoggerManager.logGuiEvent(e);
                                             logger.warning("adding slice below");
                                             final QDataSet ds= hmm.getSlicer().getDataSet();
                                             final Datum y= hmm.getSlicer().getSliceY();

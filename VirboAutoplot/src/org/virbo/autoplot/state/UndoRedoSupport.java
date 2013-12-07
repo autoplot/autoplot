@@ -82,7 +82,9 @@ public class UndoRedoSupport {
             String label = prevState.deltaDesc;
             final int ii = lstateStackPos - i;
             JMenuItem item= new JMenuItem(new AbstractAction(label) {
+                @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
                     undo(ii);
                 }
             });
@@ -109,7 +111,7 @@ public class UndoRedoSupport {
             this.deltaDesc = deltaDesc;
             this.docString= docString;
         }
-
+        @Override
         public String toString() {
             return deltaDesc;
         }
@@ -147,7 +149,9 @@ public class UndoRedoSupport {
      */
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
+            @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 undo();
             }
         };
@@ -194,6 +198,7 @@ public class UndoRedoSupport {
     public Action getRedoAction() {
         return new AbstractAction("redo") {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 redo();
             }
         };

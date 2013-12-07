@@ -208,14 +208,18 @@ public class FilterChainPanel extends JPanel {
 
         if ( fi>=0 ) {
             subAdd.addActionListener( new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
                     int ifi= getIndex( sub );
                     String s= addFilter(ifi);
                 }
             } );
         } else {
            subAdd.addActionListener( new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
                     String s= addFilter(filters.size());
                 }
             } );
@@ -227,7 +231,9 @@ public class FilterChainPanel extends JPanel {
             JButton subDelete= new JButton("");
             subDelete.setIcon( new ImageIcon( FilterChainPanel.class.getResource("/org/virbo/datasource/subtract.png") ) );
             subDelete.addActionListener( new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                    
                     int ifi= getIndex( sub );
                     deleteFilter(ifi);
                     Container parent= sub.getParent();
@@ -242,6 +248,7 @@ public class FilterChainPanel extends JPanel {
             final JTextField tf= new JTextField();
             tf.setText(filters.get(fi));
             tf.addActionListener( new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     int ifi= getIndex( sub );
                     filters.set( ifi, tf.getText() );

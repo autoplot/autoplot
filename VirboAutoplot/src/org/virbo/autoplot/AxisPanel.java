@@ -546,6 +546,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 String v= componentTextField.getText();
                 int i= componentTextField.getCaretPosition();
                 componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );
@@ -558,6 +559,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, final String label, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( label ) {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 String v= componentTextField.getText();
                 int i= componentTextField.getCaretPosition();
                 componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );

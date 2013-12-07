@@ -1238,6 +1238,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return new AbstractAction( "New Bookmark..." ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 String s = JOptionPane.showInputDialog( BookmarksManager.this, "Bookmark URL:");
                 if (s != null && !s.equals("")) {
                     String x= maybeGetRemoteBookmarkUrl( null, model, jTree1.getModel(), jTree1.getSelectionPath() );
@@ -1256,6 +1257,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return new AbstractAction( "New Folder..." ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 Bookmark context= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
                 String x= maybeGetRemoteBookmarkUrl( context, model, jTree1.getModel(), jTree1.getSelectionPath() );
                 if ( x.length()>0 ) {
@@ -1288,6 +1290,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return new AbstractAction("Delete") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                        
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
                 if ( bs.size()>0 ) {
                     bs= removeRemoteBookmarks( bs, jTree1.getModel(), jTree1.getSelectionPaths() );
@@ -1305,6 +1308,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return new AbstractAction("Export Items...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
                 model.doExport(BookmarksManager.this,bs);
             }
@@ -1619,6 +1623,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         mi= new JMenuItem( new AbstractAction("Manage and Browse...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 Container parent= BookmarksManager.this.getParent();
                 BookmarksManager.this.setLocationRelativeTo( parent );
                 setVisible(true);
@@ -1630,6 +1635,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
                 setAddBookmark(bookmark);
                 setVisible(true);

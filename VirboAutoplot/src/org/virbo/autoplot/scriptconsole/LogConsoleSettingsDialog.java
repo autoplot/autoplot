@@ -324,21 +324,25 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loggerIDCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         console.setShowLoggerId( loggerIDCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_loggerIDCheckBoxActionPerformed
 
     private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         console.setShowTimeStamps( timeStampsCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_timeStampsCheckBoxActionPerformed
 
     private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         console.setShowLevel( logLevelCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_logLevelCheckBoxActionPerformed
 
     private void searchForTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchForTextFieldActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         updateSearchText();
 }//GEN-LAST:event_searchForTextFieldActionPerformed
 
@@ -347,6 +351,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_searchForTextFieldFocusLost
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 

@@ -49,6 +49,7 @@ public class DelayMenu extends JMenu {
                     JMenuItem mi = new JMenuItem(new AbstractAction(title) {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            org.das2.util.LoggerManager.logGuiEvent(e);                        
                             //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject any, enter the dialog.
                             boolean oldLogic= true;
                             if ( oldLogic ) {

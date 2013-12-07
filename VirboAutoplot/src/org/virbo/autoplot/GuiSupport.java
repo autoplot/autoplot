@@ -388,6 +388,7 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
 
@@ -553,7 +554,7 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 final QDataSet dataSet = parent.applicationModel.dom
                         .getController().getPlotElement().getController().getDataSet();
 
@@ -654,6 +655,7 @@ public class GuiSupport {
         return new AbstractAction("Reset Window...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";
                     int result= JOptionPane.showConfirmDialog(parent,msg );
@@ -763,6 +765,7 @@ public class GuiSupport {
         return new AbstractAction("New Window") {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 newApplication();
             }
         };
@@ -772,6 +775,7 @@ public class GuiSupport {
         return new AbstractAction("Clone to New Window") {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);        
                 cloneApplication();
             }
         };
@@ -810,6 +814,7 @@ public class GuiSupport {
             mi= new JCheckBoxMenuItem(new AbstractAction(fee.getKey()) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
                     PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
                     pe.setRenderType(fee.getValue());
                 }
@@ -827,18 +832,21 @@ public class GuiSupport {
         thisPanel.getActionMap().put("RESET_ZOOM", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parent.applicationModel.resetZoom();
             }
         });
         thisPanel.getActionMap().put("INCREASE_FONT_SIZE", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parent.applicationModel.increaseFontSize();
             }
         });
         thisPanel.getActionMap().put("DECREASE_FONT_SIZE", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parent.applicationModel.decreaseFontSize();
             }
         });
@@ -846,6 +854,7 @@ public class GuiSupport {
         thisPanel.getActionMap().put("NEXT_PLOT_ELEMENT", new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 Application dom= parent.dom;
                 PlotElement p= dom.getController().getPlotElement();
                 int idx= Arrays.asList( dom.getPlotElements() ).indexOf(p);
@@ -859,6 +868,7 @@ public class GuiSupport {
         thisPanel.getActionMap().put("PREV_PLOT_ELEMENT", new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 Application dom= parent.dom;
                 PlotElement p= dom.getController().getPlotElement();
                 int idx= Arrays.asList( dom.getPlotElements() ).indexOf(p);
@@ -872,12 +882,14 @@ public class GuiSupport {
         thisPanel.getActionMap().put("SAVE", new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parent.stateSupport.createSaveAction().actionPerformed(e);
             }
         });
         thisPanel.getActionMap().put("RELOAD_ALL", new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+               org.das2.util.LoggerManager.logGuiEvent(e);
                RequestProcessor.invokeLater( new Runnable() { public void run() {
                     AutoplotUtil.reloadAll(parent.dom);
                 } } );
@@ -955,6 +967,7 @@ public class GuiSupport {
         return new AbstractAction("Print as "+ext.toUpperCase()) {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 final JPanel decor;
                 final DasCanvas canvas = app.getController().getDasCanvas();
                 final JFileChooser fileChooser = new JFileChooser();
@@ -1205,6 +1218,7 @@ public class GuiSupport {
         item= new JMenuItem(new AbstractAction("Axis Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 PropertyEditor pp = new PropertyEditor(axis);
                 pp.showDialog(dasAxis.getCanvas());
             }
@@ -1221,6 +1235,7 @@ public class GuiSupport {
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                    
                     controller.copyPlot(plot, true, false, true);
                 }
             });
@@ -1237,6 +1252,7 @@ public class GuiSupport {
             item = new JMenuItem(new AbstractAction("Add Binding to Application Time Range") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                
                     DatumRange dr= controller.getApplication().getTimeRange();
                     if ( dr==Application.DEFAULT_TIME_RANGE ) {
                         controller.getApplication().setTimeRange( dr.next() );
@@ -1251,6 +1267,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Binding to Plot Above") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot above");
@@ -1263,6 +1280,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Binding to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getPlotBelow(plot);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot below");
@@ -1275,6 +1293,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Right") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.RIGHT);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot to the right");
@@ -1287,6 +1306,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Binding to Plot to the Left") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.LEFT);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot to the left");
@@ -1300,6 +1320,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override            
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 BindingModel[] bms= controller.getBindingsFor(axis);
                 controller.unbind(axis);  // TODO: check for application timerange
                 controller.setStatus("removed "+bms.length+" bindings");
@@ -1317,6 +1338,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Connector to Plot Above") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot above");
@@ -1330,6 +1352,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Add Connector to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot dstPlot = controller.getPlotBelow(plot);
                 if (dstPlot == null) {
                     controller.setStatus("warning: no plot below");
@@ -1343,6 +1366,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Delete Connectors") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Application dom= plot.getController().getApplication();
                 for (Connector c : DomUtil.asArrayList(dom.getConnectors())) {
                     if (c.getPlotA().equals(plot.getId()) || c.getPlotB().equals(plot.getId())) {
@@ -1361,6 +1385,7 @@ public class GuiSupport {
             item= new JMenuItem( new AbstractAction("Add Additional Ticks from...") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                
                     String uri= plot.getTicksURI();
                     if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
                         uri= uri.substring("class:org.autoplot.tca.UriTcaSource:".length());
@@ -1415,6 +1440,7 @@ public class GuiSupport {
         mi= new JMenuItem(new AbstractAction("Plot Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 PropertyEditor pp = new PropertyEditor(domPlot);
                 pp.showDialog(plot.getCanvas());
             }
@@ -1425,6 +1451,7 @@ public class GuiSupport {
         mi= new JMenuItem(new AbstractAction("Plot Element Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
                 pp.showDialog(plot.getCanvas());
@@ -1437,6 +1464,7 @@ public class GuiSupport {
         JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Plot Element Style Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p.getStyle());
                 pp.showDialog(plot.getCanvas());
@@ -1505,6 +1533,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Copy Plot Elements Down") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 Runnable run= new Runnable() {
                     public void run() {
                         Plot newPlot= controller.copyPlotAndPlotElements(domPlot, null, false, false);
@@ -1534,6 +1563,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Context Overview") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
@@ -1551,6 +1581,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("New Location (URI)...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
@@ -1580,6 +1611,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Move to Plot Above") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
                 Plot dstPlot = controller.getPlotAbove(plot);
@@ -1597,6 +1629,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Move to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement pelement = controller.getPlotElement();
                 Plot plot = controller.getPlotFor(pelement);
                 Plot dstPlot = controller.getPlotBelow(plot);
@@ -1615,6 +1648,7 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement pelement = controller.getPlotElement();
                 if (controller.getApplication().getPlotElements().length < 2) {
                     DataSourceFilter dsf= controller.getDataSourceFilterFor(controller.getApplication().getPlotElements(0));
@@ -1632,6 +1666,7 @@ public class GuiSupport {
         item=  new JMenuItem(new AbstractAction("Move Plot Element Below Others") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement pelement = controller.getPlotElement();
                 Plot p= pelement.getController().getApplication().getController().getPlotFor(pelement);
                 p.getController().toBottom(pelement);
@@ -1643,6 +1678,7 @@ public class GuiSupport {
         JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 GuiSupport.editPlotElement( controller.getApplicationModel(), plot );
             }
         });
@@ -1655,6 +1691,7 @@ public class GuiSupport {
         plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 plotController.resetZoom(true, true, true);
             }
         }));
@@ -1693,6 +1730,7 @@ public class GuiSupport {
                 edit.addSaveAction( new AbstractAction("Save") {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);
                         try {
                             StatePersistence.saveState(f, vap);
                         } catch (IOException ex) {
@@ -1778,6 +1816,7 @@ public class GuiSupport {
                 JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);
                         String v= componentTextField.getText();
                         int i= componentTextField.getCaretPosition();
                         componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );

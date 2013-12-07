@@ -200,16 +200,19 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         this.dispose();
     }//GEN-LAST:event_dismissButtonActionPerformed
 
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), app );
         if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
         canEmbedFont(f);
     }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
         backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
@@ -219,6 +222,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
         List<PlotElement> pe= Arrays.asList( app.dom.getPlotElements() );
@@ -234,6 +238,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         int i = jComboBox1.getSelectedIndex();
         if (i < fores.length) {
             foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );

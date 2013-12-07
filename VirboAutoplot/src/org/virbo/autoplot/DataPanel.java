@@ -92,6 +92,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         recentComboBox.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
                 setAdjusting(false);
                 componentChanged();
@@ -147,6 +148,7 @@ public class DataPanel extends javax.swing.JPanel {
         ActionMap am= componentTextField1.getActionMap();
         am.put( "INCREMENT_UP", new AbstractAction("incr_up") {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 incrUpCount++;
                 if ( System.currentTimeMillis()-lastIncrUp > 300 ) {
                     doIncrUp(incrUpCount);
@@ -160,6 +162,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         am.put( "INCREMENT_DOWN", new AbstractAction("incr_down") {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 incrUpCount--;
                 if ( System.currentTimeMillis()-lastIncrUp > 300 ) {
                     doIncrUp(incrUpCount);
@@ -191,6 +194,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
         componentTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                org.das2.util.LoggerManager.logGuiEvent(evt);                
                 componentTextFieldActionPerformed(evt);
             }
         });
@@ -520,6 +524,7 @@ public class DataPanel extends javax.swing.JPanel {
     private JMenuItem createMenuItem( final String insert, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                                
                 String v= componentTextField1.getText();
                 int i= componentTextField1.getCaretPosition();
                 componentTextField1.setText( v.substring(0,i) + insert + v.substring(i) );
@@ -862,18 +867,21 @@ public class DataPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_doSliceCheckBoxActionPerformed
 
     private void validRangeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validRangeComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         String s = (String) validRangeComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
         applicationController.getDataSourceFilter().setValidRange(s);
 }//GEN-LAST:event_validRangeComboBoxActionPerformed
 
     private void fillValueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillValueComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         String s = (String) fillValueComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
         applicationController.getDataSourceFilter().setFill(s);
 }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         FilterChainPanel p= new FilterChainPanel();
         p.setFilters(componentTextField1.getText());
         int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );

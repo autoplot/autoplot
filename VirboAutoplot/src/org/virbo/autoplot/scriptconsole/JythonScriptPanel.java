@@ -417,6 +417,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }// </editor-fold>//GEN-END:initComponents
     private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         if ( dirty && support.file!=null ) {
             try {
                 support.save(); 
@@ -436,8 +437,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_openButtonActionPerformed
 
 private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contextSelectorActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);                
     setContext(contextSelector.getSelectedIndex());
-
 }//GEN-LAST:event_contextSelectorActionPerformed
 
 private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textAreaFocusGained
@@ -446,10 +447,12 @@ private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:eve
 }//GEN-LAST:event_textAreaFocusGained
 
 private void newScriptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newScriptButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);                
     support.newScript();
 }//GEN-LAST:event_newScriptButtonActionPerformed
 
 private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_interruptButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);                
     support.interrupt();
 }//GEN-LAST:event_interruptButtonActionPerformed
 

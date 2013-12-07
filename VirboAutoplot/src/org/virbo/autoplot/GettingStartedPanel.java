@@ -122,6 +122,7 @@ public class GettingStartedPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void browseLocalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseLocalButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         String s= DataSetSelectorSupport.browseLocal(this);
         if ( s!=null ) {
             jTextField1.setText(s);

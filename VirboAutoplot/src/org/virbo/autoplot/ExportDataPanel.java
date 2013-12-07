@@ -228,6 +228,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseFileBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFileBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
 
         JFileChooser chooser = new JFileChooser();
 
@@ -296,6 +297,8 @@ public class ExportDataPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_chooseFileBActionPerformed
 
     private void formatDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatDLActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
+
         String ff= filenameTF.getText();
         if ( ! ff.endsWith( (String)formatDL.getSelectedItem() ) ) {
             int ii2= ff.lastIndexOf("/");
@@ -364,6 +367,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_formatDLItemStateChanged
 
     private void additionalOptionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         javax.swing.JPanel j= editorPanel.getPanel();
         JOptionPane.showConfirmDialog( this, j, "Additional Options", JOptionPane.OK_CANCEL_OPTION );
     }//GEN-LAST:event_additionalOptionsButtonActionPerformed

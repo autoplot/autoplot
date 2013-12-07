@@ -116,6 +116,7 @@ public class SaveAsDialog extends java.awt.Dialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         application.setUseEmbeddedDataSet( embedDataCB.isSelected() );
         stateSupport.setCurrentFile( new File( fileNameTextField.getText() ) );
         if ( bookmarkCB.isSelected() ) {
@@ -125,6 +126,7 @@ public class SaveAsDialog extends java.awt.Dialog {
     }//GEN-LAST:event_okayButtonActionPerformed
 
     private void pickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         JFileChooser chooser= new JFileChooser();
         chooser.setSelectedFile(stateSupport.getCurrentFile());
         int result= chooser.showSaveDialog( this );

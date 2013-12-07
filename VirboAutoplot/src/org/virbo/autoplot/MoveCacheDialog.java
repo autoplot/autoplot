@@ -95,6 +95,7 @@ public class MoveCacheDialog extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void pickButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         JFileChooser chooser= new JFileChooser( new File( getNewDir().getText()) );
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if ( chooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION ) {

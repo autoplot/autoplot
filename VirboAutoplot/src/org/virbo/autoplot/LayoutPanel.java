@@ -126,6 +126,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     Action removeBindingsAction= new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Plot domPlot = app.getController().getPlot();
                 List<PlotElement> elements = app.getController().getPlotElementsFor(domPlot);
                 for (PlotElement element : elements) {
@@ -139,6 +140,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         Action deletePlotAction= new AbstractAction("Delete Plot") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 List<Object> os= canvasLayoutPanel1.getSelectedComponents();
                 for ( Object o: os ) {
                     if (app.getPlots().length > 1) {
@@ -166,6 +168,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         Action addPlotsAction= new AbstractAction("Add Plots...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 AddPlotsDialog dia= new AddPlotsDialog();
                 dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
                 dia.getNumberOfRowsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
@@ -203,6 +206,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Edit Plot Element Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Object[] os= panelListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)panelListComponent.getSelectedValue();
                 PropertyEditor edit;
@@ -224,6 +228,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Edit Plot Element Style Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                                
                 Object[] os= panelListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)panelListComponent.getSelectedValue();
                 PropertyEditor edit;
@@ -246,6 +251,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Delete Plot Element") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 Object[] os= panelListComponent.getSelectedValues();
                 for ( Object o : os ) {
                     PlotElement element = (PlotElement) o;
@@ -787,6 +793,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void propertiesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propertiesMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         DasPlot component= (DasPlot)canvasLayoutPanel1.getComponent();
         Plot domPlot = app.getController().getPlotFor(component);
         if ( domPlot==null ) {
@@ -810,6 +817,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_propertiesMenuItemActionPerformed
 
     private void swapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_swapMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Plot> plots= getSelectedPlots();
         if ( plots.size()==2 ) {
             DomOps.swapPosition( plots.get(0), plots.get(1) );
@@ -820,10 +828,12 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_swapMenuItemActionPerformed
 
     private void addPlotsBelowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPlotsBelowMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         // TODO add your handling code here:
     }//GEN-LAST:event_addPlotsBelowMenuItemActionPerformed
 
     private void addHiddenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addHiddenMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         BindToHiddenDialog dia= new BindToHiddenDialog();
 
         int op= JOptionPane.showConfirmDialog( this, dia, "Add hidden plot for binding", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
@@ -928,6 +938,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_addHiddenMenuItemActionPerformed
 
     private void deleteBindingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBindingsMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         Object[] bindings= bindingListComponent.getSelectedValues();
         for ( Object o:bindings ) {
             BindingModel b= (BindingModel)o;
@@ -943,6 +954,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_panelListComponentValueChanged
 
     private void biggerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biggerMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
             Row row= p1.getController().getRow();
@@ -963,6 +975,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_biggerMIActionPerformed
 
     private void sameSizeMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sameSizeMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
             Row row= p1.getController().getRow();
@@ -1005,6 +1018,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_sameSizeMIActionPerformed
 
     private void smallerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_smallerMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
             Row row= p1.getController().getRow();
