@@ -2495,20 +2495,22 @@ public class PlotElementController extends DomNodeController {
                                 plot.addRenderer(0,newRenderer);
                                 MouseModule mm= plot.getDasMouseInputAdapter().getModuleByLabel("Horizontal Slice");
                                 final HorizontalSlicerMouseModule hmm= ((HorizontalSlicerMouseModule)mm);
-                                hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        logger.warning("adding slice below");
-                                        final QDataSet ds= hmm.getSlicer().getDataSet();
-                                        final Datum y= hmm.getSlicer().getSliceY();
-                                        RequestProcessor.invokeLater( new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                addPlotBelow(ds,y);
-                                            }
-                                        });
-                                    }
-                                });
+                                if ( hmm!=null ) { // for example in headless mode
+                                    hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            logger.warning("adding slice below");
+                                            final QDataSet ds= hmm.getSlicer().getDataSet();
+                                            final Datum y= hmm.getSlicer().getSliceY();
+                                            RequestProcessor.invokeLater( new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    addPlotBelow(ds,y);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
                                 
                             } else {
                                 Renderer[] rends= plot.getRenderers();
