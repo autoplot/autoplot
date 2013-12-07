@@ -383,6 +383,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     filesButton.addActionListener( new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            org.das2.util.LoggerManager.logGuiEvent(e);
+
                             JFileChooser c= new JFileChooser();
                             URISplit split2= URISplit.parse(fval);
                             if ( split2.scheme.equals("file") ) {
@@ -426,6 +428,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     button.addActionListener( new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            org.das2.util.LoggerManager.logGuiEvent(e);
                             TimeRangeTool tt= new TimeRangeTool();
                             tt.setSelectedRange(tf.getText());
                             int r= JOptionPane.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
@@ -456,6 +459,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                             jcb.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
+                                    org.das2.util.LoggerManager.logGuiEvent(e);
                                     redoVariables();
                                 }
                             });
