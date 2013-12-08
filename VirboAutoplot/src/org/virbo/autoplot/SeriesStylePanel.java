@@ -167,6 +167,11 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         fillToReferenceCheckBox.setText("Fill To Reference");
         fillToReferenceCheckBox.setToolTipText("Fill from the plot trace to a reference value");
         fillToReferenceCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        fillToReferenceCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fillToReferenceCheckBoxActionPerformed(evt);
+            }
+        });
 
         jLabel8.setText("Reference Value:");
         jLabel8.setToolTipText("Fill to this value");
@@ -276,9 +281,13 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void fillToReferenceCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillToReferenceCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
+    }//GEN-LAST:event_fillToReferenceCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;

@@ -123,6 +123,11 @@ public class OptionsDialog extends javax.swing.JPanel {
         jLabel2.setText("\"reluctant\" will enable the experimental reluctant mode");
 
         flipColorbarLabelCB.setText("Flip Colorbar Label");
+        flipColorbarLabelCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                flipColorbarLabelCBActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(jLabel3.getFont().deriveFont(jLabel3.getFont().getSize()-1f));
         jLabel3.setForeground(new java.awt.Color(128, 128, 128));
@@ -153,6 +158,11 @@ public class OptionsDialog extends javax.swing.JPanel {
         jLabel9.setText("Stamp this tag, which can include $Y$m$d,etc for local time");
 
         sliceRebinnedDataCB.setText("Slice Rebinned Data");
+        sliceRebinnedDataCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sliceRebinnedDataCBActionPerformed(evt);
+            }
+        });
 
         jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getSize()-1f));
         jLabel10.setForeground(new java.awt.Color(128, 128, 128));
@@ -295,6 +305,16 @@ public class OptionsDialog extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void flipColorbarLabelCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_flipColorbarLabelCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt); 
+        //TODO: this will probably change, because we need to listen to the bindings, I think
+    }//GEN-LAST:event_flipColorbarLabelCBActionPerformed
+
+    private void sliceRebinnedDataCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceRebinnedDataCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);                
+    }//GEN-LAST:event_sliceRebinnedDataCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField autorangeTypeTF;
     private javax.swing.JComboBox displayLogLevelCB;
