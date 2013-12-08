@@ -100,13 +100,12 @@ public class DataSetSelector extends javax.swing.JPanel {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
         dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
         plotItButton.setActionCommand("doplot");
-        browseButton.setActionCommand("doinspect");
+        browseButton.setActionCommand("inspect");
         
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-                org.das2.util.LoggerManager.logGuiEvent(ev);            
                 keyModifiers= ev.getModifiers();
                 
             }
