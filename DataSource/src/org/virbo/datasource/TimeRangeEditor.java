@@ -42,7 +42,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsUtil;
-import static org.virbo.datasource.DataSetSelector.logger;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 
 /**
@@ -74,12 +73,14 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         });
         jPanel1.add( recentComboBox, BorderLayout.CENTER );
         recentComboBox.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 parseRange();
             }
         });
 
         recentComboBox.setVerifier( new RecentComboBox.InputVerifier() {
+            @Override
             public boolean verify(String text) {
                 try {
                     DatumRangeUtil.parseTimeRange(text);
@@ -204,8 +205,6 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 }
             }
         }
-
-        return;
     }
 
     /**
@@ -400,12 +399,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     public static void main( String[] args ) {
         TimeRangeEditor p= new TimeRangeEditor();
-        p.addPropertyChangeListener( p.PROP_RANGE, new PropertyChangeListener() {
-
+        p.addPropertyChangeListener( TimeRangeEditor.PROP_RANGE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 System.err.println(evt.getOldValue()+" -> "+ evt.getNewValue() ); // logger okay
             }
-
         } );
         JFrame f= new JFrame();
         f.setContentPane( p );
@@ -425,6 +423,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     public PropertyChangeListener getUriFocusListener() {
         return new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 browseButton.setToolTipText( "<html>Edit data source<br>"+evt.getNewValue().toString()+"</html>" );
             }
@@ -467,6 +466,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private JMenuItem exampleTime( final String s, final String toolTip ) {
         JMenuItem mi= new JMenuItem( new AbstractAction(s) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 recentComboBox.setSelectedItem(s);
             }
@@ -497,6 +497,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         if ( this.alternatePeerCard!=null ) {
             result.add( new JSeparator() );
             result.add( new AbstractAction( alternatePeer ) {
+                @Override
                 public void actionPerformed(ActionEvent ev) {
                     Container trp= TimeRangeEditor.this.getParent();
                     ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
