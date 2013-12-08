@@ -84,7 +84,7 @@ import org.virbo.datasource.ui.PromptTextField;
 import org.virbo.dsops.Ops;
 
 /**
- * Swing Component for selecting dataset URIs.  This provides hooks for completions.
+ * Swing component for selecting dataset URIs.  This provides hooks for completions.
  *
  * @author  jbf
  */
@@ -99,7 +99,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     public DataSetSelector() {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
         dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
-
+        plotItButton.setActionCommand("doplot");
+        browseButton.setActionCommand("doinspect");
+        
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
             @Override
