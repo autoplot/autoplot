@@ -24,7 +24,7 @@
           <Group type="102" alignment="1" attributes="0">
               <Component id="jPanel1" pref="224" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+              <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="prevButton" linkSize="3" min="-2" pref="40" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -41,7 +41,7 @@
                   <Component id="browseButton" linkSize="2" alignment="0" pref="27" max="32767" attributes="1"/>
                   <Component id="nextButton" linkSize="2" alignment="0" max="32767" attributes="1"/>
                   <Component id="prevButton" linkSize="2" alignment="0" max="32767" attributes="1"/>
-                  <Component id="jButton1" linkSize="2" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                  <Component id="timeRangeToolButton" linkSize="2" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                   <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="1"/>
               </Group>
               <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
@@ -137,7 +137,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="timeRangeToolButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/datasource/calendar.png"/>
@@ -145,7 +145,7 @@
         <Property name="toolTipText" type="java.lang.String" value="Time Range Tool"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeToolButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

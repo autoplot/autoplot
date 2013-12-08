@@ -55,6 +55,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public TimeRangeEditor() {
         initComponents();
 
+        timeRangeToolButton.setActionCommand("timeRangeTool");
+        nextButton.setActionCommand("next");
+        prevButton.setActionCommand("previous");
+        browseButton.setActionCommand("inspect");
+        
         recentComboBox.setMinimumSize( new Dimension( 200,30) ); // long items in history cause problems.
         
         recentComboBox.setPreferenceNode("timerange");
@@ -70,7 +75,6 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         jPanel1.add( recentComboBox, BorderLayout.CENTER );
         recentComboBox.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);
                 parseRange();
             }
         });
@@ -240,7 +244,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         browseButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         recentComboBox = new org.virbo.datasource.RecentComboBox();
-        jButton1 = new javax.swing.JButton();
+        timeRangeToolButton = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
@@ -284,11 +288,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel1.add(recentComboBox, java.awt.BorderLayout.CENTER);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
-        jButton1.setToolTipText("Time Range Tool");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeToolButton.setToolTipText("Time Range Tool");
+        timeRangeToolButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                timeRangeToolButtonActionPerformed(evt);
             }
         });
 
@@ -299,7 +303,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1)
+                .add(timeRangeToolButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -317,12 +321,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                     .add(browseButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                     .add(nextButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(prevButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButton1, 0, 0, Short.MAX_VALUE)
+                    .add(timeRangeToolButton, 0, 0, Short.MAX_VALUE)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(13, 13, 13))
         );
 
-        layout.linkSize(new java.awt.Component[] {browseButton, jButton1, nextButton, prevButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {browseButton, nextButton, prevButton, timeRangeToolButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -382,7 +386,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange(getRange().toString());//TODO: goofy
@@ -392,7 +396,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             recentComboBox.actionPerformed( new ActionEvent(this,0,"triggerSaveRecent",0) );
         }
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_timeRangeToolButtonActionPerformed
 
     public static void main( String[] args ) {
         TimeRangeEditor p= new TimeRangeEditor();
@@ -412,11 +416,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
-    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
     private org.virbo.datasource.RecentComboBox recentComboBox;
+    private javax.swing.JButton timeRangeToolButton;
     // End of variables declaration//GEN-END:variables
 
     public PropertyChangeListener getUriFocusListener() {
