@@ -233,6 +233,11 @@ public class AxisPanel extends javax.swing.JPanel {
         xLog.setText("Log");
         xLog.setToolTipText("X axis logarithmic scale");
         xLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        xLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xLogActionPerformed(evt);
+            }
+        });
 
         xAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -251,6 +256,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         showXAxisLabelsCB.setText("Show Labels");
         showXAxisLabelsCB.setToolTipText("Hide the axis labels of the axis, to make a stack of plots more efficient.  Run Tools->\"Fix Layout\" to pack the plots.");
+        showXAxisLabelsCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showXAxisLabelsCBActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
@@ -259,7 +269,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(xLog)
                         .add(18, 18, 18)
@@ -291,6 +301,11 @@ public class AxisPanel extends javax.swing.JPanel {
         zLog.setText("Log");
         zLog.setToolTipText("colorbar logarithmic scale");
         zLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        zLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zLogActionPerformed(evt);
+            }
+        });
 
         zAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -306,6 +321,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         cbVisibleCB.setText("Visible");
         cbVisibleCB.setToolTipText("hide/show colorbar");
+        cbVisibleCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbVisibleCBActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Label:");
         jLabel3.setToolTipText("Colorbar title");
@@ -317,7 +337,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(zAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(zLog)
                         .add(18, 18, 18)
@@ -325,7 +345,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(zAxisPanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)))
+                        .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -351,10 +371,20 @@ public class AxisPanel extends javax.swing.JPanel {
         yLog.setText("Log");
         yLog.setToolTipText("Y axis logarithmic scale");
         yLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        yLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                yLogActionPerformed(evt);
+            }
+        });
 
         isotropicCheckBox.setText("Isotropic");
         isotropicCheckBox.setToolTipText("When Y axis units are convertable to X axis units, automatically set Y axis range to ensure pixel:data ratio is the same.");
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        isotropicCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                isotropicCheckBoxActionPerformed(evt);
+            }
+        });
 
         yTitleTextField.setText("jTextField1");
         yTitleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -376,7 +406,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(yAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE)
+                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                     .add(yLog)
                     .add(isotropicCheckBox)
                     .add(yAxisPanelLayout.createSequentialGroup()
@@ -397,7 +427,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot [?]"));
@@ -415,6 +445,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         legendEnableCheckbox.setText("Legend Label:");
         legendEnableCheckbox.setToolTipText("When selected, the label is added to the legend of the plot containing the focus plot element.\n\n");
+        legendEnableCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                legendEnableCheckboxActionPerformed(evt);
+            }
+        });
 
         legendTextField.setText("label will go here");
 
@@ -432,6 +467,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         titleCB.setText("Title:");
         titleCB.setToolTipText("Title for the focus plot.  When deselected, the plot title is hidden.\n");
+        titleCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                titleCBActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -443,7 +483,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
                         .add(titleCB)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
+                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
                         .add(legendEnableCheckbox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -478,15 +518,14 @@ public class AxisPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                    .add(xAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(zAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+            .add(layout.createSequentialGroup()
+                .add(xAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(zAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         bindingGroup.bind();
@@ -515,6 +554,38 @@ public class AxisPanel extends javax.swing.JPanel {
             showTitleMenu(evt);
         }
     }//GEN-LAST:event_titleMouseAction
+
+    private void xLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xLogActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_xLogActionPerformed
+
+    private void showXAxisLabelsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showXAxisLabelsCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);        
+    }//GEN-LAST:event_showXAxisLabelsCBActionPerformed
+
+    private void yLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yLogActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_yLogActionPerformed
+
+    private void isotropicCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_isotropicCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_isotropicCheckBoxActionPerformed
+
+    private void titleCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_titleCBActionPerformed
+
+    private void legendEnableCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_legendEnableCheckboxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_legendEnableCheckboxActionPerformed
+
+    private void zLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zLogActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_zLogActionPerformed
+
+    private void cbVisibleCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbVisibleCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+    }//GEN-LAST:event_cbVisibleCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbVisibleCB;

@@ -107,6 +107,9 @@
               </Border>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="xLogActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="xAxisRangePanel">
 
@@ -132,6 +135,9 @@
             <Property name="text" type="java.lang.String" value="Show Labels"/>
             <Property name="toolTipText" type="java.lang.String" value="Hide the axis labels of the axis, to make a stack of plots more efficient.  Run Tools-&gt;&quot;Fix Layout&quot; to pack the plots."/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showXAxisLabelsCBActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -197,6 +203,9 @@
               </Border>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zLogActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="zAxisRangePanel">
 
@@ -216,6 +225,9 @@
             <Property name="text" type="java.lang.String" value="Visible"/>
             <Property name="toolTipText" type="java.lang.String" value="hide/show colorbar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbVisibleCBActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
@@ -267,7 +279,7 @@
                   <Component id="yLog" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="isotropicCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="14" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -287,6 +299,9 @@
               </Border>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="yLogActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JCheckBox" name="isotropicCheckBox">
           <Properties>
@@ -298,6 +313,9 @@
               </Border>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="isotropicCheckBoxActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="yTitleTextField">
           <Properties>
@@ -379,6 +397,9 @@
             <Property name="text" type="java.lang.String" value="Legend Label:"/>
             <Property name="toolTipText" type="java.lang.String" value="When selected, the label is added to the legend of the plot containing the focus plot element.&#xa;&#xa;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="legendEnableCheckboxActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="legendTextField">
           <Properties>
@@ -397,6 +418,9 @@
             <Property name="text" type="java.lang.String" value="Title:"/>
             <Property name="toolTipText" type="java.lang.String" value="Title for the focus plot.  When deselected, the plot title is hidden.&#xa;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleCBActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
