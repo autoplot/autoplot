@@ -1690,20 +1690,24 @@ public class PlotElementController extends DomNodeController {
                 TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
                 if ( tsb!=null ) {
                     if ( fillDs!=null ) {
-                        QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
-                        Units xunits;
-                        if ( xds.rank()<=1 ) {
-                            xunits= (Units)xds.property(QDataSet.UNITS);
+                        if ( fillDs.rank()==0 ) {
+                            logger.fine("data is rank 0, no autoranging needs to be done.");
                         } else {
-                            //JOIN dataset
-                            xunits= (Units)xds.property(QDataSet.UNITS,0);
-                        }
-                        if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
-                            DatumRange tr= tsb.getTimeRange();
-                            if ( tr==null ) {
-                                logger.fine( "tsb contains no timerange");
+                            QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
+                            Units xunits;
+                            if ( xds.rank()<=1 ) {
+                                xunits= (Units)xds.property(QDataSet.UNITS);
+                            } else {
+                                //JOIN dataset
+                                xunits= (Units)xds.property(QDataSet.UNITS,0);
                             }
-                            peleCopy.getPlotDefaults().getXaxis().setRange( tr );
+                            if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
+                                DatumRange tr= tsb.getTimeRange();
+                                if ( tr==null ) {
+                                    logger.fine( "tsb contains no timerange");
+                                }
+                                peleCopy.getPlotDefaults().getXaxis().setRange( tr );
+                            }
                         }
                     }
                 }
