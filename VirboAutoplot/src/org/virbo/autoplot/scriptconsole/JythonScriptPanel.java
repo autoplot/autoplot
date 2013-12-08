@@ -7,7 +7,6 @@ package org.virbo.autoplot.scriptconsole;
 
 import java.awt.Dimension;
 import org.virbo.jythonsupport.ui.EditorContextMenu;
-import java.awt.Event;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -22,8 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -439,7 +436,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_openButtonActionPerformed
 
 private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contextSelectorActionPerformed
-    org.das2.util.LoggerManager.logGuiEvent(evt);                
+    org.das2.util.LoggerManager.logGuiEvent(evt);      
     setContext(contextSelector.getSelectedIndex());
 }//GEN-LAST:event_contextSelectorActionPerformed
 
