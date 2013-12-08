@@ -1638,6 +1638,10 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 org.das2.util.LoggerManager.logGuiEvent(e);        
                 Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
                 setAddBookmark(bookmark);
+                if ( !isVisible() ) {
+                    Container parent= BookmarksManager.this.getParent();
+                    BookmarksManager.this.setLocationRelativeTo( parent );
+                }
                 setVisible(true);
             }
         } );
