@@ -100,7 +100,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
         dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
         plotItButton.setActionCommand("doplot");
-        browseButton.setActionCommand("inspect");
+        inspectButton.setActionCommand("inspect");
         
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
@@ -204,7 +204,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return the inspect/browse button
      */
     public JButton getBrowseButton() {
-        return browseButton;
+        return inspectButton;
     }
 
     private ProgressMonitor getMonitor() {
@@ -1354,17 +1354,17 @@ public class DataSetSelector extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        browseButton = new javax.swing.JButton();
+        inspectButton = new javax.swing.JButton();
         plotItButton = new javax.swing.JButton();
         dataSetSelector = new javax.swing.JComboBox();
 
-        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
-        browseButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
-        browseButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        browseButton.setName("browse"); // NOI18N
-        browseButton.addActionListener(new java.awt.event.ActionListener() {
+        inspectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
+        inspectButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
+        inspectButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        inspectButton.setName("browse"); // NOI18N
+        inspectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtonActionPerformed(evt);
+                inspectButtonActionPerformed(evt);
             }
         });
 
@@ -1419,10 +1419,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        layout.linkSize(new java.awt.Component[] {browseButton, plotItButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -1430,14 +1430,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                         .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        layout.linkSize(new java.awt.Component[] {browseButton, dataSetSelector, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {dataSetSelector, inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
-        browseButton.getAccessibleContext().setAccessibleDescription("inspect contents of file or directory");
+        inspectButton.getAccessibleContext().setAccessibleDescription("inspect contents of file or directory");
     }// </editor-fold>//GEN-END:initComponents
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
@@ -1450,7 +1450,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         maybePlot(true);
     }//GEN-LAST:event_plotItButtonActionPerformed
 
-    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+    private void inspectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);            
         String context = ((String) dataSetSelector.getEditor().getItem()).trim();
         if ( context==null ) context= "";
@@ -1534,7 +1534,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 showCompletions();
             }
         }
-    }//GEN-LAST:event_browseButtonActionPerformed
+    }//GEN-LAST:event_inspectButtonActionPerformed
 
 private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
     if (doItemStateChange && evt.getStateChange() == ItemEvent.SELECTED) {
@@ -1562,8 +1562,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 }//GEN-LAST:event_dataSetSelectorPopupMenuCanceled
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseButton;
     private javax.swing.JComboBox dataSetSelector;
+    private javax.swing.JButton inspectButton;
     private javax.swing.JButton plotItButton;
     // End of variables declaration//GEN-END:variables
 
