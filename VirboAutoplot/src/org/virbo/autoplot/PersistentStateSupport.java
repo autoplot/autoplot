@@ -165,12 +165,7 @@ public class PersistentStateSupport {
         this.ext= "."+extension;
         this.component= parent;
         Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
-        String currentDirString= prefs.get( PREF_DIR+ext, "" );
-        if ( !currentDirString.equals("") ) {
-            setDirectory( new File(currentDirString).getAbsolutePath() );
-        } else {
-            setDirectory( "" );
-        }
+        setDirectory( "" );
         String recentFileString= prefs.get( PREF_FILE+ext+"_recent", "" );
         setRecentFiles( recentFileString );
     }
