@@ -52,7 +52,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -84,7 +83,6 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.Entities;
-import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -103,7 +101,6 @@ import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
-import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -118,7 +115,7 @@ import org.virbo.datasource.DataSourceFormat;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Extra methods to support AutoplotUI.
  * @author jbf
  */
 public class GuiSupport {
@@ -804,6 +801,8 @@ public class GuiSupport {
         JMenu result = new JMenu("Plot Style");
         JMenuItem mi;
 
+        result.setName(plot.getId()+"_ezaccessmenu");
+        
         Map<String,RenderType> tt= getRenderTypeForString();
 
         //tt.put( "Contour Plot", RenderType.contour );  //this has issues, hide for now.
@@ -1436,7 +1435,7 @@ public class GuiSupport {
         List<JMenuItem> expertMenuItems= new ArrayList();
 
         JMenuItem mi;
-
+        
         mi= new JMenuItem(new AbstractAction("Plot Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1699,6 +1698,8 @@ public class GuiSupport {
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
         plotController.setExpertMenuItems( expertMenuItems.toArray(new JMenuItem[expertMenuItems.size()] ) );
+
+        plot.getDasMouseInputAdapter().setMenuLabel(domPlot.getId());        
 
     }
 
