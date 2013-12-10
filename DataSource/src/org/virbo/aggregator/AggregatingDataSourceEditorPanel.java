@@ -255,6 +255,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         String syr = String.valueOf(yearsComboBox.getSelectedItem()).trim();
         String smn = String.valueOf(monthsComboBox.getSelectedItem()).trim();
         String sday = String.valueOf(daysComboBox.getSelectedItem()).trim();
@@ -288,10 +289,12 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }//GEN-LAST:event_monthsComboBoxItemStateChanged
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         AutoplotHelpSystem.getHelpSystem().displayHelpFromEvent(evt,this);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool t=new TimeRangeTool();
         String tr= timeRangeTextField.getText();
         if ( tr.trim().length()==0 ) {
@@ -305,6 +308,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }//GEN-LAST:event_timeRangeToolButtonActionPerformed
 
     private void availabilityCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_availabilityCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         // TODO add your handling code here:
     }//GEN-LAST:event_availabilityCBActionPerformed
 
