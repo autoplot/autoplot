@@ -2647,6 +2647,7 @@ APSplash.checkTime("init 52");
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         String uri= (String) dataSetSelector.getValue();
+        org.das2.util.LoggerManager.getLogger("gui").log(Level.FINE, "plot URI \"{0}\"", uri);
         ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setFocusURI(uri);
         if ( this.isExpertMode() ) {
             if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
