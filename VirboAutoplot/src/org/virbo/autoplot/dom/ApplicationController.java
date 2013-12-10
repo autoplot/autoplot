@@ -2207,6 +2207,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
         }
+        if ( SwingUtilities.isEventDispatchThread() && ( oldPlotElement!=plotElement ) ) {
+            Logger.getLogger("gui").log(Level.FINE, "set plotElement {0}", plotElement);
+        }
         this.plotElement = plotElement;
         propertyChangeSupport.firePropertyChange(PROP_PLOT_ELEMENT, oldPlotElement, plotElement);
     }
@@ -2222,6 +2225,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public void setPlot(Plot plot) {
         Plot oldPlot = this.plot;
+        if ( SwingUtilities.isEventDispatchThread() && ( oldPlot!=plot ) ) {
+            Logger.getLogger("gui").log(Level.FINE, "set plot {0}", plot);
+        }
         this.plot = plot;
         propertyChangeSupport.firePropertyChange(PROP_PLOT, oldPlot, plot);
     }
@@ -2237,6 +2243,10 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public void setCanvas(Canvas canvas) {
         Canvas oldCanvas = this.canvas;
+        if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {
+            Logger.getLogger("gui").log(Level.FINE, "set canvas {0}", canvas);
+        }        
+
         this.canvas = canvas;
         propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
     }
