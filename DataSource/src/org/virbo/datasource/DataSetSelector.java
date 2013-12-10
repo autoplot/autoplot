@@ -75,6 +75,7 @@ import org.das2.datum.OrbitDatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI.CompletionResult;
@@ -118,6 +119,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 // some DataSource constructors do not return in interactive time, so create a new thread for now.
+                LoggerManager.logGuiEvent(ev);
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
@@ -131,6 +133,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 RequestProcessor.invokeLater(run);
             }
         });
+        maybePlotTimer.setActionCommand("maybePlot");
         maybePlotTimer.setRepeats(false);
 
         editor.addMouseListener( new MouseAdapter() {
@@ -1384,11 +1387,6 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
         dataSetSelector.setToolTipText("Enter data source address");
         dataSetSelector.setMinimumSize(new java.awt.Dimension(20, 20));
-        dataSetSelector.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                dataSetSelectorMouseClicked(evt);
-            }
-        });
         dataSetSelector.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
                 dataSetSelectorPopupMenuCanceled(evt);
@@ -1397,16 +1395,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                 dataSetSelectorPopupMenuWillBecomeInvisible(evt);
             }
             public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
-            }
-        });
-        dataSetSelector.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                dataSetSelectorItemStateChanged(evt);
-            }
-        });
-        dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataSetSelectorActionPerformed(evt);
             }
         });
 
@@ -1439,9 +1427,6 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         inspectButton.getAccessibleContext().setAccessibleDescription("inspect contents of file or directory");
     }// </editor-fold>//GEN-END:initComponents
-    private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
-        // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
-    }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);            
@@ -1535,12 +1520,6 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_inspectButtonActionPerformed
-
-private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
-    if (doItemStateChange && evt.getStateChange() == ItemEvent.SELECTED) {
-        maybePlot(false);
-    }
-}//GEN-LAST:event_dataSetSelectorItemStateChanged
     private boolean popupCancelled = false;
 
 private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuWillBecomeInvisible
@@ -1553,9 +1532,6 @@ private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.Popup
     }
     popupCancelled = false;
 }//GEN-LAST:event_dataSetSelectorPopupMenuWillBecomeInvisible
-
-private void dataSetSelectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dataSetSelectorMouseClicked
-}//GEN-LAST:event_dataSetSelectorMouseClicked
 
 private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuCanceled
     popupCancelled = true;
@@ -1592,7 +1568,6 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             return val.trim();
         }
     }
-    private boolean doItemStateChange = false;
 
     /**
      * Set the current value for the editor.  This does not fire an event, so call maybePlot() to accept the value.
@@ -1605,12 +1580,10 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             value="";
         }
         value= URISplit.makeColloquial( value );
-        doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
         this.editor.setText(value);
         //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
-    //doItemStateChange = true;
     }
     /**
      * Holds value of property browseTypeExt.
