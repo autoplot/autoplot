@@ -457,6 +457,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * fire off the event that indicates a new URI has been entered.
+     */
     private void firePlotDataSetURL() {
         List<String> r = new ArrayList<String>(getRecent());
         String value = getValue();
@@ -470,9 +473,13 @@ public class DataSetSelector extends javax.swing.JPanel {
             r.remove(0);
         }
 
-        ActionEvent e = new ActionEvent(this, 123, "dataSetSelect", keyModifiers);
-        fireActionListenerActionPerformed(e);
-
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                ActionEvent e = new ActionEvent(this, 123, "dataSetSelect", keyModifiers);
+                fireActionListenerActionPerformed(e);
+            }
+        }  );
+        
     }
 
     /**
