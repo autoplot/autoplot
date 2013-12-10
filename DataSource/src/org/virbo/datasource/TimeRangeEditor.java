@@ -75,6 +75,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         recentComboBox.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 parseRange();
             }
         });
@@ -499,6 +500,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             result.add( new AbstractAction( alternatePeer ) {
                 @Override
                 public void actionPerformed(ActionEvent ev) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     Container trp= TimeRangeEditor.this.getParent();
                     ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
                 }
