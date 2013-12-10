@@ -361,6 +361,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         item = new JMenuItem(new AbstractAction("Delete Plot") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 if (application.getPlots().length > 1) {
                     List<PlotElement> plotElements = getPlotElementsFor(domPlot);
                     for (PlotElement pele : plotElements) {
@@ -386,6 +387,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 List<BindingModel> bms= new ArrayList<BindingModel>();
 
                 List<PlotElement> peles = getPlotElementsFor(domPlot);
@@ -410,6 +412,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         item = new JMenuItem(new AbstractAction("Bind Plot Context to Application Time Range") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 bind( application, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
             }
         });
