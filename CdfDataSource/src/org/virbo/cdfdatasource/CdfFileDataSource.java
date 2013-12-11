@@ -87,7 +87,14 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 try {
                     QDataSet result= rcent.park( mon );
-                    return result;
+                    if ( result==null ) { 
+                        logger.fine("result after parking is null");
+                        Thread.sleep(100); // experiment with this condition.
+                        result= rcent.park( mon ); // this is still null
+                        return getDataSet(mon);    // this is successful.
+                    } else {
+                        return result;
+                    }
                 } catch ( IOException ex ) {
                     throw (IOException)ex;
                 } catch ( CDFException ex ) {
@@ -331,6 +338,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
 
             if ( rcent!=null ) rcent.finished(result);
+            
+            logger.log(Level.FINE, "loaded {0}", result);
             return result;
 
         } catch (CDFException ex) {
