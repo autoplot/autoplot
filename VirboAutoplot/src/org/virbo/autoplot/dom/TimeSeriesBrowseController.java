@@ -249,9 +249,9 @@ public class TimeSeriesBrowseController {
                 if (plot.getXAxis().valueIsAdjusting()) {
                     return;
                 } 
-                if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) {
-                    return;
-                }
+                //if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) { // This must be commented out because of 1140.  I'm not sure why this was inserted in the first place.
+                //    return;
+                //}
                 if (e.getPropertyName().equals("datumRange")) {
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
