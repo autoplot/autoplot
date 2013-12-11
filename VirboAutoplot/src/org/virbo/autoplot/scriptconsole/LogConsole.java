@@ -51,6 +51,7 @@ import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.python.core.PyException;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
@@ -92,6 +93,7 @@ public class LogConsole extends javax.swing.JPanel {
         commandLineTextPane1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
                 final String s = commandLineTextPane1.getText();
                 RequestProcessor.invokeLater(new Runnable() {
                     @Override
@@ -576,11 +578,13 @@ public class LogConsole extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
+    LoggerManager.logGuiEvent(evt);        
     records.clear();
     update();
 }//GEN-LAST:event_clearButtonActionPerformed
 
 private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+    LoggerManager.logGuiEvent(evt);        
     if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
         JFileChooser chooser = new JFileChooser();
         if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
@@ -627,6 +631,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_saveButtonActionPerformed
 
 private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+    LoggerManager.logGuiEvent(evt);        
     try {
         ByteArrayOutputStream out = new ByteArrayOutputStream(1000);
         LogConsoleUtil.serializeLogRecords(records, out);
@@ -649,6 +654,7 @@ private void commandLineTextPane1FocusGained(java.awt.event.FocusEvent evt) {//G
 }//GEN-LAST:event_commandLineTextPane1FocusGained
 
 private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    LoggerManager.logGuiEvent(evt);        
     getSettingsDialog().setVisible(true);
 }//GEN-LAST:event_jButton1ActionPerformed
 
