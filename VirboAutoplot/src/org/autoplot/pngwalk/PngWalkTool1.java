@@ -69,6 +69,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -298,6 +299,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);                        
                 final String suri;
                 if ( tool.seq==null ) {
                     suri=null;
@@ -461,11 +463,13 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
             public void actionPerformed( ActionEvent e ) {
+                LoggerManager.logGuiEvent(e);        
                 saveLocalCopy(tool,tool.getSelectedFile());
             }
         } );
         fileMenu.add( new AbstractAction( "Show Autoplot" ) {
             public void actionPerformed(ActionEvent ae) {
+               LoggerManager.logGuiEvent(ae);        
                AppManager appman= AppManager.getInstance();
                for ( int i=0; i< appman.getApplicationCount(); i++ ) {
                    if ( appman.getApplication(i) instanceof AutoplotUI  ) {
@@ -482,6 +486,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         } );
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
                     if ( JOptionPane.OK_OPTION==
                             JOptionPane.showConfirmDialog( tool,
@@ -498,6 +503,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         fileMenu.add( new AbstractAction( "Quit" ) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
                 if ( AppManager.getInstance().requestQuit() ) {
                     frame.dispose();
                     AppManager.getInstance().quit();
@@ -512,6 +518,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         JMenu navMenu= new JMenu("Navigate");
         navMenu.add( new AbstractAction( "Go To Date..." ) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
                 DatumRange dr= tool.seq.getTimeSpan();
                 String str;
                 if ( dr!=null ) {
@@ -542,6 +549,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         navMenu.add( new AbstractAction( "Previous Item" ) {
             public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
                tool.seq.skipBy( -1 );
             }
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_LEFT, 0 ));
@@ -549,6 +557,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         navMenu.add( new AbstractAction( "Next Item" ) {
             public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
                tool.seq.skipBy( 1 );
             }
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_RIGHT, 0 ));
@@ -571,6 +580,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             mi= new JCheckBoxMenuItem(
                new AbstractAction(""+fsize+" px" ) {
                   public void actionPerformed( ActionEvent e ) {
+                      LoggerManager.logGuiEvent(e);        
                       tool.setThumbnailSize(fsize);
                   }
                }
@@ -585,6 +595,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         final JMenuItem qc= new JMenuItem( new AbstractAction( "Start QC" ) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
                 if ( !tool.isQualityControlEnabled() ) {
                     tool.startQC();
                 }
@@ -1315,23 +1326,28 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.skipBy( 1 );
 }//GEN-LAST:event_nextButtonActionPerformed
 
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.skipBy( -1 );
     }//GEN-LAST:event_prevButtonActionPerformed
 
     private void nextSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSetButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.skipBy( 7 );
 }//GEN-LAST:event_nextSetButtonActionPerformed
 
     private void prevSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevSetButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.skipBy( -7 );
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
         try {
+            LoggerManager.logGuiEvent(evt);
             timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
             DatumRange range= DatumRangeUtil.parseTimeRange(timeFilterTextField.getText());
             seq.setActiveSubrange( range );
@@ -1357,14 +1373,17 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     }//GEN-LAST:event_timeFilterTextFieldFocusLost
 
     private void jumpToLastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpToLastButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.last();
     }//GEN-LAST:event_jumpToLastButtonActionPerformed
 
     private void jumpToFirstButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpToFirstButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         seq.first();
     }//GEN-LAST:event_jumpToFirstButtonActionPerformed
 
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
+        LoggerManager.logGuiEvent(evt);
         String t= dataSetSelector1.getValue();
         if ( t.endsWith(".pngwalk") ) {
             t= readPngwalkFile(t);
@@ -1377,6 +1396,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     }//GEN-LAST:event_showMissingCheckBoxItemStateChanged
 
     private void editRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRangeButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         Frame myFrame = (java.awt.Frame)SwingUtilities.getWindowAncestor(this);
         SubrangeEditorDialog d = new SubrangeEditorDialog(myFrame, true);
         List<DatumRange> times= seq.getAllTimes();
