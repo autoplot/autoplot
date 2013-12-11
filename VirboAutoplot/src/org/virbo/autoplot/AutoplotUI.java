@@ -1491,22 +1491,23 @@ APSplash.checkTime("init 52");
         logConsole.turnOffConsoleHandlers();
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
+        // This is that place that sets up loggers.  Why do we do this???  It prevents -Djava.util.logging.config.file from working.
         Handler h = logConsole.getHandler();
-        Logger.getLogger("das2").setLevel(Level.INFO);  // see http://www.autoplot.org/developer.logging
+        //Logger.getLogger("das2").setLevel(Level.INFO);  // see http://www.autoplot.org/developer.logging
         Logger.getLogger("das2").addHandler(h);
-        Logger.getLogger("datum").setLevel(Level.INFO);
+        //Logger.getLogger("datum").setLevel(Level.INFO);
         Logger.getLogger("datum").addHandler(h);
-        Logger.getLogger("qdataset").setLevel(Level.INFO);
+        //Logger.getLogger("qdataset").setLevel(Level.INFO);
         Logger.getLogger("qdataset").addHandler(h);
-        Logger.getLogger("autoplot").setLevel(Level.INFO);
+        //Logger.getLogger("autoplot").setLevel(Level.INFO);
         Logger.getLogger("autoplot").addHandler(h);
-        Logger.getLogger("apdss").setLevel(Level.INFO);
+        //Logger.getLogger("apdss").setLevel(Level.INFO);
         Logger.getLogger("apdss").addHandler(h);
-        Logger.getLogger("jython").setLevel(Level.INFO);
+        //Logger.getLogger("jython").setLevel(Level.INFO);
         Logger.getLogger("jython").addHandler(h);
-        Logger.getLogger("console").setLevel(Level.INFO);
-        Logger.getLogger("console").addHandler(h); // stderr, stdout
-        Logger.getLogger("gui").setLevel(Level.INFO);                 //TODO: this doesn't seem right.  Can't we just set it for ""?
+        //Logger.getLogger("console").setLevel(Level.INFO);
+        Logger.getLogger("console").addHandler(h); // stderr, stdout        
+        //Logger.getLogger("gui").setLevel(Level.INFO);                 //TODO: this doesn't seem right.  Can't we just set it for ""?
         Logger.getLogger("gui").addHandler(h);
 
         setMessage("log console added");
