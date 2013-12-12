@@ -1058,6 +1058,7 @@ APSplash.checkTime("init 270");
         applicationModel.dom.getController().addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent evt ) {
+                // No need to log, this is not human-generated.
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.log( Level.FINER, "state change: {0}", evt);
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
@@ -1438,6 +1439,7 @@ APSplash.checkTime("init 52");
         fileMenu.add( new AbstractAction( "Close" ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
                     int opt= JOptionPane.showConfirmDialog( AutoplotUI.this,
                             "Quit application?", "Quit Autoplot", JOptionPane.YES_NO_CANCEL_OPTION );
@@ -4047,7 +4049,8 @@ APSplash.checkTime("init 240");
                         Action a= new AbstractAction(t.getTitle()) {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                try {
+                                org.das2.util.LoggerManager.logGuiEvent(e);
+                                try {    
                                     runTool( suri, ActionEvent.SHIFT_MASK );
                                     //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
                                 } catch (MalformedURLException ex) {
