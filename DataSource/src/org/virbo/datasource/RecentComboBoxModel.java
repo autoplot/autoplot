@@ -129,7 +129,9 @@ public class RecentComboBoxModel extends DefaultComboBoxModel implements ActionL
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
+        org.das2.util.LoggerManager.logGuiEvent(e);    
 
         String s = getSelectedItem().toString();
 
