@@ -8,6 +8,7 @@
  */
 package org.virbo.aggregator;
 
+import java.io.FileNotFoundException;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,7 +166,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         String delegateFile= getRepresentativeFile( fsm, surl, null );
 
         if (delegateFile == null) {
-            throw new IllegalArgumentException("unable to find any files");
+            throw new FileNotFoundException("unable to find any files matching\n"+surl);
         }
 
         URISplit split = URISplit.parse(surl);
