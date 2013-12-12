@@ -256,6 +256,7 @@ public class TimeSeriesBrowseController {
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                        logger.log(Level.FINE, "setTimeRange({0}) because of datumRange", dr);
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
@@ -263,6 +264,7 @@ public class TimeSeriesBrowseController {
                     DatumRange dr=(DatumRange)e.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                        logger.log(Level.FINE, "setTimeRange({0}) because of context", dr);
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
