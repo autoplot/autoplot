@@ -32,6 +32,7 @@ import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.util.LoggerManager;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -131,6 +132,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         this.textArea.getActionMap().put( "save", new AbstractAction( "save" ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                LoggerManager.logGuiEvent(e);                
                 try {
                     support.save();
                 } catch (FileNotFoundException ex) {
@@ -148,18 +150,21 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("makePngWalk.jy") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 loadExample( "/scripts/pngwalk/makePngWalk.jy" );
             }
         });
         menu.addExampleAction( new AbstractAction("addDigitizer.jy") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 loadExample( "/scripts/addDigitizer.jy" );
             }
         });
         menu.addExampleAction( new AbstractAction("splineDemo.jy") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 loadExample( "/scripts/splineDemo.jy" );
             }
         });
@@ -167,6 +172,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("More Jython Scripts...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/" );
             }
         });
@@ -174,6 +180,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("mashup.jyds") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 loadExample( "/mashup.jyds" );
             }
         });
@@ -181,6 +188,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("rheology.jyds") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 loadExample( "/rheology.jyds" );
             }
         });
@@ -188,6 +196,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         menu.addExampleAction( new AbstractAction("More Jython Data Source Scripts...") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonDataSource/src/" );
             }
         });
