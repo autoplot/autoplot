@@ -549,6 +549,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }// </editor-fold>//GEN-END:initComponents
 
     private void pickDsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickDsButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         pickDs();
     }//GEN-LAST:event_pickDsButtonActionPerformed
 
@@ -557,6 +558,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
     private void dsidComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dsidComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         parameterPanel.removeAll();
         messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
         parameterPanel.add( messageComponent, BorderLayout.NORTH );
@@ -573,6 +575,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }//GEN-LAST:event_dsidComboBoxActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
         JTextField tf= timeRangeTextField;
         tt.setSelectedRange(tf.getText());
