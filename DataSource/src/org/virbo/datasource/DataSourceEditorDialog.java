@@ -162,23 +162,27 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     this.cancelled= true;
     this.setVisible(false);
 }//GEN-LAST:event_cancelButtonActionPerformed
 
 private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     this.cancelled= false;
     this.setModifiers(evt.getModifiers());
     this.setVisible(false);
 }//GEN-LAST:event_okayButtonActionPerformed
 
 private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     this.cancelled= false;
     setModifiers( KeyEvent.CTRL_MASK );
     this.setVisible(false);
 }//GEN-LAST:event_plotBelowButtonActionPerformed
 
 private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overplotButtonActionPerformed
+    org.das2.util.LoggerManager.logGuiEvent(evt);
     this.cancelled= false;
     setModifiers( KeyEvent.SHIFT_MASK );
     this.setVisible(false);
