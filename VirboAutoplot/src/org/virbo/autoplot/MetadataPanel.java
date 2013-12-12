@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -523,6 +524,7 @@ public class MetadataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void copyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyMenuItemActionPerformed
+        LoggerManager.logGuiEvent(evt);
         TreePath tp= metaDataTree.getSelectionPath();
         StringSelection stringSelection = new StringSelection( tp.getLastPathComponent().toString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
