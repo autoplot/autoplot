@@ -13,11 +13,10 @@ package org.virbo.datasource;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 
 /**
- * Dialog for explcitly selecting data source type.
+ * Dialog for explicitly selecting data source type.
  * @author jbf
  */
 public class SourceTypesBrowser extends javax.swing.JPanel {
@@ -65,7 +64,7 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
     
     private void initTypes() {
         DefaultComboBoxModel model= new DefaultComboBoxModel();
-        List<CompletionContext> cc= DataSourceRegistry.getInstance().getPlugins();
+        List<CompletionContext> cc= DataSourceRegistry.getPlugins();
         types= new ArrayList(cc.size());
         for ( int i=0; i<cc.size(); i++ ) {
             String label= cc.get(i).completable;
