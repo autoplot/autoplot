@@ -33,6 +33,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.FileUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -69,8 +70,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
 
     Action getDeleteAction(final JTree jtree) {
         return new AbstractAction("Delete") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 FSTreeModel model = (FSTreeModel) jtree.getModel();
 
                 TreePath[] paths = jtree.getSelectionPaths();
@@ -114,9 +116,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
 
     Action getPlotAction(final JTree jtree) {
         return new AbstractAction("Plot") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
-
+                LoggerManager.logGuiEvent(e);
                 if ( doPlotSelected() ) return;
 
                 Component p= JDiskHogPanel.this.getTopLevelAncestor();
@@ -173,7 +175,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
      */
     Action getPruneTreeAction(final JTree jtree) {
         return new AbstractAction("Prune empty branches") {
+            @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
             
                 File local = getSelectedFile(jtree);
                 if ( local==null ) {
@@ -221,8 +225,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
     Action getCopyToAction(final JTree jtree) {
         final File f= getSelectedFile(jtree);
         return new AbstractAction("Copy To...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 if ( f==null ) {
                     return;
                 }
@@ -273,8 +278,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
     
     Action getLocalROCacheAction(final JTree jtree) {
         return new AbstractAction("Link to Local Read-Only Cache...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 FSTreeModel model = (FSTreeModel) jtree.getModel();
 
                 TreePath path = jtree.getSelectionPath();
@@ -429,15 +435,18 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        LoggerManager.logGuiEvent(evt);
         SwingUtilities.getWindowAncestor(this).setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
         goPressed= true;
         SwingUtilities.getWindowAncestor(this).setVisible(false);
     }//GEN-LAST:event_goButtonActionPerformed
 
     private void sortCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortCBActionPerformed
+        LoggerManager.logGuiEvent(evt);
         if ( !( jTree1.getModel() instanceof FSTreeModel ) ) return;
         FSTreeModel model= ((FSTreeModel)jTree1.getModel());
         if ( sortCB.getSelectedIndex()==0 ) {
