@@ -91,6 +91,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
 
         recentComboBox.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
@@ -108,11 +109,13 @@ public class DataPanel extends javax.swing.JPanel {
         this.dom = dom;
         this.applicationController= this.dom.getController();
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doPlotElementBindings();
             }
         });
         this.applicationController.addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doDataSourceFilterBindings();
             }
@@ -120,6 +123,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         if ( sliceIndexListener==null ) {
             sliceIndexListener= new MouseWheelListener() {
+                @Override
                 public void mouseWheelMoved(MouseWheelEvent e) {
                     int pos = (Integer) sliceIndexSpinner.getValue();
                     pos -= e.getWheelRotation();
@@ -136,6 +140,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         if ( sliceIndexListener2==null ) {
             sliceIndexListener2= new MouseWheelListener() {
+                @Override
                 public void mouseWheelMoved(MouseWheelEvent e) {
                     doIncrUp(-1 * e.getWheelRotation());
                 }
@@ -147,6 +152,7 @@ public class DataPanel extends javax.swing.JPanel {
         componentTextField1.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0), "INCREMENT_DOWN" );
         ActionMap am= componentTextField1.getActionMap();
         am.put( "INCREMENT_UP", new AbstractAction("incr_up") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 incrUpCount++;
@@ -161,6 +167,7 @@ public class DataPanel extends javax.swing.JPanel {
         } );
         
         am.put( "INCREMENT_DOWN", new AbstractAction("incr_down") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 incrUpCount--;
@@ -175,6 +182,7 @@ public class DataPanel extends javax.swing.JPanel {
         } );
 
         compListener= new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 componentChanged();
             }
@@ -185,23 +193,28 @@ public class DataPanel extends javax.swing.JPanel {
 
         componentTextField1.setText(" ");
         componentTextField1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 componentTextFieldMousePressed(evt);
             }
+            @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 componentTextFieldMouseReleased(evt);
             }
         });
         componentTextField1.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 org.das2.util.LoggerManager.logGuiEvent(evt);                
                 componentTextFieldActionPerformed(evt);
             }
         });
         componentTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 componentTextFieldFocusGained(evt);
             }
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 componentTextFieldFocusLost(evt);
             }
@@ -269,7 +282,7 @@ public class DataPanel extends javax.swing.JPanel {
                 applicationController.getPlotElement().setComponent( componentTextField1.getText() );
                 componentTextField1.setCaretPosition(cp);
             } catch ( ArrayIndexOutOfBoundsException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.WARNING, ex.getMessage(), ex );
                 componentTextField1.setText(olds);
                 applicationController.getPlotElement().setComponent( componentTextField1.getText() );
                 componentTextField1.setCaretPosition(cp);
@@ -280,6 +293,7 @@ public class DataPanel extends javax.swing.JPanel {
     private int incrUpCount=0; // number to send to incrUp
 
     TickleTimer tt= new TickleTimer( 100, new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( incrUpCount!=0 ) {
                 doIncrUp(incrUpCount);
@@ -320,9 +334,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
         if ( element!=null ) {
             element.setComponentAutomatically(sprocess);
-        } else {
-            new Exception("who entered this code").printStackTrace();
-        }
+        } 
     }
 
     private void componentChanged() {
@@ -377,6 +389,7 @@ public class DataPanel extends javax.swing.JPanel {
     private BindingGroup elementBindingGroup;
 
     transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
                     updateSliceTypeComboBox( applicationController.getDataSourceFilter(), false );
@@ -403,6 +416,7 @@ public class DataPanel extends javax.swing.JPanel {
             }
         } else {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
                     if ( element!=null && !componentTextField1.getText().equals( element.getComponent() ) ) {
@@ -419,6 +433,7 @@ public class DataPanel extends javax.swing.JPanel {
      * TODO: make sure this is released so stray datasets can be garbage collected.
      */
     PropertyChangeListener contextListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateProcessDataSetLabel();
         }
@@ -501,14 +516,13 @@ public class DataPanel extends javax.swing.JPanel {
         }
         dataSourceFilterBindingGroup = bc;
 
-        if ( newDsf!=null ) {
-            int sliceDimension= sliceTypeComboBox.getSelectedIndex();
-            int max= newDsf.getController().getMaxSliceIndex( sliceDimension );
-            if ( max>0 ) sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, max-1, 1) );
-        }
+        int sliceDimension= sliceTypeComboBox.getSelectedIndex();
+        int max= newDsf.getController().getMaxSliceIndex( sliceDimension );
+        if ( max>0 ) sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, max-1, 1) );
 
         dsfListener= new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
                     updateSliceTypeComboBox( newDsf, false );
@@ -523,6 +537,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     private JMenuItem createMenuItem( final String insert, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                                
                 String v= componentTextField1.getText();
