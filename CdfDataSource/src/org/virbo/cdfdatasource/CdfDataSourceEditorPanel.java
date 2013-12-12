@@ -32,6 +32,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
@@ -147,7 +148,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereTF, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), whereCB, org.jdesktop.beansbinding.BeanProperty.create("selected"));
         bindingGroup.addBinding(binding);
 
-        whereParamList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        whereParamList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { " " }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -173,7 +174,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(12, 12, 12)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel3Layout.createSequentialGroup()
-                        .add(whereParamList, 0, 128, Short.MAX_VALUE)
+                        .add(whereParamList, 0, 123, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -199,7 +200,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     .add(whereParamList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(whereTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(interpretMetadataLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -368,7 +369,16 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             if ( cdfException!=null ) {
                 this.selectVariableLabel.setText( " " );
                 this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("Error") ) );
-                this.paramInfo.setText( "\n"+cdfException.toString() );
+                String txt= "<html>\n"+cdfException.toString();
+                try {
+                    String magic= FileUtil.getMagic( cdfFile );
+                    if ( magic.substring(1).equals("HDF") ) {
+                        txt= txt+"<br><br><p color='#FF0000'>File appears to be a HDF (or maybe NetCDF) file.</p>";
+                    }
+                } catch ( IOException ex ) {
+                    logger.log(Level.WARNING,ex.toString(),ex);
+                }
+                this.paramInfo.setText( txt );
                 return;
             }
             
