@@ -160,6 +160,7 @@ public class RecentComboBox extends JComboBox {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        org.das2.util.LoggerManager.logGuiEvent(e);        
         super.actionPerformed(e);
 
         String s = getSelectedItem().toString();
