@@ -53,6 +53,7 @@ public class CompletionsList {
                     Action a = new AbstractAction(label) {
                         @Override
                         public void actionPerformed(ActionEvent ev) {
+                            org.das2.util.LoggerManager.logGuiEvent(ev);                    
                             listener.itemSelected(s1);
                         }
                     };
