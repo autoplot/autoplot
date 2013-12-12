@@ -135,7 +135,7 @@ cd temp-volatile-src
 #mkdir -p ../temp-volatile-classes/org/virbo/datasource/
 #mkdir -p ../temp-volatile-classes/org/netbeans/modules/editor/completion/resources/
 
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xsl' -o -name '*.xsd' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
