@@ -1811,6 +1811,9 @@ public class GuiSupport {
         frame.setAlwaysOnTop(false); // security exception
     }
 
+    /**
+     * legacy code for adding examples to a text field.
+     */
     public static MouseAdapter createExamplesPopup( final JTextField tf, final String [] labels, final String[] tooltips ) {
         return new MouseAdapter() {
             private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
