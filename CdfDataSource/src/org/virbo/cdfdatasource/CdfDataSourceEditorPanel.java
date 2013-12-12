@@ -247,6 +247,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     }// </editor-fold>//GEN-END:initComponents
 
     private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);    
         setURI( getURI() );
     }//GEN-LAST:event_showAllVarTypeCBActionPerformed
 
