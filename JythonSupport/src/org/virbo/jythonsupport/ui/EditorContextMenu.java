@@ -27,6 +27,7 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceUtil;
 
@@ -116,6 +117,7 @@ public class EditorContextMenu {
     private JMenuItem createInsertMenuItem( String label, final String text ) {
         JMenuItem result= new JMenuItem( new AbstractAction( label ) {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);                                
                 insertCode( text );
             }
         } );
@@ -237,6 +239,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam()") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     String var= editor.getSelectedText();
                     logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
@@ -252,6 +255,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() with enumeration") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     insertCode( "sc= getParam( 'sc', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
                 }
             };
@@ -261,6 +265,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() for boolean checkbox") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     insertCode( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
                 }
             };
@@ -271,6 +276,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() for timerange to support time series browse") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     insertCode( "tr= getParam( 'timerange', '2012-04-18', 'timerange to load' )\n");
                 }
             };
@@ -280,6 +286,7 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() to get the resource URI") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     insertCode( "resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/rainfall_KIOW_20120522_0252.html', 'example file to load' )\n" );
                 }
             };
@@ -308,6 +315,7 @@ public class EditorContextMenu {
             
             a= new AbstractAction("getDataSet()") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     String var= editor.getSelectedText();
                     String surl= dataSetSelector.getValue();
                     if ( var==null || var.length()==0 ) {
@@ -336,6 +344,7 @@ public class EditorContextMenu {
             
             JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     String doThis= editor.getSelectedText();
                     if ( doThis==null ) return;
                     editor.plot(doThis);
@@ -345,6 +354,7 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("indent block") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
@@ -362,6 +372,7 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("dedent block") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
@@ -379,6 +390,7 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("comment block") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
@@ -396,6 +408,7 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("uncomment block") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
@@ -417,6 +430,7 @@ public class EditorContextMenu {
             JMenu settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
                     PropertyEditor p= new PropertyEditor(settings);
                     p.showModalDialog(editor);
@@ -427,6 +441,7 @@ public class EditorContextMenu {
 
             mi= new JMenuItem( new AbstractAction("Pick Font...") {
                 public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
                     JFrame parent= (JFrame)SwingUtilities.getWindowAncestor( editor );
                     JFontChooser chooser = new JFontChooser( parent );
                     chooser.setLocationRelativeTo( editor );
