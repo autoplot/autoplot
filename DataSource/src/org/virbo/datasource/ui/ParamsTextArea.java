@@ -25,7 +25,10 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSourceFactory;
 
 /**
- *
+ * Attempt to make a general-purpose way to make a GUI for a data
+ * source.  This should probably be evaluated, because there's another
+ * automatic gui-creator that is more effective.
+ * 
  * @author jbf
  */
 public class ParamsTextArea extends JTextArea {
@@ -89,7 +92,9 @@ public class ParamsTextArea extends JTextArea {
             for ( int i=0; i<ccs.size(); i++ ) {
                 final CompletionContext acc= ccs.get(i);
                 JMenuItem mi= new JMenuItem( new AbstractAction( acc.label) {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);
                         insert( acc.completable, pos );
                     }
                 } );
@@ -121,9 +126,9 @@ public class ParamsTextArea extends JTextArea {
      }
 
      public void setParams( Map<String,String> params ) {
-        StringBuffer paramsStr= new StringBuffer();
+        StringBuilder paramsStr= new StringBuilder();
         for ( Entry<String,String> e: params.entrySet() ) {
-            paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
+            paramsStr.append(e.getKey()).append("=").append(e.getValue()).append("\n");
         }
         setText(paramsStr.toString());
      }
