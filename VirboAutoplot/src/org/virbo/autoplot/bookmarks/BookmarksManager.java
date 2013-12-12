@@ -1602,7 +1602,12 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
 
     public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
-        updateBookmarks( bookmarksMenu, null, dataSetSelector );
+        Container c= getParent();
+        if ( c instanceof AutoplotUI ) {
+            updateBookmarks( bookmarksMenu, (AutoplotUI)c, dataSetSelector );
+        } else {
+            updateBookmarks( bookmarksMenu, null, dataSetSelector ); //TODO: rfe336 this is going to cause problems with delay menu if we start using Craig's suggestion.
+        }
     }
 
     public void updateBookmarks( JMenu bookmarksMenu, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
@@ -1671,7 +1676,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         this.sel= select;
 
-        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, app );
+        DelayMenu.calculateMenu( bookmarksMenu, bookmarks, treeDepth, select, app );
         if ( bookmarksMenu.isPopupMenuVisible() ) {
             select.setMessage("Bookmarks updated");
         }
