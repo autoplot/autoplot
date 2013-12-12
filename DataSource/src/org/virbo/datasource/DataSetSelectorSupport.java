@@ -6,11 +6,9 @@ package org.virbo.datasource;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
@@ -167,8 +165,9 @@ public class DataSetSelectorSupport {
 
     public Action openLocalAction() {
         return new AbstractAction("Add Plot from Local File...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
                 String result= browseLocal(ui);
 
                 if (result != null ) {
@@ -183,8 +182,9 @@ public class DataSetSelectorSupport {
 
     public Action openLocalVapAction() {
         return new AbstractAction("Open .vap File...") {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
                 String result= browseLocalVap(ui);
 
                 if (result != null ) {
@@ -207,8 +207,9 @@ public class DataSetSelectorSupport {
             for (String s : recent) {
                 final String f = s;
                 Action a = new AbstractAction(String.valueOf(f)) {
-
+                    @Override
                     public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);            
                         ui.setValue(f);
                         ui.maybePlot(false);
                     }
