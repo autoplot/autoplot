@@ -33,8 +33,12 @@ public class DelayMenu extends JMenu {
     final static int MAX_LABEL_LEN = 30; // folder item description length
     final static int TRIM_TAIL_LEN = 10;
 
+    static boolean oldLogic= true;
 
-    protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final AutoplotUI ui ) {
+    protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel, final AutoplotUI ui ) {
+        if ( !oldLogic && ui==null ) {
+            throw new IllegalArgumentException("this is not properly implemented");
+        }
         List<Bookmark> content= bookmarks;
         for ( int i=0; i<content.size(); i++ ) {
             final Bookmark book= content.get(i);
@@ -51,13 +55,16 @@ public class DelayMenu extends JMenu {
                         public void actionPerformed(ActionEvent e) {
                             org.das2.util.LoggerManager.logGuiEvent(e);                        
                             //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject any, enter the dialog.
-                            boolean oldLogic= true;
                             if ( oldLogic ) {
-                                ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
-                                ui.getDataSetSelector().maybePlot(e.getModifiers());
+                                sel.setValue(((Bookmark.Item) book).getUri());
+                                sel.maybePlot(e.getModifiers());
                             } else {
-                                ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
-                                ui.enterAddPlotElementDialog();
+                                if ( ui!=null ) {
+                                    ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
+                                    ui.enterAddPlotElementDialog();
+                                } else {
+                                    throw new IllegalStateException("this was not properly implemented");
+                                }
                             }
                         }
                     });
@@ -104,7 +111,7 @@ public class DelayMenu extends JMenu {
                     if ( titl.length()>MAX_LABEL_LEN && treeDepth>0 ) {
                         titl= titl.substring( 0,MAX_LABEL_LEN-(TRIM_TAIL_LEN+3) ) + "..."+ titl.substring( titl.length()-TRIM_TAIL_LEN,titl.length() );
                     }
-                    final JMenu subMenu = new DelayMenu( titl, folder.getBookmarks(), treeDepth+1, ui );
+                    final JMenu subMenu = new DelayMenu( titl, folder.getBookmarks(), treeDepth+1, sel, ui );
                     subMenu.setIcon(icon);
 
                     if ( tooltip.contains("%{URL}") ) {
@@ -128,7 +135,7 @@ public class DelayMenu extends JMenu {
 
     }
 
-    protected DelayMenu( final String label, final List<Bookmark> bookmarks, final int treeDepth, final AutoplotUI ui ) {
+    protected DelayMenu( final String label, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel, final AutoplotUI ui ) {
         super(label);
 
         addMenuListener( new MenuListener() {
@@ -136,7 +143,7 @@ public class DelayMenu extends JMenu {
             public void menuSelected(MenuEvent e) {
                 logger.log(Level.FINEST, "resolving menu {0}...", label);
                 DelayMenu.this.removeAll();
-                calculateMenu( DelayMenu.this, bookmarks, treeDepth, ui );
+                calculateMenu( DelayMenu.this, bookmarks, treeDepth, sel, ui );
             }
 
             public void menuDeselected(MenuEvent e) {
