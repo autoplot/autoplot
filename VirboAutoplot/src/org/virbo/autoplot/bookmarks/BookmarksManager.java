@@ -1609,6 +1609,20 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             updateBookmarks( bookmarksMenu, null, dataSetSelector ); //TODO: rfe336 this is going to cause problems with delay menu if we start using Craig's suggestion.
         }
     }
+    
+    /**
+     * Hide the plot and edit buttons, because sometimes they are confusing.  For example
+     * we click "add bookmark" because we have a plot we want to keep.  It wouldn't 
+     * make sense for this editor to offer plot as an action because we have it
+     * plotted already.
+     * @param v 
+     */
+    public void setPlotActionsVisible( boolean v ) {
+        plotBelowButton.setVisible(v);
+        overplotButton.setVisible(v);
+        plotButton.setVisible(v);
+        editButton.setVisible(v);
+    }
 
     public void updateBookmarks( JMenu bookmarksMenu, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
 
@@ -1631,6 +1645,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 org.das2.util.LoggerManager.logGuiEvent(e);        
                 Container parent= BookmarksManager.this.getParent();
                 BookmarksManager.this.setLocationRelativeTo( parent );
+                setPlotActionsVisible(true);
                 setVisible(true);
             }
         } );
@@ -1646,6 +1661,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 if ( !isVisible() ) {
                     Container parent= BookmarksManager.this.getParent();
                     BookmarksManager.this.setLocationRelativeTo( parent );
+                    setPlotActionsVisible(false);
                 }
                 setVisible(true);
             }
