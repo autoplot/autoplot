@@ -686,6 +686,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     private void viewDsdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDsdfButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         TreePath p= jTree1.getSelectionPath();
         TreeModel m= jTree1.getModel();
         if ( p==null ) {
@@ -719,6 +720,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
     private void das2ServerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_das2ServerComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         Object o= das2ServerComboBox.getSelectedItem();
         if ( o!=null ) {
             setServerURL( String.valueOf( o ) );
@@ -726,11 +728,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_das2ServerComboBoxActionPerformed
 
     private void discoveryCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_discoveryCbActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         jTree1.setModel( waitTreeModel() );
         RequestProcessor.invokeLater( getDataSetsRunnable() );
     }//GEN-LAST:event_discoveryCbActionPerformed
 
     private void examplesComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         String item= (String) examplesComboBox.getSelectedItem();
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
             int i= item.indexOf("<em>");
@@ -743,6 +747,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_examplesComboBoxActionPerformed
 
     private void timeRangeToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
         JTextField tf= timeRangeTextField;
         tt.setSelectedRange(tf.getText());
