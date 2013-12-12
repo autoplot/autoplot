@@ -854,10 +854,12 @@ public class DataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sliceTypeComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxItemStateChanged
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         updateComponent();
 }//GEN-LAST:event_sliceTypeComboBoxItemStateChanged
 
     private synchronized void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         if ( adjusting ) return; // TODO: probably get rid of this entirely.
         logger.log( Level.FINE, "set slice dimension {0}", sliceTypeComboBox.getSelectedIndex() );
         //DataSourceFilter dsf = applicationController.getDataSourceFilter();
@@ -870,14 +872,17 @@ public class DataPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_sliceTypeComboBoxActionPerformed
 
     private void sliceIndexSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliceIndexSpinnerStateChanged
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         updateComponent();
 }//GEN-LAST:event_sliceIndexSpinnerStateChanged
 
     private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         updateComponent();
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
 
     private void doSliceCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doSliceCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
         updateComponent();
 }//GEN-LAST:event_doSliceCheckBoxActionPerformed
 
