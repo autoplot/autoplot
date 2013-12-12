@@ -75,6 +75,7 @@ public class JFontChooser extends JDialog {
         JButton btnOK = new JButton("OK");
         btnOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);    
                 JFontChooser.this.OPTION = JFontChooser.OK_OPTION;
                 JFontChooser.this.setVisible(false);
             }
@@ -84,6 +85,7 @@ public class JFontChooser extends JDialog {
         JButton btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);    
                 JFontChooser.this.OPTION = JFontChooser.CANCEL_OPTION;
                 JFontChooser.this.setVisible(false);
             }
@@ -143,6 +145,7 @@ public class JFontChooser extends JDialog {
 
         ActionListener cbListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                    
                 txtSample.setFont(getCurrentFont());
                 if (fontCheck != null) {
                     updateFontCheck(getCurrentFont());
