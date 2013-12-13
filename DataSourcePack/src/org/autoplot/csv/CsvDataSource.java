@@ -128,7 +128,9 @@ public class CsvDataSource extends AbstractDataSource {
             icolumn= cols[0]; // get the units from this column
         }
 
-        String dep0column= getParam( "depend0", null );
+        String time= getParam("time",null);  // time or depend0 can be used.
+        String dep0column= getParam( "depend0", time );
+        
         int idep0column;
         if ( dep0column==null ) {
             idep0column= -1;
