@@ -249,6 +249,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 }
             }
             this.support.loadInputStream(url.openStream());
+            if ( resourceFile.endsWith(".jy") ) {
+                this.setContext(CONTEXT_APPLICATION);
+            } else {
+                this.setContext(CONTEXT_DATA_SOURCE);
+            }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
