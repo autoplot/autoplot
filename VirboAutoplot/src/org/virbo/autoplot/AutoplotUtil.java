@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -407,6 +408,12 @@ public class AutoplotUtil {
      */
     protected static void doManageFilesystems( Component parent ) {
         FileSystem[] fss= FileSystem.peekInstances();
+        Arrays.sort(fss, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
         JPanel p= new JPanel();
         p.setLayout( new GridBagLayout() );
         GridBagConstraints c= new GridBagConstraints();
@@ -416,8 +423,12 @@ public class AutoplotUtil {
             c.gridx= 0;
             c.anchor= GridBagConstraints.WEST;
             p.add( new JLabel( fs.toString() ), c );
-            c.weightx= 0.2;
+            c.weightx= 0.1;
             c.gridx= 1;
+            c.anchor= GridBagConstraints.EAST;
+            p.add( new JLabel("  "), c );
+            c.weightx= 0.1;
+            c.gridx= 2;
             c.anchor= GridBagConstraints.EAST;
             if ( fs instanceof LocalFileSystem ) {
                 p.add( new JLabel( "" ), c );
@@ -426,7 +437,11 @@ public class AutoplotUtil {
             }
             c.gridy++;
         }
-        JOptionPane.showConfirmDialog( parent , new JScrollPane(p), "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
+        JScrollPane pp=  new JScrollPane(p);
+        pp.setPreferredSize( new Dimension(640,480) );
+        
+        pp.getVerticalScrollBar().setUnitIncrement( p.getFont().getSize() );
+        AutoplotUtil.showConfirmDialog2(parent, pp, "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
 
     }
 
@@ -2039,6 +2054,9 @@ public class AutoplotUtil {
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
             throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
         }
+        if ( !( message instanceof Component ) ) {
+            throw new IllegalArgumentException("message must be component for now.");
+        }
         Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
         
@@ -2049,6 +2067,7 @@ public class AutoplotUtil {
         pc.setLayout( b );
         pc.add( Box.createGlue() );
         pc.add( new JButton( new AbstractAction("Cancel") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                        
                 result.add( JOptionPane.CANCEL_OPTION );
@@ -2057,6 +2076,7 @@ public class AutoplotUtil {
         }) );
         pc.add( Box.createHorizontalStrut(7) );
         pc.add( new JButton( new AbstractAction("Okay") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);        
                 result.add( JOptionPane.OK_OPTION );
@@ -2066,9 +2086,6 @@ public class AutoplotUtil {
         pc.add( Box.createHorizontalStrut(7) );
         
         dia.setResizable(true);
-        if ( !( message instanceof Component ) ) {
-            throw new IllegalArgumentException("message must be component for now.");
-        }
         dia.add( (Component)message );
         dia.add( pc, BorderLayout.SOUTH );
         dia.setTitle(title);
