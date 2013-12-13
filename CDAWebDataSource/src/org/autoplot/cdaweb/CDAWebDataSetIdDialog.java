@@ -198,19 +198,23 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void filterCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterCheckBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);    
         refresh();
 }//GEN-LAST:event_filterCheckBoxActionPerformed
 
     private void filterTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTFActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);    
         refresh();
 }//GEN-LAST:event_filterTFActionPerformed
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);    
         isCancelled= false;
         setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);    
         isCancelled= true;
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
