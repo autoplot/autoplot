@@ -49,6 +49,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     /** Creates new form CompletionsDataSourceEditor */
     public CompletionsDataSourceEditor() {
         initComponents();
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement( getFont().getSize() );
     }
 
     private CompletionContext prepareContext( String surl1, int carotPos ) {
