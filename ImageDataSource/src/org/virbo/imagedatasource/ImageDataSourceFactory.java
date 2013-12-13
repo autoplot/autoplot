@@ -52,9 +52,9 @@ public class ImageDataSourceFactory implements DataSourceFactory {
             } else if ( paramName.equals("blur") ) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
             } else if ( paramName.equals("xaxis") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmax,valmax,pixmax]", "add labels for each bin"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
             } else if ( paramName.equals("yaxis") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmax,valmax,pixmax]", "add labels for each bin"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
             }
         }
 
