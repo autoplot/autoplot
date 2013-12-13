@@ -32,6 +32,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -222,6 +223,8 @@ class ImageDataSource extends AbstractDataSource {
             xx= Ops.subtract( xx, xform[1] );
             xx= Ops.multiply( xx, (xform[2]-xform[0])/(xform[3]-xform[1]) );
             xx= Ops.add( xx, xform[0] );
+            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,xform[0]);
+            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xform[2]);
             result.putProperty( QDataSet.DEPEND_0, xx );
         }
         String yaxis= getParam( "yaxis", null );
@@ -231,6 +234,8 @@ class ImageDataSource extends AbstractDataSource {
             yy= Ops.subtract( yy, xform[1] );
             yy= Ops.multiply( yy, (xform[2]-xform[0])/(xform[3]-xform[1]) );
             yy= Ops.add( yy, xform[0] );
+            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,xform[0]);
+            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,xform[2]);
             result.putProperty( QDataSet.DEPEND_1, yy );
         }
         
