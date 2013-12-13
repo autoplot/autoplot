@@ -111,7 +111,7 @@ rm temp-classes/META-INF/*.SF
 
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-classes/META-INF/build.txt
 
-export TIMESTAMP=`date --utc +%Y-%m-%dT%H:%MZ`
+export TIMESTAMP=`date -u +%Y-%m-%dT%H:%MZ`
 echo $TIMESTAMP > temp-classes/buildTime.txt
 
 # end, special handling of the META-INF stuff.
