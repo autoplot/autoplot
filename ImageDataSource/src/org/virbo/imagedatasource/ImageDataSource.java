@@ -35,6 +35,7 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 import org.w3c.dom.Node;
 
@@ -133,7 +134,7 @@ class ImageDataSource extends AbstractDataSource {
 
             image= dest;
         }
-
+        
         String blur= getParam( "blur", "1" );
         if ( !blur.equals("1") ) {
             int iblur= Integer.parseInt(blur);
@@ -214,12 +215,41 @@ class ImageDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.RENDER_TYPE, "image" );
         }
         
+        String xaxis= getParam( "xaxis", null );
+        if ( xaxis!=null ) {
+            double[] xform= tryParseArray( xaxis );
+            QDataSet xx= Ops.findgen(result.length());
+            xx= Ops.subtract( xx, xform[1] );
+            xx= Ops.multiply( xx, (xform[2]-xform[0])/(xform[3]-xform[1]) );
+            xx= Ops.add( xx, xform[0] );
+            result.putProperty( QDataSet.DEPEND_0, xx );
+        }
+        String yaxis= getParam( "yaxis", null );
+        if ( yaxis!=null ) {
+            double[] xform= tryParseArray( yaxis );
+            QDataSet yy= Ops.findgen(result.length(0));
+            yy= Ops.subtract( yy, xform[1] );
+            yy= Ops.multiply( yy, (xform[2]-xform[0])/(xform[3]-xform[1]) );
+            yy= Ops.add( yy, xform[0] );
+            result.putProperty( QDataSet.DEPEND_1, yy );
+        }
+        
         mon.finished();
 
         return result;
 
     }
 
+    public double[] tryParseArray( String s ) {
+        s= s.trim();
+        if ( s.startsWith("[") && s.endsWith("]") ) s= s.substring(1,s.length()-1);
+        String[] ss= s.split(",");
+        double[] result= new double[ss.length];
+        for ( int i=0; i<result.length; i++ ) {
+            result[i]= Double.parseDouble(ss[i]);
+        }
+        return result;
+    }
     /**
      * read useful JPG metadata, such as the Orientation.  This also looks to see if GPS
      * metadata is available.
