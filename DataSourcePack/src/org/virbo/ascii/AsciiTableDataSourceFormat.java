@@ -141,6 +141,18 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
+    private JSONObject formatDataSetInline( QDataSet ds ) throws JSONException {
+        JSONObject jo1= new JSONObject();
+        jsonProp( jo1, ds, QDataSet.LABEL, -1 );
+        jsonProp( jo1, ds, QDataSet.UNITS, -1 );
+        jsonProp( jo1, ds, QDataSet.VALID_MIN, -1 );
+        jsonProp( jo1, ds, QDataSet.VALID_MAX, -1 );
+        jsonProp( jo1, ds, QDataSet.FILL_VALUE, -1 );
+        jo1.put( "VALUES", DataSetUtil.asArrayOfDoubles(ds) );
+        jo1.put( "DIMENSION", new int[] { ds.length() } );
+        return jo1;
+    }
+    
     private void formatBundleDesc(PrintWriter out, QDataSet bds, QDataSet bundleDesc ) throws JSONException {
         QDataSet dep0=null;
         if ( bds!=null ) {
@@ -156,8 +168,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         if ( bds.rank()==1 ) {
             dep0inc= 1;
         }
-        
+
         String name;
+        String dep1Name= null;
+        
+        QDataSet dep= (QDataSet) bds.property(QDataSet.DEPEND_1);
+        if ( dep!=null && UnitsUtil.isRatioMeasurement( SemanticOps.getUnits(dep) ) && bds.property(QDataSet.BUNDLE_1)==null ) {
+            dep1Name= (String) Ops.guessName(dep);
+            jo.put( dep1Name, formatDataSetInline( dep ) );
+        }
+        
         if ( dep0!=null ) {
             name= (String) Ops.guessName(dep0);
             jsonProp( jo1, dep0, QDataSet.LABEL, -1 );
@@ -217,6 +237,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             jo1.put( "ELEMENT_NAMES", elementNames );
             if ( elementLabels!=null ) {
                 jo1.put( "ELEMENT_LABELS", elementLabels );
+            }
+            if ( dep1Name!=null ) {
+                jo1.put("DEPEND_1", dep1Name );
+                jo1.put("RENDER_TYPE", "spectrogram" );
             }
         }
 
@@ -412,7 +436,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
         
         if ( dep1!=null && dep1.rank()==2 ) {
-            dep1= dep1.slice(0);
+            throw new IllegalArgumentException("dep1 rank is 2, which is not supported.");
         }
         
         DatumFormatter format=null;
