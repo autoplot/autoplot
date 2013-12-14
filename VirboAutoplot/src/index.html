@@ -37,6 +37,9 @@
             <li>improve support for rank 2 energies, supporting ds[:,0:2,:] so DEPEND_2 is preserved.</li>
             <li>the delegate editor with aggregation could not remove parameters.</li>
             <li>DataSourceEditor browseSourceType handles plugins like script:... properly, avoiding runtime error.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>Edit->Options copied to Options->Additional Options, Edit-Options will be removed after AGU.</li>
             <li>check rich ascii dep0 for colon splitting name from description</li>
             <li>1128: horizontal and vertical slices need to go away when data goes away</li>
@@ -48,31 +51,6 @@
             <li>1095: Seth showed experimental handling of reference cache was causing problems.</li>
             <li>empty CDF files now trigger NoDataInIntervalException when a variable contains no records, rather than IllegalArgumentException, to support use in scripts.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1124: reproducible deadlock on mac when printing to PDF</li>
-            <li>export bundle to qds now uses specialized formatter for efficient output.  Before it would have to use the same encoding for all datasets.</li>
-            <li>Horizontal slice works again with spectrograms with rank 2 Y and some records containing all fill, thanks Joe!</li>
-            <li>UVI images were mistaken for waveform data, thanks Len!</li>
-            <li>1119: exceptions thrown with no message</li>
-            <li>correct the selection area with events renderer orbit mode and gantt mode.</li>
-            <li>1118: default uncaught exception handler not set for CreatePngWalk</li>
-            <li>1117: .jy parameters panel would mess up timeranges</li>
-            <li>put in access information into manifest to remove warning about missing permissions manifest attribute.</li>
-            <li>rte_0530313353: script window shows error locations again</li>
-            <li>minor correction to completions in script editor when no characters constrain."x=&lt;COMP&gt;" </li>
-            <li>export to .wav would truncate data to ints before rescaling</li>
-            <li>harmless warnings caused by failed find style node cleaned up</li>
-            <li>1076: width=0 causes runtime error dialog (this is probably fixed, I couldn't demo the bug)</li>
-            <li>rte_0956688396: ArrayIndexOutOfBounds with reset zoom</li> 
-            <li>rte_1219433822: Runtime error with export data when no option can be selected but "okay" is pressed.</li>
-            <li>1112: poor adapt of legacy TableDataSet from das2server</li>
-            <li>1111: AutoplotDataServer looks for $H in granules, switches to process by hour.</li>
-            <li>1104: new cache problems, in-memory cache limited to 5 seconds.</li>
-            <li>1106: contours render, copy plot elements down. </li>
-            <li>1109: vap setting of zaxis range not respected</li>
-            <li>1110: allow cdaweb master file to override LABL_PTR_1 </li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>check for NetCDF/HDF magic number in CDF GUI</li>
@@ -82,6 +60,9 @@
             <li>CDF data source allows &amp;where=mode.eq(1)</li>
             <li>slice1 allows slicing at a datum like "1000 eV"</li>
             <li>history dialog has .vap button for convenience and example filter.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>waveform data supported in the series renderer, allowing finer control.</li>
             <li>add DasPlot options for plot background color, grid color, etc</li>
             <li>properly signed jnlp application allows launching without excessive security dialogs</li>
@@ -89,23 +70,6 @@
             <li>1093: printingLogLevel preference allows messages to be turned off when printing.</li>
             <li>Options panel replaced with custom GUI, old and redundant controls removed, explanations added</li>
             <li>introductory support for VOTables.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>331: DataSetAnnotations allows operations to be recycled. </li>
-            <li>330: Timestamp on PDF and PNG output </li>
-            <li>Henry's CubicRoot solver</li>
-            <li>1120: Series mode has a more useful rendering of data when there are &gt; 200000 points.</li>
-            <li>Orbit files updated to Nov 20.</li>
-            <li>automatically switch contexts in Jython editor when .jyds extension is used.</li>
-            <li>Add ctrl-L shortcut for reload all.</li>
-            <li>add buttons for availability and reduce in aggregation GUI</li>
-            <li>slice windows have slope slicer</li>
-            <li>.d2t and .qdst extensions resolve to the das2 stream/qstream reader to support the text extension.</li>
-            <li>createPngWalk command line now returns success/fail exit codes</li>
-            <li>experimental "now" allowed in timeranges like "2001-01-01/now"</li>
-            <li>DataSetAnnotations allows us to cache repeat operations more easily</li>
-            <li>rfe 327: pngwalks from event lists</li>
         </ul>
 
         <p>Known issues:</p>
