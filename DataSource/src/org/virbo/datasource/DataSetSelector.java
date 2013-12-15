@@ -92,9 +92,23 @@ import org.virbo.dsops.Ops;
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
     private static int MAX_RECENT=20;
+    
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
+    
+    /**
+     * the edit (inspect) button has been pressed.
+     */
     private Object PENDING_EDIT="edit";
-    private Object PENDING_PLOT="plot"; 
+    
+    /**
+     * the go button has been pressed.
+     */
+    private Object PENDING_GO="gobutton"; 
+    
+    /**
+     * a plotDataSetURL is going to be fired off.
+     */
+    private Object PENDING_PLOT="plot";
     
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
@@ -126,7 +140,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         try {
                             maybePlotImmediately();
                         } finally {
-                            pendingChanges.remove( PENDING_PLOT );
+                            pendingChanges.remove( PENDING_GO );
                         }
                     }
                 };
@@ -436,7 +450,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             keyModifiers = 0;
         }
         
-        pendingChanges.put( PENDING_PLOT, this );
+        pendingChanges.put( PENDING_GO, this );
         maybePlotTimer.restart();
     }
 
@@ -461,6 +475,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * fire off the event that indicates a new URI has been entered.
      */
     private void firePlotDataSetURL() {
+        pendingChanges.put( PENDING_PLOT, this );
         List<String> r = new ArrayList<String>(getRecent());
         String value = getValue();
         lastValue= value;
@@ -477,6 +492,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             public void run() {
                 ActionEvent e = new ActionEvent(this, 123, "dataSetSelect", keyModifiers);
                 fireActionListenerActionPerformed(e);
+                pendingChanges.remove( PENDING_PLOT );
             }
         }  );
         
