@@ -1420,7 +1420,7 @@ APSplash.checkTime("init 52");
         //mi.setToolTipText("Export the data that has the focus");
         //fileMenu.add( mi );
 
-        item = new JMenuItem( support.getDumpDataAction2( dom ) );
+        item = new JMenuItem( support.getDumpDataAction( dom ) );
         item.setToolTipText("Export the data that has the focus");
         expertItems.add(item);
         fileMenu.add( item );
