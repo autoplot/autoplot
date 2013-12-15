@@ -381,7 +381,12 @@ public class GuiSupport {
         if ( mon!=null ) mon.finished();
     }
 
-    Action getDumpDataAction2( final Application dom ) {
+    /**
+     * provide action to allow users to export a dataset to formats that support this.
+     * @param dom
+     * @return 
+     */
+    Action getDumpDataAction( final Application dom ) {
         return new AbstractAction("Export Data...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
@@ -437,7 +442,7 @@ public class GuiSupport {
                     edp.setTsb(true);
                 }
                 
-                if ( JOptionPane.showConfirmDialog( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                      try {
                         String name= edp.getFilenameTF().getText();
                         String ext = (String)edp.getFormatDL().getSelectedItem();
@@ -542,107 +547,6 @@ public class GuiSupport {
                         parent.applicationModel.getExceptionHandler().handle(ex);
                     }
 
-                }
-            }
-        };
-    }
-
-    Action getDumpDataAction() {
-        return new AbstractAction("Export Data...") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);
-                final QDataSet dataSet = parent.applicationModel.dom
-                        .getController().getPlotElement().getController().getDataSet();
-
-                if (dataSet == null) {
-                    JOptionPane.showMessageDialog(parent, "No Data to Export.");
-                    return;
-                }
-
-                JFileChooser chooser = new JFileChooser();
-
-                List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
-                FileFilter deflt = null;
-                for (String ext : exts) {
-                    final String ex = ext;
-                    final String desc = "";
-                    FileFilter ff = new FileFilter() {
-
-                        @Override
-                        public boolean accept(File f) {
-                            if ( f.toString()==null ) return false;
-                            return f.toString().endsWith(ex) || f.isDirectory();
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return "*" + ex; // DANGER: this is parsed below
-                        }
-                    };
-                    if (ext.equals(".qds")) {
-                        deflt = ff;
-                    }
-                    chooser.addChoosableFileFilter(ff);
-                }
-
-                chooser.setFileFilter(deflt);
-
-                Preferences prefs = Preferences.userNodeForPackage(AutoplotUI.class);
-                String currentFileString = prefs.get("DumpDataCurrentFile", "");
-
-                String name = (String) dataSet.property(QDataSet.NAME);
-                if (name != null) {
-                    chooser.setSelectedFile(new File(name.toLowerCase()));
-                }
-
-                if (!currentFileString.equals("") && new File(currentFileString).exists()) {
-                    File folder = new File(currentFileString).getParentFile();
-                    chooser.setCurrentDirectory(folder);
-                //chooser.setSelectedFile(new File(currentFileString));
-                }
-
-                int r = chooser.showSaveDialog(parent);
-                if (r == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        prefs.put("DumpDataCurrentFile", chooser.getSelectedFile().toString());
-                        prefs.flush();
-
-                        String s = chooser.getSelectedFile().toURI().toString();
-
-                        String ext = DataSetURI.getExt(s);
-                        if (ext == null) {
-                            ext = "";
-                        }
-
-                        DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
-                        if (format == null) {
-                            if (chooser.getFileFilter().getDescription().startsWith("*.")) {
-                                ext = chooser.getFileFilter().getDescription().substring(1);
-                                format = DataSourceRegistry.getInstance().getFormatByExt(ext);
-                                if (format == null) {
-                                    JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                    return;
-                                } else {
-                                    s = s + ext;
-                                }
-                            } else {
-                                JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                return;
-                            }
-                        }
-                        format.formatData( s,dataSet, new DasProgressPanel("formatting data"));
-                        parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
-
-                    } catch (IOException ex) {
-                        parent.applicationModel.getExceptionHandler().handle(ex);
-                    } catch ( IllegalArgumentException ex ) {
-                        parent.applicationModel.getExceptionHandler().handle(ex);
-                    } catch (RuntimeException ex ) {
-                        parent.applicationModel.getExceptionHandler().handleUncaught(ex);
-                    } catch (Exception ex) {
-                        parent.applicationModel.getExceptionHandler().handle(ex);
-                    }
                 }
             }
         };
