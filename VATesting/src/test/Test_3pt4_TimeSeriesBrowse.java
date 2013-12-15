@@ -8,6 +8,9 @@ package test;
 import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.util.LoggerManager;
 import org.netbeans.jemmy.Scenario;
@@ -43,10 +46,31 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
 
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); // TODO: try vap+cdf:
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
+            
+            final DasAxis xaxis = ScriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+
+            // The following is interesting code that needs to be studied more.  I think what's happened
+            // is I moved the DataSetSelector event firing back on to the event thread, and 
+            // this is messing up this script.
+            
+            SwingUtilities.invokeAndWait( new Runnable() {
+                public void run() {
+                    System.err.println( "1: "+ xaxis.getDatumRange() );
+                }
+            });
+            
             ScriptContext.waitUntilIdle();
 
-            DasAxis xaxis = ScriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+            SwingUtilities.invokeAndWait( new Runnable() {
+                public void run() {
+                    System.err.println( "2: "+xaxis.getDatumRange() );
+                }
+            });
+            
+            System.err.println( "3: "+xaxis.getDatumRange() );
             xaxis.scanNext(); // no gui test, but that's okay...
+            System.err.println( "4: "+xaxis.getDatumRange() );
+            
             new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
                     //app.getDataSetSelector().getBrowseButton()).clickMouse();
 
