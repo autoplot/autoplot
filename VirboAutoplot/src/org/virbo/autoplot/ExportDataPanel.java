@@ -39,6 +39,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     /** Creates new form ExportDataPanel */
     public ExportDataPanel() {
         initComponents();
+        warningMessageLabel.setText(" "); // clients may call setTsb, which will reset this.
     }
 
     public void setDataSet(Application model) {
@@ -110,8 +111,10 @@ public class ExportDataPanel extends javax.swing.JPanel {
         filenameTF = new javax.swing.JTextField();
         chooseFileB = new javax.swing.JButton();
         additionalOptionsButton = new javax.swing.JButton();
-        warningMessageLabel = new javax.swing.JLabel();
         processedWithinXRangeB = new javax.swing.JRadioButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        warningMessageLabel = new javax.swing.JLabel();
 
         jLabel2.setText("Select Output Format:");
 
@@ -160,48 +163,59 @@ public class ExportDataPanel extends javax.swing.JPanel {
         processedWithinXRangeB.setText("Processed Data within X Axis Range");
         processedWithinXRangeB.setToolTipText("Processed data, but also trim to the data to the X axis bounds.\n");
 
+        jLabel4.setText("<html><em>Data from the selected plot element can be exported to a format by data sources that provide a method to export data.");
+        jLabel4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        warningMessageLabel.setText("<html><em>(warning message)");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .add(warningMessageLabel)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
+                .add(12, 12, 12)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(formatDL, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
+                        .add(filenameTF)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(chooseFileB))))
+            .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1)
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(originalDataB))
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(processedDataB)))
-                .add(22, 22, 22))
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(processedWithinXRangeB)
-                .addContainerGap(351, Short.MAX_VALUE))
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(originalDataB)
+                            .add(processedDataB)
+                            .add(processedWithinXRangeB)))
                     .add(jLabel3)
-                    .add(layout.createSequentialGroup()
-                        .add(additionalOptionsButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 274, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(formatDL, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(additionalOptionsButton)
                     .add(jLabel2)
-                    .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(filenameTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 508, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chooseFileB)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
-                .addContainerGap())
+                    .add(jLabel1))
+                .add(0, 258, Short.MAX_VALUE))
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(originalDataB)
@@ -209,21 +223,18 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 .add(processedDataB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(processedWithinXRangeB)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(18, 18, 18)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(formatDL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(formatDL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 33, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel3)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(filenameTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(chooseFileB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(additionalOptionsButton)
-                .addContainerGap(94, Short.MAX_VALUE))
+                .add(additionalOptionsButton))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -383,6 +394,8 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton originalDataB;
     private javax.swing.JRadioButton processedDataB;
     private javax.swing.JRadioButton processedWithinXRangeB;
@@ -416,10 +429,14 @@ public class ExportDataPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * indicate that the data is from a TSB and will be reloaded.
+     * @param b 
+     */
     void setTsb(boolean b) {
         if ( b ) {
-            warningMessageLabel.setText("Exporting data at native resolution.");
-            warningMessageLabel.setToolTipText("<html>This data comes from a reader that can return data at multiple resolutions.  Data will be reread at native resolution before writing output.</html>");
+            warningMessageLabel.setText("<html><em>Exporting data at native resolution.</em></html>");
+            warningMessageLabel.setToolTipText("<html><em>This data comes from a reader that can return data at multiple resolutions.  Data will be reread at native resolution before writing output.</em></html>");
         } 
     }
 
