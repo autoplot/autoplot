@@ -1955,6 +1955,7 @@ public class AutoplotUtil {
             // https://blogs.oracle.com/scblog/entry/tip_making_joptionpane_dialog_resizable
             // TIP: Make the JOptionPane resizable using the HierarchyListener.  
             editorPane.addHierarchyListener(new HierarchyListener() {
+                @Override
                 public void hierarchyChanged(HierarchyEvent e) {
                     Window window = SwingUtilities.getWindowAncestor(editorPane);
                     if (window instanceof Dialog) {
@@ -1990,6 +1991,7 @@ public class AutoplotUtil {
             // https://blogs.oracle.com/scblog/entry/tip_making_joptionpane_dialog_resizable
             // TIP: Make the JOptionPane resizable using the HierarchyListener.  
             editorPane.addHierarchyListener(new HierarchyListener() {
+                @Override
                 public void hierarchyChanged(HierarchyEvent e) {
                     Window window = SwingUtilities.getWindowAncestor(editorPane);
                     if (window instanceof Dialog) {
