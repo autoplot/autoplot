@@ -971,6 +971,26 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
+     * Rewrite the dataset so that fill values are set by the valid extent and fill
+     * controls.  The user can override these values, so make sure the values that came
+     * with the dataset are observed as well.
+     *
+     * Note an old version of this would make fill canonical, now this simply resets the
+     * VALID_MIN, VALID_MAX, and FILL_VALUE properties.
+     *
+     * Old values of vmin, vmax, and fill are ignored.
+     * moved over from AutoplotUtil.
+     */
+    private static void applyFillValidRange(MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
+
+        // TODO bug 1141: reimplement this.
+        if (vmin > (-1 * Double.MAX_VALUE)) ds.putProperty(QDataSet.VALID_MIN, vmin);
+        if (vmax < Double.MAX_VALUE)        ds.putProperty(QDataSet.VALID_MAX, vmax);
+        if (!Double.isNaN(fill))            ds.putProperty(QDataSet.FILL_VALUE, fill);
+    }
+    
+    
+    /**
      * call updateFill in new thread
      * @param delay insert this delay so other threads may complete first. 
      */
@@ -1114,7 +1134,7 @@ public class DataSourceController extends DomNodeController {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
             // check the dataset for fill data, inserting canonical fill values.
-            AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
+            applyFillValidRange(fillDs, vmin, vmax, fill);
 
             setFillProperties(props);
             if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
