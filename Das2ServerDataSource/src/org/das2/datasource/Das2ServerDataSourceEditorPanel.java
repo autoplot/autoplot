@@ -500,13 +500,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         List<String> result= new ArrayList();
 
+        InputStream in=null;
+        
         try {
-            InputStream in = new URL(uri).openStream();
+            in = new URL(uri).openStream();
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputSource source = new InputSource(in);
             Document initialDocument = builder.parse(source);
-            in.close();
 
             XPathFactory factory = XPathFactory.newInstance();
             XPath xpath = factory.newXPath();
@@ -516,8 +517,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             for ( int i=0; i<urls.getLength(); i++ ) {
                 result.add(urls.item(i).getNodeValue());
             }
-            return result;
-                
+            
         } catch (MalformedURLException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
@@ -533,6 +533,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         } catch (XPathExpressionException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
+        } finally {
+            try {
+                if ( in!=null ) in.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return result;
         }
     }
 
@@ -943,6 +950,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     } else {
                         model= server.getDataSetList();
                     }
+                    updateDas2ServersImmediately();
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             updateTree(model);
