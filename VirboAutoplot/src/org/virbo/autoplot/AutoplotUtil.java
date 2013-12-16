@@ -520,6 +520,9 @@ public class AutoplotUtil {
         p1.add( new JButton( new AbstractAction("View Exception") {
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);        
+                JComponent c= (JComponent)ev.getSource();
+                JDialog dia= (JDialog) SwingUtilities.getWindowAncestor(c);
+                dia.dispose();
                 exh.handleUncaught(ex);
             }
         }), BorderLayout.EAST );
