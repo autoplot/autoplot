@@ -10,7 +10,6 @@ package org.virbo.autoplot;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -72,7 +71,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -345,6 +343,7 @@ public class AutoplotUtil {
         if ( i==JOptionPane.OK_OPTION ) {
             final String search= tf.getText();
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     Map<Component,String> result= new LinkedHashMap();
                     Pattern p= Pattern.compile(search,Pattern.CASE_INSENSITIVE);
@@ -518,6 +517,7 @@ public class AutoplotUtil {
         p.add( l1, BorderLayout.CENTER );
         JPanel p1= new JPanel( new BorderLayout() );
         p1.add( new JButton( new AbstractAction("View Exception") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);        
                 JComponent c= (JComponent)ev.getSource();
@@ -1003,7 +1003,7 @@ public class AutoplotUtil {
                     dd = new double[]{ dd[0], dd[0]+1};
                 }
             } else {
-                dd = simpleRange(ds);
+                //dd = simpleRange(ds);
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
                 } else {
@@ -1399,47 +1399,10 @@ public class AutoplotUtil {
      */
     public static void applyFillValidRange(MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
 
-        Number ovmin = (Number) ds.property(QDataSet.VALID_MIN);
-        Number ovmax = (Number) ds.property(QDataSet.VALID_MAX);
-
-        boolean needToCopy = false;
-        // if the old valid range contains the new range, then we simply reset the range.
-        if (ovmax != null && ovmax.doubleValue() < vmax) needToCopy = true;
-        if (ovmin != null && ovmin.doubleValue() > vmin) needToCopy = true;
-
-        Number oldFill = (Number) ds.property(QDataSet.FILL_VALUE);
-
-        if (oldFill != null && Double.isNaN(fill) == false && oldFill.doubleValue() != fill)
-            needToCopy = true;
-
-        // always clobber old fill values.  This allows for fill data itself to be plotted.
-        needToCopy = false;
-
-        if (needToCopy == false) {
-            if (vmin > (-1 * Double.MAX_VALUE))
-                ds.putProperty(QDataSet.VALID_MIN, vmin);
-            if (vmax < Double.MAX_VALUE)
-                ds.putProperty(QDataSet.VALID_MAX, vmax);
-            if (!Double.isNaN(fill)) ds.putProperty(QDataSet.FILL_VALUE, fill);
-
-        } else {
-            /*Units u = (Units) ds.property(QDataSet.UNITS);
-
-            if (u == null) {
-            u = Units.dimensionless;
-            }
-
-            QubeDataSetIterator it= new QubeDataSetIterator(ds);
-            while ( it.hasNext() ) {
-            it.next();
-            double d = it.getValue(ds);
-            if (d == fill || d < vmin || d > vmax) {
-            it.putValue(ds, u.getFillDouble());
-            }
-            }
-
-            ds.putProperty(QDataSet.UNITS, u);*/
-        }
+        // TODO bug 1141: reimplement this.
+        if (vmin > (-1 * Double.MAX_VALUE)) ds.putProperty(QDataSet.VALID_MIN, vmin);
+        if (vmax < Double.MAX_VALUE)        ds.putProperty(QDataSet.VALID_MAX, vmax);
+        if (!Double.isNaN(fill))            ds.putProperty(QDataSet.FILL_VALUE, fill);
     }
 
     /**
