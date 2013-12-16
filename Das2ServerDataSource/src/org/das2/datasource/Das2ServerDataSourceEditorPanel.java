@@ -11,8 +11,12 @@
 
 package org.das2.datasource;
 
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -21,14 +25,13 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,10 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -43,6 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -486,14 +494,61 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void updateDas2ServersImmediately() {
         d2ss= listDas2Servers();
-        das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
-        
-        if ( serverURL.length()==0 ) {
-            serverURL= d2ss.get(0);
-        }
-        das2ServerComboBox.setSelectedItem(serverURL);
+        Runnable run= new Runnable() {
+            public void run() {
+                das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
+            
+                if ( serverURL.length()==0 ) {
+                    serverURL= d2ss.get(0);
+                }
+                das2ServerComboBox.setSelectedItem(serverURL);
+                das2ServerComboBox.setRenderer(myListCellRenderer);
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
+    
+    private static Map<String,ImageIcon> icons= new HashMap();
+    
+    private static Icon iconFor( Object o ) {
+        //return new javax.swing.ImageIcon(Das2ServerDataSourceEditorPanel.class.getResource("/org/virbo/datasource/fileMag.png"));
+        //icons.clear();
+        ImageIcon result= icons.get(o.toString());
+        if (result==null ) {
+            try {
+                long t1= System.currentTimeMillis();
+                result= new ImageIcon( new URL( "" + o +"?server=logo" ) );
+                Image im= result.getImage();
+                int h= im.getWidth(null);
+                int w= im.getHeight(null);
+                int s= 20;
+                int h1= Math.min(24,s*w/h);
+                BufferedImage bi=  new BufferedImage( s, h1, BufferedImage.TYPE_INT_ARGB);
+                Graphics g= bi.createGraphics();
+                g.drawImage( im, 0, 0, s, h1, null, null );
+                result= new ImageIcon(bi);
+                logger.log(Level.FINE, "time to load icon for {0}: {1}", new Object[]{s, System.currentTimeMillis()-t1});
+                icons.put( o.toString(), result );
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } 
+        return result;
+    }
+    
+    private class IconCellRenderer implements ListCellRenderer {
+        DefaultListCellRenderer r= new DefaultListCellRenderer();
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Icon icon= iconFor( value );
+            ((DefaultListCellRenderer)c).setIcon(icon);
+            return c;
+        }
+    }
+    
+    private ListCellRenderer myListCellRenderer= new IconCellRenderer();
+    
     private List<String> listPeers( String suri ) {
 
         String uri= suri+"?server=peers";
@@ -604,6 +659,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         } else {
             logger.log( Level.FINE, "no history file found: {0}", hist );
         }
+        
+        List<String> rm= new ArrayList();
+        for ( String s: d2ss1 ) {
+            Icon i= iconFor(s); // force load of icon off the event thread.
+        }
+        
         return d2ss1;
 
     }
