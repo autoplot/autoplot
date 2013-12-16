@@ -29,4 +29,4 @@ mm.BoxSelected=boxSelected
 plot.dasMouseInputAdapter.primaryModule= mm
 
 import javax
-javax.swing.JOptionPane.showMessageDialog(None,'Draw a box, and it will be recorded on the digitizer tab')
+javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Draw a box, and it will be recorded on the digitizer tab')
