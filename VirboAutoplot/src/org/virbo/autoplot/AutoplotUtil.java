@@ -1386,24 +1386,6 @@ public class AutoplotUtil {
         return result;
     }
 
-    /**
-     * Rewrite the dataset so that fill values are set by the valid extent and fill
-     * controls.  The user can override these values, so make sure the values that came
-     * with the dataset are observed as well.
-     *
-     * Note an old version of this would make fill canonical, now this simply resets the
-     * VALID_MIN, VALID_MAX, and FILL_VALUE properties.
-     *
-     * Old values of vmin, vmax, and fill are ignored.
-     * 
-     */
-    public static void applyFillValidRange(MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
-
-        // TODO bug 1141: reimplement this.
-        if (vmin > (-1 * Double.MAX_VALUE)) ds.putProperty(QDataSet.VALID_MIN, vmin);
-        if (vmax < Double.MAX_VALUE)        ds.putProperty(QDataSet.VALID_MAX, vmax);
-        if (!Double.isNaN(fill))            ds.putProperty(QDataSet.FILL_VALUE, fill);
-    }
 
     /**
      * extract the properties from the dataset into the same format as metadata model returns.
