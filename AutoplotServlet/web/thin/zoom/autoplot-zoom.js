@@ -75,8 +75,12 @@ function refresh() {
 
 /**
  * the current URL to set.  The timerange is reset by appending to this "timeRange=" + iso8601s + "/" + iso8601e;
+ * If blank, then read the URL from vapta input area.
  */
 function resetUrl(url) {
+    if ( url.length===0 ) {
+        url= '../../SimpleServlet?vap='+document.getElementById('vapta').value;
+    }
     $('#progress').attr('src', 'spinner.gif');
     imgurl = url;
     ImageInfo.loadInfo(imgurl, mycallback);
