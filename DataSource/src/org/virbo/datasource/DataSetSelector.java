@@ -366,7 +366,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     tsb.setTimeRange(timeRange);
                                     String suri= tsb.getURI();
                                     problems.remove( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ); 
-                                    if ( !f.reject( suri, new ArrayList<String>(), mon) ) {
+                                    if ( !f.reject( suri, problems, mon) ) {
                                         setMessage("accepted uri after setting timerange");
                                         int modifiers= this.keyModifiers;
                                         setValue(suri);
