@@ -862,7 +862,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String oldServerURL = this.serverURL;
         this.serverURL = serverURL;
         if ( !this.serverURL.equals(oldServerURL) ) {
-            timeRangeTextField.setText( DEFAULT_TIMERANGE );
+            //timeRangeTextField.setText( DEFAULT_TIMERANGE );
             descriptionLabel.setText("");
             jTree1.setModel( waitTreeModel() );
             RequestProcessor.invokeLater( getDataSetsRunnable() );
