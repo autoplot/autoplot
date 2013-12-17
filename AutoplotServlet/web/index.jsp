@@ -16,8 +16,8 @@
     </head>
     <body>
         <h2>Autoplot Servlet</h2>
-        <p>This is an example showing how Autoplot can be used to produce graphics
-        for clients via HTTP.  Request parameters are sent to the <a href="simple.jsp">"SimpleServlet"</a>
+        <p>The <a href="simple.jsp">"SimpleServlet"</a> is an example showing how Autoplot can be used to produce graphics
+        for clients via HTTP.  Request parameters are sent to the servlet,
         indicating the data set URI or vap file to plot, and parameters such as
         plot size.  Autoplot then produces a static image or PDF on the server
         side, and sends the result.
