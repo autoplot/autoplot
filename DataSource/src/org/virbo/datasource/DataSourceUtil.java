@@ -34,6 +34,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
@@ -815,6 +817,20 @@ public class DataSourceUtil {
         JOptionPane.showMessageDialog( parent, msg, title, messageType );
     }
     
+    /**
+     * Matlab uses net.sf.saxon.xpath.XPathEvaluator by default, so we explicitly look for the Java 6 one.
+     * @return com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl, probably.
+     */
+    public static XPathFactory getXPathFactory() {
+        XPathFactory xpf;
+        try {
+            xpf= XPathFactory.newInstance( XPathFactory.DEFAULT_OBJECT_MODEL_URI, "com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl", null );
+        } catch (XPathFactoryConfigurationException ex) {
+            xpf= XPathFactory.newInstance();
+            logger.log( Level.INFO, "using default xpath implementation: {0}", xpf.getClass());
+        }
+        return xpf;
+    }
 //    /**
 //     * Used for debugging, this dumps the data out to a das2stream.
 //     * @param ds
