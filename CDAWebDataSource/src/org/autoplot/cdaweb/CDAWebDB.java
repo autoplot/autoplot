@@ -46,6 +46,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -227,14 +228,7 @@ public class CDAWebDB {
      * @return com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl, probably.
      */
     private static XPathFactory getXPathFactory() {
-        XPathFactory xpf;
-        try {
-            xpf= XPathFactory.newInstance( XPathFactory.DEFAULT_OBJECT_MODEL_URI, "com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl", null );
-        } catch (XPathFactoryConfigurationException ex) {
-            xpf= XPathFactory.newInstance();
-            logger.log( Level.INFO, "using default xpath implementation: {0}", xpf.getClass());
-        }
-        return xpf;
+        return DataSourceUtil.getXPathFactory();
     }
     
     /**
