@@ -57,12 +57,17 @@
      		}) */
         </script>
 
-<a href="#" onclick="resetUrl('../../SimpleServlet?uri=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em');">demo1</a>
-<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap%2Bdas2server%3Ahttp%3A%2F%2Femfisis.physics.uiowa.edu%2Fdas%2Fdas2Server%3Fdataset%3Drbsp%2FRBSP-A%2FHFR_spectra.dsdf%26start_time%3D2012-09-25T00%3A00%3A00.000Z%26end_time%3D2012-09-26T00%3A00%3A00.000Z');">demo2</a>
-<a href="#" onclick="resetUrl('../../SimpleServlet?vap=http://autoplot.org/data/autoplot-applet.vap');">demo3</a>
-<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap+cdaweb:ds%3DAC_H1_EPM&id%3DE4p%26timerange%3D2011-06-08');">demo4</a>
-<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap+pdsppi:id%3DPPI/VG_1501/DATA/PLS/ELE_MOM/T790301%26ds%3DELE_DEN');">demo5</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?uri=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em');return false;">tsds</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap%2Bdas2server%3Ahttp%3A%2F%2Femfisis.physics.uiowa.edu%2Fdas%2Fdas2Server%3Fdataset%3Drbsp%2FRBSP-A%2FHFR_spectra.dsdf%26start_time%3D2012-09-25T00%3A00%3A00.000Z%26end_time%3D2012-09-26T00%3A00%3A00.000Z');">das2server</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?vap=http://autoplot.org/data/autoplot-applet.vap');">vap</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap+cdaweb:ds%3DAC_H1_EPM&id%3DE4p%26timerange%3D2011-06-08');">cdaweb</a>
+<a href="#" onclick="resetUrl('../../SimpleServlet?uri=vap+pdsppi:id%3DPPI/VG_1501/DATA/PLS/ELE_MOM/T790301%26ds%3DELE_DEN');">pdsppi</a>
 
+<br>
+    <form>
+    <input id='vapta' size="80">
+        <button onclick="resetUrl(''); return false;">GO</button>
+    </form>
 <hr></hr>
 <p>Click and drag a range on the plot to zoom in.  Buttons below zoom out
         and scan.  Click to read coordinates, and the center button will center the 
