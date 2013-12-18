@@ -1,11 +1,9 @@
 package org.das2.jythoncompletion;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -14,7 +12,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -22,7 +19,6 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
-import org.das2.jythoncompletion.support.CompletionItem;
 
 /*
  * This is the engine that does the Jython completions.  We figure out the
@@ -79,7 +75,7 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
-    public void query(CompletionResultSet arg0) {
+    public void query(CompletionResultSet arg0) throws PyException {
         try {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
             CompletionContext cc = CompletionSupport.getCompletionContext(editor);
@@ -327,13 +323,14 @@ public class JythonCompletionTask implements CompletionTask {
                 "list.append('*')\n" + 
                 "list\n";
         PyList po2;
-        try {
-            interp.exec(eval);
-        } catch ( PyException e ) {  // "no module called c" when c<TAB>
-            // empty list
-            e.printStackTrace();
-            return;
-        }
+
+        //try {    // this is handled at a higher level now.
+        interp.exec(eval);
+//        } catch ( PyException e ) {  // "no module called c" when c<TAB>
+//            // empty list
+//            e.printStackTrace();
+//            return;
+//        }
         po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
