@@ -31,7 +31,7 @@ public class Test010 {
         List<String> tests= new ArrayList();
         tests.add("http://autoplot.org/data/foo.dat");
         tests.add("http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
-        tests.add("http://stevens.lanl.gov/");
+        tests.add("http://www.rbsp-ect.lanl.gov/");
         tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
         tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
         //tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
