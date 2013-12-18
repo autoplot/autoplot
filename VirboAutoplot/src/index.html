@@ -25,12 +25,14 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>catch more RTEs in Jython Script panel when using completions.</li>
+            <li>remove old code that would reset the timerange when switching das2servers.  This could break bindings.</li>
             <li>clean up of export to rich ascii</li>
             <li>hide confusing plot buttons on add bookmark popup</li>
             <li>log level are not set initially.  This was unnecessary and prevented use of logging.properties file</li>
             <li>rte 1171026816: George's RTE about RBSP-ECT file</li>
             <li>1140: bugfix in TSB where events where thrown out when application was locked, so data wouldn't load</li>
-            <li>rte 1466756642: new code broke "View in Autoplot" button.  Thanks balazs, dgcrawfo, and icohen</li>
+            <li>rte 1466756642: new code broke "View in Autoplot" button.  Thanks ksigsbee, balazs, dgcrawfo, and icohen</li>
             <li>1138: don't mistake "/c" for protocol in "/c:/"</li>
             <li>isConstant uses equivalent function now, instead of .equals.</li>
             <li>A CDF variable's DELTA_PLUS_VAR could point to itself, cause infinite recursion and crashing Java</li>
@@ -53,6 +55,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Example thin client code allows arbitrary .vap to be used</li>
             <li>check for NetCDF/HDF magic number in CDF GUI</li>
             <li>Improve logging with new "gui" logger that will improve feedback for debugging</li>
             <li>length render shows equation of the line</li>
