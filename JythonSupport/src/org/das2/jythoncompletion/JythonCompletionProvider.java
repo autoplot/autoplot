@@ -14,6 +14,7 @@ import org.das2.jythoncompletion.support.AsyncCompletionTask;
 import org.das2.jythoncompletion.support.CompletionProvider;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
+import org.python.core.PyException;
 
 /**
  *
@@ -46,7 +47,15 @@ public class JythonCompletionProvider implements CompletionProvider {
         return new AsyncCompletionTask( new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet resultSet, Document doc, int caretOffset) {
-                syncTask.query(resultSet);
+                try {
+                    syncTask.query(resultSet);
+                } catch ( PyException ex ) {
+                    if ( resultSet.isFinished() ) {
+                        setMessage("warning: "+ex.toString());
+                    } else {
+                        resultSet.addItem( new MessageCompletionItem(ex.getMessage()) );
+                    }
+                }
             }
         });
     }
