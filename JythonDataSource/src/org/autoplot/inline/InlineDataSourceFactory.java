@@ -61,6 +61,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
+        if ( surl.length()==11 ) return true;
         return super.reject(surl, problems, mon); //To change body of generated methods, choose Tools | Templates.
     }
 
