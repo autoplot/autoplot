@@ -4,11 +4,17 @@
  */
 package org.autoplot.inline;
 
+import java.awt.BorderLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -51,7 +57,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
         jLabel1 = new javax.swing.JLabel();
-        examples = new javax.swing.JComboBox();
+        examplesButton = new javax.swing.JButton();
 
         jTabbedPane1.setToolTipText("jython tab allows short scripts to be constructed");
         jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -107,13 +113,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                         .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 11, Short.MAX_VALUE)
-                                .addComponent(jButton2)))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -127,7 +131,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2)
-                        .addGap(0, 197, Short.MAX_VALUE)))
+                        .addGap(0, 203, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -138,10 +142,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jLabel1.setText("<html>Enter lines of jython assignments and expressions.  Expressions are interpreted as the X values, then Y values, then Z values if specified.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        examples.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "ex1", "ex2" }));
-        examples.addActionListener(new java.awt.event.ActionListener() {
+        examplesButton.setText("Examples...");
+        examplesButton.setToolTipText("Example scripts");
+        examplesButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                examplesActionPerformed(evt);
+                examplesButtonActionPerformed(evt);
             }
         });
 
@@ -153,9 +158,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                        .addComponent(examples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE))
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
@@ -164,10 +169,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(examples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(examplesButton)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -187,9 +192,12 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         LoggerManager.logGuiEvent(evt);
-        JTextField tf= new JTextField();
-        if ( JOptionPane.showConfirmDialog(schemeComboBox,tf,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
-            String sval= tf.getText();
+        JTextField tf1= new JTextField();
+        if ( tm.getRowCount()>0 ) {
+            tf1.setText( (String)tm.getValueAt(tm.getRowCount()-1,0) );
+        }
+        if ( JOptionPane.showConfirmDialog(schemeComboBox,tf1,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
+            String sval= tf1.getText();
             String[] ss= new String[tm.getRowCount()+1];
             for ( int i=0; i<tm.getRowCount(); i++ ) {
                 ss[i]= (String)tm.getValueAt(i,0);
@@ -241,16 +249,33 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
     }//GEN-LAST:event_schemeComboBoxActionPerformed
 
-    private void examplesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesActionPerformed
-        if ( examples.getSelectedIndex()==0 ) {
-            tf.setText("linspace(0,5*PI,100)\nt&sin(linspace(0,5*PI,100))");
-        } else if ( examples.getSelectedIndex()==1 ) {
-            tf.setText("t=linspace(0,5*PI,100)\nt&sin(t)");
+    private void examplesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        final String t1= "linspace(0,5*PI,100)\nsin(linspace(0,5*PI,100))";
+        final JTextArea tf1= new JTextArea(5,40);
+        tf1.setText(t1);
+        final JComboBox examples= new JComboBox( new DefaultComboBoxModel( new Object[] { "ex1","ex2" }) );
+        examples.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( examples.getSelectedIndex()==0 ) {
+                    tf1.setText(t1);
+                } else if ( examples.getSelectedIndex()==1 ) {
+                    tf1.setText("t=linspace(0,5*PI,100)\nt\nsin(t)");
+                }
+            }
+        } );
+        JPanel p= new JPanel();
+        p.setLayout( new BorderLayout() );
+        p.add( examples, BorderLayout.NORTH );
+        p.add( tf1, BorderLayout.CENTER );
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( examplesButton, p, "Example Inline Jython", JOptionPane.OK_CANCEL_OPTION ) ) {
+            jTextPane1.setText( tf1.getText() );
         }
-    }//GEN-LAST:event_examplesActionPerformed
+    }//GEN-LAST:event_examplesButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox examples;
+    private javax.swing.JButton examplesButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -318,6 +343,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 t.append(ss[i]);
             }
             text= t.toString();
+            this.tm= null;
         }
     }
 
@@ -328,9 +354,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public JPanel getPanel() {
+        TableModel ltm= tm;
         initComponents();
         if ( text!=null ) jTextPane1.setText(text);
-        if ( tm!=null ) {
+        if ( ltm!=null ) {
             this.table.setModel(tm);
             tf= new JTextField();
             tf.setEditable(true);
