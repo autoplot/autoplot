@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -22,6 +23,7 @@ import org.das2.components.propertyeditor.PropertyEditorAdapter;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsutil.QDataSetTableModel;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
@@ -51,8 +53,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         schemeComboBox = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
+        deleteSelectedButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -66,7 +68,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
-        schemeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Event List" }));
+        schemeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Event List", "Y(X)" }));
         schemeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 schemeComboBoxActionPerformed(evt);
@@ -75,30 +77,30 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Title 1", "Title 2"
             }
         ));
         jScrollPane1.setViewportView(table);
 
-        jButton1.setText("Add");
-        jButton1.setToolTipText("Add a record");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addButton.setText("Add");
+        addButton.setToolTipText("Add a record");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Delete Selected");
-        jButton2.setToolTipText("Delete selected records");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        deleteSelectedButton.setText("Delete Selected");
+        deleteSelectedButton.setToolTipText("Delete selected records");
+        deleteSelectedButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                deleteSelectedButtonActionPerformed(evt);
             }
         });
 
@@ -116,8 +118,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -128,9 +130,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
+                        .addComponent(deleteSelectedButton)
                         .addGap(0, 203, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -190,48 +192,87 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         JTextField tf1= new JTextField();
         if ( tm.getRowCount()>0 ) {
-            tf1.setText( (String)tm.getValueAt(tm.getRowCount()-1,0) );
+            StringBuilder sval= new StringBuilder( (String)tm.getValueAt(tm.getRowCount()-1,0) );
+            for ( int j=1; j<tm.getColumnCount(); j++ ) {
+                sval.append(",").append( (String)tm.getValueAt(tm.getRowCount()-1,j) );
+            } 
+            tf1.setText( sval.toString() );
         }
         if ( JOptionPane.showConfirmDialog(schemeComboBox,tf1,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
             String sval= tf1.getText();
             String[] ss= new String[tm.getRowCount()+1];
             for ( int i=0; i<tm.getRowCount(); i++ ) {
-                ss[i]= (String)tm.getValueAt(i,0);
+                if ( tm.getColumnCount()>1 ) {
+                    StringBuilder sb= new StringBuilder();
+                    sb.append((String)tm.getValueAt(i,0));
+                    for ( int j=1; j<tm.getColumnCount(); j++ ) {
+                        sb.append(",").append((String)tm.getValueAt(i,j));
+                    }
+                    ss[i]= sb.toString();
+                } else {
+                    ss[i]= (String)tm.getValueAt(i,0);
+                }
             }
-            ss[tm.getRowCount()]= sval;
-            tm= toTableModel(ss);
+            if ( tm.getColumnCount()>1 ) {
+                ss[tm.getRowCount()]= sval;
+                
+                tm= toTableModel( DataSourceUtil.strjoin( Arrays.asList(ss), ";" ), 2 );
+                
+            } else {
+                ss[tm.getRowCount()]= sval;
+                tm= toTableModel(ss);
+            }
             table.setModel( tm );
         }
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_addButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private String getValueAt( TableModel tm, int i, int j ) {
+        String ss= (String)tm.getValueAt(i,0);
+        ss= ss.replaceAll(",","");
+        ss= ss.replaceAll(";","");
+        return ss;
+    }
+
+    
+    private void deleteSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSelectedButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         int[] rows= table.getSelectedRows();
-        String[] ss= new String[tm.getRowCount()-rows.length];
+        //String[] ss= new String[tm.getRowCount()-rows.length];
+        StringBuilder sb= new StringBuilder();
         
         int irow= 0;
-        int j= 0;
+        int k= 0;
         
         if ( rows.length==0 ) {
             return;
         }
         
+        boolean rank2Table= tm.getColumnCount()>1;
+        
         for ( int i=0; i<tm.getRowCount(); i++ ) {
             if ( rows[irow]==i ) {
                 irow++;
             } else {
-                ss[j]= (String)tm.getValueAt(i,0);
-                j++;
+                if ( k>0 ) sb.append( rank2Table ? ";" : ",");
+                if ( rank2Table ) {
+                    for ( int j=0; j<tm.getColumnCount(); j++ ) {
+                        if ( j>0 ) sb.append(",");
+                        sb.append( getValueAt(tm,i,j));
+                    }
+                } else {
+                    sb.append( getValueAt(tm,i,0));
+                }
+                k++;
             }
         }
-        tm= toTableModel(ss);
+        tm= toTableModel(sb.toString(), 2);
         table.setModel( tm );
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
         LoggerManager.logGuiEvent(evt);
@@ -246,7 +287,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         LoggerManager.logGuiEvent(evt);
         if ( schemeComboBox.getSelectedIndex()==0 ) {
             tm= toTableModel( new String[0] );
+        } else if ( schemeComboBox.getSelectedIndex()==1 ) {
+            tm= toTableModel( 0, 2 );
         }
+        table.setModel( tm );
     }//GEN-LAST:event_schemeComboBoxActionPerformed
 
     private void examplesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesButtonActionPerformed
@@ -275,9 +319,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     }//GEN-LAST:event_examplesButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
+    private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JButton examplesButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -303,6 +347,61 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return true;
     }
 
+    private static TableModel toTableModel( final int nr, final int nc ) {
+        TableModel   tm= new AbstractTableModel() {
+
+            @Override
+            public int getRowCount() {
+                return nr;
+            }
+
+            @Override
+            public int getColumnCount() {
+                return nc;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return "";
+            }
+        };
+        return tm;
+
+    }
+    
+    /**
+     *
+     * @param s the value of s
+     * @param rank the value of rank
+     */
+    private static TableModel toTableModel( final String s, int rank) {
+        final String[] ss= s.split(";");
+        if ( rank==1 ) {
+            return toTableModel( s.split(",") );
+        }
+        final int nc= ss[0].split(",").length;
+        
+        TableModel   tm= new AbstractTableModel() {
+
+                @Override
+                public int getRowCount() {
+                    return ss.length;
+                }
+
+                @Override
+                public int getColumnCount() {
+                    return nc;
+                }
+
+                @Override
+                public Object getValueAt(int rowIndex, int columnIndex) {
+                    String[] sss= ss[rowIndex].split(",");
+                    return sss[columnIndex];
+                }
+            };
+        return tm;
+    }
+    
     private static TableModel toTableModel( final String[] s ) {
          TableModel   tm= new AbstractTableModel() {
 
@@ -333,8 +432,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             int amp= uri.indexOf("&");
             if ( amp==-1 ) amp= uri.length();
             String lit= uri.substring(0,amp);
-            String[] ss= lit.split(",");
-            this.tm= toTableModel(ss);
+            if ( lit.contains(";") ) {
+                this.tm= toTableModel(lit, 2);
+            } else {
+                this.tm= toTableModel(lit, 1);
+            }
         } else {
             String[] ss= uri.split("&");
             StringBuilder t= new StringBuilder();
@@ -358,7 +460,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         initComponents();
         if ( text!=null ) jTextPane1.setText(text);
         if ( ltm!=null ) {
-            this.table.setModel(tm);
+            if ( tm.getColumnCount()==2 ) {
+                this.schemeComboBox.setSelectedIndex(1);
+            }
+            this.table.setModel(ltm); //schemeComboBox.setSelectedIndex resets the table.
             tf= new JTextField();
             tf.setEditable(true);
             this.table.setCellEditor(new DefaultCellEditor(tf) );
@@ -380,8 +485,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( jTabbedPane1.getSelectedIndex()==0 ) {
             StringBuilder s= new StringBuilder( "vap+inline:" );
             for ( int i=0; i<tm.getRowCount(); i++ ) {
-                if ( i>0 ) s.append(",");
-                s.append(tm.getValueAt(i,0));
+                if ( tm.getColumnCount()>1 ) {
+                    if ( i>0 ) s.append(";");
+                    for ( int j=0; j<tm.getColumnCount();j++ ) {
+                        if ( j>0 ) s.append(",");
+                        s.append(tm.getValueAt(i,j));
+                    }
+                } else {
+                    if ( i>0 ) s.append(",");
+                    s.append(tm.getValueAt(i,0));
+                }
             }
             s.append("&RENDER_TYPE=eventsBar");
             return s.toString();
