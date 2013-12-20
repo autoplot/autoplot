@@ -516,7 +516,7 @@ public class AutoplotUtil {
         JLabel l1= new JLabel( string );
         p.add( l1, BorderLayout.CENTER );
         JPanel p1= new JPanel( new BorderLayout() );
-        p1.add( new JButton( new AbstractAction("View Exception") {
+        p1.add( new JButton( new AbstractAction("Details...") {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);        
