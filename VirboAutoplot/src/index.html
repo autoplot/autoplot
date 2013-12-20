@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New where parameter for CDF makes it easier to filter by mode.</small></p>
+        <p><small>Winter break project: can a script count the rings?</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -30,6 +30,7 @@
             <li>clean up of export to rich ascii</li>
             <li>hide confusing plot buttons on add bookmark popup</li>
             <li>log level are not set initially.  This was unnecessary and prevented use of logging.properties file</li>
+            <li>rte 1199617891: Java CDF would produce RTE when parameter is null.</li>
             <li>rte 1171026816: George's RTE about RBSP-ECT file</li>
             <li>1140: bugfix in TSB where events where thrown out when application was locked, so data wouldn't load</li>
             <li>rte 1466756642: new code broke "View in Autoplot" button.  Thanks ksigsbee, balazs, dgcrawfo, and icohen</li>
