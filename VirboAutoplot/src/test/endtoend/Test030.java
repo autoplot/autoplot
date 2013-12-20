@@ -11,7 +11,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 /**
  * tests of metadata representation in the ascii file parser, that provides a means
- * for putting metadata into ascii file headers.
+ * for putting metadata into ascii file headers. "Rich ascii"
  *
  * http://sourceforge.net/tracker/?func=detail&aid=3169739&group_id=199733&atid=970685
  * JSON-encoded metadata support in ASCII files
