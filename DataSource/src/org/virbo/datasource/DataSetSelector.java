@@ -53,6 +53,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -1197,7 +1198,10 @@ public class DataSetSelector extends javax.swing.JPanel {
         buttons.add( new JButton( new AbstractAction("Details...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                org.das2.util.LoggerManager.logGuiEvent(e);                
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                JComponent c= (JComponent)e.getSource();
+                JDialog dia= (JDialog) SwingUtilities.getWindowAncestor(c);
+                dia.dispose();
                 FileSystem.getExceptionHandler().handle(ex);
             }
         } ), BorderLayout.EAST );
