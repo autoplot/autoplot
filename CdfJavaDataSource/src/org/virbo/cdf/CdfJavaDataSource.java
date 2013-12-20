@@ -243,6 +243,10 @@ public class CdfJavaDataSource extends AbstractDataSource {
             }
             String constraint = null;
 
+            if ( svariable==null ) {
+                throw new IllegalArgumentException("CDF URI needs an argument");
+            }
+            
             String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
                 Variable variable;
