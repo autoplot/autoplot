@@ -63,7 +63,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                         boolean invisible= true;
                         StringBuilder err= new StringBuilder();
                         for ( Handler h: logger.getHandlers() ) {
-                            if ( h.getLevel().intValue()>level.intValue() ) {
+                            if ( level!=null && h.getLevel().intValue()>level.intValue() ) {
                                 err.append("handler filters data: ").append(h).append( "\n");
                             } else {
                                 invisible= false; 
