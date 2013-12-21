@@ -181,59 +181,8 @@ public class JythonOps {
      * @param value
      * @return the dataset, possibly converted to a mutable dataset.
      */
-    public static MutablePropertyDataSet putProperty( QDataSet ds, String name, Object value ) {
-        
-        MutablePropertyDataSet mds;
-        if ( !( ds instanceof MutablePropertyDataSet ) ) {
-            mds= ArrayDataSet.maybeCopy(ds);
-        } else {
-            mds= (MutablePropertyDataSet)ds;            
-        }
-        
-        if ( name.equals( QDataSet.BINS_0 ) || 
-                name.equals( QDataSet.BINS_1 ) || 
-                name.equals( QDataSet.BIN_MINUS ) || 
-                name.equals( QDataSet.BIN_PLUS ) || 
-                name.equals( QDataSet.DELTA_MINUS ) || 
-                name.equals( QDataSet.DELTA_PLUS ) || 
-                name.equals( QDataSet.DEPEND_0 ) || 
-                name.equals( QDataSet.DEPEND_1 ) || 
-                name.equals( QDataSet.DEPEND_2 ) || 
-                name.equals( QDataSet.DEPEND_3 ) || 
-                name.equals( QDataSet.CADENCE ) 
-                ) {
-            mds.putProperty(name, Ops.dataset(value));
-        } else if ( name.equals( QDataSet.CACHE_TAG ) ) {
-            if ( value instanceof String ) {
-                String svalue= (String)value;
-                int i= svalue.indexOf("@");
-                try {
-                    DatumRange tr= DatumRangeUtil.parseTimeRange( svalue.substring(0,i) );
-                    CacheTag r;
-                    if ( i==-1 ) {
-                        value= new CacheTag( tr, null );
-                    } else if ( svalue.substring(i+1).trim().equals("intrinsic") ) {
-                        value= new CacheTag( tr, null );
-                    } else {
-                        Datum res= Units.seconds.parse(svalue.substring(i+1));
-                        value= new CacheTag( tr, res );
-                    }
-                } catch ( ParseException ex ) {
-                    throw new IllegalArgumentException(ex);
-                }
-            }
-            mds.putProperty( name, value);
-        } else if ( name.equals( QDataSet.UNITS ) ) {
-            if ( value instanceof String ) {
-                String svalue= (String)value;
-                value= SemanticOps.lookupUnits(svalue);
-            }
-            mds.putProperty( name, value);
-
-        } else {
-            mds.putProperty( name, value);
-        }
-        return mds;
+    public static MutablePropertyDataSet putProperty( QDataSet ds, String name, Object value ) {   
+        return Ops.putProperty( ds, name, value );
     }
     
     /**
