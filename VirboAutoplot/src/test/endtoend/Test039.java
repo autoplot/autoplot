@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
@@ -25,7 +24,8 @@ import org.virbo.dsops.Ops;
 import test.graph.QFunctionLarry;
 
 /**
- * Test of Das2 aspects used as APL
+ * Test of Das2 aspects used as APL.  
+ * test019 and test009 also test das2 internals.
  * @author jbf
  */
 public class Test039 {
