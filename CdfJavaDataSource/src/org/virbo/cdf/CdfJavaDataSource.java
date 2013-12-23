@@ -200,6 +200,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
             }
         } catch (Throwable ex) {
+            logger.log( Level.SEVERE, "An exception was caught in CdfJava openFiles caching", ex );
+            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
         timer.tickle("unload cdf soon");
