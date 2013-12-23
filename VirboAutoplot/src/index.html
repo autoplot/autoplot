@@ -28,6 +28,9 @@
             <li>RPW Group's data looked bad with LANL NN rebinning because cadence detection failed.  Pull out code that infers bins from ytags.</li>
             <li>catch more RTEs in Jython Script panel when using completions.</li>
             <li>1142: remove old code that would reset the timerange when switching das2servers.  This could break bindings.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>clean up of export to rich ascii</li>
             <li>hide confusing plot buttons on add bookmark popup</li>
             <li>log level are not set initially.  This was unnecessary and prevented use of logging.properties file</li>
@@ -42,23 +45,13 @@
             <li>the delegate editor with aggregation could not remove parameters.</li>
             <li>DataSourceEditor browseSourceType handles plugins like script:... properly, avoiding runtime error.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>Edit->Options copied to Options->Additional Options, Edit-Options will be removed after AGU.</li>
-            <li>check rich ascii dep0 for colon splitting name from description</li>
-            <li>1128: horizontal and vertical slices need to go away when data goes away</li>
-            <li>1129: renderers can get out of sync with axes, fail to repaint</li>
-            <li>1130: bugfix in java cdf, where outerProduct was used to replicate a non-varying record, replacing invalid measurements with fill value, so valid range could not be corrected.</li>
-            <li>addTab is run on event thread, could cause deadlock</li>
-            <li>reference in DataSource to QStream removed because it was not necessary and caused compile problems.</li>
-            <li>clean up after vertical and horizontal spectrogram slicers when spectrogram is removed</li>
-            <li>1095: Seth showed experimental handling of reference cache was causing problems.</li>
-            <li>empty CDF files now trigger NoDataInIntervalException when a variable contains no records, rather than IllegalArgumentException, to support use in scripts.</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>Inline data source now has editor panel, with discovery.</li>
             <li>Example thin client code allows arbitrary .vap to be used</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>check for NetCDF/HDF magic number in CDF GUI</li>
             <li>Improve logging with new "gui" logger that will improve feedback for debugging</li>
             <li>length render shows equation of the line</li>
@@ -66,16 +59,6 @@
             <li>CDF data source allows &amp;where=mode.eq(1)</li>
             <li>slice1 allows slicing at a datum like "1000 eV"</li>
             <li>history dialog has .vap button for convenience and example filter.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>waveform data supported in the series renderer, allowing finer control.</li>
-            <li>add DasPlot options for plot background color, grid color, etc</li>
-            <li>properly signed jnlp application allows launching without excessive security dialogs</li>
-            <li>Also, message bubble timeout preference introduced as well as displayLogLevel</li>
-            <li>1093: printingLogLevel preference allows messages to be turned off when printing.</li>
-            <li>Options panel replaced with custom GUI, old and redundant controls removed, explanations added</li>
-            <li>introductory support for VOTables.</li>
         </ul>
 
         <p>Known issues:</p>
