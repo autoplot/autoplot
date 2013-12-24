@@ -5,6 +5,7 @@
 package org.autoplot.inline;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,8 +25,6 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.dsutil.QDataSetTableModel;
-import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
  *
@@ -55,6 +54,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         table = new javax.swing.JTable();
         addButton = new javax.swing.JButton();
         deleteSelectedButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -104,6 +104,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
+        jLabel2.setText("Dataset Type:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -112,20 +114,24 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -162,7 +168,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE))
+                        .addComponent(examplesButton, javax.swing.GroupLayout.PREFERRED_SIZE, 102, Short.MAX_VALUE))
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
@@ -174,7 +180,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -194,16 +200,20 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
-        JTextField tf1= new JTextField();
-        if ( tm.getRowCount()>0 ) {
-            StringBuilder sval= new StringBuilder( (String)tm.getValueAt(tm.getRowCount()-1,0) );
-            for ( int j=1; j<tm.getColumnCount(); j++ ) {
-                sval.append(",").append( (String)tm.getValueAt(tm.getRowCount()-1,j) );
-            } 
-            tf1.setText( sval.toString() );
+        JPanel p= new JPanel();
+        p.setLayout( new FlowLayout() );
+        JTextField[] tfs= new JTextField[tm.getColumnCount()];
+        for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
+            JTextField tf1= new JTextField();
+            tf1.setColumns(20);
+            int ir= tm.getRowCount()-1;
+            if ( tm.getRowCount()>0 ) {
+                tf1.setText( String.valueOf( tm.getValueAt(ir,i) ) );
+            }
+            p.add(tf1);
+            tfs[i]= tf1;
         }
-        if ( JOptionPane.showConfirmDialog(schemeComboBox,tf1,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
-            String sval= tf1.getText();
+        if ( JOptionPane.showConfirmDialog(schemeComboBox,p,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
             String[] ss= new String[tm.getRowCount()+1];
             for ( int i=0; i<tm.getRowCount(); i++ ) {
                 if ( tm.getColumnCount()>1 ) {
@@ -216,6 +226,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 } else {
                     ss[i]= (String)tm.getValueAt(i,0);
                 }
+            }
+            String sval= tfs[0].getText();
+            for ( int i=1; i<tm.getColumnCount(); i++ ) {
+                sval+= "," + tfs[i].getText();
             }
             if ( tm.getColumnCount()>1 ) {
                 ss[tm.getRowCount()]= sval;
@@ -232,7 +246,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     }//GEN-LAST:event_addButtonActionPerformed
 
     private String getValueAt( TableModel tm, int i, int j ) {
-        String ss= (String)tm.getValueAt(i,0);
+        String ss= (String)tm.getValueAt(i,j);
         ss= ss.replaceAll(",","");
         ss= ss.replaceAll(";","");
         return ss;
@@ -255,7 +269,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         boolean rank2Table= tm.getColumnCount()>1;
         
         for ( int i=0; i<tm.getRowCount(); i++ ) {
-            if ( rows[irow]==i ) {
+            if ( irow<rows.length && rows[irow]==i ) {
                 irow++;
             } else {
                 if ( k>0 ) sb.append( rank2Table ? ";" : ",");
@@ -270,7 +284,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 k++;
             }
         }
-        tm= toTableModel(sb.toString(), 2);
+        int rank= tm.getColumnCount()>1 ? 2 : 1;
+        tm= toTableModel(sb.toString(), rank );
         table.setModel( tm );
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
@@ -323,6 +338,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JButton examplesButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -463,6 +479,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             if ( tm.getColumnCount()==2 ) {
                 this.schemeComboBox.setSelectedIndex(1);
             }
+            tm= ltm; // kludgy way to get around goofy code.
             this.table.setModel(ltm); //schemeComboBox.setSelectedIndex resets the table.
             tf= new JTextField();
             tf.setEditable(true);
@@ -475,6 +492,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             table.setRowHeight( cellHeight );
             table.setDefaultEditor( Object.class, editor );            
         } else {
+            this.schemeComboBox.setSelectedIndex(0);
             this.jTabbedPane1.setSelectedIndex(1);
         }
         return this;
