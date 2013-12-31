@@ -66,7 +66,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
     
-    static final Logger logger= LoggerManager.getLogger("apdss.cdfjava");
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdfjava");
     Map<String, Object> attributes;
 
     CdfJavaDataSource( URI uri ) {
@@ -183,15 +183,15 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
             } else {
                 synchronized (lock) { // freshen reference.
-                    long date= openFilesFresh.get(fileName);
-                    if ( new File(fileName).lastModified() > date ) {
+                    Long date= openFilesFresh.get(fileName);
+                    if ( date==null || ( new File(fileName).lastModified() > date ) ) {
                         cdf = CDFFactory.getCDF(fileName);
                         openFiles.put(fileName, cdf);
                         openFilesRev.put(cdf, fileName);
                         openFilesFresh.put(fileName,System.currentTimeMillis());
 
                     } else {
-                        cdfCacheUnload(fileName,false);
+                        //cdfCacheUnload(fileName,false);
                         openFiles.put(fileName, cdf);
                         openFilesRev.put(cdf, fileName);
                         openFilesFresh.put(fileName,System.currentTimeMillis());
@@ -905,7 +905,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
                         if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
                             QDataSet wds= SemanticOps.weightsDataSet(depDs);
-                            int i0=0;
+                            int i0;
                             int l0= (wds.length(0)-1)*1/8;
                             int l1= (wds.length(0)-1)*7/8;
                             for ( i0=0; i0<depDs.length(); i0++ ) {
