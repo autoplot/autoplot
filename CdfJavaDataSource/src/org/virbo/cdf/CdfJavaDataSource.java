@@ -491,7 +491,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         dep1_.putProperty( QDataSet.FILL_VALUE, null );
                         while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
                         if ( dep1_.value()>1e6 ) {
-                            logger.warning("offset units do not appear to be in "+dep1units+", using ns");
+                            logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
                             ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
                         }
                     }
