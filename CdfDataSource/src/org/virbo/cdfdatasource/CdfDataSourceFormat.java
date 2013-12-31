@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  * Format the QDataSet into CDF tables.
@@ -57,7 +58,16 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
         
-        if ( name==null ) name = (String) dep0.property(QDataSet.NAME);
+        if ( name==null ) {
+            name = (String) dep0.property(QDataSet.NAME);
+            if ( name!=null ) {
+                String s= Ops.safeName(name);
+                if ( !s.equals(name) ) {
+                    logger.log(Level.WARNING, "making invalid name valid: {0}", name);
+                    name= s;
+                }
+            }
+        }
         
         Units units = (Units) dep0.property(QDataSet.UNITS);
         if (name == null) {
