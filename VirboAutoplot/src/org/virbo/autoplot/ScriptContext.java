@@ -1053,6 +1053,11 @@ public class ScriptContext extends PyJavaInstance {
             lock.unlock();
             canvasLock.unlock();
         }
+        try {
+            waitUntilIdle();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
