@@ -50,7 +50,7 @@ public class DomOps {
      * Copy the plot and its axis settings, optionally binding the axes. Whether
      * the axes are bound or not, the duplicate plot is initially synchronized to
      * the source plot.
-     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlot(org.virbo.autoplot.dom.Plot, boolean, boolean, boolean) copyPlot}
+     * See {@link org.virbo.autoplot.dom.ApplicationController#copyPlot(org.virbo.autoplot.dom.Plot, boolean, boolean, boolean) copyPlot}
      * @param srcPlot
      * @param bindx
      * @param bindy
@@ -88,7 +88,7 @@ public class DomOps {
     /**
      * copy the plot elements from srcPlot to dstPlot.  This does not appear
      * to be used.
-     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlotElement(org.virbo.autoplot.dom.PlotElement, org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter) copyPlotElement}
+     * See {@link org.virbo.autoplot.dom.ApplicationController#copyPlotElement(org.virbo.autoplot.dom.PlotElement, org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter) copyPlotElement}
      * @param srcPlot plot containing zero or more plotElements.
      * @param dstPlot destination for the plotElements.
      * @return 
@@ -127,7 +127,7 @@ public class DomOps {
 
     /**
      * copyPlotAndPlotElements.  This does not appear to be used.
-     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlotAndPlotElements(org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter, boolean, boolean) copyPlotAndPlotElements}
+     * See {@link org.virbo.autoplot.dom.ApplicationController#copyPlotAndPlotElements(org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter, boolean, boolean) copyPlotAndPlotElements}
      * @param srcPlot
      * @param copyPlotElements
      * @param bindx
