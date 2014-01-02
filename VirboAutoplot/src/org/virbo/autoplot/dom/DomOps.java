@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.das2.datum.DatumVector;
 import org.das2.graph.DasRow;
-import org.das2.graph.TickVDescriptor;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -48,6 +46,18 @@ public class DomOps {
 
     }
 
+    /**
+     * Copy the plot and its axis settings, optionally binding the axes. Whether
+     * the axes are bound or not, the duplicate plot is initially synchronized to
+     * the source plot.
+     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlot(org.virbo.autoplot.dom.Plot, boolean, boolean, boolean) copyPlot}
+     * @param srcPlot
+     * @param bindx
+     * @param bindy
+     * @param direction
+     * @return the new plot
+     *
+     */    
     public static Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, Object direction ) {
         Application application= srcPlot.getController().getApplication();
         ApplicationController ac= application.getController();
@@ -75,7 +85,14 @@ public class DomOps {
 
     }
 
-
+    /**
+     * copy the plot elements from srcPlot to dstPlot.  This does not appear
+     * to be used.
+     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlotElement(org.virbo.autoplot.dom.PlotElement, org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter) copyPlotElement}
+     * @param srcPlot plot containing zero or more plotElements.
+     * @param dstPlot destination for the plotElements.
+     * @return 
+     */
     public static List<PlotElement> copyPlotElements( Plot srcPlot, Plot dstPlot ) {
 
         DataSourceFilter dsf= null;
@@ -94,14 +111,12 @@ public class DomOps {
                 PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, dsf);
                 newElements.add(newp);
                 List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
-                List<PlotElement> newKids = new ArrayList();
                 DataSourceFilter dsf1 = ac.getDataSourceFilterFor(newp);
                 for (PlotElement k : srcKids) {
                     if (srcElements.contains(k)) {
                         PlotElement kidp = ac.copyPlotElement(k, dstPlot, dsf1);
                         kidp.getController().setParentPlotElement(newp);
                         newElements.add(kidp);
-                        newKids.add(kidp);
                     }
                 }
             }
@@ -110,13 +125,31 @@ public class DomOps {
 
     }
 
-    
+    /**
+     * copyPlotAndPlotElements.  This does not appear to be used.
+     * {@link org.virbo.autoplot.dom.ApplicationController#copyPlotAndPlotElements(org.virbo.autoplot.dom.Plot, org.virbo.autoplot.dom.DataSourceFilter, boolean, boolean) copyPlotAndPlotElements}
+     * @param srcPlot
+     * @param copyPlotElements
+     * @param bindx
+     * @param bindy
+     * @param direction
+     * @return 
+     */
     public static Plot copyPlotAndPlotElements( Plot srcPlot, boolean copyPlotElements, boolean bindx, boolean bindy, Object direction ) {
         Plot dstPlot= copyPlot( srcPlot, bindx, bindy, direction );
         if ( copyPlotElements ) copyPlotElements( srcPlot, dstPlot );
         return dstPlot;
     }
 
+    /**
+     * Used in the LayoutPanel's add hidden plot, get the column of 
+     * the selected plot or create a new column if several plots are
+     * selected.
+     * @param dom the application.
+     * @param selectedPlots the selected plots.
+     * @param create allow a new column to be created.
+     * @return 
+     */
     public static Column getOrCreateSelectedColumn( Application dom, List<Plot> selectedPlots, boolean create ) {
         List<String> n= new ArrayList<String>();
         for ( Plot p: selectedPlots ) {
@@ -137,6 +170,15 @@ public class DomOps {
         }
     }
 
+    /**
+     * Used in the LayoutPanel's add hidden plot, get the row of 
+     * the selected plot or create a new row if several plots are
+     * selected.
+     * @param dom the application.
+     * @param selectedPlots the selected plots.
+     * @param create allow a new column to be created.
+     * @return 
+     */    
     public static Row getOrCreateSelectedRow( Application dom, List<Plot> selectedPlots, boolean create ) {
         List<String> n= new ArrayList<String>();
         for ( Plot p: selectedPlots ) {
@@ -261,12 +303,12 @@ public class DomOps {
 
         for ( int i=0; i<nrow; i++ ) {
             List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
-            double MaxUpJEm= 0.;
-            double MaxDownJ= 0.;
+            double MaxUpJEm;
+            double MaxDownJ;
             for ( int j=0; j<plots.size(); j++ ) {
                 Plot plotj= plots.get(j);
                 String title= plotj.getTitle();
-                MaxUpJEm= plotj.isDisplayTitle() ? lineCount(title) : 0;
+                MaxUpJEm= plotj.isDisplayTitle() ? lineCount(title) : 0.;
                 if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                 Rectangle plot= plotj.getController().getDasPlot().getBounds();
