@@ -155,6 +155,10 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * attempt to plot the URI selected.
+     * @return 
+     */
     public boolean doPlotSelected() {
         File f = getSelectedFile(jTree1);
         if ( f==null ) return true;
