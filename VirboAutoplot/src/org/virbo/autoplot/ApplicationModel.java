@@ -442,6 +442,11 @@ public class ApplicationModel {
     }
 
     /**
+     * Plot this URI, without checking to see if the URI is valid by 
+     * checking reject of the data source.
+     * When using the AutoplotUI, it is preferable to use AutoplotUI.plotUri, 
+     * which will have the effect of typing in the URI and hitting the "go" 
+     * arrow button.
      * @throws RuntimeException when _getDataSource throws Exception
      */
     public void setDataSourceURL(String surl) {
