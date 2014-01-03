@@ -1206,6 +1206,12 @@ APSplash.checkTime("init 270");
         });
     }
 
+    /**
+     * Attempt to plot the given URI, which may be rejected and its
+     * editor invoked.  This is the equivalent of typing in the URI in the 
+     * address bar and pressing the Go (green arrow) button.
+     * @param uri the Autoplot URI.
+     */
     public void plotUri( String uri ) {
         dataSetSelector.setValue(uri);
         dataSetSelector.maybePlot(false);        
@@ -3288,6 +3294,15 @@ private void updateFrameTitle() {
     }
 
     /**
+     * create a new application.  This is a convenience method for scripts.
+     * @return 
+     */
+    public AutoplotUI newApplication() {
+        ApplicationModel model= support.newApplication();
+        return (AutoplotUI)model.application.getMainFrame();
+    }
+    
+    /**
      * add a listener to the webstart interface so that there is only one running Autoplot at a time.  This
      * registers a SingleInstanceListener with webstart, which will prompt the user to add a new plot or to
      * replace the current one.
@@ -3369,33 +3384,29 @@ private void updateFrameTitle() {
                                 "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                                 + "or replace the current plot with the new URI, possibly entering the editor, <br>"
                                 + "or always enter the editor to inspect and insert the plot below.<br>"
-                                + "Replace or Inspect, replacing data with<br>%s?", url );
+                                + "View in new window, replace, or add plot, using<br>%s?", url );
                         } else {
                                 msg= String.format(
                                 "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                                 + "or replace the current plot with the new URI, possibly entering the editor <br>"
                                 + "or always enter the editor to inspect before plotting.<br>"
-                                + "Replace or Inspect, replacing data with<br>%s?", url );
+                                + "View in new window, replace, or add plot, using<br>%s?", url );
                         }
                         String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                                 msg,
-                                "Replace URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
+                                "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                                 new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                         if ( action!=null ) {
                             if (action.equals("Replace")) {
-                                app.dataSetSelector.setValue(url);
-                                app.dataSetSelector.maybePlot(false); // allow for completions
+                                app.plotUri(url);
                                 raise= true;
                             } else if (action.equals("Add Plot")) {
                                 app.dataSetSelector.setValue(url);
                                 app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
                                 raise= true;
                             } else if (action.equals("New Window")) {
-                                ApplicationModel nmodel = app.support.newApplication();
-                                DataSetSelector sel= ((AutoplotUI)nmodel.application.getMainFrame()).dataSetSelector;
-                                sel.setValue(url);
-                                sel.maybePlot(false);
-                                nmodel.setDataSourceURL(url);
+                                AutoplotUI ui2= app.newApplication();
+                                ui2.plotUri(url);
                             }
                         } else {
                             raise= true;
