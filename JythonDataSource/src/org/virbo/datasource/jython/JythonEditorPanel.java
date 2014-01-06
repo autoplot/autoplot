@@ -405,6 +405,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     valuePanel.add( filesButton );
                 } else if ( parm.type=='U' ) {
                     final DataSetSelector sel= new DataSetSelector();
+                    sel.setPlotItButtonVisible(false);
                     String val;
                     if (params.get(vname)!=null ) {
                         val= params.get(vname);
