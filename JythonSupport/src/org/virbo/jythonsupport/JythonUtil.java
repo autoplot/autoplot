@@ -37,6 +37,7 @@ import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
+import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
@@ -901,6 +902,14 @@ public class JythonUtil {
                 } else if ( p.deft instanceof PyFloat ) {
                     p.type= 'F';
                     p.deft= ((PyFloat)p.deft).__tojava__(double.class);
+                } else if ( p.deft instanceof PyJavaInstance ) {
+                    Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
+                    if ( pp==Py.NoConversion ) {
+                        throw new IllegalArgumentException("unable to use type: "+p.deft);
+                    } else {
+                        p.type= 'U';
+                        p.deft= pp;
+                    }
                 }
             }
             result.add(p);
