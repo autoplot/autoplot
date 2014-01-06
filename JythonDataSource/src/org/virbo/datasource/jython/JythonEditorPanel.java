@@ -403,6 +403,20 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     valuePanel.add( ctf );
                     filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     valuePanel.add( filesButton );
+                } else if ( parm.type=='U' ) {
+                    final DataSetSelector sel= new DataSetSelector();
+                    String val;
+                    if (params.get(vname)!=null ) {
+                        val= params.get(vname);
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= String.valueOf( parm.deft );
+                        params.put( vname, val );
+                    }
+                    sel.setValue( val );
+                    valuePanel.add( sel );
+                    ctf= sel;
                     
                 } else if ( parm.type=='T' ) {
                     String val;
@@ -492,7 +506,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                             ctf.setMaximumSize(x);
                             ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                         }
-
                     } else {
                         JTextField tf= new JTextField();
                         Dimension x= tf.getPreferredSize();
