@@ -370,7 +370,8 @@ public class JythonUtil {
      }
      
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
-     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper," };
+     //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
+     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI," };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
@@ -622,9 +623,9 @@ public class JythonUtil {
      }
      
      private static StringBuilder appendToResult( StringBuilder result, String line ) {
-         if ( line.contains("getDataSet") ) {
-             System.err.println("here626");
-         }
+         //if ( line.contains("getDataSet") ) {
+         //    System.err.println("here626");
+         //}
          result.append(line);
          return result;
      }
