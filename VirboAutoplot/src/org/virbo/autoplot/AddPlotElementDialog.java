@@ -14,7 +14,13 @@ package org.virbo.autoplot;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
@@ -34,9 +40,6 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
-        primaryDataSetSelector.setPlotItButtonVisible(false);
-        secondaryDataSetSelector.setPlotItButtonVisible(false);
-        tertiaryDataSetSelector.setPlotItButtonVisible(false);
         DataSetSelector source= null;
         if ( parent instanceof AutoplotUI ) {
             source= ((AutoplotUI)parent).getDataSetSelector();
@@ -44,22 +47,24 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             secondaryDataSetSelector.setTimeRange( source.getTimeRange() );
             tertiaryDataSetSelector.setTimeRange( source.getTimeRange() );
         }
+        
+        Icon bookmarkIcon= new javax.swing.ImageIcon(getClass().getResource("/resources/purplebookmark.png") );
 
-        primaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+        primaryDataSetSelector.replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 doBookmarks(primaryDataSetSelector);
             }
         });
-            
-        secondaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+
+        secondaryDataSetSelector.replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 doBookmarks(secondaryDataSetSelector);
             }
         });
 
-        tertiaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+        tertiaryDataSetSelector.replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 doBookmarks(tertiaryDataSetSelector);
