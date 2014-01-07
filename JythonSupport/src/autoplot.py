@@ -10,7 +10,7 @@ from org.virbo.dsutil.BinAverage import *
 from org.virbo.dsutil import DataSetBuilder
 
 from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
-from java.net import URL
+from java.net import URL, URI
 from org.das2.datum import TimeParser
 
 # security concerns
@@ -19,15 +19,15 @@ from org.das2.datum import TimeParser
 #from org.das2.fsm import FileStorageModel
 from org.virbo.datasource.DataSetURI import getFile
 from org.virbo.datasource.DataSetURI import downloadResourceAsTempFile
-import java
-import org
+#import java
+#import org
 # end, security concerns.
 
 # jython is tricky with single-jar releases, and using star imports to find classes doesn't work.
-import org.das2
-import org.das2.dataset
-import org.das2.dataset.NoDataInIntervalException
-import org.das2.graph
+#import org.das2
+#import org.das2.dataset
+#import org.das2.dataset.NoDataInIntervalException
+#import org.das2.graph
 
 params= dict()
 _paramMap= dict()
