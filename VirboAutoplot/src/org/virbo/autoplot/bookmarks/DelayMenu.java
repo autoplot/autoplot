@@ -37,9 +37,6 @@ public class DelayMenu extends JMenu {
     private static boolean oldLogic= false;
 
     protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel, final AutoplotUI ui ) {
-        if ( !oldLogic && ui==null ) {
-            throw new IllegalArgumentException("this is not properly implemented");
-        }
         List<Bookmark> content= bookmarks;
         for ( int i=0; i<content.size(); i++ ) {
             final Bookmark book= content.get(i);
@@ -56,7 +53,7 @@ public class DelayMenu extends JMenu {
                         public void actionPerformed(ActionEvent e) {
                             org.das2.util.LoggerManager.logGuiEvent(e);                        
                             //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject anyway, enter the dialog.
-                            if ( oldLogic ) {
+                            if ( oldLogic || ui==null ) {
                                 sel.setValue(((Bookmark.Item) book).getUri());
                                 sel.maybePlot(e.getModifiers());
                             } else {
