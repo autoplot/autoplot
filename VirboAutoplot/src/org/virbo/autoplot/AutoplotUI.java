@@ -4146,6 +4146,15 @@ APSplash.checkTime("init 240");
         return this.undoRedoSupport;
     }
 
+    /**
+     * return the current state of this application window.  Note this is
+     * the actual and not a copy, so it should not be modified.
+     * @return the application state.
+     */
+    public Application getDocumentModel() {
+        return this.applicationModel.getDocumentModel();
+    }
+    
     public DataSetSelector getDataSetSelector() {
         return this.dataSetSelector;
     }
