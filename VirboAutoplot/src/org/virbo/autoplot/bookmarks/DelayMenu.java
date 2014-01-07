@@ -54,7 +54,7 @@ public class DelayMenu extends JMenu {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             org.das2.util.LoggerManager.logGuiEvent(e);                        
-                            //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject any, enter the dialog.
+                            //TODO: is might be nice to see if the URI can be rejected, and if it was going to reject anyway, enter the dialog.
                             if ( oldLogic ) {
                                 sel.setValue(((Bookmark.Item) book).getUri());
                                 sel.maybePlot(e.getModifiers());
