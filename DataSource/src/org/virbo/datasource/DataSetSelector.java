@@ -1662,8 +1662,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public void replacePlayButton( Icon icon, AbstractAction action ) {
        
-       this.plotItButton.setIcon(icon);
        this.plotItButton.setAction(action);
+       this.plotItButton.setIcon(icon);
        this.plotItButton.revalidate();
        this.plotItButton.setText("");
        this.plotItButton.setToolTipText( String.valueOf( action.getValue( AbstractAction.NAME ) ) );
