@@ -33,7 +33,7 @@ public class DelayMenu extends JMenu {
     final static int MAX_LABEL_LEN = 30; // folder item description length
     final static int TRIM_TAIL_LEN = 10;
 
-    static boolean oldLogic= true;
+    private static boolean oldLogic= false;
 
     protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel, final AutoplotUI ui ) {
         if ( !oldLogic && ui==null ) {
@@ -59,11 +59,17 @@ public class DelayMenu extends JMenu {
                                 sel.setValue(((Bookmark.Item) book).getUri());
                                 sel.maybePlot(e.getModifiers());
                             } else {
-                                if ( ui!=null ) {
-                                    ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
-                                    ui.enterAddPlotElementDialog();
+                                // if there is nothing of value on the plot, go ahead and use this, otherwise enter dialog.
+                                if ( ui!=null && ui.getDocumentModel().getDataSourceFilters().length==1 &&  ui.getDocumentModel().getDataSourceFilters(0).getUri().length()==0 ) {
+                                    sel.setValue(((Bookmark.Item) book).getUri());
+                                    sel.maybePlot(e.getModifiers());
                                 } else {
-                                    throw new IllegalStateException("this was not properly implemented");
+                                    if ( ui!=null ) {
+                                        ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
+                                        ui.enterAddPlotElementDialog();
+                                    } else {
+                                        throw new IllegalStateException("this was not properly implemented");
+                                    }
                                 }
                             }
                         }
