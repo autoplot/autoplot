@@ -11,7 +11,13 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
+import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -38,8 +44,40 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             secondaryDataSetSelector.setTimeRange( source.getTimeRange() );
             tertiaryDataSetSelector.setTimeRange( source.getTimeRange() );
         }
-        
 
+        primaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doBookmarks(primaryDataSetSelector);
+            }
+        });
+            
+        secondaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doBookmarks(secondaryDataSetSelector);
+            }
+        });
+
+        tertiaryDataSetSelector.replacePlayButton( new javax.swing.ImageIcon(getClass().getResource("/resources/bookmark.png")), new AbstractAction("bookmarks") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doBookmarks(tertiaryDataSetSelector);
+            }
+        });
+    }
+    
+    private void doBookmarks( DataSetSelector sel ) {
+        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true );
+        man.setHidePlotButtons(true);
+        man.setPrefNode( "bookmarks", "autoplot.default.bookmarks",  "http://autoplot.org/data/bookmarks.xml" );
+        //man.setPrefNode("tca","autoplot.default.tca.bookmarks", "http://autoplot.org/data/tca.demos.xml");
+        //man.setPrefNode("tca");
+        man.setVisible(true);
+        Bookmark book= man.getSelectedBookmark();
+        if ( book!=null ) {
+            sel.setValue( ((Bookmark.Item)book).getUri() );
+        }
     }
 
     /** This method is called from within the constructor to
