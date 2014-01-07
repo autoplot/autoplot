@@ -263,7 +263,12 @@ public class GuiSupport {
     }
 
 
-    void addPlotElement() {
+    /**
+     * enter dialog to possibly add a plot to the vap, or combine multiple 
+     * URIs combined into an internal dataset.
+     * @param title title for the popup.
+     */
+    void addPlotElement( String title ) {
 
         ApplicationModel applicationModel = parent.applicationModel;
         DataSetSelector dataSetSelector = parent.dataSetSelector;
@@ -286,7 +291,10 @@ public class GuiSupport {
             dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
         }
 
-        dia.setTitle( "Adding Plot Element" );
+        if ( title==null ) {
+            title= "Adding Plot Element";
+        }
+        dia.setTitle( title );
         dia.setVisible(true);
         if (dia.isCancelled()) {
             return;
@@ -1489,7 +1497,7 @@ public class GuiSupport {
                     @Override
                     public void run() {
                         app.dom.getController().setPlot(domPlot);
-                        app.support.addPlotElement();
+                        app.support.addPlotElement("New Location (URI)");
                     }
                 };
                 SwingUtilities.invokeLater(run);
