@@ -291,6 +291,11 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return hasDoc;
     }
 
+    /**
+     * return spacer of width 20.
+     * @param size
+     * @return 
+     */
     private JComponent getSpacer() {
         JComponent spacer= new JLabel("  ");
         spacer.setSize( new Dimension(20,16) );
@@ -299,6 +304,18 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return spacer;
     }
     
+    /**
+     * return spacer of width size.
+     * @param size
+     * @return 
+     */
+    private JComponent getSpacer( int size ) {
+        JComponent spacer= new JLabel(" ");
+        spacer.setSize( new Dimension(size,16) );
+        spacer.setMinimumSize( new Dimension(size,16) );
+        spacer.setPreferredSize( new Dimension(size,16) );
+        return spacer;
+    }
     
     /**
      * See org.virbo.jythonsupport.ui.Util.createForm
@@ -372,9 +389,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
                     final String fval= val;
 
-                    final DataSetSelector sel= new DataSetSelector();
-                    sel.setHidePlayButton(true);
-                    sel.setSuggestFiles(true);
+                    //TODO: figure out, why didn't this work?
+                    //final DataSetSelector sel= new DataSetSelector();
+                    //sel.setHidePlayButton(true);
+                    //sel.setSuggestFiles(true);
 
                     final JTextField tf= new JTextField();
                     Dimension x= tf.getPreferredSize();
@@ -419,9 +437,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                         params.put( vname, val );
                     }
-                    sel.setRecent( sel.getDefaultRecent() );
+                    sel.setRecent( DataSetSelector.getDefaultRecent() );
                     sel.setValue( val );
+                    
+                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
                     valuePanel.add( sel );
+                    sel.setValue( val );
+                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
+                            
                     ctf= sel;
                     
                 } else if ( parm.type=='T' ) {
