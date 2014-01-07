@@ -50,6 +50,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -1437,7 +1438,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(dataSetSelector, 0, 314, Short.MAX_VALUE)
+                .add(dataSetSelector, 0, 368, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1448,10 +1449,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(plotItButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         layout.linkSize(new java.awt.Component[] {dataSetSelector, inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -1653,6 +1653,26 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         firePropertyChange(PROP_HIDEPLAYBUTTON, oldHidePlayButton, hidePlayButton);
     }
 
+    /**
+     * rather than allowing clients to add buttons, which would make
+     * Matisse GUI builder less useful here, clients can replace the
+     * behavior of the play button.
+     * @param icon
+     * @param action 
+     */
+    public void replacePlayButton( Icon icon, AbstractAction action ) {
+       
+       this.plotItButton.setIcon(icon);
+       this.plotItButton.setAction(action);
+       this.plotItButton.revalidate();
+       this.plotItButton.setText("");
+       this.plotItButton.setToolTipText( String.valueOf( action.getValue( AbstractAction.NAME ) ) );
+       this.plotItButton.setVisible(true);
+       
+       this.plotItButtonVisible= false;
+       
+    }
+            
     /**
      * Utility field holding list of ActionListeners.
      */
