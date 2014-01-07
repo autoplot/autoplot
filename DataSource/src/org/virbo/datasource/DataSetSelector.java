@@ -1388,10 +1388,15 @@ public class DataSetSelector extends javax.swing.JPanel {
         plotItButton = new javax.swing.JButton();
         dataSetSelector = new javax.swing.JComboBox();
 
+        setMaximumSize(new java.awt.Dimension(1000, 27));
+
         inspectButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
         inspectButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
         inspectButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        inspectButton.setMaximumSize(new java.awt.Dimension(27, 27));
+        inspectButton.setMinimumSize(new java.awt.Dimension(27, 27));
         inspectButton.setName("browse"); // NOI18N
+        inspectButton.setPreferredSize(new java.awt.Dimension(27, 27));
         inspectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inspectButtonActionPerformed(evt);
@@ -1400,10 +1405,10 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
         plotItButton.setToolTipText("<html>Plot this data location, or URI.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
-        plotItButton.setMaximumSize(new java.awt.Dimension(20, 20));
-        plotItButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        plotItButton.setMaximumSize(new java.awt.Dimension(27, 27));
+        plotItButton.setMinimumSize(new java.awt.Dimension(27, 27));
         plotItButton.setName("go"); // NOI18N
-        plotItButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        plotItButton.setPreferredSize(new java.awt.Dimension(27, 27));
         plotItButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotItButtonActionPerformed(evt);
@@ -1413,7 +1418,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setEditable(true);
         dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
         dataSetSelector.setToolTipText("Enter data source address");
-        dataSetSelector.setMinimumSize(new java.awt.Dimension(20, 20));
+        dataSetSelector.setMaximumSize(new java.awt.Dimension(2000, 27));
+        dataSetSelector.setMinimumSize(new java.awt.Dimension(100, 27));
+        dataSetSelector.setPreferredSize(new java.awt.Dimension(300, 27));
         dataSetSelector.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
                 dataSetSelectorPopupMenuCanceled(evt);
@@ -1430,7 +1437,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(dataSetSelector, 0, 320, Short.MAX_VALUE)
+                .add(dataSetSelector, 0, 314, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1441,13 +1448,10 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                        .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(inspectButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         layout.linkSize(new java.awt.Component[] {dataSetSelector, inspectButton, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
