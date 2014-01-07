@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,6 +298,16 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     /**
+     * cheat by using Java reflection to see if we can get a recent entries
+     * list.  The data source knows nothing about the Autoplot application, but
+     * users will surely wonder if they can't access the list.
+     * @return 
+     */
+    private String[] getRecent() {
+        return new String[0];
+    }
+    
+    /**
      * See org.virbo.jythonsupport.ui.Util.createForm
      * See org.virbo.jythonsupport.ui.Util.doVariables which is a copy.
      * @param f
@@ -415,6 +426,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                         params.put( vname, val );
                     }
+                    
+                    try {
+                        String[] recent= getRecent();
+                    } catch ( Exception ex ) {
+                        //sel.setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
+                        sel.setRecent( Collections.singletonList( "(recent URIs are not available)" ) );
+                    }
+                    
                     sel.setValue( val );
                     valuePanel.add( sel );
                     ctf= sel;
