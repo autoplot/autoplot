@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.virbo.autoplot.AutoplotUI;
@@ -65,8 +66,17 @@ public class DelayMenu extends JMenu {
                                     sel.maybePlot(e.getModifiers());
                                 } else {
                                     if ( ui!=null ) {
-                                        ui.getDataSetSelector().setValue(((Bookmark.Item) book).getUri());
-                                        ui.enterAddPlotElementDialog();
+                                        String uri= ((Bookmark.Item) book).getUri();
+                                        if ( uri.contains(".vap" ) ) {
+                                            ui.getDataSetSelector().setValue(uri);
+                                            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( sel, "Use vap file "+uri +"?", "Use Bookmarked .vap File", JOptionPane.OK_CANCEL_OPTION ) ) {
+                                                sel.setValue(((Bookmark.Item) book).getUri());
+                                                sel.maybePlot(e.getModifiers());
+                                            }
+                                        } else {
+                                            ui.getDataSetSelector().setValue(uri);
+                                            ui.enterAddPlotElementDialog();
+                                        }
                                     } else {
                                         throw new IllegalStateException("this was not properly implemented");
                                     }
