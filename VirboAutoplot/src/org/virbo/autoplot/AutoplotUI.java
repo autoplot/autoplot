@@ -1223,7 +1223,7 @@ APSplash.checkTime("init 270");
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
-                support.addPlotElement();
+                support.addPlotElement("Add Plot");
             }
         };
     }
@@ -1232,7 +1232,7 @@ APSplash.checkTime("init 270");
      * make this public before AGU.  Set the editor to the URI, then call this.
      */
     public void enterAddPlotElementDialog() {
-        support.addPlotElement();
+        support.addPlotElement("Add Bookmarked Plot");
     }
         
     JMenu addDataFromMenu= null;
