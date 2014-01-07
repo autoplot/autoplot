@@ -106,9 +106,11 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 try {
                     int offs= textArea.viewToModel(e.getPoint());
                     int[] ii= Utilities.getIdentifierBlock( textArea, offs ) ;
-                    String id= textArea.getDocument().getText(ii[0],ii[1]-ii[0]);
-                    int idx= lookupResultVariableIndex(id);
-                    if ( idx!=-1 ) variableComboBox.setSelectedIndex( idx );
+                    if ( ii!=null ) {
+                        String id= textArea.getDocument().getText(ii[0],ii[1]-ii[0]);
+                        int idx= lookupResultVariableIndex(id);
+                        if ( idx!=-1 ) variableComboBox.setSelectedIndex( idx );
+                    }
                 } catch (BadLocationException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
@@ -296,16 +298,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         spacer.setPreferredSize( new Dimension(20,16) );
         return spacer;
     }
-
-    /**
-     * cheat by using Java reflection to see if we can get a recent entries
-     * list.  The data source knows nothing about the Autoplot application, but
-     * users will surely wonder if they can't access the list.
-     * @return 
-     */
-    private String[] getRecent() {
-        return new String[0];
-    }
+    
     
     /**
      * See org.virbo.jythonsupport.ui.Util.createForm
@@ -426,14 +419,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                         params.put( vname, val );
                     }
-                    
-                    try {
-                        String[] recent= getRecent();
-                    } catch ( Exception ex ) {
-                        //sel.setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
-                        sel.setRecent( Collections.singletonList( "(recent URIs are not available)" ) );
-                    }
-                    
+                    sel.setRecent( sel.getDefaultRecent() );
                     sel.setValue( val );
                     valuePanel.add( sel );
                     ctf= sel;
