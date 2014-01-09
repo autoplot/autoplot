@@ -32,6 +32,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.dnd.DropTarget;
@@ -117,6 +118,7 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
+import org.virbo.autoplot.bookmarks.DelayMenu;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingModel;
@@ -136,6 +138,10 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceEditorDialog;
+import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
@@ -4359,6 +4365,48 @@ APSplash.checkTime("init 240");
             setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+
+    /**
+     * give the user a chance to review the bookmark before using it.
+     * The user has selected the URI via the bookmarks and we will show it to
+     * them before using it.
+     * (rfe336)
+     * @param uri 
+     */
+    public void reviewBookmark( String uri, int modifiers ) {
+        DataSetSelector sel= this.dataSetSelector;
+        if ( uri.contains(".vap" ) ) {
+            sel.setValue(uri);
+            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, "Use vap file "+uri +"?", "Use Bookmarked .vap File", JOptionPane.OK_CANCEL_OPTION ) ) {
+                sel.setValue(uri);
+                sel.maybePlot(modifiers);
+            }
+        } else {
+            sel.setValue(uri);
+            DataSourceFactory factory=null;
+            try {
+                factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+            } catch (IOException ex) {
+                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            if ( factory==null ) {
+                enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+            } else {
+                List<String> problems= new ArrayList<String>();
+                if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
+                    sel.maybePlot(modifiers); // this should enter the editor as before
+                } else {
+                    enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+                }
+                    
+            }
+       }
     }
 
 }
