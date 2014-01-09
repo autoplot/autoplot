@@ -104,10 +104,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         List<CompletionContext> result;
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-
-            URI uri = DataSetURI.getURI( CompletionContext.get(CompletionContext.CONTEXT_FILE, cc) );
-
-            cc.resourceURI= DataSetURI.getResourceURI(uri);
+            String resourceUri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
+            if ( resourceUri!=null ) {
+                URI uri = DataSetURI.getURI( CompletionContext.get(CompletionContext.CONTEXT_FILE, cc) );
+                cc.resourceURI= DataSetURI.getResourceURI(uri);
+            }
             cc.params = split.params;
 
             result = factory.getCompletions(cc, mon );
