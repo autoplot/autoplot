@@ -84,6 +84,7 @@ import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.Entities;
 import org.das2.util.awt.PdfGraphicsOutput;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
@@ -107,6 +108,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
@@ -1068,6 +1070,21 @@ public class GuiSupport {
                 if ( val.endsWith(".vap") ) {
                     mergeVap(dom,plot, pelement, val);
                 } else {
+                    String uri= val;
+                    DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                    if ( factory==null ) {
+                        throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                    }
+                    List<String> problems= new ArrayList<String>();
+                    while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
+                        dia.setTitle("Add Plot, URI was rejected...");
+                        dia.setVisible(true);
+                        if ( dia.isCancelled() ) {
+                            return;
+                        }
+                        val= dia.getPrimaryDataSetSelector().getValue();
+                        uri= val;
+                    }
                     dom.getController().doplot(plot, pelement, val );
                 }
             } else if (dia.getDepCount() == 1) {
