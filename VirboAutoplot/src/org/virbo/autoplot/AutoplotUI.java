@@ -4377,12 +4377,18 @@ APSplash.checkTime("init 240");
     public void reviewBookmark( String uri, int modifiers ) {
         DataSetSelector sel= this.dataSetSelector;
         if ( uri.contains(".vap" ) ) {
+            // ask the user if they want to use the .vap
             sel.setValue(uri);
             if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, "Use vap file "+uri +"?", "Use Bookmarked .vap File", JOptionPane.OK_CANCEL_OPTION ) ) {
                 sel.setValue(uri);
                 sel.maybePlot(modifiers);
             }
+        } else if ( uri.endsWith(".jy" ) || uri.contains(".jy?") ) {
+            // scripts have a different dialog where they are accepted.
+            sel.setValue(uri);
+            sel.maybePlot(modifiers);
         } else {
+            // see if the uri would be rejected, and show the editor.
             sel.setValue(uri);
             DataSourceFactory factory=null;
             try {
@@ -4396,7 +4402,9 @@ APSplash.checkTime("init 240");
             }
             
             if ( factory==null ) {
-                enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+                logger.fine("unable to find factory when I expected to see uri");
+                sel.setValue(uri);
+                sel.maybePlot(modifiers); // have the user deal with the bad uri, and support plugins.
             } else {
                 List<String> problems= new ArrayList<String>();
                 if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
