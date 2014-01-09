@@ -255,8 +255,14 @@ public class EditorContextMenu {
 
             a= new AbstractAction("getParam() with enumeration") {
                 public void actionPerformed(ActionEvent e) {
-                    LoggerManager.logGuiEvent(e);                
-                    insertCode( "sc= getParam( 'sc', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
+                    LoggerManager.logGuiEvent(e);    
+                    String var= editor.getSelectedText();
+                    logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
+                    if ( var==null || var.length()==0 ) {
+                        insertCode( "sc= getParam( 'sc', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
+                    } else {
+                        insertCode( var + "= getParam( '"+var+"', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
+                    }
                 }
             };
             item= new JMenuItem( a );
@@ -266,7 +272,13 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() for boolean checkbox") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    insertCode( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
+                    String var= editor.getSelectedText();
+                    logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
+                    if ( var==null || var.length()==0 ) {
+                        insertCode( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
+                    } else {
+                        insertCode( var + "= getParam( '"+var+"', 'F', 'filter data', ['T','F'] )\n");
+                    }
                 }
             };
             item= new JMenuItem( a );
@@ -277,7 +289,12 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() for timerange to support time series browse") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    insertCode( "tr= getParam( 'timerange', '2012-04-18', 'timerange to load' )\n");
+                    String var= editor.getSelectedText();
+                    if ( var==null || var.length()==0 ) {
+                        insertCode( "tr= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
+                    } else {
+                        insertCode( var + "= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
+                    }   
                 }
             };
             item= new JMenuItem( a );
