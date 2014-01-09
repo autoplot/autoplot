@@ -71,7 +71,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             }
         });
     }
-    
+
     private void doBookmarks( DataSetSelector sel ) {
         BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true );
         man.setHidePlotButtons(true);
@@ -242,6 +242,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_tertiaryCheckBoxActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        cancelled= true;
         setVisible(false);
 }//GEN-LAST:event_cancelButtonActionPerformed
 
@@ -328,5 +329,11 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox tertiaryCheckBox;
     private org.virbo.datasource.DataSetSelector tertiaryDataSetSelector;
     // End of variables declaration//GEN-END:variables
+
+    private boolean maybeEnterEditor= false;
+    
+    void maybeEnterEditor() {
+        maybeEnterEditor= true;
+    }
 
 }
