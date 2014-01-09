@@ -6,6 +6,8 @@
 package org.virbo.autoplot.bookmarks;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,10 +18,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFactory;
 
 /**
  * JMenu that delays creating children until the folder is exposed.  Otherwise we would have thousands of
@@ -58,25 +62,12 @@ public class DelayMenu extends JMenu {
                                 sel.maybePlot(e.getModifiers());
                             } else {
                                 // if there is nothing of value on the plot, go ahead and use this, otherwise enter dialog.
-                                if ( ui!=null && ui.getDocumentModel().getDataSourceFilters().length==1 &&  ui.getDocumentModel().getDataSourceFilters(0).getUri().length()==0 ) {
+                                if ( ui.getDocumentModel().getDataSourceFilters().length==1 &&  ui.getDocumentModel().getDataSourceFilters(0).getUri().length()==0 ) {
                                     sel.setValue(((Bookmark.Item) book).getUri());
                                     sel.maybePlot(e.getModifiers());
                                 } else {
-                                    if ( ui!=null ) {
-                                        String uri= ((Bookmark.Item) book).getUri();
-                                        if ( uri.contains(".vap" ) ) {
-                                            ui.getDataSetSelector().setValue(uri);
-                                            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( sel, "Use vap file "+uri +"?", "Use Bookmarked .vap File", JOptionPane.OK_CANCEL_OPTION ) ) {
-                                                sel.setValue(((Bookmark.Item) book).getUri());
-                                                sel.maybePlot(e.getModifiers());
-                                            }
-                                        } else {
-                                            ui.getDataSetSelector().setValue(uri);
-                                            ui.enterAddPlotElementDialog();
-                                        }
-                                    } else {
-                                        throw new IllegalStateException("this was not properly implemented");
-                                    }
+                                    String uri= ((Bookmark.Item) book).getUri();
+                                    ui.reviewBookmark(uri,e.getModifiers());
                                 }
                             }
                         }
