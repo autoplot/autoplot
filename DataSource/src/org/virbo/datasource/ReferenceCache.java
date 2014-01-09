@@ -106,14 +106,25 @@ public class ReferenceCache {
             if ( this.exception!=null ) {
                 throw this.exception;
             } else {
+                logger.log( Level.FINE, "park if {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
                 return this.qds.get();
             }
         }
+        
+        /**
+         * hand the dataset resulting from the completed load off to the reference cache.
+         * Threads that are parked will continue.
+         */
         public void finished( QDataSet ds ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ds, uri} );
             this.qds= new WeakReference<QDataSet>(ds);
             this.status= ReferenceCacheEntryStatus.DONE;
         }
+        
+        /**
+         * the load resulted in an exception and this notifies the reference cache.
+         * Threads that are parked will continue
+         */
         public void exception( Exception ex ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ex, uri} );
             this.exception= ex;
