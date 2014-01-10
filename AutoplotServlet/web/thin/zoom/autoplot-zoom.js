@@ -81,6 +81,7 @@ function resetUrl(url) {
     if ( url.length===0 ) {
         url= '../../SimpleServlet?vap='+document.getElementById('vapta').value;
     }
+    $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
     imgurl = url;
     ImageInfo.loadInfo(imgurl, mycallback);
@@ -246,13 +247,13 @@ function setTime(startMilliseconds, endMilliseconds) {
     zoomurl = buildImgUrl(imgurl, startMilliseconds, endMilliseconds);
     n = zoomurl.length;
     zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
-    $('#idstatus').text("loading " + zoomurlc + " ...");
     console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
     $('#idplot').attr('src', imgurl);
     $('#idplot').attr('src', zoomurl);
-    $('#progress').attr('src', 'spinner.gif');
     $('#xwidth').val( ''+((endMilliseconds-startMilliseconds) /3600000) );
     $('#timerange').val( iso8601RangeStr(startMilliseconds,endMilliseconds) );
+    $('#idstatus').text("setTime "+iso8601RangeStr(startMilliseconds,endMilliseconds));
+    $('#progress').attr('src', 'spinner.gif');
 
     // update imgurl
     imgurl = zoomurl;
@@ -290,8 +291,7 @@ function mycallback() {
     msecperpx = diffmilliseconds / graphwidth;
     echoGraphParams();
     $('#idstatus').text("ready");
-    var p = $('#progress');
-    p.attr('src', 'idle-icon.png');
+    $('#progress').attr('src', 'idle-icon.png');
 }
 
 
