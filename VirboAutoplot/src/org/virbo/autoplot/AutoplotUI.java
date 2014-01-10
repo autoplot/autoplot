@@ -4408,7 +4408,7 @@ APSplash.checkTime("init 240");
             } else {
                 List<String> problems= new ArrayList<String>();
                 if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
-                    sel.maybePlot(modifiers); // this should enter the editor as before
+                    sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                 } else {
                     enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
                 }
