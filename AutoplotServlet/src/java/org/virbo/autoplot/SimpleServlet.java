@@ -61,7 +61,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20131217.1740a";
+    public static final String version= "v20140110.0740";
 
     static FileHandler handler;
 
@@ -90,7 +90,9 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        logger.fine( version );
+        //logger.setLevel(Level.FINE);
+        
+        logger.finer( version );
 
         logger.fine("=======================");
 
@@ -110,7 +112,7 @@ public class SimpleServlet extends HttpServlet {
         }
 
         String debug = request.getParameter("debug");
-        if ( debug==null ) debug= "true";
+        if ( debug==null ) debug= "false";
 
         logit("-- new request " + uniq + " --", t0, uniq, debug);
         try {
@@ -149,11 +151,9 @@ public class SimpleServlet extends HttpServlet {
             String grid= ServletUtil.getStringParameter( request, "drawGrid", "" );
             String stamp= ServletUtil.getStringParameter( request, "stamp", "false" );  // print a stamp for debugging.  If not false, the value is printed in blue along with a timestamp.
 
-            if ( !debug.equals("false")) {
-                for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
-                    String n = (String) en.nextElement();
-                    logger.log( Level.FINER, "{0}: {1}", new Object[]{n, Arrays.asList(request.getParameterValues(n))});
-                }
+            for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
+                String n = (String) en.nextElement();
+                logger.log( Level.FINE, "{0}: {1}", new Object[]{n, Arrays.asList(request.getParameterValues(n))});
             }
 
             if (srenderType.equals("fill_to_zero")) {
