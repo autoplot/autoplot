@@ -1167,7 +1167,7 @@ public class DataSourceController extends DomNodeController {
                 if ( dataSet!=null ) {
                     setStatus("done loading dataset");
                     if ( dsf.getUri().length()==0 ) {
-                        logger.warning("dsf.getUri was null");
+                        logger.fine("dsf.getUri was null"); // I'm not sure what the condition was here, but I never use this log message.
                         return;
                     }
                 } else {
