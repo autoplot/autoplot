@@ -28,7 +28,7 @@ function buildImgUrl(srcurl, start, end) {
     var outurl = '';
     var inpurl = srcurl;
     var iso8601s = new Date(start).toISOString();
-    var iso8601e = new Date(end).toISOString(); // toLocalIsoString( end );
+    var iso8601e = new Date(end).toISOString(); 
     var slt = inpurl.split('&timeRange=');
     outurl = slt[0] + "&timeRange=" + iso8601s + "/" + iso8601e;
     console.log('' + start + " - " + end + " " + new Date(start));
@@ -37,7 +37,7 @@ function buildImgUrl(srcurl, start, end) {
 }
 
 function echoImgUrl() {
-    $('#idechourl').text(imgurl);
+    //$('#idechourl').text(imgurl);
 }
 
 function echoGraphParams() {
@@ -112,6 +112,68 @@ function centerFocus() {
     }
 }
 
+/**
+ * 
+ * @param number startMilliseconds
+ * @param number endMilliseconds
+ * @returns the formatted string, limited to resolution
+ */
+function iso8601RangeStr( startMilliseconds, endMilliseconds ) {
+    st1= iso8601Str( startMilliseconds, endMilliseconds, startMilliseconds );    
+    st2= iso8601Str( startMilliseconds, endMilliseconds, endMilliseconds );
+    return st1 + "/"+ st2;
+}
+
+/**
+ * return the iso string, limited in resolution by startMilliseconds and endMilliseconds
+ * @param number startMilliseconds time in ms since 1970
+ * @param number endMilliseconds time in ms since 1970
+ * @param number t the time to be formatted
+ * @returns the formatted string, limited to the resolution
+ */
+function iso8601Str( startMilliseconds, endMilliseconds, t ) {
+    s= new Date(t).toJSON();
+    if ( endMilliseconds - startMilliseconds > 100*24*86400000 ) {
+        s= s.substring(0,11)+"00:00Z";
+    } else if ( endMilliseconds - startMilliseconds > 5*24*86400000 ) {
+        s= s.substring(0,13)+":00Z";
+    } else if ( endMilliseconds - startMilliseconds > 43200000 ) {
+        s= s.substring(0,16)+"Z";
+    } else if ( endMilliseconds - startMilliseconds > 3600000 ) {
+        s= s.substring(0,19)+"Z";
+    }
+    return s;
+}
+
+function resetWidth() {
+    if (typeof xwidth === "undefined") {
+        $("#info").html('reset the width of the time axis');
+    } else {
+        swidthx = $('#xwidth').val();
+        center = (enddateinmilliseconds + startdateinmilliseconds) / 2;
+        half = (swidthx*3600000)/2;
+        setTime(center - half, center + half);
+    }
+}
+
+/**
+ * reset the timerange to the contents of $('#timerange').val().  It should
+ * contains times like "2014-01-10T00:00/2014-01-10T13:00"
+ * @returns {undefined}
+ */
+function resetTime() {
+    if (typeof timerange === "undefined") {
+        $("#info").html('reset the timerange for the time axis');
+    } else {
+        stimerange = $('#timerange').val();
+        n= stimerange.indexOf('/');
+        st1 = new Date(stimerange.substring(0,n)).toJSON();
+        t1= new Date(st1).getTime();
+        st2 = new Date(stimerange.substring(n+1)).toJSON();
+        t2= new Date(st2).getTime();
+        setTime( t1,t2 );
+    }
+}
 
 function testing() {
     setTime(1104451200000, 1104451200000 + 86400000);
@@ -143,7 +205,7 @@ function clickshift(subEvent) {
                 dmin = Date.parse(p.xaxis.min);
                 dmax = Date.parse(p.xaxis.max);
                 datax = ((xx - p.xaxis.left) * dmax + (p.xaxis.right - xx) * dmin) / l;
-                datax = new Date(datax).toJSON();
+                datax = iso8601Str( dmin, dmax, datax );
             } else {
                 if (p.xaxis.type == 'log') {
                     oo = ((p.xaxis.right - xx) / l);
@@ -189,6 +251,8 @@ function setTime(startMilliseconds, endMilliseconds) {
     $('#idplot').attr('src', imgurl);
     $('#idplot').attr('src', zoomurl);
     $('#progress').attr('src', 'spinner.gif');
+    $('#xwidth').val( ''+((endMilliseconds-startMilliseconds) /3600000) );
+    $('#timerange').val( iso8601RangeStr(startMilliseconds,endMilliseconds) );
 
     // update imgurl
     imgurl = zoomurl;
@@ -196,8 +260,8 @@ function setTime(startMilliseconds, endMilliseconds) {
     enddateinmilliseconds = endMilliseconds;
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
     msecperpx = diffmilliseconds / graphwidth;
-
-    echoImgUrl();
+    
+    //echoImgUrl();
 
     ImageInfo.loadInfo(imgurl, mycallback);
     console.log('--> startdateinmilliseconds=' + startdateinmilliseconds);
@@ -214,6 +278,7 @@ function mycallback() {
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
     console.log('   mycallback--> startdateinmilliseconds=' + startdateinmilliseconds + " (exit)");
 
+    $('#xwidth').text= diffmilliseconds;
 
     topside = PLOTINFO.plots[0].yaxis.top;
     bottomside = PLOTINFO.plots[0].yaxis.bottom;
