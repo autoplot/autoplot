@@ -130,7 +130,7 @@ public class ScriptServlet extends HttpServlet {
             interp.set("getFile",null);
             interp.set("downloadResourceAsTempFile",null);
 
-            interp.setOut( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) );
+            interp.setOut( new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ) );
             
             interp.set( "response", response );
 
@@ -138,7 +138,7 @@ public class ScriptServlet extends HttpServlet {
             response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
             
             //TODO: this limits to one user!
-            ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
+            ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ) ); 
             
             interp.exec(script);
             
