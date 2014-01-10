@@ -54,6 +54,8 @@ import org.virbo.metatree.MetadataUtil;
  * @author jbf
  */
 public class DodsAdapter {
+    
+    private final static Logger logger= Logger.getLogger("apdss.dods");
 
     /**
      * http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc
@@ -394,7 +396,7 @@ public class DodsAdapter {
                             u = SemanticOps.lookupTimeUnits(sunits);
                             dep0.putProperty(QDataSet.UNITS, u);
                         } catch (java.text.ParseException ex) {
-                            Logger.getLogger(DodsAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                     }
                 }

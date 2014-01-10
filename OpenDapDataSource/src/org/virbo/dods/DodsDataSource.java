@@ -59,7 +59,7 @@ public class DodsDataSource extends AbstractDataSource {
     Map<String, Object> metadata;
     DAS das;
 
-    private final static Logger logger= Logger.getLogger("autoplot.dodsdatasource");
+    private final static Logger logger= Logger.getLogger("apdss.dods");
 
     /**
      * Creates a new instance of DodsDataSetSource

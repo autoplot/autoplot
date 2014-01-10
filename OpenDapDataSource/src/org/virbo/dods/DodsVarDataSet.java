@@ -16,10 +16,10 @@ import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.Slice0DataSet;
 import org.virbo.dataset.TrimDataSet;
@@ -31,6 +31,8 @@ import org.virbo.dataset.WritableDataSet;
  */
 public abstract class DodsVarDataSet implements WritableDataSet {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.dods");
+    
     int rank;
     int[] dimSizes = new int[4];
     HashMap properties;
@@ -48,13 +50,14 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         properties.put( QDataSet.NAME, array.getName() );
     }
 
+    @Override
     public String toString() {
-        StringBuffer dimStr = new StringBuffer("" + dimSizes[0]);
+        StringBuilder dimStr = new StringBuilder("" + dimSizes[0]);
         for (int i = 1; i < rank; i++) {
-            dimStr.append("," + dimSizes[i]);
+            dimStr.append(",").append(dimSizes[i]);
         }
         String u = String.valueOf(properties.get(UNITS));
-        if (u.equals("null") || u == "") {
+        if ( "null".equals(u) || "".equals(u)) {
             u = "dimensionless";
         }
         return "dataSet[" + dimStr.toString() + "] (" + u + ")";
@@ -99,6 +102,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
     @SuppressWarnings("unchecked")
     public void putProperty(String name, Object value) {
+        checkImmutable();
         properties.put(name, value);
     }
 
@@ -107,14 +111,6 @@ public abstract class DodsVarDataSet implements WritableDataSet {
     }
 
     public void putProperty(String name, int i0, int i1, Object value) {
-        putProperty(name, value);
-    }
-
-    public void putProperty(String name, int i0, int i1, int i2, Object value) {
-        putProperty(name, value);
-    }
-
-    public void putProperty(String name, int i0, int i1, int i2, int i3, Object value) {
         putProperty(name, value);
     }
 
@@ -147,6 +143,27 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         return new TrimDataSet(this, start, end);
     }
 
+        
+    boolean immutable= false;
+        
+    public void makeImmutable() {
+        immutable= true;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+        
+    /**
+     * here is the one place where we check immutable, and we can make this throw an exception
+     * once things look stable.
+     */
+    protected final void checkImmutable() {
+        if ( immutable ) {
+            logger.warning("dataset has been marked as immutable, this will soon throw an exception");
+        }
+    }
+    
 
     public static class Int32Array extends DodsVarDataSet {
 
@@ -216,19 +233,21 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();
             back[i0]= putIntValue(d);
         }
 
         public void putValue(int i0, int i1, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] + i1]= putIntValue(d);
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
         }
-
     }
-
+    
     public static class Int16Array extends DodsVarDataSet {
 
         short[] back;
@@ -287,7 +306,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3]);
         }
          
-        private final short putIntValue( double val ) {
+        private short putIntValue( double val ) {
             return (short)( ( val - addOffset ) / scaleFactor );
         }
 
@@ -296,14 +315,17 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();            
             back[i0]= putIntValue(d);
         }
 
         public void putValue(int i0, int i1, double d) {
-            back[i0 * dimSizes[1] + i1]= putIntValue(d);;
+            checkImmutable();            
+            back[i0 * dimSizes[1] + i1]= putIntValue(d);
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();            
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
         }
     }
@@ -333,12 +355,12 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
         double validMin, validMax;
 
-        private final double doubleValue(float val) {
+        private double doubleValue(float val) {
             double r = (double) val;
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
         
-        private final float putFloatValue( double val ) {
+        private float putFloatValue( double val ) {
             return (float)val;
         }
 
@@ -368,14 +390,17 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();
             back[i0]= putFloatValue(d);
         }
 
         public void putValue(int i0, int i1, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] + i1]= putFloatValue(d);
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putFloatValue(d);
         }
     }
@@ -415,14 +440,17 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();
             back[i0]= d;
         }
 
         public void putValue(int i0, int i1, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] + i1]= d;
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= d;
         }
     }
@@ -469,14 +497,17 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         public void putValue(int i0, int i1, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
@@ -523,14 +554,17 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
 
         public void putValue(int i0, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         public void putValue(int i0, int i1, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         public void putValue(int i0, int i1, int i2, double d) {
+            checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
