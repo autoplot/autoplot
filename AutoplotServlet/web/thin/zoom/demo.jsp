@@ -6,20 +6,31 @@
 
 <%@page import="java.net.URLEncoder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Autoplot Servlet Image Zoom</title>
+	<link rel="stylesheet" type="text/css" href="css/imgareaselect-default.css" />
+        <link rel="stylesheet" type="text/css" href="demo.css" />
+</head>
 <body>
     <%
          String vap= request.getParameter("vap");
+         if ( vap==null ) {
+             throw new IllegalArgumentException("vap file not specified.");
+         }
      %>
 	<div id="iddivimg">
 		<img id="idplot" 
-                     src="../../SimpleServlet?vap=<%= URLEncoder.encode(vap,"US-ASCII") %>">
+                     src="../../SimpleServlet?vap=<%= URLEncoder.encode(vap,"US-ASCII") %>"
+                     onload="logloaded();" 
+                >
 	</div>
     <div id="divprogress">
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
     </div>
-        
-    <form>
+       
             <button onclick="scanprev();"><< PREV</button>
             <button onclick="scannext();">NEXT >></button>
             <button onclick="zoomout();">Zoom Out</button>    
@@ -32,7 +43,6 @@
                         <button onclick="resetTime();">Reset</button> to <input id="timerange" size="50"></input>
             </p>
             
-    </form>
             <div id="info"></div>
                
 		<!--<pre><div id="iddates"></div></pre> -->
@@ -40,7 +50,7 @@
 		<!--<pre><div id="idcolumn"></div></pre>-->
 		<!--<pre><div id="idrow"></div></pre>-->
 		<!--<pre><div id="iddifftime"></div></pre>-->
-                
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>                 
 	<script type="text/javascript" src="js/jquery.ui.js"></script>
 	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
 	<script type="text/javascript" src="autoplot-zoom.js"></script>
@@ -69,7 +79,7 @@
 
 <br>
     <form>
-        <input id='vapta' size="80" value="<%=vap%>">
+    <input id='vapta' size="80">
         <button onclick="resetUrl(''); return false;">GO</button>
     </form>
 <hr></hr>
@@ -82,7 +92,7 @@
         <div id="idstatus">status</div>
         <!-- src="../../SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em" />-->
         
-        <small>v20140110_0725</small>
+        <small>v20140111_0753</small>
 
 </body>
 </html>
