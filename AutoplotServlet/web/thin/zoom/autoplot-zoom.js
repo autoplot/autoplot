@@ -17,6 +17,7 @@ var graphwidth = 0; // rightside - leftside;
 var graphheight = 0; // bottomside - topside;
 var msecperpx = 0;
 var center = undefined;
+var imgloaded= 0;  // 1=onload.  2=plotinfo ajax  3=both
 
 // ****************************************************************************
 //
@@ -158,6 +159,18 @@ function resetWidth() {
 }
 
 /**
+ * callback that the image was loaded.
+ * @returns {undefined}
+ */
+function logloaded() {
+    imgloaded= imgloaded & ( ~1 );
+    console.log('image loaded '+imgloaded);
+    if ( imgloaded===0 ) {
+       $('#progress').attr('src', 'idle-icon.png');
+    }
+}
+
+/**
  * reset the timerange to the contents of $('#timerange').val().  It should
  * contains times like "2014-01-10T00:00/2014-01-10T13:00"
  * @returns {undefined}
@@ -240,15 +253,14 @@ function clickshift(subEvent) {
 
 function setTime(startMilliseconds, endMilliseconds) {
     console.log('==setTime()==');
-    console.log('    startdateinmilliseconds=' + startMilliseconds);
+    console.log('    startMilliseconds=' + iso8601Str( startMilliseconds,endMilliseconds,startMilliseconds ) );
     console.log('    diffmilliseconds=' + (endMilliseconds - startMilliseconds));
-    console.log('    mod86400000/3600000= ' + ((startMilliseconds % 86400000) / 3600000));
     console.log('PLOTINFO.plots[0].xaxis.min,max=' + PLOTINFO.plots[0].xaxis.min + '/' + PLOTINFO.plots[0].xaxis.max);
     zoomurl = buildImgUrl(imgurl, startMilliseconds, endMilliseconds);
-    n = zoomurl.length;
-    zoomurlc = zoomurl.substring(0, 30) + '...' + zoomurl.substring(n - 20);
     console.log('imgAreaSelect() : ' + 'zoomurl = ' + zoomurl);
-    $('#idplot').attr('src', imgurl);
+    console.log('    imgurl:  ', imgurl );
+    console.log('    zoomurl: ', zoomurl );
+    imgloaded= 3;
     $('#idplot').attr('src', zoomurl);
     $('#xwidth').val( ''+((endMilliseconds-startMilliseconds) /3600000) );
     $('#timerange').val( iso8601RangeStr(startMilliseconds,endMilliseconds) );
@@ -273,11 +285,11 @@ function setTime(startMilliseconds, endMilliseconds) {
 function mycallback() {
     splotInfo = ImageInfo.getField(imgurl, "data")['plotInfo'];
     PLOTINFO = $.parseJSON(splotInfo);
-    console.log('   mycallback--> startdateinmilliseconds=' + startdateinmilliseconds);
+    console.log('   mycallback--> startdateinmilliseconds=' + iso8601Str( startdateinmilliseconds,enddateinmilliseconds,startdateinmilliseconds ) );
     startdateinmilliseconds = new Date(PLOTINFO.plots[0].xaxis.min).getTime();
     enddateinmilliseconds = new Date(PLOTINFO.plots[0].xaxis.max).getTime();
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
-    console.log('   mycallback--> startdateinmilliseconds=' + startdateinmilliseconds + " (exit)");
+    console.log('   mycallback--> startdateinmilliseconds=' + iso8601Str( startdateinmilliseconds,enddateinmilliseconds,startdateinmilliseconds) + " (exit)");
 
     $('#xwidth').text= diffmilliseconds;
 
@@ -291,7 +303,10 @@ function mycallback() {
     msecperpx = diffmilliseconds / graphwidth;
     echoGraphParams();
     $('#idstatus').text("ready");
-    $('#progress').attr('src', 'idle-icon.png');
+    imgloaded= imgloaded & ( ~2 );
+    if ( imgloaded==0 ) {
+       $('#progress').attr('src', 'idle-icon.png');
+    }
 }
 
 
