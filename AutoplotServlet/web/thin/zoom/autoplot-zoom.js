@@ -61,6 +61,20 @@ function scannext() {
 }
 
 /**
+ * scan half way to the previous interval.
+ */
+function scanhalfprev() {
+    setTime(startdateinmilliseconds - diffmilliseconds/2, enddateinmilliseconds - diffmilliseconds/2);
+}
+
+/**
+ * scan half way to the next interval
+ */
+function scanhalfnext() {
+    setTime(startdateinmilliseconds + diffmilliseconds/2, enddateinmilliseconds + diffmilliseconds/2);
+}
+
+/**
  * zoom out so the plotted range is 3 times the width.
  */
 function zoomout() {
