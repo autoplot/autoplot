@@ -16,7 +16,9 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  * Provide a cache of datasets that are in memory, so that the same data is not loaded twice.  This first implementation
@@ -107,7 +109,17 @@ public class ReferenceCache {
                 throw this.exception;
             } else {
                 logger.log( Level.FINE, "park if {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
-                return this.qds.get();
+                QDataSet ds= this.qds.get();
+                if ( ds instanceof MutablePropertyDataSet ) {
+                    MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                    if ( mpds.isImmutable() ) {
+                        return ds;
+                    } else {
+                        return Ops.copy(ds);
+                    }
+                } else {
+                    return ds;
+                }
             }
         }
         
@@ -161,6 +173,14 @@ public class ReferenceCache {
                 return null;
             } else {
                 QDataSet ds= entry.qds.get();
+                if ( ds instanceof MutablePropertyDataSet ) {
+                    MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                    if ( mpds.isImmutable() ) {
+                        return mpds;
+                    } else {
+                        return Ops.copy(ds);
+                    }
+                }
                 return ds;
             }
         }
@@ -244,9 +264,22 @@ public class ReferenceCache {
         monitor.finished();
     }
 
+    /**
+     * put the dataset into the ReferenceCache.  If it is mutable, then a copy is
+     * made.
+     * @param uri
+     * @param ds 
+     */
     public synchronized void putDataSet( String uri, QDataSet ds ) {
         ReferenceCacheEntry result= uris.get(uri);
         logger.log( Level.FINEST, "putDataSet on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
+        if ( ds instanceof MutablePropertyDataSet ) {
+            MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+            if ( !mpds.isImmutable() ) {
+                ds= Ops.copy(mpds);
+                ((MutablePropertyDataSet)ds).makeImmutable();
+            }
+        }
         result.qds= new WeakReference<QDataSet>(ds);
         result.status= ReferenceCacheEntryStatus.DONE;
     }
