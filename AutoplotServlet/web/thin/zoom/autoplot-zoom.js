@@ -304,14 +304,14 @@ function mycallback() {
     echoGraphParams();
     $('#idstatus').text("ready");
     imgloaded= imgloaded & ( ~2 );
-    if ( imgloaded==0 ) {
+    if ( imgloaded===0 ) {
        $('#progress').attr('src', 'idle-icon.png');
     }
 }
 
 
 var ias;
-$('#idstatus').text("v20131024_1138");
+$('#idstatus').text("v20140111_0754");
 
 var PLOTINFO;
 
