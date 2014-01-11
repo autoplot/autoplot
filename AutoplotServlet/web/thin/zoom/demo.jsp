@@ -31,12 +31,14 @@
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
     </div>
        
-            <button onclick="scanprev();"><< PREV</button>
-            <button onclick="scannext();">NEXT >></button>
+            <button onclick="scanprev();">&lt;&lt; PREV</button>
+            <button onclick="scanhalfprev();">&lt;&lt;PR</button>
+            <button onclick="scanhalfnext();">NE&gt;&gt;</button>
+            <button onclick="scannext();">NEXT &gt;&gt;</button>
             <button onclick="zoomout();">Zoom Out</button>    
             <button onclick="zoomin();">Zoom In</button>    
-            
-	
+
+            	
             <p><button onclick="centerFocus();">Center</button> at x=<input id="xclick" ></input> 
                 <button onclick="resetWidth(); return false;">Width</button>=<input id="xwidth" size="4">hr
                     <br>
