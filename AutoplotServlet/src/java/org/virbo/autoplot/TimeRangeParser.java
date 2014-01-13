@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class TimeRangeParser {
 
     /**
-     * get an integer, using a letter as the delimiter to the next field.
+     * get an integer, allowing a letter at the end.
      * @param val
      * @param deft
      * @return 
@@ -31,7 +31,7 @@ public class TimeRangeParser {
     }
 
     /**
-     * get the double, using a letter as the delimiter to the next field.
+     * get the double, allowing a letter at the end.
      * @param val
      * @param deft
      * @return 
