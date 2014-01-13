@@ -15,7 +15,7 @@ function isLetter(str) {
  */
 function getInt( val, deft ) {
     if ( val===undefined ) {
-        if ( deft!==-99 ) return deft; else throw new IllegalArgumentException("bad digit");
+        if ( deft!==-99 ) return deft; else alert("bad digit");
     }
     n= val.length-1;
     if ( isLetter( val.charAt(n) ) ) {
