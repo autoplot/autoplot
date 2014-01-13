@@ -9,8 +9,8 @@ function isLetter(str) {
 
 /**
  * get an integer, allowing a letter at the end.
- * @param val
- * @param deft
+ * @param val string value
+ * @param deft int value to return if the string is not valid. -99 will throw exception
  * @return 
  */
 function getInt( val, deft ) {
@@ -28,8 +28,8 @@ function getInt( val, deft ) {
 /**
 /**
  * get the double, allowing a letter at the end.
- * @param val
- * @param deft
+ * @param val string value
+ * @param deft double value to return if the string is not valid. -99 will throw exception
  * @return 
  */
 function getDouble( val, deft ) {
