@@ -1,0 +1,28 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <script type="text/javascript" src="TimeRangeParser.js"></script>
+        <div></div>
+        <script type="text/javascript">
+            //alert( parseISO8601Duration('P1D') );
+            //result= [0,0,0,0,0,0,0];
+            //alert( parseISO8601Datum('2014-01-12T02:03:04.005',result,0) );
+            //alert( result );
+            r= undefined;
+            alert( parseISO8601Range( "2014-01-12T03:07:09.200/2015-02-12T03:04",r) );
+            alert( parseISO8601Range( "2014-01-12T03:07/P1D",r) );
+            alert( parseISO8601Range( "2014-01-12T03:07/P1DT12H",r) );
+            alert( parseISO8601Range( "P1D/2014-01-12T03:07",r) );
+            
+        </script>
+        
+    </body>
+</html>
