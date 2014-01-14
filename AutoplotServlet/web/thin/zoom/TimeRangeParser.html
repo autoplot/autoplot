@@ -16,7 +16,8 @@
 		output:
 		<br/>
 		<input id="test001out" style="width:30em"type="text"></input>
-
+                <input id="test001formt" style="width:30em"type="text"></input>
+                
                 <hr>
 		Test002:
 		<br/>
@@ -25,7 +26,8 @@
 		output:
 		<br/>
 		<input id="test002out" style="width:30em"type="text"></input>
-
+                <input id="test002formt" style="width:30em"type="text"></input>
+                
                 <hr>
 		Test003:
 		<br/>
@@ -34,6 +36,7 @@
 		output:
 		<br/>
 		<input id="test003out" style="width:30em"type="text"></input>
+                <input id="test003formt" style="width:30em"type="text"></input>
 
                 <hr>
 		Test004:
@@ -43,7 +46,17 @@
 		output:
 		<br/>
 		<input id="test004out" style="width:30em"type="text"></input>
-
+                <input id="test004formt" style="width:30em"type="text"></input>
+                
+                <hr>
+		Test005:
+		<br/>
+		<input id="test005in" style="width:30em"type="text" value="P1D/2014-01-12T03:07"></input><input id="test005go" type="button" class="try" value="Go">
+		<br/>
+		output:
+		<br/>
+		<input id="test005out" style="width:30em"type="text"></input>
+                <input id="test005formt" style="width:30em"type="text"></input>
                 
         <script type="text/javascript">
                         
@@ -55,18 +68,36 @@
             //TODO: There should be expected values hard-coded, with alerts when they are not met.
             
             $("#test001out").val( runTest($("#test001in").val() ) );
+            $("#test001formt").val( formatISO8601Range( runTest($("#test001in").val() ) ) );
             $("#test002out").val( runTest($("#test002in").val() ) );
+            $("#test002formt").val( formatISO8601Range( runTest($("#test002in").val() ) ) );
             $("#test003out").val( runTest($("#test003in").val() ) );
+            $("#test003formt").val( formatISO8601Range( runTest($("#test003in").val() ) ) );
             $("#test004out").val( runTest($("#test004in").val() ) );
+            $("#test004formt").val( formatISO8601Range( runTest($("#test004in").val() ) ) );
+            $("#test005out").val( runTest($("#test005in").val() ) );
+            $("#test005formt").val( formatISO8601Range( runTest($("#test005in").val() ) ) );
             
             $('#test001go').click( function () {
-				$("#test001out").val( runTest($("#test001in").val() ) ) } );
+				$("#test001out").val( runTest($("#test001in").val() ) );
+                                $("#test001formt").val( formatISO8601Range( runTest($("#test001in").val() ) ) );
+                            } );
             $('#test002go').click( function () {
-				$("#test002out").val( runTest($("#test002in").val() ) ) } );
+				$("#test002out").val( runTest($("#test002in").val() ) );
+                                $("#test002formt").val( formatISO8601Range( runTest($("#test002in").val() ) ) );
+                            } );
             $('#test003go').click( function () {
-				$("#test003out").val( runTest($("#test003in").val() ) ) } );
+				$("#test003out").val( runTest($("#test003in").val() ) );
+                                $("#test003formt").val( formatISO8601Range( runTest($("#test003in").val() ) ) );
+                            } );
             $('#test004go').click( function () {
-				$("#test004out").val( runTest($("#test004in").val() ) ) } );
+				$("#test004out").val( runTest($("#test004in").val() ) );
+                                $("#test004formt").val( formatISO8601Range( runTest($("#test004in").val() ) ) );
+                            } );
+            $('#test005go').click( function () {
+				$("#test005out").val( runTest($("#test005in").val() ) );
+                                $("#test005formt").val( formatISO8601Range( runTest($("#test005in").val() ) ) );
+                            } );
             
         </script>
         
