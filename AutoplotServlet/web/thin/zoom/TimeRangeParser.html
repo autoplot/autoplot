@@ -1,26 +1,72 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>ISO 8601 TimeRangeParser Tests</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
         <script type="text/javascript" src="TimeRangeParser.js"></script>
-        <div></div>
+        <br/>
+		<hr>
+                Test001:
+                <br/>
+                <input id="test001in" style="width:30em"type="text" value="2014-01-12T03:07:09.200/2015-02-12T03:04"></input><input type="button" id="test001go" class="try" value="Go">
+		<br/>
+		output:
+		<br/>
+		<input id="test001out" style="width:30em"type="text"></input>
+
+                <hr>
+		Test002:
+		<br/>
+		<input id="test002in" style="width:30em"type="text" value="2014-01-12T03:07/P1D"></input><input id="test002go" type="button" class="try" value="Go">
+		<br/>
+		output:
+		<br/>
+		<input id="test002out" style="width:30em"type="text"></input>
+
+                <hr>
+		Test003:
+		<br/>
+		<input id="test003in" style="width:30em"type="text" value="2014-01-12T03:07/P1DT12H"></input><input id="test003go" type="button" class="try" value="Go">
+		<br/>
+		output:
+		<br/>
+		<input id="test003out" style="width:30em"type="text"></input>
+
+                <hr>
+		Test004:
+		<br/>
+		<input id="test004in" style="width:30em"type="text" value="P1D/2014-01-12T03:07"></input><input id="test004go" type="button" class="try" value="Go">
+		<br/>
+		output:
+		<br/>
+		<input id="test004out" style="width:30em"type="text"></input>
+
+                
         <script type="text/javascript">
-            //alert( parseISO8601Duration('P1D') );
-            //result= [0,0,0,0,0,0,0];
-            //alert( parseISO8601Datum('2014-01-12T02:03:04.005',result,0) );
-            //alert( result );
-            r= undefined;
-            alert( parseISO8601Range( "2014-01-12T03:07:09.200/2015-02-12T03:04",r) );
-            alert( parseISO8601Range( "2014-01-12T03:07/P1D",r) );
-            alert( parseISO8601Range( "2014-01-12T03:07/P1DT12H",r) );
-            alert( parseISO8601Range( "P1D/2014-01-12T03:07",r) );
+                        
+            function runTest( inputtxt ) {
+                return parseISO8601Range(inputtxt);
+            }
+            
+            //TODO: Generate the GUI in javascript so this can be done consistently.
+            //TODO: There should be expected values hard-coded, with alerts when they are not met.
+            
+            $("#test001out").val( runTest($("#test001in").val() ) );
+            $("#test002out").val( runTest($("#test002in").val() ) );
+            $("#test003out").val( runTest($("#test003in").val() ) );
+            $("#test004out").val( runTest($("#test004in").val() ) );
+            
+            $('#test001go').click( function () {
+				$("#test001out").val( runTest($("#test001in").val() ) ) } );
+            $('#test002go').click( function () {
+				$("#test002out").val( runTest($("#test002in").val() ) ) } );
+            $('#test003go').click( function () {
+				$("#test003out").val( runTest($("#test003in").val() ) ) } );
+            $('#test004go').click( function () {
+				$("#test004out").val( runTest($("#test004in").val() ) ) } );
             
         </script>
         
