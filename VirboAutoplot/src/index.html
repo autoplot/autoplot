@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A new das2server for temperatures around the house is set up, and annotations are coming soon.</small></p>
+        <p><small>Random RBSP data.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,7 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1148: start to introduce methods for making mutable objects mutable, after seeing problems with reference cache</li>
             <li>1144:"CDF URI needs an argument" still lingers (in webstart single-instance hander)</li>
             <li>bounds of axis annotation labels corrected, before there was a 50px kludge which would leave unnecessary whitespace to the left of labels</li>
             <li>code that flattens waveforms for SeriesRenderer picks a unit that improves precision</li>
@@ -51,6 +52,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
+            <li>Improvements to the thin client</li>
+            <li>Bookmarks logic allows users to review bookmarks before using them.</li>
             <li>Inline data source now has editor panel, with discovery.</li>
             <li>Example thin client code allows arbitrary .vap to be used</li>
        </ul>
