@@ -234,6 +234,9 @@ function parseISO8601Datum( str, result, lsd ) {
 
         if ( d1 ) {
             digits0= parseISO8601Duration( parts[0] );
+        } else if ( parts[0]==='now' ) {
+            dd= new Date();
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
         } else {
             digits0= [0,0,0,0,0,0,0];
             lsd= parseISO8601Datum( parts[0], digits0, lsd );
@@ -242,6 +245,9 @@ function parseISO8601Datum( str, result, lsd ) {
 
         if ( d2 ) {
             digits1= parseISO8601Duration(parts[1]);
+        } else if ( parts[1]==='now' ) {
+            dd= new Date();
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
         } else {
             if ( d1 ) {
                 digits1= [0,0,0,0,0,0,0];
