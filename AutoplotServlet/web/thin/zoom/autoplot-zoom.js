@@ -185,8 +185,14 @@ function logloaded() {
 }
 
 /**
- * reset the timerange to the contents of $('#timerange').val().  It should
- * contains times like "2014-01-10T00:00/2014-01-10T13:00"
+ * reset the timerange to the contents of $('#timerange').val().  The times
+ * are parsed with an ISO8601 parser, so the following example timeranges 
+ * are supported:
+ * "2014-01-12T03:07:09.200/2015-02-12T03:04"
+ * "2014-01-12T03:07/P1D"      1-day following the datum
+ * "2014-01-12T03:07/P1DT12H"  1-day 12-hours following the datum
+ * "P1D/2014-01-12T03:07"      1-day preceeding the datum
+ * "P1D/now"                   1-day preceeding this instant
  * @returns {undefined}
  */
 function resetTime() {
@@ -194,11 +200,11 @@ function resetTime() {
         $("#info").html('reset the timerange for the time axis');
     } else {
         stimerange = $('#timerange').val();
-        n= stimerange.indexOf('/');
-        st1 = new Date(stimerange.substring(0,n)).toJSON();
-        t1= new Date(st1).getTime();
-        st2 = new Date(stimerange.substring(n+1)).toJSON();
-        t2= new Date(st2).getTime();
+        itr = parseISO8601Range( stimerange );
+        st1 = new Date( itr[0], itr[1]-1, itr[2], itr[3], itr[4], itr[5], itr[6]/1000000 ); //stimerange.substring(0,n)).toJSON();
+        t1= st1.getTime() - st1.getTimezoneOffset() * 60000;  // really?  
+        st2 = new Date( itr[7], itr[8]-1, itr[9], itr[10], itr[11], itr[12], itr[13]/1000000 );
+        t2= st2.getTime() - st2.getTimezoneOffset() * 60000;
         setTime( t1,t2 );
     }
 }
