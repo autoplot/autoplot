@@ -311,7 +311,12 @@ function mycallback() {
     diffmilliseconds = enddateinmilliseconds - startdateinmilliseconds;
     console.log('   mycallback--> startdateinmilliseconds=' + iso8601Str( startdateinmilliseconds,enddateinmilliseconds,startdateinmilliseconds) + " (exit)");
 
-    $('#xwidth').text= diffmilliseconds;
+    $('#xwidth').val( diffmilliseconds/3600000 );
+    dd1= new Date(startdateinmilliseconds);
+    dd2= new Date(enddateinmilliseconds);
+    digits= [ dd1.getUTCFullYear(), dd1.getUTCMonth()+1, dd1.getUTCDate(), dd1.getUTCHours(), dd1.getUTCMinutes(), dd1.getUTCSeconds(), dd1.getUTCMilliseconds()*1000000,
+                   dd2.getUTCFullYear(), dd2.getUTCMonth()+1, dd2.getUTCDate(), dd2.getUTCHours(), dd2.getUTCMinutes(), dd2.getUTCSeconds(), dd2.getUTCMilliseconds()*1000000 ];
+    $('#timerange').val( formatISO8601Range(digits) );
 
     topside = PLOTINFO.plots[0].yaxis.top;
     bottomside = PLOTINFO.plots[0].yaxis.bottom;
