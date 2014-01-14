@@ -508,6 +508,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
     /* read all the variable attributes into a Map */
     private synchronized HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> gattrs = new LinkedHashMap<String, Object>();
+        
         Pattern p = Pattern.compile("DEPEND_[0-9]");
 
         String[] vv;
@@ -556,7 +558,24 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
             }
         }
-
+        
+        if ( depth==0 ) {
+            try {
+                vv= cdf.globalAttributeNames();
+            } catch ( NullPointerException ex ) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                throw ex;
+            }        
+            for (int i = 0; i < vv.length; i++) {
+                Object attr= cdf.getAttribute(vv[i]);
+                if ( attr.getClass().isArray() && Array.getLength(attr)>0 ) {
+                    gattrs.put( vv[i], Array.get(attr,0) );
+                }
+            }
+        
+            props.put( "GlobalAttributes", gattrs );
+        }
+        
         Object o=props.get("UNIT_PTR");
         if ( o!=null && o instanceof String ) {
             try {

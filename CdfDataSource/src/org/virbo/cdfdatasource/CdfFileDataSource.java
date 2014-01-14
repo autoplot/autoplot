@@ -753,6 +753,8 @@ public class CdfFileDataSource extends AbstractDataSource {
     /* read all the variable attributes into a Map */
     private HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> gattrs = new LinkedHashMap<String, Object>();
+        
         Pattern p = Pattern.compile("DEPEND_[0-9]");
 
         // do two global attr for S/C identification
@@ -816,8 +818,26 @@ public class CdfFileDataSource extends AbstractDataSource {
                         props.put(attr.getName(), entry.getData());
                     }
                 } catch (CDFException e) {
+                    try {
+                        if ( depth==0 ) {
+                            Vector vv = attr.getEntries();
+                            if ( vv.size()>0 ) {
+                                Entry e2= (Entry)vv.get(0);
+                                if ( e2!=null ) {
+                                    gattrs.put( attr.getName(), e2.getData() );
+                                }
+                            }
+                        }
+                    } catch (CDFException ex) {
+                        Logger.getLogger(CdfFileDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
                 }
             }
+        }
+        
+        if ( depth==0 ) {
+            props.put( "GlobalAttributes", gattrs );
         }
         
         Object o=props.get("UNIT_PTR");
