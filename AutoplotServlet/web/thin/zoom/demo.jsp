@@ -31,18 +31,18 @@
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
     </div>
        
-            <button onclick="scanprev();">&lt;&lt; PREV</button>
-            <button onclick="scanhalfprev();">&lt;&lt;PR</button>
-            <button onclick="scanhalfnext();">NE&gt;&gt;</button>
-            <button onclick="scannext();">NEXT &gt;&gt;</button>
-            <button onclick="zoomout();">Zoom Out</button>    
-            <button onclick="zoomin();">Zoom In</button>    
+            <button onclick="scanprev();" title="Previous interval">&lt;&lt; PREV</button>
+            <button onclick="scanhalfprev();" title="Previous half interval">&lt;&lt;PR</button>
+            <button onclick="scanhalfnext();" title="Next half interval">NE&gt;&gt;</button>
+            <button onclick="scannext();" title="Next interval">NEXT &gt;&gt;</button>
+            <button onclick="zoomout();" title="Zoom Out">Zoom Out</button>    
+            <button onclick="zoomin();" title="Zoom In">Zoom In</button>    
 
             	
-            <p><button onclick="centerFocus();">Center</button> at x=<input id="xclick" ></input> 
-                <button onclick="resetWidth(); return false;">Width</button>=<input id="xwidth" size="4">hr
+            <p><button onclick="centerFocus();" title="Shift center to here">Center</button> at x=<input id="xclick" ></input> 
+                <button onclick="resetWidth();" title="Make this the new width">Width</button>=<input id="xwidth" size="4">hr
                     <br>
-                        <button onclick="resetTime();">Reset</button> to <input id="timerange" size="50"></input>
+                        <button onclick="resetTime();" title="Jump to this range">Reset</button> to <input id="timerange" size="50"></input>
             </p>
             
             <div id="info"></div>
@@ -52,9 +52,11 @@
 		<!--<pre><div id="idcolumn"></div></pre>-->
 		<!--<pre><div id="idrow"></div></pre>-->
 		<!--<pre><div id="iddifftime"></div></pre>-->
+                
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>                 
 	<script type="text/javascript" src="js/jquery.ui.js"></script>
 	<script type="text/javascript" src="js/jquery.imgareaselect.min.js"></script>
+        <script type="text/javascript" src="TimeRangeParser.js"></script>
 	<script type="text/javascript" src="autoplot-zoom.js"></script>
         <script type="text/javascript" src="prepimage.js"></script>
         <script type="text/javascript" src="binaryajax.js"></script>

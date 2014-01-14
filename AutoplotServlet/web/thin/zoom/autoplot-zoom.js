@@ -135,7 +135,7 @@ function centerFocus() {
  * @returns the formatted string, limited to resolution
  */
 function iso8601RangeStr( startMilliseconds, endMilliseconds ) {
-    st1= iso8601Str( startMilliseconds, endMilliseconds, startMilliseconds );    
+    st1= iso8601Str( startMilliseconds, endMilliseconds, startMilliseconds );
     st2= iso8601Str( startMilliseconds, endMilliseconds, endMilliseconds );
     return st1 + "/"+ st2;
 }
