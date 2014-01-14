@@ -278,6 +278,63 @@ function parseISO8601Datum( str, result, lsd ) {
 
     }
     
+    /**
+     * again I am shocked that javascript doesn't support sprintf style formatting.
+     * @param int num zero or positive number
+     * @param int size total number of digits, must be less than 10.
+     * @returns formatted in with zeroes prefix.
+     */
+    function zeroPad( num, size ) {
+        var s = "000000000" + num;
+        return s.substr(s.length-size);
+    }
+    
+    /**
+     * format the seven digits starting at index.
+     * @param int arr
+     * @param int index
+     * @returns {undefined}
+     */
+    function formatISO8601( arr, index ) {
+        s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+1], 2 ) + "-" + zeroPad( arr[index+2], 2 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );
+        if ( arr[index+5]>0 || arr[6]>0 ) { 
+            s1= s1+":"+zeroPad( arr[index+5], 2 );
+        }
+        if ( arr[index+6]>0 ) {
+            s1= s1+"."+zeroPad( arr[index+6]/1e6, 3 ); // nanos
+        }
+        return s1;
+    }
+    
+    /**
+     * format the 14-element array efficiently (few characters).  
+     * @param int array 14-element array of [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
+     * @returns String
+     */
+    function formatISO8601Range( arr ) {
+        ds= [ arr[9]-arr[2], arr[10]-arr[3], arr[11]-arr[4], arr[12]-arr[5], arr[13]-arr[6] ];
+        uu= [ "D","H","M","S" ];
+        dur= "P"
+        havet= false;
+        for ( i=0; i<ds.length; i++ ) {
+            if ( ds[i]>0 ) {
+                if ( i>0 && havet===false ) {
+                    dur= dur + "T";
+                    havet= true;
+                }
+                dur= dur + ds[i] + uu[i];
+            }
+        }
+        s1= formatISO8601( arr, 0 );
+        if ( dur.length > 1 && dur.length < 6 ) {
+            return s1+"/"+dur;
+        } else {
+            s2= formatISO8601( arr, 7 );
+            return s1+"/"+s2;
+        }
+        
+    }
+    
 //    public static void main( String[] args ) {
 //        int[] r= new int[14];
 //        
