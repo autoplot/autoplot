@@ -245,9 +245,9 @@ public class DocumentationScrollPane extends JScrollPane {
         } else if (url != null) {
             try {
                 view.setPage(url);
-                if ( view.getDocument().getLength()==0 ) { // tested on a mac
-                    view.setText("Unable to load "+url );
-                }
+                //if ( view.getDocument().getLength()==0 ) { // tested on a mac
+                //    view.setText("Unable to load "+url );
+                //}
             } catch ( java.net.UnknownHostException ioe ) {
                 view.setContent( ioe.toString(), null );
             } catch ( FileNotFoundException ex ) {
