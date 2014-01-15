@@ -291,12 +291,16 @@ function parseISO8601Datum( str, result, lsd ) {
     
     /**
      * format the seven digits starting at index.
-     * @param int arr
-     * @param int index
-     * @returns {undefined}
+     * @param int arr like [ 2014, 1, 5, 0, 0, 3, 300000000, 2014, 1, 5, 0, 0, 3, 600000000 ]
+     * @param int index into array like 7
+     * @returns ISO8601 formatted string like "2014-01-05T00:00:03.600" 
      */
     function formatISO8601( arr, index ) {
-        s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+1], 2 ) + "-" + zeroPad( arr[index+2], 2 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );
+        if ( arr[index+1]===1 && arr[index+2]>31 ) {  // day-of-year
+            s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+2], 3 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );            
+        } else {
+            s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+1], 2 ) + "-" + zeroPad( arr[index+2], 2 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );
+        }
         if ( arr[index+5]>0 || arr[index+6]>0 ) { 
             s1= s1+":"+zeroPad( arr[index+5], 2 );
         }
