@@ -132,6 +132,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         // macs have an annoying feature that macs select everything when focus is gained.
         // I would often loose all the text I'd typed in as I used the completions.
+        // http://www.coderanch.com/t/488520/GUI/java/JTextField-highlighted-windows
         editor.addFocusListener( new FocusListener() {
 
             @Override
