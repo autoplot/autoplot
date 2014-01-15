@@ -96,7 +96,7 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-volatile-src/MANIFEST.MF
+echo -e "Main-Class: org.virbo.autoplot.AutoplotUI\nApplication-Name: Autoplot\nCodebase: http://autoplot.org/" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA

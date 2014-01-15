@@ -17,7 +17,7 @@ rm -f META-INF/MANIFEST.MF   # remove leftover signatures.
 rm -f META-INF/*.DSA
 rm -f META-INF/*.SF
 
-echo "Main-Class: org.virbo.autoplot.AutoplotUI" > META-INF/MANIFEST.MF
+echo -e "Main-Class: org.virbo.autoplot.AutoplotUI\nApplication-Name: Autoplot\nCodebase: http://autoplot.org/" > META-INF/MANIFEST.MF
 zip -r ../autoplot.jar.1 * | grep -v "adding:"
 
 cd ..
