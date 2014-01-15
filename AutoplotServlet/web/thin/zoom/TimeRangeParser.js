@@ -297,7 +297,7 @@ function parseISO8601Datum( str, result, lsd ) {
      */
     function formatISO8601( arr, index ) {
         s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+1], 2 ) + "-" + zeroPad( arr[index+2], 2 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );
-        if ( arr[index+5]>0 || arr[6]>0 ) { 
+        if ( arr[index+5]>0 || arr[index+6]>0 ) { 
             s1= s1+":"+zeroPad( arr[index+5], 2 );
         }
         if ( arr[index+6]>0 ) {
