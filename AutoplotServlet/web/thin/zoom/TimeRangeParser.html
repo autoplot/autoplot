@@ -64,13 +64,32 @@
                 return parseISO8601Range(inputtxt);
             }
             
+            function testFormat( arr, format ) {
+                tst= runTest( format );
+                soundAlert= false;
+                for ( i=0; i<14; i++ ) {
+                    if ( tst[i]!==arr[i] ) {
+                        soundAlert= true;
+                    }
+                }
+                if ( soundAlert ) {
+                    alert("here "+tst + " " + arr);
+                } else {
+                    alert("ok");
+                }
+            }
+            
             //TODO: Generate the GUI in javascript so this can be done consistently.
             //TODO: There should be expected values hard-coded, with alerts when they are not met.
             
             $("#test001out").val( runTest($("#test001in").val() ) );
             $("#test001formt").val( formatISO8601Range( runTest($("#test001in").val() ) ) );
+            testFormat( $("#test002out").val(), $("#test002formt") );
+            
             $("#test002out").val( runTest($("#test002in").val() ) );
             $("#test002formt").val( formatISO8601Range( runTest($("#test002in").val() ) ) );
+            testFormat( $("#test002out").val(), $("#test002formt") );
+            
             $("#test003out").val( runTest($("#test003in").val() ) );
             $("#test003formt").val( formatISO8601Range( runTest($("#test003in").val() ) ) );
             $("#test004out").val( runTest($("#test004in").val() ) );
