@@ -200,6 +200,20 @@ function resetTime() {
         $("#info").html('reset the timerange for the time axis');
     } else {
         stimerange = $('#timerange').val();
+        n= stimerange.indexOf('/');
+        if ( n===-1 ) {
+            if ( stimerange.length<4 ) {
+                return;
+            } else if ( stimerange.length===4 ) {
+                stimerange= stimerange+'/P1Y';
+            } else if ( stimerange.length===7 ) {
+                stimerange= stimerange+'/P1M';
+            } else if ( stimerange.length===8 ) {
+                stimerange= stimerange+'/P1D';
+            } else if ( stimerange.length===10 ) {
+                stimerange= stimerange+'/P1D';
+            }
+        }        
         itr = parseISO8601Range( stimerange );
         st1 = new Date( itr[0], itr[1]-1, itr[2], itr[3], itr[4], itr[5], itr[6]/1000000 ); //stimerange.substring(0,n)).toJSON();
         t1= st1.getTime() - st1.getTimezoneOffset() * 60000;  // really?  
@@ -235,13 +249,13 @@ function clickshift(subEvent) {
         if (p.xaxis.left <= xx && xx < p.xaxis.right && p.yaxis.top <= yy && yy < p.yaxis.bottom) {
             l = p.xaxis.right - p.xaxis.left;
 
-            if (p.xaxis.units == 'UTC') {
+            if (p.xaxis.units === 'UTC') {
                 dmin = Date.parse(p.xaxis.min);
                 dmax = Date.parse(p.xaxis.max);
                 datax = ((xx - p.xaxis.left) * dmax + (p.xaxis.right - xx) * dmin) / l;
                 datax = iso8601Str( dmin, dmax, datax );
             } else {
-                if (p.xaxis.type == 'log') {
+                if (p.xaxis.type === 'log') {
                     oo = ((p.xaxis.right - xx) / l);
                     zz = Math.log(p.xaxis.max / p.xaxis.min);
                     datax = Math.exp(Math.log(p.xaxis.min) + ((xx - p.xaxis.left) / l) * Math.log(p.xaxis.max / p.xaxis.min));
@@ -250,7 +264,7 @@ function clickshift(subEvent) {
                 }
             }
             l = p.yaxis.bottom - p.yaxis.top;
-            if (p.yaxis.type == 'log') {
+            if (p.yaxis.type === 'log') {
                 datay = Math.exp(Math.log(p.yaxis.min) + ((p.yaxis.bottom - yy) / l) * Math.log(p.yaxis.max / p.yaxis.min));
             } else {
                 datay = ((yy - p.yaxis.top) * p.yaxis.min + (p.yaxis.bottom - yy) * p.yaxis.max) / l;
