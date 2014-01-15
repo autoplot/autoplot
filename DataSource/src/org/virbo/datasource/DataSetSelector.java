@@ -23,6 +23,8 @@ import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
@@ -128,6 +130,23 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
+        // macs have an annoying feature that macs select everything when focus is gained.
+        // I would often loose all the text I'd typed in as I used the completions.
+        editor.addFocusListener( new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                int i= editor.getCaretPosition();
+                editor.setSelectionStart(i);
+                editor.setSelectionEnd(i);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                        
+            }
+        });
+        
         addCompletionKeys();
         addAbouts();
         
@@ -851,7 +870,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
         
         boolean shortFsCompletion= carotpos<6 && ( surl.startsWith("/") || ( surl.length()>1 && Character.isLetter(surl.charAt(0)) && surl.charAt(1)==':' ) );
-
+        
         boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl));
         if ( ( split.file==null || split.resourceUriCarotPos > split.file.length() ) && haveSource ) {
             showFactoryCompletions( surl, carotpos );
