@@ -14,8 +14,9 @@
 
 # set JAVA_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=$JAVA_HOME
+    JAVA_HOME=/usr/local/jdk1.6.0_35/
 fi
+
 if [ "" = "$JAVA6_HOME" ]; then
     JAVA6_HOME=/usr/local/jdk1.6.0_35/
 fi
