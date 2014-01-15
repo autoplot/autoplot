@@ -204,13 +204,13 @@ function resetTime() {
         if ( n===-1 ) {
             if ( stimerange.length<4 ) {
                 return;
-            } else if ( stimerange.length===4 ) {
+            } else if ( stimerange.length===4 ) { // YYYY
                 stimerange= stimerange+'/P1Y';
-            } else if ( stimerange.length===7 ) {
+            } else if ( stimerange.length===7 ) { // YYYY-DD
                 stimerange= stimerange+'/P1M';
-            } else if ( stimerange.length===8 ) {
+            } else if ( stimerange.length===8 ) { // YYYY-MMM
                 stimerange= stimerange+'/P1D';
-            } else if ( stimerange.length===10 ) {
+            } else if ( stimerange.length===10 ) { // YYYY-MM-DD
                 stimerange= stimerange+'/P1D';
             }
         }        
