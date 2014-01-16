@@ -90,8 +90,8 @@ function nextToken( str, index, delims ) {
  * 
  * @param str the string we are parsing
  * @param result the int[7] result
- * @param lsd???
- * @return 
+ * @param lsd
+ * @return the lsd
  */
 function parseISO8601Datum( str, result, lsd ) {
     delims= "-T:.Z";
@@ -119,6 +119,8 @@ function parseISO8601Datum( str, result, lsd ) {
                 result[0]= iyear;
                 want= 1;
                 dir=DIR_FORWARD;
+                result[1]= 0; result[2]= 0; result[3]=0; result[4]=0; result[5]=0; result[6]=0;
+                
             } else if ( tok.length===6 ) {
                 want= lsd;
                 if ( want!==6 ) alert("lsd must be 6");
@@ -135,12 +137,14 @@ function parseISO8601Datum( str, result, lsd ) {
                 result[2]= parseInt( tok.substring(4,7) );
                 want= 3;                    
                 dir=DIR_FORWARD; 
+                result[3]=0; result[4]=0; result[5]=0; result[6]=0;
             } else if ( tok.length===8 ) {
                 result[0]= Integer.parseInt( tok.substring(0,4) );
                 result[1]= Integer.parseInt( tok.substring(4,6) );
                 result[2]= Integer.parseInt( tok.substring(6,8) );
                 want= 3;                    
                 dir=DIR_FORWARD;
+                result[3]=0; result[4]=0; result[5]=0; result[6]=0;
             } else {
                 dir= DIR_REVERSE;
                 want= lsd;  // we are going to have to reverse these when we're done.
@@ -185,7 +189,6 @@ function parseISO8601Datum( str, result, lsd ) {
             }
             want--;
         }
-        console.log("index1="+index1);
         index= index1+1;
         index1= nextToken( str, index, delims );
     }
@@ -252,7 +255,7 @@ function parseISO8601Datum( str, result, lsd ) {
             if ( d1 ) {
                 digits1= [0,0,0,0,0,0,0];
             } else {
-                digits1= digits0.slice(0);
+                digits1= digits0.slice(0); // make a clone of the array
             }
             lsd= parseISO8601Datum( parts[1], digits1, lsd );
             for ( j=lsd+1; j<3; j++ ) digits1[j]=1; // month 1 is first month, not 0. day 1 
@@ -296,6 +299,7 @@ function parseISO8601Datum( str, result, lsd ) {
      * @returns ISO8601 formatted string like "2014-01-05T00:00:03.600" 
      */
     function formatISO8601( arr, index ) {
+        var s1;
         if ( arr[index+1]===1 && arr[index+2]>31 ) {  // day-of-year
             s1= zeroPad( arr[index+0], 4 ) + "-" + zeroPad( arr[index+2], 3 ) + "T" + zeroPad( arr[index+3], 2 ) + ":" + zeroPad( arr[index+4], 2 );            
         } else {
@@ -316,6 +320,7 @@ function parseISO8601Datum( str, result, lsd ) {
      * @returns String
      */
     function formatISO8601Range( arr ) {
+        var s1,s2;
         ds= [ arr[7]-arr[0], arr[8]-arr[1], arr[9]-arr[2], arr[10]-arr[3], arr[11]-arr[4], arr[12]-arr[5], arr[13]-arr[6] ];
         uu= [ "Y","M","D","H","M","S" ];
         dur= "P";
