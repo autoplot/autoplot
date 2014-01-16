@@ -1251,6 +1251,10 @@ public class PlotController extends DomNodeController {
     }
 
 
+    /**
+     * TODO: this is really confusing, because the plot has a CONTEXT property and the
+     * there's DataSetUtil.contextAsString(ds).
+     */
     Converter contextConverter= new Converter() {
         @Override
         public Object convertForward(Object value) {
