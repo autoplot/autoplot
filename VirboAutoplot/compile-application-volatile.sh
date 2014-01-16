@@ -97,7 +97,7 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 file=helpsets.txt
 sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-echo -e "Main-Class: org.virbo.autoplot.AutoplotUI\nApplication-Name: Autoplot\nCodebase: http://autoplot.org/" > temp-volatile-src/MANIFEST.MF
+echo -e "Main-Class: org.virbo.autoplot.AutoplotUI\nApplication-Name: Autoplot\nCodebase: http://autoplot.org/\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA
@@ -246,10 +246,6 @@ cd ..
 ${JAVA_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
 ${JAVA_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
 ${JAVA_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/pngwalk_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
-
-#echo "proguard/pack200 stuff..."
-#${JAVA_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-#echo "done proguard/pack200 stuff."
 
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
