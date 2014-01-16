@@ -6,6 +6,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
+        <b>ISO8601 Time Range Parser</b>.  See <a href="http://wikipedia.org/wiki/ISO_8601#Time_intervals">http://wikipedia.org/wiki/ISO_8601#Time_intervals</a>
         <script type="text/javascript" src="TimeRangeParser.js"></script>
         <br/>
 		<hr>
@@ -41,7 +42,7 @@
                 <hr>
 		Test004:
 		<br/>
-		<input id="test004in" style="width:30em"type="text" value="P1D/2014-01-12T03:07"></input><input id="test004go" type="button" class="try" value="Go">
+		<input id="test004in" style="width:30em"type="text" value="P1Y2M10DT2H30M/2008-05-11T15:30:00Z"></input><input id="test004go" type="button" class="try" value="Go">
 		<br/>
 		output:
 		<br/>
@@ -51,7 +52,7 @@
                 <hr>
 		Test005:
 		<br/>
-		<input id="test005in" style="width:30em"type="text" value="P1D/2014-01-12T03:07"></input><input id="test005go" type="button" class="try" value="Go">
+		<input id="test005in" style="width:30em"type="text" value="2014-01-12T03:07/06:09"></input><input id="test005go" type="button" class="try" value="Go">
 		<br/>
 		output:
 		<br/>
@@ -84,11 +85,11 @@
             
             $("#test001out").val( runTest($("#test001in").val() ) );
             $("#test001formt").val( formatISO8601Range( runTest($("#test001in").val() ) ) );
-            testFormat( $("#test002out").val(), $("#test002formt") );
+            //testFormat( $("#test002out").val(), $("#test002formt").val() );
             
             $("#test002out").val( runTest($("#test002in").val() ) );
             $("#test002formt").val( formatISO8601Range( runTest($("#test002in").val() ) ) );
-            testFormat( $("#test002out").val(), $("#test002formt") );
+            //testFormat( $("#test002out").val(), $("#test002formt").val() );
             
             $("#test003out").val( runTest($("#test003in").val() ) );
             $("#test003formt").val( formatISO8601Range( runTest($("#test003in").val() ) ) );
