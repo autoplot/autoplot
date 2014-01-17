@@ -141,6 +141,9 @@ public class FileSystemUtil {
         URI resource= DataSetURI.toUri( split.path );
         String scheme= resource.getScheme();
         if ( scheme.equals("file") || scheme.equals("sftp") ) {
+            if ( resource.getPath().contains( FileSystem.settings().getLocalCacheDir().toString() ) ) {
+                return false;
+            }
             return true;
         } else {
             return false;
