@@ -16,6 +16,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -25,6 +27,8 @@ import org.das2.util.monitor.ProgressMonitor;
  * @author jbf
  */
 public class FileSystemUtil {
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss.util.fsutil");
     
     public static String getNameRelativeTo( FileSystem fs, String resource ) {
         String s= fs.getRootURI().toString();
@@ -143,6 +147,11 @@ public class FileSystemUtil {
         String scheme= resource.getScheme();
         if ( scheme.equals("file") || scheme.equals("sftp") ) {
             if ( resource.getPath().contains( FileSystem.settings().getLocalCacheDir().toString() ) ) {
+                logger.info( "path within local cache dir is considered non-local" );
+                return false;
+            }
+            if ( resource.getPath().contains("upload") ) {
+                logger.info( "path containing upload is considered non-local" );
                 return false;
             }
             return true;
