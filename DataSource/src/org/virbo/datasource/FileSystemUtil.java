@@ -129,12 +129,16 @@ public class FileSystemUtil {
     }
 
     /**
-     * return true if the resource is local.  This was introduced to 
-     * secure the server, where an Autoplot there could be used to access
-     * local resources.  This returns true for file:/ references, and also c:/.
+     * return true if the resource is local, and can therefore be trusted.  
+     * This was introduced to secure the server, where an Autoplot there could be 
+     * used to access local resources.  This returns true for file:/ references.
      * Note this will also return true for sftp since the reference 
-     * may utilitize keys private to the server.  This should return true
-     * for any use of local resources that would provide better access
+     * may utilize keys private to the server.  Note too that a .jyds script
+     * that is not local could attempt to use local resources.  For this reason
+     * there is JythonDataSourceFactory.hasLocalReferences.
+     * 
+     * "upload" is another magic element.  Paths containing upload are considered 
+     * remote.
      * 
      * @param file an Autoplot URI.
      * @return true if the uri is a reference to a local resource.
