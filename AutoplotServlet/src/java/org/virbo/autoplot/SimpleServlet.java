@@ -11,6 +11,8 @@ import java.io.File;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,17 +40,21 @@ import org.das2.util.AboutUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.datasource.jython.JythonDataSourceFactory;
 import org.virbo.dsops.Ops;
 
 /**
@@ -81,7 +87,50 @@ public class SimpleServlet extends HttpServlet {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
-
+    
+    /**
+     * return true if the .vap file contains any references to local resources.
+     * @param vap vap file
+     * @return true if the file has local references.
+     */
+    private static boolean vapHasLocalReferences( File vap ) {
+        try {
+            Application app= (Application) StatePersistence.restoreState(vap);
+            DataSourceFilter[] dsfs= app.getDataSourceFilters();
+            for ( int i=0; i<dsfs.length; i++ ) {
+                URI uri= DataSetURI.toUri(dsfs[i].getUri());
+                if ( FileSystemUtil.isLocalResource( dsfs[i].getUri() ) ) {
+                    logger.log( Level.FINE, "vap contains local reference: {0}", uri );
+                    return true;
+                } else {
+                    try {
+                        DataSourceFactory dssf= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor() );
+                        if ( dssf instanceof JythonDataSourceFactory ) {
+                            if ( JythonDataSourceFactory.jydsHasLocalReferences(uri) ) {
+                                return true;
+                            }
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }                    
+                }
+            }
+            Plot[] plots= app.getPlots();
+            for ( int i=0; i<plots.length; i++ ) {
+                if ( FileSystemUtil.isLocalResource( plots[i].getTicksURI() ) ) {
+                    logger.log( Level.FINE, "vap contains local reference: {0}", dsfs[i].getUri());
+                    return true;
+                }
+            }
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
+        
+    }
+    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -257,24 +306,38 @@ public class SimpleServlet extends HttpServlet {
             logit("set canvas parameters", t0, uniq, debug);
 
             if (vap != null) {
+                boolean isLocalVap= FileSystemUtil.isLocalResource(vap);
+                logger.log(Level.FINER, "vap isLocalVap={0}", isLocalVap);
                 File openable = DataSetURI.getFile(vap,new NullProgressMonitor());
+                if ( !isLocalVap ) {
+                    if ( vapHasLocalReferences( openable ) ) {
+                        throw new IllegalArgumentException("remote vap file has local references");
+                    }
+                }
                 URISplit split= URISplit.parse(vap);
                 if (split.params != null) {
                     LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
                     if ( params.containsKey("timerange") && !params.containsKey("timeRange") ) {
                         params.put("timeRange", params.remove("timerange") );
                     }
-                    params.put("PWD",split.path);
+                    if ( isLocalVap ) params.put("PWD",split.path);
                     if ( stimeRange.trim().length()>0 ) {
                         params.put( "timeRange", stimeRange );
+                    }
+                    if ( !isLocalVap ) {
+                        LinkedHashMap<String, String> params1 = new LinkedHashMap();
+                        if ( params.get("timeRange")!=null ) {
+                            params1.put( "timeRange", params.get("timeRange") );
+                        }
+                        params= params1;
                     }
                     appmodel.doOpen(openable, params);
                 } else {
                     LinkedHashMap<String, String> params = new LinkedHashMap();
-                    params.put("PWD",split.path);
+                    if ( isLocalVap ) params.put("PWD",split.path);
                     if ( stimeRange.trim().length()>0 ) {
                         params.put( "timeRange", stimeRange );
-                    }
+                    }                   
                     appmodel.doOpen(openable, params);
                 }
                 logit("opened vap", t0, uniq, debug);
