@@ -246,6 +246,7 @@ public class AutoplotDataServer {
             lastUpdateTime= tnow;
             super.setTaskProgress(position);
             String msg= String.format(  "[xx]000059<comment type=\"taskProgress\" value=\"%08d\" source=\"\" />\n", position );
+            if ( outEmpty.isEmpty() ) return;
             out.print( msg );
         }
     }
