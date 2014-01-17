@@ -132,12 +132,13 @@ public class FileSystemUtil {
      * may utilitize keys private to the server.  This should return true
      * for any use of local resources that would provide better access
      * 
-     * @param vap
+     * @param file an Autoplot URI.
      * @return true if the uri is a reference to a local resource.
      */
-    public static boolean isLocalResource(String vap) {
-        if ( vap.trim().length()==0 ) return false;
-        URISplit split= URISplit.parse(vap);
+    public static boolean isLocalResource(String file) {
+        if ( file.trim().length()==0 ) return false;
+        URISplit split= URISplit.parse(file);
+        if ( split.path==null ) return false;
         URI resource= DataSetURI.toUri( split.path );
         String scheme= resource.getScheme();
         if ( scheme.equals("file") || scheme.equals("sftp") ) {
