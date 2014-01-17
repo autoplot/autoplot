@@ -348,6 +348,12 @@ public class SimpleServlet extends HttpServlet {
             }
 
             if (surl != null && !"".equals(surl)) {
+                
+                if ( FileSystemUtil.isLocalResource(surl) ) {
+                    // See http://autoplot.org/developer.servletSecurity for more info.
+                    throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                }
+                
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(surl);
