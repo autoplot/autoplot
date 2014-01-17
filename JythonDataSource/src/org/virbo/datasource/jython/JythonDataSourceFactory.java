@@ -332,6 +332,18 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
+    /**
+     * this is a non-trivial problem, and for now we will
+     * assume any .jyds has local references and therefore cannot
+     * be run from a remote .vap file.  Further, it's probably better
+     * to look into creating a sandboxed thread on which to run the script.
+     * 
+     * @param jyds
+     * @return 
+     */
+    public static boolean jydsHasLocalReferences( URI uri ) {
+        return true;
+    }
 
 
 
