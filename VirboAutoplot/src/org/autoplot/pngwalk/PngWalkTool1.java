@@ -13,6 +13,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -914,7 +915,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         timeFilterTextField.setText("");
 
         if ( seq.size()==0 ) {
-            JOptionPane.showMessageDialog( this, "<html>Unable to find any images in sequence:<br>"+ seq.getTemplate() );
+            Container p= this.getParent();
+            if ( this.getX()!=0 ) p= this; // for Linux, where the component isn't initialized yet.
+            JOptionPane.showMessageDialog( p, "<html>Unable to find any images in sequence:<br>"+ seq.getTemplate() );
             return;
         }
         
