@@ -37,8 +37,16 @@ import org.das2.util.monitor.ProgressMonitor;
  * @author jbf
  */
 public class CompletionsDataSourceEditor extends javax.swing.JPanel implements DataSourceEditorPanel {
+    /**
+     * maximum length of vap+xxx: in URIs.
+     */
+    private static final int MAX_VAP_PREFIX = 14;
 
     String suri;
+    /**
+     * true indicates that this type of URI does not have a file component.
+     */
+    boolean suriNoFile= false;
 
     List<JCheckBox> opsCbs;
     List<JComboBox> opsComboBoxes;
@@ -52,14 +60,30 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1.getVerticalScrollBar().setUnitIncrement( getFont().getSize() );
     }
 
+    private boolean isNoFile( String surl1 ) {
+        int icolon= surl1.indexOf(":");
+        if ( icolon>-1 && icolon<MAX_VAP_PREFIX && surl1.length()>16 ) {
+            if ( surl1.charAt(icolon+1)!='/' || surl1.charAt(icolon+2)!='/' ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private CompletionContext prepareContext( String surl1, int carotPos ) {
 
         CompletionContext cc = new CompletionContext();
 
         int qpos = surl1.lastIndexOf('?', carotPos);
         if ( qpos==-1 && carotPos==surl1.length() ) {
-            surl1= surl1+"?";
-            qpos= surl1.length()-1;
+            int icolon= surl1.indexOf(":");
+            if ( suriNoFile ) {
+                surl1= surl1.substring(0,icolon)+":?"+surl1.substring(icolon+1);
+                qpos= icolon+1;
+            } else {
+                surl1= surl1+"?";
+                qpos= surl1.length()-1;
+            }
             carotPos= surl1.length();
         }
 
@@ -114,9 +138,14 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             result = factory.getCompletions(cc, mon );
 
         }  else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
-            URI uri = DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            if ( suriNoFile ) {
+                cc.resourceURI= null;
+            } else {
+                URI uri;
+                uri= DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+                cc.resourceURI= DataSetURI.getResourceURI(uri);
+            }
 
-            cc.resourceURI= DataSetURI.getResourceURI(uri);
             cc.params = split.params;
 
             if (factory == null) {
@@ -137,7 +166,18 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     public void populateFromCompletions( DataSourceFactory dsf, ProgressMonitor mon ) throws URISyntaxException, Exception {
 
         int i= suri.indexOf("?");
-        if ( i==-1 ) i= suri.length(); else i=i+1;
+        if ( i==-1 ) {
+            int icolon= suri.indexOf(":");
+            if ( suriNoFile && icolon>-1 && icolon<MAX_VAP_PREFIX ) {
+                suri= suri.substring(0,icolon)+":?"+suri.substring(icolon+1);
+                i= icolon+2;
+            } else {
+                suri= suri+"?";
+                i= suri.length();
+            }
+        } else {
+            i=i+1;
+        }
 
         URISplit split= URISplit.parse(suri);
         Map<String,String> map= URISplit.parseParams(split.params);
@@ -245,6 +285,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
                 optionsPanel.add( optPanel );
                 optionsPanel.add( Box.createVerticalStrut(8) );
+            } else {
+                opsComboBoxes.add( null );
             }
             
         }
@@ -280,7 +322,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             if ( isel!=-1 ) {
                 jopts.setSelectedIndex(isel);
             }
-
+            opsComboBoxes.add( jopts );
+            
             if ( arg0Extra!=null ) {
                 arg0ExtraTF= new JTextField(12);
                 arg0ExtraTF.setText(arg0Extra);
@@ -313,6 +356,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public void setURI(String uri) {
         this.suri= uri;
+        this.suriNoFile=isNoFile(uri);
         URISplit split= URISplit.parse(suri);
         Map<String,String> params= URISplit.parseParams( split.params );
         for ( Entry<String,String> e: params.entrySet() ) {
@@ -321,7 +365,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             for ( int i=0; i<opsCbs.size(); i++ ) {
                 if ( opsCbs.get(i).getText().equals(s+"=") ) {
                     opsCbs.get(i).setSelected(true);
-                    opsComboBoxes.get(i).setSelectedItem(v);
+                    if ( opsComboBoxes.get(i)!=null ) {
+                        opsComboBoxes.get(i).setSelectedItem(v);
+                    } else {
+                        
+                    }
                 }
             }
         }
@@ -331,7 +379,12 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     public String getURI() {
         StringBuilder base= new StringBuilder( this.suri );
         int j= base.indexOf("?");
-        if ( j!=-1 ) {
+        if ( j==-1 ) {
+            int icolon= suri.indexOf(":");
+            if ( suriNoFile && icolon>-1 && icolon<MAX_VAP_PREFIX ) {
+                base= new StringBuilder( base.substring(0,icolon+1) );
+            }
+        } else {
             base= new StringBuilder( base.substring(0,j) );
         }
 
@@ -355,7 +408,12 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         for ( int i=0; i<opsCbs.size(); i++ ) {
             if ( opsCbs.get(i).isSelected() ) {
                 String paramName= opsCbs.get(i).getText();
-                String paramValue= String.valueOf( opsComboBoxes.get(i).getSelectedItem() );
+                String paramValue;
+                if ( opsComboBoxes.get(i)!=null ) {
+                    paramValue= String.valueOf( opsComboBoxes.get(i).getSelectedItem() );
+                } else {
+                    paramValue= "????";
+                }
                 int icolon= paramValue.indexOf(":");
                 if ( icolon!=-1 ) {
                     paramValue= paramValue.substring(0,icolon);
@@ -378,6 +436,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         this.suri= uri;
+        this.suriNoFile=isNoFile(uri);        
         DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), mon);
         if ( dsf==null ) {
             throw new UnrecognizedDataSourceException(uri);
