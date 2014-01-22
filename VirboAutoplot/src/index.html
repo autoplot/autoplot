@@ -25,7 +25,16 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+	    <li>1137: renderer performance is (nearly) restored after properly fixing.</li>
+            <li>1145: just don't offer $Y$m01 as a completion.  This was put in to support CDAWEB, and direct CDAWEB support lessens the need for this</li>
+            <li>remove RANGE_CHECK because it would cause RTE when it's legitimate to query zero-length qube datasets for other dimensions</li>
+            <li>automatic completions editor works for URIs that don't have a file, like vap+orbit:</li>
+            <li>Application-Name and Codebase to manifest to get rid of warning messages.</li>
             <li>documentation popup on script editor works again.</li>
+            <li>SortDataSet called with zero-length sort list is trivially okay.  </li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>DataSetSelector focus on a mac made it easy to loose URI when using completions.</li>
             <li>1148: start to introduce methods for making mutable objects immutable, after seeing problems with reference cache</li>
             <li>1144:"CDF URI needs an argument" still lingers (in webstart single-instance hander)</li>
@@ -36,39 +45,16 @@
             <li>catch more RTEs in Jython Script panel when using completions.</li>
             <li>1142: remove old code that would reset the timerange when switching das2servers.  This could break bindings.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>clean up of export to rich ascii</li>
-            <li>hide confusing plot buttons on add bookmark popup</li>
-            <li>log level are not set initially.  This was unnecessary and prevented use of logging.properties file</li>
-            <li>rte 1199617891: Java CDF would produce RTE when parameter is null.</li>
-            <li>rte 1171026816: George's RTE about RBSP-ECT file</li>
-            <li>1140: bugfix in TSB where events where thrown out when application was locked, so data wouldn't load</li>
-            <li>rte 1466756642: new code broke "View in Autoplot" button.  Thanks ksigsbee, balazs, dgcrawfo, and icohen</li>
-            <li>1138: don't mistake "/c" for protocol in "/c:/"</li>
-            <li>isConstant uses equivalent function now, instead of .equals.</li>
-            <li>A CDF variable's DELTA_PLUS_VAR could point to itself, cause infinite recursion and crashing Java</li>
-            <li>improve support for rank 2 energies, supporting ds[:,0:2,:] so DEPEND_2 is preserved.</li>
-            <li>the delegate editor with aggregation could not remove parameters.</li>
-            <li>DataSourceEditor browseSourceType handles plugins like script:... properly, avoiding runtime error.</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>Improvements to the thin client</li>
             <li>Bookmarks logic allows users to review bookmarks before using them.</li>
             <li>Inline data source now has editor panel, with discovery.</li>
             <li>Example thin client code allows arbitrary .vap to be used</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>check for NetCDF/HDF magic number in CDF GUI</li>
-            <li>Improve logging with new "gui" logger that will improve feedback for debugging</li>
-            <li>length render shows equation of the line</li>
-            <li>"Plot Below" button on horizontal slicer copies the data onto the canvas.</li>            
-            <li>CDF data source allows &amp;where=mode.eq(1)</li>
-            <li>slice1 allows slicing at a datum like "1000 eV"</li>
-            <li>history dialog has .vap button for convenience and example filter.</li>
         </ul>
 
         <p>Known issues:</p>
