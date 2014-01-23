@@ -18,6 +18,7 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -109,26 +110,27 @@ public class ReferenceCache {
                 throw this.exception;
             } else {
                 logger.log( Level.FINE, "park if {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
-                QDataSet ds= this.qds.get();
-                if ( ds instanceof MutablePropertyDataSet ) {
-                    MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
-                    if ( mpds.isImmutable() ) {
-                        return ds;
-                    } else {
-                        return Ops.copy(ds);
-                    }
-                } else {
-                    return ds;
-                }
+                return this.qds.get();
             }
         }
         
         /**
          * hand the dataset resulting from the completed load off to the reference cache.
-         * Threads that are parked will continue.
+         * Threads that are parked will continue.  If the dataset is mutable, then a 
+         * copy is made.
          */
         public void finished( QDataSet ds ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ds, uri} );
+            if ( ds instanceof MutablePropertyDataSet ) {
+                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                if ( mpds.isImmutable() ) {
+
+                } else {
+                    WritableDataSet wds= Ops.copy(ds);
+                    wds.makeImmutable();
+                    ds= wds;
+                }
+            }
             this.qds= new WeakReference<QDataSet>(ds);
             this.status= ReferenceCacheEntryStatus.DONE;
         }
@@ -172,16 +174,7 @@ public class ReferenceCache {
             if ( entry.qds==null ) {
                 return null;
             } else {
-                QDataSet ds= entry.qds.get();
-                if ( ds instanceof MutablePropertyDataSet ) {
-                    MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
-                    if ( mpds.isImmutable() ) {
-                        return mpds;
-                    } else {
-                        return Ops.copy(ds);
-                    }
-                }
-                return ds;
+                return entry.qds.get();
             }
         }
     }
