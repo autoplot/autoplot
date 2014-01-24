@@ -6,7 +6,9 @@ package org.virbo.jythonsupport.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -53,14 +55,17 @@ public class SquigglePainter extends DefaultHighlighter.DefaultHighlightPainter
 
 		//  Draw the squiggles
 
-		int squiggle = 2;
+		int squiggle = 4;
 		int twoSquiggles = squiggle * 2;
-		int y = r.y + r.height - squiggle;
-
+		int y = r.y + r.height - squiggle -1 ;
+        Graphics2D g2= (Graphics2D)g;
+        g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
         for (int x = r.x; x <= r.x + r.width - twoSquiggles; x += twoSquiggles)
         {
-            g.drawArc(x, y, squiggle, squiggle, 0, 180);
-            g.drawArc(x + squiggle, y, squiggle, squiggle, 180, 181);
+            g.drawLine( x, y+squiggle, x+squiggle, y );
+            g.drawLine( x+squiggle, y, x+squiggle*2, y+squiggle );
+            //g.drawArc(x, y, squiggle+1, squiggle, 0, 180);
+            //g.drawArc(x + squiggle, y, squiggle, squiggle, 180, 181);
         }
 
 		// Return the drawing area
