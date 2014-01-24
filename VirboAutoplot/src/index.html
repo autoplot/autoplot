@@ -1,9 +1,9 @@
 <html>
     <head>
-        <title>Autoplot Application (#{tag})</title>
+        <title>Autoplot Application (v2013b_5)</title>
     </head>
     <body>
-        <H3>Autoplot Application (#{tag})</H3>
+        <H3>Autoplot Application (v2013b_5)</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
@@ -25,7 +25,11 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>Red squiggle used to indicate errors in the Jython editor, the old block offered no feedback when highliting.</li>
+            <li>scripts are loaded off the event thread</li>
+            <li>Jython data source editor would not handle RESOURCE_URI correctly.</li>
 	    <li>1137: renderer performance is (nearly) restored after properly fixing.</li>
+	    <li>1148: reference cache finally gets immutability right, by making dataset immutable before it enters the cache.</li>
             <li>1145: just don't offer $Y$m01 as a completion.  This was put in to support CDAWEB, and direct CDAWEB support lessens the need for this</li>
             <li>remove RANGE_CHECK because it would cause RTE when it's legitimate to query zero-length qube datasets for other dimensions</li>
             <li>automatic completions editor works for URIs that don't have a file, like vap+orbit:</li>
@@ -36,7 +40,6 @@
         <p>Older Bugfixes:</p>
         <ul>
             <li>DataSetSelector focus on a mac made it easy to loose URI when using completions.</li>
-            <li>1148: start to introduce methods for making mutable objects immutable, after seeing problems with reference cache</li>
             <li>1144:"CDF URI needs an argument" still lingers (in webstart single-instance hander)</li>
             <li>bounds of axis annotation labels corrected, before there was a 50px kludge which would leave unnecessary whitespace to the left of labels</li>
             <li>code that flattens waveforms for SeriesRenderer picks a unit that improves precision</li>
@@ -47,6 +50,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>das2server lists folders separately from data sources.</li>
             <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
        </ul>
         <p>Less recent features:</p>
