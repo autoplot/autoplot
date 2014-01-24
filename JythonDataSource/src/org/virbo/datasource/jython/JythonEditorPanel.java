@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +56,6 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
-import org.python.core.PySyntaxError;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -69,7 +69,10 @@ import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 import org.virbo.jythonsupport.ui.Util;
 
 /**
- *
+ * Editor for vap+jyds uris.  These URIs offer a couple of challenges,
+ * such as the mode where the resourceURI is the name of the data file and
+ * the script argument is used.  Also we identify types and offer decent
+ * GUI elements to control the types.
  * @author jbf
  */
 public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
@@ -645,8 +648,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     params.put( name, value );
                 } else if ( type=='R' ) {
                     URISplit ruriSplit= URISplit.parse(value);
-                    if ( !params.containsKey("script") ) {
-                        params.put( "script", split.resourceUri.toString() );
+                    if ( !params.containsKey(JythonDataSource.PARAM_SCRIPT) ) {
+                        params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
+                        params.put( JythonDataSource.PARAM_RESOURCE_URI, ruriSplit.resourceUri.toString() );
                     }
                     split.resourceUri= ruriSplit.resourceUri;
                     split.scheme= ruriSplit.scheme;
@@ -659,8 +663,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 }
             } else if ( type=='R' && value.equals(deft) && ( split.resourceUri==null || !split.resourceUri.toString().equals(deft) ) ) {
                 URISplit ruriSplit= URISplit.parse(value); //TODO: consider removing script=param.
-                if (params.get("script")==null ) {
-                    params.put( "script", split.resourceUri.toString() );
+                if (params.get( JythonDataSource.PARAM_SCRIPT )==null ) {
+                    params.put( JythonDataSource.PARAM_SCRIPT, split.resourceUri.toString() );
+                    params.put( JythonDataSource.PARAM_RESOURCE_URI, ruriSplit.resourceUri.toString() );
                 }
                 split.resourceUri= ruriSplit.resourceUri;
                 split.scheme= ruriSplit.scheme;
@@ -679,8 +684,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         String furi;
         String resourceUri1=null;
-        if ( params.containsKey("script") ) {
-            furi= params.get("script");
+        if ( params.containsKey(JythonDataSource.PARAM_SCRIPT) ) {
+            furi= params.get(JythonDataSource.PARAM_SCRIPT);
             resourceUri1= split.resourceUri==null ? null : split.resourceUri.toString();
         } else {
             furi= split.resourceUri.toString();
@@ -691,6 +696,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             
     }
 
+    @Override
     public void setURI(String url) {
         try {
             this.suri= url;
@@ -730,7 +736,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             Map<String,String> ffparams= new HashMap( params );
 
-            if ( furir[1]!=null ) ffparams.put( "resourceURI", furir[1] );
+            if ( furir[1]!=null ) ffparams.put( JythonDataSource.PARAM_RESOURCE_URI, furir[1] );
             
             support.loadFile(f);
 
@@ -820,6 +826,19 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         URISplit split=  URISplit.parse(suri);
         
         Map<String, String> params = getParamsFromGui();
+        
+        if ( split.resourceUri!=null && params.get(JythonDataSource.PARAM_RESOURCE_URI)!=null ) {
+            try {
+                split.resourceUri= new URI( params.remove(JythonDataSource.PARAM_RESOURCE_URI) );
+                split.file= split.resourceUri.toString();
+                split.vapScheme="vap+jyds";
+            } catch ( URISyntaxException ex ) {
+                
+            }
+        } else {
+            params.remove(JythonDataSource.PARAM_SCRIPT);
+            params.remove(JythonDataSource.PARAM_RESOURCE_URI);
+        }
 
         split.params= URISplit.formatParams(params);
 
@@ -843,7 +862,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.length()==0 || split.file.equals("file:///") ) {
             Map<String,String> params= URISplit.parseParams(split.params);
-            if ( params.containsKey("script") ) {
+            if ( params.containsKey(JythonDataSource.PARAM_SCRIPT) ) {
                 return false;
             } else {
                 return true;
