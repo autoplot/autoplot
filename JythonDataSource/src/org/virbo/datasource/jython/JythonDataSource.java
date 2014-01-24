@@ -228,8 +228,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
                 
                 if ( lresourceURI!=null ) {
-                    interp.set("resourceURI", lresourceURI); // legacy
-                    interp.exec("autoplot.params['resourceURI']="+ maybeQuoteString( lresourceURI ) );
+                    interp.set( PARAM_RESOURCE_URI, lresourceURI); // legacy
+                    interp.exec("autoplot.params['"+PARAM_RESOURCE_URI+"']="+ maybeQuoteString( lresourceURI ) );
                 }
 
                 mon.setProgressMessage( "executing script");
