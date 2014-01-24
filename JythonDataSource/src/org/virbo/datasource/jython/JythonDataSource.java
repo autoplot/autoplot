@@ -62,6 +62,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private Map<String, Object> metadata;
     protected final static String PARAM_SCRIPT= "script";
     protected final static String PARAM_TIMERANGE= "timerange";
+    protected final static String PARAM_RESOURCE_URI= "resourceURI";
 
     private static final Logger logger= LoggerManager.getLogger( LogNames.APDSS_JYDS );
     private boolean notCheckedTsb= true;
