@@ -35,9 +35,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledEditorKit;
+import jsyntaxpane.syntaxkits.PythonSyntaxKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -126,16 +132,41 @@ public class ScriptPanelSupport {
                 Map<String,String> params= URISplit.parseParams(split.params);
                 if ( params.containsKey("script") ) {
                     sfile= params.get("script");
+                } else {
+                    sfile= split.resourceUri.toString();
                 }
+            } else {
+                sfile= split.resourceUri.toString();
             }
-            file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
-            loadFile(file);
-            panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-            panel.setFilename(file.toString());
+            final URI fsfile= DataSetURI.getURI(sfile);
+            //TODO: why can't we have a DasProgressPanel on any component?
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        file = DataSetURI.getFile( fsfile, new NullProgressMonitor() );
+                        loadFile(file);
+                        panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+                        panel.setFilename(file.toString());    
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                }
+            };
+            try {
+                panel.getEditorPanel().getEditorKit();
+                MutableAttributeSet att= new SimpleAttributeSet();
+                StyleConstants.setItalic( att, true);
+                panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
+                panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
+            } catch ( BadLocationException ex ) {
+                
+            }
+            new Thread( run, "load script thread" ).start();
+            
         } catch (NullPointerException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
-        } catch (IOException ex) {
+        } catch (URISyntaxException ex ) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return false;
         }
@@ -143,6 +174,7 @@ public class ScriptPanelSupport {
         return true;
     }
 
+    
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
