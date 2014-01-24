@@ -6,11 +6,15 @@ package org.virbo.jythonsupport.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -18,6 +22,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
 import org.python.core.PyJavaInstance;
@@ -79,10 +86,12 @@ public class EditorAnnotationsSupport {
     public void clearAnnotations() {
         if ( SwingUtilities.isEventDispatchThread() ) {
             Markers.removeMarkers(editorPanel);
+            editorPanel.getHighlighter().removeAllHighlights();
         } else {
            SwingUtilities.invokeLater( new Runnable() {
                 public void run() {
                     Markers.removeMarkers(editorPanel);
+                    editorPanel.getHighlighter().removeAllHighlights();
                 }
             } );
         }
@@ -99,6 +108,9 @@ public class EditorAnnotationsSupport {
                 public void run() {
                     Markers.removeMarkers(editorPanel,ann.marker);
                     annotations.remove(ann.offset);
+                    if ( ann.highlightInfo!=null ) {
+                        editorPanel.getHighlighter().removeHighlight(ann.highlightInfo);
+                    }
                 }
             } );
         }
@@ -109,6 +121,7 @@ public class EditorAnnotationsSupport {
         int offset;
         int len;
         SimpleMarker marker;
+        Object highlightInfo;
     }
     SortedMap<Integer, Annotation> annotations = new TreeMap<Integer, Annotation>();
 
@@ -188,6 +201,8 @@ public class EditorAnnotationsSupport {
             public void run() {
 
                 SimpleMarker mark;
+                Object highlightInfo=null;
+                
                 if ( name.equals(ANNO_WARNING) ) {
                     mark= new SimpleMarker(Color.YELLOW);
                 } else if ( name.equals(ANNO_ERROR) ) {
@@ -198,12 +213,23 @@ public class EditorAnnotationsSupport {
                     mark=  new SimpleMarker(Color.GRAY );
                 }
                 
-                Markers.markText( editorPanel, i0, i1, mark );
+                if (  name.equals(ANNO_ERROR) ) {
+                    SquigglePainter red= new SquigglePainter( Color.RED );
+                    try {
+                        highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    Markers.markText( editorPanel, i0, i1, mark );
+                }
+                
                 Annotation ann = new Annotation();
                 ann.len = i1 - i0;
                 ann.offset = i0;
                 ann.text = text;
                 ann.marker= mark;
+                ann.highlightInfo= highlightInfo;
                 annotations.put(ann.offset, ann);
                 EditorAnnotationsSupport.this.interp= interp;
             }
