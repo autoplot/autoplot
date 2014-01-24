@@ -888,7 +888,15 @@ private void guessTimeFormatButtonAP( ) {
                 template.append("$y");
                 curr= TimeUtil.MONTH;
             } else if ( slen==8 ) {
-                template.append("$Y$m$d");
+                if ( Character.isDigit( s.charAt(4) ) ) {
+                    template.append("$Y$m$d");
+                    curr= TimeUtil.HOUR;
+                } else {
+                    template.append("$Y").append(s.charAt(4)).append("$j");
+                    curr= TimeUtil.HOUR;
+                }
+            } else if ( slen==10 ) {
+                template.append("$Y").append(s.substring(4,5)).append("$m").append(s.substring(7,8)).append("$d");
                 curr= TimeUtil.HOUR;
             } else if ( slen==7 ) {
                 template.append("$Y$j");
@@ -919,6 +927,12 @@ private void guessTimeFormatButtonAP( ) {
             if ( slen<=2 ) {
                 template.append("$H");
                 curr= TimeUtil.MINUTE;
+            } else if ( slen==5 ) {
+                template.append("$H").append(s.substring(2,3)).append("$M");
+                curr= TimeUtil.SECOND;
+            } else if ( slen==8 ) {
+                template.append("$H").append(s.substring(2,3)).append("$M").append(s.substring(5,6)).append("$S");
+                curr= TimeUtil.MILLI;
             }
         } else if ( curr==TimeUtil.MINUTE ) {
             if ( slen<=2 ) {
