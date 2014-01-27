@@ -1,9 +1,9 @@
 <html>
     <head>
-        <title>Autoplot Application (v2013b_5)</title>
+        <title>Autoplot Application (#{tag})</title>
     </head>
     <body>
-        <H3>Autoplot Application (v2013b_5)</H3>
+        <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
@@ -25,10 +25,10 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
+            <li>1137: renderer performance is restored, and probably improved, after properly fixing.</li>
             <li>Red squiggle used to indicate errors in the Jython editor, the old block offered no feedback when highliting.</li>
             <li>scripts are loaded off the event thread</li>
             <li>Jython data source editor would not handle RESOURCE_URI correctly.</li>
-	    <li>1137: renderer performance is (nearly) restored after properly fixing.</li>
 	    <li>1148: reference cache finally gets immutability right, by making dataset immutable before it enters the cache.</li>
             <li>1145: just don't offer $Y$m01 as a completion.  This was put in to support CDAWEB, and direct CDAWEB support lessens the need for this</li>
             <li>remove RANGE_CHECK because it would cause RTE when it's legitimate to query zero-length qube datasets for other dimensions</li>
@@ -50,6 +50,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Allow smooth on rank 2 datasets, smoothing on the first dimension (usually time).</li>
+            <li>rbsp orbits updated to 2014-02-14</li>
             <li>das2server lists folders separately from data sources.</li>
             <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
        </ul>
