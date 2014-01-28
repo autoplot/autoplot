@@ -563,7 +563,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 String s= source.getValue();
                 if ( s.endsWith(".jy") ) {
                     try {
-                        int res= JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
+                        JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
                                 new HashMap(), true, true, new NullProgressMonitor() );
                     } catch ( IOException ex ) {
                         throw new RuntimeException(ex);
