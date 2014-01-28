@@ -19,7 +19,6 @@ public abstract class TrArrayDataSet extends AbstractDataSet {
     protected static final Logger logger= Logger.getLogger("apdss");
     float fill= Float.NaN;
     double dfill= Double.NaN;
-    long lfill= Long.MAX_VALUE;
 
     /**
      * return the array as ArrayDataSet  The array must be a 1-D array and the
