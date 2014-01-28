@@ -7,14 +7,13 @@ package org.virbo.imagedatasource;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 
 /**
- *
+ * Factory for ImageDataSource, which read in images into datasets.
  * @author jbf
  */
 public class ImageDataSourceFactory implements DataSourceFactory {
@@ -22,12 +21,8 @@ public class ImageDataSourceFactory implements DataSourceFactory {
     public DataSource getDataSource(URI uri) throws Exception {
         return new ImageDataSource(uri);
     }
-    Map<String, List<String>> datasetsList = null;
 
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
-        //http://www-pw.physics.uiowa.edu/das/das2Server
-        //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
-        //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
 
         List<CompletionContext> result = new ArrayList<CompletionContext>();
 
