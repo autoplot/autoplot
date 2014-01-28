@@ -102,7 +102,7 @@ public class FilterChainPanel extends JPanel {
         filters.remove(in);
     }
 
-    private String addFilter( int idx ) {
+    private void addFilter( int idx ) {
         JPanel optionsPanel= new JPanel();
 
         optionsPanel.setLayout( new BoxLayout(optionsPanel,BoxLayout.Y_AXIS) );
@@ -197,7 +197,6 @@ public class FilterChainPanel extends JPanel {
            }
        }
 
-       return null;
     }
 
     private JPanel onePanel( int fi ) {
@@ -212,7 +211,7 @@ public class FilterChainPanel extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
                     int ifi= getIndex( sub );
-                    String s= addFilter(ifi);
+                    addFilter(ifi);
                 }
             } );
         } else {
@@ -220,7 +219,7 @@ public class FilterChainPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
-                    String s= addFilter(filters.size());
+                    addFilter(filters.size());
                 }
             } );
         }
