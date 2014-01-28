@@ -177,11 +177,10 @@ public class LayoutUtil {
      * @param col
      * @return
      */
-    public static List<DasDevicePosition> getChildColumns(DasDevicePosition col, boolean doCol) {
+    public static List<DasDevicePosition> getChildColumns(DasDevicePosition col) {
         DasCanvas canvas = col.getParent();
         List<DasDevicePosition> result = new ArrayList<DasDevicePosition>();
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
-            DasDevicePosition ccol = doCol ? cc.getColumn() : cc.getRow();
             if (cc.getColumn().getParentDevicePosition() == col) {
                 result.add(cc.getColumn());
             }
