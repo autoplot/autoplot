@@ -62,8 +62,8 @@ public class SquigglePainter extends DefaultHighlighter.DefaultHighlightPainter
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
         for (int x = r.x; x <= r.x + r.width - twoSquiggles; x += twoSquiggles)
         {
-            g.drawLine( x, y+squiggle, x+squiggle, y );
-            g.drawLine( x+squiggle, y, x+squiggle*2, y+squiggle );
+            g.drawLine( x, y+squiggle, x+squiggle, y+squiggle/2 );
+            g.drawLine( x+squiggle, y+squiggle/2, x+squiggle*2, y+squiggle );
             //g.drawArc(x, y, squiggle+1, squiggle, 0, 180);
             //g.drawArc(x + squiggle, y, squiggle, squiggle, 180, 181);
         }
