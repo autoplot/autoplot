@@ -30,7 +30,6 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
 
     int fieldCount = -1;
     boolean inField = false;
-    boolean inRow = false;
     String fieldText = "";
 
     boolean isHeader= false;
@@ -76,7 +75,6 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         } else if ( inTable ) {
             if (t == HTML.Tag.TR) {
                 currentRow = new ArrayList<String>();
-                inRow = true;
             } else if (t == HTML.Tag.TH) {
                 String colspan= (String) a.getAttribute(HTML.Attribute.COLSPAN);
                 icolspan= ( colspan!=null ) ? Integer.parseInt(colspan) : 1;
@@ -97,7 +95,6 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
             if ( inTable ) inTable= false;
         } else if ( inTable ) {
             if (t == HTML.Tag.TR) {
-                inRow = false;
                 if (fieldCount == -1) {
                     fieldCount = currentRow.size();
                 }
