@@ -892,7 +892,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         messages= new ArrayList(messages); // make local copy to avoid concurrent modifications
         List<String> result= new LinkedList<String>(messages);
         for ( String s: messages ) {
-            if ( s.equals("Delete Plot" ) ) {
+            if ( s==null ) {
+                System.err.println("here null in cleanMessages");
+            } else if ( s.equals("Delete Plot" ) ) {
                 result.remove("Delete Plot Element");
             }
         }
