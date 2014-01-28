@@ -105,6 +105,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 }
 
                 if (!okay) {
+                    assert ex!=null;
                     JOptionPane.showConfirmDialog(jtree, ex.getLocalizedMessage(), "unable to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
                 }
 
@@ -226,46 +227,55 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         return f;
     }
     
-    Action getCopyToAction(final JTree jtree) {
-        final File f= getSelectedFile(jtree);
-        return new AbstractAction("Copy To...") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoggerManager.logGuiEvent(e);
-                if ( f==null ) {
-                    return;
-                }
-                JFileChooser chooser = new JFileChooser();
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                File p=  new File("foo").getAbsoluteFile().getParentFile();
-                chooser.setCurrentDirectory( p ); //http://www.rgagnon.com/javadetails/java-0370.html
-                chooser.setSelectedFile( new File(p,f.getName() ) );
-                chooser.setAcceptAllFileFilterUsed(false);
-                if (chooser.showSaveDialog(jtree) == JFileChooser.APPROVE_OPTION) {
-                    File destdir = chooser.getSelectedFile();
-                    
-                    FSTreeModel model = (FSTreeModel) jtree.getModel();
+    static class CopyToAction extends AbstractAction {
+        private File f;
+        private JTree jtree;
+        public CopyToAction( File f, JTree jtree ) {
+            super( "Copy to..");
+            this.f= f;
+            this.jtree= jtree;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LoggerManager.logGuiEvent(e);
+            if ( f==null ) {
+                return;
+            }
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            File p=  new File("foo").getAbsoluteFile().getParentFile();
+            chooser.setCurrentDirectory( p ); //http://www.rgagnon.com/javadetails/java-0370.html
+            chooser.setSelectedFile( new File(p,f.getName() ) );
+            chooser.setAcceptAllFileFilterUsed(false);
+            if (chooser.showSaveDialog(jtree) == JFileChooser.APPROVE_OPTION) {
+                File destdir = chooser.getSelectedFile();
 
-                    TreePath[] paths = jtree.getSelectionPaths();
-                    if ( paths==null ) return;
+                FSTreeModel model = (FSTreeModel) jtree.getModel();
 
-                    for (int i = 0; i < paths.length; i++) {
-                        File f = model.getFile(paths[i]);
-                        try {
-                            FileUtil.fileCopy(f, destdir);
-                        } catch (FileNotFoundException ex1) {
-                            logger.log(Level.SEVERE, ex1.getMessage(), ex1);
-                            JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
-                        } catch (IOException ex1) {
-                            logger.log(Level.SEVERE, ex1.getMessage(), ex1);
-                            JOptionPane.showMessageDialog(jtree, "Error Occurred:\n" + ex1.getLocalizedMessage());
-                        }
+                TreePath[] paths = jtree.getSelectionPaths();
+                if ( paths==null ) return;
+
+                for (int i = 0; i < paths.length; i++) {
+                    File f1 = model.getFile(paths[i]);
+                    try {
+                        FileUtil.fileCopy(f1, destdir);
+                    } catch (FileNotFoundException ex1) {
+                        logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                        JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
+                    } catch (IOException ex1) {
+                        logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                        JOptionPane.showMessageDialog(jtree, "Error Occurred:\n" + ex1.getLocalizedMessage());
                     }
-
                 }
 
             }
-        };
+
+        }
+    }
+
+    Action getCopyToAction( final JTree jtree ) {
+        CopyToAction a= new CopyToAction(getSelectedFile(jtree),jtree);
+        return a;
     }
 
     private boolean writeROCacheLink( File src, File dest ) throws IOException {
