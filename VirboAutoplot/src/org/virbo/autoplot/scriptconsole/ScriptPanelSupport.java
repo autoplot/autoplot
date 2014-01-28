@@ -666,8 +666,9 @@ public class ScriptPanelSupport {
     }
 
     void interrupt() {
-        if ( getInterruptible()!=null ) {
-            getInterruptible().interrupt( ts );
+        InteractiveInterpreter interp= getInterruptible();
+        if ( interp!=null ) {
+            interp.interrupt( ts );
         }
     }
 
