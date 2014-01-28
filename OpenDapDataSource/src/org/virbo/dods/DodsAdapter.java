@@ -84,20 +84,6 @@ public class DodsAdapter {
         this.variable= variable;
     }
 
-//    private String doEscapes(String s) {
-//        StringBuffer result = new StringBuffer();
-//        for (int i = 0; i < s.length(); i++) {
-//            char ch = s.charAt(i);
-//            if (Character.isJavaIdentifierPart(ch) || ch == '%') {
-//                result.append(ch);
-//            } else {
-//                String s2 = Integer.toHexString(ch);
-//                result.append("%" + s2.substring(s2.length() - 2));
-//            }
-//        }
-//        return result.toString();
-//    }
-
     public void setConstraint(String c) {
         if (!c.startsWith("?")) {
             throw new IllegalArgumentException("constraint must start with question mark(?)");
@@ -134,11 +120,11 @@ public class DodsAdapter {
 
     private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
-            DDS dds = new DDS();
-            dds.parse(new URL(this.getSource().toString() + ".dds" + constraint).openStream());
+            DDS ldds = new DDS();
+            ldds.parse(new URL(this.getSource().toString() + ".dds" + constraint).openStream());
 
             // calculate size
-            Enumeration variables = dds.getVariables();
+            Enumeration variables = ldds.getVariables();
             long size = 0;
             while (variables.hasMoreElements()) {
                 Object o = variables.nextElement();
@@ -242,11 +228,6 @@ public class DodsAdapter {
             }
         }
 
-    }
-    int sliceIndex = 0;
-
-    public void setSliceIndex(int index) {
-        this.sliceIndex = index;
     }
 
     private enum Type { spectrogram, vectors, scalars };
