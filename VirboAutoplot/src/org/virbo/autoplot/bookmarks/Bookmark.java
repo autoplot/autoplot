@@ -323,8 +323,8 @@ public abstract class Bookmark {
             }
         }
 
-        result.remoteURL= remoteUrl;
-        result.depth= remoteLevel;
+        //result.remoteURL= remoteUrl; // for debugging.
+        //result.depth= remoteLevel;
         result.remoteRemote= remoteRemote;
         result.status= offline ? Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL : Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
 
