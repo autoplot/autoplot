@@ -1276,9 +1276,7 @@ public class DataSourceController extends DomNodeController {
             logger.fine("invoke later do load");
             if (mon != null) {
                 logger.warning("double load!");
-                if (mon != null) {
-                    mon.cancel();
-                }
+                mon.cancel();
             }
             RequestProcessor.invokeLater(run);
         } else {
