@@ -265,7 +265,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
         List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
         for ( PlotElement p: pe ) {
             if ( closeColors( p.getStyle().getColor(), back ) ) {
-                final PlotElement pf= p;
                 return true;
             }
         }
