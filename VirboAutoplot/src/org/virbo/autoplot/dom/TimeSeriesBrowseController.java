@@ -348,9 +348,9 @@ public class TimeSeriesBrowseController {
                     return;
                 }
                 if ( xAxis!=null ) {
-                    if (plot.isOverSize() && autorange==false ) {
-                        visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3); //TODO: be aware of
-                    }
+                    //if (plot.isOverSize() && autorange==false ) {
+                    //    visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3); //TODO: be aware of
+                    //}
                     tsb.setTimeRange(trange);
                     tsb.setTimeResolution(newResolution);
                     logger.log( Level.FINE, "updateTsb: {0} (@{1})", new Object[]{trange, newResolution});
