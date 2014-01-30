@@ -30,6 +30,7 @@ public class DomOps {
      * @param b
      */
     public static void swapPosition( Plot a, Plot b ) {
+        if ( a==b ) return;
         String trowid= a.getRowId();
         String tcolumnid= a.getColumnId();
         boolean txtv= a.getXaxis().isDrawTickLabels();
