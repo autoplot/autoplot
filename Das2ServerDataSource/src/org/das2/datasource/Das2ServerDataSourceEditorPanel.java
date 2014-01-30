@@ -660,10 +660,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             logger.log( Level.FINE, "no history file found: {0}", hist );
         }
         
-        for ( String s: d2ss1 ) {
-            Icon i= iconFor(s); // force load of icon off the event thread.
-            i.getIconHeight();  
-        }
+        final List<String> fd2ss1= d2ss1;
+        Runnable run= new Runnable() {
+            public void run() {
+                for ( String s: fd2ss1 ) {
+                    Icon i= iconFor(s); // force load of icon off the event thread.
+                    i.getIconHeight();                      
+                }
+            };
+        };
+        new Thread(run,"loadDas2ServerIcons").start();
         
         return d2ss1;
 
