@@ -55,8 +55,9 @@ pro hdfsave, var0, var1, var2, var3, var4, var5, var6, var7, var8, var9, var10ch
       datatype_id = H5T_IDL_CREATE(var)
       s= size( var, /dimensions )
       dataspace_id = H5S_CREATE_SIMPLE( s,max_dimensions=s)
-      dataType = H5T_MEMTYPE( size( var, /type ) )
-      dataset_id = H5D_CREATE( fid, varname, dataType, dataspace_id )
+      dataType_id = H5T_IDL_CREATE( var )
+      ;dataType_id = H5T_MEMTYPE( size( var, /type ) )
+      dataset_id = H5D_CREATE( fid, varname, dataType_id, dataspace_id )
       H5D_EXTEND,dataset_id,size(var,/dimensions)
       H5D_WRITE, dataset_id, var
 

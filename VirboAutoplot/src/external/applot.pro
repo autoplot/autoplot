@@ -112,6 +112,171 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
 
 end
 
+;; for rank 2, ytags must be specified
+; ascii, boolean, use ascii transfer types
+pro qstream, dataStruct, filename, depend_1=ytags, ascii=ascii, xunits=xunits
+
+   print, 'writing qstream to ' + filename
+   on_error, 2
+   
+   t= tag_names( dataStruct )
+   name= t[1]
+   tname= t[0]
+   
+   streamHeader= [ '[00]xxxxxx<stream dataset_id="'+name+'" source="applot.pro" localDate="'+systime(0)+'">', '</stream>' ]
+   contentLength= -10 ; don't include the packet tag and content length
+   for i=0,n_elements( streamHeader )-1 do begin
+      contentLength += strlen( streamHeader[i] ) + 1
+   endfor
+   x= streamHeader[0]
+   strput, x, string( contentLength, format='(i6.6)' ), 4
+   streamHeader[0]= x
+
+   ascii= keyword_Set(ascii) ; 1=do ascii stream, 0=binary
+   if ( n_elements( xunits ) eq 0 ) then begin
+      xunits=""  ; dimensionless
+   end
+
+   xdatatype= ascii ? 'ascii24' : 'double'
+   datatype= ascii ? 'ascii16' : 'double'
+
+   if ( n_elements( ytags ) gt 0 ) then begin
+      ny= n_elements(ytags)
+      svals= strtrim(ytags[0],2)
+      for j=1,n_elements(ytags)-1 do begin
+         svals= svals+','+strtrim(ytags[j],2)
+      endfor
+         dep1Descriptor= [ '[99]xxxxxx<packet>' ]
+         dep1Descriptor= [ dep1Descriptor, '     <qdataset id="DEP1" rank="1" >' ]
+         dep1Descriptor= [ dep1Descriptor, '       <properties>' ]
+         dep1Descriptor= [ dep1Descriptor, '           <property name="NAME" type="String" value="DEP1" />']
+         dep1Descriptor= [ dep1Descriptor, '       </properties>' ]
+         dep1Descriptor= [ dep1Descriptor, '       <values encoding="'+datatype+'" length="'+strtrim(ny,2)+'" values="'+svals+'" />' ]         
+         dep1Descriptor= [ dep1Descriptor, '     </qdataset>' ]  
+         dep1Descriptor= [ dep1Descriptor, '     </packet>' ]
+         
+      contentLength= -10 ; don't include the packet tag and content length
+      for i=0,n_elements( dep1Descriptor )-1 do begin
+         contentLength += strlen( dep1Descriptor[i] ) + 1
+      endfor
+      x= dep1Descriptor[0]
+      strput, x, string( contentLength, format='(i6.6)' ), 4
+      dep1Descriptor[0]= x
+
+   endif
+   
+   packetDescriptor= [ '[01]xxxxxx<packet>' ]
+   
+   nt= n_elements(t)
+   packetDescriptor=       [ packetDescriptor, '     <qdataset id="'+tname+'" rank="1" >' ]
+   packetDescriptor=       [ packetDescriptor, '       <properties>' ]
+   packetDescriptor=       [ packetDescriptor, '           <property name="NAME" type="String" value="'+tname+'" />']
+   packetDescriptor=       [ packetDescriptor, '           <property name="UNITS" type="units" value="'+xunits+'" />']
+   packetDescriptor=       [ packetDescriptor, '       </properties>' ]
+   packetDescriptor=       [ packetDescriptor, '       <values encoding="'+xdatatype+'" length="" />' ]
+   packetDescriptor=       [ packetDescriptor, '     </qdataset>' ]
+
+   totalItems=1
+
+   format='(f24.12'
+   reclen= 4 + 24 + (nt-1) * 20
+   for i=1,nt-1 do begin
+      s= size( dataStruct.(i) )
+      name= t[i]  ;;; stream reader needs a default plane
+      if ( s[0] eq 1 ) then begin      
+         packetDescriptor= [ packetDescriptor, '     <qdataset id="'+name+'" rank="1" >' ]
+         packetDescriptor= [ packetDescriptor, '       <properties>' ]
+         packetDescriptor= [ packetDescriptor, '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />']
+         packetDescriptor= [ packetDescriptor, '           <property name="NAME" type="String" value="'+name+'" />']
+         packetDescriptor= [ packetDescriptor, '       </properties>' ]
+         packetDescriptor= [ packetDescriptor, '       <values encoding="'+datatype+'" length="" />' ]         
+         packetDescriptor= [ packetDescriptor, '     </qdataset>' ]
+         format= format + ( ( i lt n_elements(t)-1 ) ? ',e16.4' : ',e15.3)' )
+         totalItems+=1
+      endif else begin
+         nitems= s[2]
+         packetDescriptor= [ packetDescriptor, '   <qdataset id="'+name+'" rank="2" >' ]
+         packetDescriptor= [ packetDescriptor, '       <properties>' ]
+         packetDescriptor= [ packetDescriptor, '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />']
+         packetDescriptor= [ packetDescriptor, '           <property name="DEPEND_1" type="qdataset" value="DEP1" />']
+         packetDescriptor= [ packetDescriptor, '           <property name="NAME" type="String" value="'+name+'" />']
+         packetDescriptor= [ packetDescriptor, '       </properties>' ]
+         packetDescriptor= [ packetDescriptor, '       <values encoding="'+datatype+'" length="'+strtrim(nitems,2)+'" />' ]         
+         packetDescriptor= [ packetDescriptor, '   </qdataset>' ]
+         for i=1,nitems-1 do format= format + ',e16.4'
+         format= format + ( ( i lt n_elements(t)-1 ) ? ','+',e16.4' : ','+'e15.4)' )
+         totalItems+= nitems
+      endelse
+   endfor
+   packetDescriptor=       [ packetDescriptor, '</packet>' ]
+
+  contentLength= -10 ; don't include the packet tag and content length
+  for i=0,n_elements( packetDescriptor )-1 do begin
+      contentLength += strlen( packetDescriptor[i] ) + 1
+  endfor
+  x= packetDescriptor[0]
+  strput, x, string( contentLength, format='(i6.6)' ), 4
+  packetDescriptor[0]= x
+
+  openw, unit, filename, /get_lun
+
+   for i=0,n_elements(streamHeader)-1 do begin
+     writeu, unit, byte( streamHeader[i] )
+     writeu, unit, byte(10)
+   endfor
+
+   if ( n_elements( ytags ) gt 0 ) then begin
+     for i=0,n_elements(dep1Descriptor)-1 do begin
+      writeu, unit, byte( dep1Descriptor[i] )
+      writeu, unit, byte(10)
+     endfor
+   endif
+
+   for i=0,n_elements(packetDescriptor)-1 do begin
+     writeu, unit, byte( packetDescriptor[i] )
+     writeu, unit, byte(10)
+   endfor
+
+   nr= n_elements(dataStruct.(0))
+
+   data= make_array( /double, totalItems, nr )
+   dataCol= 0 ; column within rank2 array
+   for j=0,nt-1 do begin
+     dd= dataStruct.(j)
+     s= size(dd)
+     if ( s[0] eq 2 ) then begin
+        data[dataCol:(dataCol+nitems-1),*]= transpose(dd)
+        dataCol= dataCol+nitems
+     endif else begin
+        data[dataCol,*]= dd
+        dataCol= dataCol+1
+     endelse
+   endfor
+
+   if ( ascii eq 0 ) then begin
+      r= where( finite( data ) eq 0 )
+      swap_endian_inplace, data, /swap_if_little_endian
+      if ( r[0] ne -1 ) then begin
+         data[r]= !values.d_nan
+      endif 
+   endif
+
+   for i=0L, nr-1 do begin
+      writeu, unit, byte(':01:')
+      if ( ascii ) then begin
+         s= string( data[*,i], format=format )
+         writeu, unit, s
+         writeu, unit, byte(10)
+      endif else begin
+         writeu, unit, data[*,i]
+      endelse
+   endfor
+
+   close, unit
+   free_lun, unit
+
+end
+
 
 pro test_dump
    x= findgen(3000)/3
@@ -127,6 +292,21 @@ pro test_dump_rank2
    data= { x:x, z:z }
 
    das2stream, data, 'my.d2s', ytags= y, /ascii
+end
+
+pro test_dump_qstream
+   x= findgen(3000)/3
+   y= sin( x )
+   data= { x:x, y:y }
+   qstream, data, 'my.qds', /ascii
+end
+
+pro test_dump_rank2_qstream
+   z= dist(15,20)
+   x= findgen(15)+3
+   y= findgen(20)*10
+   data= { x:x, z:z }
+   qstream, data, 'my.qds', depend_1= y, /ascii
 end
 
 
