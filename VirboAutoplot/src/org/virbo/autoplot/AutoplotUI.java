@@ -926,7 +926,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 1830, true, new Runnable() { 
+        invokeLater( 2230, true, new Runnable() { 
             @Override
             public String toString() { return "addLayout"; }
             @Override            
@@ -944,7 +944,7 @@ APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 1850, true, new Runnable() {
+        invokeLater( 2350, true, new Runnable() {
             @Override
             public String toString() { return "addDataPanel"; }
             @Override
@@ -962,7 +962,7 @@ APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 1870, true, new Runnable() { 
+        invokeLater( 2470, true, new Runnable() { 
             @Override
             public String toString() { return "addMetadataPanel"; }
             @Override
@@ -981,7 +981,7 @@ APSplash.checkTime("init 270");
             jythonScriptPanel= new JPanel( new BorderLayout() );
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
-            invokeLater( 2000, true, new Runnable() {
+            invokeLater( 2600, true, new Runnable() {
                 @Override
                 public String toString() { return "addScriptPanel"; }
                 @Override
@@ -998,7 +998,7 @@ APSplash.checkTime("init 270");
             logConsolePanel= new JScrollPane();
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-            invokeLater( 2020, true, new Runnable() {
+            invokeLater( 2700, true, new Runnable() {
                 @Override
                 public String toString() { return "addLogConsole"; }
                 public void run() {
