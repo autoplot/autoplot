@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A script is used to study the slowness in rendering since a different bug was fixed late last fall.  The bug is fixed now.</small></p>
+        <p><small>More experiments with rendering look promising, but final changes for the rendering will have to wait for the 2014a production branch.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,7 +25,8 @@
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
         <ul>
-            <li>1137: renderer performance is restored, and probably improved, after properly fixing.</li>
+            <li>1137: back off recent changes after seeing it mucked up Jemmy tests (and interactive use by clients) with demo 5 (stack of series).</li>
+            <li>All components are created on the event thread after observing occasional hangs on Linux.  Reduce delay for creating layout, data and script tabs.</li>
             <li>Red squiggle used to indicate errors in the Jython editor, the old block offered no feedback when highliting.</li>
             <li>scripts are loaded off the event thread</li>
             <li>Jython data source editor would not handle RESOURCE_URI correctly.</li>
@@ -51,7 +52,7 @@
         <p>Features:</p>
         <ul>
             <li>Allow smooth on rank 2 datasets, smoothing on the first dimension (usually time).</li>
-            <li>rbsp orbits updated to 2014-02-14</li>
+            <li>internal rbsp orbits updated to 2014-02-03</li>
             <li>das2server lists folders separately from data sources.</li>
             <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
        </ul>
