@@ -12,10 +12,12 @@ package org.virbo.autoplot;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
@@ -70,6 +72,8 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
+    Plot draggingPlot=null;
+    
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
         initComponents();
@@ -90,6 +94,22 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         MouseListener popupTrigger = createPopupTrigger();
         canvasLayoutPanel1.addMouseListener(popupTrigger);
+        canvasLayoutPanel1.addMouseMotionListener( new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                Object s= canvasLayoutPanel1.getCanvasComponentAt( e.getX(), e.getY() );
+                if ( draggingPlot==null && s instanceof Component ) {
+                    draggingPlot= app.getController().getPlotFor( (Component)s );
+                    setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                    app.getController().setStatus("swap "+draggingPlot+ ", drop to swap positions." );
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                
+            }
+        });
         panelListComponent.addMouseListener(popupTrigger);
         bindingListComponent.addMouseListener(popupTrigger);
 
@@ -117,6 +137,18 @@ public class LayoutPanel extends javax.swing.JPanel {
                         menu.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
+                if ( draggingPlot!=null ) {
+                    Object s= canvasLayoutPanel1.getCanvasComponentAt( e.getX(), e.getY() );
+                    if ( s instanceof Component ) {
+                        Plot targetPlot= app.getController().getPlotFor( (Component)s );
+                        if ( targetPlot!=null ) {
+                            DomOps.swapPosition( draggingPlot, targetPlot );
+                            app.getController().setStatus("swapped "+draggingPlot+ " and " +targetPlot );
+                        }
+                    }
+                    setCursor(null);
+                }
+                draggingPlot= null;
             }
         };
     }
