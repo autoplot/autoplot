@@ -926,7 +926,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 1830, true, new Runnable() {
+        invokeLater( 1830, true, new Runnable() { 
             @Override
             public String toString() { return "addLayout"; }
             @Override            
