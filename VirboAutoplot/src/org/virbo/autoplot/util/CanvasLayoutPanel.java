@@ -182,6 +182,40 @@ public class CanvasLayoutPanel extends JLabel {
     }
 
     /**
+     * return the plot component at the position on this GUI.
+     * @param x the x position, 0 is left side of this component.
+     * @param y the x position, 0 is top of this component.
+     * @return DasPlot, DasAxis, etc.
+     */
+    public Object getCanvasComponentAt( int x, int y ) {
+        int twidth = target.getWidth();
+        int theight= target.getHeight();
+        int mwidth = getWidth();
+        double scale= (double) mwidth / twidth;
+        if ( theight * scale > getHeight() ) {
+           scale= (double)getHeight() / theight;
+        }
+        Rectangle m= new Rectangle( (int)( x / scale ), (int)( y / scale), 1, 1 );
+        Rectangle select= null;
+        select= m;
+
+        List<Object> newSelect= new ArrayList();
+        for (int i = target.getComponentCount() - 1; i >= 0; i--) {
+            Component c= target.getComponent(i);
+            Color color = types.get(c.getClass());
+            if ( color!=null ) {
+                if ( select.intersects(c.getBounds() ) ) {
+                    newSelect.add(c);
+                }
+            }
+        } 
+        if ( newSelect.isEmpty() ) {
+            return null;
+        } else {
+            return newSelect.get(0);
+        }
+    }
+    /**
      * set the primary selected component.
      * @return 
      */
