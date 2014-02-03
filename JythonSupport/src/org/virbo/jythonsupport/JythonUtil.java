@@ -764,6 +764,11 @@ public class JythonUtil {
              return "";
          }
          
+         // check for continuation in last getParam call.
+         while ( ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) && ss.length>lastLine+1 ) {
+             lastLine++;
+         }
+         
          HashSet variableNames= new HashSet();
          variableNames.add("getParam");
          try {
