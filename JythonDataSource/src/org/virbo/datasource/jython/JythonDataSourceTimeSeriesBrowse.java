@@ -84,22 +84,7 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
      */
     @Override
     public String getURI() {
-        try {
-            if ( ! FileSystemUtil.resourceIsLocal( uri ) ) {
-                logger.warning("getURI of JythonDataSourceTimeSeriesBrowse triggered load with no monitor");
-            }
-            File jythonScript= DataSetURI.getFile( uri, new NullProgressMonitor() );  // this assumes the user can go without progress feedback.
-            JythonDataSourceTimeSeriesBrowse tsb1= JythonDataSourceTimeSeriesBrowse.checkForTimeSeriesBrowse( uri.toString(), jythonScript );
-            if ( tsb1!=null ) {
-                return uri;
-            } else {
-                return blurURI();
-            }
-        } catch (ParseException ex ) {
-            return uri;
-        } catch (IOException ex) {
-            return uri;
-        }
+        return uri;
     }
 
     @Override
