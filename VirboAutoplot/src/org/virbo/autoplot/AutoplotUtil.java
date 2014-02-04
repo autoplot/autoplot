@@ -104,6 +104,7 @@ import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.WebFileSystem;
@@ -874,7 +875,9 @@ public class AutoplotUtil {
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
 
-        logger.log(Level.FINE, "enter autoRange {0}", ds);
+        Logger logger1= LoggerManager.getLogger("autoplot.autorange");
+        
+        logger1.log(Level.FINE, "enter autoRange {0}", ds);
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -964,7 +967,7 @@ public class AutoplotUtil {
                 int lastValid=wds.length()-1;
                 while ( lastValid>=0 && wds.value(lastValid)==0 ) lastValid--;
                 if ( ( lastValid-firstValid+1 ) == 0 ) {
-                    logger.fine("special case where monotonic dataset contains no valid data");
+                    logger1.fine("special case where monotonic dataset contains no valid data");
                     if (UnitsUtil.isTimeLocation(u)) {
                         dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
                     } else {
@@ -1014,7 +1017,7 @@ public class AutoplotUtil {
             // find min and max of three-point medians
             try {
                 dd = simpleRange(ds);
-                logger.log(Level.FINEST, "simpleRange(ds)= {0} - {1}", new Object[]{dd[0], dd[1]});
+                logger1.log(Level.FINEST, "simpleRange(ds)= {0} - {1}", new Object[]{dd[0], dd[1]});
                 if ( Units.dimensionless.isFill(dd[0]) ) dd[0]= dd[0] / 100; // kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FEDO
                 if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 100;
             } catch (IllegalArgumentException ex) {
@@ -1056,7 +1059,7 @@ public class AutoplotUtil {
             // find the median by looking at the histogram.  If the dataset should be log, then the data will bunch up in the lowest bins.
             isHist= "stairSteps".equals( ds.property( QDataSet.RENDER_TYPE) ); // nasty bit of code
             QDataSet hist = DataSetOps.histogram(ds, dd[0], dd[1] + (dd[1] - dd[0]) * 0.01, (dd[1] - dd[0]) / 100);
-            positiveMin= ((Double) hist.property("positiveMin")).doubleValue();
+            positiveMin= ((Double) hist.property("positiveMin"));
             total = 0;
             for (int i = 0; i < hist.length(); i++) {
                 total += hist.value(i);
@@ -1152,7 +1155,7 @@ public class AutoplotUtil {
                 if ( isLog && tmin!=null && tmin.doubleValue()<=0 ) {
     //                tmin= new Double( result.range.min().doubleValue(result.range.getUnits()) );
     //                if ( tmin.doubleValue()<0 ) {
-                        tmin= Double.valueOf( tmax.doubleValue() / 1e4 ); // this used to happen in IstpMetadataModel
+                      tmin= tmax.doubleValue() / 1e4; // this used to happen in IstpMetadataModel
     //                }
                 }
 
@@ -1160,7 +1163,7 @@ public class AutoplotUtil {
 
                 // see if the typical extent is consistent with extent seen.  If the
                 // typical extent won't hide the data's structure, then use it.
-                if ((tmin != null || tmax != null)) {
+                if ((tmin != null && tmax != null)) {
                     double d1, d2;
                     if (result.log) {
                         if ( ftmin.doubleValue(uu)<=0 ) ftmin= uu.createDatum(1e-38);
@@ -1179,20 +1182,21 @@ public class AutoplotUtil {
                             d2 = DatumRangeUtil.normalizeLog(range, dd2);
                         }
                         if ( d2>1.2 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                            logger1.log(Level.FINE, "TYPICAL_MAX rejected because max ({0}) outside the value of TYPICAL range ({1})", new Object[]{ result.range.max(), range } );
                             range= DatumRangeUtil.rescaleLog( range, 0, 1.333 );
                             DatumRange range2= DatumRangeUtil.rescaleLog( range, 0, 2 );
                             d2= d2/1.333;
                             d1= d1/1.333;
-                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 1.2");
+                            logger1.fine("adjusting TYPICAL_MAX from metadata, multiply by 1.2");
                             if ( d2>1.2 && d2<2.0 ) { // do what we used to do.
                                 range= range2;
                                 d2= d2*1.333/2;
                                 d1= d1*1.333/2;
-                                logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                                logger1.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                             }
                         }
                         if ( d1<-4 && d2>0  ) { //often with log we get "1 count" averages that are very small (demo2: po_h0_hyd_$Y$m$d_v01.cdf)
-                            logger.fine("rejecting statistical range because min is too small.");
+                            logger1.fine("rejecting statistical range because min is too small.");
                             result.range = range;
                             result.robustMin= range.min().doubleValue(result.range.getUnits());
                             result.robustMax= range.max().doubleValue(result.range.getUnits());
@@ -1213,7 +1217,7 @@ public class AutoplotUtil {
                             range= DatumRangeUtil.rescale( range, 0, 2 );
                             d2= d2/2;
                             d1= d1/2;
-                            logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
+                            logger1.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                         }
                     }
                     if (d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
@@ -1224,10 +1228,10 @@ public class AutoplotUtil {
                             && uu.isConvertableTo( u ) ) {  // and we ARE talking about the same thing
                         result.range = range;
                         // just use the metadata settings.
-                        logger.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
+                        logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
                         return result; // DANGER--EXIT POINT
                     } else {
-                        logger.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin, tmax, result.range});
+                        logger1.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin.toString(), tmax.toString(), result.range});
                     }
                 }
             }
@@ -1274,7 +1278,7 @@ public class AutoplotUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
 
-        logger.fine("exit autoRange");
+        logger1.fine("exit autoRange");
 
         if ( typical!=null ) {
             if ( result.log && typical.log ) {
