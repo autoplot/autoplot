@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -74,11 +76,29 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         return null;
     }
 
+    /**
+     * get the URI, bluring it if we discover it didn't need time series browse.
+     * TODO: This is experimental.
+     * @return 
+     */
     @Override
     public String getURI() {
-        return uri;
+        try {
+            File jythonScript= DataSetURI.getFile( uri, new NullProgressMonitor() );  // this assumes the user can go without progress feedback.
+            JythonDataSourceTimeSeriesBrowse tsb1= JythonDataSourceTimeSeriesBrowse.checkForTimeSeriesBrowse( uri.toString(), jythonScript );
+            if ( tsb1!=null ) {
+                return uri;
+            } else {
+                return blurURI();
+            }
+        } catch (ParseException ex ) {
+            return uri;
+        } catch (IOException ex) {
+            return uri;
+        }
     }
 
+    @Override
     public String blurURI() {
         URISplit split= URISplit.parse(this.uri);
         Map<String,String> params= URISplit.parseParams(split.params);
