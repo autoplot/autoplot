@@ -194,7 +194,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     /**
      * Reject when:
-     *   - the URI doesn't contain a timerange but the data source ha
+     *   - the URI doesn't contain a timerange but the data source has TimeSeriesBrowse
      * @param surl
      * @param problems
      * @param mon
