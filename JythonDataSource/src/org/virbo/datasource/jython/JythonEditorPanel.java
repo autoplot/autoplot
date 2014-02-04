@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -180,7 +181,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(scriptScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+            .add(scriptScrollPane)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -211,7 +212,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(variableComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -840,8 +841,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             params.remove(JythonDataSource.PARAM_RESOURCE_URI);
         }
 
-        split.params= URISplit.formatParams(params);
-
         if ( support.isDirty() ) {
             try {
                 FileWriter writer = new FileWriter(support.getFile());
@@ -854,7 +853,27 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-        return URISplit.format(split);
+
+        JythonDataSourceTimeSeriesBrowse tsb1;
+        try {
+            tsb1 = JythonDataSourceTimeSeriesBrowse.checkForTimeSeriesBrowse( suri, support.getFile() );
+            if ( tsb1==null ) {
+                params.remove("timerange");
+                if ( "".equals( params.get(URISplit.PARAM_ARG_0) ) ) {
+                    params.remove(URISplit.PARAM_ARG_0);
+                }
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
+        split.params= params.isEmpty() ? null : URISplit.formatParams(params);        
+        
+        String uri= URISplit.format(split);
+        
+        return uri;
     }
 
     @Override
