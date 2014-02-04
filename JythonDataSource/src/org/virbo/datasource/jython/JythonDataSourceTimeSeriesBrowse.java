@@ -20,6 +20,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -84,6 +85,9 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
     @Override
     public String getURI() {
         try {
+            if ( ! FileSystemUtil.resourceIsLocal( uri ) ) {
+                logger.warning("getURI of JythonDataSourceTimeSeriesBrowse triggered load with no monitor");
+            }
             File jythonScript= DataSetURI.getFile( uri, new NullProgressMonitor() );  // this assumes the user can go without progress feedback.
             JythonDataSourceTimeSeriesBrowse tsb1= JythonDataSourceTimeSeriesBrowse.checkForTimeSeriesBrowse( uri.toString(), jythonScript );
             if ( tsb1!=null ) {
