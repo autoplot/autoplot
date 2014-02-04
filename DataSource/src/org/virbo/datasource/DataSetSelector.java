@@ -771,12 +771,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                             pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
                             dialog.setVisible(true);
                             if (!dialog.isCancelled()) {
-                                logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
-                                dataSetSelector.setSelectedItem(fedit.getURI());
+                                String surl= fedit.getURI();                                
+                                logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", surl );
+                                dataSetSelector.setSelectedItem(surl);
 
                                 boolean bug1098= false; //TODO finish off this change.
                                 if ( bug1098 ) {
-                                    String surl= fedit.getURI();
                                     DataSourceFactory dsf;
                                     try {
                                         dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
