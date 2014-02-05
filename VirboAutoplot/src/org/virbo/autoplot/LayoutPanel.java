@@ -13,6 +13,10 @@ package org.virbo.autoplot;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -73,6 +77,8 @@ public class LayoutPanel extends javax.swing.JPanel {
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
     Plot draggingPlot=null;
+    Point dragInitialClick= null;
+    Point dragLocation=null;
     
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -97,11 +103,21 @@ public class LayoutPanel extends javax.swing.JPanel {
         canvasLayoutPanel1.addMouseMotionListener( new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                Object s= canvasLayoutPanel1.getCanvasComponentAt( e.getX(), e.getY() );
-                if ( draggingPlot==null && s instanceof Component ) {
-                    draggingPlot= app.getController().getPlotFor( (Component)s );
-                    setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                    app.getController().setStatus("swap "+draggingPlot+ ", drop to swap positions." );
+                if ( draggingPlot==null && dragInitialClick==null ) {
+                    Object s= canvasLayoutPanel1.getCanvasComponentAt( e.getX(), e.getY() );
+                    if ( s instanceof Component ) {
+                        draggingPlot= app.getController().getPlotFor( (Component)s );
+                        setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                        app.getController().setStatus("swap "+draggingPlot+ ", drop to swap positions." );
+                    } else {
+                        dragInitialClick= e.getPoint();
+                        app.getController().setStatus("select plots by drawing a box." );
+                    }
+                } else if ( dragInitialClick!=null ) {
+                    dragLocation= e.getPoint();
+                    Rectangle rect= new Rectangle( dragInitialClick );
+                    rect.add( e.getPoint() );
+                    canvasLayoutPanel1.setSelectedComponents( rect );
                 }
             }
 
@@ -147,12 +163,19 @@ public class LayoutPanel extends javax.swing.JPanel {
                         }
                     }
                     setCursor(null);
+                    draggingPlot= null;
                 }
-                draggingPlot= null;
+                if ( dragInitialClick!=null ) {
+                    Rectangle rect= new Rectangle( dragInitialClick );
+                    rect.add( e.getPoint() );
+                    canvasLayoutPanel1.setSelectedComponents( rect );
+                    dragInitialClick= null;
+                }
+                
             }
         };
     }
-    ;
+    
     Map<Component, JPopupMenu> contextMenus = null;
 
     Action removeBindingsAction= new AbstractAction("Remove Bindings") {
@@ -715,11 +738,11 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
 
         jSplitPane1.setRightComponent(jPanel2);
@@ -769,7 +792,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 .add(shorterButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sameHeightButton)
-                .add(0, 96, Short.MAX_VALUE))
+                .add(0, 69, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(new java.awt.Component[] {shorterButton, tallerButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
@@ -777,7 +800,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(tallerButton)
@@ -790,6 +813,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings [?]"));
         jPanel3.setToolTipText("List of connections between DOM properties");
 
+        bindingListComponent.setFont(bindingListComponent.getFont().deriveFont(bindingListComponent.getFont().getSize()-2f));
         bindingListComponent.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
@@ -805,7 +829,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
         );
 
         jSplitPane2.setRightComponent(jPanel3);
