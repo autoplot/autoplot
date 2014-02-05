@@ -89,7 +89,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
         try {
 
-            mon.setLabel("Executing script to get names."); // warn of this dangerous behavior.    
+            mon.setLabel("Executing script to get names."); // warn of this slow, inefficient, and risky behavior.    
             interp.execfile(new FileInputStream(src));
 
             PyStringMap map = ((PyStringMap) interp.getLocals());
