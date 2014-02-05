@@ -107,30 +107,46 @@ public class EmbedDataExperiment {
         return result;
     }
     
+    /**
+     * save the application, but embed data file resources within the 
+     * zip, along with the .vap.  The vap is saved with the name default.vap.
+     * 
+     * @param dom3 the state to save.
+     * @param f the zip file output name.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     public static void save( Application dom3, File f ) throws FileNotFoundException, IOException {
         // too bad I have to do this...  but it doesn't work otherwise...
         Application dom = dom3.getController().getApplicationModel().createState(false);
 
         FileOutputStream fout= new FileOutputStream(f);
-        final ZipOutputStream out = new ZipOutputStream( fout );
-        for ( URI uri: getResources(dom) ) {
-            String name= uri.toString().replaceAll("://","/");
-            File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
-            writeToZip( out, name, file1 );
-        }
-        for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
-            String uri = dsf.getUri();
-            URISplit split= URISplit.parse(uri);
-            if ( split.resourceUri!=null ) {
-                String name= split.resourceUri.toString().replaceAll("://","/");
-                split.file= "%{PWD}/"+name;
-                dsf.setUri( URISplit.format(split) );
+        ZipOutputStream out=null;
+        try {
+            out= new ZipOutputStream( fout );
+            for ( URI uri: getResources(dom) ) {
+                String name= uri.toString().replaceAll("://","/");
+                File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
+                writeToZip( out, name, file1 );
             }
+            for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
+                String uri = dsf.getUri();
+                URISplit split= URISplit.parse(uri);
+                if ( split.resourceUri!=null ) {
+                    String name= split.resourceUri.toString().replaceAll("://","/");
+                    split.file= "%{PWD}/"+name;
+                    dsf.setUri( URISplit.format(split) );
+                }
+            }
+            ZipEntry e= new ZipEntry("default.vap");
+            out.putNextEntry(e);
+            StatePersistence.saveState( new NoCloseOutputStream(out), dom, "" );
+        } finally {
+            if ( out!=null ) {
+                out.closeEntry();
+                out.close();
+            }
+            fout.close();
         }
-        ZipEntry e= new ZipEntry("default.vap");
-        out.putNextEntry(e);
-        StatePersistence.saveState( new NoCloseOutputStream(out), dom, "" );
-        out.closeEntry();
-        out.close();
     }
 }
