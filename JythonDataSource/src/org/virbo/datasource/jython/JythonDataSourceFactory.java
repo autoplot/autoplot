@@ -269,6 +269,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         String s = reader.readLine();
 
         Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=(.*)(#(.*))?");
+        
+        Pattern tuplePattern=  Pattern.compile("\\s*\\(?\\s*([_a-zA-Z][_a-zA-Z0-9\\s*,\\s*]*)\\s*\\)?\\s*=(.*)(#(.*))?");
+        
         Pattern defPattern= Pattern.compile("def .*");
 
         boolean inDef= false;
@@ -302,7 +305,26 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                             result.put(m.group(1), s );
                         }
                     }
+                } else {
+                    m= tuplePattern.matcher(s);
+                    if ( m.matches() ) {
+                        String tuple= m.group(1);
+                        String rhs= m.group(2);
+                        if ( rhs.contains("getParam(") ) {
+                            // reject
+                        } else {
+                            String[] ss= tuple.split(",");
+                            for ( String s1 : ss ) {
+                                if (m.group(4)!=null) {
+                                    result.put( s1, m.group(4));
+                                } else {
+                                    result.put( s1, s );
+                                }
+                            }
+                        }
+                    }
                 }
+                    
             }
 
             s = reader.readLine();
