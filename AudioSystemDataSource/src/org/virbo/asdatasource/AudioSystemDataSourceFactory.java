@@ -9,10 +9,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.URISplit;
 
 /**
  * Read data directly from the Audiosystem.  This is for demonstration purposes.
@@ -25,6 +27,17 @@ public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
         return new AudioSystemDataSource(uri);
     }
 
+    @Override
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
+        URISplit split= URISplit.parse(surl);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        if ( params.get("len")==null ) {
+            return true;
+        }
+        return super.reject(surl, problems, mon); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
