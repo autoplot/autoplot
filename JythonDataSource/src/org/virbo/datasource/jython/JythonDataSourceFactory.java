@@ -6,14 +6,11 @@ package org.virbo.datasource.jython;
 
 import java.beans.ExceptionListener;
 import java.io.BufferedReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.virbo.jythonsupport.PyQDataSet;
-import org.virbo.jythonsupport.PyQDataSetAdapter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,6 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -41,6 +40,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import static org.virbo.datasource.jython.JythonDataSource.PARAM_SCRIPT;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.jythonsupport.PyQDataSet;
+import org.virbo.jythonsupport.PyQDataSetAdapter;
 
 /**
  *
@@ -74,28 +75,21 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
         return jythonScript;
     }    
-
+            
     private Map<String, Object> getNames(URI uri, ProgressMonitor mon) throws Exception {
-        PythonInterpreter interp = new PythonInterpreter();
-        Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
-        interp.set("monitor", mon);
-        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py"); // import everything into default namespace.
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> paramsl= URISplit.parseParams(split.params); // abstract datasource params don't update.
+
+        PythonInterpreter interp = JythonUtil.createInterpreter(true);
+
+        JythonUtil.setupInterp( interp, split.path, split.resourceUri.toString(), paramsl, mon );
 
         File src = DataSetURI.getFile(uri, new NullProgressMonitor());
 
-        URISplit split = URISplit.parse(uri);
-        Map<String, String> params = URISplit.parseParams(split.params);
         try {
-            interp.exec("import autoplot");
-            interp.exec("autoplot.params=dict()");
-            for ( Entry<String,String> e : params.entrySet()) {
-                String s= e.getKey();
-                if (!s.equals("arg_0")) {
-                    interp.exec("autoplot.params['" + s + "']=" + e.getValue() );
-                }
-            }
 
+            mon.setLabel("Executing script to get names."); // warn of this dangerous behavior.    
             interp.execfile(new FileInputStream(src));
 
             PyStringMap map = ((PyStringMap) interp.getLocals());
