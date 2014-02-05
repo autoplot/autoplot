@@ -100,8 +100,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         support.addFileLabel(fileNameLabel);
         support.setReadOnly();
 
-        scriptScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
-        paramsScrollPane.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
+        scriptScrollPane.getVerticalScrollBar().setUnitIncrement(scriptScrollPane.getFont().getSize()); 
+        paramsScrollPane.getVerticalScrollBar().setUnitIncrement(scriptScrollPane.getFont().getSize());
         
         textArea.addMouseListener( new MouseAdapter() {
 
