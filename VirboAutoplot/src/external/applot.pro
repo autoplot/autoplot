@@ -114,7 +114,7 @@ end
 
 ;; for rank 2, ytags must be specified
 ; ascii, boolean, use ascii transfer types
-pro qstream, dataStruct, filename, depend_1=ytags, ascii=ascii, xunits=xunits
+pro qstream, dataStruct, filename, depend_1=ytags, ascii=ascii, xunits=xunits, delta_plus=delta_plus, delta_minus=delta_minus
 
    print, 'writing qstream to ' + filename
    on_error, 2
@@ -186,8 +186,16 @@ pro qstream, dataStruct, filename, depend_1=ytags, ascii=ascii, xunits=xunits
       if ( s[0] eq 1 ) then begin      
          packetDescriptor= [ packetDescriptor, '     <qdataset id="'+name+'" rank="1" >' ]
          packetDescriptor= [ packetDescriptor, '       <properties>' ]
-         packetDescriptor= [ packetDescriptor, '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />']
          packetDescriptor= [ packetDescriptor, '           <property name="NAME" type="String" value="'+name+'" />']
+         packetDescriptor= [ packetDescriptor, '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />']
+         if ( i eq 1 ) then begin
+             if ( keyword_set(delta_plus) ) then begin
+                 packetDescriptor= [ packetDescriptor, '           <property name="DELTA_PLUS" type="qdataset" value="'+strupcase(delta_plus)+'" />']
+             endif
+             if ( keyword_set(delta_minus) ) then begin
+                 packetDescriptor= [ packetDescriptor, '           <property name="DELTA_MINUS" type="qdataset" value="'+strupcase(delta_minus)+'" />']
+             endif
+         endif
          packetDescriptor= [ packetDescriptor, '       </properties>' ]
          packetDescriptor= [ packetDescriptor, '       <values encoding="'+datatype+'" length="" />' ]         
          packetDescriptor= [ packetDescriptor, '     </qdataset>' ]
@@ -309,6 +317,14 @@ pro test_dump_rank2_qstream
    qstream, data, 'my.qds', depend_1= y, /ascii
 end
 
+pro test_dump_delta_plus_qstream
+   z= dist(15,20)
+   x= findgen(20)+3
+   y= findgen(20)*10 + randomn( s, 20 )
+   dy= replicate(1,20)
+   data= { x:x, y:y, delta:dy }
+   qstream, data, 'my.qds', /ascii, delta_plus='delta', delta_minus='delta' 
+end
 
 function tryPortConnect, host, port, unit=unit
    socket, unit, 'localhost', port, error=error, /get_lun, write_timeout=1
@@ -388,8 +404,10 @@ end
 ;   tmpfile=   explicitly set the file used to move data into Autoplot.  This can also be used with /noplot
 ;   /noplot    just make the tmpfile, don't actually try to plot.
 ;   xunits=    units as a string, especially like "seconds since 2010-01-01T00:00"
+;   delta_plus=  array of positive lengths showing the upper limit of the 1-sigma confidence interval.
+;   delta_minus= array of positive lengths showing the lower limit of the 1-sigma confidence interval.
 ;-
-pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=noplot, _extra=e, respawn=respawn
+pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=noplot, _extra=e, respawn=respawn, delta_plus=delta_plus, delta_minus=delta_minus
 
    x= x_in
    if ( n_elements(y_in) gt 0 ) then y= y_in
@@ -431,16 +449,22 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
       print, 'survived spawn'
    endif
 
+   ext='d2s'
+   if ( keyword_set( delta_plus ) ) then begin
+       ext='qds'
+   endif
+    
+   
    if n_elements( tmpfile ) eq 0 then begin
      caldat, systime(1, /julian), Mon, Day, Year, Hour, Min
      tag= string( Year, Mon, Day, Hour, Min, format='(I04,I02,I02,"T",I02,I02)' )
-     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.???.d2s'
+     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.???.'+ext
      f= findfile( tmpfile, count=c )
-     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.' + string(c,format='(I3.3)') + '.d2s'
+     tmpfile= getenv('IDL_TMPDIR') + 'autoplot.' + tag + '.' + string(c,format='(I3.3)') + '.'+ext
      tmpfile= strjoin( str_sep( tmpfile, '\' ), '/' )
    endif else begin
-     if ( strpos( tmpfile, '.d2s' ) ne strlen(tmpfile)-4 ) then begin
-       tmpfile= tmpfile + '.d2s'  ; add the extension
+     if ( strpos( tmpfile, '.'+ext ) ne strlen(tmpfile)-4 ) then begin
+       tmpfile= tmpfile + '.'+ext  ; add the extension
      endif
    endelse
 
@@ -523,30 +547,45 @@ pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, tmpfile=tmpfile, noplot=nopl
 
    if n_elements(xunits) eq 0 then xunits=''
    
-   if np eq 3 then begin
-      data= { x:xx, z:zz }
-      das2stream, data, tmpfile, ytags=yy, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
-   endif else if np eq 2 then begin
-      data= { x:xx, y:yy }
-      das2stream, data, tmpfile, ascii=0, xunits=xunits
+   if ( keyword_set(delta_plus) and keyword_set(delta_minus) ) then begin
+     if ( ext ne 'qds' ) then begin  
+         message, 'internal error, ext does not match'
+     endif
+     if np eq 3 then begin
+       data= { x:xx, z:zz }
+       qstream, data, tmpfile, ytags=yy, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
+     endif else if np eq 2 then begin
+       data= { x:xx, y:yy, delta_plus:delta_plus, delta_minus:delta_minus }
+       qstream, data, tmpfile, ascii=0, xunits=xunits, delta_plus='DELTA_PLUS', delta_minus='DELTA_MINUS'
+     endif else begin
+       s= size( xx )
+       if s[0] eq 2 then begin
+         data= { x:findgen(s[1]), z:xx }
+         qstream, data, tmpfile, ytags=findgen(s[2]), ascii=0, xunits=''
+       endif else begin
+         data= { x:findgen(s[1]), y:xx, delta_plus:delta_plus, delta_minus:delta_minus }
+         qstream, data, tmpfile, ascii=0, xunits='', delta_plus='DELTA_PLUS', delta_minus='DELTA_MINUS'
+       endelse    
+     endelse
    endif else begin
-      s= size( xx )
-      if s[0] eq 2 then begin
-        data= { x:findgen(s[1]), z:xx }
-        das2stream, data, tmpfile, ytags=findgen(s[2]), ascii=0, xunits=''
-      endif else begin
-        data= { x:findgen(s[1]), y:xx }
-        das2stream, data, tmpfile, ascii=0, xunits=''
-      endelse
+     if np eq 3 then begin
+        data= { x:xx, z:zz }
+        das2stream, data, tmpfile, ytags=yy, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
+     endif else if np eq 2 then begin
+        data= { x:xx, y:yy }
+        das2stream, data, tmpfile, ascii=0, xunits=xunits
+     endif else begin
+        s= size( xx )
+        if s[0] eq 2 then begin
+          data= { x:findgen(s[1]), z:xx }
+          das2stream, data, tmpfile, ytags=findgen(s[2]), ascii=0, xunits=''
+        endif else begin
+          data= { x:findgen(s[1]), y:xx }
+          das2stream, data, tmpfile, ascii=0, xunits=''
+        endelse
+     endelse
    endelse
-
-   ;openw, unit, tmpfile, /get_lun
-   ;for i=0,n_elements(x)-1 do begin
-   ;    printf, unit, string( x[i]) ,' ', string(y[i])
-   ;endfor
-   ;close, unit
-   ;free_lun, unit
-
+    
    if keyword_set( noplot ) then begin
       return
    endif
