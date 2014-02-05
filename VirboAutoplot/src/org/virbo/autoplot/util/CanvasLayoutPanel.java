@@ -215,9 +215,37 @@ public class CanvasLayoutPanel extends JLabel {
             return newSelect.get(0);
         }
     }
+    
+    /**
+     * get the canvas components within the rectangle.
+     * @param r rectangle within the GUI.
+     * @return 
+     */
+    public List<Object> getCanvasComponentsWithin( Rectangle r ) {
+        int twidth = target.getWidth();
+        int theight= target.getHeight();
+        int mwidth = getWidth();
+        double scale= (double) mwidth / twidth;
+        if ( theight * scale > getHeight() ) {
+           scale= (double)getHeight() / theight;
+        }
+        r= new Rectangle( (int)( r.x / scale ), (int)( r.y / scale), (int)(r.width/scale), (int)(r.height/scale) );
+        List<Object> newSelect= new ArrayList();
+        for (int i = target.getComponentCount() - 1; i >= 0; i--) {
+            Component c= target.getComponent(i);
+            Color color = types.get(c.getClass());
+            if ( color!=null ) {
+                if ( r.contains(c.getBounds()) ) {
+                    newSelect.add(c);
+                }
+            }
+        } 
+        return newSelect;
+    }
+    
     /**
      * set the primary selected component.
-     * @return 
+     * @param component null or the selected component.
      */
     public void setComponent(Object component) {
         
@@ -257,6 +285,15 @@ public class CanvasLayoutPanel extends JLabel {
         handlingEvent= false;
         repaint();
     }
+    
+    /**
+     * set the selected components to those within the rectangle.
+     * @param r rectangle in GUI coordinates.
+     */
+    public void setSelectedComponents( Rectangle r ) {
+        setSelectedComponents( getCanvasComponentsWithin( r ) );
+    }
+    
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /**
