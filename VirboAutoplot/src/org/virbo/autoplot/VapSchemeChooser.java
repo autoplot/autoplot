@@ -22,6 +22,10 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         initComponents();
     }
 
+    /**
+     * return the scheme to target.
+     * @return 
+     */
     public String getScheme() {
         if ( currentVersionCB.isSelected() ) {
             return "";
@@ -33,6 +37,15 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * return true if the scientist wants to embed data within the
+     * vap.
+     * @return 
+     */
+    public boolean isEmbedData() {
+        return this.embedDataCheckBox.isSelected();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -45,6 +58,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         v1_06CB = new javax.swing.JRadioButton();
         currentVersionCB = new javax.swing.JRadioButton();
+        embedDataCheckBox = new javax.swing.JCheckBox();
 
         buttonGroup1.add(v1_06CB);
         v1_06CB.setText("v1.06 (Autoplot 2010)");
@@ -52,6 +66,8 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         buttonGroup1.add(currentVersionCB);
         currentVersionCB.setSelected(true);
         currentVersionCB.setText("Save as current version");
+
+        embedDataCheckBox.setText("Embed data within .vap file");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -61,7 +77,8 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(v1_06CB)
-                    .add(currentVersionCB))
+                    .add(currentVersionCB)
+                    .add(embedDataCheckBox))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -71,7 +88,9 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                 .add(currentVersionCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(v1_06CB)
-                .addContainerGap(110, Short.MAX_VALUE))
+                .add(18, 18, 18)
+                .add(embedDataCheckBox)
+                .addContainerGap(68, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -79,6 +98,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton currentVersionCB;
+    private javax.swing.JCheckBox embedDataCheckBox;
     private javax.swing.JRadioButton v1_06CB;
     // End of variables declaration//GEN-END:variables
 
