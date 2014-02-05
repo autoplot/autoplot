@@ -221,7 +221,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= e.getValue();
                         
-                        sval= maybeQuoteString( sval );
+                        sval= JythonUtil.maybeQuoteString( sval );
                         logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
                         interp.exec("autoplot.params['" + s + "']=" + sval);
                     }
@@ -229,7 +229,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 
                 if ( lresourceURI!=null ) {
                     interp.set( PARAM_RESOURCE_URI, lresourceURI); // legacy
-                    interp.exec("autoplot.params['"+PARAM_RESOURCE_URI+"']="+ maybeQuoteString( lresourceURI ) );
+                    interp.exec("autoplot.params['"+PARAM_RESOURCE_URI+"']="+ JythonUtil.maybeQuoteString( lresourceURI ) );
                 }
 
                 mon.setProgressMessage( "executing script");
@@ -501,23 +501,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     @Override
     public void reset() {
         interp= null;
-    }
-
-    private String maybeQuoteString(String sval) {
-        boolean isNumber= false;
-        try {
-            Double.parseDouble(sval); 
-        } catch ( NumberFormatException ex ) {
-            isNumber= false;
-        }
-
-        if ( sval.length()>0 && !isNumber && !sval.equals("True") && !sval.equals("False") ) {
-            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
-                sval= String.format( "'%s'", sval );
-            }
-        }
-        return sval;
-
     }
 
 }
