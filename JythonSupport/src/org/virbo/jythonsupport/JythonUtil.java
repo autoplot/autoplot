@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -142,6 +143,48 @@ public class JythonUtil {
 
         return interp;
 
+    }
+    
+    /**
+     * set up the interp variables scripts will often use, such as PWD and monitor.
+     * @param interp
+     * @param pwd
+     * @param resourceUri
+     * @param paramsl
+     * @param mon 
+     */
+    public static void setupInterp( PythonInterpreter interp, String pwd, String resourceUri, Map<String,String> paramsl, ProgressMonitor mon ) {
+        interp.set("PWD", pwd);
+        interp.exec("import autoplot");
+        interp.exec("autoplot.params=dict()");
+        for ( Entry<String,String> e : paramsl.entrySet()) {
+            String s= e.getKey();
+            if (!s.equals("arg_0") && !s.equals("script") ) {
+                String sval= e.getValue();
+                sval= JythonUtil.maybeQuoteString( sval );
+                logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
+                interp.exec("autoplot.params['" + s + "']=" + sval);
+            }
+        }
+
+        if ( resourceUri!=null ) {
+            interp.set( "resourceURI", resourceUri ); // legacy
+            interp.exec("autoplot.params['"+"resourceURI"+"']="+ JythonUtil.maybeQuoteString( resourceUri ) );
+        }
+        
+        interp.set("monitor", mon);
+        
+        try {
+            InputStream in= JythonOps.class.getResource("imports.py").openStream();
+            try {
+                interp.execfile( in, "imports.py"); // import everything into default namespace.
+            } finally {
+                in.close();
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
+        }
+        
     }
 
     /**
