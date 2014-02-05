@@ -46,8 +46,11 @@ import javax.xml.parsers.ParserConfigurationException;
 //import org.apache.xml.serialize.OutputFormat;
 //import org.apache.xml.serialize.XMLSerializer;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.state.EmbedDataExperiment;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelectorSupport;
+import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -218,8 +221,14 @@ public class PersistentStateSupport {
         chooser.setFileFilter( simpleFilter("*"+ext ) );
         int result= chooser.showSaveDialog(this.component);
         if ( result==JFileChooser.APPROVE_OPTION ) {
+            String lext= ext;
+        
+            if ( vapVersion.isEmbedData() ) {
+                lext= ".zip";
+            }
+        
             File f= chooser.getSelectedFile();
-            if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
+            if ( !f.getName().endsWith(lext) ) f= new File( f.getPath()+lext );
             setCurrentFile(f.toString());
             setCurrentFileOpened(true);
             if ( saveMenuItem!=null ) saveMenuItem.setText("Save");
@@ -228,11 +237,12 @@ public class PersistentStateSupport {
 
             String v= vapVersion.getScheme();
             if ( v.length()>0 ) {
-                save( new File( getCurrentFile()),v );
+                save( new File( getCurrentFile()),v, vapVersion.isEmbedData() );
             } else {
-                save( new File( getCurrentFile()), "" );
+                save( new File( getCurrentFile()), "", vapVersion.isEmbedData() );
             }
         }
+
         return result;
         
     }
@@ -276,7 +286,7 @@ public class PersistentStateSupport {
         }
     }
     
-    private void save( final File file, final String scheme ) {
+    private void save( final File file, final String scheme, final boolean embedData ) {
         setSaving(true);
         Runnable run= new Runnable() {
             public void run() {
@@ -295,7 +305,16 @@ public class PersistentStateSupport {
                         }
                     }
                     
-                    saveImpl(f,scheme);
+                    if ( embedData ) {
+                        if ( component instanceof AutoplotUI ) {
+                            Application dom= ((AutoplotUI)component).getDocumentModel();
+                            EmbedDataExperiment.save( dom, f );
+                        } else {
+                            throw new IllegalArgumentException("Unable to embed data, please submit this error so the problem can be corrected");
+                        }
+                    } else {
+                        saveImpl(f,scheme);
+                    }
                     
                     Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
                     prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
@@ -332,7 +351,7 @@ public class PersistentStateSupport {
                             setCurrentFile(child.toString());
                             saveAs();
                         } else {
-                            save(new File(getCurrentFile()),"");
+                            save(new File(getCurrentFile()),"",false);
                         }
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
