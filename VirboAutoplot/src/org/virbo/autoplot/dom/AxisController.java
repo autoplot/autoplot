@@ -124,6 +124,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "log", p, "log");
         ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
+        ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
     }
 
@@ -140,6 +141,7 @@ public class AxisController extends DomNodeController {
         //TODO: should call ((DomNode)n).syncTo(n);
         Axis that = (Axis) n;
         if ( !exclude.contains( Axis.PROP_LOG ) ) axis.setLog(that.isLog());
+        if ( !exclude.contains( Axis.PROP_FLIPPED ) ) axis.setFlipped(that.isFlipped());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());

@@ -1503,11 +1503,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).getXaxis().setLog(false); // TODO kludge
             application.getPlots(0).getYaxis().setLog(false); // TODO kludge
             application.getPlots(0).getZaxis().setLog(false); // TODO kludge
+
             application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
             application.getPlots(0).getXaxis().setAutoRange(true);
             application.getPlots(0).getYaxis().setAutoRange(true);
             application.getPlots(0).getZaxis().setAutoRange(true);
-
+            
             for ( int i=application.getBindings().length-1; i>=0; i-- ) {
                 deleteBinding( application.getBindings(i) );
             }

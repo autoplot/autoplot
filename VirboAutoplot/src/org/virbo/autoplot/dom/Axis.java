@@ -149,6 +149,22 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
     }
 
+    /**
+     * true indicates that the axis should be top to bottom or right to left.
+     */
+    private boolean flipped = false;
+    public static final String PROP_FLIPPED = "flipped";
+
+    public boolean isFlipped() {
+        return flipped;
+    }
+
+    public void setFlipped(boolean flipped) {
+        boolean oldFlipped = this.flipped;
+        this.flipped = flipped;
+        propertyChangeSupport.firePropertyChange(PROP_FLIPPED, oldFlipped, flipped);
+    }
+
 
     AxisController controller;
 
@@ -174,6 +190,7 @@ public class Axis extends DomNode {
         } else {
             Axis that = (Axis) n;
             if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
+            if ( !exclude.contains( PROP_FLIPPED ) ) this.setFlipped(that.isFlipped());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
@@ -200,6 +217,8 @@ public class Axis extends DomNode {
 
         b= that.log==this.log ;
         if ( !b ) result.add( new PropertyChangeDiff( PROP_LOG , that.log, this.log) );
+        b= that.flipped==this.flipped;
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_FLIPPED , that.flipped, this.flipped) );
         b=  that.range.equals(this.range) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
         b=  that.label.equals(this.label) ;
