@@ -20,6 +20,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     /** Creates new form VapSchemeChooser */
     public VapSchemeChooser() {
         initComponents();
+        embedDataCheckBox.setVisible(false);
     }
 
     /**
