@@ -20,11 +20,14 @@
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
 
-        <p>Bugfixes:</p>
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
+        <p>Bugfixes (2014-02-15):</p>
         <ul>
+            <li>four-argument-histogram routine now takes datums and strings as arguments.</li>
+            <li>jython (a,b)=myFunc() now supports a,b in selection.</li>
+            <li>tab completion on the address bar works again with JythonDataSource.</li>
             <li>1156: Scott's script shows that color scatter was broken in December</li>
             <li>timeSeriesBrowse resulted in timerange being added to scripts in jyds editor when it wasn't needed</li>
             <li>das2server delays loading icons.  The way it was coded would block GUI until they were loaded</li>
@@ -54,7 +57,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>drag a box to select multiple plots on layout panel</li>
             <li>drag on layout panel is shortcut for swap</li>
+            <li>axis flipped property is supported in the vaps.</li>
             <li>Allow smooth on rank 2 datasets, smoothing on the first dimension (usually time).</li>
             <li>internal rbsp orbits updated to 2014-02-03</li>
             <li>das2server lists folders separately from data sources.</li>
