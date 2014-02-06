@@ -104,7 +104,15 @@ public class AudioSystemDataSourceEditorPanel extends javax.swing.JPanel impleme
     // End of variables declaration//GEN-END:variables
 
     public boolean reject(String uri) throws Exception {
-        return false;
+        boolean allowDiscovery= false;
+        if ( allowDiscovery ) {
+            return true;
+        } else {
+            URISplit split= URISplit.parse(uri);
+            Map<String,String> params= URISplit.parseParams(split.params);
+            String len= params.get("len");
+            return len==null;
+        }
     }
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
