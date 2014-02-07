@@ -176,6 +176,7 @@ public final class ChangesSupport {
 
     /**
      * someone has registered a pending change.
+     * See getChangesPending.
      */
     public boolean isPendingChanges() {
         if ( changesPending.size() > 0 ) {
@@ -184,8 +185,20 @@ public final class ChangesSupport {
             return false;
         }
     }
-    
 
+    /**
+     * return a map listing the pending changes.  This is a thread-safe
+     * read-only copy.
+     * @return Map
+     */
+    public synchronized Map getChangesPending() {
+        if ( changesPending.size() > 0 ) {
+            return new HashMap(changesPending);
+        } else {
+            return Collections.emptyMap();            
+        }
+    }
+    
     /**
      * null, "", or a description of the change
      */
