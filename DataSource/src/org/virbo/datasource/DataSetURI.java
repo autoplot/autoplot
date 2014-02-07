@@ -755,7 +755,9 @@ public class DataSetURI {
         } catch ( IllegalArgumentException ex ) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
-                throw new IOException(ex.getMessage());
+                throw new FileNotFoundException(ex.getMessage());
+            } else if ( ex.getMessage().startsWith("local root does not exist") ) {
+                throw new FileNotFoundException(ex.getMessage());
             } else if ( ex.getMessage().contains("unable to create") ) {
                 IOException ex2= new IOException(ex); 
                 throw ex2;
