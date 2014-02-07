@@ -38,7 +38,6 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
