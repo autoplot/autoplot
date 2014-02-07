@@ -413,36 +413,6 @@ public class Util {
         return result.toArray( new String[result.size()] );
 
     }
-    
-    /**
-     * Export the data into a format implied by the filename extension.  
-     * See the export data dialog for additional parameters available for formatting.
-     *
-     * For example:
-     * <p><blockquote><pre>
-     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
-     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
-     * </pre></blockquote></p>
-     * 
-     * @param ds
-     * @param file local file name that is the target
-     * @throws java.lang.Exception
-     */
-    public static void formatDataSet(QDataSet ds, String file) throws Exception {
-        if (!file.contains(":/")) {
-            file = new File(file).getCanonicalFile().toString();
-        }
-        URI uri = DataSetURI.getURIValid(file);
-
-        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
-        
-        if (format == null) {
-            throw new IllegalArgumentException("no format for extension: " + file);
-        }
-
-        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
-
-    }
         
     /**
      * return true if we should do the imports as before, where all of Autoplot is
