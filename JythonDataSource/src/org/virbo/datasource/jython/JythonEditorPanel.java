@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * JythonEditorPanel.java
  *
  * Created on Jul 14, 2009, 10:44:41 AM
@@ -28,10 +23,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +66,7 @@ import org.virbo.jythonsupport.ui.Util;
 /**
  * Editor for vap+jyds uris.  These URIs offer a couple of challenges,
  * such as the mode where the resourceURI is the name of the data file and
- * the script argument is used.  Also we identify types and offer decent
+ * the script argument is used.  Also, we identify types and offer decent
  * GUI elements to control the types.
  * @author jbf
  */
