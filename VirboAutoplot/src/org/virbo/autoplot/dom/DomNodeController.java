@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -164,13 +165,14 @@ public class DomNodeController {
      * return a list of all the pending changes.  These are returned in a
      * Map that goes from pending change to change manager.  Note this will
      * recurse through all the children, so to see pending changes
-     * for the application, just call this on it's controller.
+     * for the application, just call this on its controller.
      *
      * @param changes a Map to which the changes will be added.
      */
     public void pendingChanges( Map<Object,Object> changes ) {
-        if (changesSupport.isPendingChanges()) {
-            changes.putAll( changesSupport.changesPending );
+        Map lchangesPending= changesSupport.getChangesPending();
+        if ( !lchangesPending.isEmpty() ) {
+            changes.putAll( lchangesPending );
         }
         List<DomNodeController> kids= getChildControllers();
         for ( DomNodeController k: kids ) {
