@@ -392,8 +392,6 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                     }
 
-                    final String fval= val;
-
                     //TODO: figure out, why didn't this work?
                     //final DataSetSelector sel= new DataSetSelector();
                     //sel.setHidePlayButton(true);
@@ -691,7 +689,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         Map<String,String> params= URISplit.parseParams(split.params);
 
         String furi;
-        String resourceUri1=null;
+        String resourceUri1;
         if ( params.containsKey(JythonDataSource.PARAM_SCRIPT) ) {
             furi= params.get(JythonDataSource.PARAM_SCRIPT);
             resourceUri1= split.resourceUri==null ? null : split.resourceUri.toString();
