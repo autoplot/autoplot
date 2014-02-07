@@ -267,7 +267,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                                 Thread.sleep(200);
                                 interp.execfile(in);
                             } else {
-                                throw ex; // caught 6 lines down
+                                throw ex; // This exception is caught again 6 lines down
                             }
                         }
                         in.close();
