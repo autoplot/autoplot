@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -412,9 +413,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                             org.das2.util.LoggerManager.logGuiEvent(e);
 
                             JFileChooser c= new JFileChooser();
-                            URISplit split2= URISplit.parse(fval);
+                            URISplit split2= URISplit.parse(tf.getText());
                             if ( split2.scheme.equals("file") ) {
-                                c.setSelectedFile( new File( split2.file.substring(7)) );
+                                try {
+                                    c.setCurrentDirectory( new File( new URI( split2.path ) ) );
+                                    c.setSelectedFile( new File( new URI( split2.file ) ) );
+                                } catch (URISyntaxException ex) {
+                                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                
                             }
                             int r= c.showOpenDialog(jLabel1);
                             if ( r==JFileChooser.APPROVE_OPTION) {
