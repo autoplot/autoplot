@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
@@ -50,6 +51,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
@@ -715,8 +717,8 @@ public class ScriptContext extends PyJavaInstance {
     public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
         return org.virbo.jythonsupport.Util.generateTimeRanges( spec, srange );
     }
-
-    /**
+    
+        /**
      * Export the data into a format implied by the filename extension.  
      * See the export data dialog for additional parameters available for formatting.
      *
@@ -729,11 +731,22 @@ public class ScriptContext extends PyJavaInstance {
      * @param ds
      * @param file local file name that is the target
      * @throws java.lang.Exception
-     */    
+     */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
-        org.virbo.jythonsupport.Util.formatDataSet( ds, file );
-    }    
-    
+        if (!file.contains(":/")) {
+            file = new File(file).getCanonicalFile().toString();
+        }
+        URI uri = DataSetURI.getURIValid(file);
+
+        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
+        
+        if (format == null) {
+            throw new IllegalArgumentException("no format for extension: " + file);
+        }
+
+        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
+
+    }
     
     /**
      * set the title of the plot.
