@@ -575,7 +575,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             
         } catch (MalformedURLException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return new ArrayList();
+            return new ArrayList();  // findbugs DLS_DEAD_LOCAL_STORE, false positive?
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return new ArrayList();
