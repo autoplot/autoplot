@@ -3,6 +3,9 @@ package org.virbo.netCDF;
 
 import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -28,7 +31,10 @@ import ucar.unidata.io.RandomAccessFile;
  * @author jbf
  */
 public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvider {
-
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
+    
+    @Override
     public boolean isValidFile(RandomAccessFile arg0) throws IOException {
         return false; // must refer via iosp="org.virbo.netcdf.APIOServiceProvider"
     }
@@ -45,7 +51,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
             
             result= DataSetURI.getDataSource( suri ).getDataSet( new NullProgressMonitor() );
 
-            Dimension dim = null;
+            Dimension dim;
 
             String name = (String) result.property(QDataSet.NAME);
             if ( name==null ) name="data";
@@ -61,7 +67,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
             dep0name=null;
             if ( dep0!=null ) {
                 dep0name = (String) dep0.property(QDataSet.NAME);
-                if ( name==null ) dep0name="dep0";
+                if ( dep0name==null ) dep0name="dep0";
 
                 dim = new Dimension(dep0name, n, true, true, false);
 
@@ -81,7 +87,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
             ncfile.addVariable(null, var);
 
         } catch (Throwable t) {
-            t.printStackTrace();
+            logger.log( Level.WARNING, t.getMessage(), t );
             throw new IOException("APIOSP.open() failed: "+t.getMessage()); //, t);
         }
 
@@ -90,18 +96,14 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
 
 
     public Array readData(Variable variable, Section section) throws IOException, InvalidRangeException {
-        String vname = variable.getName();
+        
         DataType type = variable.getDataType();
 
-        double[] data = null;
+        double[] data;
         String[] sdata = null;
 
         Array array;
 
-        QDataSet co= result;
-        if ( vname.equals(dep0name) ) {
-            co= (QDataSet) result.property(QDataSet.DEPEND_0);
-        }
         //Construct the Array.
         if (type.isString()) {
             array = Array.factory(type, DataSetUtil.qubeDims(result), sdata);
