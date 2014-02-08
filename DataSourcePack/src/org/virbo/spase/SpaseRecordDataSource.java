@@ -306,11 +306,11 @@ public class SpaseRecordDataSource extends AbstractDataSource {
 
             Node n= document.getDocumentElement();
 
-            String localName= n.getNodeName();
-            int i= localName.indexOf(":");
-            if ( i>-1  ) {
-                localName= localName.substring(i+1);
-            }
+            //String localName= n.getNodeName();
+            //int i= localName.indexOf(":");
+            //if ( i>-1  ) {
+            //    localName= localName.substring(i+1);
+            //}
 
         } finally {
             in.close();
