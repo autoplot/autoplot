@@ -1419,7 +1419,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         return new DefaultTimeSpecImpl();
     }
 
-    public class DefaultTimeSpecImpl implements TimeSpec {
+    public static class DefaultTimeSpecImpl implements TimeSpec {
         double baseTime = JANUARY_1_1970;
         int baseTimeUnits = MILLISECOND_PRECISION;
         int offsetUnits = MILLISECOND_PRECISION;
