@@ -140,13 +140,13 @@ public class ScriptPanelSupport {
 
     public void loadFile(File file) throws IOException, FileNotFoundException {
         logger.log(Level.FINE, "loadFile({0})", file);
-        InputStream r= new FileInputStream(file);
-        loadInputStream( r );
+        loadFileInternal( file );
         setFile(file);
         setDirty(false);
     }
 
-    protected void loadInputStream( InputStream in ) throws IOException {
+    protected void loadFileInternal( File file ) throws IOException {
+        InputStream in= new FileInputStream(file);
         BufferedReader r = null;
         final StringBuilder buf= new StringBuilder();
         try {
