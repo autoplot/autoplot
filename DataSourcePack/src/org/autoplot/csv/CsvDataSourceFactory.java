@@ -13,16 +13,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Factory for producing comma separated values file sources.
  * @author jbf
  */
 public class CsvDataSourceFactory implements DataSourceFactory {
@@ -79,10 +77,12 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         File f = DataSetURI.getFile(cc.resourceURI, mon);
 
         FileReader fr= new FileReader(f);
-        CsvReader reader= new CsvReader( fr );
+        CsvReader reader= null;
 
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         try {
+            reader= new CsvReader( fr );
+
             String[] columns;
             if ( reader.readHeaders() ) {
                 //int ncol= reader.getHeaderCount();
@@ -105,7 +105,7 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                         label, null ) ) ;
             }
         } finally {
-            reader.close();
+            if ( reader!=null ) reader.close();
             fr.close();
         }
         
