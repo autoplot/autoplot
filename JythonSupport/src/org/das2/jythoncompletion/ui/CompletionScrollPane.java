@@ -188,7 +188,7 @@ public class CompletionScrollPane extends JScrollPane {
             TextUI ui = component.getUI();
             Keymap km = component.getKeymap();
             if (ui != null && km != null) {
-                EditorKit kit = ui.getEditorKit(component);
+                //EditorKit kit = ui.getEditorKit(component);
                /* if (kit instanceof BaseKit) {
                     Action a = ((BaseKit)kit).getActionByName(editorActionName);
                     if (a != null) {
