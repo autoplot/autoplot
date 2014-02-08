@@ -50,7 +50,7 @@ import org.virbo.datasource.ui.TableRowHeader;
  */
 public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
-    private static final Logger logger= LoggerManager.getLogger("apdss");
+    private static final Logger logger= LoggerManager.getLogger("apdss.xls");
     
     HSSFWorkbook wb;
     Map<Integer, String> columns;
@@ -72,6 +72,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         params = URISplit.parseParams(split.params);
 
         File f = DataSetURI.getFile(new URL(split.file), mon );
+        logger.log( Level.FINEST, "got file {0}", f);
         return true;
     }
 
@@ -453,12 +454,6 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
             maybeInitializeWorkBook();
 
-            List<String> result = new ArrayList<String>();
-            for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-                String s = wb.getSheetName(i);
-                result.add(s);
-            }
-
             HSSFSheet lsheet = wb.getSheet(string);
             this.jTable1.setModel(new SVTableModel(lsheet));
 
@@ -474,10 +469,10 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     }
 
 private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_sheetComboBoxItemStateChanged
-    final String sheet = (String) sheetComboBox.getSelectedItem();
-    params.put(PROP_SHEET, sheet);
-    setSheet(sheet);
-    resetSheet(sheet);
+    final String sheet1 = (String) sheetComboBox.getSelectedItem();
+    params.put(PROP_SHEET, sheet1);
+    setSheet(sheet1);
+    resetSheet(sheet1);
 }//GEN-LAST:event_sheetComboBoxItemStateChanged
 
 private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
