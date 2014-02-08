@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -279,13 +280,30 @@ public class Util {
         try {
             DataSourceUtil.transfer(chin, chout);
         } finally {
-            if ( chout.isOpen() ) chout.close();
-            if ( chin.isOpen() ) chin.close();
+            closeResources( chout, chin );
         }
 
         String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
         QDataSet ds= getDataSet(virtUrl,mon);
         return ds;
+    }
+    
+    /**
+     * encapsulate the logic that cleanly closes both channels.  
+     * This is an experiment to see if this satifies findbugs OBL_UNSATISFIED_OBLIGATION
+     * @param ch1
+     * @param ch2 
+     */
+    private static void closeResources( Channel chout, Channel chin ) throws IOException {
+        if ( chout!=null && chout.isOpen() ) {
+            try { 
+                chout.close(); 
+            } finally {
+                if ( chin!=null && chin.isOpen() ) chin.close();
+            }
+        } else {
+            if ( chin!=null && chin.isOpen() ) chin.close();
+        }        
     }
 //
 //    /**
