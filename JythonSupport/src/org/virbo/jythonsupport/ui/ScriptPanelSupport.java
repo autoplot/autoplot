@@ -127,9 +127,8 @@ public class ScriptPanelSupport {
             saveAs();
             return;
         }
-        OutputStream out = null;
+        OutputStream out = new FileOutputStream(file);
         try {
-            out = new FileOutputStream(file);
             String text = editor.getText();
             out.write(text.getBytes());
             setDirty(false);
