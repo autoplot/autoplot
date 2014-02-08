@@ -1276,7 +1276,6 @@ public class DataSetURI {
 
     public static List<CompletionResult> getFileSystemAggCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
-        String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
 
         mon.setLabel("getting remote listing");
@@ -1289,11 +1288,6 @@ public class DataSetURI {
         s = fs.listDirectory("/");
 
         Arrays.sort(s);
-
-        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(FileSystem.PROP_CASE_INSENSITIVE));
-        if (foldCase) {
-            prefix = prefix.toLowerCase();
-        }
 
         List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(5);
 
