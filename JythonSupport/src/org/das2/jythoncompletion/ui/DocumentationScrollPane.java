@@ -460,7 +460,7 @@ public class DocumentationScrollPane extends JScrollPane {
 
     }
 
-    private class BrowserButton extends JButton {
+    private static class BrowserButton extends JButton {
 
         public BrowserButton() {
             setBorderPainted(false);
@@ -540,7 +540,7 @@ public class DocumentationScrollPane extends JScrollPane {
         }
     }
 
-    private class DefaultDoc implements CompletionDocumentation {
+    private static class DefaultDoc implements CompletionDocumentation {
 
         private URL url = null;
 

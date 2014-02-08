@@ -242,7 +242,7 @@ public class CompletionJList extends JList {
         }
     }
 
-    private final class Model extends AbstractListModel {
+    private static final class Model extends AbstractListModel {
 
         List data;
 
