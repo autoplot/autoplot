@@ -1729,9 +1729,10 @@ public class PlotElementController extends DomNodeController {
 
             if ( plotElement.getComponent().equals("") && plotElement.isAutoLabel() ) plotElement.setLegendLabelAutomatically( peleCopy.getLegendLabel() );
 
-            peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
-            peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
-            peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
+            // bugfix1157: the autorange property has a meaning now, and it is set for each plot element.
+            //peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
+            //peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
+            //peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
 
             if ( logger.isLoggable(Level.FINER) ) {
                 logger.finer( String.format( "done, autorange  x:%s, y:%s ",
@@ -2020,7 +2021,6 @@ public class PlotElementController extends DomNodeController {
                 label=  (String) qube.slice(1).property( QDataSet.LABEL );
                 peleCopy.getPlotDefaults().getYaxis().setLabel( label==null ? "" : label );
                 peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
-                
             }
 
         } else if ( spec==RenderType.digital ) {
@@ -2030,6 +2030,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.contour ) {
             QDataSet qube= ContoursRenderer.doAutorange( fillDs );
@@ -2038,6 +2039,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.eventsBar ) {
             QDataSet qube= EventsRenderer.doAutorange( fillDs );
@@ -2046,6 +2048,8 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setAutoRange(false);
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.vectorPlot ) { //TODO: this should be discoverable
             QDataSet qube= VectorPlotRenderer.doAutorange( fillDs );
@@ -2054,6 +2058,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.orbitPlot ) { 
             QDataSet qube= TickCurveRenderer.doAutorange( fillDs );
@@ -2062,6 +2067,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.image ) {
             QDataSet qube= RGBImageRenderer.doAutorange( fillDs );
@@ -2070,6 +2076,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }       
         } else if ( spec==RenderType.hugeScatter ) {
             QDataSet qube= ImageVectorDataSetRenderer.doAutorange( fillDs );
@@ -2078,6 +2085,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
 
         } else {
@@ -2151,8 +2159,11 @@ public class PlotElementController extends DomNodeController {
                 }
                  
 
+            } else {
+                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
 
+            //TODO: this cheesy old code needs to be addressed sometime, perhaps introducing more nodes under plot defaults
             if (fillDs.length() > LARGE_DATASET_COUNT) {
                 peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
                 peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
