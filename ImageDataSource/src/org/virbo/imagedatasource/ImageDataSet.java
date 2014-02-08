@@ -26,7 +26,7 @@ public class ImageDataSet extends AbstractDataSet {
         double value( int rgb );
     }
 
-    private class ChannelColorOp implements ColorOp {
+    private static class ChannelColorOp implements ColorOp {
         int mask;
         int rot;
         ChannelColorOp( int mask, int rot ) {
