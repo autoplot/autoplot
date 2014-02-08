@@ -30,8 +30,10 @@ public class CsvDataSourceFormat implements DataSourceFormat {
         URISplit split = URISplit.parse( uri );
         File f= new File( split.resourceUri );
         FileWriter fw= new FileWriter(f);
-        CsvWriter writer= new CsvWriter( fw, ',' );
+        CsvWriter writer= null;
         try {
+            writer= new CsvWriter( fw, ',' );
+            
             writer.setForceQualifier(true);
             writer.setUseTextQualifier(true);  // force quotes on header
 
@@ -127,7 +129,7 @@ public class CsvDataSourceFormat implements DataSourceFormat {
                 writer.writeRecord(values);
             }
         } finally {
-            writer.close();
+            if ( writer!=null ) writer.close();
             fw.close();
         }
     }
