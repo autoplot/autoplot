@@ -40,17 +40,22 @@ public class EmbedDataExperiment {
     
     private static void writeToZip( ZipOutputStream out, String name, File f ) throws FileNotFoundException, IOException {
         ZipEntry e= new ZipEntry( name ) ;
-        FileChannel ic = new FileInputStream(f).getChannel();
-        out.putNextEntry(e);
-        
-        byte[] bbuf= new byte[2048];
-        ByteBuffer buf= ByteBuffer.wrap(bbuf);
-        int c;
-        while ( (c=ic.read(buf))>0 ) {
-            out.write( bbuf, 0, c);
-            buf.flip();
+        FileChannel ic=null;
+        try {
+            ic = new FileInputStream(f).getChannel();
+            out.putNextEntry(e);
+
+            byte[] bbuf= new byte[2048];
+            ByteBuffer buf= ByteBuffer.wrap(bbuf);
+            int c;
+            while ( (c=ic.read(buf))>0 ) {
+                out.write( bbuf, 0, c);
+                buf.flip();
+            }
+            out.closeEntry();
+        } finally {
+            if ( ic!=null ) ic.close();
         }
-        out.closeEntry();
     }
     
     public static class NoCloseOutputStream extends OutputStream {
