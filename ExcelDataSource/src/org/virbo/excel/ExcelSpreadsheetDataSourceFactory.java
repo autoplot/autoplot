@@ -75,8 +75,13 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     private HSSFWorkbook getWorkbook(URI uri, ProgressMonitor mon) throws IOException {
         File file = DataSetURI.getFile(uri, mon);
         InputStream in = new FileInputStream(file);
-        POIFSFileSystem fs = new POIFSFileSystem(in);
-        HSSFWorkbook wb = new HSSFWorkbook(fs);
+        HSSFWorkbook wb=null;
+        try {
+            POIFSFileSystem fs = new POIFSFileSystem(in);
+            wb = new HSSFWorkbook(fs);
+        } finally {
+            in.close();
+        }
         return wb;
     }
 
