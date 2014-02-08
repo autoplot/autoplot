@@ -49,7 +49,8 @@ public class PlotElement extends DomNode {
     }
     
     /**
-     * preferred settings for the element.
+     * preferred settings for the element.  autoRange property of 
+     * each axis will indicate if they care about this setting.
      */
     protected Plot plotDefaults = new Plot();
     public static final String PROP_PLOT_DEFAULTS = "plotDefaults";
