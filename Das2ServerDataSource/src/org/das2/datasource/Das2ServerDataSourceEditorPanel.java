@@ -537,7 +537,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return result;
     }
     
-    private class IconCellRenderer implements ListCellRenderer {
+    private static class IconCellRenderer implements ListCellRenderer {
         DefaultListCellRenderer r= new DefaultListCellRenderer();
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
