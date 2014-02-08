@@ -28,6 +28,7 @@ import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -280,7 +281,7 @@ public class Util {
         try {
             DataSourceUtil.transfer(chin, chout);
         } finally {
-            closeResources( chout, chin );
+            FileSystemUtil.closeResources( chout, chin );
         }
 
         String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
@@ -288,23 +289,6 @@ public class Util {
         return ds;
     }
     
-    /**
-     * encapsulate the logic that cleanly closes both channels.  
-     * This is an experiment to see if this satifies findbugs OBL_UNSATISFIED_OBLIGATION
-     * @param ch1
-     * @param ch2 
-     */
-    private static void closeResources( Channel chout, Channel chin ) throws IOException {
-        if ( chout!=null && chout.isOpen() ) {
-            try { 
-                chout.close(); 
-            } finally {
-                if ( chin!=null && chin.isOpen() ) chin.close();
-            }
-        } else {
-            if ( chin!=null && chin.isOpen() ) chin.close();
-        }        
-    }
 //
 //    /**
 //     *
