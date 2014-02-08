@@ -490,18 +490,27 @@ public class PlotController extends DomNodeController {
     /**
      * introduced when a linear digitized trace was put on top of a log spectrogram.
      * We need to be more sophistocated about how we resolve the two.
-     * @param a1
-     * @param a2
+     * Axes that have autorange=false indicate that they do not care about this 
+     * dimension.
+     * @param a1 an axis with range, log, and autoRange properties.
+     * @param a2 an axis with range, log, and autoRange properties.
      * @return
      */
     private Axis resolveSettings( Axis a1, Axis a2 ) {
-        Axis result= new Axis();
+        Axis result;
+        if ( !a1.isAutoRange() && a2.isAutoRange() ) {
+            return a2;
+        } else if ( !a2.isAutoRange() && a1.isAutoRange() ) {
+            return a1;
+        }
+        result = new Axis();
         result.range = DatumRangeUtil.union( a1.range, a2.range );
         if ( a1.log==a2.log ) {
             result.log= a1.log;
         } else {
             result.log= result.range.min().doubleValue(result.range.getUnits()) > 0;
         }
+        result.autoRange= a1.autoRange && a2.isAutoRange();
         return result;
     }
     
