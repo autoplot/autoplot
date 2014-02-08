@@ -276,17 +276,22 @@ public class Util {
         File f= File.createTempFile("autoplot", "."+ext );
 
         ReadableByteChannel chin= Channels.newChannel(in);
-        WritableByteChannel chout= new FileOutputStream(f).getChannel();
-        
         try {
-            DataSourceUtil.transfer(chin, chout);
-        } finally {
-            FileSystemUtil.closeResources( chout, chin );
-        }
+            WritableByteChannel chout= new FileOutputStream(f).getChannel();
+        
+            try {
+                DataSourceUtil.transfer(chin, chout);
+            } finally {
+                chout.close();
+            }
 
-        String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
-        QDataSet ds= getDataSet(virtUrl,mon);
-        return ds;
+            String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
+            QDataSet ds= getDataSet(virtUrl,mon);
+            return ds;
+            
+        } finally {
+            chin.close();
+        }
     }
     
 //
