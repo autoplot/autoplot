@@ -8,9 +8,12 @@ package org.virbo.datasource;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -20,8 +23,12 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
     public String uri;
     DatumRange timeRange;
-
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss.util");
+    
+    @Override
     public void setURI(String suri) throws ParseException {
+        logger.log(Level.FINE, "setURI {0}", suri );
         this.uri= suri;
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -31,12 +38,14 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         }
     }
 
+    @Override
     public String getURI() {
         return this.uri;
     }
 
     @Override
     public void setTimeRange(DatumRange dr) {
+        logger.log(Level.FINE, "setTimeRange {0}", dr);
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         params.put( URISplit.PARAM_TIME_RANGE, dr.toString().replaceAll(" ","+"));
@@ -55,6 +64,7 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
 
     @Override
     public void setTimeResolution(Datum d) {
+        logger.log(Level.FINE, "setTimeResolution {0} ignores resolution", d );
         // do nothing
     }
 
@@ -76,6 +86,7 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         }
         try {
             DatumRange dr= DatumRangeUtil.parseTimeRange(timeRange);
+            logger.log(Level.FINEST, "timeRange parses to {0}", dr);
         } catch ( ParseException ex ) {
             problems.add( TimeSeriesBrowse.PROB_PARSE_ERROR_IN_TIMERANGE);
             return true;
