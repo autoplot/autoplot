@@ -1642,15 +1642,10 @@ public class DataSetURI {
     public static List<CompletionResult> getTypesCompletions( String surl, int carotpos, ProgressMonitor mon) throws Exception {
 
         List<String> dexts= getDiscoverableExtensions();
-        List<CompletionContext> exts= DataSourceRegistry.getPlugins();
 
         List<CompletionResult> completions = new ArrayList();
 
         String prefix= surl.substring(0,carotpos);
-        String suffix = "";
-        if ( surl.startsWith("vap:") ) {
-            suffix= surl.substring( 4 );
-        }
 
         for ( String ext: dexts ) {
             String vapext= "vap+"+ext.substring(1);
