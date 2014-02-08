@@ -1,6 +1,5 @@
 package test;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -84,7 +83,7 @@ public class PdfUnicodeTextImageTest
         contentbytes.addTemplate(template, 0, 0);
     }
 
-    class StringPainter extends JComponent
+    private static class StringPainter extends JComponent
     {
         private Font font;
 
