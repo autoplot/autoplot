@@ -125,8 +125,6 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         s= (String) typeComboBox.getSelectedItem();
         if ( !s.equals("double") ) args.put( "type", s );
 
-        String sargs= URISplit.formatParams(args);
-
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
