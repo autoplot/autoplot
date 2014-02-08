@@ -148,8 +148,11 @@ public class EmbedDataExperiment {
             StatePersistence.saveState( new NoCloseOutputStream(out), dom, "" );
         } finally {
             if ( out!=null ) {
-                out.closeEntry();
-                out.close();
+                try {
+                    out.closeEntry();
+                } finally {
+                    out.close();
+                }
             }
             fout.close();
         }
