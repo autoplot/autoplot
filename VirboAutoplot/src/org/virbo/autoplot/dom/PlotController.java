@@ -1050,15 +1050,13 @@ public class PlotController extends DomNodeController {
             }
             this.plotElement= p;
             this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
-            if ( pele==null || defaults.getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
+            if ( true ) {   // bugfix 1157: simplify logic, was: if ( pele==null || defaults.getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
                 if ( defaults!=null ) {
                     if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( defaults.getTitle() );
-                    if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( defaults.getXaxis().getLabel() );
-                    if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( defaults.getYaxis().getLabel() );
-                    if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( defaults.getZaxis().getLabel() );
-                    if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
-                        plot.setIsotropic( defaults.isIsotropic() );
-                    }
+                    if ( plot.getXaxis().isAutoLabel() && defaults.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( defaults.getXaxis().getLabel() );
+                    if ( plot.getYaxis().isAutoLabel() && defaults.getYaxis().isAutoLabel() ) plot.getYaxis().getController().setLabelAutomatically( defaults.getYaxis().getLabel() );
+                    if ( plot.getZaxis().isAutoLabel() && defaults.getZaxis().isAutoLabel() ) plot.getZaxis().getController().setLabelAutomatically( defaults.getZaxis().getLabel() );
+                    if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() )  plot.setIsotropic( defaults.isIsotropic() );
                 } else {
                     if ( plot.isAutoLabel() ) plot.getController().setTitleAutomatically( p.getPlotDefaults().getTitle() ); // stack of traces
                     if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().getController().setLabelAutomatically( "" );
