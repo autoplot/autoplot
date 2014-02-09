@@ -558,42 +558,40 @@ public class PlotController extends DomNodeController {
         boolean warnedAboutUnits= false;
         for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
-            if ( plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
-                if (newSettings == null) {
-                    newSettings = (Plot) plot1.copy();
-                } else {
-                    try {
-                        newSettings.xaxis= resolveSettings( newSettings.xaxis,plot1.getXaxis() );
-                    } catch ( InconvertibleUnitsException ex ) {
-                        if ( !warnedAboutUnits ) {
-                            logger.log( Level.FINE, "plot elements on the same xaxis have inconsistent units: {0} {1}",
-                                    new Object[]{newSettings.xaxis.range.getUnits().toString(), plot1.getXaxis().getRange().getUnits().toString()});
-                            warnedAboutUnits= true;
-                        }
-                    }
-                    try {
-                        newSettings.yaxis= resolveSettings( newSettings.yaxis, plot1.getYaxis() );
-                    } catch ( InconvertibleUnitsException ex ) {
-                        if ( !warnedAboutUnits ) {
-                            logger.log( Level.FINE, "plot elements on the same yaxis have inconsistent units: {0} {1}",
-                                    new Object[]{newSettings.yaxis.range.getUnits().toString(), plot1.getYaxis().getRange().getUnits().toString()});
-                            warnedAboutUnits= true;
-                        }
-                    }
-                    try {
-                        newSettings.zaxis= resolveSettings( newSettings.zaxis, plot1.getZaxis() );
-                    } catch ( InconvertibleUnitsException ex ) {
-                        if ( !warnedAboutUnits ) {
-                            logger.log( Level.FINE, "plot elements on the same zaxis have inconsistent units: {0} {1}",
-                                    new Object[]{newSettings.zaxis.range.getUnits().toString(), plot1.getZaxis().getRange().getUnits().toString()});
-                            warnedAboutUnits= true;
-                        }
+            if (newSettings == null) {
+                newSettings = (Plot) plot1.copy();
+            } else {
+                try {
+                    newSettings.xaxis= resolveSettings( newSettings.xaxis,plot1.getXaxis() );
+                } catch ( InconvertibleUnitsException ex ) {
+                    if ( !warnedAboutUnits ) {
+                        logger.log( Level.FINE, "plot elements on the same xaxis have inconsistent units: {0} {1}",
+                                new Object[]{newSettings.xaxis.range.getUnits().toString(), plot1.getXaxis().getRange().getUnits().toString()});
+                        warnedAboutUnits= true;
                     }
                 }
-                DataSourceFilter dsf= this.dom.controller.getDataSourceFilterFor(p);
-                if ( dsf!=null && dsf.getController()!=null && dsf.getController().tsb!=null ) {
-                    haveTsb= true;
+                try {
+                    newSettings.yaxis= resolveSettings( newSettings.yaxis, plot1.getYaxis() );
+                } catch ( InconvertibleUnitsException ex ) {
+                    if ( !warnedAboutUnits ) {
+                        logger.log( Level.FINE, "plot elements on the same yaxis have inconsistent units: {0} {1}",
+                                new Object[]{newSettings.yaxis.range.getUnits().toString(), plot1.getYaxis().getRange().getUnits().toString()});
+                        warnedAboutUnits= true;
+                    }
                 }
+                try {
+                    newSettings.zaxis= resolveSettings( newSettings.zaxis, plot1.getZaxis() );
+                } catch ( InconvertibleUnitsException ex ) {
+                    if ( !warnedAboutUnits ) {
+                        logger.log( Level.FINE, "plot elements on the same zaxis have inconsistent units: {0} {1}",
+                                new Object[]{newSettings.zaxis.range.getUnits().toString(), plot1.getZaxis().getRange().getUnits().toString()});
+                        warnedAboutUnits= true;
+                    }
+                }
+            }
+            DataSourceFilter dsf= this.dom.controller.getDataSourceFilterFor(p);
+            if ( dsf!=null && dsf.getController()!=null && dsf.getController().tsb!=null ) {
+                haveTsb= true;
             }
         }
         
@@ -1074,8 +1072,8 @@ public class PlotController extends DomNodeController {
             //System.err.println("should this happen?  see bug 2992903");
         }
 
-        if ( ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) && dom.getOptions().isAutoranging() ) {
-            resetZoom( plot.getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
+        if ( dom.getOptions().isAutoranging() ) {
+            resetZoom( plot.getXaxis().isAutoRange() && pele!=null && pele.getPlotDefaults().getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
         }
     }
 
