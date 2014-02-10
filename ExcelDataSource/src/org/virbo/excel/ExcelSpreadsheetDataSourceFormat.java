@@ -135,7 +135,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             cell.setCellValue( new HSSFRichTextString( (l == null ? "data" : l) ) );
         }
 
-        Units u0 = null;
+        Units u0 = Units.dimensionless;
         if (dep0 != null) {
             u0 = (Units) dep0.property(QDataSet.UNITS);
             if (u0 == null) {
@@ -185,7 +185,6 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
     
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
 	URISplit split= URISplit.parse(uri);
-        java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
         FileOutputStream out = new FileOutputStream( new File( split.resourceUri ) );
         try {
