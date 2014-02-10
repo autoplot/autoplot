@@ -277,12 +277,12 @@ public class Util {
 
         ReadableByteChannel chin= Channels.newChannel(in);
         try {
-            WritableByteChannel chout= new FileOutputStream(f).getChannel();
-        
+            FileOutputStream fout= new FileOutputStream(f);    
             try {
+                WritableByteChannel chout= fout.getChannel();
                 DataSourceUtil.transfer(chin, chout);
             } finally {
-                chout.close();
+                fout.close();
             }
 
             String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
