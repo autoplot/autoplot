@@ -72,11 +72,10 @@ public class Das2StreamDataSourceFormatEditorPanel extends javax.swing.JPanel im
     }
 
     public void setURI(String uri) {
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> args= URISplit.parseParams(split.params);
+        URISplit lsplit= URISplit.parse(uri);
         String type= URISplit.getParam( uri, "type", "ascii" );
         typeComboBox.setSelectedItem( type );
-        this.split= split;
+        this.split= lsplit;
     }
 
     public String getURI() {
