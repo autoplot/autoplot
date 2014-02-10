@@ -822,9 +822,12 @@ public class FtpBean
             out.seek(restart);
             readData(reader, out, observer);
 
-            if (reader!=null ) { reader.close(); reader=null; }
-            if ( out!=null ) { out.close(); out=null; }
-            if ( sock!=null ) { sock.close(); sock=null; }
+            reader.close();
+            reader=null;
+            out.close(); 
+            out=null;
+            sock.close(); 
+            sock=null;
 
             getRespond(CMD_RETR);
         } finally
