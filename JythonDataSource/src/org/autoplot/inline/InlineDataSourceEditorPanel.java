@@ -227,17 +227,17 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     ss[i]= (String)tm.getValueAt(i,0);
                 }
             }
-            String sval= tfs[0].getText();
+            StringBuilder sval= new StringBuilder(tfs[0].getText());
             for ( int i=1; i<tm.getColumnCount(); i++ ) {
-                sval+= "," + tfs[i].getText();
+                sval.append(",").append(tfs[i].getText());
             }
             if ( tm.getColumnCount()>1 ) {
-                ss[tm.getRowCount()]= sval;
+                ss[tm.getRowCount()]= sval.toString();
                 
                 tm= toTableModel( DataSourceUtil.strjoin( Arrays.asList(ss), ";" ), 2 );
                 
             } else {
-                ss[tm.getRowCount()]= sval;
+                ss[tm.getRowCount()]= sval.toString();
                 tm= toTableModel(ss);
             }
             table.setModel( tm );
