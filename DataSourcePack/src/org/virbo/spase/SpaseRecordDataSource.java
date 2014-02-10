@@ -304,7 +304,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
             InputSource source = new InputSource( in );
             document = builder.parse(source);
 
-            Node n= document.getDocumentElement();
+            //Node n= document.getDocumentElement();
 
             //String localName= n.getNodeName();
             //int i= localName.indexOf(":");
