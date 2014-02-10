@@ -21,7 +21,6 @@ import java.awt.image.Kernel;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -309,8 +308,6 @@ class ImageDataSource extends AbstractDataSource {
 
             File f = DataSetURI.getFile(uri, new NullProgressMonitor());
 
-            Map<String, Object> map = new HashMap<String, Object>();
-
             ImageReader jpegImageReader = ImageIO.getImageReadersByFormatName(ext.substring(1)).next();
             ImageInputStream imageInputStream = ImageIO.createImageInputStream(f);
             boolean seekForwardOnly = true;
@@ -321,6 +318,7 @@ class ImageDataSource extends AbstractDataSource {
 
             Node metaDataRoot = imageMetadata.getAsTree(imageMetadata.getNativeMetadataFormatName());
 
+            Map<String, Object> map;
             map = MetadataUtil.toMetaTree(metaDataRoot);
 
             return map;
