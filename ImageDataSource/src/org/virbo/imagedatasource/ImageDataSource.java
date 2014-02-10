@@ -271,24 +271,21 @@ class ImageDataSource extends AbstractDataSource {
 
         exifDirectory = metadata.getDirectory(ExifSubIFDDirectory.class);
         if ( exifDirectory!=null ) {
-            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
-                Tag t = (Tag) i.next();
+            for (Tag t : exifDirectory.getTags()) {
                 map.put(t.getTagName(), t.getDescription());
             }
         }
 
         exifDirectory = metadata.getDirectory(ExifIFD0Directory.class);
         if ( exifDirectory!=null ) {
-            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
-                Tag t = (Tag) i.next();
+            for (Tag t : exifDirectory.getTags()) {
                 map.put(t.getTagName(), t.getDescription());
             }
         }
 
         exifDirectory = metadata.getDirectory(GpsDirectory.class);
         if ( exifDirectory!=null ) {
-            for (Iterator i = exifDirectory.getTags().iterator(); i.hasNext();) {
-                Tag t = (Tag) i.next();
+            for (Tag t : exifDirectory.getTags()) {
                 map.put(t.getTagName(), t.getDescription());
             }
         }
