@@ -62,6 +62,8 @@ import org.xml.sax.SAXException;
  */
 class TsdsDataSource extends AbstractDataSource {
 
+    private static final Logger logger = LoggerManager.getLogger("apdss.tsds");
+
     long t0 = System.currentTimeMillis();
 
     public TsdsDataSource(URI uri) {
@@ -132,9 +134,8 @@ class TsdsDataSource extends AbstractDataSource {
      */
     int currentPpd = -1;
     private static final int SIZE_DOUBLE = 8;
-    private static final Logger logger = LoggerManager.getLogger("apdss.tsds");
+
     Document initialDocument;
-    DatumRange parameterRange = null; // extent of the parameter.
     int parameterPpd = -1; // max resolution of the parameter.
     boolean haveInitialTsml = false;
     Exception exceptionFromConstruct = null;
@@ -157,7 +158,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
         double resdays = resolution.doubleValue(Units.days);
         double dppd = 1 / resdays;
-        int ppd = ppds[ppds.length - 1];
+        int ppd;
         for (int i = 0; i < ppds.length && ppds[i] <= parameterPpd; i++) {
             if (ppds[i] > dppd) {
                 ppd = ppds[i];
@@ -175,13 +176,7 @@ class TsdsDataSource extends AbstractDataSource {
         if ( str==null ) {
             DatumRange dr0,dr1;
             if ( params2.isEmpty() ) { // this should be rejected now.  I'll delete this after Bob confirms that support for this can be removed.
-                String suri= uri.toString();
-                int i= suri.indexOf("to_");
-                String sto= suri.substring(i+3,i+11);
-                i= suri.indexOf("tf_");
-                String stf= suri.substring(i+3,i+11);
-                dr0 = DatumRangeUtil.parseTimeRangeValid(sto);
-                dr1 = DatumRangeUtil.parseTimeRangeValid(stf);
+                logger.warning("should no longer enter this block.");
             } else {
                 String start= params2.get("StartDate");
                 if ( start!=null ) {
@@ -214,7 +209,6 @@ class TsdsDataSource extends AbstractDataSource {
             }
             resolution = Units.days.createDatum(1.0).divide(currentPpd);
         } else {
-            ppd = -1;
             currentPpd = -1;
             resolution = null;
         }
@@ -464,42 +458,37 @@ class TsdsDataSource extends AbstractDataSource {
         }
     }
 
-
-    /**
-     * do the initial settings.
-     * @param in
-     * @throws javax.xml.parsers.ParserConfigurationException
-     * @throws java.io.IOException
-     * @throws org.xml.sax.SAXException
-     */
-    private void initialNcml(InputStream in) throws ParserConfigurationException, IOException, SAXException {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource source = new InputSource(in);
-            initialDocument = builder.parse(source);
-            in.close();
-
-            XPathFactory factory = XPathFactory.newInstance();
-            XPath xpath = factory.newXPath();
-
-            String sStartTime = xpath.evaluate("//netcdf/StartDate/text()", initialDocument);
-            String sEndTime = xpath.evaluate("//netcdf/EndDate/text()", initialDocument);
-
-            String sppd = xpath.evaluate("//netcdf/IntervalsPerDay/text()", initialDocument);
-
-            int ppd = Integer.parseInt(sppd);
-            parameterPpd = ppd;
-
-            DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(sStartTime);
-            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(sEndTime);
-
-            parameterRange = new DatumRange(dr0.min(), dr1.max());
-
-        } catch (XPathExpressionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
-    }
+//
+//    /**
+//     * do the initial settings.
+//     * @param in
+//     * @throws javax.xml.parsers.ParserConfigurationException
+//     * @throws java.io.IOException
+//     * @throws org.xml.sax.SAXException
+//     */
+//    private void initialNcml(InputStream in) throws ParserConfigurationException, IOException, SAXException {
+//        try {
+//            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//            InputSource source = new InputSource(in);
+//            initialDocument = builder.parse(source);
+//            in.close();
+//
+//            XPathFactory factory = XPathFactory.newInstance();
+//            XPath xpath = factory.newXPath();
+//
+//            String sStartTime = xpath.evaluate("//netcdf/StartDate/text()", initialDocument);
+//            String sEndTime = xpath.evaluate("//netcdf/EndDate/text()", initialDocument);
+//
+//            String sppd = xpath.evaluate("//netcdf/IntervalsPerDay/text()", initialDocument);
+//
+//            int ppd = Integer.parseInt(sppd);
+//            parameterPpd = ppd;
+//
+//        } catch (XPathExpressionException ex) {
+//            logger.log(Level.SEVERE, ex.getMessage(), ex);
+//        }
+//
+//    }
 
     /**
      * do the initial settings.
@@ -532,7 +521,6 @@ class TsdsDataSource extends AbstractDataSource {
             if ( hasEndDate==false ) {
                 timeRange= new DatumRange( dr0.min(), dr1.max() );
             }
-            parameterRange = new DatumRange(dr0.min(), dr1.max());
 
         } catch (XPathExpressionException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
