@@ -129,8 +129,6 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         s= (String) endianComboBox.getSelectedItem();
         if ( !s.equals("little") ) args.put( "byteOrder", s );
 
-        String sargs= URISplit.formatParams(args);
-
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
