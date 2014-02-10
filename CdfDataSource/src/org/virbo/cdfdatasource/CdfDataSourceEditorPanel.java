@@ -118,6 +118,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         jSplitPane2.setLeftComponent(jScrollPane3);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced"));
+        jPanel3.setMaximumSize(new java.awt.Dimension(300, 32767));
 
         jLabel3.setText("Load subset of the data:");
         jLabel3.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
