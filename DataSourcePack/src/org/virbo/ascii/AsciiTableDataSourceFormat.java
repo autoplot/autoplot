@@ -154,10 +154,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     }
     
     private void formatBundleDesc(PrintWriter out, QDataSet bds, QDataSet bundleDesc ) throws JSONException {
-        QDataSet dep0=null;
-        if ( bds!=null ) {
-            dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
-        }
+        
+        assert bds!=null;
+        
+        QDataSet dep0;
+        dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
 
         JSONObject jo= new JSONObject();
         JSONObject jo1= new JSONObject();
