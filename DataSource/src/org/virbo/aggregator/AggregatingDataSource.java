@@ -514,7 +514,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 }
 
             }
-            cacheRange = cacheRange1;
 
             mon.finished();
 
@@ -639,13 +638,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
         propertyChangeSupport.firePropertyChange("resolution", old, resolution);
     }
 
-
-
-    /**
-     * this is the range of files that was loaded, based on the granularity of the
-     * delegate.  This is used to calculate the new URL.
-     */
-    private DatumRange cacheRange = null;
     /**
      * Utility field used by bound properties.
      */
