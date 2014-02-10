@@ -344,26 +344,15 @@ public class GuiSupport {
                 DasPlot p= pe.getController().getDasPlot();
                 DatumRange xbounds= p.getXAxis().getDatumRange();
                 QDataSet dsout=  pe.getController().getDataSet();
-                if ( dsf.getController().getTsb()!=null ) {
-                    //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
-                    long t0= System.currentTimeMillis();
-                    if ( SemanticOps.isRank2Waveform(dsout) ) {
-                        dsout= DataSetOps.flattenWaveform(dsout);
-                        //dsout= ArrayDataSet.copy( dsout );
-                    }
-                    dsout= SemanticOps.trim( dsout, xbounds, null );
-                    format.formatData( uriOut, dsout, mon );
-                    logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
-                } else {
-                    long t0= System.currentTimeMillis();
-                    if ( SemanticOps.isRank2Waveform(dsout) ) { // TODO: rough trim first, then precise trim would be much faster.
-                        dsout= DataSetOps.flattenWaveform(dsout);
-                        //dsout= ArrayDataSet.copy( dsout );
-                    }
-                    dsout= SemanticOps.trim( dsout, xbounds, null );
-                    format.formatData( uriOut, dsout, mon );
-                    logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
+                //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                long t0= System.currentTimeMillis();
+                if ( SemanticOps.isRank2Waveform(dsout) ) {
+                    dsout= DataSetOps.flattenWaveform(dsout);
+                    //dsout= ArrayDataSet.copy( dsout );
                 }
+                dsout= SemanticOps.trim( dsout, xbounds, null );
+                format.formatData( uriOut, dsout, mon );
+                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
             } else if ( dscontrol.equals("plotElement") ) {
                 long t0= System.currentTimeMillis();
                 QDataSet dsout=  pe.getController().getDataSet();
