@@ -259,8 +259,12 @@ public class JythonUtil {
             } finally {
                 out.close();
                 in.close();
-                new File( ff3, s ).setReadOnly();
-                new File( ff3, s ).setWritable( true, true );
+                if ( new File( ff3, s ).setReadOnly()==false ) {
+                    logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                }
+                if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                    logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                }
             }
             s= r.readLine();
         }
@@ -317,8 +321,12 @@ public class JythonUtil {
                     out.close();
                     in.close();
                 }
-                new File( ff3, s ).setReadOnly();
-                new File( ff3, s ).setWritable( true, true );
+                if ( new File( ff3, s ).setReadOnly()==false ) {
+                    logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                }
+                if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                    logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                }
             }
         }
         logger.fine("   ...done");
