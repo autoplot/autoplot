@@ -270,6 +270,9 @@ public class ScreenshotsTool extends EventQueue {
             }
         }
 
+        if ( r==null ) {
+            throw new IllegalArgumentException("unable to find rectange");
+        }
         r= r.intersection(b);
         r.width= Math.max(0,r.width);
         r.height= Math.max(0,r.height);
@@ -529,12 +532,16 @@ public class ScreenshotsTool extends EventQueue {
         //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
-            file.createNewFile();
-            ImageIO.write(im, "png", file);
-            //long processTime= ( System.currentTimeMillis() - processTime0 );
-            //System.err.println(""+file+" created in "+processTime+"ms.");
+            if ( !file.createNewFile() ) {
+                logger.log(Level.WARNING, "failed to create new file {0}", file);
+            } else {
+                ImageIO.write(im, "png", file);
+                //long processTime= ( System.currentTimeMillis() - processTime0 );
+                //System.err.println(""+file+" created in "+processTime+"ms.");
+            }
 
         } catch ( Exception ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
 
         t0= System.currentTimeMillis();
@@ -561,6 +568,10 @@ public class ScreenshotsTool extends EventQueue {
         return reject;
     }
 
+    private static void setButton( int b ) {
+        button= b;
+    }
+    
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
 
@@ -598,11 +609,11 @@ public class ScreenshotsTool extends EventQueue {
             MouseEvent me= (MouseEvent)theEvent;
             if ( me.getModifiersEx()!=0 ) {
                 if ( ( me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
-                    button= MouseEvent.BUTTON1_DOWN_MASK;
+                    setButton( MouseEvent.BUTTON1_DOWN_MASK );
                 } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
-                    button= MouseEvent.BUTTON2_DOWN_MASK;
+                    setButton( MouseEvent.BUTTON2_DOWN_MASK );
                 } else if ( ( me.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
-                    button= MouseEvent.BUTTON3_DOWN_MASK;
+                    setButton( MouseEvent.BUTTON3_DOWN_MASK );
                 }
                 reject= false;
             } else {
