@@ -193,43 +193,13 @@ public abstract class Bookmark {
 
             // Copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
             // See if the URI is file-like, not containing query parameters, in which case we allow caching to occur.
-            try {
-                URI ruri= rurl.toURI();
-                URI parentUri= null; // FileSystemUtil.isCacheable( ruri );
-                if ( parentUri!=null ) {
-                    logger.fine("Using isCacheable route");
-                    FileSystem fd= FileSystem.create(parentUri);
-                    if ( fd instanceof WebFileSystem ) {
-                        offline= ((WebFileSystem)fd).isOffline();
-                    }
-                    logger.log(Level.FINE, "  offline: {0}", offline);
-                    FileObject fo= fd.getFileObject( parentUri.relativize(ruri).toString() );
-                    if ( !fo.exists() && fd.getFileObject( fo.getNameExt()+".gz" ).exists() ) {
-                        fo= fd.getFileObject( fo.getNameExt()+".gz" );
-                        in= new GZIPInputStream( fo.getInputStream() );
-                    } else {
-                        if ( remoteUrl.endsWith(".gz" ) ) {
-                            logger.fine("bookmarks stream is uncompressed because of .gz");
-                            in= new GZIPInputStream( fo.getInputStream() );
-                        } else {
-                            in= fo.getInputStream();
-                        }
-                    }
-
-                } else {
-                    logger.log(Level.FINE, "Using downloadResourceAsTempFile route.  Files are cached for up to 3600 seconds" );
-                    in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600, new NullProgressMonitor()) );
-                    if (  remoteUrl.endsWith(".gz" ) ) {
-                        logger.fine("bookmarks stream is uncompressed because of .gz");
-                        in= new GZIPInputStream( in );
-                    }
-                    logger.fine("  got it...");
-                }
-            } catch ( URISyntaxException ex ) {
-                logger.log(Level.FINE, "fall back to Using downloadResourceAsTempFile route: {0}", rurl);
-                in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600, new NullProgressMonitor()) );
-                logger.fine("  got it...");
+            logger.log(Level.FINE, "Using downloadResourceAsTempFile route.  Files are cached for up to 3600 seconds" );
+            in = new FileInputStream( DataSetURI.downloadResourceAsTempFile( rurl, 3600, new NullProgressMonitor()) );
+            if (  remoteUrl.endsWith(".gz" ) ) {
+                logger.fine("bookmarks stream is uncompressed because of .gz");
+                in= new GZIPInputStream( in );
             }
+            logger.fine("  got it...");
 
             ByteArrayOutputStream boas=new ByteArrayOutputStream();
             WritableByteChannel dest = Channels.newChannel(boas);
