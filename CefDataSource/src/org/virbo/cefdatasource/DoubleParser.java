@@ -12,16 +12,6 @@ import java.nio.ByteBuffer;
  */
 public class DoubleParser {
 
-    private static boolean match(String str, byte[] csq, int start, int length) {
-        for (int i = 0; i < str.length(); i++) {
-            if ((start + i >= length) || csq[start + i] != str.charAt(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
     private static boolean match(String str, ByteBuffer csq, int start, int length) {
         for (int i = 0; i < str.length(); i++) {
             if ((start + i >= length) || csq.get(start + i) != str.charAt(i)) {
@@ -126,6 +116,5 @@ public class DoubleParser {
 
         return decimal * Math.pow( 10, exp - fractionLength );
     }
-
 
 }
