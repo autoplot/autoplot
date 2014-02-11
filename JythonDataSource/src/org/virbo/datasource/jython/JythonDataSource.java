@@ -498,8 +498,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
     }
     
+    /**
+     * explicitly reset the interpreter, which is cached to provide results.
+     */
     @Override
-    public void reset() {
+    public synchronized void reset() {
         interp= null;
     }
 
