@@ -128,18 +128,9 @@ public class ApplicationControllerSyncSupport {
                 final PlotController pc= new PlotController( application, p );
                 final Row frow= row;
                 final Column fcol= col;
-                Runnable run= new Runnable() { public void run() {
-                    pc.createDasPeer( frow.controller.getCanvas(), frow, fcol );
-                } };
+                pc.createDasPeer( frow.controller.getCanvas(), frow, fcol );
                 if ( SwingUtilities.isEventDispatchThread() ) {
-                    run.run();
-                } else {
-                    run.run();
-                    //try {
-                    //    SwingUtilities.invokeAndWait(run);
-                    //} catch ( Exception ex ) {
-                    //    logger.log( Level.WARNING, null, ex );
-                    //}
+                    logger.finer("sync called on event thread");
                 }
             }
             nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
