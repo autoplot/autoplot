@@ -498,7 +498,8 @@ public class WalkImage  {
             }
 
             setStatus(Status.IMAGE_LOADED);
-
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
