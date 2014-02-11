@@ -291,6 +291,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
+        if (!exclude.contains(PROP_DISPLAYTITLE)) this.setDisplayTitle(that.isDisplayTitle());
     }
 
     @Override
@@ -339,6 +340,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
         b= that.displayLegend==this.displayLegend;
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYLEGEND, that.displayLegend, this.displayLegend ));
+        b= that.displayTitle==this.displayTitle;
+        if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYTITLE, that.displayTitle, this.displayTitle ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
