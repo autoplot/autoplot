@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class CefReaderHeader {
 
-    enum State {
+    private enum State {
 
         TOP, END, DATA_READ, GLOBAL, PARAM
     }
