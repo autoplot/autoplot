@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-02-06):</p>
+        <p>Bugfixes (2014-02-11):</p>
         <ul>
+            <li>Chris noticed that the new code that sorts das2server folders and files would drop nodes.</li>
+            <li>Chris noticed that the vap files don't save the displayTitle property</li>
+            <li>1157: allow renders to specify if they have autoranged a dimension.<li>
+            <li>file chooser in the resourceURI dialog didn't set the current directory properly.</li>
             <li>four-argument-histogram routine now takes datums and strings as arguments.</li>
             <li>jython (a,b)=myFunc() now supports a,b in selection.</li>
             <li>tab completion on the address bar works again with JythonDataSource.</li>
@@ -57,6 +61,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>another round of findbugs</li>            
+            <li>formatDataSet back to ScriptContext in new attempts to clean up security.</li>
             <li>drag a box to select multiple plots on layout panel</li>
             <li>drag on layout panel is shortcut for swap</li>
             <li>axis flipped property is supported in the vaps.</li>
