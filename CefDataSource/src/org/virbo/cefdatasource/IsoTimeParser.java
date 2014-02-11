@@ -4,8 +4,6 @@
  */
 package org.virbo.cefdatasource;
 
-import org.das2.datum.Datum;
-import org.das2.datum.Units;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 
@@ -76,7 +74,7 @@ public class IsoTimeParser implements FieldParser {
         int second = readPositiveInt(buf, offset + 17, 2);
         int micros = microsMult * readPositiveInt(buf, offset + 20, decimalPlaces);
         long microsOffset = hour * 3600000000L + minute * 60000000L + second * 1000000L + micros;
-        Datum checkd = Units.us2000.createDatum(cacheMicros + microsOffset);
+        //Datum checkd = Units.us2000.createDatum(cacheMicros + microsOffset);
         return cacheMicros + microsOffset;
 
     }
