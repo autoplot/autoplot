@@ -23,25 +23,25 @@ public class CefReaderHeader {
         TOP, END, DATA_READ, GLOBAL, PARAM
     }
 
-    class Record {
+    private static class Record {
 
         String data;
     }
 
-    class KeyValue {
+    private static class KeyValue {
 
         String key;
         String[] val;
     }
 
-    class GlobalStruct {
+    private static class GlobalStruct {
 
         //String name;
         //List<String> entries;
         String valueType;
     }
 
-    class ParamStruct {
+    private static class ParamStruct {
 
         String name;
         int[] sizes;
@@ -49,6 +49,7 @@ public class CefReaderHeader {
         int[] cefFieldPos;  // start, end inclusive
         Map<String, Object> entries = new LinkedHashMap<String, Object>();
     }
+    
     private byte eol = 10;
 
     private boolean cefReadHeadRec(ReadableByteChannel c, Record record) throws IOException {
