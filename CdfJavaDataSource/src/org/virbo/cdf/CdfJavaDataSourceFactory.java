@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
@@ -104,8 +105,9 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 //cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-                for ( String key:result.keySet() ) {
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, result.get(key), true  );
+                for ( Entry<String,String> ent:result.entrySet() ) {
+                    String key= ent.getKey();
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, ent.getValue(), true  );
                     ccresult.add(cc1);
                 }
                 
