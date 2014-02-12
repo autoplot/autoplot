@@ -346,7 +346,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                     setPlotElement(p);
                     setStatus("" + domPlot + ", " + p + " selected");
                     if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
-                        canvas.controller.indicateSelection( Collections.singletonList((DomNode)p) ); // don't flash plot node, just the plot element.
+                        Canvas c= getCanvas();
+                        c.controller.indicateSelection( Collections.singletonList((DomNode)p) ); // don't flash plot node, just the plot element.
                     }
                 }
             } else {
@@ -899,6 +900,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * focus plot, and currently only LayoutConstants.ABOVE and LayoutConstants.BELOW
      * are supported.
      * 
+     * @param focus the current focus plot.
      * @param direction LayoutConstants.ABOVE, LayoutConstants.BELOW, or null.  
      * Null indicates the layout will be done elsewhere, and the new plot will
      * be on top of the old.
@@ -915,24 +917,26 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.lock("Add Plot");
         final Plot domPlot = new Plot();
 
-        CanvasController ccontroller=  ((CanvasController)canvas.controller);
+        final Canvas c= getCanvas();
+        
+        CanvasController ccontroller=  ((CanvasController)c.controller);
         Row domRow;
         
-        if ( focus!=null && ccontroller.getRowFor(focus)==canvas.marginRow ) { 
+        if ( focus!=null && ccontroller.getRowFor(focus)==c.marginRow ) { 
             String srcRow;
-            if ( canvas.getRows().length>0 ) {
-                srcRow= canvas.getRows(0).getId();
+            if ( c.getRows().length>0 ) {
+                srcRow= c.getRows(0).getId();
             } else {
                 ccontroller.addRows(2);
-                srcRow= canvas.getRows(0).getId();
+                srcRow= c.getRows(0).getId();
             }
-            if ( canvas.getRows().length>1 ) {
-                domRow= canvas.getRows(1);
+            if ( c.getRows().length>1 ) {
+                domRow= c.getRows(1);
             } else {
                 domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction );
             }
             focus.setRowId(srcRow);
-        } else if ( canvas.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
+        } else if ( c.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
             domRow = ccontroller.addRow();
         } else if ( direction==null || direction==LayoutConstants.LEFT || direction==LayoutConstants.RIGHT ) {
             domRow= ccontroller.getRowFor(focus);
@@ -940,23 +944,23 @@ public class ApplicationController extends DomNodeController implements RunLater
             domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
         }
 
-        Column domColumn= canvas.getMarginColumn();
+        Column domColumn= c.getMarginColumn();
 
         // the logic for columns is different because we optimize the application for a stack of time
         // series.
         if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
-            domColumn= canvas.marginColumn;
+            domColumn= c.marginColumn;
         } else {
-            if ( focus!=null && ccontroller.getColumnFor(focus)==canvas.marginColumn ) {
+            if ( focus!=null && ccontroller.getColumnFor(focus)==c.marginColumn ) {
                 String srcColumn;
-                if ( canvas.getColumns().length>0 ) {
-                    srcColumn= canvas.getColumns(0).getId();
+                if ( c.getColumns().length>0 ) {
+                    srcColumn= c.getColumns(0).getId();
                 } else {
                     ccontroller.addColumns(2);
-                    srcColumn= canvas.getColumns(0).getId();
+                    srcColumn= c.getColumns(0).getId();
                 }
-                if ( canvas.getColumns().length>1 ) {
-                    domColumn= canvas.getColumns(1);
+                if ( c.getColumns().length>1 ) {
+                    domColumn= c.getColumns(1);
                 } else {
                     domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction );
                 }
@@ -972,7 +976,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         final Row frow= domRow;
 
         Runnable run= new Runnable() { public void run() {
-            new PlotController(application, domPlot).createDasPeer(canvas, frow ,fcol );
+            new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
         } };
         if ( SwingUtilities.isEventDispatchThread() ) {
             run.run();
@@ -1465,7 +1469,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
         lock.lock("Reset");
-        Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
+        Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
         logger.fine("got locks to reset application...");
 
@@ -1585,7 +1589,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 @Override
                 public void run() {
                     //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
-                    DasCanvasComponent[] dccs= canvas.controller.getDasCanvas().getCanvasComponents();
+                    Canvas c= getCanvas();
+                    DasCanvasComponent[] dccs= c.controller.getDasCanvas().getCanvasComponents();
                     for ( int i=0; i<dccs.length; i++ ) {
                         if ( dccs[i] instanceof DasPlot ) {
                             DasPlot p= (DasPlot)dccs[i];
@@ -1594,7 +1599,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                                 if ( pp.getController().getDasPlot()==p ) okay=true;
                             }
                             if ( !okay ) {
-                                canvas.controller.getDasCanvas().remove(p);
+                                c.controller.getDasCanvas().remove(p);
                             } else {
                                 Renderer[] rr= p.getRenderers();
                                 for ( int j=0; j<rr.length; j++ ) {
@@ -2238,17 +2243,18 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
-    public Canvas getCanvas() {
+    public synchronized Canvas getCanvas() {
         return canvas;
     }
 
     public void setCanvas(Canvas canvas) {
-        Canvas oldCanvas = this.canvas;
-        if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {
-            Logger.getLogger("gui").log(Level.FINE, "set canvas {0}", canvas);
-        }        
-
-        this.canvas = canvas;
+        Canvas oldCanvas = getCanvas();
+        synchronized (this) {
+            if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {
+                Logger.getLogger("gui").log(Level.FINE, "set canvas {0}", canvas);
+            }        
+            this.canvas = canvas;
+        }
         propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
     }
     /**
