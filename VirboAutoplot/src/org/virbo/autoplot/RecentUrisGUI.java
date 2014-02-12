@@ -119,13 +119,18 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }, "updateRecentUris").start();
     }
 
-    private synchronized void update() {
-        theModel= new MyTreeModel();
+    private void update() {
+        MyTreeModel ltheModel= new MyTreeModel();
+        synchronized ( this ) {
+            theModel= ltheModel;
+        }
 
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                jTree1.setModel( theModel );
+                synchronized ( RecentUrisGUI.this ) {
+                    jTree1.setModel( theModel );
+                }
                 jTree1.setCellRenderer( new MyCellRenderer() );
                 
                 Object r= jTree1.getModel().getRoot();
@@ -148,7 +153,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
     }
 
-    class MyCellRenderer extends DefaultTreeCellRenderer {
+    private class MyCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -160,7 +165,11 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             } else if ( value instanceof DatumRange ) {
                 tooltip= ((DatumRange)value).toString();               
                 int count= tree.getModel().getChildCount(value);
-                value= String.format( "%s (%d)", theModel.nameFor((DatumRange)value), count );
+                MyTreeModel ltheModel;
+                synchronized ( RecentUrisGUI.this ) {
+                    ltheModel= theModel;
+                }
+                value= String.format( "%s (%d)", ltheModel.nameFor((DatumRange)value), count );
             }
             Component c= super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if ( c instanceof JLabel ) {
@@ -171,7 +180,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }
     }
 
-    final class MyTreeModel implements TreeModel {
+    private final class MyTreeModel implements TreeModel {
 
         private final Object root= new Object();
 
@@ -197,7 +206,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
         }
 
-        public void update() {
+        private void update() {
             if ( EventQueue.isDispatchThread() ) {
                 throw new IllegalStateException("should not be called from event queue");
             }
