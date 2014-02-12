@@ -540,9 +540,12 @@ public class PlotController extends DomNodeController {
     }
     
     /**
-     * set the zoom so that all of the plotElements' data is visible.  Thie means finding
-     * the "union" of each plotElements' plotDefault ranges.  If any plotElement's default log
+     * set the zoom so that all of the plotElements' data is visible.  This means finding
+     * the "union" of the plotElements' plotDefault ranges.  If any plotElement's default log
      * is false, then the new setting will be false.
+     * @param x reset zoom in the x dimension.
+     * @param y reset zoom in the y dimension.
+     * @param z reset zoom in the z dimension.
      */
     public void resetZoom(boolean x, boolean y, boolean z) {
         List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
@@ -591,7 +594,7 @@ public class PlotController extends DomNodeController {
                 }
             }
             DataSourceFilter dsf= this.dom.controller.getDataSourceFilterFor(p);
-            if ( dsf!=null && dsf.getController()!=null && dsf.getController().tsb!=null ) {
+            if ( dsf!=null && dsf.getController()!=null && dsf.getController().getTsb()!=null ) {
                 haveTsb= true;
             }
         }
@@ -904,8 +907,7 @@ public class PlotController extends DomNodeController {
     /**
      * add a context overview.  This uses controllers, and should be rewritten
      * so that it doesn't.
-     * @param domPlot
-     * @returns the new plot which is the overview.
+     * @return the new plot which is the overview.
      */
     public Plot contextOverview( ) {
         DomLock lock= changesSupport.mutatorLock();
