@@ -100,7 +100,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         mon.started();
         readData( mon );
-        NetCdfVarDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon );
+        NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon );
         QDataSet qresult= checkLatLon(result);
         mon.finished();
         ncfile.close();
@@ -188,6 +188,10 @@ public class NetCDFDataSource extends AbstractDataSource {
         mon.finished();
     }
     
+    private synchronized Variable getVariable() {
+        return this.variable;
+    }
+    
     public static DataSourceFactory getFactory() {
         return new NetCDFDataSourceFactory();
     }
@@ -197,7 +201,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         mon.started();
         mon.setProgressMessage("reading metadata");
         readData( mon );
-        List attr= variable.getAttributes();
+        List attr= getVariable().getAttributes();
         
         if ( attr==null ) return null; // transient state
 
@@ -226,7 +230,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         if ( true ) {
             return MetadataModel.createNullModel();
         } else {
-            if (variable==null ) {
+            if (getVariable()==null ) {
                 try {
                     readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
                 } catch (IOException ex) {
@@ -236,7 +240,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             MetadataModel result= MetadataModel.createNullModel();
 
-            List attr= variable.getAttributes();
+            List attr= getVariable().getAttributes();
             if ( attr==null ) return null; // transient state
             for( int i=0; i<attr.size(); i++ ) {
                 Attribute at= (Attribute) attr.get(i);
