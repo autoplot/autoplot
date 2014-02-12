@@ -106,7 +106,7 @@ public class APIOServiceProvider extends AbstractIOSP implements IOServiceProvid
 
         //Construct the Array.
         if (type.isString()) {
-            array = Array.factory(type, DataSetUtil.qubeDims(result), sdata);
+            //array = Array.factory(type, DataSetUtil.qubeDims(result), sdata);
             throw new RuntimeException("whoops");
         } else {
             data= new double[result.length()];
