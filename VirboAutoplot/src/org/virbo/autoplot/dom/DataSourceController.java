@@ -1214,7 +1214,7 @@ public class DataSourceController extends DomNodeController {
     public void cancel() {
         DataSource dss= this.getDataSource();  // Note not getDataSource, which is synchronized.
         if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
-            ProgressMonitor monitor= mon;
+            ProgressMonitor monitor= getMonitor();
             if (monitor != null) {
                 logger.fine("cancel running request");
                 monitor.cancel();
@@ -1275,9 +1275,10 @@ public class DataSourceController extends DomNodeController {
         if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
             // this code will never be invoked because this is synchronous.  See cancel().
             logger.fine("invoke later do load");
-            if (mon != null) {
+            ProgressMonitor monitor= getMonitor();
+            if (monitor != null) {
                 logger.warning("double load!");
-                mon.cancel();
+                monitor.cancel();
             }
             RequestProcessor.invokeLater(run);
         } else {
@@ -1500,6 +1501,10 @@ public class DataSourceController extends DomNodeController {
             result.append(": <br>").append(ss[i]);
         }
         return result.toString();
+    }
+    
+    private synchronized ProgressMonitor getMonitor() {
+        return mon;
     }
     
     /**
