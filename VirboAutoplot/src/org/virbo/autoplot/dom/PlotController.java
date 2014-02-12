@@ -8,6 +8,7 @@ import java.awt.dnd.DropTarget;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TooManyListenersException;
@@ -1392,7 +1393,7 @@ public class PlotController extends DomNodeController {
     }
 
     public JMenuItem[] getExpertMenuItems() {
-        return this.expertMenuItems;
+        return Arrays.copyOf( expertMenuItems, expertMenuItems.length );
     }
 
     public void setExpertMode( boolean expert ) {
