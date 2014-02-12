@@ -282,7 +282,9 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
                     }
                     if ((type & CompletionProvider.COMPLETION_QUERY_TYPE) != 0 &&
                             CompletionSettings.INSTANCE.completionAutoPopup()) {
-                        autoModEndOffset = modEndOffset;
+                        synchronized ( this ) {
+                            autoModEndOffset = modEndOffset;
+                        }
                         if (completionResultNull)
                             showCompletion(false, true, CompletionProvider.COMPLETION_QUERY_TYPE);
                     }
