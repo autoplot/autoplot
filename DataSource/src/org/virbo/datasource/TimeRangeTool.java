@@ -542,7 +542,6 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }//GEN-LAST:event_scComboBoxItemStateChanged
 
     private void orbitComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_orbitComboBoxItemStateChanged
-        Orbits o= Orbits.getOrbitsFor((String)scComboBox.getSelectedItem());
         if ( orbitComboBox.getSelectedItem().equals("...") ) {
             if ( evt.getStateChange()==ItemEvent.DESELECTED ) {
                 orbitFeedbackLabel.setText( "Any orbit number can be entered by editing the text." );
