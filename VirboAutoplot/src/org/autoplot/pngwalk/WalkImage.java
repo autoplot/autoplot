@@ -331,9 +331,7 @@ public class WalkImage  {
             synchronized ( old ) {
                 logger.log( Level.FINE, "unloading thumbnail for {0}", old);
                 old.setStatus( Status.SIZE_THUMB_LOADED );
-                old.squishedThumb= null;
-                old.thumb= null;
-                old.im= null;
+                old.clearImages();
             }
         }
     }
@@ -425,9 +423,9 @@ public class WalkImage  {
      * @return
      */
     public BufferedImage getSquishedThumbnail( boolean loadIfNeeded ) {
-        if (status == Status.MISSING)
-            return missingImage;
-        if (squishedThumb == null) {
+        if (status == Status.MISSING) return missingImage;
+        BufferedImage lsquishedThumb= getSquishedThumb();
+        if (lsquishedThumb == null) {
             synchronized ( this ) {
                 if (thumb == null) {
                     if (getThumbnail(loadIfNeeded) == null) {
@@ -437,12 +435,23 @@ public class WalkImage  {
                 if (thumb != null) {  //might be loading on another thread
                     BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
                     squishedThumb = resizeOp.filter(thumb, null);
+                    lsquishedThumb= squishedThumb;
                 }
             }
         }
-        return squishedThumb;
+        return lsquishedThumb;
     }
 
+    private synchronized BufferedImage getSquishedThumb() {
+        return this.squishedThumb;
+    }
+    
+    private synchronized void clearImages() {
+        this.squishedThumb= null;
+        this.thumb= null;
+        this.im= null;        
+    }
+    
     private void loadImageImmediately() {
         try {
             //System.err.println("download "+imgURI );
