@@ -971,7 +971,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getTimeSeries not " +
            "implemented for " + varName);
         return method.invoke(null, new Object [] 
-            {thisCDF, var, new Boolean(ignoreFill), timeRange});
+            {thisCDF, var, Boolean.valueOf(ignoreFill), timeRange});
     }
 
     public TimeSeries getTimeSeriesObject(String varName, boolean ignoreFill,
@@ -982,7 +982,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (method == null) throw new Throwable("getTimeSeriesObject not " +
            "implemented for " + varName);
         return (TimeSeries)method.invoke(null, new Object [] 
-            {thisCDF, var, new Boolean(ignoreFill), timeRange, ts});
+            {thisCDF, var, Boolean.valueOf(ignoreFill), timeRange, ts});
     }
 
     public Object getTimeSeries(String vname, boolean ignoreFill,
