@@ -11,7 +11,9 @@
 
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,6 +40,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.das2.components.DasProgressLabel;
+import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.LoggerManager;
@@ -45,6 +49,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.filesystem.Glob;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -111,16 +116,21 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         jTree1.setCellRenderer( new DefaultTreeCellRenderer() );
         jTree1.repaint();
         this.filter= filter;
-        new Thread( new Runnable() {
-            @Override
-            public void run() {
-                update();
-            }
-        }, "updateRecentUris").start();
+        DasProgressPanel label= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(RecentUrisGUI.this),"reading history");
+        new Thread( getUpdateRunnable(label), "updateRecentUris").start();
     }
 
-    private void update() {
-        MyTreeModel ltheModel= new MyTreeModel();
+    private Runnable getUpdateRunnable( final ProgressMonitor mon) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                update(mon);
+            };
+        };
+    }
+    
+    private void update( ProgressMonitor mon ) {
+        MyTreeModel ltheModel= new MyTreeModel(mon);
         synchronized ( this ) {
             theModel= ltheModel;
         }
@@ -189,8 +199,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         private DatumRange[] list;
         private boolean[] skip;
 
-        MyTreeModel() {
-            update();
+        MyTreeModel( ProgressMonitor mon ) {
+            update( mon );
         }
 
         private String nameFor( DatumRange dr ) {
@@ -206,46 +216,50 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
         }
 
-        private void update() {
+        private void update( ProgressMonitor mon ) {
             if ( EventQueue.isDispatchThread() ) {
                 throw new IllegalStateException("should not be called from event queue");
             }
             Datum tz= Units.milliseconds.createDatum( Calendar.getInstance().getTimeZone().getRawOffset() );
-                Datum now = TimeUtil.now().add(tz);
-                list = new DatumRange[8];
-                list[0] = new DatumRange(TimeUtil.prevMidnight(now).subtract(tz), TimeUtil.nextMidnight(now).subtract(tz) );
-                list[1] = list[0].previous();
-                list[2] = new DatumRange(TimeUtil.prevWeek(list[1].min()), list[1].min());
-                list[3] = new DatumRange(TimeUtil.prev(TimeUtil.MONTH, list[2].min()), list[2].min());
-                list[4] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[3].min()), list[3].min());
-                list[5] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[4].min()), list[4].min());
-                list[6] = new DatumRange(TimeUtil.prev(TimeUtil.HALF_YEAR, list[5].min()), list[5].min());
-                list[7] = new DatumRange(Datum.create(0, Units.t1970), list[6].min());
-                File f2 = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/");
-                if (!f2.exists()) {
-                    boolean ok = f2.mkdirs();
-                    if (!ok) {
-                        throw new RuntimeException("unable to create folder " + f2);
-                    }
+            Datum now = TimeUtil.now().add(tz);
+            list = new DatumRange[8];
+            list[0] = new DatumRange(TimeUtil.prevMidnight(now).subtract(tz), TimeUtil.nextMidnight(now).subtract(tz) );
+            list[1] = list[0].previous();
+            list[2] = new DatumRange(TimeUtil.prevWeek(list[1].min()), list[1].min());
+            list[3] = new DatumRange(TimeUtil.prev(TimeUtil.MONTH, list[2].min()), list[2].min());
+            list[4] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[3].min()), list[3].min());
+            list[5] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[4].min()), list[4].min());
+            list[6] = new DatumRange(TimeUtil.prev(TimeUtil.HALF_YEAR, list[5].min()), list[5].min());
+            list[7] = new DatumRange(Datum.create(0, Units.t1970), list[6].min());
+            File f2 = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/");
+            if (!f2.exists()) {
+                boolean ok = f2.mkdirs();
+                if (!ok) {
+                    throw new RuntimeException("unable to create folder " + f2);
                 }
-                uris= new TreeMap<Datum, String[]>();
-                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z);
+            }
+            uris= new TreeMap<Datum, String[]>();
+            TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z);
 
-                LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
+            LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
 
-                Pattern filtPattern= null;
-                String filt= RecentUrisGUI.this.filter;
-                if ( filt!=null && filt.length()==0 ) filt=null;
-                if ( filt!=null ) filt= filt.toLowerCase();
-                if ( filt!=null ) { // make into regex
-                    filt= "(?i)"+ Glob.getRegex(filt);
-                    filtPattern= Pattern.compile(filt);
-                }
-                long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
+            Pattern filtPattern= null;
+            String filt= RecentUrisGUI.this.filter;
+            if ( filt!=null && filt.length()==0 ) filt=null;
+            if ( filt!=null ) filt= filt.toLowerCase();
+            if ( filt!=null ) { // make into regex
+                filt= "(?i)"+ Glob.getRegex(filt);
+                filtPattern= Pattern.compile(filt);
+            }
+            long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
 
-                String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
-                        null );
-                //int iline=0;
+            String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ), null );
+            
+            mon.started();
+            try {
+                mon.setTaskSize(50000);
+
+                int iline=0;
                 final File f3 = new File(f2, "history.txt");
                 if ( f3.exists()&&f3.canRead() ) {
                     Scanner scan;
@@ -257,8 +271,10 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                     while (scan.hasNextLine()) {
                         String line = scan.nextLine();
-                        //iline++;
+                        iline++;
                         String[] ss= line.split("\\s+",2);
+                        mon.setTaskProgress(iline);
+                        mon.setProgressMessage(ss[0]);
                         if ( ss.length<2 ) {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
                         }
@@ -332,6 +348,10 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     }
                 }
                 list= newlist;
+
+            } finally {
+                mon.finished();
+            }
 
         }
 
