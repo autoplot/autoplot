@@ -108,12 +108,12 @@ public class DataTypes {
                 new Class[] {ByteBuffer.class, Integer.class});
             method[51] = meth;
             method[52] = meth;
-        } catch (Exception ex) {
+        } catch (NoSuchMethodException ex) {
         }
     }
     public static String getString(ByteBuffer buf, Integer nc)  {
         ByteBuffer slice = buf.slice();
-        byte [] ba = new byte[nc.intValue()];
+        byte [] ba = new byte[nc];
         int i = 0;
         for (; i < ba.length; i++) {
             ba[i] = slice.get();
