@@ -223,10 +223,8 @@ public class DodsDataSource extends AbstractDataSource {
                 DataSetUtil.putProperties(interpretedMetadata, ds);
             }
 
-            synchronized (this) {
-                AttributeTable at = das.getAttributeTable(variable);
-                ds.putProperty(QDataSet.METADATA,at);
-            }
+            AttributeTable at = das.getAttributeTable(variable);
+            ds.putProperty(QDataSet.METADATA,at);
 
             if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
                 ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
@@ -256,7 +254,7 @@ public class DodsDataSource extends AbstractDataSource {
      * @param variable
      * @return
      */
-    private synchronized Map<String, Object> getMetaData(String variable) {
+    private Map<String, Object> getMetaData(String variable) {
         AttributeTable at = das.getAttributeTable(variable);
         return getMetaData(at);
     }
@@ -314,7 +312,7 @@ public class DodsDataSource extends AbstractDataSource {
 
 
     @Override
-    public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException, DASException, ParseException {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
             MyDASParser parser = new MyDASParser();
             URL url = new URL(adapter.getSource().toString() + ".das");
