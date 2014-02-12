@@ -67,7 +67,7 @@ public class DataPanel extends javax.swing.JPanel {
     DataSetSelector dataSetSelector;
     JTextField componentTextField1;
 
-    PropertyChangeListener compListener; // listen to component property changes
+    private transient PropertyChangeListener compListener; // listen to component property changes
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
@@ -303,6 +303,18 @@ public class DataPanel extends javax.swing.JPanel {
         }
     } );
 
+    /**
+     * encourage making local copies for thread safety.
+     * @return the current plotElement.
+     */
+    private synchronized PlotElement getElement() {
+        return element;
+    }
+    
+    private synchronized DataSourceFilter getDsf() {
+        return dsf;
+    }
+        
 
     public void doBindings() {
         doPlotElementBindings();
@@ -332,17 +344,19 @@ public class DataPanel extends javax.swing.JPanel {
         if ( transposeCheckBox.isSelected() ) {
             sprocess+="|transpose";
         }
-        if ( element!=null ) {
-            element.setComponentAutomatically(sprocess);
+        PlotElement lelement= getElement();
+        if ( lelement!=null ) {
+            lelement.setComponentAutomatically(sprocess);
         } 
     }
 
     private void componentChanged() {
         if ( adjusting ) return;
-        if ( element==null ) {
+        PlotElement lelement= getElement();
+        if ( lelement==null ) {
             return;
         }
-        String scomp= element.getComponent();
+        String scomp= lelement.getComponent();
         Pattern slicePattern= Pattern.compile("\\|slice(\\d+)\\((\\d+)\\)(\\|transpose)?");
         Matcher m= slicePattern.matcher(scomp);
         if ( m.matches() ) {
@@ -350,9 +364,10 @@ public class DataPanel extends javax.swing.JPanel {
             doSliceCheckBox.setSelected(true);
             sliceTypeComboBox.setSelectedIndex(Integer.parseInt(m.group(1)));
 
-            if ( dsf!=null ) {
+            DataSourceFilter ldsf= getDsf();
+            if ( ldsf!=null ) {
                 if ( sliceTypeComboBox.getSelectedIndex()>-1 ) { // transient state?
-                    int max = dsf.getController().getMaxSliceIndex(sliceTypeComboBox.getSelectedIndex());
+                    int max = ldsf.getController().getMaxSliceIndex(sliceTypeComboBox.getSelectedIndex());
                     if (max > 0) max--;
                     sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, max, 1));
                     sliceIndexSpinner.setValue(Integer.parseInt(m.group(2)));
@@ -409,30 +424,31 @@ public class DataPanel extends javax.swing.JPanel {
             depNames1[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
         }
         if ( immediately ) {
-            sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
-            if ( element!=null && !componentTextField1.getText().equals( element.getComponent() ) ) {
-                componentTextField1.setText( element.getComponent() );
-                componentChanged();
-            }
+            updateSliceTypeComboBoxImmediately(depNames1);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
-                    if ( element!=null && !componentTextField1.getText().equals( element.getComponent() ) ) {
-                        componentTextField1.setText( element.getComponent() );
-                        componentChanged();
-                    }
+                    updateSliceTypeComboBoxImmediately(depNames1);
                 }
             });
         }
     }
 
+    private void updateSliceTypeComboBoxImmediately( String[] depNames1 ) {
+        sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
+        PlotElement lelement= getElement();
+        if ( lelement!=null && !componentTextField1.getText().equals( lelement.getComponent() ) ) {
+            componentTextField1.setText( lelement.getComponent() );
+            componentChanged();
+        }
+    }
+    
     /**
      * show the context after the slicing and operations for the user's reference.
      * TODO: make sure this is released so stray datasets can be garbage collected.
      */
-    PropertyChangeListener contextListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener contextListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateProcessDataSetLabel();
@@ -440,14 +456,15 @@ public class DataPanel extends javax.swing.JPanel {
     };
 
     private void updateProcessDataSetLabel() {
-        DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(element);
+        PlotElement lelement= getElement();
+        DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(lelement);
         QDataSet orig= dsf1==null ? null : dsf1.getController().getFillDataSet();
-        QDataSet proc= element.getController().getDataSet();
+        QDataSet proc= lelement.getController().getDataSet();
         if ( orig==proc || proc==null ) {
             processDataSetLabel.setText( "" );
         } else {
             String lbl= String.valueOf( proc );
-            QDataSet ds= element.getController().getDataSet();
+            QDataSet ds= lelement.getController().getDataSet();
             String s=  DataSetUtil.contextAsString( ds ).trim();
             processDataSetLabel.setText( "<html>These operations result in the dataset<br>"+lbl + ( s.length()==0 ? "" : ( "<br>@ "+ s ) ) );
         }
