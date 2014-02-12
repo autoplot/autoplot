@@ -1010,14 +1010,16 @@ public class DataSetURI {
                 logger.log(Level.FINE,"downloadResourceAsTempFile-> transfer was successful");
             } finally {
                 if ( fail ) { // clean up if there was an exception
-                    tempfile.delete();
-                    result.delete();
+                    if ( !tempfile.delete() ) {
+                        logger.log(Level.WARNING, "failed to delete after exception: {0}", tempfile);
+                    }
+                    if ( !result.delete() ) {
+                        logger.log(Level.WARNING, "failed to delete after exception: {0}", result);
+                    }
                 }
-                if ( in!=null ) in.close();
+                if ( in!=null ) in.close(); // This will throw the InterruptedIOException
             }
         }
-
-        //result.deleteOnExit(); // we can no longer do this, because another process may have created the file.
 
         //checkNonHtml( tempfile, url ); // until 9/22/2011 we didn't check this...
 
@@ -1676,7 +1678,10 @@ public class DataSetURI {
                 if ( Boolean.FALSE.equals( m.invoke( result1, uri ) ) ) {
                     result.add( ext );
                 }
+            } catch (RuntimeException ex) {
+                throw ex;
             } catch (Exception ex) {
+                logger.log( Level.WARNING, ex.toString(), ex );
                 //this happens often, but we'll work to make it never.
             }
         }
