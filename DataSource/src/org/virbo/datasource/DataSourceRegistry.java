@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -372,8 +374,14 @@ public class DataSourceRegistry {
      * @param jarFile the jar file, which must contain META-INF/org.virbo.datasource.DataSourceFactory.extensions.
      * @throws IOException 
      */
-    public void registerDataSourceJar( String ext, URL jarFile ) throws IOException {
-        URLClassLoader loader= new URLClassLoader( new URL[] {jarFile}, DataSourceRegistry.class.getClassLoader() );
+    public void registerDataSourceJar( String ext, final URL jarFile ) throws IOException {
+        URLClassLoader loader= (URLClassLoader) AccessController.doPrivileged(new PrivilegedAction() {
+            @Override
+            public Object run() {
+                URLClassLoader load= new URLClassLoader( new URL[] {jarFile}, DataSourceRegistry.class.getClassLoader() );
+                return load;
+            }
+        });
 
         Enumeration<URL> re= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
         List<URL> rre= new ArrayList();
