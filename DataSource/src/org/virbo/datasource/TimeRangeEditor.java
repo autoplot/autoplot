@@ -41,6 +41,7 @@ import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 
@@ -125,6 +126,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }
 
     public void setRange( DatumRange value ) {
+        if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
         DatumRange oldValue= this.range;
         this.range= value;
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
