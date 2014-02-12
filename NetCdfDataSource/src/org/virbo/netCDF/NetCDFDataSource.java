@@ -201,7 +201,8 @@ public class NetCDFDataSource extends AbstractDataSource {
         mon.started();
         mon.setProgressMessage("reading metadata");
         readData( mon );
-        List attr= getVariable().getAttributes();
+        List attr;
+        attr= getVariable().getAttributes();
         
         if ( attr==null ) return null; // transient state
 
