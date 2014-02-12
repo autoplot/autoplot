@@ -508,11 +508,13 @@ public class ScriptContext extends PyJavaInstance {
         setStatus("wrote to "+filename);
     }
 
-    private static void maybeMakeParent( String filename ) {
+    private static void maybeMakeParent( String filename ) throws IOException {
         File file= new File(filename);
         if ( file.getParentFile()!=null ) { // relative filenames are okay.
             if ( !file.getParentFile().exists() ) {
-                file.getParentFile().mkdirs();
+                if ( !file.getParentFile().mkdirs() ) {
+                    throw new IOException( "unable to mkdir "+filename );
+                }
             }
         }
     }
