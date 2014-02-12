@@ -593,7 +593,7 @@ public class DataSourceController extends DomNodeController {
             return parentSources1;
         }
     }
-
+    
     /**
      * removes the parentSources link, and listeners to the parents.  The
      * parents are left in the DOM and will be removed later.
@@ -770,7 +770,7 @@ public class DataSourceController extends DomNodeController {
      * to the TimeSeriesBrowse.getTimeRange().
      * @return null if everything is okay, error message otherwise
      */
-    private synchronized String checkParents() {
+    private String checkParents() {
 
         QDataSet x;
         QDataSet y = null;
@@ -780,21 +780,23 @@ public class DataSourceController extends DomNodeController {
         QDataSet ds=null;
         Map<String,Object> props=null;
 
-        if ( parentSources==null ) return "no parent sources";
-        if ( parentSources[0]==null ) return "first parent is null";
-        x = parentSources[0].controller.getFillDataSet();
-        xprops= maybeCopy( parentSources[0].controller.getFillProperties() );
-        if (parentSources.length > 1) {
-            if ( parentSources[1]==null ) return "second parent is null";
-            y = parentSources[1].controller.getFillDataSet();
-            yprops= maybeCopy( parentSources[1].controller.getFillProperties() );
+        DataSourceFilter[] lparentSources= getParentSources();
+        
+        if ( lparentSources==null || lparentSources.length==0 ) return "no parent sources";
+        if ( lparentSources[0]==null ) return "first parent is null";
+        x = lparentSources[0].controller.getFillDataSet();
+        xprops= maybeCopy( lparentSources[0].controller.getFillProperties() );
+        if (lparentSources.length > 1) {
+            if ( lparentSources[1]==null ) return "second parent is null";
+            y = lparentSources[1].controller.getFillDataSet();
+            yprops= maybeCopy( lparentSources[1].controller.getFillProperties() );
         }
-        if (parentSources.length > 2) {
-            if ( parentSources[2]==null ) return "third parent is null";
-            z = parentSources[2].controller.getFillDataSet();
-            zprops= maybeCopy( parentSources[2].controller.getFillProperties() );
+        if (lparentSources.length > 2) {
+            if ( lparentSources[2]==null ) return "third parent is null";
+            z = lparentSources[2].controller.getFillDataSet();
+            zprops= maybeCopy( lparentSources[2].controller.getFillProperties() );
         }
-        if ( parentSources.length==1 ) {
+        if ( lparentSources.length==1 ) {
             if (x == null ) {
                 return "parent dataset is null";
             }
@@ -802,7 +804,7 @@ public class DataSourceController extends DomNodeController {
                 ds= x;
                 props= xprops;
             }
-        } else if (parentSources.length == 2) {
+        } else if (lparentSources.length == 2) {
             if (x == null || y == null) {
                 return "first or second dataset is null";
             }
@@ -817,7 +819,7 @@ public class DataSourceController extends DomNodeController {
             } else {
                 logger.fine("intermediate state where y and x have different lengths");
             }
-        } else if (parentSources.length == 3) {
+        } else if (lparentSources.length == 3) {
             if (x == null || y == null || z == null) {
                 return "at least one of the three datasets is null";
             }
