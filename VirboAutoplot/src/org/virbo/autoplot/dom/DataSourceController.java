@@ -466,8 +466,6 @@ public class DataSourceController extends DomNodeController {
      *  slice dimensions are set for dataset.
      * 
      * @param ds
-     * @param autorange if false, autoranging will not be done.  if false, autoranging
-     *   might be done.
      * @param immediately if false, then this is done after the application is done adjusting.
      */
     public synchronized void setDataSetInternal( QDataSet ds, Map<String,Object> rawProperties, boolean immediately) {
@@ -480,7 +478,7 @@ public class DataSourceController extends DomNodeController {
             if ( dss==null ) {
                 uri= "vap+internal:";
             } else {
-                uri= getDataSource().getURI();
+                uri= dss.getURI();
             }
             if ( this.tsb!=null ) {
                 uri= this.tsbSuri;
@@ -933,8 +931,9 @@ public class DataSourceController extends DomNodeController {
         Map<String, Object> props; // QDataSet properties.
 
         props = AutoplotUtil.extractProperties(getDataSet());
-        if (getDataSource() != null) {
-            props = AutoplotUtil.mergeProperties(getDataSource().getProperties(), props);
+        DataSource dss= getDataSource();
+        if ( dss != null) {
+            props = AutoplotUtil.mergeProperties( dss.getProperties(), props );
         }
 
         setProperties(props);
@@ -1154,9 +1153,10 @@ public class DataSourceController extends DomNodeController {
     private synchronized void updateImmediately() {
         
         try {
-            if (getDataSource() != null) {
+            DataSource dss= getDataSource();
+            if ( dss != null) {
                 setStatus("busy: loading dataset");
-                logger.log(Level.FINE, "loading dataset {0}", getDataSource());
+                logger.log(Level.FINE, "loading dataset {0}", dss );
                 if ( tsb!=null ) {
                     logger.log(Level.FINE, "   tsb= {0}", tsb.getURI());
                 }
@@ -1212,7 +1212,7 @@ public class DataSourceController extends DomNodeController {
      * cancel the loading process. 
      */
     public void cancel() {
-        DataSource dss= this.dataSource;  // Note not getDataSource, which is synchronized.
+        DataSource dss= this.getDataSource();  // Note not getDataSource, which is synchronized.
         if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
             ProgressMonitor monitor= mon;
             if (monitor != null) {
@@ -1240,7 +1240,8 @@ public class DataSourceController extends DomNodeController {
         changesSupport.registerPendingChange(this, PENDING_UPDATE);
         changesSupport.performingChange(this, PENDING_UPDATE);
 
-        logger.log(Level.FINE, "request update {0}", getDataSource());
+        DataSource dss= getDataSource();
+        logger.log(Level.FINE, "request update {0}", dss );
         
         setDataSet(null);
 
@@ -1267,11 +1268,11 @@ public class DataSourceController extends DomNodeController {
             
             @Override
             public String toString() {
-                return "load "+String.valueOf(dataSource);
+                return "load "+String.valueOf(getDataSource());
             }
         };
 
-        if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
+        if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
             // this code will never be invoked because this is synchronous.  See cancel().
             logger.fine("invoke later do load");
             if (mon != null) {
@@ -1352,10 +1353,13 @@ public class DataSourceController extends DomNodeController {
      * TODO: there is probably a better way to do this, synchronizing properly on
      * several objects.
      *
-     * @return
+     * @return the controller's current datasource.
      */
     public DataSource getDataSource() {
-        return dataSource;
+        logger.log( Level.FINE, null, "accessing data source");
+        synchronized ( this ) {
+            return dataSource;
+        }
     }
 
     public void setDataSource(DataSource dataSource) {
@@ -1506,17 +1510,20 @@ public class DataSourceController extends DomNodeController {
         ProgressMonitor mymon;
 
         QDataSet result = null;
-        mymon = getMonitor("loading data", "loading " + getDataSource());
+        
+        DataSource dss= getDataSource();
+        
+        mymon = getMonitor("loading data", "loading " + dss );
         this.mon = mymon;
         try {
 
             // Call the data source to get the data set.
-            logger.log( Level.FINE, "load {0}", getDataSource());
-            result = getDataSource().getDataSet(mymon);
+            logger.log( Level.FINE, "load {0}", dss);
+            result = dss.getDataSet(mymon);
 
             if ( dsf.getUri().length()>0 ) this.model.addRecent(dsf.getUri());
-            logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
-            Map<String,Object> props= getDataSource().getMetadata( new AlertNullProgressMonitor("getMetadata") );
+            logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{ dss, result});
+            Map<String,Object> props= dss.getMetadata( new AlertNullProgressMonitor("getMetadata") );
 
             if ( result!=null && getTsb()!=null && result.rank()>0 && !UnitsUtil.isTimeLocation( SemanticOps.getUnits( SemanticOps.xtagsDataSet(result)) ) ) {
                 // we had turned off the autoranging, but turns out we need to turn it back on.
@@ -1531,8 +1538,8 @@ public class DataSourceController extends DomNodeController {
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
 
             // look again to see if it has timeSeriesBrowse now--JythonDataSource
-            if ( getTsb()==null && getDataSource().getCapability( TimeSeriesBrowse.class ) !=null ) {
-                TimeSeriesBrowse tsb1= getDataSource().getCapability( TimeSeriesBrowse.class );
+            if ( getTsb()==null && dss.getCapability( TimeSeriesBrowse.class ) !=null ) {
+                TimeSeriesBrowse tsb1= dss.getCapability( TimeSeriesBrowse.class );
                 PlotElement pe= getPlotElement();
                 if ( pe!=null && this.doesPlotElementSupportTsb( pe ) ) {  //TODO: less flakey
                     setTsb(tsb1);
@@ -1657,7 +1664,7 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * set the data source uri.
-     * @param uri
+     * @param suri
      * @param mon
      */
     public synchronized void setSuri(String suri, ProgressMonitor mon) {
@@ -1668,7 +1675,7 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * set the data source uri, forcing a reload if it is the same.
-     * @param surl
+     * @param suri
      * @param mon
      */
     public synchronized void resetSuri(String suri, ProgressMonitor mon) {
@@ -1728,7 +1735,7 @@ public class DataSourceController extends DomNodeController {
                     if (cache1.satisfies(surl)) {
                         cache1.resetURI(surl);
                         //trigger autorange
-                        propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, null, dataSource);
+                        propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, null, getDataSource() );
                         update();
                         return;
                     }
