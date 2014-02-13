@@ -59,7 +59,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
 
-    private DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport
+    private transient DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport  
 
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
