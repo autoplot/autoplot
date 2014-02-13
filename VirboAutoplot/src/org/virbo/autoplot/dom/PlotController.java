@@ -1391,7 +1391,7 @@ public class PlotController extends DomNodeController {
      * @param items
      */
     public void setExpertMenuItems( JMenuItem[] items ) {
-        this.expertMenuItems= items;
+        this.expertMenuItems= Arrays.copyOf( items, items.length );
     }
 
     public JMenuItem[] getExpertMenuItems() {
