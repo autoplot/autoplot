@@ -1366,9 +1366,9 @@ public class DataSourceController extends DomNodeController {
         //   plot vap+inline:http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf?SpPolarGrid06km/Data Fields/SI_06km_SH_89H_DSC
         //   edit URI, select a different one, plot below.
         
-        synchronized ( this ) {
+        //synchronized ( this ) {
             return dataSource;
-        }
+        //}
     }
 
     public void setDataSource(DataSource dataSource) {
