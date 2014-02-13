@@ -86,7 +86,7 @@ public class FTPFile {
 	 *            The last modified date of the file.
 	 */
 	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
+		this.modifiedDate = (Date)modifiedDate.clone();
 	}
 
 	/**
