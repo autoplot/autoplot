@@ -3484,6 +3484,12 @@ private void updateFrameTitle() {
             }
         }, AWTEvent.KEY_EVENT_MASK );
         
+        //I get a message on the stdout and sometimes as a popup containing:
+        //   (at java.util.TimSort.mergeHi(TimSort.java:895))
+        //http://stackoverflow.com/questions/13575224/comparison-method-violates-its-general-contract-timsort-and-gridlayout 
+        //https://sourceforge.net/p/autoplot/bugs/1159/
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+        
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
