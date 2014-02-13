@@ -1,9 +1,12 @@
 package gov.nasa.gsfc.voyager.cdf;
+
+import java.util.Arrays;
+
     public class Stride {
         int[] stride;
         int nv;
         public Stride(int[] stride) {
-            this.stride = stride;
+            this.stride = Arrays.copyOf( stride,stride.length );
         }
         public int getStride(int nv) {
             this.nv = nv;
