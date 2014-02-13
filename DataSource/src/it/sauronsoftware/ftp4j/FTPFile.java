@@ -76,7 +76,7 @@ public class FTPFile {
 	 *         not supplied.
 	 */
 	public Date getModifiedDate() {
-		return modifiedDate;
+		return (Date)modifiedDate.clone();
 	}
 
 	/**
