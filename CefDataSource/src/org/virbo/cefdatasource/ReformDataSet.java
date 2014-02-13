@@ -49,7 +49,7 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
         }
 
         rank = sizes.length;
-        this.sizes = sizes;
+        this.sizes = Arrays.copyOf( sizes, sizes.length );
 
         if (rank > 4) {
             StringBuilder ssizes= new StringBuilder( 10 ).append(sizes[0]);
