@@ -76,7 +76,12 @@ public class FTPFile {
 	 *         not supplied.
 	 */
 	public Date getModifiedDate() {
-		return (Date)modifiedDate.clone();
+            if ( modifiedDate!=null ) {
+                return (Date)modifiedDate.clone();
+            } else {
+                return null;
+            }
+            
 	}
 
 	/**
@@ -86,7 +91,11 @@ public class FTPFile {
 	 *            The last modified date of the file.
 	 */
 	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = (Date)modifiedDate.clone();
+            if ( modifiedDate!=null ) {
+                this.modifiedDate = (Date)modifiedDate.clone();
+            } else {
+                this.modifiedDate= null;
+            }
 	}
 
 	/**
