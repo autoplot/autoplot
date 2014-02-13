@@ -2562,8 +2562,8 @@ public class Extractor {
                 }
             }
         }
-        public double[] getTimes() {return times;}
-        public double[] getValues() {return vdata;}
+        public double[] getTimes() {return Arrays.copyOf(times,times.length);}
+        public double[] getValues() {return Arrays.copyOf(vdata,vdata.length);}
         public TimeSpec getTimeSpec() {return tspec;}
     }
 
