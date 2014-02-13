@@ -23,12 +23,12 @@ public class WGetFileSystemFactory implements FileSystemFactory {
     /**
      * support curl too, since it is on macs by default.
      */
-    protected static boolean useCurl= true;
+    static boolean useCurl= true;
     
     /**
      * the executable to spawn.  See createFileSystem for use of AP_WGET or AP_CURL environment variables.
      */
-    protected static String exe=null;
+    static String exe=null;
     
     @Override
     public FileSystem createFileSystem(URI root) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException {
