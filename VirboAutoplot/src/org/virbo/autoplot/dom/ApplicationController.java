@@ -2243,8 +2243,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
-    public synchronized Canvas getCanvas() {
-        return canvas;
+    public Canvas getCanvas() {
+        logger.fine("enter getCanvas synchronized block");
+        synchronized (this) {
+            return canvas;
+        }
     }
 
     public void setCanvas(Canvas canvas) {
