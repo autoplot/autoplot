@@ -784,9 +784,9 @@ public class CdfUtil {
             StringBuilder vdescr=null;
 
             Variable var = cdf.getVariable(v[i]);
-            if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
-                continue;
-            }
+            //if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
+            //    continue;
+            //}
 
             List<String> warn= new ArrayList();
 
