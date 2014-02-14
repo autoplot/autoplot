@@ -1026,7 +1026,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * add a plot to the canvas to the row and column.
-     * @return
+     * @param row row for the plot
+     * @param column column for the plot
+     * @return the new plot.
      */
     public Plot addPlot(Row row, Column column) {
         Plot p= addPlot(null);
