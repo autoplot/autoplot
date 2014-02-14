@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Color scatter mode was broken back in December, and tests did not catch the mistake.</small></p>
+        <p><small>Improve support for rendering (X,Y,Z) buckshot data with spectrograms.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,12 +23,17 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-02-11):</p>
+        <p>Bugfixes (2014-02-14):</p>
         <ul>
+            <li>Non-time strings got into the time range dialog, causing parse errors.</li>
+            <li>update version in about dialog</li>
             <li>new code that sorts das2server folders and files would drop nodes. (Thanks Chris!)</li>
             <li>the vap files don't save the displayTitle property (Thanks Chris!)</li>
             <li>1157: allow renders to specify if they have autoranged a dimension.<li>
             <li>file chooser in the resourceURI dialog didn't set the current directory properly.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>four-argument-histogram routine now takes datums and strings as arguments.</li>
             <li>jython (a,b)=myFunc() now supports a,b in selection.</li>
             <li>tab completion on the address bar works again with JythonDataSource.</li>
@@ -48,21 +53,15 @@
             <li>documentation popup on script editor works again.</li>
             <li>SortDataSet called with zero-length sort list is trivially okay.  </li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>DataSetSelector focus on a mac made it easy to loose URI when using completions.</li>
-            <li>1144:"CDF URI needs an argument" still lingers (in webstart single-instance hander)</li>
-            <li>bounds of axis annotation labels corrected, before there was a 50px kludge which would leave unnecessary whitespace to the left of labels</li>
-            <li>code that flattens waveforms for SeriesRenderer picks a unit that improves precision</li>
-            <li>calculate CADENCE in Reduction.reducexWaveform to correct lines connecting waveform bursts</li>
-            <li>RPW Group's data looked bad with LANL NN rebinning because cadence detection failed.  Pull out code that infers bins from ytags.</li>
-            <li>catch more RTEs in Jython Script panel when using completions.</li>
-            <li>1142: remove old code that would reset the timerange when switching das2servers.  This could break bindings.</li>
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>another round of findbugs</li>            
+            <li>remove use of obsolete classes like DasDie.</li>
+            <li>another round of findbugs (down to 98 from 250+)</li>  
+            <li>improve support for buckshot data in spectrogram rebinners</li>
             <li>formatDataSet back to ScriptContext in new attempts to clean up security.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>drag a box to select multiple plots on layout panel</li>
             <li>drag on layout panel is shortcut for swap</li>
             <li>axis flipped property is supported in the vaps.</li>
@@ -70,13 +69,6 @@
             <li>internal rbsp orbits updated to 2014-02-03</li>
             <li>das2server lists folders separately from data sources.</li>
             <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Improvements to the thin client</li>
-            <li>Bookmarks logic allows users to review bookmarks before using them.</li>
-            <li>Inline data source now has editor panel, with discovery.</li>
-            <li>Example thin client code allows arbitrary .vap to be used</li>
         </ul>
 
         <p>Known issues:</p>
