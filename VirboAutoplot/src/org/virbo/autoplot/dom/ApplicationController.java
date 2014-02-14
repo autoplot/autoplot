@@ -1474,14 +1474,13 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.fine("got locks to reset application...");
 
         try {
-
-            Plot p0= getPlotFor(application.getPlotElements(0) );
-
-            p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
             
             for ( int i=application.getPlots().length-1; i>0; i-- ) {
                 deletePlot( application.getPlots(i) );
             }
+            
+            Plot p0= application.getPlots(0);
+            p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
 
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
                 deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
