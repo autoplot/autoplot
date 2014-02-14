@@ -2766,7 +2766,12 @@ public class PlotElementController extends DomNodeController {
     @Override
     public void pendingChanges(Map<Object, Object> changes) {
         super.pendingChanges(changes);
-        getDataSourceFilter().controller.pendingChanges(changes);
+        DataSourceFilter dsf= getDataSourceFilter();
+        if ( dsf!=null ) {
+            dsf.controller.pendingChanges(changes);
+        } else {
+            //System.err.println("here is null");
+        }
     }
 
 
