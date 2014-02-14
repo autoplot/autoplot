@@ -275,6 +275,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                     logger.fine("renderType=image not supported in CDF files");
                     renderType= null;
                 }
+                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+                    renderType= "eventsbar";
+                }
+
                 String os1= (String)map.get(PARAM_SLICE1);
                 if ( os1!=null && !os1.equals("") && variable.getNumDims()>0 ) {
                     logger.finer("dropping render type because of slice1");
@@ -502,7 +506,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             // doFill must not be true for this branch.
         }
 
-        final boolean doFill= ! UnitsUtil.isTimeLocation(units);
+        final boolean doFill= ! ( UnitsUtil.isTimeLocation(units) || UnitsUtil.isNominalMeasurement(units) );
         if ( doFill ) {
             Object f= thisAttributes.get("FILLVAL");
             double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );

@@ -1087,9 +1087,9 @@ public class CdfUtil {
 
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
-            if (var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) {
-                continue;
-            }
+            //if (var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) {
+            //    continue;
+            //}
 
             List<String> warn= new ArrayList();
 
