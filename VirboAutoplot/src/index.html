@@ -25,6 +25,7 @@
         to resolve old numbers.
         <p>Bugfixes (2014-02-14):</p>
         <ul>
+            <li>DE CDF data had rank 0 DELTA_PLUS.  This is supported now.</li>
             <li>Non-time strings got into the time range dialog, causing parse errors.</li>
             <li>update version in about dialog</li>
             <li>new code that sorts das2server folders and files would drop nodes. (Thanks Chris!)</li>
@@ -55,6 +56,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce support for ordinal data in CDFs</li>
+            <li>another round of findbugs</li>            
             <li>remove use of obsolete classes like DasDie.</li>
             <li>another round of findbugs (down to 98 from 250+)</li>  
             <li>improve support for buckshot data in spectrogram rebinners</li>
