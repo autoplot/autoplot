@@ -4,13 +4,7 @@
  */
 package org.virbo.binarydatasource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
 
 /**
  * reader to read Vax floats, motivated by RPWS group need to read ISEE data.
