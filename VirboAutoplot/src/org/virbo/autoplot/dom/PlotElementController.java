@@ -12,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -30,8 +29,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.event.DataPointSelectionEvent;
-import org.das2.event.DataPointSelectionListener;
 import org.das2.event.HorizontalSlicerMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.graph.ContoursRenderer;
@@ -58,7 +55,6 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import static org.virbo.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.virbo.autoplot.RenderTypeUtil;
-import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
@@ -194,6 +190,7 @@ public class PlotElementController extends DomNodeController {
             return "" + PlotElementController.this;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(DataSourceFilter.PROP_FILTERS) ) {
                 logger.log(Level.FINE, "property change in DSF means I need to autorange: {0}", evt.getPropertyName());
@@ -244,6 +241,7 @@ public class PlotElementController extends DomNodeController {
             return "" + PlotElementController.this;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             logger.log(Level.FINE, "plotElementListener: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             if ( evt.getPropertyName().equals(PlotElement.PROP_RENDERTYPE) && !PlotElementController.this.isValueAdjusting() ) {
@@ -255,6 +253,7 @@ public class PlotElementController extends DomNodeController {
                 if ( SwingUtilities.isEventDispatchThread() ) {
                     changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
                     Runnable run= new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
@@ -302,6 +301,7 @@ public class PlotElementController extends DomNodeController {
                     return;
                 }
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         if ( changesSupport==null ) {
                             logger.severe("changesSupport is null!!!");
@@ -338,6 +338,7 @@ public class PlotElementController extends DomNodeController {
      * listen for changes in the parent plotElement that this child can respond to.
      */
     PropertyChangeListener parentStyleListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             try {
                 DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
@@ -356,6 +357,7 @@ public class PlotElementController extends DomNodeController {
      * fire changes.
      */
     PropertyChangeListener styleListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals( PlotElementStyle.PROP_REBINMETHOD ) ) {
                 if ( plotElement.getRenderType()==RenderType.nnSpectrogram || plotElement.getRenderType()==RenderType.spectrogram ) {
@@ -678,7 +680,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     PropertyChangeListener exceptionListener = new PropertyChangeListener() {
-
+        @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
 
             changesSupport.performingChange( this, PENDING_SET_DATASET );
@@ -711,7 +713,9 @@ public class PlotElementController extends DomNodeController {
 
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
+        @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
+            logger.fine("enter fillDataSetListener propertyChange");
             if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
                 //TODO: find a way to fix this properly or don't call it a kludge! logger.fine("kludge pec446 cannot be removed");
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
@@ -890,6 +894,7 @@ public class PlotElementController extends DomNodeController {
         //TODO: we should hand off the dataset here instead of mucking around with it...  
         if (!dom.controller.isValueAdjusting()) {
             Runnable run= new Runnable() {
+                @Override
                 public void run() { // java complains about method not override.
                     try {
                         updateDataSetImmediately();
@@ -1164,6 +1169,7 @@ public class PlotElementController extends DomNodeController {
      */
     private void addParentComponentListener( PlotElement plotElement, final PlotElement ele ) {
         PropertyChangeListener pcl= new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals(PlotElement.PROP_COMPONENT) ) {
                     if ( DataSetOps.changesDimensions((String)evt.getOldValue(),(String)evt.getNewValue()) ) {
@@ -1335,6 +1341,7 @@ public class PlotElementController extends DomNodeController {
 
                     //check for non-unique labels, or labels that are simply numbers.
                     boolean uniqLabels= true;
+                    assert lnames!=null;
                     for ( int i=0;i<lnames.length; i++ ) {
                         if ( AutoplotUtil.isParsableDouble( lnames[i] ) ) uniqLabels= false;
                         for ( int j=i+1; j<lnames.length; j++ ) {
@@ -1414,6 +1421,7 @@ public class PlotElementController extends DomNodeController {
      * sets resetRanges to false after the load.
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( dsfReset ) {
                 setResetComponent(true);
@@ -1817,7 +1825,7 @@ public class PlotElementController extends DomNodeController {
             }
         } else { // hugeScatter okay
 
-            Map<String,Object> yprop, xprop=null, prop=null;
+            Map<String,Object> yprop, xprop=null, prop;
 
             QDataSet bundle1= (QDataSet) properties.get(QDataSet.BUNDLE_1);
             if ( bundle1!=null ) {
@@ -2090,34 +2098,28 @@ public class PlotElementController extends DomNodeController {
 
         } else {
 
-            QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor ydesc; //TODO: QDataSet can model AutoRangeDescriptors, it should be used instead.
             
             QDataSet depend0;
 
-            if ( false && hist!=null ) {
-                ydesc= AutoplotUtil.autoRange( hist, fillDs, props );
-                depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-            } else {
-                if ( SemanticOps.isBundle(fillDs) ) {
-                    depend0= SemanticOps.xtagsDataSet(fillDs);
-                    if ( spec==RenderType.colorScatter ) {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
-                    } else {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); //TODO: small problem that we don't support colorScatter here
-                        for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
-                           AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
-                           if ( ydesc1.range.getUnits().isConvertableTo(ydesc.range.getUnits()) ) {
-                               ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
-                           } else {
-                               break;
-                           }
-                        }
-                    }
+            if ( SemanticOps.isBundle(fillDs) ) {
+                depend0= SemanticOps.xtagsDataSet(fillDs);
+                if ( spec==RenderType.colorScatter ) {
+                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props, ignoreDsProps );
                 } else {
-                    ydesc = AutoplotUtil.autoRange( fillDs, props, ignoreDsProps );
-                    depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); //TODO: small problem that we don't support colorScatter here
+                    for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
+                       AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
+                       if ( ydesc1.range.getUnits().isConvertableTo(ydesc.range.getUnits()) ) {
+                           ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                       } else {
+                           break;
+                       }
+                    }
                 }
+            } else {
+                ydesc = AutoplotUtil.autoRange( fillDs, props, ignoreDsProps );
+                depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             }
 
             peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
@@ -2485,6 +2487,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             Runnable run = new Runnable() {
+                @Override
                 public void run() {
                     DasPlot plot = getDasPlot();
                     if ( plot==null ) {
@@ -2766,9 +2769,9 @@ public class PlotElementController extends DomNodeController {
     @Override
     public void pendingChanges(Map<Object, Object> changes) {
         super.pendingChanges(changes);
-        DataSourceFilter dsf= getDataSourceFilter();
-        if ( dsf!=null ) {
-            dsf.controller.pendingChanges(changes);
+        DataSourceFilter ldsf= getDataSourceFilter();
+        if ( ldsf!=null ) {
+            ldsf.controller.pendingChanges(changes);
         } else {
             //System.err.println("here is null");
         }
