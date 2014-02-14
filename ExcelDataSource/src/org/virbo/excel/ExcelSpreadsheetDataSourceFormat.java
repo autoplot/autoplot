@@ -27,7 +27,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 
 /**
- * Format the QDataSet into Ascii tables.  
+ * Format the QDataSet into Excel spreadsheets (1990s format).  
  * @author jbf
  */
 public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
