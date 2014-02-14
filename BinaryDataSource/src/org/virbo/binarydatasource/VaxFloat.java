@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 /**
  * reader to read Vax floats, motivated by RPWS group need to read ISEE data.
- * vap+bin:file:///opt/project/isee/archive/a1977/77295.arc?recLength=880&type=vaxfloat&recOffset=20
+ * vap+bin:sftp://klunk.physics.uiowa.edu/opt/project/isee/archive/a1977/77295.arc?recLength=880&type=vaxfloat&recOffset=20
  * @author jbf
  */
 public class VaxFloat extends BufferDataSet {
