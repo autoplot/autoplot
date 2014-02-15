@@ -4,6 +4,9 @@
  */
 package test;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.graph.SpectrogramRenderer;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -17,6 +20,9 @@ import org.virbo.autoplot.dom.Application;
  * @author jbf
  */
 public class Test_4pt1_Lanl20140214b implements Scenario {
+    
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     public int runIt(Object param) {
         try {
             createGui();
@@ -36,6 +42,8 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
 
             Util.switchToTab(app,"style");
             // how to push droplist?
+            Util.switchToTab(app,"canvas");
+            
             dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor );
             
             writeToPng( "Test_4pt1_Lanl20140214b.001a.png");
@@ -58,6 +66,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
             return 0;
             
         } catch ( Exception e ) {
+            logger.log( Level.SEVERE, e.getMessage(), e );
             return 1;
         }
     }
