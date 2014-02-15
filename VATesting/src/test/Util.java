@@ -12,6 +12,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.das2.graph.DasPlot;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
+import org.netbeans.jemmy.operators.JTabbedPaneOperator;
+import org.virbo.autoplot.AutoplotUI;
 import util.RegexComponentChooser;
 
 /**
@@ -55,5 +57,14 @@ public class Util {
         } catch (UnsupportedLookAndFeelException ex) {
             Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * switch to the named tab
+     * @param app
+     * @param style 
+     */
+    static void switchToTab( AutoplotUI app, String style) {
+        new JTabbedPaneOperator( app.getTabs() ).selectPage("style");
     }
 }
