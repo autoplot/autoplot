@@ -4,10 +4,9 @@
  */
 package test;
 
+import org.das2.graph.SpectrogramRenderer;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JFrameOperator;
-import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -35,14 +34,26 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
             
             writeToPng( "Test_4pt1_Lanl20140214b.001.png");
 
+            Util.switchToTab(app,"style");
+            // how to push droplist?
+            dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor );
+            
+            writeToPng( "Test_4pt1_Lanl20140214b.001a.png");
+            
+            waitUntilIdle();
+
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
                     new String[] { "Plot Style", "Series" } );
             
             waitUntilIdle();
             
             writeToPng( "Test_4pt1_Lanl20140214b.002.png");
-             
+            
+            Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
+                    new String[] { "Plot Style", "Series" } );
+            
             waitUntilIdle();
+            
              
             return 0;
             
