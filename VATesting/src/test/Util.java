@@ -62,9 +62,9 @@ public class Util {
     /**
      * switch to the named tab
      * @param app
-     * @param style 
+     * @param name  
      */
-    static void switchToTab( AutoplotUI app, String style) {
-        new JTabbedPaneOperator( app.getTabs() ).selectPage("style");
+    static void switchToTab( AutoplotUI app, String name ) {
+        new JTabbedPaneOperator( app.getTabs() ).selectPage(name);
     }
 }
