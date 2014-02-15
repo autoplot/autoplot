@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.FileChooserUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -650,7 +652,6 @@ public class ScriptPanelSupport {
                 // this hangs on Java 1.7.0_17 Linux Centos 6:
                 chooser.getFileSystemView().isParent(chooser.getCurrentDirectory(),new File(openFile));
                 File fopenFile= new File(openFile);
-                chooser.setCurrentDirectory( fopenFile.getParentFile() );
                 chooser.setSelectedFile(fopenFile);
                 // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
             }
