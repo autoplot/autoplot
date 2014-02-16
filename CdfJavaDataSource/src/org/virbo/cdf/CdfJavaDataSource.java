@@ -258,6 +258,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     svariable = svariable.substring(0, i);
                 }
                 variable= cdf.getVariable(svariable);
+                if ( variable==null ) {
+                    throw new IllegalArgumentException("No Such Variable: "+svariable);
+                }
                 long numRec= variable.getNumberOfValues();
 
                 long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
