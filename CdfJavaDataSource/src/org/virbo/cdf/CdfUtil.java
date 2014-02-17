@@ -784,9 +784,18 @@ public class CdfUtil {
             StringBuilder vdescr=null;
 
             Variable var = cdf.getVariable(v[i]);
-            //if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
-            //    continue;
-            //}
+
+            // reject variables that are ordinal data that do not have DEPEND_0.
+            Object dep0= cdf.getAttribute("DEPEND_0");
+            boolean hasDep0= false;
+            if ( dep0!=null ) {
+                hasDep0= true;
+            }
+            if ( ( var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
+                logger.log(Level.FINER, "skipping becuase ordinal and no depend_0: {0}", var.getName());
+                continue;
+            }
+
 
             List<String> warn= new ArrayList();
 
