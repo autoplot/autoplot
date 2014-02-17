@@ -275,9 +275,6 @@ public class CdfFileDataSource extends AbstractDataSource {
                     logger.fine("renderType=image not supported in CDF files");
                     renderType= null;
                 }
-                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-                    renderType= "eventsbar";
-                }
 
                 String os1= (String)map.get(PARAM_SLICE1);
                 if ( os1!=null && !os1.equals("") && variable.getNumDims()>0 ) {
@@ -286,17 +283,26 @@ public class CdfFileDataSource extends AbstractDataSource {
                     result.putProperty(QDataSet.RENDER_TYPE, renderType );
                 }
                 
-                if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
-                        String rt= (String)istpProps.get("RENDER_TYPE" );
-                        if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
-                        if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
-                            if ( result.property("DEPEND_1")==null ) {
-                                result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+                    if ( result.property(QDataSet.DEPEND_0)==null ) {
+                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
+                    } else {
+                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
+                    }
+                } else {
+                    if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
+                        if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
+                            String rt= (String)istpProps.get("RENDER_TYPE" );
+                            if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
+                            if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
+                                if ( result.property("DEPEND_1")==null ) {
+                                    result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                                }
                             }
                         }
                     }
                 }
+
                 for ( int j=0; j<QDataSet.MAX_RANK; j++ ) {
                     MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
                     Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
