@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Event;
 import java.beans.PropertyChangeSupport;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
@@ -29,12 +31,18 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.FileChooserUI;
 import javax.swing.text.AttributeSet;
@@ -46,6 +54,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledEditorKit;
 import jsyntaxpane.syntaxkits.PythonSyntaxKit;
+import org.apache.batik.ext.awt.image.spi.DefaultBrokenLinkProvider;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -623,6 +632,56 @@ public class ScriptPanelSupport {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
+    
+    private JComponent getRecentAccessory( final String filter, final int limit, final JFileChooser c ) {
+        JPanel recentPanel= new JPanel(new BorderLayout());
+        
+        final JList p= new JList();
+        p.setFont( p.getFont().deriveFont(8.f) );
+        final String msgWait= "Getting Recent...";
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                Map<String,String> recent= model.getRecent(filter,limit);
+
+                DefaultListModel mm= new DefaultListModel();
+                for ( String s:recent.keySet() ){
+                    if ( s.startsWith("script:") ) s= s.substring(7);
+                    if ( s.startsWith("file:") ) {
+                        if ( s.startsWith("file://") ) s= s.substring(7);
+                        if ( s.startsWith("file:") ) s= s.substring(5);
+                        mm.addElement(s);
+                    }
+                }
+                p.setModel( mm );
+            }
+        } ;
+        new Thread(run).start();
+        p.addListSelectionListener( new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if ( !e.getValueIsAdjusting() ){
+                    if ( p.getSelectedValue().equals(msgWait) ) {
+                        
+                    } else {
+                        String s=  (String)p.getSelectedValue();
+
+                        c.setSelectedFile( new File(s));
+                    }
+                }
+            }
+        } );
+        
+        
+        DefaultListModel mm= new DefaultListModel();
+        mm.add(0,msgWait);
+        p.setModel(mm);
+        p.setPreferredSize( new Dimension(300,300) );
+        p.setMinimumSize( new Dimension(300,300) );
+        recentPanel.add( new JLabel("Recently used local files:"), BorderLayout.NORTH );
+        recentPanel.add( new JScrollPane(p), BorderLayout.CENTER );
+        return recentPanel;
+    }
 
     protected void open() {
         try {
@@ -655,6 +714,9 @@ public class ScriptPanelSupport {
                 chooser.setSelectedFile(fopenFile);
                 // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
             }
+            
+            chooser.setAccessory( getRecentAccessory("*.jy",10,chooser) );
+            
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
