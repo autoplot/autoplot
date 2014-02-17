@@ -1087,9 +1087,21 @@ public class CdfUtil {
 
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
-            //if (var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) {
-            //    continue;
-            //}
+            
+            // reject variables that are ordinal data that do not have DEPEND_0.
+            Attribute dep0= cdf.getAttribute("DEPEND_0");
+            boolean hasDep0= false;
+            try {
+                if ( dep0!=null && dep0.getEntry(var)!=null ) {
+                    hasDep0= true;
+                }
+            } catch ( CDFException ex ) {
+                logger.finer("no depend_0: "+var.getName());
+            }
+            if ( ( var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) && ( !hasDep0 ) ) {
+                logger.finer("skipping becuase ordinal and no depend_0: "+var.getName());
+                continue;
+            }
 
             List<String> warn= new ArrayList();
 
