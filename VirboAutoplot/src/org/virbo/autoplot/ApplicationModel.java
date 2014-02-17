@@ -27,11 +27,13 @@ import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,11 +52,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -732,6 +736,59 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
+    /** 
+     * return a list of items matching filter.
+     * @param filter String like "*.jy"
+     * @param limit maximum number of items to return
+     * @return 
+     */
+    public Map<String,String> getRecent( String filter, final int limit ) {
+        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+        if ( !f2.exists() ) {
+            boolean ok= f2.mkdirs();
+            if ( !ok ) {
+                throw new RuntimeException("unable to create folder "+ f2 );
+            }
+        }
+        
+        // always tack on the URI to history.dat file
+        final File f3 = new File( f2, "history.txt");
+        
+        Pattern p= org.das2.util.filesystem.Glob.getPattern(filter);
+        
+        LinkedHashMap<String,String> result= new LinkedHashMap<String, String>() {
+            @Override
+            protected boolean removeEldestEntry(Entry<String, String> eldest) {
+               return size() > limit;
+            }
+        };
+        
+        BufferedReader reader=null;
+        try {
+            reader= new BufferedReader( new FileReader(f3) );
+            String line= reader.readLine();
+            while ( line!=null ) {            
+                String[] ss= line.split("\\s+",2);
+                if ( ss.length>1 ) {
+                    if ( p.matcher(ss[1]).matches() ) {
+                        result.put( ss[1], ss[0] );
+                    }
+                }
+                line= reader.readLine();
+            }
+        } catch ( IOException ex ) {
+            logger.log(Level.SEVERE,ex.getMessage(),ex);
+            if ( reader!=null ) try {
+                reader.close();
+            } catch (IOException ex1) {
+                logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+            }
+        }
+
+        return result;
+        
+    }
+    
     /**
      * //TODO: this should not be called.
      * @deprecated.  Use BookmarksManager.addBookmark.
