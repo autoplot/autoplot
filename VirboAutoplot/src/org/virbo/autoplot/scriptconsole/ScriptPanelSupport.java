@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -44,17 +43,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.FileChooserUI;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledEditorKit;
-import jsyntaxpane.syntaxkits.PythonSyntaxKit;
-import org.apache.batik.ext.awt.image.spi.DefaultBrokenLinkProvider;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -86,6 +80,7 @@ import org.virbo.jythonsupport.ui.ParametersFormPanel;
 public class ScriptPanelSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final int RECENT_FILES_COUNT = 10;
 
     File file;
     final ApplicationModel model;
@@ -715,7 +710,11 @@ public class ScriptPanelSupport {
                 // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
             }
             
-            chooser.setAccessory( getRecentAccessory("*.jy",10,chooser) );
+            if ( panel.getContext()==JythonScriptPanel.CONTEXT_APPLICATION ) {
+                chooser.setAccessory( getRecentAccessory("*.jy", RECENT_FILES_COUNT,chooser) );
+            } else {
+                chooser.setAccessory( getRecentAccessory("*.jyds", RECENT_FILES_COUNT,chooser) );
+            }
             
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
