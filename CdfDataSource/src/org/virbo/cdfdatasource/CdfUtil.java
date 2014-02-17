@@ -1096,10 +1096,10 @@ public class CdfUtil {
                     hasDep0= true;
                 }
             } catch ( CDFException ex ) {
-                logger.finer("no depend_0: "+var.getName());
+                logger.log(Level.FINER, "no depend_0: {0}", var.getName());
             }
             if ( ( var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) && ( !hasDep0 ) ) {
-                logger.finer("skipping becuase ordinal and no depend_0: "+var.getName());
+                logger.log(Level.FINER, "skipping becuase ordinal and no depend_0: {0}", var.getName());
                 continue;
             }
 
