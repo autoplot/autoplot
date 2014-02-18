@@ -1,7 +1,7 @@
 = What is Autoplot =
-Autoplot is an interactive browser for data on the web. Give it a URL or a name of a file on your computer and it tries to create a sensible plot. It was developed to allow quick and interactive browsing of data and metadata.
+Autoplot is an interactive browser for data on the web. Give it a URL or a name of a file on your computer and it tries to create a sensible plot. It was developed to allow quick and interactive browsing of data and metadata.  Autoplot works with more abstract data sources as well, like the CDAWeb at NASA/Goddard.  In this case a compact URI is provided, that refers to data.  These URIs (and URLs) can be pasted into emails for easy collaboration with collegues.
 
-See http://www.autoplot.org
+See http://autoplot.org
 
 = Building Autoplot =
 
