@@ -30,6 +30,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
@@ -157,11 +158,48 @@ public class InlineDataSource extends AbstractDataSource {
         String[] ss= s.split(";");
         if ( ss.length>1 ) { // rank 2
             BundleDataSet bds= BundleDataSet.createRank1Bundle();
-            for ( int i=0; i<ss.length; i++ ) {
-                MutablePropertyDataSet result= parseInlineDsSimple(ss[i]);
-                bds.bundle(result);
+            String[] ss2= ss[0].split(",");
+            int nds= ss2.length;
+            boolean enumTimeNoChange= true;
+            Units ru= null;
+            for ( int j=0; j<ss2.length; j++ ) {
+                QDataSet result= parseInlineDsSimple(ss2[j]);
+                Units u= SemanticOps.getUnits(result);
+                if ( ru==null ) {
+                    ru= u;
+                } else {
+                    if ( ru!=u ) {
+                        enumTimeNoChange= false;
+                    }
+                }
             }
-            bds.putProperty( QDataSet.BUNDLE_1, null );
+
+            if ( enumTimeNoChange ) {
+                for ( int i=0; i<ss.length; i++ ) {
+                    ss2= ss[i].split(",");
+                    DataSetBuilder b= new DataSetBuilder(1,10);
+                    for ( int j=0; j<nds; j++ ) {
+                        QDataSet result= parseInlineDsSimple(ss2[j]);
+                        b.putValue(-1,result.value(0));
+                        b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
+                        b.nextRecord();
+                    }
+                    bds.bundle(b.getDataSet());
+                }
+            } else {
+                for ( int j=0; j<nds; j++ ) {
+                    DataSetBuilder b= new DataSetBuilder(1,10);
+                    for ( int i=0; i<ss.length; i++ ) {
+                        ss2= ss[i].split(",");
+                        QDataSet result= parseInlineDsSimple(ss2[j]);
+                        b.putValue(-1,result.value(0));
+                        b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
+                        b.nextRecord();
+                    }
+                    bds.bundle(b.getDataSet());
+                }
+            }
+            //bds.putProperty( QDataSet.BUNDLE_1, null );
             return bds;
         } else {
             MutablePropertyDataSet result= parseInlineDsSimple(ss[0]);
@@ -171,7 +209,7 @@ public class InlineDataSource extends AbstractDataSource {
 
     // http://autoplot.org/developer.inlineData
     //vap+inline:3,4;3,6;5,6
-    //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5//TODO: check this
+    //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5
     //vap+inline:1,2,3&DEPEND_0=1,2,3&DEPEND_0.UNITS=hours since 2000-001T00:00
     //vap+inline:exp(findgen(20))&UNITS=eV&SCALE_TYPE=log&LABEL=Energy
     //vap+inline:ripples(1440)&DEPEND_0=timegen('2003-05-01','1 min',1440) 
