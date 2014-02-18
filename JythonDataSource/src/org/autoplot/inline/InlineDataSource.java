@@ -276,7 +276,7 @@ public class InlineDataSource extends AbstractDataSource {
                             bundle1= parseInlineDs(propValue);
                         }
                     } else {
-                        if ( DataSetUtil.isDimensionProperty(propName) ) {
+                        if ( DataSetUtil.isDimensionProperty(propName) || propName.equals(QDataSet.RENDER_TYPE) || propName.equals(QDataSet.DELTA_PLUS) || propName.equals(QDataSet.DELTA_MINUS) ) {
                             p.put(propName,propValue);
                             continue;
                         } else {
@@ -327,20 +327,7 @@ public class InlineDataSource extends AbstractDataSource {
         for ( Entry<String,String> e: p.entrySet() ) {
             String prop= e.getKey();
             String propValue= e.getValue();
-            if ( prop.equals("UNITS") ) {
-                ds.putProperty( prop, SemanticOps.lookupUnits(propValue) );
-            } else if ( prop.equals("FILL_VALUE" ) || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX")) {
-                ds.putProperty( prop, Double.parseDouble(propValue) );
-            } else if ( prop.equals("MONOTONIC") ) {
-                ds.putProperty( prop, Boolean.parseBoolean(propValue) ); // True or TRUE
-            } else if ( prop.startsWith("DEPEND_") ) {
-                if ( propValue.equals("") || propValue.equals("None") || propValue.equals("null") ) {
-                    ds.putProperty( prop, null);
-                }
-            } else {
-                // it would be nice to use QStream's SerializeRegistery here to attempt decode for each type.
-                ds.putProperty(prop,propValue);
-            }
+            ds= Ops.putProperty( ds, prop, propValue );
         }
 
         if ( depn[0]==null ) {
