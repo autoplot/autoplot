@@ -40,7 +40,7 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class InlineDataSource extends AbstractDataSource {
 
-    Logger logger= LoggerManager.getLogger("jython.inline");
+    private static final Logger logger= LoggerManager.getLogger("jython.inline");
     
     PythonInterpreter interp;
     public InlineDataSource(URI uri) {
@@ -145,6 +145,8 @@ public class InlineDataSource extends AbstractDataSource {
         } catch ( RuntimeException ex ) {
             // since we couldn't run the command, we know that wasn't it.
             // TODO: it would be nicer to try to parse the string a little instead.
+            logger.log(Level.FINE, "failed to execute: {0}", linkCommand);
+            logger.log( Level.FINE, ex.getMessage(), ex );
         }
 
 
@@ -169,17 +171,18 @@ public class InlineDataSource extends AbstractDataSource {
 
     // http://autoplot.org/developer.inlineData
     //vap+inline:3,4;3,6;5,6
-    //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5
+    //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5//TODO: check this
     //vap+inline:1,2,3&DEPEND_0=1,2,3&DEPEND_0.UNITS=hours since 2000-001T00:00
     //vap+inline:exp(findgen(20))&UNITS=eV&SCALE_TYPE=log&LABEL=Energy
-    //vap+inline:vap+inline:ripples(1440)&DEPEND_0=timegen('2003-05-01','1 min',1440)
-    //vap+inline:t=linspace(0,2*PI,200)&cos(2*t)),sin(3*t)),t
+    //vap+inline:ripples(1440)&DEPEND_0=timegen('2003-05-01','1 min',1440) 
+    //vap+inline:t=linspace(0,2*PI,200)&cos(2*t),sin(3*t),t
+    @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
 
         logger.log(Level.FINE, "getDataSet {0}", getURI() );
 
         logger.log( Level.FINER, "create interpreter");
-        interp= JythonUtil.createInterpreter(false);
+        interp= JythonUtil.createInterpreter(true);
         if ( ! org.virbo.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
             logger.log( Level.FINER, "import the stuff we don't import automatically anymore");
             InputStream in=  org.virbo.jythonsupport.Util.class.getResource("imports.py").openStream();
@@ -207,7 +210,7 @@ public class InlineDataSource extends AbstractDataSource {
         Map<String,String> p= new LinkedHashMap<String,String>();
 
         Pattern depPat= Pattern.compile("DEPEND_(\\d+)(\\.([A-Z]+))?");
-        Matcher m=null;
+        Matcher m;
         for ( int i=0; i<ss.length; i++ ) {
             String arg= ss[i];
             if ( arg.length()==0 ) continue;
@@ -235,7 +238,12 @@ public class InlineDataSource extends AbstractDataSource {
                             bundle1= parseInlineDs(propValue);
                         }
                     } else {
-                        p.put(propName,propValue);
+                        if ( DataSetUtil.isDimensionProperty(propName) ) {
+                            p.put(propName,propValue);
+                            continue;
+                        } else {
+                            interp.exec(arg);
+                        }
                     }
                 } else {
                     throw new ParseException("expected = for non-number",0);
