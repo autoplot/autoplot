@@ -3234,38 +3234,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 
     
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-        if ( eventsListTool==null ) {
-            JFrame frame= new JFrame( "Events List");
-            final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
-            Icon bookmarkIcon= new javax.swing.ImageIcon(getClass().getResource("/resources/purplebookmark.png") );
-
-            ll.getDataSetSelector().replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(AutoplotUI.this), true );
-                    man.setHidePlotButtons(true);
-                    man.setPrefNode( "bookmarks", "autoplot.default.events",  "http://autoplot.org/data/events.xml" );
-                    man.setVisible(true);
-                    Bookmark book= man.getSelectedBookmark();
-                    if ( book!=null ) {
-                        ll.getDataSetSelector().setValue( ((Bookmark.Item)book).getUri() );
-                    }
-                }
-            });
-            ll.addDataRangeSelectionListener( new DataRangeSelectionListener() {
-                @Override
-                public void dataRangeSelected(DataRangeSelectionEvent e) {
-                    AutoplotUI.this.applicationModel.dom.setTimeRange( e.getDatumRange() );
-                }
-            });
-            
-            frame.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
-            frame.getContentPane().add( ll );
-            frame.pack();
-            eventsListToolFrame= frame;
-            eventsListTool= ll;
-        }
-        eventsListToolFrame.setVisible(true);
+        EventsListToolUtil.show( this );
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
