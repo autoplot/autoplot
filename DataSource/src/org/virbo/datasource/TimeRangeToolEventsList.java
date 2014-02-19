@@ -26,7 +26,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.DataRangeSelectionEvent;
-import org.das2.graph.GraphUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
