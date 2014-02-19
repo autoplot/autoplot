@@ -36,12 +36,14 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -804,6 +806,27 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 parser.setFieldParser(icol, parser.UNITS_PARSER);
             }
         }
+        
+        o= params.get("where");
+        if ( o!=null ) {
+            String w= o;
+            if ( w.length()>0 ) {
+                Pattern p= Pattern.compile("\\.([nelg][qte])\\(");
+                Matcher m= p.matcher(w);
+                int ieq;
+                if ( !m.find() ) {
+                    throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
+                } else {
+                    ieq= m.start();
+                    String op= m.group(1);
+                    String sval= w.substring(ieq+4);
+                    if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                    String sparm= w.substring(0,ieq);
+                    parser.setWhereConstraint( sparm, op, sval );
+                }
+            }
+        }
+                
         
         // --- done configuration, now read ---
         DDataSet ds1;
