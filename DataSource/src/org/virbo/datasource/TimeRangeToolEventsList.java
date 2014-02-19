@@ -314,7 +314,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     /** Removes DataRangeSelectionListener from the list of listeners.
      * @param listener The listener to remove.
      */
-    public synchronized void removeDataRangeSelectionListener(org.das2.event.DataRangeSelectionListener listener) {
+    public void removeDataRangeSelectionListener(org.das2.event.DataRangeSelectionListener listener) {
         listenerList.remove(org.das2.event.DataRangeSelectionListener.class, listener);
     }
     
