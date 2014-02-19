@@ -85,6 +85,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "read the last n records."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "eventListColumn=",
                     "read in the file as an event list, where the first two columns are UT times"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "where=",
+                    "add constraint by another field's value"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "title=",
                     "title for the dataset"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "label=",
@@ -167,6 +169,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if (paramName.equals("eventListColumn")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 if ( result.size()>2 ) result.subList( 2, result.size() );
+                return result;
+            } else if (paramName.equals("where")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
                 return result;
             } else {
                 return Collections.emptyList();
