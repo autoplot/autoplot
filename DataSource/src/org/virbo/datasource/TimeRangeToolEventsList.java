@@ -5,11 +5,19 @@
 package org.virbo.datasource;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
@@ -18,6 +26,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.DataRangeSelectionEvent;
+import org.das2.graph.GraphUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
@@ -41,6 +50,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     DataSource dss= null;
     QDataSet currentDataSet= null;
     TimeSeriesBrowse tsb= null;
+    boolean hasIcons= false;
     
     /**
      * Creates new form TimeRangeToolEventsList
@@ -99,9 +109,83 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             lm.add(lm.getSize(),"Load Next Set...");
         }
         intervalsList.setModel( lm );
+        intervalsList.setCellRenderer( listCellRenderer );
     }
     
-        /**
+    ListCellRenderer listCellRenderer= new ListCellRenderer() {
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel result= new JLabel(String.valueOf(value));
+            
+            result.setIcon(null);
+            
+            Color background, foreground;
+            
+            if (isSelected) {
+                background = list.getSelectionBackground();
+                foreground = list.getSelectionForeground();
+            } else {
+                background = list.getBackground();
+                foreground = list.getForeground();
+            }
+            
+            result.setOpaque(true);
+            result.setForeground(foreground);
+            result.setBackground(background);
+            
+            if ( currentDataSet==null ) {
+                return result;
+            }
+            
+            QDataSet rec;
+            
+            if ( tsb==null ) {
+                rec= currentDataSet.slice(index);
+            } else {
+                if ( index==0 ) {
+                    return result;
+                } else if ( index==currentDataSet.length() ) {
+                    return result;
+                }
+                if ( index-1 >= currentDataSet.length() ) {
+                    return result;
+                } else {
+                    rec= currentDataSet.slice(index-1);                
+                }
+            }
+            
+            QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
+            Units eu= (Units) bds.property(QDataSet.UNITS,3);
+            String s= eu.createDatum(rec.value(3)).toString();            
+            
+            if ( hasIcons ) {
+                result.setText( String.valueOf(value)+": "+s );
+                int color= (int)rec.value(2);
+                Icon icon= colorIcon( new Color(color), 12,12 );
+                result.setIcon(icon);
+            }
+            
+            return result;
+        }
+    };
+    
+    /**
+     * return a block with the color and size.
+     * @param w
+     * @param h
+     * @return 
+     */
+    private static Icon colorIcon( Color iconColor, int w, int h ) {
+        BufferedImage image= new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+        Graphics g= image.getGraphics();
+        g.setColor( Color.WHITE );
+        g.fillRect( 0,0,w,h );
+        g.setColor( new Color( iconColor.getRed(), iconColor.getGreen(), iconColor.getBlue(), 140 ) );
+        g.fillRect( 0, 0, w, h );
+        return new ImageIcon(image);
+    }    
+
+    /**
      * make canonical rank 2 bundle dataset of min,max,color,text
      * @param vds
      * @return
@@ -460,7 +544,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 tsb.setTimeRange(current);
                 ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                 try {
-                    currentDataSet= dss.getDataSet(mon);
+                    QDataSet currentDataSet1= dss.getDataSet(mon);
+                    currentDataSet= makeCanonical(currentDataSet1);
                 } catch ( Exception ex ) {
                     currentDataSet= null;
                 } finally {
@@ -490,6 +575,15 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     currentDataSet= dss.getDataSet(mon);
                     tsb= dsource.getCapability( TimeSeriesBrowse.class );
                     currentDataSet= makeCanonical(currentDataSet);
+                    hasIcons= false;
+                    if ( currentDataSet.length()>0 ) {
+                        double color0= currentDataSet.value(0,2);
+                        for ( int i=0; i<currentDataSet.length(); i++ ) {
+                            if ( currentDataSet.value(i,2)!=color0 ) {
+                                hasIcons= true;
+                            }
+                        }
+                    }
                     currentDataSetSelector.setEnabled(true);
                     fillList( );
                 } catch (Exception ex) {
