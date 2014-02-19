@@ -274,6 +274,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             } catch ( org.virbo.qstream.StreamException ex ) {
                 Throwable cause= ex.getCause();
+                mon.finished();
                 if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 
                     ex.printStackTrace();
                     //TODO CancelledOperationException
@@ -303,6 +304,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             try {
                 StreamTool.readStream(channel, handler);
             } catch ( StreamException ex ) {
+                mon.finished();
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
                     logger.log( Level.INFO, ex.getMessage(), ex );
                     if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
@@ -398,6 +400,8 @@ class Das2ServerDataSource extends AbstractDataSource {
         } catch ( IllegalArgumentException ex ) {
             ex.printStackTrace();
         }
+        
+        mon.finished();
         return result1;
 
     }
