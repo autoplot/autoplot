@@ -16,6 +16,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
@@ -377,6 +378,16 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
         if ( fire==null ) {
             return;
+        }
+        if ( fire.width().value()==0 ) {
+            logger.fine("zero width.");
+            Units tu;
+            if ( UnitsUtil.isTimeLocation(fire.min().getUnits()) ) {
+                tu= Units.seconds;
+            } else {
+                tu= fire.min().getUnits().getOffsetUnits();
+            }
+            fire= new DatumRange( fire.min().subtract(1,tu), fire.min().add(1,tu) );
         }
         if ( rescaleComboBox.getSelectedIndex()>0 ) {
             try {
