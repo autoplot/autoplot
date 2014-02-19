@@ -67,7 +67,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     private DatumRange getRange( int i ) {
         QDataSet ds1= currentDataSet.slice(i).trim(0,2); // it's a shame this doesn't get the units right...
         Units tu= (Units)((QDataSet)currentDataSet.property(QDataSet.BUNDLE_1)).property(QDataSet.UNITS,0);
-        return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+        if ( ds1.value(0)<ds1.value(1) ) {
+            return DatumRange.newDatumRange( ds1.value(0), ds1.value(1), tu );
+        } else {
+            logger.log(Level.INFO, "start and stop times are out-of-order at index {0}", i);
+            return DatumRange.newDatumRange( ds1.value(1), ds1.value(0), tu );
+        }
     }
     
     /**
@@ -300,11 +305,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(currentDataSetSelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(rescaleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(prevButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(nextButton))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(rescaleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1)
+                        .addComponent(nextButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
         );
