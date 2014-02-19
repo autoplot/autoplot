@@ -1594,6 +1594,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         }
     }
 
+    /**
+     * add the bookmarks to the JMenu.
+     * @param bookmarksMenu
+     * @param dataSetSelector 
+     */
     public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
         Container c= getParent();
         if ( c instanceof AutoplotUI ) {
