@@ -135,7 +135,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         DataSetURI.init();  // for FtpFileSystem implementation
 
-        System.err.println("this is pngwalk 20110114");
+        System.err.println("autoplot pngwalk 20140214");
         final ArgumentList alm = new ArgumentList("PngWalkTool1");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument( "mode", "m", "mode", "filmStrip", "initial display mode: grid, filmStrip, covers, contextFlow, etc");
