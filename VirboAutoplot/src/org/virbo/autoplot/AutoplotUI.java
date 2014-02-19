@@ -103,9 +103,12 @@ import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
+import org.das2.event.DataRangeSelectionEvent;
+import org.das2.event.DataRangeSelectionListener;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasPlot;
+import org.das2.graph.DataRange;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.LoggerManager;
@@ -146,6 +149,7 @@ import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
+import org.virbo.datasource.TimeRangeToolEventsList;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 import org.w3c.dom.Document;
@@ -187,6 +191,9 @@ public class AutoplotUI extends javax.swing.JFrame {
     // if non-null, then load this set of initial bookmarks.
     private String initialBookmarksUrl= null;
 
+    private TimeRangeToolEventsList eventsListTool= null;
+    private JFrame eventsListToolFrame=null;
+    
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
         @Override
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -1981,6 +1988,7 @@ APSplash.checkTime("init 52");
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem6 = new javax.swing.JMenuItem();
         fixLayoutMenuItem = new javax.swing.JMenuItem();
         createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
@@ -2473,6 +2481,14 @@ APSplash.checkTime("init 52");
         toolsMenu.add(createPngWalkMenuItem);
         toolsMenu.add(jSeparator2);
 
+        jMenuItem6.setText("Events List");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(jMenuItem6);
+
         fixLayoutMenuItem.setText("Fix Layout");
         fixLayoutMenuItem.setToolTipText("Run new layout routine that removes spaces between plots");
         fixLayoutMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -2631,14 +2647,14 @@ APSplash.checkTime("init 52");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 638, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 650, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -3215,6 +3231,42 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             p.copyOptions( applicationModel.dom.getOptions() );
         }
     }//GEN-LAST:event_additionalOptionsMIActionPerformed
+
+    
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        if ( eventsListTool==null ) {
+            JFrame frame= new JFrame( "Events List");
+            final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
+            Icon bookmarkIcon= new javax.swing.ImageIcon(getClass().getResource("/resources/purplebookmark.png") );
+
+            ll.getDataSetSelector().replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(AutoplotUI.this), true );
+                    man.setHidePlotButtons(true);
+                    man.setPrefNode( "bookmarks", "autoplot.default.events",  "http://autoplot.org/data/events.xml" );
+                    man.setVisible(true);
+                    Bookmark book= man.getSelectedBookmark();
+                    if ( book!=null ) {
+                        ll.getDataSetSelector().setValue( ((Bookmark.Item)book).getUri() );
+                    }
+                }
+            });
+            ll.addDataRangeSelectionListener( new DataRangeSelectionListener() {
+                @Override
+                public void dataRangeSelected(DataRangeSelectionEvent e) {
+                    AutoplotUI.this.applicationModel.dom.setTimeRange( e.getDatumRange() );
+                }
+            });
+            
+            frame.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
+            frame.getContentPane().add( ll );
+            frame.pack();
+            eventsListToolFrame= frame;
+            eventsListTool= ll;
+        }
+        eventsListToolFrame.setVisible(true);
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
@@ -3921,6 +3973,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
