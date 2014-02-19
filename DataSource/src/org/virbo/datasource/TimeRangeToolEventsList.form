@@ -77,10 +77,11 @@
     <Component class="javax.swing.JComboBox" name="rescaleComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
+          <StringArray count="4">
             <StringItem index="0" value="none"/>
             <StringItem index="1" value="-5%,105%"/>
             <StringItem index="2" value="-10%,110%"/>
+            <StringItem index="3" value="-100%,200%"/>
           </StringArray>
         </Property>
       </Properties>

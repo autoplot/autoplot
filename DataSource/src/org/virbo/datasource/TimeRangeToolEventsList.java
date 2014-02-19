@@ -51,6 +51,14 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     }
 
     /**
+     * return the dataSetSelector, so that a button for bookmarks can be added.
+     * @return 
+     */
+    public DataSetSelector getDataSetSelector() {
+        return this.currentDataSetSelector;
+    }
+    
+    /**
      * return the ith range in the current list.
      * @param i
      * @return 
@@ -237,7 +245,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(intervalsList);
 
-        rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "-5%,105%", "-10%,110%" }));
+        rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "-5%,105%", "-10%,110%", "-100%,200%" }));
         rescaleComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rescaleComboBoxActionPerformed(evt);
