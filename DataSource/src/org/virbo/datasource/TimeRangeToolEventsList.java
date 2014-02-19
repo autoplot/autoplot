@@ -5,6 +5,7 @@
 package org.virbo.datasource;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -345,6 +346,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 }
             }
             fireSelection();
+            Rectangle r= intervalsList.getCellBounds(intervalsList.getMinSelectionIndex(),intervalsList.getMaxSelectionIndex());
+            if ( r!=null ) intervalsList.scrollRectToVisible(r);
         }
     } 
     
@@ -357,10 +360,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         for ( int i=i1; i<=i2; i++ ) {
             if ( intervalsList.isSelectedIndex(i) ) {
                 int isel= (tsb!=null) ? i-1 : i;
-                if ( fire==null ) {
-                    fire= getRange(isel);
-                } else {
-                    fire= DatumRangeUtil.union( fire, getRange(isel) );
+                if ( isel>=0 && ( currentDataSet==null || isel<currentDataSet.length() ) ) {
+                    if ( fire==null ) {
+                        fire= getRange(isel);
+                    } else {
+                        fire= DatumRangeUtil.union( fire, getRange(isel) );
+                    }
                 }
             }
         }
