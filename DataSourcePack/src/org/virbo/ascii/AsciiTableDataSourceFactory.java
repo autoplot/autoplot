@@ -170,7 +170,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 if ( result.size()>2 ) result.subList( 2, result.size() );
                 return result;
-            } else if (paramName.equals("where")) {
+            } else if (paramName.equals("where")) { // TODO: a fun project would be to make completions for this that look in the file...
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
