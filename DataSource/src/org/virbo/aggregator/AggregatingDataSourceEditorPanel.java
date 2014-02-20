@@ -72,6 +72,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     String uri;
     List<DatumRange> ranges;
     boolean updatingDropLists = false;  // avoid re-entry in droplists.
+    boolean droplistIsDirty= false;
 
     public void setDelegateEditorPanel(DataSourceEditorPanel edit) {
         delegateEditorPanel = edit;
@@ -122,6 +123,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 yearsComboBoxItemStateChanged(evt);
             }
         });
+        yearsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                yearsComboBoxActionPerformed(evt);
+            }
+        });
 
         monthsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "...", " " }));
         monthsComboBox.setToolTipText("Select from available months");
@@ -130,9 +136,19 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 monthsComboBoxItemStateChanged(evt);
             }
         });
+        monthsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                monthsComboBoxActionPerformed(evt);
+            }
+        });
 
         daysComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "...", " " }));
         daysComboBox.setToolTipText("Select from available days");
+        daysComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                daysComboBoxActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Select This Time Range");
         jButton1.setToolTipText("<html>\nCopy the date into the time range field.<br>\nHolding shift down will add the selected time to the aggregation.<br>\n</html>");
@@ -312,6 +328,24 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         // TODO add your handling code here:
     }//GEN-LAST:event_availabilityCBActionPerformed
 
+    private void yearsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yearsComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        droplistIsDirty= true;
+        jButton1.setText("Select this Time Range*");
+    }//GEN-LAST:event_yearsComboBoxActionPerformed
+
+    private void monthsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monthsComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        droplistIsDirty= true;
+        jButton1.setText("Select this Time Range*");
+    }//GEN-LAST:event_monthsComboBoxActionPerformed
+
+    private void daysComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_daysComboBoxActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        droplistIsDirty= true;
+        jButton1.setText("Select this Time Range*");
+    }//GEN-LAST:event_daysComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox availabilityCB;
     private javax.swing.JComboBox daysComboBox;
@@ -451,6 +485,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
 
         updatingDropLists = false;
+        jButton1.setText("Select This Time Range*");
+        droplistIsDirty= false;
     }
 
     @Override
