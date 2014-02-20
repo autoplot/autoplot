@@ -988,16 +988,14 @@ APSplash.checkTime("init 270");
             jythonScriptPanel= new JPanel( new BorderLayout() );
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
-            invokeLater( 2600, true, new Runnable() {
+            invokeLater( 4000, true, new Runnable() {
                 @Override
                 public String toString() { return "addScriptPanel"; }
                 @Override
                 public void run() {
                     scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                       jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
-                       scriptPanelMenuItem.setSelected(true);
-                    } } );
+                    jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
+                    scriptPanelMenuItem.setSelected(true);
                 }
             } );
         }
@@ -1005,14 +1003,12 @@ APSplash.checkTime("init 270");
             logConsolePanel= new JScrollPane();
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-            invokeLater( 2700, true, new Runnable() {
+            invokeLater( 4020, true, new Runnable() {
                 @Override
                 public String toString() { return "addLogConsole"; }
                 public void run() {
                     initLogConsole();
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        logConsolePanel.setViewportView( logConsole );
-                    } } );
+                    logConsolePanel.setViewportView( logConsole );
                 }
             }  );
         }
