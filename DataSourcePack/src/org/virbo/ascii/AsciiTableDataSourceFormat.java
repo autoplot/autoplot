@@ -331,78 +331,77 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             jj++;
         }
         
-        if (bundleDesc != null) {
-            if (dep0 != null) {
-                String l = (String) Ops.guessName(dep0);
-                if ( l==null ) {
-                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
-                        l= "time(UTC)";
-                    } else {
-                        l= "dep0";
-                    }
+        if (dep0 != null) {
+            String l = (String) Ops.guessName(dep0);
+            if ( l==null ) {
+                if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                    l= "time(UTC)";
                 } else {
-                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
-                        l= l+" (UTC)";
-                    }
+                    l= "dep0";
                 }
-                out.print(" " + l + ", ");
+            } else {
+                if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                    l= l+" (UTC)";
+                }
             }
+            out.print(" " + l + ", ");
+        }
 
-            int i;
-            boolean startStopTime= false;
-            for (  i = 0; i < bundleDesc.length(); i++) {
-                String l1;
-                if ( haveRich ) {
-                    l1= (String) bundleDesc.property(QDataSet.NAME,i);
-                } else {
-                    l1= (String) bundleDesc.property(QDataSet.LABEL,i);
-                }
+        int i;
+        boolean startStopTime= false;
+        for (  i = 0; i < bundleDesc.length(); i++) {
+            String l1;
+            if ( haveRich ) {
+                l1= (String) bundleDesc.property(QDataSet.NAME,i);
+            } else {
+                l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+            }
+            if ( l1==null ) {
+                l1= (String) bundleDesc.property(QDataSet.NAME,i);
                 if ( l1==null ) {
-                    l1= (String) bundleDesc.property(QDataSet.NAME,i);
-                    if ( l1==null ) {
-                        l1="";
+                    l1="";
+                }
+            }
+            if ( l1.trim().length()==0 ) {
+                Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
+                if ( i==0 && UnitsUtil.isTimeLocation(u1) && bundleDesc.length()>1 ) {
+                    Units u2= (Units) bundleDesc.property(QDataSet.UNITS,1);
+                    if ( UnitsUtil.isTimeLocation(u2)) {
+                        startStopTime= true;
                     }
                 }
-                if ( l1.trim().length()==0 ) {
-                    Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
-                    if ( i==0 && UnitsUtil.isTimeLocation(u1) && bundleDesc.length()>1 ) {
-                        Units u2= (Units) bundleDesc.property(QDataSet.UNITS,1);
-                        if ( UnitsUtil.isTimeLocation(u2)) {
-                            startStopTime= true;
-                        }
-                    }
-                    if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
-                        if ( startStopTime ) {
-                            l1= "time"+i;                            
-                        } else {
-                            l1= "time";
-                        }
+                if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
+                    if ( startStopTime ) {
+                        l1= "time"+i;                            
                     } else {
-                        l1= "field"+i;
+                        l1= "time";
                     }
+                } else {
+                    l1= "field"+i;
                 }
-                if ( uu[i]!=null && uu[i]!=Units.dimensionless ) {
-                    if ( uu[i] instanceof EnumerationUnits ) {
-                    } else if ( UnitsUtil.isTimeLocation(uu[i] ) ) {
-                        l1+= "(UTC)";
-                    } else {
-                        l1+="("+uu[i]+")";
-                    }
+            }
+            if ( uu[i]!=null && uu[i]!=Units.dimensionless ) {
+                if ( uu[i] instanceof EnumerationUnits ) {
+                } else if ( UnitsUtil.isTimeLocation(uu[i] ) ) {
+                    l1+= "(UTC)";
+                } else {
+                    l1+="("+uu[i]+")";
                 }
-                int nelements= 1;
-                for ( int k=0; k<bundleDesc.length(i); k++ ) {
-                    nelements*= bundleDesc.value(i,k);
-                }
-                for ( int k=0; k<nelements; k++ ) {
-                    out.print( l1  );
-                    if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
-                        out.print( "\n" );
-                    } else {
-                        out.print( ", " );
-                    }
+            }
+            int nelements= 1;
+            for ( int k=0; k<bundleDesc.length(i); k++ ) {
+                nelements*= bundleDesc.value(i,k);
+            }
+            for ( int k=0; k<nelements; k++ ) {
+                out.print( l1  );
+                if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
+                    out.print( "\n" );
+                } else {
+                    out.print( ", " );
                 }
             }
         }
+        
 
         DatumFormatter cf0= tf;
         Units u0 = null;
@@ -421,10 +420,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.setTaskSize(data.length());
         mon.started();
 
-        for (int i = 0; i < data.length(); i++) {
+        for ( i = 0; i < data.length(); i++) {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
+                assert u0!=null;
                 out.print("" + cf0.format( u0.createDatum(dep0.value(i)) ) + ", ");
             }
 
