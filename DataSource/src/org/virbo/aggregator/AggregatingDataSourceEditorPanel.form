@@ -94,9 +94,9 @@
                       <Component id="timeRangeToolButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="outerRangeTextField" min="-2" max="-2" attributes="0"/>
-                      <Component id="reduceCB" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="reduceCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="outerRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -185,6 +185,7 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Select This Time Range"/>
             <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Copy the date into the time range field.&lt;br&gt;&#xa;Holding shift down will add the selected time to the aggregation.&lt;br&gt;&#xa;&lt;/html&gt;"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>

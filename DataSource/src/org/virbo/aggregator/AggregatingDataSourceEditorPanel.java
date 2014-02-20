@@ -78,6 +78,27 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegateEditorPanel = edit;
     }
 
+    private void copyTimes( int modifiers ) {
+        String syr = String.valueOf(yearsComboBox.getSelectedItem()).trim();
+        String smn = String.valueOf(monthsComboBox.getSelectedItem()).trim();
+        String sday = String.valueOf(daysComboBox.getSelectedItem()).trim();
+        String range = syr + " " + smn + " " + sday;
+        range = range.trim();
+        if ((modifiers & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(range);
+            DatumRange dr2;
+            try {
+                dr2 = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+                dr2 = DatumRangeUtil.union(dr1, dr2);
+                timeRangeTextField.setText(dr2.toString());
+            } catch (ParseException ex) {
+                timeRangeTextField.setText(range);
+            }
+        } else {
+            timeRangeTextField.setText(range);
+        }        
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -152,6 +173,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         jButton1.setText("Select This Time Range");
         jButton1.setToolTipText("<html>\nCopy the date into the time range field.<br>\nHolding shift down will add the selected time to the aggregation.<br>\n</html>");
+        jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -238,9 +260,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .add(jButton3)
                     .add(timeRangeToolButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(outerRangeTextField)
-                    .add(reduceCB))
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(reduceCB)
+                    .add(outerRangeTextField))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -271,25 +293,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        jButton1.setEnabled(false);
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        String syr = String.valueOf(yearsComboBox.getSelectedItem()).trim();
-        String smn = String.valueOf(monthsComboBox.getSelectedItem()).trim();
-        String sday = String.valueOf(daysComboBox.getSelectedItem()).trim();
-        String range = syr + " " + smn + " " + sday;
-        range = range.trim();
-        if ((evt.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
-            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(range);
-            DatumRange dr2;
-            try {
-                dr2 = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
-                dr2 = DatumRangeUtil.union(dr1, dr2);
-                timeRangeTextField.setText(dr2.toString());
-            } catch (ParseException ex) {
-                timeRangeTextField.setText(range);
-            }
-        } else {
-            timeRangeTextField.setText(range);
-        }
+        copyTimes(evt.getModifiers());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void yearsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_yearsComboBoxItemStateChanged
@@ -331,19 +337,19 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private void yearsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yearsComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         droplistIsDirty= true;
-        jButton1.setText("Select this Time Range*");
+        jButton1.setEnabled(true);
     }//GEN-LAST:event_yearsComboBoxActionPerformed
 
     private void monthsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monthsComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         droplistIsDirty= true;
-        jButton1.setText("Select this Time Range*");
+        jButton1.setEnabled(true);
     }//GEN-LAST:event_monthsComboBoxActionPerformed
 
     private void daysComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_daysComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         droplistIsDirty= true;
-        jButton1.setText("Select this Time Range*");
+        jButton1.setEnabled(true);
     }//GEN-LAST:event_daysComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -485,8 +491,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
 
         updatingDropLists = false;
-        jButton1.setText("Select This Time Range*");
         droplistIsDirty= false;
+        jButton1.setEnabled(false);
     }
 
     @Override
@@ -699,6 +705,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
         URISplit dsplit = URISplit.parse(delegateUrl);
         Map<String, String> allParams = new LinkedHashMap<String, String>();
+        
+        if ( droplistIsDirty ) {
+            copyTimes(0);
+        }
+        
         //allParams.putAll(params);
         allParams.putAll(URISplit.parseParams(dsplit.params));
         String tr = timeRangeTextField.getText();
