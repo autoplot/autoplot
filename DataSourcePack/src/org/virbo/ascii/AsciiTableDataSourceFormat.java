@@ -349,8 +349,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
 
             int i;
+            boolean startStopTime= false;
             for (  i = 0; i < bundleDesc.length(); i++) {
-                String l1=null;
+                String l1;
                 if ( haveRich ) {
                     l1= (String) bundleDesc.property(QDataSet.NAME,i);
                 } else {
@@ -359,20 +360,31 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 if ( l1==null ) {
                     l1= (String) bundleDesc.property(QDataSet.NAME,i);
                     if ( l1==null ) {
-                        throw new IllegalArgumentException("unnamed dataset in bundle at index "+i);
+                        l1="";
                     }
                 }
                 if ( l1.trim().length()==0 ) {
                     Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
+                    if ( i==0 && UnitsUtil.isTimeLocation(u1) && bundleDesc.length()>1 ) {
+                        Units u2= (Units) bundleDesc.property(QDataSet.UNITS,1);
+                        if ( UnitsUtil.isTimeLocation(u2)) {
+                            startStopTime= true;
+                        }
+                    }
                     if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
-                        l1= "time(UTC)";
+                        if ( startStopTime ) {
+                            l1= "time"+i;                            
+                        } else {
+                            l1= "time";
+                        }
                     } else {
                         l1= "field"+i;
                     }
                 }
                 if ( uu[i]!=null && uu[i]!=Units.dimensionless ) {
                     if ( uu[i] instanceof EnumerationUnits ) {
-                        
+                    } else if ( UnitsUtil.isTimeLocation(uu[i] ) ) {
+                        l1+= "(UTC)";
                     } else {
                         l1+="("+uu[i]+")";
                     }
