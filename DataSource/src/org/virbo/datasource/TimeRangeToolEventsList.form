@@ -22,13 +22,17 @@
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="rescaleComboBox" min="-2" pref="137" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="prevButton" linkSize="1" min="-2" pref="36" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="nextButton" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+              <Component id="timeRangeTF" min="-2" pref="114" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="timeRangeButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="currentDataSetSelector" alignment="0" pref="438" max="32767" attributes="0"/>
+          <Component id="currentDataSetSelector" alignment="0" pref="493" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -42,6 +46,8 @@
                       <Component id="rescaleComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="nextButton" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="timeRangeTF" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="timeRangeButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -78,12 +84,14 @@
     </Container>
     <Component class="javax.swing.JComboBox" name="rescaleComboBox">
       <Properties>
+        <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
+          <StringArray count="5">
             <StringItem index="0" value="none"/>
             <StringItem index="1" value="-5%,105%"/>
             <StringItem index="2" value="-10%,110%"/>
             <StringItem index="3" value="-100%,200%"/>
+            <StringItem index="4" value="-300%,400%"/>
           </StringArray>
         </Property>
       </Properties>
@@ -94,6 +102,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Rescale:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Expand the interval range"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="prevButton">
@@ -101,6 +110,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/datasource/prevPrev.png"/>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Previous Interval"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevButtonActionPerformed"/>
@@ -111,6 +121,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/datasource/nextNext.png"/>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Next Interval"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextButtonActionPerformed"/>
@@ -119,6 +130,27 @@
     <Component class="org.virbo.datasource.DataSetSelector" name="currentDataSetSelector">
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="currentDataSetSelectorActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="timeRangeTF">
+      <Properties>
+        <Property name="text" type="java.lang.String" value=" "/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeTFActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="timeRangeButton">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/org/virbo/datasource/calendar.png"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Time Range Tool for setting the interval range"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

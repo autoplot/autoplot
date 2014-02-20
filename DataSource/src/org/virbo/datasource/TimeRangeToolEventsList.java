@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.virbo.datasource;
 
 import java.awt.Color;
@@ -17,6 +13,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
@@ -36,9 +34,9 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
- * Introduce tool to make it easy to browse around a list of events.
- * This is in the events list format, and will probably become part of the
- * timerange GUI.
+ * The EventsList tool makes it easy to browse around a list of events.  It
+ * takes a URI for a dataset which can be represented as an events list, 
+ * and fires off timeRangeSelection events when an event is selected.  
  * 
  * @author jbf
  */
@@ -57,12 +55,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     public TimeRangeToolEventsList() {
         initComponents();
         fillList();
-        //currentDataSetSelector.setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
     }
 
     /**
-     * return the dataSetSelector, so that a button for bookmarks can be added.
-     * @return 
+     * return the dataSetSelector, so that for example a button for bookmarks 
+     * can be added by clients that know about bookmarks.
+     * @return the DataSetSelector component.
      */
     public DataSetSelector getDataSetSelector() {
         return this.currentDataSetSelector;
@@ -157,8 +155,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             Units eu= (Units) bds.property(QDataSet.UNITS,3);
             String s= eu.createDatum(rec.value(3)).toString();            
             
+            result.setText( String.valueOf(value)+": "+s );
             if ( hasIcons ) {
-                result.setText( String.valueOf(value)+": "+s );
                 int color= (int)rec.value(2);
                 Icon icon= colorIcon( new Color(color), 12,12 );
                 result.setIcon(icon);
@@ -321,6 +319,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         prevButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
         currentDataSetSelector = new org.virbo.datasource.DataSetSelector();
+        timeRangeTF = new javax.swing.JTextField();
+        timeRangeButton = new javax.swing.JButton();
 
         intervalsList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -334,7 +334,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(intervalsList);
 
-        rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "-5%,105%", "-10%,110%", "-100%,200%" }));
+        rescaleComboBox.setEditable(true);
+        rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "-5%,105%", "-10%,110%", "-100%,200%", "-300%,400%" }));
         rescaleComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rescaleComboBoxActionPerformed(evt);
@@ -342,8 +343,10 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         });
 
         jLabel1.setText("Rescale:");
+        jLabel1.setToolTipText("Expand the interval range");
 
         prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/prevPrev.png"))); // NOI18N
+        prevButton.setToolTipText("Previous Interval");
         prevButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevButtonActionPerformed(evt);
@@ -351,6 +354,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         });
 
         nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/nextNext.png"))); // NOI18N
+        nextButton.setToolTipText("Next Interval");
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextButtonActionPerformed(evt);
@@ -360,6 +364,23 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         currentDataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 currentDataSetSelectorActionPerformed(evt);
+            }
+        });
+
+        timeRangeTF.setText(" ");
+        timeRangeTF.setEnabled(false);
+        timeRangeTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeTFActionPerformed(evt);
+            }
+        });
+
+        timeRangeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
+        timeRangeButton.setToolTipText("Time Range Tool for setting the interval range");
+        timeRangeButton.setEnabled(false);
+        timeRangeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeButtonActionPerformed(evt);
             }
         });
 
@@ -373,12 +394,16 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rescaleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(prevButton, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nextButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(timeRangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(timeRangeButton)
                 .addContainerGap())
-            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {nextButton, prevButton});
@@ -393,7 +418,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(rescaleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel1)
-                        .addComponent(nextButton)))
+                        .addComponent(nextButton)
+                        .addComponent(timeRangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(timeRangeButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
         );
@@ -540,27 +567,38 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 } else {
                     current= current.next();
                 }
-                tsb.setTimeRange(current);
-                ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
-                try {
-                    QDataSet currentDataSet1= dss.getDataSet(mon);
-                    currentDataSet= makeCanonical(currentDataSet1);
-                } catch ( Exception ex ) {
-                    currentDataSet= null;
-                } finally {
-                    fillList();
-                    if ( dir==-1 ) {
-                        intervalsList.setSelectedIndex(intervalsList.getModel().getSize()-2);
-                    } else {
-                        intervalsList.setSelectedIndex(1);
-                    }
-                    intervalsList.setEnabled(true);
-                }
+                loadViaTsb( current, dir );
             }
         };
         new Thread(run).start();
     }
     
+    /**
+     * Load the events for the given range.
+     * @param range range to load
+     * @param dir -1 was going back to it, 1 is going ahead
+     */
+    private void loadViaTsb( DatumRange range, int dir ) {
+        tsb.setTimeRange( range );
+        ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
+        try {
+            QDataSet currentDataSet1= dss.getDataSet(mon);
+            currentDataSet= makeCanonical(currentDataSet1);
+        } catch ( Exception ex ) {
+            currentDataSet= null;
+        } finally {
+            fillList();
+            if ( dir==-1 ) {
+                intervalsList.setSelectedIndex(intervalsList.getModel().getSize()-2);
+            } else if ( dir==1 ) {
+                intervalsList.setSelectedIndex(1);
+            } else {
+                // don't set anything
+            }
+            intervalsList.setEnabled(true);
+            timeRangeTF.setText( range.toString() );
+        }
+    }
     private void currentDataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentDataSetSelectorActionPerformed
         final String uri= (String)currentDataSetSelector.getValue();
         Runnable run= new Runnable() {
@@ -573,6 +611,15 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                     currentDataSet= dss.getDataSet(mon);
                     tsb= dsource.getCapability( TimeSeriesBrowse.class );
+                    if ( tsb!=null ) {
+                        timeRangeTF.setText(tsb.getTimeRange().toString());
+                        timeRangeTF.setEnabled(true);
+                        timeRangeButton.setEnabled(true);
+                    } else {
+                        timeRangeTF.setText("");
+                        timeRangeTF.setEnabled(false);
+                        timeRangeButton.setEnabled(false);
+                    }
                     currentDataSet= makeCanonical(currentDataSet);
                     hasIcons= false;
                     if ( currentDataSet.length()>0 ) {
@@ -595,6 +642,43 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
            
     }//GEN-LAST:event_currentDataSetSelectorActionPerformed
 
+    private void timeRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeButtonActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        TimeRangeTool tt= new TimeRangeTool();
+        JTextField tf= timeRangeTF;
+        tt.setSelectedRange(tf.getText());
+        int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+        if ( r==JOptionPane.OK_OPTION) {
+            tf.setText(tt.getSelectedRange());
+            String str= timeRangeTF.getText();
+            final DatumRange drtr= DatumRangeUtil.parseTimeRangeValid(str);
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    loadViaTsb( drtr, 0 );
+                }
+            };
+            new Thread(run).start();   
+        }
+    }//GEN-LAST:event_timeRangeButtonActionPerformed
+
+    private void timeRangeTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTFActionPerformed
+        try {
+            String str= timeRangeTF.getText();
+            final DatumRange drtr= DatumRangeUtil.parseTimeRange(str);
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    loadViaTsb( drtr, 0 );
+                }
+            };
+            new Thread(run).start();
+            
+        } catch (ParseException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeTFActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.virbo.datasource.DataSetSelector currentDataSetSelector;
     private javax.swing.JList intervalsList;
@@ -603,5 +687,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
     private javax.swing.JComboBox rescaleComboBox;
+    private javax.swing.JButton timeRangeButton;
+    private javax.swing.JTextField timeRangeTF;
     // End of variables declaration//GEN-END:variables
 }
