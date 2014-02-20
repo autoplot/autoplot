@@ -723,6 +723,8 @@ public class DataSourceRegistry {
             return "CDAWeb database at NASA/SPDF";
         } else if ( vapext.startsWith("vap+das2server") ) {
             return "Das2Server";
+        } else if ( vapext.startsWith("vap+inline") ) {
+            return "Data encoded within the URI";
         } else {
             return null;
         }
