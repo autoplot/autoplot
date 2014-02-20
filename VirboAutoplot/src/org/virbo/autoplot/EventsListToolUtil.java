@@ -6,6 +6,7 @@
 
 package org.virbo.autoplot;
 
+import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
@@ -66,17 +68,23 @@ public class EventsListToolUtil {
         
     }
     
-    private static WeakHashMap<AutoplotUI,JFrame> instances= new WeakHashMap();
+    private static WeakHashMap<AutoplotUI,JDialog> instances= new WeakHashMap();
     
     /**
      * this must be called on the event thread.
      * @param t 
      */
     public static void show( final AutoplotUI t ) {
-        JFrame frames= instances.get(t);
+        
+        if ( !EventQueue.isDispatchThread() ) {
+            throw new IllegalArgumentException("must be called from the event thread");
+        }
+        JDialog dialog= instances.get(t);
               
-        if ( frames==null ) {
-            JFrame frame= new JFrame( "Events List");
+        if ( dialog==null ) {
+            JDialog d= new JDialog( t, "Events List");
+            d.setModal(false);
+            
             final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
             Icon bookmarkIcon= new javax.swing.ImageIcon(EventsListToolUtil.class.getResource("/resources/purplebookmark.png") );
 
@@ -103,13 +111,14 @@ public class EventsListToolUtil {
             deflts( ll.getDataSetSelector() );
             ll.getDataSetSelector().setValue("");
             
-            frame.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
-            frame.getContentPane().add( ll );
-            frame.pack();
+            d.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
+            d.getContentPane().add( ll );
+            d.pack();
+            d.setLocationRelativeTo(t);
             
-            instances.put( t , frame);
-            frames= frame;
+            instances.put( t, d );
+            dialog= d;
         }
-        frames.setVisible(true);
+        dialog.setVisible(true);
     }
 }
