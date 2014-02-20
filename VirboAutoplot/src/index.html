@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-02-14):</p>
         <ul>
+            <li>George pointed out that slicer popups are offscreen on Windows when window is maximized.</li>
+            <li>Recent startup code changes would occasionally cause hang on Linux when script panel was showing.</li>
             <li>DE CDF data had rank 0 DELTA_PLUS.  This is supported now.</li>
             <li>Non-time strings got into the time range dialog, causing parse errors.</li>
             <li>update version in about dialog</li>
@@ -56,6 +58,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce Event List tool for using long events lists to control axes.</li>
+            <li>introduce where support for text files.</li>
             <li>introduce support for ordinal data in CDFs</li>
             <li>another round of findbugs</li>            
             <li>remove use of obsolete classes like DasDie.</li>
