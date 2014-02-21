@@ -66,6 +66,9 @@ public class DataSourceController extends DomNodeController {
     private ApplicationModel model;
     private Application dom;
 
+    private final Object internalLock= new Object();
+    private final Object uriLock= new Object();
+    
     /**
      * the current load being monitored.
      */
@@ -427,7 +430,7 @@ public class DataSourceController extends DomNodeController {
 
     }
 
-    public synchronized void setDataSetInternal( QDataSet ds ) {
+    public void setDataSetInternal( QDataSet ds ) {
         setDataSetInternal( ds, null , this.dom.controller.isValueAdjusting() );
     }
 
@@ -468,7 +471,7 @@ public class DataSourceController extends DomNodeController {
      * @param ds
      * @param immediately if false, then this is done after the application is done adjusting.
      */
-    public synchronized void setDataSetInternal( QDataSet ds, Map<String,Object> rawProperties, boolean immediately) {
+    public void setDataSetInternal( QDataSet ds, Map<String,Object> rawProperties, boolean immediately) {
 
         List<String> problems = new ArrayList<String>();
 
@@ -498,21 +501,10 @@ public class DataSourceController extends DomNodeController {
                 this.model.showMessage( message.toString(), "Data Set is Invalid", JOptionPane.WARNING_MESSAGE );
             }
 
-            if (ds instanceof MutablePropertyDataSet) {
-                //MutablePropertyDataSet mds= (MutablePropertyDataSet)ds;
-                //DataSetUtil.makeValid(mds);
-                //  we would also have to modify the metadata, labels etc.
-                return;
-            } else {
-                return;
-            }
+            return;
+           
         }
-        //try {
-           // Thread.sleep(1000);
-        //} catch (InterruptedException ex) {
-        //    Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
-      //  }
-        
+ 
         if ( this.getTimeSeriesBrowseController()!=null && ds!=null && !isTimeSeries(ds) && this.getTimeSeriesBrowseController().isListeningToAxis() ) {
             // the dataset we get back isn't part of a time series.  So we should connect the TSB
             // to the application TimeRange property.
@@ -900,22 +892,24 @@ public class DataSourceController extends DomNodeController {
      * @param path
      * @return true if the resolution was successful.
      */
-    private synchronized boolean doInternal(String path) {
-        if ( parentSources!=null ) {
-            for ( int i=0; i<parentSources.length; i++ ) {
-                if ( parentSources[i]!=null ) parentSources[i].controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+    private boolean doInternal(String path) {
+        synchronized ( internalLock ) {
+            if ( parentSources!=null ) {
+                for ( int i=0; i<parentSources.length; i++ ) {
+                    if ( parentSources[i]!=null ) parentSources[i].controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+                }
             }
+            if ( path.trim().length()==0 ) return true;
+            String[] ss = path.split(",", -2);
+            parentSources = new DataSourceFilter[ss.length];
+            resolveParents();
+            String prob= checkParents();
+            if ( prob!=null ) {
+                setStatus("warning: "+prob);
+                return false;
+            }
+            dom.addPropertyChangeListener( Application.PROP_DATASOURCEFILTERS, dsfListener );
         }
-        if ( path.trim().length()==0 ) return true;
-        String[] ss = path.split(",", -2);
-        parentSources = new DataSourceFilter[ss.length];
-        resolveParents();
-        String prob= checkParents();
-        if ( prob!=null ) {
-            setStatus("warning: "+prob);
-            return false;
-        }
-        dom.addPropertyChangeListener( Application.PROP_DATASOURCEFILTERS, dsfListener );
         return true;
     }
 
@@ -1152,7 +1146,7 @@ public class DataSourceController extends DomNodeController {
      * time.  Note if a dataSource doesn't check mon.isCancelled(), then processing
      * will block until the old load is done.
      */
-    private synchronized void updateImmediately() {
+    private void updateImmediately() {
         
         try {
             DataSource dss= getDataSource();
@@ -1222,15 +1216,6 @@ public class DataSourceController extends DomNodeController {
                 monitor.cancel();
             }
         }
-    }
-    
-    /**
-     * support legacy.  reloadAllUris.jy calls this.
-     * @param x
-     * @param y
-     */
-    public synchronized void update( final boolean autorange, final boolean interpretMeta ) {
-        update();
     }
 
     /**
@@ -1511,7 +1496,7 @@ public class DataSourceController extends DomNodeController {
         return result.toString();
     }
     
-    private synchronized ProgressMonitor getMonitor() {
+    private ProgressMonitor getMonitor() {
         return mon;
     }
     
@@ -1682,8 +1667,10 @@ public class DataSourceController extends DomNodeController {
      */
     public synchronized void setSuri(String suri, ProgressMonitor mon) {
         suri= URISplit.makeCanonical(suri);
-        dsf.setUri(suri);
-        setUriNeedsResolution(true);
+        synchronized ( uriLock ) {
+            dsf.setUri(suri);
+            setUriNeedsResolution(true);
+        }
     }
 
     /**
@@ -1691,13 +1678,15 @@ public class DataSourceController extends DomNodeController {
      * @param suri
      * @param mon
      */
-    public synchronized void resetSuri(String suri, ProgressMonitor mon) {
+    public void resetSuri(String suri, ProgressMonitor mon) {
         String old = dsf.getUri();
         suri= URISplit.makeCanonical(suri);
-        if (  old.length()>0 && old.equals(suri)) {
-            dsf.setUri("");
+        synchronized ( uriLock ) {
+            if (  old.length()>0 && old.equals(suri)) { // force reload
+                dsf.setUri("");
+            }
+            setSuri(suri, mon);
         }
-        setSuri(suri, mon);
     }
 
     /**
