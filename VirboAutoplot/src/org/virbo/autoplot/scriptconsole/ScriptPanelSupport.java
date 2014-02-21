@@ -645,7 +645,7 @@ public class ScriptPanelSupport {
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
-                        mm.addElement(s);
+                        mm.add(0,s);
                     }
                 }
                 p.setModel( mm );
@@ -660,8 +660,9 @@ public class ScriptPanelSupport {
                         
                     } else {
                         String s=  (String)p.getSelectedValue();
-
-                        c.setSelectedFile( new File(s));
+                        File ff= new File(s);
+                        c.setSelectedFile( ff ); //work around mac bug (?)
+                        c.setSelectedFile( ff );
                     }
                 }
             }
