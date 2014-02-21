@@ -69,6 +69,7 @@ public class EventsListToolUtil {
     }
     
     private static WeakHashMap<AutoplotUI,JDialog> instances= new WeakHashMap();
+    private static WeakHashMap<AutoplotUI,TimeRangeToolEventsList> instances2= new WeakHashMap();
     
     /**
      * this must be called on the event thread.
@@ -81,6 +82,30 @@ public class EventsListToolUtil {
         }
         JDialog dialog= instances.get(t);
               
+        if ( dialog==null ) {
+            getEventsList( t );
+            dialog= instances.get(t);
+        }
+        dialog.setVisible(true);
+    }
+    
+    public static void show( final AutoplotUI t, String uri ) {
+        
+        if ( !EventQueue.isDispatchThread() ) {
+            throw new IllegalArgumentException("must be called from the event thread");
+        }
+        JDialog dialog= instances.get(t);
+              
+        if ( dialog==null ) {
+            getEventsList( t );
+            dialog= instances.get(t);
+        }
+        dialog.setVisible(true);
+        instances2.get(t).getDataSetSelector().setValue(uri);
+    }
+    
+    public static TimeRangeToolEventsList getEventsList( final AutoplotUI t ) {
+        JDialog dialog= instances.get(t);
         if ( dialog==null ) {
             JDialog d= new JDialog( t, "Events List");
             d.setModal(false);
@@ -117,8 +142,9 @@ public class EventsListToolUtil {
             d.setLocationRelativeTo(t);
             
             instances.put( t, d );
-            dialog= d;
+            instances2.put( t, ll);
+  
         }
-        dialog.setVisible(true);
+        return instances2.get(t);
     }
 }
