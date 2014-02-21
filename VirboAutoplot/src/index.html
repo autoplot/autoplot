@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Improve support for rendering (X,Y,Z) buckshot data with spectrograms.</small></p>
+        <p><small>Events list tool allows events list sources to control axes.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,10 +23,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-02-14):</p>
+        <p>Bugfixes (2014-02-21):</p>
         <ul>
+            <li>upper case constants in inline data source were always used as property values.  Now only valid property names are treated this way.</li>
+            <li>"scan" buttons renamed "step" buttons in anticipation of events lists</li>
             <li>George pointed out that slicer popups are offscreen on Windows when window is maximized.</li>
             <li>Recent startup code changes would occasionally cause hang on Linux when script panel was showing.</li>
+            <li>mon.finished was never called in Das2DataSource, leaving spinner when emphemeris data is loaded.</li>
             <li>DE CDF data had rank 0 DELTA_PLUS.  This is supported now.</li>
             <li>Non-time strings got into the time range dialog, causing parse errors.</li>
             <li>update version in about dialog</li>
@@ -58,6 +61,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>minor tweaks to the aggregation data source editor</li>
+            <li>events list property in the vap.</li>
             <li>introduce Event List tool for using long events lists to control axes.</li>
             <li>introduce where support for text files.</li>
             <li>introduce support for ordinal data in CDFs</li>
@@ -72,6 +77,7 @@
             <li>drag a box to select multiple plots on layout panel</li>
             <li>drag on layout panel is shortcut for swap</li>
             <li>axis flipped property is supported in the vaps.</li>
+            <li>update RBSP orbit files</li>
             <li>Allow smooth on rank 2 datasets, smoothing on the first dimension (usually time).</li>
             <li>internal rbsp orbits updated to 2014-02-03</li>
             <li>das2server lists folders separately from data sources.</li>
