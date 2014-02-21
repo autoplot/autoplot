@@ -136,19 +136,19 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             
             QDataSet rec;
             
-            if ( tsb==null ) {
-                rec= currentDataSet.slice(index);
-            } else {
-                if ( index==0 ) {
-                    return result;
-                } else if ( index==currentDataSet.length() ) {
-                    return result;
-                }
-                if ( index-1 >= currentDataSet.length() ) {
-                    return result;
+            boolean nextPreviousItem= tsb!=null && ( ( index==0 ) || (index==currentDataSet.length()+1 ) );
+            if ( nextPreviousItem ) {
+                return result;
+            } 
+                
+            try {
+                if ( tsb==null ) {
+                    rec= currentDataSet.slice(index);
                 } else {
                     rec= currentDataSet.slice(index-1);                
                 }
+            } catch ( IndexOutOfBoundsException ex ) {
+                return result; //?????
             }
             
             QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
