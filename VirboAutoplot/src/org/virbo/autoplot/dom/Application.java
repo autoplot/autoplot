@@ -153,6 +153,21 @@ public class Application extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
     }
 
+    /**
+     * URI pointing to events list, or empty String.
+     */
+    private String eventsListUri = "";
+    public static final String PROP_EVENTSLISTURI = "eventsListUri";
+
+    public String getEventsListUri() {
+        return eventsListUri;
+    }
+
+    public void setEventsListUri(String eventsListUri) {
+        String oldEventsListUri = this.eventsListUri;
+        this.eventsListUri = eventsListUri;
+        propertyChangeSupport.firePropertyChange(PROP_EVENTSLISTURI, oldEventsListUri, eventsListUri);
+    }
 
     protected List<BindingModel> bindings= Collections.emptyList();
     public static final String PROP_BINDINGS = "bindings";
@@ -338,6 +353,10 @@ public class Application extends DomNode {
 
         if ( !that.timeRange.equals( this.timeRange ) ) {
             result.add( new PropertyChangeDiff( "timeRange", this.timeRange, that.timeRange ) );  //TODO: why is this backwards but it works?
+        }
+
+        if ( !that.eventsListUri.equals( this.eventsListUri ) ) {
+            result.add( new PropertyChangeDiff( "eventsListUri", this.eventsListUri, that.eventsListUri ) );  //TODO: why is this backwards but it works?
         }
 
         return result;
