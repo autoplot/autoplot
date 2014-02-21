@@ -2318,6 +2318,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
             application.setTimeRange(that.getTimeRange());
+            application.setEventsListUri(that.getEventsListUri());
 
             syncSupport.syncBindings( that.getBindings(), nameMap );
             syncSupport.syncConnectors(that.getConnectors());
