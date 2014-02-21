@@ -113,7 +113,7 @@ public class ApplicationModel {
     DasApplication application;
     DasCanvas canvas;
     Timer tickleTimer;
-    Application dom;
+    final Application dom;
     private ExceptionHandler exceptionHandler;
     boolean applet= false;
 
