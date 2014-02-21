@@ -2062,4 +2062,12 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         }
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        dataSetSelector.setEnabled(enabled);
+        plotItButton.setEnabled(enabled);
+        inspectButton.setEnabled(enabled);
+        super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }
