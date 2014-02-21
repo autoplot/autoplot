@@ -111,21 +111,22 @@ public class EventsListToolUtil {
             d.setModal(false);
             
             final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
-            Icon bookmarkIcon= new javax.swing.ImageIcon(EventsListToolUtil.class.getResource("/resources/purplebookmark.png") );
-
-            ll.getDataSetSelector().replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(t), true );
-                    man.setHidePlotButtons(true);
-                    man.setPrefNode( "bookmarks", "autoplot.default.events",  "http://autoplot.org/data/events.xml" );
-                    man.setVisible(true);
-                    Bookmark book= man.getSelectedBookmark();
-                    if ( book!=null ) {
-                        ll.getDataSetSelector().setValue( ((Bookmark.Item)book).getUri() );
-                    }
-                }
-            });
+//            Icon bookmarkIcon= new javax.swing.ImageIcon(EventsListToolUtil.class.getResource("/resources/purplebookmark.png") );
+//
+//            ll.getDataSetSelector().replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(t), true );
+//                    man.setHidePlotButtons(true);
+//                    man.setPrefNode( "bookmarks", "autoplot.default.events",  "http://autoplot.org/data/events.xml" );
+//                    man.setVisible(true);
+//                    Bookmark book= man.getSelectedBookmark();
+//                    if ( book!=null ) {
+//                        ll.getDataSetSelector().setValue( ((Bookmark.Item)book).getUri() );
+//                    }
+//                }
+            //});
+            
             ll.addDataRangeSelectionListener( new DataRangeSelectionListener() {
                 @Override
                 public void dataRangeSelected(DataRangeSelectionEvent e) {
