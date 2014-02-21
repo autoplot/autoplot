@@ -67,7 +67,7 @@ public class CreatePngWalk {
      */
     private static String[] getListOfTimes( Params params ) throws IllegalArgumentException, ParseException {
         String[] times;
-        if ( params.batchUri!=null && params.batchUri.length()>0 ) {
+        if ( params.useBatchUri ) {
             try {
                 QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( params.batchUri );
                 if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
@@ -162,6 +162,11 @@ public class CreatePngWalk {
          * or null for automatically generating names based on template.
          */
         public String batchUri=null;
+        
+        /**
+         * if true, use the URI to source the list of events.
+         */
+        public boolean useBatchUri= false;
         
         /*
          * if true, the also create thumbs.
