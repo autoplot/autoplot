@@ -2,7 +2,13 @@
 <!-- <jnlp 
     spec="1.0+"
     codebase="http://www-pw.physics.uiowa.edu/das2/autoplot/production/"
-    href="autoplot.jnlp"> -->
+    href="autoplot.jnlp">
+-->
+<!-- <jnlp 
+    spec="1.0+"
+    codebase="http://autoplot.org/jnlp/#{tag}/"
+    href="autoplot.jnlp"> 
+-->
 <jnlp 
     spec="1.0+"
     codebase="#{codebase}"
@@ -31,9 +37,6 @@
     <security>
         <all-permissions/>
     </security>
-
-    <!-- start up as quickly as possible, doing updates in the background -->
-    <update check="background"/>
 
     <resources> 
         <j2se version="1.6+" initial-heap-size="96m" max-heap-size="1024m" java-vm-args="-Dsun.java2d.d3d=false"
