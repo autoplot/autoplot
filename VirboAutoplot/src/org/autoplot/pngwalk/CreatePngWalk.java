@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.das2.DasApplication;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -27,7 +26,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ArgumentList;
 import org.das2.util.ExceptionHandler;
@@ -346,12 +344,12 @@ public class CreatePngWalk {
         appmodel.setExceptionHandler( new ExceptionHandler() {
             @Override
             public void handle(Throwable t) {
-                t.printStackTrace();
+                logger.log( Level.WARNING, null, t );
                 returnCode1= 11;
             }
             @Override
             public void handleUncaught(Throwable t) {
-                t.printStackTrace();
+                logger.log( Level.WARNING, null, t );
                 returnCode1= 12;
             }
         });
@@ -522,6 +520,7 @@ public class CreatePngWalk {
                         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
                         final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
                         SwingUtilities.invokeLater( new Runnable() {
+                            @Override
                             public void run() {
                                 PngWalkTool1.start( st, ScriptContext.getViewWindow() );
                             }
