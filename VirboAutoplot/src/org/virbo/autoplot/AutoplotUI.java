@@ -1204,6 +1204,17 @@ APSplash.checkTime("init 270");
                         }
                     }
                 });
+                
+                dom.addPropertyChangeListener( Application.PROP_EVENTSLISTURI, new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        String uri = (String)evt.getNewValue();
+                        if ( uri.trim().length()>0 ){
+                            EventsListToolUtil.show( AutoplotUI.this, uri );
+                        }
+                    }
+                    
+                });
 
             }
         };
