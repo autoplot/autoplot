@@ -382,7 +382,8 @@ public class Util {
      * Given a spec to format timeranges and a range to contain each timerange,
      * produce a list of all timeranges covering the range formatted with the
      * spec.  For example, <code>generateTimeRanges( "%Y-%m-%d", "Jun 2009" )</code> would result in
-     * 2009-06-01, 2009-06-02, ..., 2009-06-30.
+     * 2009-06-01, 2009-06-02, ..., 2009-06-30.  This is limited to create no more than 
+     * 100000 elements.
      * @param spec such as "%Y-%m".  Note specs like "%Y%m" will not be parsable.
      * @param srange range limiting the list, such as "2009"
      * @return a string array of formatted time ranges, such as [ "2009-01", "2009-02", ..., "2009-12" ]
@@ -406,7 +407,16 @@ public class Util {
 
         tp.parse(sstart);
         DatumRange curr= tp.getTimeRange();
-        List<String> result= new ArrayList<String>();
+        
+        int countLimit= 1000000;
+        int approxCount= (int)( 1.01 * range.width().divide(curr.width()).value() ); // extra 1% for good measure.
+
+        if ( approxCount>countLimit*1.03 ) {
+            throw new IllegalArgumentException("too many intervals would be created, this is limited to about 1000000 intervals.");
+        }
+        
+        List<String> result= new ArrayList<String>( approxCount );
+        
         while ( range.intersects(curr) ) {
             String scurr= tp.format( curr.min(), curr.max() );
             result.add( scurr );
