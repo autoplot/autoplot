@@ -824,7 +824,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                invokeLater( 2500, false, new Runnable() {
+                invokeLater( 2500, true, new Runnable() {
                     @Override
                     public String toString() { return "addAxesRunnable"; }
                     @Override
@@ -850,7 +850,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                invokeLater( 2500, false, new Runnable() {
+                invokeLater( 2500, true, new Runnable() {
                     @Override
                     public String toString() { return "addStyle"; }
                     @Override                    
@@ -933,7 +933,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 2230, false, new Runnable() { 
+        invokeLater( 2230, true, new Runnable() { 
             @Override
             public String toString() { return "addLayout"; }
             @Override            
@@ -951,7 +951,7 @@ APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 2350, false, new Runnable() {
+        invokeLater( 2350, true, new Runnable() {
             @Override
             public String toString() { return "addDataPanel"; }
             @Override
@@ -969,7 +969,7 @@ APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 2470, false, new Runnable() { 
+        invokeLater( 2470, true, new Runnable() { 
             @Override
             public String toString() { return "addMetadataPanel"; }
             @Override
