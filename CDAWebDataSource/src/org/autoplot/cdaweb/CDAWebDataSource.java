@@ -113,8 +113,6 @@ public class CDAWebDataSource extends AbstractDataSource {
 
         try {
 
-            mon.started();
-
             try {
                 mon.setProgressMessage("refreshing database");
                 db.maybeRefresh( SubTaskMonitor.create(mon,0,10) ); //TODO: this ain't right, what's the taskSize?
