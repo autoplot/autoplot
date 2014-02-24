@@ -65,10 +65,12 @@ public class Test_3pt7_ZoomPan implements Scenario {
 
             if ( dr0.width().value()==125.0
                     && dr1.width().value()==100.0
-                    && dr1.width().value()==100.0
                     && ( close( dr2.width().value(), 171.397 ) || close( dr2.width().value(), 177.201 ) ) ) { // autolayout=false -> 156.88488 ) ) {
                 return 0;
             } else {
+                System.err.println( "dr0.width= "+dr0.width());
+                System.err.println( "dr1.width= "+dr1.width());
+                System.err.println( "dr2.width= "+dr2.width());
                 return 1;
             }
             
