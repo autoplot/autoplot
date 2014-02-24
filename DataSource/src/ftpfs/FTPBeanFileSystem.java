@@ -559,7 +559,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             resetListCache( fo.getParent().getNameExt() );
             listDirectory( fo.getParent().getNameExt() );
             bean.close();
-
+            
         } catch (RuntimeException ex) {
 
             logger.log( Level.SEVERE, ex.getMessage(), ex );
@@ -573,6 +573,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         } catch ( CancelledOperationException ex ) {
             throw new IOException(ex.getMessage());
+        } finally {
+            mon.finished();
         }
 
 
@@ -677,6 +679,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 } catch ( CancelledOperationException ex ) {
                     throw new FileSystemOfflineException("user cancelled credentials");
+                } finally {    
+                    mon.finished();
                 }
             }
 
