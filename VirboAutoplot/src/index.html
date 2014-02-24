@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-02-21):</p>
         <ul>
+            <li>unnecessary fold case in local cache completions prevented "Flight" from showing</li>
+            <li>spaces in NetCDF file names caused problems after check for matlab was installed.  Thanks sspagnol!</li>
             <li>createEvent doesn't make so many assumptions about the dataset it's appending to.</li>
             <li>upper case constants in inline data source were always used as property values.  Now only valid property names are treated this way.</li>
             <li>"scan" buttons renamed "step" buttons in anticipation of events lists</li>
