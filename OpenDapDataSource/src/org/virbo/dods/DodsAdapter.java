@@ -226,7 +226,10 @@ public class DodsAdapter {
             } else {
                 throw ex;
             }
+        } finally {
+            mon.finished();
         }
+       
 
     }
 
