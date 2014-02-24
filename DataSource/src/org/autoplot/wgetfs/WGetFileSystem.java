@@ -130,7 +130,6 @@ public class WGetFileSystem extends WebFileSystem {
                 }
             }
             p.waitFor();
-            monitor.finished();
             if ( p.exitValue()!=0 ) {
                 partfile.delete();
                 throw new IOException( cmd[0] +" returned with exit code "+p.exitValue() );
@@ -140,6 +139,7 @@ public class WGetFileSystem extends WebFileSystem {
             throw new IOException(ex);
         } finally {
             err.close();
+            monitor.finished();
         }
 
         partfile.renameTo(f);
