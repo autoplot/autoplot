@@ -102,13 +102,17 @@ public class NetCDFDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         logger.finer("getDataSet");
         mon.started();
-        readData( mon );
-        NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon );
-        QDataSet qresult= checkLatLon(result);
-        mon.finished();
-        ncfile.close();
-        ncfile= null;
-        return qresult;
+        try { 
+            readData( mon );
+            NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon );
+            QDataSet qresult= checkLatLon(result);
+            
+            ncfile.close();
+            ncfile= null;
+            return qresult;
+        } finally {
+            mon.finished();
+        }
         
     }
     
@@ -160,35 +164,38 @@ public class NetCDFDataSource extends AbstractDataSource {
         NetcdfDataset dataset;
 
         mon.started();
-        if ( sMyUrl.endsWith(".ncml" ) ) {
-            dataset= NcMLReader.readNcML( location, null );
-        } else {
-            NetCDFDataSourceFactory.checkMatlab(location);
-            NetcdfFile f= NetcdfFile.open( location );
-            dataset= new NetcdfDataset( f );
-        }
+        try {
+            if ( sMyUrl.endsWith(".ncml" ) ) {
+                dataset= NcMLReader.readNcML( location, null );
+            } else {
+                NetCDFDataSourceFactory.checkMatlab(location);
+                NetcdfFile f= NetcdfFile.open( location );
+                dataset= new NetcdfDataset( f );
+            }
 
-        ncfile= dataset;
-        
-        List<Variable> variables= (List<Variable>)dataset.getVariables();
-        
-        if ( svariable==null ) {
-            for ( int i=0; i<variables.size(); i++ ) {
-                Variable v= variables.get(i);
-                if ( !v.getDimension(0).getName().equals(v.getName()) ) {
-                    variable= v;
-                    break;
+            ncfile= dataset;
+
+            List<Variable> variables= (List<Variable>)dataset.getVariables();
+
+            if ( svariable==null ) {
+                for ( int i=0; i<variables.size(); i++ ) {
+                    Variable v= variables.get(i);
+                    if ( !v.getDimension(0).getName().equals(v.getName()) ) {
+                        variable= v;
+                        break;
+                    }
+                }
+            } else {
+                for ( int i=0; i<variables.size(); i++ ) {
+                    Variable v= variables.get(i);
+                    if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
+                        variable= v;
+                    }
                 }
             }
-        } else {
-            for ( int i=0; i<variables.size(); i++ ) {
-                Variable v= variables.get(i);
-                if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
-                    variable= v;
-                }
-            }
+        } finally {
+            mon.finished();
         }
-        mon.finished();
     }
     
     private synchronized Variable getVariable() {
@@ -202,30 +209,33 @@ public class NetCDFDataSource extends AbstractDataSource {
     @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
         mon.started();
-        mon.setProgressMessage("reading metadata");
-        readData( mon );
-        List attr;
-        attr= getVariable().getAttributes();
-        
-        if ( attr==null ) return null; // transient state
-
-        Map<String,Object> result= new LinkedHashMap<String, Object>();
-        for( int i=0; i<attr.size(); i++ ) {
-            Attribute at= (Attribute) attr.get(i);
-            result.put( at.getName(), at.getStringValue() );
-        }
-
         try {
-            if ( ncfile!=null ) {
-                ncfile.close();
-                ncfile= null;
-            }
-        } catch ( IOException ex ) {
-            logger.log( Level.WARNING, null, ex );
-        }
+            mon.setProgressMessage("reading metadata");
+            readData( mon );
+            List attr;
+            attr= getVariable().getAttributes();
 
-        mon.finished();
-        return result;
+            if ( attr==null ) return null; // transient state
+
+            Map<String,Object> result= new LinkedHashMap<String, Object>();
+            for( int i=0; i<attr.size(); i++ ) {
+                Attribute at= (Attribute) attr.get(i);
+                result.put( at.getName(), at.getStringValue() );
+            }
+
+            try {
+                if ( ncfile!=null ) {
+                    ncfile.close();
+                    ncfile= null;
+                }
+            } catch ( IOException ex ) {
+                logger.log( Level.WARNING, null, ex );
+            }
+            return result;
+        } finally {
+            mon.finished();
+        }
+        
         
     }
 
