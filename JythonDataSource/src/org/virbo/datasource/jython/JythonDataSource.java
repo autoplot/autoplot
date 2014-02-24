@@ -195,7 +195,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
                 logger.log(Level.FINE, "running script {0}", jythonScript );
 
-                mon.started();
                 mon.setProgressMessage( "initialize Jython interpreter...");
 
                 interp = JythonUtil.createInterpreter(false);
@@ -355,13 +354,13 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
             QDataSet res;
             if (result instanceof PyList) {
-                res = JythonOps.coerceToDs((PyList) result);
+                res = JythonOps.dataset((PyList) result);
             } else if ( result instanceof PyArray ) {
-                res = JythonOps.coerceToDs((PyArray) result);
+                res = JythonOps.dataset((PyArray) result);
             } else if ( result instanceof PyInteger ) {
-                res = JythonOps.coerceToDs((PyInteger) result);
+                res = JythonOps.dataset((PyInteger) result);
             } else if ( result instanceof PyFloat ) {
-                res = JythonOps.coerceToDs((PyFloat) result);
+                res = JythonOps.dataset((PyFloat) result);
             } else {
                 res = (QDataSet) result.__tojava__(QDataSet.class);
             }
@@ -418,7 +417,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp= null;
             }
 
-            mon.finished();
             return res;
 
         } catch (PyException ex) {
