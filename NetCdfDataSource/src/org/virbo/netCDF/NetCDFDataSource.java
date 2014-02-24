@@ -18,6 +18,7 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -38,6 +39,8 @@ import ucar.nc2.ncml.NcMLReader;
  */
 public class NetCDFDataSource extends AbstractDataSource {
     
+    private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
+    
     Variable variable;
     String sMyUrl;
     String svariable;
@@ -48,11 +51,11 @@ public class NetCDFDataSource extends AbstractDataSource {
         try {
             NetcdfFile.registerIOProvider("org.virbo.netCDF.APIOServiceProvider");
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 */
@@ -74,7 +77,6 @@ public class NetCDFDataSource extends AbstractDataSource {
         
         if ( i==-1 ) {
             svariable= null;
-            return;
             
         } else {
             // get the variable            
@@ -98,6 +100,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     }
     
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
+        logger.finer("getDataSet");
         mon.started();
         readData( mon );
         NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon );
@@ -149,7 +152,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         boolean makeLocal= true;
         if ( makeLocal ) {
             File file= getFile(mon);
-            location= file.toURI().toURL().toString();
+            location= "file://"+file.toString();
         } else {
             location= DataSetURI.fromUri(resourceURI);
         }

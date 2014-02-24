@@ -29,7 +29,7 @@ public class NetcdfMetadataModel extends MetadataModel {
         Map<String,Object> result= new HashMap<String, Object>();
         if (meta.containsKey("valid_range")) {
             //result.put( QDataSet.VALID_RANGE, meta.get("valid_range" ) );
-            Logger.getLogger("virbo.netcdf").fine("here's where I didn't think there was going to be VALID_RANGE");
+            Logger.getLogger("apdss.netcdf").fine("here's where I didn't think there was going to be VALID_RANGE");
         }
         return result;
     }

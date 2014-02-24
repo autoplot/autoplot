@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -43,7 +44,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     double[] data;
     int[] shape;
 
-    private static final Logger logger= Logger.getLogger("virbo.netcdf");
+    private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
 
     public static NetCdfVarDataSet create( Variable variable, String constraint, NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
         NetCdfVarDataSet result = new NetCdfVarDataSet(  );
