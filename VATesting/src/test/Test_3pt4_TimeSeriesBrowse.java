@@ -95,6 +95,8 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
                     ScriptContext.getDocumentModel().getBindings(1).getSrcProperty().equals("timeRange")) {
                 return 0;
             } else {
+                System.err.println("bindings.length="+ScriptContext.getDocumentModel().getBindings().length );
+                System.err.println("bindings[1].getSrcProperty()="+ScriptContext.getDocumentModel().getBindings(1).getSrcProperty() );
                 return 1;
             }
         } catch ( Exception ex ) {

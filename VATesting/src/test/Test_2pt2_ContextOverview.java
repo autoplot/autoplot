@@ -92,6 +92,8 @@ public class Test_2pt2_ContextOverview implements Scenario {
             if ( tbindings && trange ) {
                 return 0;
             } else {
+                System.err.println("tbindings="+tbindings);
+                System.err.println("trange="+trange);
                 return 1;
             }
 
