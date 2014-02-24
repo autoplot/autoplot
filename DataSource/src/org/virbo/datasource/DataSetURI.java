@@ -1376,7 +1376,7 @@ public class DataSetURI {
         for (int j = 0; j < s.length; j++) {
             String scomp = foldCase ? s[j].toLowerCase() : s[j];
             if (scomp.startsWith(prefix) && !scomp.endsWith(".listing") ) {
-                File ff= new File(cacheF, scomp );
+                File ff= new File(cacheF, s[j] );
                 if ( ! ff.isDirectory() ) continue;
                 if ( ff.list().length==0 ) continue;
 
