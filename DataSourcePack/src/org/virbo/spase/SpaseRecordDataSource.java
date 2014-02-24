@@ -156,7 +156,6 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                 
                 QDataSet result= delegate.getDataSet(mon);
 
-                mon.finished();
                 return result;
 
             } else if ( type==XMLTypeCheck.TYPE_HELM ) {
@@ -198,8 +197,6 @@ public class SpaseRecordDataSource extends AbstractDataSource {
                     timespans.putValue(j, 1, Units.us2000.parse(stopDate).doubleValue(Units.us2000) );
                 }
 
-                mon.finished();
-                
                 DDataSet dd= description.getDataSet();
                 dd.putProperty( QDataSet.DEPEND_0, timespans.getDataSet() );
 
@@ -281,6 +278,8 @@ public class SpaseRecordDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("Spase record AccessURL is malformed: "+surl );
         } catch ( Exception ex ) {
             throw ex;
+        } finally {
+            mon.finished();
         }
     }
     
