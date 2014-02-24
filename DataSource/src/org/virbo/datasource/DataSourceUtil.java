@@ -387,7 +387,7 @@ public class DataSourceUtil {
         String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
         String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
         String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
-        String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\-)\\d{2}(?!\\d)"; //"(\\d{8})";
+        String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
 
         String version= "([Vv])\\d{2}";                // $v
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
