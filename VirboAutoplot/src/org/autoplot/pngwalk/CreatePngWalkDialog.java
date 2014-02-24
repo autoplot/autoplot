@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import org.virbo.autoplot.EventsListToolUtil;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.TimeRangeTool;
 
@@ -37,6 +38,8 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     /** Creates new form CreatePngWalkDialog */
     public CreatePngWalkDialog() {
         initComponents();
+        EventsListToolUtil.deflts(eventsFileSelector);
+        
         String home= java.lang.System.getProperty( "user.home" ) + java.lang.System.getProperty( "file.separator" );
         home= home.replaceAll("\\\\","/");
         outputFolderTf.setText( home + "pngwalk/" );
@@ -290,17 +293,17 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
                             .add(jLabel3)
+                            .add(timeRangeRadioButton)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, timeFormatCB, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, flnRootTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 412, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                            .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 306, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(timeRangeToolButton))
-                            .add(timeRangeRadioButton))
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, timeFormatCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(org.jdesktop.layout.GroupLayout.LEADING, flnRootTf))
+                                    .add(layout.createSequentialGroup()
+                                        .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 306, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(timeRangeToolButton)))))
                         .add(25, 25, 25)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(updateCB)
@@ -318,20 +321,20 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel2)
+                            .add(eventsFileRadioButton)
                             .add(layout.createSequentialGroup()
                                 .add(12, 12, 12)
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(overwriteCB)
                                     .add(layout.createSequentialGroup()
-                                        .add(outputFolderTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 529, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(outputFolderTf)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(pickFolderButton))))
-                            .add(eventsFileRadioButton)
-                            .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .add(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                        .add(pickFolderButton))
+                                    .add(layout.createSequentialGroup()
+                                        .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .add(146, 146, 146)))))
+                        .add(45, 45, 45)))
+                .add(0, 0, 0))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -369,14 +372,15 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(timeRangeRadioButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(timeRangeToolButton))))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(timeRangeToolButton)
+                            .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(1, 1, 1)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(eventsFileRadioButton)
-                .add(7, 7, 7)
+                .add(1, 1, 1)
                 .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(18, 18, 18)
                 .add(createThumbsCb)
                 .addContainerGap(45, Short.MAX_VALUE))
         );
