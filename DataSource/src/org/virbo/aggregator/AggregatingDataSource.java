@@ -601,15 +601,19 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if (metadata == null) {
             mon.setTaskSize(10);
             mon.started();
-            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
-            if (!sparams.equals("")) {
-                scompUrl += "?" + sparams;
+            try {
+                String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
+                if (!sparams.equals("")) {
+                    scompUrl += "?" + sparams;
+                }
+                
+                URI delegateUri= DataSetURI.getURIValid(scompUrl);
+                DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
+                metadata = delegateDataSource.getMetadata(mon.getSubtaskMonitor(5,10,"get metadata"));
+                metadataModel= delegateDataSource.getMetadataModel();
+            } finally {
+                mon.finished();
             }
-
-            URI delegateUri= DataSetURI.getURIValid(scompUrl);
-            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
-            metadata = delegateDataSource.getMetadata(mon.getSubtaskMonitor(5,10,"get metadata"));
-            metadataModel= delegateDataSource.getMetadataModel();
             return metadata;
         } else {
             return metadata;
