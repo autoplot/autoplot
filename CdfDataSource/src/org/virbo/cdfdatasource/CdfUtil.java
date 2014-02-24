@@ -558,21 +558,24 @@ public class CdfUtil {
             int nread= (int)(rc/blockSize);
             mon.started();
             mon.setTaskSize(nread+1);
-            for ( int i=0; i<nread; i++ ) {
-                mon.setTaskProgress(i);
-                CDFData cdfData= variable.getHyperDataObject( recStart + i*blockSize, blockSize, recInterval, dimIndeces, dimCounts, dimIntervals );
-                float[] odata1= (float[])cdfData.getRawData(); // this is my hack
-                System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*i*blockSize), (int)(recSizeCount*blockSize) );
+            try {
+                for ( int i=0; i<nread; i++ ) {
+                    mon.setTaskProgress(i);
+                    CDFData cdfData= variable.getHyperDataObject( recStart + i*blockSize, blockSize, recInterval, dimIndeces, dimCounts, dimIntervals );
+                    float[] odata1= (float[])cdfData.getRawData(); // this is my hack
+                    System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*i*blockSize), (int)(recSizeCount*blockSize) );
+                }
+                // read the remainder
+                long nremain= rc - ( recStart + nread*blockSize );
+                if ( nremain>0 ) {
+                    mon.setTaskProgress(nread);
+                    CDFData cdfData= variable.getHyperDataObject( recStart + nread*blockSize, nremain, recInterval, dimIndeces, dimCounts, dimIntervals );
+                    float[] odata1= (float[])cdfData.getRawData(); // this is my hack
+                    System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*nread*blockSize), (int)(recSizeCount*nremain) );
+                }
+            } finally {
+                mon.finished();
             }
-            // read the remainder
-            long nremain= rc - ( recStart + nread*blockSize );
-            if ( nremain>0 ) {
-                mon.setTaskProgress(nread);
-                CDFData cdfData= variable.getHyperDataObject( recStart + nread*blockSize, nremain, recInterval, dimIndeces, dimCounts, dimIntervals );
-                float[] odata1= (float[])cdfData.getRawData(); // this is my hack
-                System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*nread*blockSize), (int)(recSizeCount*nremain) );
-            }
-            mon.finished();
         } else {
             CDFData cdfData= variable.getHyperDataObject( recStart, rc, recInterval, dimIndeces, dimCounts, dimIntervals );
             odata= cdfData.getRawData(); // this is my hack
