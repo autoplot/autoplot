@@ -7,24 +7,18 @@
 package org.virbo.autoplot;
 
 import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.event.DataRangeSelectionListener;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeToolEventsList;
 import org.xml.sax.SAXException;
@@ -37,7 +31,7 @@ public class EventsListToolUtil {
     
     private static final Logger logger= LoggerManager.getLogger("autoplot.events");
     
-    private static void deflts( DataSetSelector sel ) {
+    public static void deflts( DataSetSelector sel ) {
         
         final String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 "<bookmark-list version=\"1.1\">\n" +
