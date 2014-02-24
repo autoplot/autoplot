@@ -157,7 +157,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             location= DataSetURI.fromUri(resourceURI);
         }
         
-        NetcdfDataset dataset=null;
+        NetcdfDataset dataset;
 
         mon.started();
         if ( sMyUrl.endsWith(".ncml" ) ) {
@@ -221,7 +221,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                 ncfile= null;
             }
         } catch ( IOException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
         }
 
         mon.finished();
