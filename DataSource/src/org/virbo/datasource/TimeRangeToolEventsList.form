@@ -27,12 +27,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="nextButton" linkSize="1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="timeRangeTF" min="-2" pref="114" max="-2" attributes="0"/>
+              <Component id="timeRangeTF" min="-2" pref="196" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangeButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="currentDataSetSelector" alignment="0" pref="493" max="32767" attributes="0"/>
+          <Component id="currentDataSetSelector" alignment="0" pref="573" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

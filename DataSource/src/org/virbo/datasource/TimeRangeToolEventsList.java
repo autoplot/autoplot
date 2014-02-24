@@ -399,11 +399,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nextButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(timeRangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(timeRangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeRangeButton)
                 .addContainerGap())
-            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+            .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {nextButton, prevButton});
@@ -584,6 +584,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         try {
             QDataSet currentDataSet1= dss.getDataSet(mon);
             currentDataSet= makeCanonical(currentDataSet1);
+            //TODO: someone is going to want to trim to this range.  QDataSet rr= Ops.trim()
         } catch ( Exception ex ) {
             currentDataSet= null;
         } finally {
