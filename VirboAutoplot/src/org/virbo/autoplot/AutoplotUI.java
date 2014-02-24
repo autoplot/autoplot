@@ -190,9 +190,6 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     // if non-null, then load this set of initial bookmarks.
     private String initialBookmarksUrl= null;
-
-    private TimeRangeToolEventsList eventsListTool= null;
-    private JFrame eventsListToolFrame=null;
     
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
         @Override
