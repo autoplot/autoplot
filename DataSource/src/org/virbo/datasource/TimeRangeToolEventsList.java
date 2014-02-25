@@ -583,8 +583,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
         try {
             QDataSet currentDataSet1= dss.getDataSet(mon);
-            currentDataSet= makeCanonical(currentDataSet1);
+            currentDataSet1= makeCanonical(currentDataSet1);
             //TODO: someone is going to want to trim to this range.  QDataSet rr= Ops.trim()
+            currentDataSet= SemanticOps.trim( currentDataSet1, range, null );
         } catch ( Exception ex ) {
             currentDataSet= null;
         } finally {
@@ -610,7 +611,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     DataSource dsource = DataSetURI.getDataSource(uri);
                     dss= dsource;
                     ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
-                    currentDataSet= dss.getDataSet(mon);
+                    QDataSet currentDataSet1= dss.getDataSet(mon);
                     tsb= dsource.getCapability( TimeSeriesBrowse.class );
                     if ( tsb!=null ) {
                         timeRangeTF.setText(tsb.getTimeRange().toString());
@@ -621,7 +622,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                         timeRangeTF.setEnabled(false);
                         timeRangeButton.setEnabled(false);
                     }
-                    currentDataSet= makeCanonical(currentDataSet);
+                    currentDataSet1= makeCanonical(currentDataSet1);
+                    if ( tsb!=null ) {
+                        currentDataSet1= SemanticOps.trim( currentDataSet1, tsb.getTimeRange(), null );
+                    }
+                    currentDataSet= currentDataSet1;
                     hasIcons= false;
                     if ( currentDataSet.length()>0 ) {
                         double color0= currentDataSet.value(0,2);
