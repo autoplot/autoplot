@@ -240,10 +240,9 @@ public class PlotController extends DomNodeController {
          }
     };
 
-    private void updateNextPrevious() {
+    private void updateNextPrevious( DatumRange dr ) {
         List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-        DatumRange dr= plot.getXaxis().getRange();
-        
+        logger.warning("updateRadius: "+dr);
         QDataSet ds= pele.get(0).getController().getDataSet();
         if ( ds!=null &&  ds.rank()>0 ) {
             QDataSet bounds= SemanticOps.bounds(ds).slice(0);
@@ -308,7 +307,7 @@ public class PlotController extends DomNodeController {
         xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                updateNextPrevious();
+                updateNextPrevious((DatumRange)evt.getNewValue());
             }
         });
         
@@ -320,23 +319,7 @@ public class PlotController extends DomNodeController {
                 if ( pele==null || pele.isEmpty() ) {    
                     xaxis.setDatumRange(dr.next());
                 } else {
-                    QDataSet ds= pele.get(0).getController().getDataSet();
-                    if ( ds!=null &&  ds.rank()>0 ) {
-                        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                        DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                        limit= DatumRangeUtil.union( limit, dr );
-                        dr= dr.next();
-                        while ( dr.intersects(limit) ) {
-                            QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                            if ( ds1==null || ds1.length()==0 ) {
-                                dr= dr.next();
-                            } else {
-                                break;
-                            }
-                        }
-                    } else {
-                        dr= dr.next();
-                    }
+                    dr= scanNextRange;
                     if ( !dr.min().equals( xaxis.getDatumRange().max() ) ) {
                         xaxis.setAnimated(true); // yeah, return of animated axes!
                         xaxis.setDataRange( dr.min(), dr.max() );
@@ -355,23 +338,7 @@ public class PlotController extends DomNodeController {
                 if ( pele==null || pele.isEmpty() ) {    
                     xaxis.setDatumRange(dr.previous());
                 } else {
-                    QDataSet ds= pele.get(0).getController().getDataSet();
-                    if ( ds!=null &&  ds.rank()>0 ) {
-                        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                        DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                        limit= DatumRangeUtil.union( limit, dr );
-                        dr= dr.previous();
-                        while ( dr.intersects(limit) ) {
-                            QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                            if ( ds1==null || ds1.length()==0 ) {
-                                dr= dr.previous();
-                            } else {
-                                break;
-                            }
-                        }
-                    } else {
-                        dr= dr.previous();
-                    }
+                    dr= scanPrevRange;
                     if ( !dr.max().equals( xaxis.getDatumRange().min() ) ) {
                         xaxis.setAnimated(true);
                         xaxis.setDataRange( dr.min(), dr.max() );
