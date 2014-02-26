@@ -801,6 +801,7 @@ public class DataSourceController extends DomNodeController {
                 return "first or second dataset is null";
             }
             ArrayDataSet yds = ArrayDataSet.copy(y);
+            assert yprops!=null;
             if ( DataSetUtil.validate(x,yds,null) ) {
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yprops.put(QDataSet.DEPEND_0, xprops);
@@ -815,6 +816,8 @@ public class DataSourceController extends DomNodeController {
             if (x == null || y == null || z == null) {
                 return "at least one of the three datasets is null";
             }
+            assert yprops!=null;
+            assert zprops!=null;
             if (z.rank() == 1) {
                 ArrayDataSet yds = ArrayDataSet.copy(y);
                 yds.putProperty(QDataSet.RENDER_TYPE,null);
