@@ -58,6 +58,17 @@ public class PlotController extends DomNodeController {
     Plot plot;
     private DasPlot dasPlot;
     private DasColorBar dasColorBar;
+    
+    /**
+     * if the user clicks on the axis "previous" button, which interval should 
+     * be shown.
+     */
+    private DatumRange scanPrevRange= null;
+    /**
+     * if the user clicks on the axis "next" button, which interval should 
+     * be shown.
+     */
+    private DatumRange scanNextRange= null;
 
     /**
      * the plot elements we listen to for autoranging.
@@ -229,6 +240,50 @@ public class PlotController extends DomNodeController {
          }
     };
 
+    private void updateNextPrevious() {
+        List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+        DatumRange dr= plot.getXaxis().getRange();
+        
+        QDataSet ds= pele.get(0).getController().getDataSet();
+        if ( ds!=null &&  ds.rank()>0 ) {
+            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+            DatumRange limit= DataSetUtil.asDatumRange(bounds);
+            limit= DatumRangeUtil.union( limit, dr );
+            dr= dr.next();
+            while ( dr.intersects(limit) ) {
+                QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                if ( ds1==null || ds1.length()==0 ) {
+                    dr= dr.next();
+                } else {
+                    break;
+                }
+            }
+        } else {
+            dr= dr.next();
+        }
+        scanNextRange= dr;
+        
+        if ( ds!=null &&  ds.rank()>0 ) {
+            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+            DatumRange limit= DataSetUtil.asDatumRange(bounds);
+            limit= DatumRangeUtil.union( limit, dr );
+            dr= dr.previous();
+            while ( dr.intersects(limit) ) {
+                QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                if ( ds1==null || ds1.length()==0 ) {
+                    dr= dr.previous();
+                } else {
+                    break;
+                }
+            }
+        } else {
+            dr= dr.previous();
+        }
+        scanPrevRange= dr;
+        
+        
+    }
+    
     /**
      * Create the das2 GUI components that implement the plot.  This should
      * be called from the event thread.
@@ -249,6 +304,13 @@ public class PlotController extends DomNodeController {
         //xaxis.setUseDomainDivider(true);
         yaxis.setEnableHistory(false);
         //yaxis.setUseDomainDivider(true);
+        
+        xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateNextPrevious();
+            }
+        });
         
         xaxis.setNextAction( "scan", new AbstractAction( "scannext" ) {
             @Override
