@@ -68,6 +68,7 @@ public class DataSourceController extends DomNodeController {
 
     private final Object internalLock= new Object();
     private final Object uriLock= new Object();
+    private final Object dscLock= new Object(); // just to figure out synchronization
     
     /**
      * the current load being monitored.
@@ -300,8 +301,8 @@ public class DataSourceController extends DomNodeController {
                 !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
     }
 
-    public synchronized void resetDataSource(boolean valueWasAdjusting,DataSource dataSource) {
-
+    public void resetDataSource(boolean valueWasAdjusting,DataSource dataSource) {
+        synchronized ( dscLock ) {
         if ( dataSource==null ) {
             setDataSetNeedsLoading(false);
         } else {
@@ -427,7 +428,7 @@ public class DataSourceController extends DomNodeController {
                 update( );
             }
         }
-
+        }
     }
 
     public void setDataSetInternal( QDataSet ds ) {
@@ -578,7 +579,7 @@ public class DataSourceController extends DomNodeController {
             return new DataSourceFilter[0];
         } else {
             DataSourceFilter[] parentSources1;
-            synchronized ( this ) {
+            synchronized ( dscLock ) {
                 parentSources1= new DataSourceFilter[parentSources.length];
                 System.arraycopy(parentSources, 0, parentSources1, 0, parentSources.length );
             }
@@ -590,26 +591,27 @@ public class DataSourceController extends DomNodeController {
      * removes the parentSources link, and listeners to the parents.  The
      * parents are left in the DOM and will be removed later.
      */
-    private synchronized void clearParentSources() {
+    private void clearParentSources() {
+        synchronized ( dscLock ) {
         if ( this.parentSources!=null ) {
             for ( DataSourceFilter parentDsf: parentSources ) {
                 if ( parentDsf!=null ) parentDsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
             }
         }
         this.parentSources= null; 
-
+        }
     }
 
     /**
      * if the internal dataset points to DSF's with TimeSeriesBrowse, then add our
      * own TSB.
      */
-    private synchronized void maybeAddInternalTimeSeriesBrowse() {
+    private void maybeAddInternalTimeSeriesBrowse() {
 
+        synchronized ( dscLock ) {
         if ( this.haveCheckedInternalTsb ) {
             return;
         }
-
         String uri= dsf.getUri();
         if ( uri==null ) {
             return; // when does this happen?  reset?
@@ -655,6 +657,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
         haveCheckedInternalTsb= true;
+        }
     }
 
     /**
@@ -729,7 +732,8 @@ public class DataSourceController extends DomNodeController {
         
     }
 
-    private synchronized void resolveParents() {
+    private void resolveParents() {
+        synchronized ( dscLock ) {
         if ( dsf.getUri().length()==0 ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri()); 
         if ( !dsf.getUri().startsWith("vap+internal:") ) {
@@ -748,6 +752,7 @@ public class DataSourceController extends DomNodeController {
                 parentSources[i] = null;
             }
  	}
+        }
     }
 
     private static Map maybeCopy( Map m ) {
@@ -1226,7 +1231,8 @@ public class DataSourceController extends DomNodeController {
      * then inspecting the dataset to decide on axis settings.
      *
      */
-    public synchronized void update() {
+    public void update() {
+        synchronized ( dscLock ) {
         changesSupport.registerPendingChange(this, PENDING_UPDATE);
         changesSupport.performingChange(this, PENDING_UPDATE);
 
@@ -1239,7 +1245,7 @@ public class DataSourceController extends DomNodeController {
             @Override
             public void run() {
                 try {
-                    synchronized (DataSourceController.this) {
+                    synchronized ( dscLock ) {
                         updateImmediately();
                         if (dataSource != null) {
                             if (updating != null) {
@@ -1273,6 +1279,7 @@ public class DataSourceController extends DomNodeController {
             RequestProcessor.invokeLater(run);
         } else {
             run.run();
+        }
         }
     }
     /****** controller properties *******/
@@ -1361,7 +1368,7 @@ public class DataSourceController extends DomNodeController {
 
     public void setDataSource(DataSource dataSource) {
         DataSource oldDataSource;
-        synchronized ( this ) {
+        synchronized ( dscLock ) {
             oldDataSource= this.dataSource;
             this.dataSource = dataSource;
         }
@@ -1506,8 +1513,8 @@ public class DataSourceController extends DomNodeController {
     /**
      * load the data set from the DataSource.
      */
-    private synchronized QDataSet loadDataSet() {
-
+    private QDataSet loadDataSet() {
+        synchronized ( dscLock ) {
         ProgressMonitor mymon;
 
         QDataSet result = null;
@@ -1661,6 +1668,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
         return result;
+        }
     }
 
     /**
@@ -1668,11 +1676,13 @@ public class DataSourceController extends DomNodeController {
      * @param suri
      * @param mon
      */
-    public synchronized void setSuri(String suri, ProgressMonitor mon) {
+    public void setSuri(String suri, ProgressMonitor mon) {
+        synchronized ( dscLock ) {
         suri= URISplit.makeCanonical(suri);
         synchronized ( uriLock ) {
             dsf.setUri(suri);
             setUriNeedsResolution(true);
+        }
         }
     }
 
