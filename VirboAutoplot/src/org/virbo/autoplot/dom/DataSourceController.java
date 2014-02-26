@@ -732,6 +732,9 @@ public class DataSourceController extends DomNodeController {
         
     }
 
+    /**
+     * vap+internal: -> populate array of parent sources.
+     */
     private void resolveParents() {
         synchronized ( dscLock ) {
         if ( dsf.getUri().length()==0 ) return; //TODO: remove
@@ -745,6 +748,7 @@ public class DataSourceController extends DomNodeController {
  	for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf1 = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
             if ( dsf1!=null ) {
+                //TODO: where are these listeners removed?
                 dsf1.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf1;
             }else {
@@ -897,7 +901,11 @@ public class DataSourceController extends DomNodeController {
     
     /**
      * resolve a URI like vap+internal:data_0,data_1.
-     * @param path
+     * preconditions: a vap+internal URI was found.
+     * postconditions: 
+     *   parentSources array is defined with one element per parent.
+     *   a listener is installed for each parent what will notify when a dataset is loaded.
+     * @param path string with internal references like "data_1,data_2,data_4".
      * @return true if the resolution was successful.
      */
     private boolean doInternal(String path) {
