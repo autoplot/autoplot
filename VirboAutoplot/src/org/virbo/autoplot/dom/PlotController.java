@@ -240,14 +240,16 @@ public class PlotController extends DomNodeController {
          }
     };
 
-    private void updateNextPrevious( DatumRange dr ) {
+    private void updateNextPrevious( DatumRange dr0 ) {
         List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-        logger.warning("updateRadius: "+dr);
+        logger.warning("updateRadius: "+dr0);
         QDataSet ds= pele.get(0).getController().getDataSet();
+        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+        DatumRange limit= DataSetUtil.asDatumRange(bounds);
+        limit= DatumRangeUtil.union( limit, dr0 );
+        
+        DatumRange dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
-            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-            DatumRange limit= DataSetUtil.asDatumRange(bounds);
-            limit= DatumRangeUtil.union( limit, dr );
             dr= dr.next();
             while ( dr.intersects(limit) ) {
                 QDataSet ds1= SemanticOps.trim( ds, dr, null);
@@ -262,10 +264,8 @@ public class PlotController extends DomNodeController {
         }
         scanNextRange= dr;
         
+        dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
-            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-            DatumRange limit= DataSetUtil.asDatumRange(bounds);
-            limit= DatumRangeUtil.union( limit, dr );
             dr= dr.previous();
             while ( dr.intersects(limit) ) {
                 QDataSet ds1= SemanticOps.trim( ds, dr, null);
