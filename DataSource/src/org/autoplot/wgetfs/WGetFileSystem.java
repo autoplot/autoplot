@@ -125,7 +125,11 @@ public class WGetFileSystem extends WebFileSystem {
                 line= err.readLine();
                 if ( monitor.isCancelled() ) {
                     p.destroy();
-                    if ( partfile.exists() ) partfile.delete();
+                    if ( partfile.exists() ) {
+                        if ( !partfile.delete() ) {
+                            logger.log(Level.WARNING, "unable to delete file: {0}", partfile);
+                        }
+                    }
                     throw new InterruptedException("user cancel");
                 }
             }
@@ -142,7 +146,9 @@ public class WGetFileSystem extends WebFileSystem {
             monitor.finished();
         }
 
-        partfile.renameTo(f);
+        if ( !partfile.renameTo(f) ) {
+            logger.log(Level.WARNING, "unable to rename file {0} to {1}", new Object[]{partfile, f});
+        }
         
     }
 
@@ -243,7 +249,9 @@ public class WGetFileSystem extends WebFileSystem {
         try {
             p.waitFor();
             if ( p.exitValue()!=0 ) {
-                listingFile.delete();
+                if ( !listingFile.delete() ) {
+                    logger.log(Level.WARNING, "unable to delete listing file: {0}", listingFile);
+                }
                 throw new IOException("wget returned with exit code "+p.exitValue() );
             }
         } catch ( InterruptedException ex ) {
