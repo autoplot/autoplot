@@ -43,6 +43,7 @@ import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -240,16 +241,19 @@ public class PlotController extends DomNodeController {
          }
     };
 
-    private void updateNextPrevious( DatumRange dr0 ) {
+    private void updateNextPrevious( DatumRange dr0, QDataSet ds ) {
         List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-        logger.warning("updateRadius: "+dr0);
-        QDataSet ds= pele.get(0).getController().getDataSet();
-        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-        DatumRange limit= DataSetUtil.asDatumRange(bounds);
-        limit= DatumRangeUtil.union( limit, dr0 );
-        
+        logger.log(Level.FINE, "updateRadius: {0}", dr0);
+        if ( ds!=null && SemanticOps.isBundle(ds) ) {
+            logger.log(Level.FINE, "unbundling: {0}", ds);
+            ds= DataSetOps.unbundle(ds,0);
+        }
+                
         DatumRange dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
+            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+            DatumRange limit= DataSetUtil.asDatumRange(bounds);
+            limit= DatumRangeUtil.union( limit, dr0 );
             dr= dr.next();
             while ( dr.intersects(limit) ) {
                 QDataSet ds1= SemanticOps.trim( ds, dr, null);
@@ -263,9 +267,17 @@ public class PlotController extends DomNodeController {
             dr= dr.next();
         }
         scanNextRange= dr;
+        if ( dr.min().equals(dr0.max()) ) {
+            getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("step >>");
+        } else {
+            getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("scan >>");
+        }
         
         dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
+            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+            DatumRange limit= DataSetUtil.asDatumRange(bounds);
+            limit= DatumRangeUtil.union( limit, dr0 );
             dr= dr.previous();
             while ( dr.intersects(limit) ) {
                 QDataSet ds1= SemanticOps.trim( ds, dr, null);
@@ -279,7 +291,11 @@ public class PlotController extends DomNodeController {
             dr= dr.previous();
         }
         scanPrevRange= dr;
-        
+        if ( dr.max().equals(dr0.min()) ) {
+            getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< step");
+        } else {
+            getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< scan");
+        }
         
     }
     
@@ -307,7 +323,9 @@ public class PlotController extends DomNodeController {
         xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                updateNextPrevious((DatumRange)evt.getNewValue());
+                List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+                QDataSet ds= pele.get(0).getController().getDataSet();
+                updateNextPrevious((DatumRange)evt.getNewValue(),ds);
             }
         });
         
@@ -813,6 +831,7 @@ public class PlotController extends DomNodeController {
                 String title= insertString( plot.getXaxis().getLabel(), "CONTEXT", shortContextStr );
                 dasPlot.getXAxis().setLabel(title);
             }
+            updateNextPrevious( plot.getXaxis().getRange(), pds );
         }
     };
 
