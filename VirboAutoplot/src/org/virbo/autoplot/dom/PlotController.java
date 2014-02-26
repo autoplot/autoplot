@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import org.das2.datum.DatumRange;
@@ -21,7 +23,9 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.datum.format.DateTimeDatumFormatter;
 import org.das2.event.BoxZoomMouseModule;
+import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
 import org.das2.event.ZoomPanMouseModule;
 import org.das2.graph.DasAxis;
@@ -39,10 +43,9 @@ import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.das2.datum.format.DateTimeDatumFormatter;
-import org.das2.event.DasMouseInputAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 
 /**
  * Manages a Plot node, for example listening for autoRange updates and layout
@@ -239,13 +242,69 @@ public class PlotController extends DomNodeController {
 
         DatumRange x = this.plot.xaxis.range;
         DatumRange y = this.plot.yaxis.range;
-        DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
+        final DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
 
         xaxis.setEnableHistory(false);
         //xaxis.setUseDomainDivider(true);
         yaxis.setEnableHistory(false);
         //yaxis.setUseDomainDivider(true);
+        
+        xaxis.setNextAction( "scan", new AbstractAction( "scannext" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+                DatumRange dr= xaxis.getDatumRange().next();
+                if ( pele==null || pele.isEmpty() ) {    
+                    xaxis.setDatumRange(dr);
+                } else {
+                    QDataSet ds= pele.get(0).getController().getDataSet();
+                    if ( ds!=null &&  ds.rank()>0 ) {
+                        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+                        DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                        while ( dr.intersects(limit) ) {
+                            QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                            if ( ds1==null || ds1.length()==0 ) {
+                                dr= dr.next();
+                            } else {
+                                break;
+                            }
+                        }
+                    } else {
+                        dr= dr.next();
+                    }
+                    xaxis.setDatumRange(dr);
+                }
+            }
+        });
+
+        xaxis.setPrevAction( "scan", new AbstractAction( "scanprev" ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+                DatumRange dr= xaxis.getDatumRange().previous();
+                if ( pele==null || pele.isEmpty() ) {    
+                    xaxis.setDatumRange(dr);
+                } else {
+                    QDataSet ds= pele.get(0).getController().getDataSet();
+                    if ( ds!=null &&  ds.rank()>0 ) {
+                        QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+                        DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                        while ( dr.intersects(limit) ) {
+                            QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                            if ( ds1==null || ds1.length()==0 ) {
+                                dr= dr.previous();
+                            } else {
+                                break;
+                            }
+                        }
+                    } else {
+                        dr= dr.previous();
+                    }
+                    xaxis.setDatumRange(dr);
+                }
+            }
+        });
 
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
             xaxis.setUserDatumFormatter(new DateTimeDatumFormatter(dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); //See kludge in TimeSeriesBrowseController
