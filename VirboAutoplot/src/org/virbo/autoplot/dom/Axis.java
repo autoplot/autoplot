@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 
 /**
  * The state of an axis, X, Y, or a Z axis colorbar.
@@ -41,8 +42,8 @@ public class Axis extends DomNode {
             logger.log( Level.WARNING, "range set to null!");
         }
         //System.err.println("range="+range);
-        //if ( range.equals(DatumRangeUtil.parseTimeRangeValid("2012-10-15") ) ) {
-        //    logger.log( Level.WARNING, "range set when it ought not to have been!");
+        //if ( UnitsUtil.isTimeLocation( range.getUnits() ) && range.intersects(DatumRangeUtil.parseTimeRangeValid("2006-04-16/2006-04-18") ) ) {
+        //    logger.log( Level.WARNING, "breakpoint here in setRange");
         //}
         DatumRange oldRange = this.range;
         this.range= range;
