@@ -174,4 +174,8 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         return false;
     }
 
+    public boolean supportsDiscovery() {
+        return true;
+    }
+    
 }
