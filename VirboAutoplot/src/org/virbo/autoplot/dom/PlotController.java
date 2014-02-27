@@ -353,7 +353,7 @@ public class PlotController extends DomNodeController {
             public void propertyChange(PropertyChangeEvent evt) {
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 final DatumRange dr= (DatumRange)evt.getNewValue();
-                final QDataSet ds= pele.get(0).getController().getDataSet();
+                final QDataSet ds= pele.size()> 0 ? pele.get(0).getController().getDataSet() : null;
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
