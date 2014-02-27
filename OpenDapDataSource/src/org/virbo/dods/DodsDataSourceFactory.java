@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -30,7 +31,7 @@ import org.virbo.datasource.URISplit;
  * Reads OpenDAP streams.
  * @author jbf
  */
-public class DodsDataSourceFactory implements DataSourceFactory {
+public class DodsDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
     
     /** Creates a new instance of DodsDataSourceFactory */
     public DodsDataSourceFactory() {
