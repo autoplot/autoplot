@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -22,7 +23,7 @@ import org.virbo.datasource.URISplit;
  * vap+pdsppi:id=pds://PPI/GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO
  * @author jbf
  */
-public class PDSPPIDataSourceFactory implements DataSourceFactory {
+public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
     protected static final Logger logger= LoggerManager.getLogger("apdss.pdsppi");
 
