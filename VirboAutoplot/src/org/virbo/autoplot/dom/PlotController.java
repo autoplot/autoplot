@@ -242,7 +242,6 @@ public class PlotController extends DomNodeController {
     };
 
     private void updateNextPrevious( DatumRange dr0, QDataSet ds ) {
-        List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
         logger.log(Level.FINE, "updateRadius: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
