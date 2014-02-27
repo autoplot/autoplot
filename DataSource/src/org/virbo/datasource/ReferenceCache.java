@@ -281,6 +281,7 @@ public class ReferenceCache {
      * explicitly remove entries from the cache.
      */
     public synchronized void reset() {
+        logger.fine("reset");
         uris.clear();
         locks.clear();
     }
