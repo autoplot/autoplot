@@ -118,6 +118,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
+import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -274,6 +275,7 @@ public class AutoplotUtil {
      */
     public static void reloadAll( Application dom ) {
         ReferenceCache.getInstance().reset();
+        DataSetAnnotations.getInstance().reset();
         for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
             if ( dsf.getUri()!=null && ! dsf.getUri().startsWith("vap+internal:") ) {
                 final DataSourceFilter fdsf= dsf;
