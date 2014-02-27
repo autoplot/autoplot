@@ -31,4 +31,7 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
         return false;
     }
     
+    public boolean supportsDiscovery() {
+        return false;
+    }
 }
