@@ -46,4 +46,11 @@ public interface DataSourceFactory {
      */
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) ;
     
+    /**
+     * mark that this source has an editor that allows discovery of data,
+     * and the GUI can be entered with "vap+ext:"  This must be consistent
+     * with the reject method of the editor.
+     * @return true if the data source factory supports discovery.
+     */
+    public boolean supportsDiscovery();
 }
