@@ -132,6 +132,7 @@ import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
+import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
@@ -1288,8 +1289,7 @@ APSplash.checkTime("init 270");
     
     /**
      * look up the discoverable extensions--the sources that can be added with
-     * just "vap+<ext>:" because we can enter a GUI right away.  This should be
-     * called off the event thread, and will fill the addDataFromMenu.
+     * just "vap+<ext>:" because we can enter a GUI right away. 
      */
     private void fillAddDataFromMenu() {
         final List<String> exts= DataSetURI.getDiscoverableExtensions();
@@ -1564,7 +1564,11 @@ APSplash.checkTime("init 52");
         };
     }
 
-    private void plotUrl( String surl ) {
+    /**
+     * this must not be called on the event thread.
+     * @param surl 
+     */
+    private void plotUrlImmediately( String surl ) {
         try {
             logger.log(Level.FINE, "plotUrl({0})", surl);
             URISplit split= URISplit.parse(surl);
@@ -1638,6 +1642,22 @@ APSplash.checkTime("init 52");
                 if ( msg==null ) msg= ex.toString();
                 setStatus(ERROR_ICON,msg);
             }
+        }
+        
+    }
+    
+    private void plotUrl( final String surl ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                plotUrlImmediately(surl);
+            }
+        };
+        if ( false && SwingUtilities.isEventDispatchThread() ) {
+            logger.fine("plotUrl on different thread");
+            new Thread(run).start();
+        } else {
+            logger.fine("plotUrl on this thread");
+            run.run();
         }
     }
 
@@ -3211,6 +3231,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         } else {
             ReferenceCache.getInstance().printStatus();
             ReferenceCache.getInstance().reset();
+            DataSetAnnotations.getInstance().reset();
             System.setProperty( "enableReferenceCache", "false" );
             setMessage( "Reference Cache is disabled." );
         }
