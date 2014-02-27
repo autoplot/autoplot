@@ -8,8 +8,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.das2.datum.DatumRange;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -20,7 +20,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  *
  * @author jbf
  */
-public class TsdsDataSourceFactory implements DataSourceFactory {
+public class TsdsDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new TsdsDataSource(uri);
