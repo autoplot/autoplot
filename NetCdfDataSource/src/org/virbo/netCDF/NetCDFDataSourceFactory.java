@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -40,7 +41,7 @@ import ucar.nc2.ncml.NcMLReader;
  *
  * @author jbf
  */
-public class NetCDFDataSourceFactory implements DataSourceFactory {
+public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
