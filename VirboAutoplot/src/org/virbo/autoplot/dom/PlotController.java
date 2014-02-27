@@ -48,6 +48,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  * Manages a Plot node, for example listening for autoRange updates and layout
@@ -251,7 +252,9 @@ public class PlotController extends DomNodeController {
         logger.log(Level.FINE, "updateRadius: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
-            ds= DataSetOps.unbundle(ds,0);
+            QDataSet xds= SemanticOps.xtagsDataSet(ds);
+            ds= SemanticOps.getDependentDataSet(ds);
+            ds= Ops.link( xds, ds );
         }
                 
         DatumRange dr= dr0;
