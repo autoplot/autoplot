@@ -80,5 +80,9 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return null;
     }
 
+    public boolean supportsDiscovery() {
+        return false;
+    }
+
 
 }
