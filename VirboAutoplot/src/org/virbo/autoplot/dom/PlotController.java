@@ -37,6 +37,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.MouseModuleType;
@@ -241,7 +242,12 @@ public class PlotController extends DomNodeController {
          }
     };
 
-    private void updateNextPrevious( DatumRange dr0, QDataSet ds ) {
+    /**
+     * A new dataset has been loaded or the axis is focused on a new range.
+     * @param dr0 the new range for the axis.
+     * @param ds the dataset to find next or previous focus.
+     */
+    private void updateNextPrevious( final DatumRange dr0, QDataSet ds ) {
         logger.log(Level.FINE, "updateRadius: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
@@ -274,11 +280,6 @@ public class PlotController extends DomNodeController {
             dr= dr.next();
         }
         scanNextRange= dr;
-        if ( dr.min().equals(dr0.max()) ) {
-            getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("step >>");
-        } else {
-            getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("scan >>");
-        }
         
         dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
@@ -297,7 +298,7 @@ public class PlotController extends DomNodeController {
                 }
             } catch ( InconvertibleUnitsException ex ) {
                 logger.log(Level.FINE, ex.getMessage() );
-                dr= dr.next();
+                dr= dr.previous();
             } catch ( IllegalArgumentException ex ) {
                 logger.log(Level.FINE, ex.getMessage() );
                 dr= dr.previous();
@@ -306,11 +307,23 @@ public class PlotController extends DomNodeController {
             dr= dr.previous();
         }
         scanPrevRange= dr;
-        if ( dr.max().equals(dr0.min()) ) {
-            getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< step");
-        } else {
-            getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< scan");
-        }
+        
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                if ( scanNextRange.min().equals(dr0.max()) ) {
+                    getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
+                } else {
+                    getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
+                }
+                if ( scanPrevRange.max().equals(dr0.min()) ) {
+                    getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
+                } else {
+                    getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
         
     }
     
@@ -339,8 +352,15 @@ public class PlotController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-                QDataSet ds= pele.get(0).getController().getDataSet();
-                updateNextPrevious((DatumRange)evt.getNewValue(),ds);
+                final DatumRange dr= (DatumRange)evt.getNewValue();
+                final QDataSet ds= pele.get(0).getController().getDataSet();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        updateNextPrevious(dr,ds);
+                    }
+                };
+                new Thread( run, "nextprev" ).start();
             }
         });
         
@@ -349,7 +369,7 @@ public class PlotController extends DomNodeController {
             public void actionPerformed(ActionEvent e) {
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
-                if ( pele==null || pele.isEmpty() ) {    
+                if ( pele==null || pele.isEmpty() || scanNextRange==null ) {    
                     xaxis.setDatumRange(dr.next());
                 } else {
                     dr= scanNextRange;
@@ -363,12 +383,12 @@ public class PlotController extends DomNodeController {
             }
         });
 
-        xaxis.setPrevAction( "scan", new AbstractAction( "scanprev" ) {
+        xaxis.setPreviousAction( "scan", new AbstractAction( "scanprev" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
-                if ( pele==null || pele.isEmpty() ) {    
+                if ( pele==null || pele.isEmpty() || scanPrevRange==null ) {    
                     xaxis.setDatumRange(dr.previous());
                 } else {
                     dr= scanPrevRange;
