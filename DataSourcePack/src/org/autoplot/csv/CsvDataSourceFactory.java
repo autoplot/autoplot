@@ -121,4 +121,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
         return null;
     }
 
+    public boolean supportsDiscovery() {
+        return false;
+    }
+
 }
