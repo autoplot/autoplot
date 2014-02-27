@@ -78,7 +78,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
         
-        if (seman.containsKey(name) ) {
+        if (seman.containsKey(name) && !names.containsKey(dep0) ) {
             String oname= name;
             int i=1;
             name= oname+"_"+i;
@@ -150,7 +150,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
         
+        String name1= params.get( "arg_0" );
 
+        if ( name1!=null ) {
+            names.put(data,name1);
+            seman.put(name1,data);
+        }
+        
         nameFor(data); // allocate a good name
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
