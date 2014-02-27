@@ -250,17 +250,25 @@ public class PlotController extends DomNodeController {
                 
         DatumRange dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
-            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-            DatumRange limit= DataSetUtil.asDatumRange(bounds);
-            limit= DatumRangeUtil.union( limit, dr0 );
-            dr= dr.next();
-            while ( dr.intersects(limit) ) {
-                QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                if ( ds1==null || ds1.length()==0 ) {
-                    dr= dr.next();
-                } else {
-                    break;
+            try {
+                QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+                DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                limit= DatumRangeUtil.union( limit, dr0 );
+                dr= dr.next();
+                while ( dr.intersects(limit) ) {
+                    QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                    if ( ds1==null || ds1.length()==0 ) {
+                        dr= dr.next();
+                    } else {
+                        break;
+                    }
                 }
+            } catch ( InconvertibleUnitsException ex ) {
+                logger.log(Level.FINE, ex.getMessage() );
+                dr= dr.next();
+            } catch ( IllegalArgumentException ex ) {
+                logger.log(Level.FINE, ex.getMessage() );
+                dr= dr.next();
             }
         } else {
             dr= dr.next();
@@ -274,17 +282,25 @@ public class PlotController extends DomNodeController {
         
         dr= dr0;
         if ( ds!=null &&  ds.rank()>0 ) {
-            QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-            DatumRange limit= DataSetUtil.asDatumRange(bounds);
-            limit= DatumRangeUtil.union( limit, dr0 );
-            dr= dr.previous();
-            while ( dr.intersects(limit) ) {
-                QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                if ( ds1==null || ds1.length()==0 ) {
-                    dr= dr.previous();
-                } else {
-                    break;
+            try {
+                QDataSet bounds= SemanticOps.bounds(ds).slice(0);
+                DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                limit= DatumRangeUtil.union( limit, dr0 );
+                dr= dr.previous();
+                while ( dr.intersects(limit) ) {
+                    QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                    if ( ds1==null || ds1.length()==0 ) {
+                        dr= dr.previous();
+                    } else {
+                        break;
+                    }
                 }
+            } catch ( InconvertibleUnitsException ex ) {
+                logger.log(Level.FINE, ex.getMessage() );
+                dr= dr.next();
+            } catch ( IllegalArgumentException ex ) {
+                logger.log(Level.FINE, ex.getMessage() );
+                dr= dr.previous();
             }
         } else {
             dr= dr.previous();
