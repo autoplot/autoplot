@@ -630,16 +630,20 @@ public class ScriptPanelSupport {
     
     private JComponent getRecentAccessory( final String filter, final int limit, final JFileChooser c ) {
         JPanel recentPanel= new JPanel(new BorderLayout());
+
+        final String msgWait= "Getting Recent...                    ..";
+        DefaultListModel waitModel= new DefaultListModel();
+        waitModel.add(0,msgWait);
         
-        final JList p= new JList();
+        final JList p= new JList(waitModel);
         p.setFont( p.getFont().deriveFont(8.f) );
-        final String msgWait= "Getting Recent...";
+        
         Runnable run= new Runnable() {
             @Override
             public void run() {
                 Map<String,String> recent= model.getRecent(filter,limit);
 
-                DefaultListModel mm= new DefaultListModel();
+                final DefaultListModel mm= new DefaultListModel();
                 for ( String s:recent.keySet() ){
                     if ( s.startsWith("script:") ) s= s.substring(7);
                     if ( s.startsWith("file:") ) {
@@ -648,7 +652,13 @@ public class ScriptPanelSupport {
                         mm.add(0,s);
                     }
                 }
-                p.setModel( mm );
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        p.setModel( mm );
+                    }
+                };
+                SwingUtilities.invokeLater(run);
             }
         } ;
         new Thread(run).start();
@@ -669,13 +679,14 @@ public class ScriptPanelSupport {
         } );
         
         
-        DefaultListModel mm= new DefaultListModel();
-        mm.add(0,msgWait);
-        p.setModel(mm);
-        p.setPreferredSize( new Dimension(300,300) );
-        p.setMinimumSize( new Dimension(300,300) );
+        JScrollPane scrollPane= new JScrollPane(p);
+        //p.setPreferredSize( new Dimension(300,300) );
+        //p.setMinimumSize( new Dimension(300,300) );
+        scrollPane.setPreferredSize( new Dimension(300,300) );
+        scrollPane.setMinimumSize( new Dimension(300,300) );
+        
         recentPanel.add( new JLabel("Recently used local files:"), BorderLayout.NORTH );
-        recentPanel.add( new JScrollPane(p), BorderLayout.CENTER );
+        recentPanel.add( scrollPane, BorderLayout.CENTER );
         return recentPanel;
     }
 
