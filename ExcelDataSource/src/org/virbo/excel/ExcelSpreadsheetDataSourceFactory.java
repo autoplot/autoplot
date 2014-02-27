@@ -123,4 +123,8 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
+
+    public boolean supportsDiscovery() {
+        return false;
+    }
 }
