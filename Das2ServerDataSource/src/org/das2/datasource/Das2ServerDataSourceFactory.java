@@ -135,6 +135,11 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         return !( params.containsKey("start_time") && params.containsKey("end_time") && ds!=null && ds.length()>0 );
     }
 
+    public boolean supportsDiscovery() {
+        return true; //TODO: completions should support this.
+    }
+
+    
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz== TimeSeriesBrowse.class ) {
            return (T) new Das2ServerTimeSeriesBrowse();
