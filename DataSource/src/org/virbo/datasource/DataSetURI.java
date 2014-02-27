@@ -1668,15 +1668,10 @@ public class DataSetURI {
         List<String> exts= DataSourceRegistry.getInstance().getSourceEditorExtensions();
         List<String> result= new ArrayList<String>();
         for ( String ext: exts ) {
-            String uri= "vap+" + ext.substring(1) + ":";
             try {
-                Object o = DataSourceRegistry.getInstance().dataSourceEditorByExt.get(ext);
-                Class clas = Class.forName((String) o);
-                Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
-                Object result1 =  constructor.newInstance(new Object[]{});
-                Method m= result1.getClass().getMethod( "reject", String.class );
-                if ( Boolean.FALSE.equals( m.invoke( result1, uri ) ) ) {
-                    result.add( ext );
+                DataSourceFactory o = DataSourceRegistry.getInstance().getSource(ext);
+                if ( o!=null && o.supportsDiscovery() ) {
+                    result.add(ext);
                 }
             } catch (RuntimeException ex) {
                 throw ex;
