@@ -647,11 +647,13 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 50");
 
         setIconImage( AutoplotUtil.getAutoplotIcon() );
+        APSplash.checkTime("init 50.5");
         updateFrameTitle();
         
         stateSupport = getPersistentStateSupport(this, applicationModel);
-
-        fillFileMenu();
+        
+        fillFileMenu(); // init 51,52
+        APSplash.checkTime("init 52.999");
         fillInitialBookmarksMenu();
         APSplash.checkTime("init 53");
 
@@ -741,9 +743,12 @@ public class AutoplotUI extends javax.swing.JFrame {
         //    }
         //});
         addAxes().run();
+        APSplash.checkTime("init 72");
         addStyle().run();
+        APSplash.checkTime("init 75");
         addFeatures(fmodel);
-
+        APSplash.checkTime("init 77");
+        
         List<String> uris = new ArrayList<String>();
         List<Bookmark> recent = applicationModel.getRecent();
         APSplash.checkTime("init 80");
@@ -787,20 +792,20 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 110");
 
         // jython is often slow to start up the first time, so go ahead and do this in the background.
-        run= new Runnable() {
-            @Override
-            public String toString() { return "addInitializePython"; }
-            @Override
-            public void run() {
-                try {
-                    //initialize the python interpretter
-                    JythonUtil.createInterpreter(true, false);
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                }
-            }
-        };
-        invokeLater( 10000, false, run );
+//        run= new Runnable() {
+//            @Override
+//            public String toString() { return "addInitializePython"; }
+//            @Override
+//            public void run() {
+//                try {
+//                    //initialize the python interpretter
+//                    JythonUtil.createInterpreter(true, false);
+//                } catch (IOException ex) {
+//                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+//                }
+//            }
+//        };
+//        invokeLater( 10000, false, run );
     }
 
     private Runnable addAxes() {
@@ -1151,6 +1156,7 @@ APSplash.checkTime("init 270");
             public String toString() { return "bindings"; }
             @Override
             public void run() {
+                logger.fine("adding bindings");
                 BindingGroup bc = new BindingGroup();
                 bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
@@ -1347,7 +1353,7 @@ APSplash.checkTime("init 52");
         mi.setToolTipText("Add a new plot or overplot to the application");
         expertItems.add(mi);
         fileMenu.add(mi);
-
+APSplash.checkTime("init 52.3");
         mi= new JMenuItem( new AbstractAction( "Open URI History..." ) {
               @Override
               public void actionPerformed( ActionEvent e ) {
@@ -1366,15 +1372,16 @@ APSplash.checkTime("init 52");
               }
         } );
         mi.setToolTipText("Open URI history dialog");
-        mi.setIcon( new ImageIcon( getClass().getResource("/resources/history.png") ) );
-
+APSplash.checkTime("init 52.4");
+mi.setIcon( new ImageIcon( getClass().getResource("/resources/history.png") ) );
+APSplash.checkTime("init 52.5");
         fileMenu.add( mi );
 
         mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
         mi.setToolTipText("Open local data file");
         expertItems.add(mi);
         fileMenu.add(mi);
-
+APSplash.checkTime("init 52.7");
         fileMenu.add( new JSeparator() );
 
         mi= new JMenuItem(dataSetSelector.getOpenLocalVapAction() );
@@ -1397,7 +1404,7 @@ APSplash.checkTime("init 52");
 //            }
 //        });
         fileMenu.addSeparator();
-
+APSplash.checkTime("init 52.8");
         //TODO: decorate print action to set focus.
         AbstractAction printAction= new AbstractAction( "Print...") {
             @Override
@@ -1438,7 +1445,7 @@ APSplash.checkTime("init 52");
         item.setToolTipText("Export the data that has the focus");
         expertItems.add(item);
         fileMenu.add( item );
-
+APSplash.checkTime("init 52.9");
         JSeparator dumpSep= new JSeparator();
         expertItems.add( dumpSep );
 
@@ -3741,7 +3748,7 @@ APSplash.checkTime("init 210");
 APSplash.checkTime("init 220");
                 if ( !headless ) {
                     logger.fine("UI.setVisible(true)");
-                    SwingUtilities.invokeLater( new Runnable() {
+                    Runnable repaintRunnable= new Runnable() {
                         @Override
                         public String toString() {
                             return "repaintRunnable";
@@ -3756,7 +3763,9 @@ APSplash.checkTime("init 220");
                             }
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
-                    } );
+                    };
+                    //repaintRunnable.run();
+                    SwingUtilities.invokeLater(repaintRunnable);
 
 
                     logger.fine("UI is visible");
