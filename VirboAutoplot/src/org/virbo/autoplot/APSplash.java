@@ -28,14 +28,17 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 //import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 //import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.das2.datum.LoggerManager;
 import org.das2.util.AboutUtil;
 
 /**
@@ -50,6 +53,8 @@ public class APSplash extends JFrame {
     private JLabel messageLabel;
     private long t0; // time of application start
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.splash");
+    
     public static String getVersion() {
         try {
             String tag= AboutUtil.getReleaseTag( APSplash.class );
@@ -101,6 +106,7 @@ public class APSplash extends JFrame {
     }
 
     public static void checkTime( String msg ) {
+        logger.log( Level.FINE, "checkTime {0} @ {1} ms ", new Object[]{msg.replaceAll(" ","_").replaceFirst("_", " "), String.valueOf( System.currentTimeMillis()-instance.t0 )} );
         //System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
     }
 
