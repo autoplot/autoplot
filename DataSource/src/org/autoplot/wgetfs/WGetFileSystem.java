@@ -4,7 +4,6 @@
  */
 package org.autoplot.wgetfs;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,8 +173,8 @@ public class WGetFileSystem extends WebFileSystem {
                 } else {
                     lookFor = filename + "/";
                 }
-                for (int i = 0; i < list.length; i++) {
-                    if (list[i].equals(lookFor)) {
+                for (String list1 : list) {
+                    if (list1.equals(lookFor)) {
                         return true;
                     }
                 }
@@ -206,10 +205,10 @@ public class WGetFileSystem extends WebFileSystem {
                 if ( fin!=null ) fin.close();
             }
             
+            assert list!=null;
             result = new LinkedHashMap(list.length);
             int n = directory.length();
-            for (int i = 0; i < list.length; i++) {
-                URL url = list[i];
+            for (URL url : list) {
                 DirectoryEntry de1= new DirectoryEntry();
                 de1.modified= Long.MAX_VALUE; // HTTP is somewhat expensive to get dates and sizes, so put in Long.MAX_VALUE to indicate need to load.
                 de1.name= getLocalName(url).substring(n);
@@ -225,8 +224,6 @@ public class WGetFileSystem extends WebFileSystem {
             return FileSystem.getListing( result );
         }
         
-        boolean successOrCancel= false;
-
         if ( this.isOffline() ) {
             File f= new File(localRoot, directory);
             if ( !f.exists() ) throw new FileSystemOfflineException("unable to list "+f+" when offline");
@@ -290,8 +287,7 @@ public class WGetFileSystem extends WebFileSystem {
 
                 URL[] list = HtmlUtil.getDirectoryListing(getURL(directory), in );
                 int n = directory.length();
-                for (int i = 0; i < list.length; i++) {
-                    URL url = list[i];
+                for (URL url : list) {
                     DirectoryEntry de1= new DirectoryEntry();
                     de1.modified= Long.MAX_VALUE;
                     de1.name= getLocalName(url).substring(n);
