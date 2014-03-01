@@ -775,8 +775,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         invokeLater( 1000, true, run );
         APSplash.checkTime("init 90");
 
-        addTools();
-        addBindings();
+        //addTools();
+        //addBindings();
 
         pack();
 
@@ -3764,8 +3764,8 @@ APSplash.checkTime("init 220");
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
                     };
-                    //repaintRunnable.run();
-                    SwingUtilities.invokeLater(repaintRunnable);
+                    repaintRunnable.run();
+                    //SwingUtilities.invokeLater(repaintRunnable);
 
 
                     logger.fine("UI is visible");
@@ -4426,9 +4426,10 @@ APSplash.checkTime("init 240");
      * them before using it.
      * (rfe336)
      * @param uri 
+     * @param modifiers 
      */
-    public void reviewBookmark( String uri, int modifiers ) {
-        DataSetSelector sel= this.dataSetSelector;
+    public void reviewBookmark( final String uri, final int modifiers ) {
+        final DataSetSelector sel= this.dataSetSelector;
         if ( uri.contains(".vap" ) ) {
             // ask the user if they want to use the .vap
             sel.setValue(uri);
@@ -4441,32 +4442,37 @@ APSplash.checkTime("init 240");
             sel.setValue(uri);
             sel.maybePlot(modifiers);
         } else {
-            // see if the uri would be rejected, and show the editor.
-            sel.setValue(uri);
-            DataSourceFactory factory=null;
-            try {
-                factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
-            } catch (IOException ex) {
-                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            if ( factory==null ) {
-                logger.fine("unable to find factory when I expected to see uri");
-                sel.setValue(uri);
-                sel.maybePlot(modifiers); // have the user deal with the bad uri, and support plugins.
-            } else {
-                List<String> problems= new ArrayList<String>();
-                if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
-                    sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
-                } else {
-                    enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+            Runnable run= new Runnable() { 
+                public void run() {
+                    // see if the uri would be rejected, and show the editor.
+                    sel.setValue(uri);
+                    DataSourceFactory factory=null;
+                    try {
+                        factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                    } catch (IOException ex) {
+                        Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    if ( factory==null ) {
+                        logger.fine("unable to find factory when I expected to see uri");
+                        sel.setValue(uri);
+                        sel.maybePlot(modifiers); // have the user deal with the bad uri, and support plugins.
+                    } else {
+                        List<String> problems= new ArrayList<String>();
+                        if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
+                            sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
+                        } else {
+                            enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+                        }
+
+                    }
                 }
-                    
-            }
+            };
+            new Thread( run ).start();
        }
     }
 
