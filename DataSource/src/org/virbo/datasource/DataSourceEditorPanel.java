@@ -7,12 +7,16 @@ import org.das2.util.monitor.ProgressMonitor;
 /**
  * Interface for discovering a GUI editor for an URL.
  * Note the correct order to use a GUI is:
+ * <tt>
  *    reject( String uri ) is the URI close enough that we can create an editor for it?  Editors that never reject, "allow discovery"
  *      setExpertMode( boolean ) if available, then expert mode is supported and the options should be restricted to reliable options.
  *    prepare( String uri, Window parent, ProgressMonitor mon )  prepare the GUI, maybe by downloading resources, etc
  *    setURI( String uri ) set the URI for editing.  This is the oldest method and is a bit redundant.
  *    getPanel()           enter the GUI.
  *    getURI()             may be called at any time.  Note this should return a valid URI.  The intent here is that this could be called multiple times.
+ * </tt>
+ * Data Sources that support discovery will create a DataSourceEditorPanel with
+ * no parameters, e.g. "vap+cdaweb:"
  * @author jbf
  */
 public interface DataSourceEditorPanel {
