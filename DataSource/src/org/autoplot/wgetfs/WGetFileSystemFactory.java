@@ -36,8 +36,16 @@ public class WGetFileSystemFactory implements FileSystemFactory {
             if ( exe==null ) {
                 useCurl= false;
                 exe= System.getProperty("AP_WGET");
+                if ( exe!=null && ( exe.length()<2 || exe.equalsIgnoreCase("true") || exe.equalsIgnoreCase("false") ) ) {
+                    exe= null;
+                    throw new IllegalArgumentException("AP_WGET must be set to the name of the command to run, or empty string");
+                }
                 if ( exe==null || exe.length()==0 ) {
                     exe= System.getProperty("AP_CURL");
+                    if ( exe!=null && ( exe.length()<2 || exe.equalsIgnoreCase("true") || exe.equalsIgnoreCase("false") ) ) {
+                       exe= null;
+                       throw new IllegalArgumentException("AP_CURL must be set to the name of the command to run, or empty string");
+                    }
                     if ( exe!=null && exe.length()>0 ) useCurl= true;
                 } 
                 if ( exe==null || exe.length()==0 ) {
