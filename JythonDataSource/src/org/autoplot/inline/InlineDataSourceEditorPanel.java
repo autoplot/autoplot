@@ -320,7 +320,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 if ( examples.getSelectedIndex()==0 ) {
                     tf1.setText(t1);
                 } else if ( examples.getSelectedIndex()==1 ) {
-                    tf1.setText("t=linspace(0,5*PI,100)\nt\nsin(t)");
+                    tf1.setText("t=linspace(0,5*PI,100)\nt,sin(t)");
                 }
             }
         } );
