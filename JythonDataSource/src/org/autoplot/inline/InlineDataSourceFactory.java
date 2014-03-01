@@ -23,7 +23,7 @@ import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**
- *
+ * Creates inline data sources.
  * @author jbf
  */
 public class InlineDataSourceFactory extends AbstractDataSourceFactory {
@@ -65,6 +65,10 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         return super.reject(surl, problems, mon); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public boolean supportsDiscovery() {
+        return true;
+    }
 
 
 }

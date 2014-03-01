@@ -27,7 +27,8 @@ import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
- *
+ * Editor panel for inline URIs.  This supports events lists and short 
+ * Jython scripts with a simple editor.
  * @author jbf
  */
 public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
