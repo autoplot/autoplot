@@ -2699,21 +2699,28 @@ APSplash.checkTime("init 52.9");
 
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        String uri= (String) dataSetSelector.getValue();
+        final String uri= (String) dataSetSelector.getValue();
+        final int modifiers= evt.getModifiers();
         org.das2.util.LoggerManager.getLogger("gui").log(Level.FINE, "plot URI \"{0}\"", uri);
         ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setFocusURI(uri);
-        if ( this.isExpertMode() ) {
-            if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
-                plotAnotherUrl();
-            } else if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
-                overplotAnotherUrl();
-            } else {
-                plotUrl(uri);
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                if ( AutoplotUI.this.isExpertMode() ) {
+                    if ( ( modifiers & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
+                        plotAnotherUrl();
+                    } else if ( ( modifiers & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
+                        overplotAnotherUrl();
+                    } else {
+                        plotUrl(uri);
+                    }
+                } else {
+                    dom.getController().reset();
+                    plotUrl( uri );
+                }
             }
-        } else {
-            dom.getController().reset();
-            plotUrl( uri );
-        }
+        };
+        new Thread(run,"dataSetSelectThread").start();
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void zoomOutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutMenuItemActionPerformed
