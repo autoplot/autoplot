@@ -106,8 +106,13 @@ public class APSplash extends JFrame {
     }
 
     public static void checkTime( String msg ) {
-        logger.log( Level.FINE, "checkTime {0} @ {1} ms ", new Object[]{msg.replaceAll(" ","_").replaceFirst("_", " "), String.valueOf( System.currentTimeMillis()-instance.t0 )} );
-        //System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
+        if ( instance!=null ) {
+            logger.log( Level.FINE, "checkTime {0} @ {1} ms ", new Object[]{msg.replaceAll(" ","_").replaceFirst("_", " "), String.valueOf( System.currentTimeMillis()-instance.t0 )} );
+            //System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
+        } else {
+            logger.log( Level.FINE, "checkTime {0} @ -1 ms ", msg.replaceAll(" ","_").replaceFirst("_", " ") );
+            //System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ -1 ms ");
+        }
     }
 
     public static void hideSplash() {
