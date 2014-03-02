@@ -8,16 +8,8 @@
  */
 package org.virbo.aggregator;
 
+import java.awt.EventQueue;
 import java.io.FileNotFoundException;
-import org.das2.datum.CacheTag;
-import org.das2.datum.Datum;
-import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.TimeUtil;
-import java.util.logging.Level;
-import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.SubTaskMonitor;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -26,14 +18,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.CacheTag;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -83,43 +85,15 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     TimeSeriesBrowse tsb;
 
-    private DatumRange quantize(DatumRange timeRange) {
-        try {
-            String[] ss = fsm.getNamesFor(timeRange); // 3523483 there's a bug here when reading from a zip file, because we need to download it first.
-            DatumRange result= timeRange;
-            Datum oneDay= Units.hours.createDatum(24);
-            while ( ss.length == 0 && result.width().value()>0 && result.width().lt( oneDay ) ) {
-                result= DatumRangeUtil.rescale( result, -1, 2 );
-                ss = fsm.getNamesFor(result);
-            } 
-            if ( ss.length==0 ) {
-                return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
-            }
-            result = fsm.getRangeFor(ss[0]);
-            for (int i = 1; i < ss.length; i++) {
-                DatumRange r1 = fsm.getRangeFor(ss[i]);
-                result = result.include(r1.max()).include(r1.min());
-            }
-            if ( timeRange.contains(result) ) {
-                return timeRange;
-            } else {
-                if ( !result.intersects(timeRange) ) {
-                    if ( result.max().lt(timeRange.min() ) ) {
-                        result= DatumRangeUtil.rescale( result, 0, 2 );
-                    } else if ( result.min().gt(timeRange.max()) ) {
-                        result= DatumRangeUtil.rescale( result, -1, 1 );
-                    }
-                }
-                return result;
-            }
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
-            return timeRange;
-        }
-    }
 
-    /** Creates a new instance of AggregatingDataSource */
+    /** 
+     * Creates a new instance of AggregatingDataSource
+     * @param uri the URI
+     * @param delegateFactory the factory used to read each granule.
+     * @throws java.net.MalformedURLException
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws java.text.ParseException 
+     */
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
@@ -145,7 +119,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
             upd= new AggregationPollUpdating(fsm1, viewRange, (long)(ffilePollUpdates) );
             addCability( Updating.class, upd );
         }
-
     }
 
 
@@ -158,7 +131,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         @Override
         public void setTimeRange(DatumRange dr) {
             if ( getParam( "reduce", "F" ).equals("F") ) {
-                viewRange = quantize(dr);
+                viewRange = fsm.quantize( dr ); // does not communicate with FileSystem.
             } else {
                 viewRange = dr;
             }
