@@ -4,6 +4,7 @@
  */
 package org.autoplot.wgetfs;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -188,6 +189,10 @@ public class WGetFileSystem extends WebFileSystem {
                 
         directory = toCanonicalFolderName(directory);
 
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("listDirectory called on event thread");
+        }
+        
         Map<String,DirectoryEntry> result;
         if ( isListingCached(directory) ) {
             logger.log(Level.FINE, "using cached listing for {0}", directory);
