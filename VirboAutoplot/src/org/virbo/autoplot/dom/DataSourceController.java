@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -301,7 +302,23 @@ public class DataSourceController extends DomNodeController {
                 !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
     }
 
+    /**
+     * This might be considered the heart of the DataSourceController.  
+     * This is where TimeSeriesBrowse is set up as well as Caching.
+     * 
+     * This might also be a good spot to make sure we are not on the event thread,
+     * and this is being studied.
+     * 
+     * @param valueWasAdjusting
+     * @param dataSource 
+     */
     public void resetDataSource(boolean valueWasAdjusting,DataSource dataSource) {
+        
+        if ( EventQueue.isDispatchThread() ) {
+            // study where this is called from.
+            logger.fine("resetDataSource on event thread");
+        }
+        
         synchronized ( dscLock ) {
         if ( dataSource==null ) {
             setDataSetNeedsLoading(false);
