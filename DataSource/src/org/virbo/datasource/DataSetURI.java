@@ -214,6 +214,9 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(o");
         if (ipercy == -1) ipercy = surl.lastIndexOf("%{o");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$(periodic");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("%{periodic");
+        
         return ipercy != -1;
     }
 
