@@ -53,6 +53,7 @@ import javax.swing.ActionMap;
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -96,6 +97,9 @@ import org.virbo.dsops.Ops;
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
     private static int MAX_RECENT=20;
+    
+    public static final Icon BUSY_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/virbo/aggregator/spinner_16.gif"));
+    public static final Icon FILEMAG_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/virbo/datasource/fileMag.png"));
     
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
     
@@ -840,6 +844,10 @@ public class DataSetSelector extends javax.swing.JPanel {
         showCompletions(surl, carotpos);
 
     }
+    
+    private void clearBusyIcon() {
+        inspectButton.setIcon( FILEMAG_ICON );
+    }
 
     /**
      * remove "vap+X:" from the URI, if it exists.
@@ -854,6 +862,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     private void showCompletions(String surl1, int carotpos1) {
         logger.log(Level.FINE, "showCompletions({0},{1})", new Object[]{surl1, carotpos1});
+        inspectButton.setIcon( BUSY_ICON );
         String surl2= surl1.trim();
         int off= surl1.indexOf(surl2);
         String surl= surl2;
@@ -965,6 +974,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         //completionsPopupMenu.setFocusable(true);
         
         setMessage("done getting completions");
+        clearBusyIcon();
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
