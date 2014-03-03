@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -145,26 +143,10 @@ public class DataSetURI {
     }
 
     /**
-     * split the url string (http://www.example.com/data/myfile.nc?myVariable) into:
-     *   path, the directory with http://www.example.com/data/
-     *   file, the file, http://www.example.com/data/myfile.nc
-     *   ext, the extenion, .nc
-     *   params, myVariable or null
-     * @deprecated use URISplit.parse(surl);
-     */
-    public static URISplit parse(String surl) {
-        return URISplit.parse(surl);
-    }
-
-    /**
-     * @deprecated use URISplit.format(split);
-     */
-    public static String format(URISplit split) {
-        return URISplit.format(split);
-    }
-
-    /**
      * get the data source for the URL.
+     * @param uri the URI.
+     * @return the data source from which the data set can be retrieved.
+     * @throws java.lang.Exception when the DataSourceFactory throws an Exception
      * @throws IllegalArgumentException if the url extension is not supported.
      */
     public static DataSource getDataSource(URI uri) throws Exception {
@@ -190,9 +172,8 @@ public class DataSetURI {
      * TODO: note ds.getURI() should return the fully-qualified URI, so this is
      * no longer necessary.
      * 
-     * @param surl
-     * @param dataSource
-     * @return
+     * @param ds the data source.
+     * @return the canonical URI.
      */
     public static String getDataSourceUri(DataSource ds) {
         DataSourceFactory factory = dsToFactory.get(ds);
@@ -233,18 +214,16 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(o");
         if (ipercy == -1) ipercy = surl.lastIndexOf("%{o");
-        if (ipercy != -1) {
-            return true;
-        } else {
-            return false;
-        }
+        return ipercy != -1;
     }
 
     /**
      * taken from unaggregate.jy in the servlet.
      * @param resourceURI resource URI like "file://tmp/data$Y$m$d.dat"
-     * @param timeRange a timerange that will be covered by the span.
-     * @return 
+     * @param timerange a timerange that will be covered by the span.
+     * @return the strings resolved.
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException 
+     * @throws java.net.UnknownHostException 
      */
     public static String[] unaggregate( String resourceURI, DatumRange timerange ) throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
         
@@ -283,7 +262,7 @@ public class DataSetURI {
      *
      * Changes:
      *   20090916: client-side parameters removed from URI.
-     * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
+     * @param surl, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
      * @return the URI for the datasource resource, or null if it is not valid.
      */
     public static URI getResourceURI(String surl) {
@@ -347,8 +326,8 @@ public class DataSetURI {
 
     /**
      * for now, just hide the URI stuff from clients, let's not mess with factories
-     * @param url
-     * @return
+     * @param uri the URI describing the output format and any arguments.
+     * @return the DataSourceFormat that formats a dataset to the format.
      */
     public static DataSourceFormat getDataSourceFormat(URI uri) {
         int i = uri.getScheme().indexOf(".");
@@ -376,7 +355,12 @@ public class DataSetURI {
 
 
     /**
-     * get the datasource factory for the URL.
+     * get the datasource factory for the URL.  This has the rarely-used 
+     * logic that looks up MIME types.
+     * @param uri the URI of the data source.
+     * @param mon progress monitor
+     * @return the factory that produces the data source.
+     * @throws java.io.IOException 
      * @throws URISyntaxException if the schemeSpecficPart is not itself a URI.
      * TODO: this should probably throw UnrecognizedDataSourceException
      */
@@ -628,8 +612,15 @@ public class DataSetURI {
     /**
      * return a file reference for the url.  This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
+     * This will use a temporary local file in some cases, such as when the URL
+     * has parameters, which prevent use with the FileSystem model.
      *
      * TODO: why is there both getFile(url,mon) and getFile( suri, allowHtml, mon )???
+     * 
+     * @param url the URL of the file.
+     * @param mon progress monitor
+     * @return the File
+     * @throws java.io.IOException
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
 
@@ -701,7 +692,11 @@ public class DataSetURI {
      * downloadResourceAsTempFile for this).
      * This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
+     * @param suri the URL.
      * @param allowHtml skip html test that tests for html content.
+     * @param mon progress monitor
+     * @return a local copy of the file.
+     * @throws java.io.IOException
      */
     public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
@@ -854,11 +849,7 @@ public class DataSetURI {
             FileSystemUtil.deleteFilesInTree( localCache1, new FileSystemUtil.Check() {
                 @Override
                 public boolean check(File f) {
-                    if ( tnow - f.lastModified() > 86400000 ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return tnow - f.lastModified() > 86400000;
                 }
             } ); 
         }
@@ -1049,7 +1040,7 @@ public class DataSetURI {
     }
 
     /**
-     * get the file, allowing it to have "<html>" in the front.  Normally this is not
+     * get the file, allowing it to have "&lt;html&gt;" in the front.  Normally this is not
      * allowed because of http://sourceforge.net/tracker/?func=detail&aid=3379717&group_id=199733&atid=970682
      * @param url
      * @param mon
@@ -1084,7 +1075,9 @@ public class DataSetURI {
      * result will start with an Autoplot scheme like "vap:" or "vap+cdf:"
      *
      * Note 20111117: "vap+cdaweb:" -> URI( "vap+cdaweb:file:///"  that's why this works to toUri doesn't.
+     * @param surl the string from the user that should be representable as a URI.
      * @return the URI or null if it's clearly not a URI.
+     * @throws java.net.URISyntaxException
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
@@ -1127,7 +1120,9 @@ public class DataSetURI {
     /**
      * canonical method for getting the URL.  These will always be web-downloadable 
      * URLs.
+     * @param surl the string from the user that should be representable as a URI.
      * @return null or the URL if available.
+     * @throws java.net.MalformedURLException
      */
     public static URL getURL(String surl) throws MalformedURLException {
         try {
@@ -1208,6 +1203,14 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * get completions for hosts, by looking in the user's cache area.
+     * @param surl 
+     * @param carotpos
+     * @param mon
+     * @return
+     * @throws IOException 
+     */
     public static List<CompletionResult> getHostCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos));
 
@@ -1228,8 +1231,8 @@ public class DataSetURI {
         if ( split.scheme==null ) {
             List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>();
             s= new String[] { "ftp://", "http://", "https://", "file:///", "sftp://",  };
-            for (int j = 0; j < s.length; j++) {
-                completions.add(new DataSetURI.CompletionResult( s[j] + surl + "/", s[j] + surl + "/" ) );
+            for (String item : s) {
+                completions.add(new DataSetURI.CompletionResult(item + surl + "/", item + surl + "/"));
             }
             return completions;
         }
@@ -1245,10 +1248,10 @@ public class DataSetURI {
         }
 
         List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
-        for (int j = 0; j < s.length; j++) {
-            String scomp = foldCase ? s[j].toLowerCase() : s[j];
+        for (String item : s) {
+            String scomp = foldCase ? item.toLowerCase() : item;
             if (scomp.startsWith(prefix)) {
-                StringBuilder result1 = new StringBuilder( s[j] );
+                StringBuilder result1 = new StringBuilder(item);
                 result1.append( "/" );
                 // drill down single entries, since often the root doesn't provide a list.
                 String[] s2 = new File(cacheF, result1.toString()).list();
@@ -1276,6 +1279,15 @@ public class DataSetURI {
         return completions;
     }
 
+    /**
+     * get completions within the filesystem that appear to form aggregations.
+     * @param surl
+     * @param carotpos
+     * @param mon
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException 
+     */
     public static List<CompletionResult> getFileSystemAggCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         String surlDir = URISplit.uriDecode(split.path);
@@ -1311,7 +1323,7 @@ public class DataSetURI {
     }
 
     /**
-     *
+     * get completions within the filesystem for the directory listing of files.
      * @param surl
      * @param carotpos
      * @param inclAgg include aggregations it sees.  These are a guess.
@@ -1327,7 +1339,9 @@ public class DataSetURI {
     }
 
     /**
-     * gets completions based on cached folders.
+     * gets completions based on cached folders.  This supports use when the
+     * filesystem is offline, when parents are not web filesystems, and presents 
+     * used folders separately.
      * @param surl http://sarahandjeremy.net/
      * @param carotpos the position of the carot.  Presently everything after the carot is ignored.
      * @param inclAgg include aggregations it sees.  These are a guess.
@@ -1373,14 +1387,13 @@ public class DataSetURI {
         }
 
         List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
-        for (int j = 0; j < s.length; j++) {
-            String scomp = foldCase ? s[j].toLowerCase() : s[j];
-            if (scomp.startsWith(prefix) && !scomp.endsWith(".listing") ) {
-                File ff= new File(cacheF, s[j] );
+        for (String item : s) {
+            String scomp = foldCase ? item.toLowerCase() : item;
+            if (scomp.startsWith(prefix) && !scomp.endsWith(".listing")) {
+                File ff = new File(cacheF, item);
                 if ( ! ff.isDirectory() ) continue;
                 if ( ff.list().length==0 ) continue;
-
-                StringBuilder result1 = new StringBuilder(s[j]);
+                StringBuilder result1 = new StringBuilder(item);
                 result1.append( "/" );
                 // drill down single entries, since often the root doesn't provide a list.
                 String[] s2 = new File(cacheF, result1.toString()).list();
@@ -1498,11 +1511,11 @@ public class DataSetURI {
         if ( acceptPattern!=null ) {
             Pattern p= Pattern.compile(acceptPattern);
             List<String> res= new ArrayList<String>(s.length);
-            for ( int i=0; i<s.length; i++ ) {
-                if ( s[i].endsWith("/") ) {
-                    res.add(s[i]);
-                } else if ( p.matcher(s[i]).matches() ) {
-                    res.add(s[i]);
+            for (String item : s) {
+                if (item.endsWith("/")) {
+                    res.add(item);
+                } else if (p.matcher(item).matches()) {
+                    res.add(item);
                 }
             }
             s= res.toArray( new String[res.size()] );
@@ -1773,7 +1786,7 @@ public class DataSetURI {
             for (CompletionContext cc1 : completions) {
                 boolean useArgN= false;
                 String paramName = cc1.implicitName != null ? cc1.implicitName : cc1.completable;
-                if (paramName.indexOf("=") != -1) {
+                if (paramName.contains("=")) {
                     paramName = paramName.substring(0, paramName.indexOf("="));
                     useArgN= true;
                 }
@@ -1874,12 +1887,11 @@ public class DataSetURI {
                 FileSystem fs = FileSystem.create(getWebURL(url),new NullProgressMonitor());
                 String[] s = fs.listDirectory("/");
                 mon.finished();
-                for (int j = 0; j < s.length; j++) {
-                    if (s[j].startsWith(prefix)) {
-                        CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + s[j]);
+                for (String item : s) {
+                    if (item.startsWith(prefix)) {
+                        CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + item);
                         result.add(new CompletionResult(CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0, carotPos), true));
                     }
-
                 }
             } catch (MalformedURLException ex) {
                 result = Collections.singletonList(new CompletionResult("Malformed URI", "Something in the URL prevents processing", surl1.substring(0, carotPos), false));
