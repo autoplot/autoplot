@@ -262,6 +262,9 @@ public class PlotController extends DomNodeController {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
                 DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
+                    throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
+                }
                 limit= DatumRangeUtil.union( limit, dr0 );
                 dr= dr.next();
                 while ( dr.intersects(limit) ) {
@@ -289,6 +292,9 @@ public class PlotController extends DomNodeController {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
                 DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
+                    throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
+                }
                 limit= DatumRangeUtil.union( limit, dr0 );
                 dr= dr.previous();
                 while ( dr.intersects(limit) ) {
