@@ -49,6 +49,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -167,9 +168,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private Map<Integer,DiaDescriptor> dialogs= new HashMap<Integer, DiaDescriptor>();
+    private Map<Integer,DiaDescriptor> dialogs= Collections.synchronizedMap( new HashMap<Integer, DiaDescriptor>() );
 
-    private synchronized DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
+    private DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
         final DiaDescriptor diaDescriptor= new DiaDescriptor();
         diaDescriptor.hits=1;
 
@@ -282,7 +283,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.undoRedoSupport= undoRedoSupport;
     }
 
-    synchronized String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
+    String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
         map.put( INCLDOM, form.isAllowDom() );
         map.put( INCLSCREEN, form.isAllowScreenshot() );
         map.put( EMAIL, form.getEmailTextField().getText() );
@@ -298,7 +299,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         int hash;
     }
     
-    private synchronized void showExceptionDialog( final Throwable t, String extraInfo ) {
+    private void showExceptionDialog( final Throwable t, String extraInfo ) {
 
         final boolean uncaught= extraInfo.equals(UNCAUGHT);
 
@@ -366,12 +367,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     private LogConsole lc;
 
-    public synchronized void setLogConsole( LogConsole lc ) {
+    public void setLogConsole( LogConsole lc ) {
         this.lc= lc;
     }
 
     private String focusURI;
-    public synchronized void setFocusURI( String uri ) {
+    public void setFocusURI( String uri ) {
         this.focusURI= uri;
     }
 
@@ -711,7 +712,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     }
         
-    public synchronized void submitRuntimeException( Throwable t, boolean uncaught ) {
+    public void submitRuntimeException( Throwable t, boolean uncaught ) {
         int rteHash;
         rteHash= hashCode( t );
         
@@ -898,13 +899,37 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
+    /**
+     * try to exercise any synchronization problems we would see, after remove excessive synchronization blocks.
+     */
+    private static void syncroTest() {
+        final ExceptionHandler eh= new GuiExceptionHandler();
+        Runnable run1= new Runnable() {
+            public void run() {
+                for ( int i=0; i<10; i++ ) {
+                    eh.handle( new RuntimeException("sync test ex 1!") ); 
+                }
+            }
+        };
+        Runnable run2= new Runnable() {
+            public void run() {
+                for ( int i=0; i<10; i++ ) {
+                    eh.handle( new RuntimeException("sync test ex 2!") ); 
+                }
+            }
+        };
+        new Thread(run1).start();
+        new Thread(run2).start();
+        
+    }
     public static void main( String[] args ) {
+        syncroTest();
         ExceptionHandler eh= new GuiExceptionHandler();
-        eh.handle( new RuntimeException("Bad Deal!") );
+        eh.handle( new RuntimeException("Bad Deal!") ); // these three have different hash codes and are considered different.
         eh.handle( new RuntimeException("Bad Deal!") );
         eh.handle( new RuntimeException("Bad Deal!") );
         for ( int i=0; i<3; i++ ) {
-            eh.handle( new RuntimeException("Bad Deal 2!") );
+            eh.handle( new RuntimeException("Bad Deal 2!") ); // these three have the same hash codes and are considered the same.
         }
 
         ExceptionHandler eh2= new GuiExceptionHandler();
