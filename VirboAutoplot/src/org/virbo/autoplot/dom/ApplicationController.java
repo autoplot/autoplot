@@ -2245,20 +2245,15 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_CANVAS = "canvas";
 
     public Canvas getCanvas() {
-        logger.fine("enter getCanvas synchronized block");
-        synchronized (this) {
-            return canvas;
-        }
+        return canvas;
     }
 
     public void setCanvas(Canvas canvas) {
         Canvas oldCanvas = getCanvas();
-        synchronized (this) {
-            if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {
-                Logger.getLogger("gui").log(Level.FINE, "set canvas {0}", canvas);
-            }        
-            this.canvas = canvas;
-        }
+        if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {
+            Logger.getLogger("gui").log(Level.FINE, "set canvas {0}", canvas);
+        }        
+        this.canvas = canvas;
         propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
     }
     /**
