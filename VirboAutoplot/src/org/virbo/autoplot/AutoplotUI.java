@@ -2720,6 +2720,7 @@ APSplash.checkTime("init 52.9");
                 }
             }
         };
+        //run.run(); // simulate old code.
         new Thread(run,"dataSetSelectThread").start();
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
