@@ -792,20 +792,20 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 110");
 
         // jython is often slow to start up the first time, so go ahead and do this in the background.
-//        run= new Runnable() {
-//            @Override
-//            public String toString() { return "addInitializePython"; }
-//            @Override
-//            public void run() {
-//                try {
-//                    //initialize the python interpretter
-//                    JythonUtil.createInterpreter(true, false);
-//                } catch (IOException ex) {
-//                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-//                }
-//            }
-//        };
-//        invokeLater( 10000, false, run );
+        run= new Runnable() {
+            @Override
+            public String toString() { return "addInitializePython"; }
+            @Override
+            public void run() {
+                try {
+                    //initialize the python interpretter
+                    JythonUtil.createInterpreter(true, false);
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+        };
+        invokeLater( 10000, false, run );
     }
 
     private Runnable addAxes() {
