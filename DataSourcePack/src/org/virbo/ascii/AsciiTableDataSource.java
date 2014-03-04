@@ -3,8 +3,6 @@
  *
  * Created on March 31, 2007, 8:22 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.virbo.ascii;
 
@@ -43,7 +41,6 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ByteBufferInputStream;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -366,7 +363,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (dep0 != null) {
                 vds.putProperty(QDataSet.DEPEND_0, dep0);
             }
-            if ( eventListColumn!=null ) {
+            if ( eventListColumn!=null && dep0!=null ) {
                 Units u0= parser.getUnits(0);
                 Units u1= parser.getUnits(1);
                 if ( u0!=u1 ) {
@@ -413,7 +410,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         boolean fixedColumns = false;
 
-        int columnCount = 0;
+        int columnCount;
 
         /**
          * if non-null, this is the delim we are using to parse the file.
@@ -804,7 +801,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (column != null) {
                 int icol = parser.getFieldIndex(column);
                 parser.setUnits(icol, u);
-                parser.setFieldParser(icol, parser.UNITS_PARSER);
+                parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
             }
         }
         
@@ -884,7 +881,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             String k= e.getKey();
             Object v= e.getValue();
             if ( v==null ) continue;
-            if ( v==null || !( v instanceof Number || v instanceof String || v instanceof org.das2.datum.Datum ) ) remove.add(k);
+            if ( !( v instanceof Number || v instanceof String || v instanceof org.das2.datum.Datum ) ) remove.add(k);
         }
         for ( String k: remove ) {
             props.remove(k);
