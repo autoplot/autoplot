@@ -151,7 +151,7 @@ import org.w3c.dom.Element;
  * 
  * @author  jbf
  */
-public class AutoplotUI extends javax.swing.JFrame {
+public final class AutoplotUI extends javax.swing.JFrame {
     private static final String TAB_SCRIPT = "script";
     private static final String TAB_CONSOLE = "console";
 
@@ -315,48 +315,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //this.setFocusableWindowState(false);
-        
-        Runnable checkStatusRunnable= new Runnable() {
-            @Override
-            public void run() {
-                while ( true ) {
-                    LinkedHashMap<Object,Object> changes= new LinkedHashMap();
-                    dom.getController().pendingChanges(changes);
-                    //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
-                    if ( statusLabel.getIcon()==WARNING_ICON ) {
-                        // wait for setMessage to clear this.
-                    } else {
-                        if ( changes.size()>0 ) {
-                            statusLabel.setIcon( BUSY_ICON );
-                            String chstr="";
-                            for ( Entry<Object,Object> e: changes.entrySet() ) { 
-                                String client= String.valueOf(e.getValue());
-                                int ist= client.indexOf("(");
-                                int ien= client.lastIndexOf(")");
-                                if ( ist!=-1 ) {
-                                    client= client.substring(0,ist)+client.substring(ien+1);
-                                }
-                                if ( chstr.equals("") ) {
-                                    chstr= "* " + e.getKey() + " (" + client + ")";
-                                } else {
-                                    chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
-                                }
-                            }
-                            statusLabel.setToolTipText( chstr );
-                        } else {
-                            statusLabel.setIcon( IDLE_ICON );
-                            statusLabel.setToolTipText( null );
-                        }
-                    }
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                }
-            }
-        };
-        new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
                 
         referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
         
@@ -998,6 +956,7 @@ APSplash.checkTime("init 270");
             invokeLater( 4020, true, new Runnable() {
                 @Override
                 public String toString() { return "addLogConsole"; }
+                @Override
                 public void run() {
                     initLogConsole();
                     logConsolePanel.setViewportView( logConsole );
@@ -1655,6 +1614,7 @@ APSplash.checkTime("init 52.9");
     
     private void plotUrl( final String surl ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 plotUrlImmediately(surl);
             }
@@ -3804,10 +3764,51 @@ APSplash.checkTime("init 230");
 APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
-
-                //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
-            }
-        });
+                
+                Runnable checkStatusRunnable= new Runnable() {
+                    @Override
+                    public void run() {
+                        while ( true ) {
+                            LinkedHashMap<Object,Object> changes= new LinkedHashMap();
+                            app.dom.getController().pendingChanges(changes);
+                            //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
+                            if ( app.statusLabel.getIcon()==WARNING_ICON ) {
+                                // wait for setMessage to clear this.
+                            } else {
+                                if ( changes.size()>0 ) {
+                                    app.statusLabel.setIcon( BUSY_ICON );
+                                    String chstr="";
+                                    for ( Entry<Object,Object> e: changes.entrySet() ) { 
+                                        String client= String.valueOf(e.getValue());
+                                        int ist= client.indexOf("(");
+                                        int ien= client.lastIndexOf(")");
+                                        if ( ist!=-1 ) {
+                                            client= client.substring(0,ist)+client.substring(ien+1);
+                                        }
+                                        if ( chstr.equals("") ) {
+                                            chstr= "* " + e.getKey() + " (" + client + ")";
+                                        } else {
+                                            chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
+                                        }
+                                    }
+                                    app.statusLabel.setToolTipText( chstr );
+                                } else {
+                                    app.statusLabel.setIcon( IDLE_ICON );
+                                    app.statusLabel.setToolTipText( null );
+                                }
+                            }
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                            }
+                        }
+                    }
+                };
+                new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
+                        //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
+                    }
+                });
     }
 
     /**
@@ -4451,6 +4452,7 @@ APSplash.checkTime("init 240");
             sel.maybePlot(modifiers);
         } else {
             Runnable run= new Runnable() { 
+                @Override
                 public void run() {
                     // see if the uri would be rejected, and show the editor.
                     sel.setValue(uri);
