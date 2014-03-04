@@ -775,8 +775,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         invokeLater( 1000, true, run );
         APSplash.checkTime("init 90");
 
-        //addTools();
-        //addBindings();
+        addTools();
+        addBindings();
 
         pack();
 
