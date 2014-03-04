@@ -135,7 +135,9 @@ public class WGetFileSystem extends WebFileSystem {
             }
             p.waitFor();
             if ( p.exitValue()!=0 ) {
-                partfile.delete();
+                if ( !partfile.delete() ) {
+                    logger.log(Level.WARNING, "unable to delete file: {0}", partfile);
+                }
                 throw new IOException( cmd[0] +" returned with exit code "+p.exitValue() );
             }
             
