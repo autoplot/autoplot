@@ -43,10 +43,6 @@ package org.das2.jythoncompletion.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.text.JTextComponent;
 
 /**
@@ -59,12 +55,6 @@ import javax.swing.text.JTextComponent;
 public final class CompletionSettings  {
     
     public static final CompletionSettings INSTANCE = new CompletionSettings();
-    
-    private static final Object NULL_VALUE = new Object();
-    
-    private Reference<JTextComponent> editorComponentRef;
-    
-    private Map<String, Object> settingName2value = new HashMap<String, Object>();
     
     private CompletionSettings() {
         //Settings.addSettingsChangeListener(this);
@@ -103,7 +93,7 @@ public final class CompletionSettings  {
     }
     
     public void notifyEditorComponentChange(JTextComponent newEditorComponent) {
-        this.editorComponentRef = new WeakReference<JTextComponent>(newEditorComponent);
+        //this.editorComponentRef = new WeakReference<JTextComponent>(newEditorComponent);
         //clearSettingValues();
     }
     
