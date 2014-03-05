@@ -25,6 +25,20 @@
         to resolve old numbers.
         <p>Bugfixes (2014-02-24):</p>
         <ul>
+            <li>more findbugs cleanup (down to 80)</li>
+            <li>continue to remove synchronized code that could cause hangs</li>
+            <li>add busy feedback to dataSetSelector web activity, since this can get hung up and the user has no indication of what's going on.</li>
+            <li>periodic keyword for time parsing properly triggers TSB</li>
+            <li>contour always had extra point (0,0) in result.</li>
+            <li>clean up example in vap+inline GUI which was incorrect</li>
+            <li>minor cleanup of wget-based file system.</li>
+            <li>completions based on local cache folded case improperly.</li>
+            <li>support EMFISIS hourly files when suggesting aggregations</li>
+            <li>rte_0263418513: NetCDF spaces were not handled properly.</li>
+            <li>clean up monitors, after seeing axis ephemeris / das2server would sometimes leave monitor hanging</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>allow timeout on eventsRenderer to be adjusted (property under controller node)</li>
             <li>reset scanRange when axis units are reset.</li>
             <li>all GUI initialization is done on the event thread, fixing occasional hangs on Linux.</li>
@@ -47,28 +61,16 @@
             <li>1157: allow renders to specify if they have autoranged a dimension.</li>
             <li>file chooser in the resourceURI dialog didn't set the current directory properly.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>four-argument-histogram routine now takes datums and strings as arguments.</li>
-            <li>jython (a,b)=myFunc() now supports a,b in selection.</li>
-            <li>tab completion on the address bar works again with JythonDataSource.</li>
-            <li>1156: Scott's script shows that color scatter was broken in December</li>
-            <li>timeSeriesBrowse resulted in timerange being added to scripts in jyds editor when it wasn't needed</li>
-            <li>das2server delays loading icons.  The way it was coded would block GUI until they were loaded</li>
-            <li>Autoranging handles where lots of zeros are found in differences, which would cause problems</li>
-            <li>1137: back off recent changes after seeing it mucked up Jemmy tests (and interactive use by clients) with demo 5 (stack of series).</li>
-            <li>Red squiggle used to indicate errors in the Jython editor, the old block offered no feedback when highliting.</li>
-            <li>scripts are loaded off the event thread</li>
-            <li>Jython data source editor would not handle RESOURCE_URI correctly.</li>
-	    <li>1148: reference cache finally gets immutability right, by making dataset immutable before it enters the cache.</li>
-            <li>1145: just don't offer $Y$m01 as a completion.  This was put in to support CDAWEB, and direct CDAWEB support lessens the need for this</li>
-            <li>remove RANGE_CHECK because it would cause RTE when it's legitimate to query zero-length qube datasets for other dimensions</li>
-            <li>automatic completions editor works for URIs that don't have a file, like vap+orbit:</li>
-            <li>Application-Name and Codebase to manifest to get rid of warning messages.</li>
-            <li>documentation popup on script editor works again.</li>
-            <li>SortDataSet called with zero-length sort list is trivially okay.  </li>
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>open local data file shows .vap files as well.</li>
+            <li>SemanticOps.xtagsDataset supports bundles</li>
+            <li>DataSourceFactorysupports discovery to a non-GUI element to avoid having to create a GUI just to see if discovery is possible
+            <li>export CDF data allows the cdf variable name to be set explicitly</li>
+            <li>step/scan button hidden on axis ends now scans to next available data</li>
+            <li>time range tool shows all orbits, not just those around the current time.</li>
+       </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>internal rbsp orbits updated to 2014-03-11</li>
             <li>pngwalk tool GUI shows option for events file</li> 
@@ -82,17 +84,6 @@
             <li>another round of findbugs (down to 98 from 250+)</li>  
             <li>improve support for buckshot data in spectrogram rebinners</li>
             <li>formatDataSet back to ScriptContext in new attempts to clean up security.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>drag a box to select multiple plots on layout panel</li>
-            <li>drag on layout panel is shortcut for swap</li>
-            <li>axis flipped property is supported in the vaps.</li>
-            <li>update RBSP orbit files</li>
-            <li>Allow smooth on rank 2 datasets, smoothing on the first dimension (usually time).</li>
-            <li>internal rbsp orbits updated to 2014-02-03</li>
-            <li>das2server lists folders separately from data sources.</li>
-            <li>All CDF Global metadata now appears under "GlobalAttributes" node in metadata tab.</li>
         </ul>
 
         <p>Known issues:</p>
