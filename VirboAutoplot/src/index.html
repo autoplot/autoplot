@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Events list tool allows events list sources to control axes.</small></p>
+        <p><small>I encountered a surprise feature of the script editor, that CTRL-K shows completions based on symbols in the script.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-02-24):</p>
+        <p>Bugfixes (2014-03-05):</p>
         <ul>
+            <li>Bob pointed out case where error bars would be left on the Series renderer display.</li>
             <li>more findbugs cleanup (down to 80)</li>
             <li>continue to remove synchronized code that could cause hangs</li>
             <li>add busy feedback to dataSetSelector web activity, since this can get hung up and the user has no indication of what's going on.</li>
