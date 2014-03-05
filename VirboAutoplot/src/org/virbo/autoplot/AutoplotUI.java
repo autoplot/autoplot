@@ -1192,7 +1192,7 @@ APSplash.checkTime("init 270");
     }
     
 
-    private Action getAddPanelAction() {
+    private Action getAddPlotElementAction() {
         return new AbstractAction("Add Plot...") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1308,7 +1308,7 @@ APSplash.checkTime("init 270");
 APSplash.checkTime("init 51");
         fileMenu.add( getAddDataFromMenu() );
 APSplash.checkTime("init 52");
-        mi= new JMenuItem(getAddPanelAction() );
+        mi= new JMenuItem(getAddPlotElementAction() );
         mi.setToolTipText("Add a new plot or overplot to the application");
         expertItems.add(mi);
         fileMenu.add(mi);
