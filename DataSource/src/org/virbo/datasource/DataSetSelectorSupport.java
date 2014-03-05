@@ -98,6 +98,8 @@ public class DataSetSelectorSupport {
 
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
+        final boolean isAutoplotApp= ((DataSetSelector)parent).actionTriggers.containsKey("vapfile:(.*)"); //TODO: kludgy
+        
         FileFilter ff;
         ff = new FileFilter() {
 
@@ -114,7 +116,7 @@ public class DataSetSelectorSupport {
                 }
                 String ext = DataSetURI.getExt(t);
                 if ( ext!=null ) ext= "."+ext;
-                return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && exts.containsKey(ext));
+                return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && ( exts.containsKey(ext) ) || ( isAutoplotApp && t.endsWith(".vap") ));
             }
 
             @Override
@@ -146,6 +148,28 @@ public class DataSetSelectorSupport {
                 @Override
                 public String getDescription() {
                     return "*" + extf;
+                }
+            };
+            chooser.addChoosableFileFilter(ff);
+        }
+        
+        if ( isAutoplotApp ) {
+            ff = new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    if ( f.toString()==null ) return false;
+                    if (f.isDirectory()) {
+                        return true;
+                    }
+                    String t = f.toString();
+                    String ext = DataSetURI.getExt(t);
+                    if ( ext!=null ) ext= "."+ext;
+                    return (ext != null && ".vap".equals(ext));
+                }
+
+                @Override
+                public String getDescription() {
+                    return "*.vap";
                 }
             };
             chooser.addChoosableFileFilter(ff);
