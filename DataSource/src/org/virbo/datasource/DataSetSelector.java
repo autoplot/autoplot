@@ -900,7 +900,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     result.add( new CompletionResult(types[i],"") );
                 }
             }
-
+            clearBusyIcon();
             showCompletionsGui( "", result );
 
         } else if ( surl.startsWith("vap") && surl.substring(0,carotpos).split("\\:",-2).length==2 ) {
@@ -915,6 +915,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     result.add( new CompletionResult(sp[0]+":"+types[i],"") );
                 }
             }
+            clearBusyIcon();
             showCompletionsGui( "", result );
 
         } else {
@@ -974,7 +975,6 @@ public class DataSetSelector extends javax.swing.JPanel {
         //completionsPopupMenu.setFocusable(true);
         
         setMessage("done getting completions");
-        clearBusyIcon();
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -1020,6 +1020,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (Exception ex) {
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                } finally {
+                    clearBusyIcon();
                 }
                 
             }
@@ -1054,6 +1056,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
+                } finally {
+                    clearBusyIcon();
                 }
 
                 String doHost= surl.substring(0,carotpos);
@@ -1111,6 +1115,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
+                } finally {
+                    clearBusyIcon();
                 }
 
                 int i2= labelPrefix.lastIndexOf("/");
@@ -1201,6 +1207,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     setMessage(ex.toString());
                     showUserExceptionDialog( DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE);
                     return;
+                } finally {
+                    clearBusyIcon();
                 }
 
                 int i2= labelPrefix.lastIndexOf("/");
@@ -1265,6 +1273,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     }
                     return;
+                } finally {
+                    clearBusyIcon();
                 }
 
                 int n = Math.min( carotpos, editor.getText().length() );
