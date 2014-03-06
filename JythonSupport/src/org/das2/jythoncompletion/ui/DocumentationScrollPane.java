@@ -172,7 +172,7 @@ public class DocumentationScrollPane extends JScrollPane {
             bBack.setFocusable(false);
             bBack.setContentAreaFilled(false);
             bBack.setMargin(new Insets(0, 0, 0, 0));
-            bBack.setToolTipText("HINT_doc_browser_back_button"); //NOI18N
+            bBack.setToolTipText("Backward"); //NOI18N
             toolbar.add(bBack, gdc);
         }
 
@@ -186,7 +186,7 @@ public class DocumentationScrollPane extends JScrollPane {
             bForward.setEnabled(false);
             bForward.setFocusable(false);
             bForward.setContentAreaFilled(false);
-            bForward.setToolTipText("HINT_doc_browser_forward_button"); //NOI18N
+            bForward.setToolTipText("Forward"); //NOI18N
             bForward.setMargin(new Insets(0, 0, 0, 0));
             toolbar.add(bForward, gdc);
         }
@@ -202,7 +202,7 @@ public class DocumentationScrollPane extends JScrollPane {
             bShowWeb.setFocusable(false);
             bShowWeb.setContentAreaFilled(false);
             bShowWeb.setMargin(new Insets(0, 0, 0, 0));
-            bShowWeb.setToolTipText("HINT_doc_browser_show_web_button"); //NOI18N
+            bShowWeb.setToolTipText("You can view and edit this on Autoplot's wiki"); //NOI18N
             toolbar.add(bShowWeb, gdc);
         }
 
@@ -218,7 +218,7 @@ public class DocumentationScrollPane extends JScrollPane {
             bGoToSource.setFocusable(false);
             bGoToSource.setContentAreaFilled(false);
             bGoToSource.setMargin(new Insets(0, 0, 0, 0));
-            bGoToSource.setToolTipText("HINT_doc_browser_goto_source_button"); //NOI18N
+            bGoToSource.setToolTipText("Go to source"); //NOI18N
             toolbar.add(bGoToSource, gdc);
         }
         //toolbar.add( new JButton( new AbstractAction("PUSH") {
