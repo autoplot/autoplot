@@ -151,9 +151,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         QDataSet extent= Ops.extent(data);
         int dep0Len = 0;
         int typeSize = BufferDataSet.byteCount(type);
-        int recSize = typeSize * (dep0Len + 1);
         int channels= data.length(0);
-        int size = data.length() * recSize * channels;
+        int recSize = typeSize * channels;
+        int size = data.length() * recSize;
 
         ByteBuffer result = ByteBuffer.allocate(size);
         result.order("big".equals(params.get("byteOrder")) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
