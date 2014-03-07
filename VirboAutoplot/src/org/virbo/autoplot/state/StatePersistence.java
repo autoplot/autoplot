@@ -455,7 +455,9 @@ public class StatePersistence {
                     pp[i].getZaxis().setAutoRange(false);
                 }
             }
-
+            
+            // TODO: it would be nice to validate the state and provide feedback about what's wrong.
+            
             return state;
 
         } catch (ParseException ex) {
