@@ -103,6 +103,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param len0   number of elements in the first index
      * @param len1   number of elements in the second index
      * @param len2   number of elements in the third index
+     * @param len3 number of elements in the fourth index
      * @param buf   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
      * @return
@@ -110,7 +111,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, ByteBuffer buf, Object type ) {
         BufferDataSet result;
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
-        if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type); 
+        int nperRec=  len1 * len2 * len3; // assumes unused params are "1"
+        if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of type "+type); 
+        if ( reclen < nperRec * byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of " + nperRec +" type "+type); 
         if ( reclen * len0 > buf.limit() ) throw new IllegalArgumentException( String.format( "buffer length (%d bytes) is too small to contain data (%d %d-byte records)", buf.limit(), len0, reclen ) );
         if ( type.equals(DOUBLE) ) {
             result=new Double( rank, reclen, recoffs, len0, len1, len2, len3, buf );
