@@ -260,7 +260,7 @@ public class CefReaderData {
 
 
             if (builder == null) {
-                builder = new DataSetBuilder(2, 100, n_fields, 1);
+                builder = new DataSetBuilder(2, 100, n_fields );
                 parsers = new FieldParser[n_fields];
 
                 getParsers(work_buffer, work_size, parsers);
