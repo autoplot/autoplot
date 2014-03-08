@@ -509,13 +509,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     
-    private static Map<String,ImageIcon> icons= new HashMap();
+    private static Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
     
-    private static Icon iconFor( Object o ) {
+    private static Icon iconFor( Object o, boolean wait ) {
         //return new javax.swing.ImageIcon(Das2ServerDataSourceEditorPanel.class.getResource("/org/virbo/datasource/fileMag.png"));
-        //icons.clear();
+        //icons.clear(); // for debugging
         ImageIcon result= icons.get(o.toString());
-        if (result==null ) {
+        if (result==null && wait ) {
             try {
                 long t1= System.currentTimeMillis();
                 result= new ImageIcon( new URL( "" + o +"?server=logo" ) );
@@ -541,7 +541,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         DefaultListCellRenderer r= new DefaultListCellRenderer();
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            Icon icon= iconFor( value );
+            Icon icon= iconFor( value, false );
             ((DefaultListCellRenderer)c).setIcon(icon);
             return c;
         }
@@ -664,7 +664,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         Runnable run= new Runnable() {
             public void run() {
                 for ( String s: fd2ss1 ) {
-                    Icon i= iconFor(s); // force load of icon off the event thread.
+                    Icon i= iconFor( s, true ); // force load of icon off the event thread.
                     i.getIconHeight();                      
                 }
             };
