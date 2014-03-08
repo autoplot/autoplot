@@ -32,9 +32,6 @@
         <all-permissions/>
     </security>
 
-    <!-- start up as quickly as possible, doing updates in the background -->
-    <update check="background"/>
-
     <resources> 
         <j2se version="1.6+" initial-heap-size="96m" max-heap-size="*" java-vm-args="-Dsun.java2d.d3d=false"
               href="http://java.sun.com/products/autodl/j2se" >
@@ -42,10 +39,6 @@
 
         <jar href="AutoplotVolatile.jar" />
         <jar href="*" />
-        <!--
-        <jar href="*" />
-        <jar href="*" /> 
-        -->
 
         <extension name="cdf" href="*" />
         <!--
