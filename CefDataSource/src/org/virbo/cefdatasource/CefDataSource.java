@@ -179,7 +179,7 @@ public class CefDataSource extends AbstractDataSource {
 
             if (param.sizes.length > 1 || param.sizes[0] > 1) {
                 if (tds == null) { // create empty dataset with correct geometry
-                    DataSetBuilder result = new DataSetBuilder(2, 0, param.cefFieldPos[1] - param.cefFieldPos[0] + 1, 1);
+                    DataSetBuilder result = new DataSetBuilder( 2, 0, param.cefFieldPos[1] - param.cefFieldPos[0] + 1 );
                     ds = result.getDataSet();
                 } else {
                     ds = org.virbo.dataset.DataSetOps.leafTrim(tds, param.cefFieldPos[0], param.cefFieldPos[1] + 1);
