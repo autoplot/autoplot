@@ -2763,7 +2763,7 @@ APSplash.checkTime("init 52.9");
 
             buffy.append( "<h2>Open Source Components:</h2>");
             buffy.append( "Autoplot uses many open-source components, such as: <br>");
-            buffy.append( "OpenDAP, jsyntaxpane, Jython, CDF, FITS, NetCDF, POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
+            buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
             
             buffy.append("<h2>Runtime Information:</h2>");
 
