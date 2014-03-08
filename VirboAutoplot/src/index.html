@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-03-05):</p>
+        <p>Bugfixes (2014-03-07):</p>
         <ul>
+            <li>export of bundle dataset to multi-channel (stereo) .wav file didn't increment correctly and created half-empty mono file.</li>
+            <li>clean up tooltips on documentation popup for Jython editor.</li>
             <li>Bob pointed out case where error bars would be left on the Series renderer display.</li>
             <li>more findbugs cleanup (down to 80)</li>
             <li>continue to remove synchronized code that could cause hangs</li>
@@ -64,6 +66,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataSetBuilder checks rank and argument count in one,two,and three argument constructors.</li>
+            <li>DataSetBuilder can now take rank 0 datasets and Datums instead of doubles, setUnits added and improved support for bundles.</li>
             <li>open local data file shows .vap files as well.</li>
             <li>SemanticOps.xtagsDataset supports bundles</li>
             <li>DataSourceFactorysupports discovery to a non-GUI element to avoid having to create a GUI just to see if discovery is possible
