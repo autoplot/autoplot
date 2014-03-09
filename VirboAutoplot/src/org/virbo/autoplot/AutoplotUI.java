@@ -3768,41 +3768,7 @@ APSplash.checkTime("init 240");
                 Runnable checkStatusRunnable= new Runnable() {
                     @Override
                     public void run() {
-                        while ( true ) {
-                            LinkedHashMap<Object,Object> changes= new LinkedHashMap();
-                            app.dom.getController().pendingChanges(changes);
-                            //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
-                            if ( app.statusLabel.getIcon()==WARNING_ICON ) {
-                                // wait for setMessage to clear this.
-                            } else {
-                                if ( changes.size()>0 ) {
-                                    app.statusLabel.setIcon( BUSY_ICON );
-                                    String chstr="";
-                                    for ( Entry<Object,Object> e: changes.entrySet() ) { 
-                                        String client= String.valueOf(e.getValue());
-                                        int ist= client.indexOf("(");
-                                        int ien= client.lastIndexOf(")");
-                                        if ( ist!=-1 ) {
-                                            client= client.substring(0,ist)+client.substring(ien+1);
-                                        }
-                                        if ( chstr.equals("") ) {
-                                            chstr= "* " + e.getKey() + " (" + client + ")";
-                                        } else {
-                                            chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
-                                        }
-                                    }
-                                    app.statusLabel.setToolTipText( chstr );
-                                } else {
-                                    app.statusLabel.setIcon( IDLE_ICON );
-                                    app.statusLabel.setToolTipText( null );
-                                }
-                            }
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException ex) {
-                                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                            }
-                        }
+                        checkStatusLoop(app);
                     }
                 };
                 new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
@@ -3811,6 +3777,49 @@ APSplash.checkTime("init 240");
                 });
     }
 
+    /**
+     * periodically scan the application for nodes that are busy, and indicate
+     * with a busy swirl icon if the app is busy.
+     * @param app 
+     */
+    private static void checkStatusLoop( AutoplotUI app ) {
+        while ( true ) {
+            LinkedHashMap<Object,Object> changes= new LinkedHashMap();
+            app.dom.getController().pendingChanges(changes);
+            //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
+            if ( app.statusLabel.getIcon()==WARNING_ICON ) {
+                // wait for setMessage to clear this.
+            } else {
+                if ( changes.size()>0 ) {
+                    app.statusLabel.setIcon( BUSY_ICON );
+                    String chstr="";
+                    for ( Entry<Object,Object> e: changes.entrySet() ) { 
+                        String client= String.valueOf(e.getValue());
+                        int ist= client.indexOf("(");
+                        int ien= client.lastIndexOf(")");
+                        if ( ist!=-1 ) {
+                            client= client.substring(0,ist)+client.substring(ien+1);
+                        }
+                        if ( chstr.equals("") ) {
+                            chstr= "* " + e.getKey() + " (" + client + ")";
+                        } else {
+                            chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
+                        }
+                    }
+                    app.statusLabel.setToolTipText( chstr );
+                } else {
+                    app.statusLabel.setIcon( IDLE_ICON );
+                    app.statusLabel.setToolTipText( null );
+                }
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+        
+    }
     /**
      * add a drop listener so that URIs can be dropped on to plots.  This should be added to
      * plots as they are created.
