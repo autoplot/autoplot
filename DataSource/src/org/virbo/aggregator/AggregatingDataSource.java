@@ -282,7 +282,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             JoinDataSet altResult= null; // used when JoinDataSets are found
 
             if ( ss.length==0 ) {
-                if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
+                if ( null==getFsm().getRepresentativeFile( mon ) ) {
                     throw new FileNotFoundException("Unable to find representative file: No files found matching "+getFsm().toString());
                 } else {
                     throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
