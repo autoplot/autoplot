@@ -6,7 +6,7 @@
 <jnlp 
     spec="1.0+"
     codebase="*"
-    href="autoplot.jnlp">
+    href="*">
    
     <information> 
         <title>*</title>
