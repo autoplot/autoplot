@@ -3500,6 +3500,14 @@ private void updateFrameTitle() {
         //https://sourceforge.net/p/autoplot/bugs/1159/
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         
+        // A Mar 11, 2014 email in Jeremy's inbox describes why this is needed for secure jnlp files.
+        if ( System.getProperty( "autoplot.default.bookmarks" )==null ) {
+            String s= System.getProperty( "jnlp.autoplot.default.bookmarks" );
+            if ( s!=null ) {
+                System.setProperty( "autoplot.default.bookmarks", s );
+            }
+        }
+        
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
