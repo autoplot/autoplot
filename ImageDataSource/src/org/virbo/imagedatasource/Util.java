@@ -32,7 +32,6 @@ public class Util {
         i= s.indexOf("\""); // "
         if ( i>-1 ) {
             d[2]= Double.parseDouble( s.substring(oldi,i) );
-            oldi=i+1;
         }
 
         return d[0] + d[1]/60 + d[2]/(60*60);
