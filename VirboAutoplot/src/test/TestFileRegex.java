@@ -8,7 +8,7 @@ package test;
 import java.io.File;
 import java.net.URI;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 
 /**
@@ -24,9 +24,9 @@ public class TestFileRegex {
         //String ss= "ftp://virbo.org/POES/n15/1998/poes_n15_19980701.cdf.zip/poes_n15_19980701.cdf?minute";
 
         FileSystem fs = FileSystem.create( new URI( "ftp://virbo.org/POES/n15" ) );
-        FileStorageModelNew fsm= FileStorageModelNew.create( fs, "%Y/poes_n15_%Y%m%d.cdf.zip/poes_n15_%Y%m%d.cdf" );
+        FileStorageModel fsm= FileStorageModel.create( fs, "%Y/poes_n15_%Y%m%d.cdf.zip/poes_n15_%Y%m%d.cdf" );
 
-        FileStorageModelNew t= fsm;
+        FileStorageModel t= fsm;
         
         System.err.println("Here is the bug, we never use ZipFileSystem:");
         while ( t!=null ) {

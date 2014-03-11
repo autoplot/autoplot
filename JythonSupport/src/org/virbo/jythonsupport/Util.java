@@ -25,7 +25,7 @@ import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.TimeParser;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemUtil;
@@ -364,7 +364,7 @@ public class Util {
      */
     public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
         DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
-        FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
+        FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
         TimeParser tf = TimeParser.create(format);
 
         String[] ss = fsm.getNamesFor(dr);

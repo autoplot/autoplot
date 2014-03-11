@@ -30,7 +30,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -73,7 +73,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public static final String MSG_NO_FILES_FOUND = "No files in interval";
 
 
-    private FileStorageModelNew fsm;
+    private FileStorageModel fsm;
     DataSourceFactory delegateDataSourceFactory;
     AggregationPollUpdating upd; // allow a group of files to be watched.  This is experimental.
     
@@ -114,7 +114,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         String filePollUpdates= getParam(  URISplit.PARAM_FILE_POLL_UPDATES,"" );
         if ( filePollUpdates.length()>0 ) {
             String surl = DataSetURI.fromUri( uri );
-            FileStorageModelNew fsm1 = AggregatingDataSourceFactory.getFileStorageModel(surl);
+            FileStorageModel fsm1 = AggregatingDataSourceFactory.getFileStorageModel(surl);
             double ffilePollUpdates= Math.ceil( Double.parseDouble( filePollUpdates ) );
             upd= new AggregationPollUpdating(fsm1, viewRange, (long)(ffilePollUpdates) );
             addCability( Updating.class, upd );
@@ -655,11 +655,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
         propertyChangeSupport.firePropertyChange("viewRange", oldViewRange, viewRange);
     }
 
-    public FileStorageModelNew getFsm() {
+    public FileStorageModel getFsm() {
         return fsm;
     }
 
-    public void setFsm(FileStorageModelNew fsm) {
+    public void setFsm(FileStorageModel fsm) {
         this.fsm = fsm;
     }
     /**

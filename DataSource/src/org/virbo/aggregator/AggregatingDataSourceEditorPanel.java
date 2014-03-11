@@ -41,7 +41,7 @@ import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -392,7 +392,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private void updateTimeRanges() {
         DatumRange dr = null;
         try {
-            FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(uri);
+            FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(uri);
             String[] names = fsm.getNamesFor(null, new NullProgressMonitor());
             ranges = new ArrayList(names.length);
             for (int i = 0; i < names.length; i++) {
@@ -498,6 +498,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     @Override
     public boolean reject(String uri) throws Exception {
         String delegateUrl;
+        
+        //TODO: the following triggers web stuff on event thread!
         delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(uri, new NullProgressMonitor() );
 
         if (delegateEditorPanel == null) {

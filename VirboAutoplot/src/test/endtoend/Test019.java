@@ -20,7 +20,7 @@ import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -37,11 +37,11 @@ public class Test019 {
     public static void testRestrictedFileSystemAccess() throws Exception {
         
         String uri;
-        FileStorageModelNew fsm;
+        FileStorageModel fsm;
         File[] ff,ff2;
 
         uri= "http://autoplot.org/data/pngwalk/";
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "product_$Y$m$d.png" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
@@ -49,28 +49,28 @@ public class Test019 {
         ff2= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
 
         uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "data_$Y_$m_$d_v$v.qds" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
 
         
         uri= "http://demo@host:demo@www-pw.physics.uiowa.edu/~jbf/data/restrictAt/";
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "data_$Y_$m_$d_v$v.qds" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
 
         //Leave these commented out, since we don't want to bother their server.
 //        uri= "http://sy%40space.physics.uiowa.edu:password@mapsview.engin.umich.edu/data/MAG/KSM/";
-//        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+//        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
 //               "MAG__KSM__$Y$j_$v.TAB" );
 //        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2003-196" ) );
 //        if ( ff.length==1 ) System.err.println(ff[0]);
 //
 //
 //        uri= "http://sy@space.physics.uiowa.edu:password@mapsview.engin.umich.edu/data/MAG/KSM/";
-//        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+//        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
 //               "MAG__KSM__$Y$j_$v.TAB" );
 //        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2003-196" ) );
 //        if ( ff.length==1 ) {
@@ -80,23 +80,23 @@ public class Test019 {
 
     public static void testFSMVersioning() throws Exception {
         String uri= "http://sarahandjeremy.net/~jbf/autoplot/tests/test019_fsm/vers/";
-        FileStorageModelNew fsm;
+        FileStorageModel fsm;
         String[] ss;
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep).cdf" );
         System.err.println(fsm);
         ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
         for ( String s: ss ) {
             System.err.println(s);
         }
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep,ge=2).cdf" );
         System.err.println(fsm);
         ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
         for ( String s: ss ) {
             System.err.println(s);
         }
-        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+        fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "rbspa_pre_ect-mageis-L2_$Y$m$d_v$(v,sep,lt=2).cdf" );
         System.err.println(fsm);
         ss= fsm.getBestNamesFor(null,new NullProgressMonitor());
@@ -121,7 +121,7 @@ public class Test019 {
     }
 
     public static void testFileSystemModel() throws Exception {
-        FileStorageModelNew fsm= FileStorageModelNew.create( FileSystem.create( "file:///home/jbf/ct/hudson/data/dat/span/omni2/" ),
+        FileStorageModel fsm= FileStorageModel.create( FileSystem.create( "file:///home/jbf/ct/hudson/data/dat/span/omni2/" ),
                 "omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf" );
         System.err.println( fsm );
 

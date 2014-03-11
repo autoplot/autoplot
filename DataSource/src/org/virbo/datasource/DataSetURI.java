@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
@@ -230,13 +230,13 @@ public class DataSetURI {
      */
     public static String[] unaggregate( String resourceURI, DatumRange timerange ) throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
         
-        int i= FileStorageModelNew.splitIndex( resourceURI );
+        int i= FileStorageModel.splitIndex( resourceURI );
 
         String root= resourceURI.substring(0,i);     // the static part of the name
         String template= resourceURI.substring(i);   // the templated part of the name
 
         FileSystem fs= FileSystem.create( root );
-        FileStorageModelNew fsm= FileStorageModelNew.create( fs, template );
+        FileStorageModel fsm= FileStorageModel.create( fs, template );
 
         String[] names= fsm.getNamesFor( timerange );
 
@@ -648,7 +648,7 @@ public class DataSetURI {
                 tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
                 checkNonHtml( tfile, url );
             } else {
-                FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
+                FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModel.java has.
                 if ( foz.exists() ) {
                     File fz= foz.getFile(mon);
                     checkNonHtml( fz, url );
@@ -716,7 +716,7 @@ public class DataSetURI {
                 if ( !allowHtml && tfile.exists() && url!=null ) checkNonHtml( tfile, url );
             } else {
                 synchronized ( DataSetURI.class ) { // all this needs review, because often Apache servers will also unpack files.
-                    FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
+                    FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModel.java has.
                     if ( foz.exists() ) {
                         logger.log(Level.FINE, "getting file from compressed version: {0}", foz);
                         File fz= foz.getFile(mon);
@@ -1467,7 +1467,7 @@ public class DataSetURI {
             String s1= surlDir.substring(0,ip);
             String s2= surlDir.substring(ip,surlDir.length()-1);
             FileSystem fsp= FileSystem.create( DataSetURI.toUri(s1), mon );
-            FileStorageModelNew fsm= FileStorageModelNew.create( fsp, s2 );
+            FileStorageModel fsm= FileStorageModel.create( fsp, s2 );
 
             fs= fsp; // careful, we only use this for case insensitive check
             List<String> ss= new ArrayList();
@@ -1504,7 +1504,7 @@ public class DataSetURI {
 
         //TODO: handle folder-not-found more gracefully.
 
-        // handle .gz by presenting the uncompressed versions, which are available through the FileStorageModelNew.  This is a
+        // handle .gz by presenting the uncompressed versions, which are available through the FileStorageModel.  This is a
         for ( int i=0; i<s.length; i++ ) {
             if ( s[i].endsWith(".gz") ) {
                 s[i]= s[i].substring(0,s[i].length()-3);

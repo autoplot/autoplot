@@ -21,7 +21,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.CancelledOperationException;
@@ -134,7 +134,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             logger.log( Level.FINE, "base={0}", base);
             
             FileSystem fs= FileSystem.create( new URI( base ) ); // bug3055130 okay
-            FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+            FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
 
             if ( webService ) {
                 files= db.getFilesAndRangesFromWebService( ds.toUpperCase(), tr );

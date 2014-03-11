@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -105,8 +105,8 @@ public class WalkUtil {
         spec= spec.replaceAll("\\*", ".*"); //GRR.  What if I put .* in there knowing it was a regex.
         spec= spec.replaceAll("\\?", ".");
         
-        FileStorageModelNew fsm=null;
-        if ( TimeParser.isSpec(spec) ) fsm= FileStorageModelNew.create( fs, spec );
+        FileStorageModel fsm=null;
+        if ( TimeParser.isSpec(spec) ) fsm= FileStorageModel.create( fs, spec );
 
         String[] ss;
         if ( fsm!=null ) {

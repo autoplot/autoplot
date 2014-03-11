@@ -133,6 +133,10 @@ public class Test501 {
         
         Map<Integer,String> failures= new LinkedHashMap();
 
+        String[] serverSkip= new String[] {
+            "http://www-pw.physics.uiowa.edu/das/das2Server 003,005,006,007,008,009"
+        };
+        
         for ( int idsss= 0; idsss<dsss.length; idsss++ ) {
 
             DasServer dss= dsss[idsss];
@@ -152,6 +156,18 @@ public class Test501 {
                 skip= new ArrayList(  );
             }
 
+            
+            for ( String server: serverSkip ) {
+                String[] ss= server.split(" ",2);
+                String host= ss[0];
+                if ( dsss[idsss].toString().contains(host) ) {
+                    String[] sskip= ss[1].split(",");
+                    for ( String ssi : sskip ) {
+                        skip.add( Integer.parseInt(ssi) );
+                    }
+                }
+            }
+                    
             int count=0;
             for ( String id: ids ) {
                 if ( id.contains("/testing/") ) {

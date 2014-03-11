@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
@@ -72,7 +72,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                     String base= db.getBaseUrl(ds);
 
                     FileSystem fs= FileSystem.create( new URI( base ) );
-                    FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+                    FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
 
                     DatumRange dr= DatumRangeUtil.parseTimeRangeValid(tr);
                     String[] names= fsm.getNamesFor(dr);  //TODO: this could be slow

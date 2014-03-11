@@ -39,7 +39,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -342,7 +342,7 @@ public class CDAWebDB {
             FileSystem fs;
             try {
                 fs = FileSystem.create(new URI(base));
-                FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+                FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
                 String ff= fsm.getRepresentativeFile( new NullProgressMonitor() );
                 if ( ff!=null ) {
                     return fsm.getRangeFor(ff).toString();
@@ -419,7 +419,7 @@ public class CDAWebDB {
             baseUri = DataSetURI.toUri(base);
             FileSystem fs= FileSystem.create( baseUri );
             
-            FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+            FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
 
             String avail= CDAWebDB.getInstance().getSampleTime(ds);
             DatumRange dr;
@@ -572,7 +572,7 @@ public class CDAWebDB {
 
         System.err.println( db.getBaseUrl("AC_H3_CRIS") );
         System.err.println( db.getNaming("AC_H3_CRIS") );
-        FileStorageModelNew fsm= FileStorageModelNew.create( FileSystem.create(db.getBaseUrl("AC_H3_CRIS")), db.getNaming("AC_H3_CRIS") );
+        FileStorageModel fsm= FileStorageModel.create( FileSystem.create(db.getBaseUrl("AC_H3_CRIS")), db.getNaming("AC_H3_CRIS") );
         files= fsm.getBestNamesFor( DatumRangeUtil.parseTimeRange( "20110601-20110701" ), new NullProgressMonitor() );
         for ( String s: files ) {
             System.err.println(s); //logger ok

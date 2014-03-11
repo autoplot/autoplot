@@ -13,7 +13,7 @@ import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.URI;
@@ -63,7 +63,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
         AggregatingDataSource ads = new AggregatingDataSource(uri,delegateFactory);
         String surl = DataSetURI.fromUri( uri );
-        FileStorageModelNew fsm = getFileStorageModel(surl);
+        FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
         URISplit split = URISplit.parse(surl);
         Map parms = URISplit.parseParams(split.params);
@@ -93,7 +93,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return i;
     }
 
-    public static FileStorageModelNew getFileStorageModel(String suri) throws IOException {
+    public static FileStorageModel getFileStorageModel(String suri) throws IOException {
         URISplit split= URISplit.parse(suri);
         String surl= split.surl; // support cases where resource URI is not yet valid.
         int i = surl.indexOf('?');
@@ -106,7 +106,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
         String spec= sansArgs.substring(i).replaceAll("\\%", "\\$");
-        FileStorageModelNew fsm = FileStorageModelNew.create(fs, spec );
+        FileStorageModel fsm = FileStorageModel.create(fs, spec );
 
         return fsm;
     }
@@ -120,7 +120,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      * @return
      * @throws IOException
      */
-    private static String getRepresentativeFile( FileStorageModelNew fsm, String surl, ProgressMonitor mon ) throws IOException {
+    private static String getRepresentativeFile( FileStorageModel fsm, String surl, ProgressMonitor mon ) throws IOException {
 
         if ( mon==null ) {
             mon= new NullProgressMonitor();
@@ -161,7 +161,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         int urlLen = 0; //this is the position as we parse and process surl.
 
         surl= surl.replaceAll("%25","%");
-        FileStorageModelNew fsm = getFileStorageModel(surl);
+        FileStorageModel fsm = getFileStorageModel(surl);
         
         String delegateFile= getRepresentativeFile( fsm, surl, null );
 
@@ -217,7 +217,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         
         split.params = URISplit.formatParams(parms);
 
-        FileStorageModelNew fsm = getFileStorageModel( DataSetURI.fromUri(split.resourceUri) );
+        FileStorageModel fsm = getFileStorageModel( DataSetURI.fromUri(split.resourceUri) );
 
         String file= null;
         if ( timeRange!=null && !timeRange.equals("") ) {

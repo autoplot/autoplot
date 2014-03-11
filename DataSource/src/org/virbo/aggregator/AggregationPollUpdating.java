@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.fsm.FileStorageModelNew;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
@@ -33,7 +33,7 @@ public class AggregationPollUpdating implements Updating {
 
     private static final Logger logger= Logger.getLogger("apdss.agg");
 
-    FileStorageModelNew fsm;
+    FileStorageModel fsm;
     DatumRange dr;
     long dirHash;
     long pollCyclePeriodSeconds= -1;
@@ -43,7 +43,7 @@ public class AggregationPollUpdating implements Updating {
     private final static int LIMIT_SHORT_CYCLE_PERIOD= 1;
     private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD= 10;
 
-    public AggregationPollUpdating( FileStorageModelNew fsm, DatumRange dr, long pollCyclePeriodSeconds ) {
+    public AggregationPollUpdating( FileStorageModel fsm, DatumRange dr, long pollCyclePeriodSeconds ) {
         this.fsm= fsm;
         this.dr= dr;
         if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
@@ -142,7 +142,7 @@ public class AggregationPollUpdating implements Updating {
     }
 
     public static void main( String[] args ) throws FileSystemOfflineException, UnknownHostException, URISyntaxException, IOException, InterruptedException {
-        FileStorageModelNew fsm= FileStorageModelNew.create( FileSystem.create( new URI("file:/home/jbf/eg/data/agg/") ), "hk_h0_mag_$Y$m$d_v02.cdf" );
+        FileStorageModel fsm= FileStorageModel.create( FileSystem.create( new URI("file:/home/jbf/eg/data/agg/") ), "hk_h0_mag_$Y$m$d_v02.cdf" );
         AggregationPollUpdating a= new AggregationPollUpdating( fsm, null, 1 );
         a.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
