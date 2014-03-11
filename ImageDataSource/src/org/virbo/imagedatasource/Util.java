@@ -19,7 +19,7 @@ public class Util {
         double[] d= new double[3];
         int i=0;
         int oldi= i;
-        i= s.indexOf("°"); // degree symbol
+        i= s.indexOf("\u00b0"); // degree symbol
         if ( i>-1 ) {
             d[0]= Double.parseDouble( s.substring(oldi,i) );
             oldi=i+1;
