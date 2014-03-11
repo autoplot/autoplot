@@ -27,6 +27,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -292,6 +293,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
+        if (showAllInitially) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    showAllVarTypeCB.setSelected(true);
+                    setURI( getURI() );
+                }
+            });
+        }     
         return this;
     }
 
@@ -317,6 +326,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     String parameter;
 
+    boolean showAllInitially= false;
+    
     /**
      * can I reuse the slice?  Only if the maxRec doesn't change.
      */
@@ -398,22 +409,30 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             if ( parameterDescriptions.isEmpty() ) {
                 throw new IllegalArgumentException("no plottable parameters in cdf file!");
             }
-                Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
-                Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
-                Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 1, false, isMaster );
-                String label;
-                if ( this.showAllVarTypeCB.isSelected() ) {
-                    parameterInfo= allParameterInfo;
-                    label= "Select CDF Variable (%d data, %d support):";
-                } else {
-                    parameterInfo= dataParameterInfo;
-                    label= "Select CDF Variable (%d data, %d support not shown):";
-                }
-                int numData= dataParameterInfo.size();
-                int numSupport= allParameterInfo.size() - numData;
+            
+            Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
+            Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
+            Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 1, false, isMaster );
 
-                this.selectVariableLabel.setText( String.format( label, numData, numSupport ) );
-                this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
+            if ( allParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
+                if ( !dataParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
+                    showAllInitially= true;
+                }
+            }
+
+            String label;
+            if ( this.showAllVarTypeCB.isSelected() ) {
+                parameterInfo= allParameterInfo;
+                label= "Select CDF Variable (%d data, %d support):";
+            } else {
+                parameterInfo= dataParameterInfo;
+                label= "Select CDF Variable (%d data, %d support not shown):";
+            }
+            int numData= dataParameterInfo.size();
+            int numSupport= allParameterInfo.size() - numData;
+
+            this.selectVariableLabel.setText( String.format( label, numData, numSupport ) );
+            this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
 
             String param= params.get("arg_0");
             String subset= null;

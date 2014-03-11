@@ -27,6 +27,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -287,6 +288,14 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
+        if (showAllInitially) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    showAllVarTypeCB.setSelected(true);
+                    setURI( getURI() );
+                }
+            });
+        }            
         return this;
     }
 
@@ -312,6 +321,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     String parameter;
 
+    boolean showAllInitially= false;
+    
     /**
      * can I reuse the slice?  Only if the maxRec doesn't change.
      */
@@ -392,6 +403,12 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true );
             Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true );
             Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 1, false );
+            
+            if ( allParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
+                if ( !dataParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
+                    showAllInitially= true;
+                }
+            }
             
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {
