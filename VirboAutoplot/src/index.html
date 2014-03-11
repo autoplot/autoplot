@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>I encountered a surprise feature of the script editor, that CTRL-K shows completions based on symbols in the script.</small></p>
+        <p><small>Tooltips on the go-to-website button remind users that it's a wiki and anyone can contribute to documentation.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,7 +25,11 @@
         to resolve old numbers.
         <p>Bugfixes (2014-03-07):</p>
         <ul>
-            <li>JNLP signing is finally cleaned up to avoid extra dialog.</li>
+            <li>JNLP clean up to avoid extra dialog.  Thanks Andy!</li>
+            <li>Refactor FileStorageModelNew -> FileStorageModel after Larry pointed out the dumb name.  I've been meaning to do this for years.</li>
+            <li>in the das2server data source, there was still icon loading off on the event thread, which I could see with my slow server.</li>
+            <li>when the aggregating data source detects there are no files, use a monitor when getting the representative file.</li>
+            <li>2-channel .wav output fixed.</li>
             <li>index out-of-bounds warning on SubsetDataSet was mis-coded, issuing false warnings to logger.</li>
             <li>export of bundle dataset to multi-channel (stereo) .wav file didn't increment correctly and created half-empty mono file.</li>
             <li>clean up tooltips on documentation popup for Jython editor.</li>
