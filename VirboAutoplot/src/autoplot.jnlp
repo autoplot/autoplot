@@ -47,20 +47,14 @@
         <jar href="AutoplotStable.jar" />
         <!--
         <jar href="../lib/AutoplotStable.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.20130822.jar" /> 
         -->
 
         <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" />
-        <!--
-        <extension name="cdf" href="../../../../../../autoplot-cdf/ws/cdf-3.4.1.jnlp" />
-        <extension name="cdf" href="../cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" />
-        <extension name="cdf" href="http://autoplot.org/cdf-jnlp-3.4.1/cdf-3.4.1.jnlp" />
-        -->
 
         <property name="jnlp.packEnabled" value="true"/>
         <!-- this no longer has any effect: <property name="deployment.security.authenticator" value="false"/>-->
 
-        <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
+        <property name="jnlp.autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         <property name="sun.java2d.d3d" value="false" />  <!-- bug 3586034 -->
         
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
