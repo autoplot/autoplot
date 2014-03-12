@@ -86,17 +86,19 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             
             ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
         
+            System.err.println("--- bindings ---");
             BindingModel[] bms= ScriptContext.getDocumentModel().getBindings();
             for ( BindingModel bm: bms ) {
                 System.err.println(bm);
             }
-
-            if ( ScriptContext.getDocumentModel().getBindings().length==4 &&
-                    ScriptContext.getDocumentModel().getBindings(1).getSrcProperty().equals("timeRange")) {
+            System.err.println("---");
+            if ( bms.length==4 &&
+                    bms[1].getSrcProperty().equals("timeRange") || bms[3].getSrcProperty().equals("timeRange")) {
                 return 0;
             } else {
-                System.err.println("bindings.length="+ScriptContext.getDocumentModel().getBindings().length );
-                System.err.println("bindings[1].getSrcProperty()="+ScriptContext.getDocumentModel().getBindings(1).getSrcProperty() );
+                System.err.println("bindings.length="+bms.length );
+                System.err.println("bindings[1].getSrcProperty()="+bms[1].getSrcProperty() );
+                System.err.println("bindings[3].getSrcProperty()="+bms[3].getSrcProperty() );
                 return 1;
             }
         } catch ( Exception ex ) {
