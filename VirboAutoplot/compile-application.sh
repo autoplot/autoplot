@@ -144,7 +144,7 @@ else
    rm -rf temp-volatile-classes/JNLP-INF/
 fi
 
-printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\n" > temp-volatile-src/MANIFEST.MF
+printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\nApplication-Name: Autoplot\nCodebase: http://autoplot.org/\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA
@@ -282,6 +282,9 @@ fi
 echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
+echo " ==manifest=="
+cat ../temp-volatile-src/MANIFEST.MF
+echo " ==manifest=="
 ${JAVA6_HOME}bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
 cd ..
 
