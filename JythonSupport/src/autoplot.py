@@ -62,14 +62,14 @@ _outputParamSort= []
 # value is the value of the output parameter.
 # doc is any documentation for the output parameter.
 # constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with VALID_MIN, VALID_MAX and other relevant QDataSet properties.
-def setOutputParam( name, value, doc='', constraint='' ):
-  _outputParamMap[ name ]= [ name, value, doc, constraint ]
-  _outputParamSort.append( name )
-  globals().put( name, value )
-  if type(outputParams) is dict:
-     outputParams[name]= value
-  else:
-     raise Exception( 'in jython script, variable outputParams was overriden.' )
+#def setOutputParam( name, value, doc='', constraint='' ):
+#  _outputParamMap[ name ]= [ name, value, doc, constraint ]
+#  _outputParamSort.append( name )
+#  globals()[name]= value #TODO: this isn't working
+#  if type(outputParams) is dict:
+#     outputParams[name]= value
+#  else:
+#     raise Exception( 'in jython script, variable outputParams was overriden.' )
 
 # invokeLater command is a scientist-friendly way to define a function that 
 # is called on a different thread.
