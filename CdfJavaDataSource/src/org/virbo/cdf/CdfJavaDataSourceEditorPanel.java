@@ -414,12 +414,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
             Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 1, false, isMaster );
 
-            if ( allParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
-                if ( !dataParameterInfo.containsKey(params.get(URISplit.PARAM_ARG_0) ) ) {
-                    showAllInitially= true;
-                }
-            }
-
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {
                 parameterInfo= allParameterInfo;
@@ -444,6 +438,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 }
             }
 
+            if ( allParameterInfo.containsKey(param) ) {
+                if ( !dataParameterInfo.containsKey(param) ) {
+                    showAllInitially= true;
+                }
+            }
+            
             String slice1= params.remove("slice1");
 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
