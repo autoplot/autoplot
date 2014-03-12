@@ -65,6 +65,7 @@ _outputParamSort= []
 def setOutputParam( name, value, doc='', constraint='' ):
   _outputParamMap[ name ]= [ name, value, doc, constraint ]
   _outputParamSort.append( name )
+  globals().put( name, value )
   if type(outputParams) is dict:
      outputParams[name]= value
   else:
