@@ -549,7 +549,9 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( var!=null ) {
                 QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.getRecVariance(), false, -1, null );
                 Units deltaUnits= SemanticOps.getUnits(delta);
-                if ( UnitsUtil.isRatioMeasurement(deltaUnits) && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) && result.length()==delta.length() ) {
+                if ( UnitsUtil.isRatioMeasurement(deltaUnits)
+                        && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
+                        && ( delta.rank()==0 || result.length()==delta.length() ) ) {
                     result.putProperty( QDataSet.BIN_PLUS, delta );
                     if ( !deltaMinus.equals(deltaPlus) ) {
                         var= cdf.getVariable((String)deltaMinus);
