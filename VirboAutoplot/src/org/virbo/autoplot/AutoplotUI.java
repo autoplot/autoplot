@@ -3775,6 +3775,19 @@ APSplash.checkTime("init 230");
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
                     if ( app!=null ) app.setStatus("running script "+script);
+                    if ( headless ) {
+                        model.setExceptionHandler( new ExceptionHandler() {
+                            @Override
+                            public void handle(Throwable t) {
+                                t.printStackTrace();
+                            }
+
+                            @Override
+                            public void handleUncaught(Throwable t) {
+                                t.printStackTrace();
+                            }
+                        } );
+                    }
                     Runnable run= getRunScriptRunnable( app, model, script, scriptArgs, headless && !server );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
