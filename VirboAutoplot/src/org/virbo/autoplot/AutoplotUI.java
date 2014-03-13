@@ -3793,7 +3793,7 @@ APSplash.checkTime("init 240");
     private static void checkStatusLoop( AutoplotUI app ) {
         while ( true ) {
             LinkedHashMap<Object,Object> changes= new LinkedHashMap();
-            app.dom.getController().pendingChanges(changes);
+            app.dom.getController().pendingChanges(changes); // TODO: there's a NullPointerException when this is run with --script.
             //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
             if ( app.statusLabel.getIcon()==WARNING_ICON ) {
                 // wait for setMessage to clear this.
