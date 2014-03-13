@@ -12,29 +12,35 @@ package org.virbo.autoplot;
 
 import java.awt.event.ItemEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import org.das2.util.LoggerManager;
 import org.virbo.ascii.AsciiTableDataSourceFormatEditorPanel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormat;
 
 /**
- *
+ * GUI for specifying how data should be output to a file.
  * @author jbf
  */
 public class ExportDataPanel extends javax.swing.JPanel {
 
     private QDataSet originalDataSet;
     private QDataSet processedDataSet;
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot.export");
             
     /** Creates new form ExportDataPanel */
     public ExportDataPanel() {
@@ -272,8 +278,8 @@ public class ExportDataPanel extends javax.swing.JPanel {
         try {
             URL url = new URL( URISplit.parse(deft).file );  
             chooser.setSelectedFile( new File( url.getFile() ) );
-        } catch ( Exception e ) {
-            
+        } catch ( MalformedURLException e ) {
+            logger.log( Level.WARNING, null, e );
         }
 
         int r = chooser.showSaveDialog(this);
