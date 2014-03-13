@@ -46,6 +46,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -3447,6 +3448,15 @@ private void updateFrameTitle() {
     }
 
 
+    /**
+     * get the runnable for the script.
+     * @param app the application UI, if not headless.
+     * @param model
+     * @param script
+     * @param scriptArgs
+     * @param quit
+     * @return 
+     */
     private static Runnable getRunScriptRunnable( final AutoplotUI app, 
             final ApplicationModel model, final String script, 
             final List<String> scriptArgs, final boolean quit  ) {
@@ -3459,14 +3469,13 @@ private void updateFrameTitle() {
                     ScriptContext.setApplicationModel(model); // initialize
                     JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
-                    if ( quit ) { //TODO: headless doesn't seem to work
+                    if ( quit ) { 
                         AppManager.getInstance().quit();
                     }
-                } catch (IOException ex) {
-                    throw new IllegalArgumentException(ex);
-                } catch ( Exception ex ) {
+                } catch ( IOException ex ) {
                     if ( quit ) {
                         logger.log( Level.WARNING, ex.getMessage(), ex );
+                        ex.printStackTrace();
                         AppManager.getInstance().quit(1);
                     } else {
                         model.getExceptionHandler().handle(ex);
@@ -3773,16 +3782,18 @@ APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
                 
-                Runnable checkStatusRunnable= new Runnable() {
-                    @Override
-                    public void run() {
-                        checkStatusLoop(app);
-                    }
-                };
-                new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
-                        //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
-                    }
-                });
+                if ( app!=null ) {
+                    Runnable checkStatusRunnable= new Runnable() {
+                        @Override
+                        public void run() {
+                            checkStatusLoop(app);
+                        }
+                    };
+                    new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
+                            //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
+                }
+            };
+        } );
     }
 
     /**
