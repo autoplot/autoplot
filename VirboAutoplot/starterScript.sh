@@ -14,6 +14,9 @@
 #
 # This file is still a valid jar file and may be inspected by standard tools
 # such as "unzip".
+#
+#  -h  --headless   run in headless mode
+#  -Jxxx            pass argument xxx to JRE
 
 JAVA_ARGS=""
 AP_ARGS=""
