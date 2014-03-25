@@ -562,11 +562,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             ele.appendChild( doc.createTextNode( String.valueOf( data.get(APP_COUNT)) ) );
             e.appendChild(ele);
             
+            formatException( doc, e, t );
+
             formatBuildInfos( doc, e, bis );
 
             formatPlatform( doc, e );
-
-            formatException( doc, e, t );
 
             ele= doc.createElement( "uncaught" );
             ele.appendChild( doc.createTextNode( String.valueOf(uncaught) ) );
