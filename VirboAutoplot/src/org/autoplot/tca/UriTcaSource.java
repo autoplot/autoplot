@@ -239,6 +239,7 @@ public class UriTcaSource extends AbstractQFunction {
                             }
                             result= result1;
                         } else {
+                            logger.log( Level.INFO, "tick {0} is outside bounds of loaded data ({1})", new Object[]{DataSetUtil.asDatum(d0), tsb.getTimeRange()});
                             BundleDataSet result1= new BundleDataSet( error );
                             for ( int i=1; i<ds.length(0); i++ ) {
                                 result1.bundle(error);
