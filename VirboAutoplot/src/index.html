@@ -25,12 +25,13 @@
         to resolve old numbers.
         <p>Bugfixes (2014-03-24):</p>
         <ul>
+            <li>rte1171026815: runtime error during transitions due to unplottable bundle stored in series renderer.</li>
+            <li>#03B1&semi; prints "xxx" so that its more clear that it should have been #x03B1&semi;
             <li>USER_PROPERTIES from Ascii reader caused crash when FFTPower was looking for Translation property.  Thanks Scott for pointing this out!</li>            
             <li>FileStorageModelNew renamed to FileStorageModel after 7 years...</li>
             <li>experiment with Jython setOutputParam where output parameters can be better documented.</li>
             <li>1163: CDF editor should show hidden support variable when re-entering the dialog.</li>
             <li>JNLP clean up to avoid extra dialog.  Thanks Andy!</li>
-            <li>Refactor FileStorageModelNew -> FileStorageModel after Larry pointed out the dumb name.  I've been meaning to do this for years.</li>
             <li>in the das2server data source, there was still icon loading off on the event thread, which I could see with my slow server.</li>
             <li>when the aggregating data source detects there are no files, use a monitor when getting the representative file.</li>
             <li>2-channel .wav output fixed.</li>
