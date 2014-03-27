@@ -84,6 +84,13 @@ public class UriTcaSource extends AbstractQFunction {
         }
         needToRead= false; // clear the flag in case there is an exception.
         ds= dss.getDataSet( mon );
+        if ( this.tsb!=null && ds!=null ) {
+            DatumRange dr= this.tsb.getTimeRange();
+            QDataSet ext= Ops.extent( SemanticOps.xtagsDataSet(ds), null );
+            double d0= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(0) ) );
+            double d1= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(1) ) );
+            logger.log(Level.FINE, "normalized after load: {0}-{1}", new Object[]{d0, d1});
+        }
         bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
         if ( bundleDs==null ) {
             if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
@@ -134,6 +141,7 @@ public class UriTcaSource extends AbstractQFunction {
         }
     }
 
+    @Override
     public synchronized QDataSet value(QDataSet parm) {
 
         if ( initialError!=null ) {
@@ -179,6 +187,8 @@ public class UriTcaSource extends AbstractQFunction {
                 return new BundleDataSet( errorNoDs );
             }
 
+            logger.log( Level.FINER, "loaded dataset: {0} {1} ", new Object[]{ tsb.getTimeRange(), ds } );
+            
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             QDataSet d0= parm.slice(0);
 
@@ -191,7 +201,7 @@ public class UriTcaSource extends AbstractQFunction {
             QDataSet result;
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
-                result= ds.slice(ii);
+                result= ds.slice(ii); 
                 if ( !isValid(result) ) { // pick a relavant near neighbor
                     findex= Ops.findex( dep0, Ops.subtract( d0, deltaMinus ) );
                     int imin= (int)( findex.value() + 0.5 );
@@ -214,6 +224,20 @@ public class UriTcaSource extends AbstractQFunction {
                             }
                         }
                     }
+                } else {
+                    
+                    logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result.value(result.length()-1)});
+                    if ( deltaPlus!=null ) {
+                        QDataSet delta= Ops.abs( Ops.subtract( d0, dep0.slice(ii) ) );
+                        if ( Ops.gt( delta, Ops.add(deltaPlus,deltaMinus) ).value()==1 ) {
+                            BundleDataSet result1=  new BundleDataSet( nonValueDs );
+                            for ( int i=1; i<ds.length(0); i++ ) {
+                                result1.bundle(nonValueDs);
+                            }
+                            result= result1;
+                        }
+                    }
+                    
                 }
 
             } else {
@@ -239,7 +263,8 @@ public class UriTcaSource extends AbstractQFunction {
                             }
                             result= result1;
                         } else {
-                            logger.log( Level.INFO, "tick {0} is outside bounds of loaded data ({1})", new Object[]{DataSetUtil.asDatum(d0), tsb.getTimeRange()});
+                            logger.log( Level.INFO, "tick {0} is outside bounds of loaded data ({1}) {2}",
+                                    new Object[]{DataSetUtil.asDatum(d0), tsb.getTimeRange(), ds });
                             BundleDataSet result1= new BundleDataSet( error );
                             for ( int i=1; i<ds.length(0); i++ ) {
                                 result1.bundle(error);
@@ -266,6 +291,7 @@ public class UriTcaSource extends AbstractQFunction {
 
     }
 
+    @Override
     public synchronized QDataSet exampleInput() {
 
         Datum t0;
