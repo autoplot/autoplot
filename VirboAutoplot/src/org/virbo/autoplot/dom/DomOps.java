@@ -9,8 +9,13 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.graph.DasRow;
+import org.das2.util.LoggerManager;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -23,6 +28,9 @@ import org.virbo.datasource.DataSourceUtil;
  * @author jbf
  */
 public class DomOps {
+    
+    private static final Logger logger = LoggerManager.getLogger("autoplot.dom");
+    
     /**
      * swap the position of the two plots.  If one plot has its tick labels hidden,
      * then this is swapped as well.
@@ -289,16 +297,40 @@ public class DomOps {
         Row[] rows= canvas.getRows();
         int nrow= rows.length;
 
+        //kludge: check for duplicate names of rows.  Use the first one found.
+        Map<String,Row> rowsCheck= new HashMap();
+        List<Row> rm= new ArrayList<Row>();
+        for ( int i=0; i<nrow; i++ ) {           
+           List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
+
+           if ( plots.size()>0 ) {
+               if ( rowsCheck.containsKey(rows[i].getId()) ) {
+                   logger.log(Level.FINE, "duplicate row id: {0}", rows[i].getId());
+                   rm.add( rows[i] );
+               } else {
+                   rowsCheck.put( rows[i].getId(), rows[i] );
+               }
+            } else {
+               logger.log(Level.FINE, "unused row: {0}", rows[i]);
+               rm.add( rows[i] );
+           }
+        }
+        for ( Row r : rm ) {
+            canvas.getController().deleteRow(r);
+        }
+        rows= canvas.getRows();
+        nrow= rows.length;
+ 
         double totalPlotHeight= 0;
-        for ( int i=0; i<nrow; i++ ) {
+        for ( int i=0; i<nrow; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
            if ( plots.size()>0 ) {
                DasRow dasRow= rows[i].getController().dasRow;
                totalPlotHeight= totalPlotHeight + dasRow.getHeight();
-            }
+           }
         }
-
+        
         double [] MaxUp= new double[ nrow ];
         double [] MaxDown= new double[ nrow ];
 
@@ -306,8 +338,7 @@ public class DomOps {
             List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
             double MaxUpJEm;
             double MaxDownJ;
-            for ( int j=0; j<plots.size(); j++ ) {
-                Plot plotj= plots.get(j);
+            for ( Plot plotj : plots ) {
                 String title= plotj.getTitle();
                 MaxUpJEm= plotj.isDisplayTitle() ? lineCount(title) : 0.;
                 if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
