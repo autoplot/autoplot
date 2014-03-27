@@ -320,7 +320,7 @@ public class DomUtil {
      * return the child diff in the context of the parent node.  May return
      * null if the diff cannot be described.
      * @param childName
-     * @param diff
+     * @param diffs
      * @return
      */
     public static List<Diff> childDiffs(String childName, List<Diff> diffs) {
@@ -335,8 +335,8 @@ public class DomUtil {
     /**
      * returns the index by ID, not by equals.  Equals cannot be 
      * overriden, because property change diffs, etc.
-     * @param nodes
-     * @param node
+     * @param nodes list of nodes
+     * @param node the node to search for
      * @return the index or -1.
      */
     public static int indexOf(List<Object> nodes, Object node) {
@@ -359,12 +359,12 @@ public class DomUtil {
     /**
      * list the differences in two arrays of the same type of object.
      * This is the diffs that will make nodes2 look like nodes1.
-     * Presently this just identies inserts and deletes.  If the objects
+     * Presently this just identifies inserts and deletes.  If the objects
      * are DomNodes, then ids are used to match nodes.
-     * @param property
-     * @param node1
-     * @param node2
-     * @return
+     * @param property name used to identify the difference in the result.
+     * @param nodes1 list of nodes
+     * @param nodes2 list of nodex
+     * @return list of Diffs between the lists.
      */
     public static List<Diff> getArrayDiffs(String property, Object[] nodes1, Object[] nodes2) {
         List<Diff> result = new LinkedList<Diff>();
