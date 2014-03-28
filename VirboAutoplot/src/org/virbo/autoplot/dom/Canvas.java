@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * The state of the canvas which is the area on which plots are drawn.
  * @author jbf
  */
 public class Canvas extends DomNode {

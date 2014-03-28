@@ -8,9 +8,11 @@ package org.virbo.autoplot.dom;
 import java.util.List;
 
 /**
- * Dom node peer for DasRow
+ * Represents a vertical position on the page.  Rows are specified
+ * relative to a parent, which can be the canvas or another row.
  * @author jbf
  */
+
 public class Row extends DomNode {
 
     protected String parent="";

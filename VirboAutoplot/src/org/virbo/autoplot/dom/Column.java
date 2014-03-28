@@ -8,7 +8,8 @@ package org.virbo.autoplot.dom;
 import java.util.List;
 
 /**
- * Dom node peer for DasRow
+ * Represents a horizontal position on the page.  Columns are specified
+ * relative to a parent, which can be the canvas or another column.
  * @author jbf
  */
 public class Column extends DomNode {

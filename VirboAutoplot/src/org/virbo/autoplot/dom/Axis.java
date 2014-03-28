@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
 
 /**
- * The state of an axis, X, Y, or a Z axis colorbar.
+ * The state of an axis, X, Y, or a Z axis colorbar, such as range and the
+ * scale type.
  * @author jbf
  */
 public class Axis extends DomNode {

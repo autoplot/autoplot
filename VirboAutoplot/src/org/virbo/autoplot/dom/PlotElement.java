@@ -10,7 +10,8 @@ import java.util.List;
 import org.virbo.autoplot.RenderType;
 
 /**
- *
+ * Represents the method for painting data on to a plot, and filters that
+ * are applied to the data before plotting.
  * @author jbf
  */
 public class PlotElement extends DomNode {

@@ -13,7 +13,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 
 /**
- *
+ * Represents a state of the application as a whole, with its one canvas and
+ * multiple plots, axes, and bindings.
  * @author jbf
  */
 public class Application extends DomNode {
