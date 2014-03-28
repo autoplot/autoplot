@@ -480,6 +480,8 @@ public class AutoplotUtil {
                 w.println("#AP_WGET=/usr/local/wget");
                 w.println("# use curl to download data instead of Java's built-in network protocols. Should be command line or empty.");
                 w.println("#AP_CURL=/usr/bin/curl");
+                w.println("# provide option in save dialog to embed data within a zip file.");
+                w.println("#allowEmbedData=true");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed", propFile );
