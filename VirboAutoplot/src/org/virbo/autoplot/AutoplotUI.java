@@ -3381,7 +3381,7 @@ private void updateFrameTitle() {
                     return;
                 }
 
-                if ( url!=null ) { // check for relative filenames 
+                if ( url!=null && url.length()>1 ) { // check for relative filenames 
                     int i= url.indexOf(":");
                     if ( i==-1 ) { // it's a file.
                         boolean isAbsolute= url.startsWith("/");
@@ -3626,7 +3626,7 @@ private void updateFrameTitle() {
             }
         }
         
-        if ( initialURL!=null ) { // check for relative filenames 
+        if ( initialURL!=null && initialURL.length()>1 ) { // check for relative filenames 
             int i= initialURL.indexOf(":");
             if ( i==-1 ) { // it's a file.
                 boolean isAbsolute= initialURL.startsWith("/");
