@@ -3365,10 +3365,10 @@ private void updateFrameTitle() {
 
                 String url;
                 if (alm.getValue("URI") != null) {
-                    url = alm.getValue("URI");
+                    url = alm.getValue("URI").trim();
                     logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", url );
                 } else if ( alm.getValue("open") !=null ) {
-                    url = alm.getValue("open");
+                    url = alm.getValue("open").trim();
                     logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", url );
                 } else {
                     url = null;
@@ -3381,6 +3381,24 @@ private void updateFrameTitle() {
                     return;
                 }
 
+                if ( url!=null ) { // check for relative filenames 
+                    int i= url.indexOf(":");
+                    if ( i==-1 ) { // it's a file.
+                        boolean isAbsolute= url.startsWith("/");
+                        if ( !isAbsolute ) {
+                            try {
+                                String pwd= new File(".").getCanonicalPath();
+                                if ( pwd.length()>2 ) {
+                                    pwd= pwd + "/"; //TODO: Windows...
+                                }
+                                url= pwd + url;
+                            } catch ( IOException ex ) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                
                 String pos= alm.getValue("position");
 
                 if ( pos!=null ) {
@@ -3588,14 +3606,14 @@ private void updateFrameTitle() {
         System.err.println(welcome);
         logger.info(welcome);
         final ApplicationModel model = new ApplicationModel();
-        final String initialURL;
+        String initialURL;
         final String bookmarks;
 
         if (alm.getValue("URI") != null) {
-            initialURL = alm.getValue("URI");
+            initialURL = alm.getValue("URI").trim();
             logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else if ( alm.getValue("open") !=null ) {
-            initialURL = alm.getValue("open");
+            initialURL = alm.getValue("open").trim();
             logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else {
             initialURL = null;
@@ -3607,7 +3625,27 @@ private void updateFrameTitle() {
                 JOptionPane.showMessageDialog( null, "<html>open= switch is missing -- prefix: should be<br>--"+initialURL, "open= switch is missing -- ", JOptionPane.ERROR_MESSAGE );
             }
         }
-
+        
+        if ( initialURL!=null ) { // check for relative filenames 
+            int i= initialURL.indexOf(":");
+            if ( i==-1 ) { // it's a file.
+                boolean isAbsolute= initialURL.startsWith("/");
+                if ( !isAbsolute ) {
+                    try {
+                        String pwd= new File(".").getCanonicalPath();
+                        if ( pwd.length()>2 ) {
+                            pwd= pwd + "/"; //TODO: Windows...
+                        }
+                        initialURL= pwd + initialURL;
+                    } catch ( IOException ex ) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        final String finitialURL= initialURL;
+        
         bookmarks= alm.getValue("bookmarks");
 
         if (alm.getBooleanValue("scriptPanel")) {
@@ -3742,9 +3780,9 @@ APSplash.checkTime("init 220");
                         public void run() {
                             if ( app!=null ) {
                                 app.applicationModel.canvas.repaint();
-                                if ( initialURL==null || ! ( initialURL.startsWith("pngwalk:") 
-                                        || initialURL.endsWith(".pngwalk") 
-                                        || initialURL.contains(".pngwalk?" ) ) ) app.setVisible(true);
+                                if ( finitialURL==null || ! ( finitialURL.startsWith("pngwalk:") 
+                                        || finitialURL.endsWith(".pngwalk") 
+                                        || finitialURL.contains(".pngwalk?" ) ) ) app.setVisible(true);
                             }
                             if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
@@ -3763,8 +3801,8 @@ APSplash.checkTime("init 220");
 
                 }
 APSplash.checkTime("init 230");
-                if ( !headless && initialURL!=null) {
-                    if ( app!=null ) app.dataSetSelector.setValue(initialURL);
+                if ( !headless && finitialURL!=null) {
+                    if ( app!=null ) app.dataSetSelector.setValue(finitialURL);
                     if ( app!=null ) app.dataSetSelector.maybePlot(false);
                 }
                 
