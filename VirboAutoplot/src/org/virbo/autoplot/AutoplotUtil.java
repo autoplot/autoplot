@@ -466,12 +466,20 @@ public class AutoplotUtil {
             PrintWriter w=null;
             try {
                 w= new PrintWriter( new FileWriter( propFile ) );
+                w.println("# Autoplot loads these system properties on startup.  See http://autoplot.org/systemProperties");
+                w.println("#");
                 w.println("# reference cache allows some URIs to be resolved once per plot.");
                 w.println("#enableReferenceCache=true");
                 w.println("# use new LANL-requested Nearest Neighbor rebinning that looks at bin boundaries.");
                 w.println("#useLanlNearestNeighbor=true");
                 w.println("# do check on index and rank with commonly used datasets, at a slight performance cost.");
                 w.println("#rangeChecking=true");
+                w.println("#email RTEs by default, instead of HTTP POST, when firewall prohibits put calls.");
+                w.println("#autoplot.emailrte=true");
+                w.println("# use wget to download data instead of Java's built-in network protocols. Should be command line or empty.");
+                w.println("#AP_WGET=/usr/local/wget");
+                w.println("# use curl to download data instead of Java's built-in network protocols. Should be command line or empty.");
+                w.println("#AP_CURL=/usr/bin/curl");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed", propFile );
