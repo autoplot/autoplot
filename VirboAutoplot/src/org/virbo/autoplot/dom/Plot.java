@@ -11,7 +11,9 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.LegendPosition;
 
 /**
- *
+ * Represents a 2-D plot with an X and Y axis, and "Z" axis that is often hidden or
+ * implemented with a color bar.
+ * 
  * @author jbf
  */
 public class Plot extends DomNode {
@@ -111,7 +113,7 @@ public class Plot extends DomNode {
         this.displayLegend = displayLegend;
         propertyChangeSupport.firePropertyChange(PROP_DISPLAYLEGEND, oldDisplayLegend, displayLegend);
     }
-
+ 
     /**
      * indicates that the label was set by a machine, not a human, and can be
      * updated automatically.
