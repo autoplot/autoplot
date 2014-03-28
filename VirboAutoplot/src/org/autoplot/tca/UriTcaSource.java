@@ -38,6 +38,7 @@ public class UriTcaSource extends AbstractQFunction {
     TimeSeriesBrowse tsb;
     boolean needToRead;
     QDataSet ds;
+    QDataSet tlim;
     QDataSet bundleDs;
     DataSource dss;
     QDataSet error;
@@ -84,6 +85,8 @@ public class UriTcaSource extends AbstractQFunction {
         }
         needToRead= false; // clear the flag in case there is an exception.
         ds= dss.getDataSet( mon );
+        tlim= DataSetUtil.guessCadenceNew( SemanticOps.xtagsDataSet(ds), ds );
+            
         if ( this.tsb!=null && ds!=null ) {
             DatumRange dr= this.tsb.getTimeRange();
             QDataSet ext= Ops.extent( SemanticOps.xtagsDataSet(ds), null );
@@ -228,8 +231,8 @@ public class UriTcaSource extends AbstractQFunction {
                     
                     logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result.value(result.length()-1)});
                     if ( deltaPlus!=null ) {
-                        QDataSet delta= Ops.abs( Ops.subtract( d0, dep0.slice(ii) ) );
-                        if ( Ops.gt( delta, Ops.add(deltaPlus,deltaMinus) ).value()==1 ) {
+                        QDataSet delta= Ops.magnitude( Ops.subtract( d0, dep0.slice(ii) ) );
+                        if ( Ops.gt( delta, tlim ).value()==1 ) {
                             BundleDataSet result1=  new BundleDataSet( nonValueDs );
                             for ( int i=1; i<ds.length(0); i++ ) {
                                 result1.bundle(nonValueDs);
