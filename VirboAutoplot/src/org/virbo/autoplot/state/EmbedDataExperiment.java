@@ -58,7 +58,11 @@ public class EmbedDataExperiment {
         }
     }
     
-    public static class NoCloseOutputStream extends OutputStream {
+    /**
+     * stream that forwards data on to another stream (out) that 
+     * is not closed when this stream is closed.
+     */
+    private static class NoCloseOutputStream extends OutputStream {
         OutputStream out;
         
         NoCloseOutputStream( OutputStream out ) {
