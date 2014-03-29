@@ -77,6 +77,30 @@ public class EmbedDataExperiment {
     }
     
     /**
+     * remove double slashes from file part of URI.
+     * @param uri
+     * @return 
+     */
+    private static URI makeCanonical( URI uri ) {
+        try {
+            String path= uri.getPath();
+            String [] pp= path.split("/");
+            StringBuilder np= new StringBuilder();
+            for ( String p: pp ) {
+                if ( p.length()>0 ) {
+                    np.append("/");
+                    np.append(p);
+                }
+            }
+            path= np.toString();
+            return new URI( uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path, uri.getQuery(), uri.getFragment() );
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(EmbedDataExperiment.class.getName()).log(Level.SEVERE, null, ex);
+            return uri;
+        }
+    }
+    
+    /**
      * return a list of all the resources used in the DOM.
      * @param dom
      * @return 
@@ -84,12 +108,13 @@ public class EmbedDataExperiment {
     private static Set<URI> getResources( Application dom ) {
         Set<URI> result= new HashSet();
         for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
-            String uri = dsf.getUri();
-            URISplit split= URISplit.parse(uri);
+            String suri = dsf.getUri();
+            URISplit split= URISplit.parse(suri);
             if ( split.resourceUri!=null ) {
-                if ( DataSetURI.isAggregating(split.resourceUri.toString()) ) {
+                URI uri= makeCanonical( split.resourceUri );
+                if ( DataSetURI.isAggregating( uri.toString() ) ) {
                     try {
-                        String [] rr= DataSetURI.unaggregate( split.resourceUri.toASCIIString(), dom.getTimeRange() );
+                        String [] rr= DataSetURI.unaggregate( uri.toASCIIString(), dom.getTimeRange() );
                         for ( String r: rr ) {
                             try {
                                 result.add( new URI( r ) );
@@ -105,7 +130,7 @@ public class EmbedDataExperiment {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 } else {
-                    result.add( split.resourceUri );
+                    result.add( uri );
                 }
             }
         }
