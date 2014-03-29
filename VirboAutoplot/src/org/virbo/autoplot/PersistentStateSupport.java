@@ -292,7 +292,11 @@ public class PersistentStateSupport {
             public void run() {
                 try {
                     File f= file;
-                    if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
+                    if ( embedData ) {
+                        if ( !f.getName().endsWith("zip") ) f= new File( f.getPath()+"zip" );                        
+                    } else {
+                        if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
+                    }
 
                     if ( f.exists() ) {
                         if ( !f.canWrite() ) {
