@@ -85,44 +85,50 @@ public class UriTcaSource extends AbstractQFunction {
         }
         needToRead= false; // clear the flag in case there is an exception.
         ds= dss.getDataSet( mon );
-        tlim= DataSetUtil.guessCadenceNew( SemanticOps.xtagsDataSet(ds), ds );
-            
-        if ( this.tsb!=null && ds!=null ) {
-            DatumRange dr= this.tsb.getTimeRange();
-            QDataSet ext= Ops.extent( SemanticOps.xtagsDataSet(ds), null );
-            double d0= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(0) ) );
-            double d1= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(1) ) );
-            logger.log(Level.FINE, "normalized after load: {0}-{1}", new Object[]{d0, d1});
-        }
-        bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
-        if ( bundleDs==null ) {
-            if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
-                DDataSet bds1= DDataSet.createRank2(1,0);
-                String name= (String) ds.property(QDataSet.NAME);
-                String label= (String) ds.property(QDataSet.LABEL);
-                bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
-                bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
-                if ( ds.property(QDataSet.VALID_MIN)!=null ) bds1.putProperty( QDataSet.VALID_MIN, 0, ds.property(QDataSet.VALID_MIN) );
-                if ( ds.property(QDataSet.VALID_MAX)!=null ) bds1.putProperty( QDataSet.VALID_MAX, 0, ds.property(QDataSet.VALID_MAX) );
-                if ( ds.property(QDataSet.FILL_VALUE)!=null ) bds1.putProperty( QDataSet.FILL_VALUE, 0, ds.property(QDataSet.FILL_VALUE) );
-                bundleDs= bds1;
-            } else {
-                DDataSet bds1= DDataSet.createRank2(ds.length(0),0);
-                QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
-                Units u= dep1==null ? Units.dimensionless : SemanticOps.getUnits(dep1);
-                for ( int i=0; i<ds.length(0); i++ ) {
-                    String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
-                    String label= (String) ds.property(QDataSet.LABEL);
-                    bds1.putProperty( QDataSet.NAME, i, "ds"+i );
-                    bds1.putProperty( QDataSet.LABEL, i, label==null ?  ( name==null ? "" : name ) : label );
-                }
-                bundleDs= bds1;
+        
+        if ( ds==null ) {
+            logger.log(Level.FINE, "doRead getDataSet got null ");
+        } else {
+            logger.log(Level.FINE, "doRead got: {0}", ds);
+            tlim= DataSetUtil.guessCadenceNew( SemanticOps.xtagsDataSet(ds), ds );
+
+            if ( this.tsb!=null ) {
+                DatumRange dr= this.tsb.getTimeRange();
+                QDataSet ext= Ops.extent( SemanticOps.xtagsDataSet(ds), null );
+                double d0= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(0) ) );
+                double d1= DatumRangeUtil.normalize( dr, DataSetUtil.asDatum( ext.slice(1) ) );
+                logger.log(Level.FINE, "normalized after load: {0}-{1}", new Object[]{d0, d1});
             }
+            bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
+            if ( bundleDs==null ) {
+                if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
+                    DDataSet bds1= DDataSet.createRank2(1,0);
+                    String name= (String) ds.property(QDataSet.NAME);
+                    String label= (String) ds.property(QDataSet.LABEL);
+                    bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
+                    bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
+                    if ( ds.property(QDataSet.VALID_MIN)!=null ) bds1.putProperty( QDataSet.VALID_MIN, 0, ds.property(QDataSet.VALID_MIN) );
+                    if ( ds.property(QDataSet.VALID_MAX)!=null ) bds1.putProperty( QDataSet.VALID_MAX, 0, ds.property(QDataSet.VALID_MAX) );
+                    if ( ds.property(QDataSet.FILL_VALUE)!=null ) bds1.putProperty( QDataSet.FILL_VALUE, 0, ds.property(QDataSet.FILL_VALUE) );
+                    bundleDs= bds1;
+                } else {
+                    DDataSet bds1= DDataSet.createRank2(ds.length(0),0);
+                    QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
+                    Units u= dep1==null ? Units.dimensionless : SemanticOps.getUnits(dep1);
+                    for ( int i=0; i<ds.length(0); i++ ) {
+                        String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
+                        String label= (String) ds.property(QDataSet.LABEL);
+                        bds1.putProperty( QDataSet.NAME, i, "ds"+i );
+                        bds1.putProperty( QDataSet.LABEL, i, label==null ?  ( name==null ? "" : name ) : label );
+                    }
+                    bundleDs= bds1;
+                }
+            }
+            
         }
         if ( this.tsb==null ) { // jython scripts can get a TimeSeriesBrowse after the first read.
             tsb= dss.getCapability( TimeSeriesBrowse.class );
         }
-        logger.log(Level.FINE, "  doRead got: {0}", ds);
 
     }
 
@@ -185,12 +191,11 @@ public class UriTcaSource extends AbstractQFunction {
         try {
             if ( read ) {
                 doRead();
+                logger.log( Level.FINER, "loaded dataset: {0} {1} ", new Object[]{ tsb!=null ? tsb.getTimeRange() : "", ds } );
             }
             if ( ds==null ) {
                 return new BundleDataSet( errorNoDs );
             }
-
-            logger.log( Level.FINER, "loaded dataset: {0} {1} ", new Object[]{ tsb.getTimeRange(), ds } );
             
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             QDataSet d0= parm.slice(0);
