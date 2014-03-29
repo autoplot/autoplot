@@ -130,7 +130,14 @@ public class EmbedDataExperiment {
         try {
             out= new ZipOutputStream( fout );
             for ( URI uri: getResources(dom) ) {
-                String name= uri.toString().replaceAll("://","/");
+                String name;
+                if ( uri.getScheme().equals("file")) {
+                   name= uri.toString().replaceAll(":///","/");
+                   name= name.replaceAll(":/", "/" );
+                } else {
+                   name= uri.toString().replaceAll("://","/");     
+                }
+                name= name.replaceAll("//","/");
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
             }
@@ -138,7 +145,14 @@ public class EmbedDataExperiment {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
                 if ( split.resourceUri!=null ) {
-                    String name= split.resourceUri.toString().replaceAll("://","/");
+                    String name;
+                    if ( split.resourceUri.getScheme().equals("file")) {
+                        name= split.resourceUri.toString().replaceAll(":///","/");
+                        name= name.replaceAll(":/", "/" );
+                    } else {
+                        name= uri.toString().replaceAll("://","/");  
+                    }
+                    name= name.replaceAll("//","/");
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
                 }
