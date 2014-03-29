@@ -179,7 +179,7 @@ public class EmbedDataExperiment {
                         name= split.resourceUri.toString().replaceAll(":///","/");
                         name= name.replaceAll(":/", "/" );
                     } else {
-                        name= uri.toString().replaceAll("://","/");  
+                        name= uri.replaceAll("://","/");  
                     }
                     name= name.replaceAll("//","/");
                     split.file= "%{PWD}/"+name;
