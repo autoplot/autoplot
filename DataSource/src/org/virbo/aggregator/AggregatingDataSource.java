@@ -362,8 +362,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     
                     if ( ds1==null ) {
                         logger.warning("delegate returned null");
-                        //ds1 = delegateDataSource.getDataSet(mon1);
-                        continue;
+                        ds1 = delegateDataSource.getDataSet(mon1);
+                        if ( ds1==null ) continue;
                     }
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
