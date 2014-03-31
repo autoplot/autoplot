@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -122,7 +123,6 @@ import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -246,17 +246,19 @@ public class AutoplotUtil {
             
            String oldf= split.file;
 
-           String newf= JOptionPane.showInputDialog( parent,
-            "<html>Current file is<br>"+oldf+"<br><br>Enter New Filename: ",
-             oldf );
+           ReplaceFilePanel p= new ReplaceFilePanel();
+           p.setCurrentFile(oldf);
+           
+           int result= JOptionPane.showConfirmDialog( parent,
+            p, "Replace Filename", JOptionPane.OK_CANCEL_OPTION );
 
-           if ( newf!=null ) {
+           if ( result==JOptionPane.OK_OPTION ) {
 
                 for ( DataSourceFilter i: dom2.getDataSourceFilters() ) {
                     String oldf1= i.getUri();
-                    String newf1= oldf1.replace( oldf, newf );
+                    String newf1= oldf1.replace( oldf, p.getSelectedFile() );
                     i.setUri( newf1 );
-                }  
+                }
                 
                 dom.syncTo(dom2);
                 dom.getController().waitUntilIdle();
