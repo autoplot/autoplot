@@ -6,6 +6,7 @@ package org.virbo.autoplot;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -105,12 +106,34 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
         } else if ( sfile.startsWith("file:") ) {
             sfile= sfile.substring(5);
         }
+        int iext= sfile.lastIndexOf(".");
+        final String ext;
+        if ( iext!=-1 ) {
+            ext= sfile.substring(iext).toLowerCase();
+        } else {
+            ext= null;
+        }
+        
         File current= new File( sfile );
         if ( !current.exists() ) {
             current= current.getParentFile();
         }
         JFileChooser choose= new JFileChooser( current );
-        choose.setVisible(true);
+        if ( ext!=null ) {
+            choose.addChoosableFileFilter( new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    String sf= f.getName();
+                    return sf.toLowerCase().endsWith(ext);
+                }
+
+                @Override
+                public String getDescription() {
+                    return ext + " files";
+                }
+            });
+        }
+        
         if (choose.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.jTextField1.setText( "file://"+ choose.getSelectedFile().getPath() );
         }
