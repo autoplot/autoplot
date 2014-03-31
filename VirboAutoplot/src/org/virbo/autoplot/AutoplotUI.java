@@ -3147,11 +3147,10 @@ private void resetZMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
 private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceFileMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
-    final Component source= (Component)evt.getSource();
     Runnable run= new Runnable() {
         @Override
         public void run() {
-            AutoplotUtil.replaceFile( source,dom );
+            AutoplotUtil.replaceFile( AutoplotUI.this,dom );
         }
     };
     RequestProcessor.invokeLater(run);
