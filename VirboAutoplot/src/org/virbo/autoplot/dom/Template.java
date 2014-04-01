@@ -51,7 +51,7 @@ public class Template extends DomNode {
 
     @Override
     public List<Diff> diffs(DomNode node) {
-        return new ArrayList<Diff>();
+        return DomUtil.getDiffs( this, node );
     }
 
 }
