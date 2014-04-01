@@ -161,6 +161,10 @@ public class ApplicationControllerSyncSupport {
         for ( Connector c:deleteConnectors ) {
             controller.deleteConnector( c );
         }
+        
+        for ( int i=0; i<connectors.length; i++ ) {
+            application.connectors.get(i).syncTo(connectors[i]);
+        }
 
     }
 
