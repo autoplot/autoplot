@@ -460,7 +460,7 @@ public class UndoRedoSupport {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
-            System.err.println( String.format( "saved state file in %d ms", ( System.currentTimeMillis()-t0 ) ) );
+            logger.fine( String.format( "saved state file in %d ms", ( System.currentTimeMillis()-t0 ) ) );
             
         }
 

@@ -282,7 +282,8 @@ public class SerializeUtil {
             Class claz= scheme.getClass(clasName);
             
             if ( claz==null ) {
-                System.err.println("unable to resolve: "+element.getTagName() );
+                logger.log( Level.WARNING, "unable to resolve: {0}", element.getTagName());
+                throw new ParseException("unable to resolve class: "+ clasName, 0 );
             }
 
             node = (DomNode) claz.newInstance();
@@ -305,10 +306,10 @@ public class SerializeUtil {
                 Node k= kids.item(i);
                 if ( k instanceof Element ) {
                     logger.log( Level.FINE, "reading node {0}", k.getNodeName() + k.getAttributes().getNamedItem("name") + " " + k.getAttributes().getNamedItem("value") );
-                    Node nameNode= k.getAttributes().getNamedItem("name");
-                    if ( node instanceof Application && nameNode!=null && nameNode.getNodeValue().equals("connectors") ) {
-                        System.err.println("here connectors");
-                    }
+                    //Node nameNode= k.getAttributes().getNamedItem("name");
+                    //if ( node instanceof Application && nameNode!=null && nameNode.getNodeValue().equals("connectors") ) {
+                    //    System.err.println("here connectors");
+                    //}
                     Element e= (Element)k;
                     try {
                         //System.err.println( e.getAttribute("name") );
@@ -362,13 +363,13 @@ public class SerializeUtil {
                         }
                     } catch ( RuntimeException ex) {
                         if ( scheme.resolveProperty(e, node) ) {
-                            System.err.println("imported "+e.getAttribute("name") );
+                            logger.log(Level.INFO, "imported {0}", e.getAttribute("name"));
                         } else {
                             scheme.addUnresolvedProperty(e,node, ex);
                         }
                     } catch ( Exception ex ) {
                         if ( scheme.resolveProperty(e, node) ) {
-                            System.err.println("imported "+e.getAttribute("name") );
+                            logger.log( Level.INFO, "imported {0}", e.getAttribute("name"));
                         } else {
                             scheme.addUnresolvedProperty(e,node, ex);
                         }

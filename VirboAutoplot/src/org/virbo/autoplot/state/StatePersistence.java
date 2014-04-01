@@ -317,8 +317,8 @@ public class StatePersistence {
                 //throw new RuntimeException("It is no longer possible to convert old " +
                 //        "files at runtime.  Contact Autoplot group at Google groups " +
                 //        "for conversion help." );
-                System.err.println("importing legacy vap file v0.99. ");
-                System.err.println("These must be rewritten to new vap format, support will be dropped.");
+                logger.info("importing legacy vap file v0.99. ");
+                logger.info("These must be rewritten to new vap format, support will be dropped.");
 
                 DOMImplementation impl = document.getImplementation();
                 DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
