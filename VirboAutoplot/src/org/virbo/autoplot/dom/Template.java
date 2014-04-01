@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Template for making new nodes.  There's a lot to get right when 
+ * changing the dom, and this should help.  
+ * Make sure the node is mutable.  I added properties to the Connector
+ * and this was tricky because before it was not mutable.
  * @author jbf
  */
 public class Template extends DomNode {
