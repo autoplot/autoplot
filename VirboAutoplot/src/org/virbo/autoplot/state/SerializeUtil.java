@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
  */
 public class SerializeUtil {
 
-    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.dom");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.dom.vap");
 
     static {
         SerializeRegistry.register( BindingModel.class, new BindingModelSerializeDelegate() );
@@ -67,6 +67,13 @@ public class SerializeUtil {
         SerializeRegistry.register( LegendPosition.class, new TypeSafeEnumSerializeDelegate() );
     }
     
+    /**
+     * Return the XML for the node.
+     * @param document the document to which the node is added.
+     * @param node the dom node (Application, Plot, PlotElement, etc.)
+     * @param scheme the version of the vap that we are writing.  This identifies the scheme, but also provides names for nodes.
+     * @return the Document (XML) element for the node.
+     */
     public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
         try {
             String elementName = scheme.getName(node.getClass());
@@ -86,6 +93,15 @@ public class SerializeUtil {
                 if (propertyName.equals("controller")) {
                     //special node should runtime data
                     continue;
+                }
+
+                // I made the mistake of making the connectors a proper DOM node,
+                // without realizing this was going to affect the vap.  This is
+                // kludge to avoid saving out the node and preserving v1.07 for
+                // the vap files.
+                boolean connectorKludge107= false;
+                if ( propertyName.equals("connectors") ) {
+                    connectorKludge107= true;
                 }
 
                 // setters like "setComponentAutomatically" which should probably not be in the dom node anyway.
@@ -124,7 +140,7 @@ public class SerializeUtil {
                 IndexedPropertyDescriptor ipd = null;
                 if (pd instanceof IndexedPropertyDescriptor) {
                     ipd = (IndexedPropertyDescriptor) pd;
-                }
+                }                
                 if (value instanceof DomNode) {
                     // special optimization, only serialize at the first reference to DCC, afterwards just use name
                     Element propertyElement = document.createElement("property");
@@ -133,7 +149,7 @@ public class SerializeUtil {
                     Element child = getDomElement(document, (DomNode) value, scheme);
                     propertyElement.appendChild(child);
                     element.appendChild(propertyElement);
-                } else if (ipd != null && (DomNode.class.isAssignableFrom(ipd.getIndexedPropertyType()))) {
+                } else if (ipd != null && !connectorKludge107 && (DomNode.class.isAssignableFrom(ipd.getIndexedPropertyType()))) {
                     // serialize each element of the array.  Assumes order doesn't change
                     Element propertyElement = document.createElement("property");
                     propertyElement.setAttribute("name", propertyName);
@@ -146,7 +162,7 @@ public class SerializeUtil {
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
-                } else if (ipd != null) {
+                } else if (ipd != null) { // array of non-DomNodes, such as bindings.
                     Element propertyElement = document.createElement("property");
                     propertyElement.setAttribute("name", propertyName);
                     String clasName = scheme.getName(ipd.getIndexedPropertyType());
@@ -264,6 +280,10 @@ public class SerializeUtil {
             String clasName= element.getNodeName();
 
             Class claz= scheme.getClass(clasName);
+            
+            if ( claz==null ) {
+                System.err.println("unable to resolve: "+element.getTagName() );
+            }
 
             node = (DomNode) claz.newInstance();
 
@@ -284,6 +304,11 @@ public class SerializeUtil {
             for ( int i=0; i<kids.getLength(); i++ ) {
                 Node k= kids.item(i);
                 if ( k instanceof Element ) {
+                    logger.log( Level.FINE, "reading node {0}", k.getNodeName() + k.getAttributes().getNamedItem("name") + " " + k.getAttributes().getNamedItem("value") );
+                    Node nameNode= k.getAttributes().getNamedItem("name");
+                    if ( node instanceof Application && nameNode!=null && nameNode.getNodeValue().equals("connectors") ) {
+                        System.err.println("here connectors");
+                    }
                     Element e= (Element)k;
                     try {
                         //System.err.println( e.getAttribute("name") );
@@ -295,7 +320,8 @@ public class SerializeUtil {
                             Class c= scheme.getClass(clasName);
                             int n= Integer.parseInt(e.getAttribute("length"));
                             Object arr= Array.newInstance( c,n );
-                            if ( DomNode.class.isAssignableFrom(c) ) {
+                            boolean connectorKludge107= c==Connector.class;
+                            if ( !connectorKludge107 && DomNode.class.isAssignableFrom(c) ) {
                                 NodeList arraykids= e.getChildNodes();
                                 int ik=0;
                                 for ( int j=0; j<n; j++ ) { //DANGER
@@ -312,7 +338,7 @@ public class SerializeUtil {
                                 NodeList arraykids= e.getChildNodes();
                                 int ik=0;
                                 for ( int j=0; j<n; j++ ) { //DANGER
-                                    Object c1=null;
+                                    Object c1;
                                     while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
                                     c1 = getLeafNode( (Element) arraykids.item(ik));
                                     ik++;
@@ -324,11 +350,13 @@ public class SerializeUtil {
                             String stype= e.getAttribute("type");
                             if ( !stype.equals("DomNode") ) {
                                 Object child= getLeafNode( e );
+                                logger.log( Level.FINEST, "leafNode={0} type {1}",  new Object[] { child, stype } );
                                 pd.getWriteMethod().invoke( node, child );
                             } else {
                                 Node childElement= e.getFirstChild();
                                 while ( !( childElement instanceof Element ) ) childElement= childElement.getNextSibling();
                                 DomNode child= getDomNode( (Element)childElement, scheme );
+                                logger.log( Level.FINEST, "firstChild={0}", child );
                                 pd.getWriteMethod().invoke( node, child );
                             }
                         }
@@ -350,7 +378,7 @@ public class SerializeUtil {
 
             String unres= scheme.describeUnresolved();
             if ( unres!=null && unres.trim().length()>0 ) {
-                System.err.println(unres);
+                logger.log( Level.WARNING, "Unresolved: {0}", unres);
             }
 
             return node;
