@@ -26,7 +26,6 @@ import org.das2.graph.LegendPosition;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.system.DasLogger;
 import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.qstream.SerializeDelegate;
@@ -65,6 +64,7 @@ public class SerializeUtil {
         SerializeRegistry.register( MouseModuleType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( PlotSymbol.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( LegendPosition.class, new TypeSafeEnumSerializeDelegate() );
+        SerializeRegistry.register( Level.class, new LevelSerializeDelegate() );
     }
     
     /**
@@ -179,6 +179,7 @@ public class SerializeUtil {
                     Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
                     if (prop == null) {
                         logger.log(Level.WARNING, "unable to serialize {0}", propertyName);
+                        prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
                         continue;
                     }
                     prop.setAttribute("name", pd.getName());
