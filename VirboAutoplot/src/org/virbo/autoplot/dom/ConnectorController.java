@@ -33,6 +33,7 @@ public class ConnectorController extends DomNodeController  {
     
     public void removeBindings() {
         ApplicationController ac= dom.controller;
+        ac.unbind( this.connector );
         //TODO: undelete the bindings.
     }
 
