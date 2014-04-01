@@ -680,6 +680,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
         final Connector connector = new Connector(upperPlot.getId(), lowerPlot.getId());
         connectors.add(connector);
+        connector.setController( new ConnectorController(application, connector) );
 
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
@@ -697,6 +698,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         overviewPlotConnector.setBottomCurtain(true);
         overviewPlotConnector.setCurtainOpacityPercent(80);
 
+        connector.getController().bindTo(overviewPlotConnector);
+        
         MouseModule mm = new ColumnColumnConnectorMouseModule(upper, lower);
         overviewPlotConnector.getDasMouseInputAdapter().setSecondaryModule(mm);
         overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(mm);
@@ -724,7 +727,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         connectors.remove(connector);
 
         connectorImpls.remove(connector);
-
+        connector.getController().removeBindings();
+        
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
 
