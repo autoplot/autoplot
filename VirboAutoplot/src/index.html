@@ -25,6 +25,7 @@
         to resolve old numbers.
         <p>Bugfixes (2014-03-24):</p>
         <ul>
+            <li>1174: connector properties were not saved to vap file.</li>
             <li>embed data didn't work properly with local files, because of double slashes that matter in zip files.</li>
             <li>improve handling of ephemeris ticks (TCA) when TCA data has gaps by limiting interpolation gaps.</li>
             <li>getPropertyType had Number as the type of SCALE_TYPE, not String.</li>
@@ -81,6 +82,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>replaceFile dialog improved with pickfile button.</li>
             <li>allowEmbedData system property added to support maturing this feature.</li>
             <li>AP_WGET, AP_CURL, allowEmbedData added to autoplot_data/config/system.properties</li>
             <li>autoplot.jar launch script allows relative URIs, so "autoplot myfile.cdf" now works from command line.</li>
