@@ -247,7 +247,9 @@ public class Application extends DomNode {
         result.setPlotElements( peleCopy );
 
         Connector[] connectorsCopy= this.getConnectors();
-        System.arraycopy(connectorsCopy, 0, connectorsCopy, 0, connectorsCopy.length);
+        for ( int i=0; i<connectorsCopy.length; i++ ) {
+            connectorsCopy[i]= (Connector)connectorsCopy[i].copy(); // this was way to hard to uncover...
+        }
         result.setConnectors( connectorsCopy );
         
         Canvas[] canvasesCopy= this.getCanvases();
@@ -346,6 +348,12 @@ public class Application extends DomNode {
             result.addAll( DomUtil.childDiffs( "plots["+i+"]", thatPlot.diffs( thisPlot ) ) );
         }
 
+        for ( int i=0; i<Math.min(this.connectors.size(),that.connectors.size()); i++ ) {
+            Connector thisConnector= this.connectors.get(i);
+            Connector thatConnector= that.connectors.get(i);
+            result.addAll( DomUtil.childDiffs( "connectors["+i+"]", thatConnector.diffs( thisConnector ) ) );
+        }
+        
         for ( int i=0; i<Math.min(this.plotElements.size(),that.plotElements.size()); i++ ) {
             result.addAll( DomUtil.childDiffs( "plotElements["+i+"]", that.getPlotElements(i).diffs( this.plotElements.get(i) ) ) );
         }
