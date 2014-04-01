@@ -23,6 +23,7 @@ public abstract class AbstractVapScheme implements VapScheme {
         this.packg= "org.virbo.autoplot.dom";
     }
     
+    @Override
     public Class getClass(String clasName) {
         if ( !clasName.contains(".") )  clasName= packg + "." + clasName;
         Class c;
@@ -34,6 +35,7 @@ public abstract class AbstractVapScheme implements VapScheme {
         return c;
     }
 
+    @Override
     public String getName(Class clas) {
         String elementName= clas.getName();
         if ( elementName.startsWith(packg+".") ) {
@@ -43,20 +45,22 @@ public abstract class AbstractVapScheme implements VapScheme {
         return elementName;
     }
 
+    @Override
     public void addUnresolvedProperty( Element element, DomNode node, Exception exception) {
         String name =element.getAttribute("name");
         if ( name.length()==0 ) {
             name= element.getNodeName();
         }
         String value= element.getAttribute("value");
-        unresolved.add( node.getId() + "  " + name + "=" +value + "  "+exception );
+        unresolved.add( node.getId() + "  name=" + name + " value=\"" +value + "\"  "+exception );
         
     }
 
+    @Override
     public String describeUnresolved() {
-        StringBuffer buf= new StringBuffer();
+        StringBuilder buf= new StringBuilder();
         for ( String s: unresolved ) {
-            buf.append( s + "\n" );
+            buf.append(s).append( "\n");
         }
         return buf.toString();
     }
