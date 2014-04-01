@@ -994,7 +994,7 @@ APSplash.checkTime("init 270");
                         undoRedoSupport.pushState(evt,messages.get(0)); // named undo operation
                     } else {
                         //undoRedoSupport.pushState(evt,messages.get(0));
-                        undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
+                        undoRedoSupport.pushState(evt,String.format("%d changes",messages.size())); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
                     }
                 } else if ( messages.size()==1 ) {
                     if ( messages.get(0).contains(" from ") ) {
