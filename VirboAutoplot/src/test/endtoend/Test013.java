@@ -401,6 +401,7 @@ public class Test013 {
             PrintStream fout= new PrintStream("exception.qds");
             fout.println("[00]000067<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             fout.println("<stream dataset_id=\"ds_0\"/>");
+            //TODO: putting 143 characters resulted in the parser hanging.
             fout.println("[xx]000144<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             fout.println("<exception type=\"NoDataInInterval\" message=\"No data found in interval.  Last data found at 2012-02-01\"/>");
             fout.close();
