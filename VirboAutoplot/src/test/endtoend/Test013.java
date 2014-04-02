@@ -401,14 +401,14 @@ public class Test013 {
 
     private static void testException() {
         try {
-            PrintStream fout= new PrintStream("exception.qds");
+            PrintStream fout= new PrintStream("test013_exception.qds");
             fout.println("[00]000067<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             fout.println("<stream dataset_id=\"ds_0\"/>");
             //TODO: putting 143 characters resulted in the parser hanging.
             fout.println("[xx]000144<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             fout.println("<exception type=\"NoDataInInterval\" message=\"No data found in interval.  Last data found at 2012-02-01\"/>");
             fout.close();
-            InputStream in = new FileInputStream("exception.qds");
+            InputStream in = new FileInputStream("test013_exception.qds");
             ReadableByteChannel rin= Channels.newChannel(in);
             QDataSetStreamHandler h= new QDataSetStreamHandler();
             try {
@@ -429,7 +429,7 @@ public class Test013 {
         try {
             SimpleStreamFormatter ssf= new SimpleStreamFormatter();
             QDataSet ds= Util.getDataSet("vap+inline:ripples(5,4)&DEPEND_1=pow(10,linspace(1,3,4))&DEPEND_0=timegen('2013-04-04T00:00','60 sec',5)");
-            File f= new File("spectrogram.qds");
+            File f= new File("test013_spectrogram.qds");
             ssf.format( ds, new FileOutputStream(f),true);
             readStream(f);
         } catch (Exception ex) {
