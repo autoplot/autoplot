@@ -19,6 +19,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
@@ -26,6 +27,7 @@ import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.FDataSet;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -35,6 +37,7 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 import static org.virbo.dsops.Ops.*;
+import org.virbo.jythonsupport.Util;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
@@ -422,10 +425,24 @@ public class Test013 {
         }
     }
     
+    private static void testRank2Spectrogram() {
+        try {
+            SimpleStreamFormatter ssf= new SimpleStreamFormatter();
+            QDataSet ds= Util.getDataSet("vap+inline:ripples(5,4)&DEPEND_1=pow(10,linspace(1,3,4))&DEPEND_0=timegen('2013-04-04T00:00','60 sec',5)");
+            File f= new File("spectrogram.qds");
+            ssf.format( ds, new FileOutputStream(f),true);
+            readStream(f);
+        } catch (Exception ex) {
+            Logger.getLogger(Test013.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public static void main(String[] args)  {
         try {
 
             testException();
+            
+            testRank2Spectrogram();
             
             MutablePropertyDataSet ds;
             //testBundle();
