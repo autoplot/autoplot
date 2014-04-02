@@ -25,7 +25,7 @@
         to resolve old numbers.
         <p>Bugfixes (2014-03-24):</p>
         <ul>
-            <li>1174: connector properties were not saved to vap file.</li>
+            <li>extraneous messages about can't serialize Level fixed.</li>
             <li>embed data didn't work properly with local files, because of double slashes that matter in zip files.</li>
             <li>improve handling of ephemeris ticks (TCA) when TCA data has gaps by limiting interpolation gaps.</li>
             <li>getPropertyType had Number as the type of SCALE_TYPE, not String.</li>
@@ -34,6 +34,9 @@
             <li>#03B1&semi; prints "xxx" so that its more clear that it should have been #x03B1&semi;
             <li>USER_PROPERTIES from Ascii reader caused crash when FFTPower was looking for Translation property.  Thanks Scott for pointing this out!</li>            
             <li>FileStorageModelNew renamed to FileStorageModel after 7 years...</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>experiment with Jython setOutputParam where output parameters can be better documented.</li>
             <li>1163: CDF editor should show hidden support variable when re-entering the dialog.</li>
             <li>JNLP clean up to avoid extra dialog.  Thanks Andy!</li>
@@ -56,30 +59,6 @@
             <li>rte_0263418513: NetCDF spaces were not handled properly.</li>
             <li>clean up monitors, after seeing axis ephemeris / das2server would sometimes leave monitor hanging</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>allow timeout on eventsRenderer to be adjusted (property under controller node)</li>
-            <li>reset scanRange when axis units are reset.</li>
-            <li>all GUI initialization is done on the event thread, fixing occasional hangs on Linux.</li>
-            <li>unnecessary fold case in local cache completions prevented "Flight" from showing</li>
-            <li>suggestion aggregation code supports 20140216T03</li>
-            <li>sanity checks on generate timeranges limit the number to 1000000 instead of hanging createPngWalk</li>
-            <li>loosen up excessive synchronized block use in DataSourceController that could get hung up needlessly.</li>
-            <li>spaces in NetCDF file names caused problems after check for matlab was installed.  Thanks sspagnol!</li>
-            <li>createEvent doesn't make so many assumptions about the dataset it's appending to.</li>
-            <li>upper case constants in inline data source were always used as property values.  Now only valid property names are treated this way.</li>
-            <li>"scan" buttons renamed "step" buttons in anticipation of events lists</li>
-            <li>George pointed out that slicer popups are offscreen on Windows when window is maximized.</li>
-            <li>Recent startup code changes would occasionally cause hang on Linux when script panel was showing.</li>
-            <li>mon.finished was never called in Das2DataSource, leaving spinner when emphemeris data is loaded.</li>
-            <li>DE CDF data had rank 0 DELTA_PLUS.  This is supported now.</li>
-            <li>Non-time strings got into the time range dialog, causing parse errors.</li>
-            <li>update version in about dialog</li>
-            <li>new code that sorts das2server folders and files would drop nodes. (Thanks Chris!)</li>
-            <li>the vap files don't save the displayTitle property (Thanks Chris!)</li>
-            <li>1157: allow renders to specify if they have autoranged a dimension.</li>
-            <li>file chooser in the resourceURI dialog didn't set the current directory properly.</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>replaceFile dialog improved with pickfile button.</li>
@@ -87,6 +66,9 @@
             <li>AP_WGET, AP_CURL, allowEmbedData added to autoplot_data/config/system.properties</li>
             <li>autoplot.jar launch script allows relative URIs, so "autoplot myfile.cdf" now works from command line.</li>
             <li>autoplot.jar launch script looks for JRE arguments (-J-Xmx4G) and introduces --headless</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>DataSetBuilder checks rank and argument count in one,two,and three argument constructors.</li>
             <li>DataSetBuilder can now take rank 0 datasets and Datums instead of doubles, setUnits added and improved support for bundles.</li>
             <li>open local data file shows .vap files as well.</li>
@@ -95,21 +77,6 @@
             <li>export CDF data allows the cdf variable name to be set explicitly</li>
             <li>step/scan button hidden on axis ends now scans to next available data</li>
             <li>time range tool shows all orbits, not just those around the current time.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>internal rbsp orbits updated to 2014-03-11</li>
-            <li>pngwalk tool GUI shows option for events file</li> 
-            <li>minor tweaks to the aggregation data source editor</li>
-            <li>events list property in the vap.</li>
-            <li>introduce Event List tool for using long events lists to control axes.</li>
-            <li>introduce where support for text files.</li>
-            <li>introduce support for ordinal data in CDFs</li>
-            <li>another round of findbugs</li>            
-            <li>remove use of obsolete classes like DasDie.</li>
-            <li>another round of findbugs (down to 98 from 250+)</li>  
-            <li>improve support for buckshot data in spectrogram rebinners</li>
-            <li>formatDataSet back to ScriptContext in new attempts to clean up security.</li>
         </ul>
 
         <p>Known issues:</p>
