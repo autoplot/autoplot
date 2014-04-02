@@ -11,13 +11,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -391,9 +396,36 @@ public class Test013 {
 
     }
 
+    private static void testException() {
+        try {
+            PrintStream fout= new PrintStream("exception.qds");
+            fout.println("[00]000067<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            fout.println("<stream dataset_id=\"ds_0\"/>");
+            fout.println("[xx]000144<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            fout.println("<exception type=\"NoDataInInterval\" message=\"No data found in interval.  Last data found at 2012-02-01\"/>");
+            fout.close();
+            InputStream in = new FileInputStream("exception.qds");
+            ReadableByteChannel rin= Channels.newChannel(in);
+            QDataSetStreamHandler h= new QDataSetStreamHandler();
+            try {
+                StreamTool.readStream( rin, h );        
+            } catch ( StreamException ex ) {
+                if ( ex.getCause()!=null && ( ex.getCause() instanceof NoDataInIntervalException ) ) {
+                    System.err.println(ex.getCause().getMessage());
+                } else {
+                    ex.printStackTrace();
+                }
+            }
+        } catch ( Exception ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public static void main(String[] args)  {
         try {
 
+            testException();
+            
             MutablePropertyDataSet ds;
             //testBundle();
             //xxx("testBundle");
