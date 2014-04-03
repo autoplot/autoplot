@@ -558,7 +558,7 @@ public class DataSourceController extends DomNodeController {
                 return;
             }
 
-            extractProperties();
+            extractProperties(ds);
 
             doDimensionNames();
 
@@ -956,10 +956,10 @@ public class DataSourceController extends DomNodeController {
      * postconditions:
      *   properties is set.
      */
-    private void extractProperties() {
+    private void extractProperties( QDataSet ds ) {
         Map<String, Object> props; // QDataSet properties.
 
-        props = AutoplotUtil.extractProperties(getDataSet());
+        props = AutoplotUtil.extractProperties( ds );
         DataSource dss= getDataSource();
         if ( dss != null) {
             props = AutoplotUtil.mergeProperties( dss.getProperties(), props );
