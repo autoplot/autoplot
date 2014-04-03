@@ -708,6 +708,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         map.put( INCLSCREEN, form.isAllowScreenshot() );
 
         String report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+        logger.log(Level.FINE, "indexOf arrow= {0}", report.indexOf( (char)8594 ));
         return report;
 
     }
