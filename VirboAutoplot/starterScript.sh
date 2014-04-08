@@ -16,7 +16,10 @@
 # such as "unzip".
 #
 #  -h  --headless   run in headless mode
-#  -Jxxx            pass argument xxx to JRE
+#  -Jxxx            pass argument xxx to JRE (e.g. -J-Xmx4G to get 4 Gig of RAM)
+#
+#  For example:
+#    autoplot -J-Xmx4G
 
 JAVA_ARGS=""
 AP_ARGS=""
