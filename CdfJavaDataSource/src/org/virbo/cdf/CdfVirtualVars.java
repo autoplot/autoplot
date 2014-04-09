@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.Units;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -55,8 +54,10 @@ public class CdfVirtualVars {
         } else if (function.equalsIgnoreCase("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
             QDataSet size=  args.get(1);
             while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
-            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int)size.value(), Ops.FFTFilterType.Hanning);
-            return Ops.fftPower(hanningSet, (int)size.value(), new NullProgressMonitor()); //TODO: these should be redone using fftPower(ds,FFTFilterType.TenPercentCos
+            mon.setProgressMessage("apply Hann window");
+            QDataSet hanningSet = Ops.fftFilter(args.get(0), (int) size.value(), Ops.FFTFilterType.Hanning);
+            mon.setProgressMessage("apply FFT power");
+            return Ops.fftPower(hanningSet, (int)size.value(), mon ); //TODO: these should be redone using fftPower(ds,FFTFilterType.TenPercentCos
         } else if (function.equalsIgnoreCase("fftPowerDelta512")) {
             //introduced to support PlasmaWaveGroup
             QDataSet deltaT = args.get(1);       // time between successive measurements.
