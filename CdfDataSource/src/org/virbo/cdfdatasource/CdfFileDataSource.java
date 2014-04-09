@@ -898,7 +898,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         double dmin=Double.NEGATIVE_INFINITY;
         double dmax=Double.POSITIVE_INFINITY;
-        if ( ds.rank()==1 ) {
+        if ( ds.rank()==1 && ds.length()>0 ) {
             QDataSet range= Ops.extent(ds);
             dmin= uc.convert(range.value(0));
             dmax= uc.convert(range.value(1));
