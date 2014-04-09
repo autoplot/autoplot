@@ -160,6 +160,7 @@ public class VOTableReader {
                     ids.add( id );
                     names.add( name );
                     String dt= attributes.getValue("datatype");
+                    if ( dt==null ) throw new IllegalArgumentException("expected to see datatype in FIELD");
                     String ucd= attributes.getValue("ucd");
                     String sunit= attributes.getValue("unit");
                     String arraysize= attributes.getValue("arraysize");
