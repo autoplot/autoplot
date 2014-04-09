@@ -1060,6 +1060,10 @@ public class CdfUtil {
         try {
             function= cdf.getAttribute("FUNCTION");
         } catch (CDFException e) {
+            try {
+                function= cdf.getAttribute("FUNCT");
+            } catch (CDFException e2) {
+            }
         }
         try {
             varType= cdf.getAttribute("VAR_TYPE");
@@ -1124,7 +1128,7 @@ public class CdfUtil {
             }
 
             boolean isVirtual= false;
-            if ( virtual!=null ) {
+            if ( true || virtual!=null ) {
                 try {
                     Entry entry = virtual.getEntry(var);
                     if ( String.valueOf(entry.getData()).equalsIgnoreCase("TRUE") ) {
