@@ -113,7 +113,12 @@ class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        BufferedImage image = ImageIO.read(DataSetURI.getFile(uri, mon));
+        File ff= DataSetURI.getFile(uri, mon);
+        if ( ff.length()==0 ) {
+            throw new IllegalArgumentException("Image file is empty: "+ff);
+        }
+        
+        BufferedImage image = ImageIO.read(ff);
         //BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
 
         String rot= getParam( "rotate", "0" );
