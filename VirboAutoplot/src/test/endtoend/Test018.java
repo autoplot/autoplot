@@ -241,7 +241,8 @@ public class Test018 {
     public static void main(String[] args) {
 
         boolean exit= true;
-
+        //DasLogger.getLogger(DasLogger.GRAPHICS_LOG).setLevel(Level.ALL);
+        
         try {
 
             if ( exit==false ) {
