@@ -486,9 +486,11 @@ public class CdfUtil {
         int dims;
         if (dimSizes == null) {
             dims = 0;
+            dimSizes= new long[0]; // to simplify code  
         } else {
             dims = dimSizes.length;
         }
+        assert dimSizes!=null;
 
         long[] dimCounts;
         long[] dimIntervals;
@@ -537,10 +539,8 @@ public class CdfUtil {
         }
 
         int recSizeCount= 1;
-        if ( dimSizes!=null ) {
-            for ( int i=0; i<dimSizes.length; i++ ) {
-                recSizeCount*= dimSizes[i];
-            }
+        for ( int i=0; i<dimSizes.length; i++ ) {
+            recSizeCount*= dimSizes[i];
         }
 
         if ( recCount==-1 && recStart>0 && variable.getMaxWrittenRecord()==0 ) { // another kludge for Rockets, where depend was assigned variance
@@ -604,8 +604,6 @@ public class CdfUtil {
         }
         
         WritableDataSet result;
-
-        if ( dims==0 ) dimSizes= new long[0]; // to simplify code
 
         int[] qube;
         if ( recCount==-1 ) {
@@ -969,6 +967,7 @@ public class CdfUtil {
             }
         } catch (CDFException e) {
             //e.printStackTrace();
+            assert bAttr!=null;
             warn.add( "problem with " + bAttr.getName() + ": " + e.getMessage() );
         }
 
@@ -991,6 +990,7 @@ public class CdfUtil {
                 }
             }
         } catch (CDFException e) {
+            assert blAttr!=null;
             warn.add( "problem with " + blAttr.getName() + ": " + e.getMessage() );
         }
         return result;
@@ -1156,213 +1156,208 @@ public class CdfUtil {
                 continue;
             }
 
-            if ( false ) {
-                result.put(var.getName(), null);
-            } else {
-
-                if ( dataOnly && varType!=null ) {
-                    if ( hasEntry( varType, var ) ) {
-                        Entry varTypeEntry= varType.getEntry( var );
-                        if ( !( String.valueOf( varTypeEntry.getData() ).equals( VAR_TYPE_DATA ) ) ) {
-                            continue;
-                        }
+            if ( dataOnly && varType!=null ) {
+                if ( hasEntry( varType, var ) ) {
+                    Entry varTypeEntry= varType.getEntry( var );
+                    if ( !( String.valueOf( varTypeEntry.getData() ).equals( VAR_TYPE_DATA ) ) ) {
+                        continue;
                     }
                 }
+            }
 
-                Variable xDependVariable = null;
-                long xMaxRec = -1;
-                String scatDesc = null;
-                String svarNotes = null;
-                StringBuilder vdescr=null;
+            Variable xDependVariable = null;
+            long xMaxRec = -1;
+            String scatDesc = null;
+            String svarNotes = null;
+            StringBuilder vdescr=null;
 
-                try {
-                    if ( virtual!=null ) {
-                        Entry entry = virtual.getEntry(var);
-                        String satt= String.valueOf(entry.getData());
-                        if ( satt.equalsIgnoreCase("TRUE") ) {
-                            if ( !isVirtual ) { // maybe some virtual functions are not supported.
+            try {
+                if ( virtual!=null ) {
+                    Entry entry = virtual.getEntry(var);
+                    String satt= String.valueOf(entry.getData());
+                    if ( satt.equalsIgnoreCase("TRUE") ) {
+                        if ( !isVirtual ) { // maybe some virtual functions are not supported.
+                            continue;
+                        } else {
+                            logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
+                            String funct= (String)getAttribute( cdf, var, "FUNCTION" );
+                            if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                            if ( !CdfVirtualVars.isSupported(funct) ) {
+                                if ( !funct.startsWith("comp_themis") ) {
+                                    logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                                }
                                 continue;
                             } else {
-                                logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
-                                String funct= (String)getAttribute( cdf, var, "FUNCTION" );
-                                if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
-                                if ( !CdfVirtualVars.isSupported(funct) ) {
-                                    if ( !funct.startsWith("comp_themis") ) {
-                                        logger.log(Level.FINE, "virtual function not supported: {0}", funct);
-                                    }
-                                    continue;
-                                } else {
-                                    vdescr= new StringBuilder( funct );
-                                    vdescr.append( "( " );
-                                    int icomp=0;
-                                    String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
-                                    if ( comp!=null ) {
-                                        vdescr.append( comp );
-                                        icomp++;
-                                    }
-                                    for ( ; icomp<5; icomp++ ) {
-                                        comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
-                                        if ( comp!=null ) {
-                                            vdescr.append( ", ").append( comp );
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                    vdescr.append(" )" );
+                                vdescr= new StringBuilder( funct );
+                                vdescr.append( "( " );
+                                int icomp=0;
+                                String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                if ( comp!=null ) {
+                                    vdescr.append( comp );
+                                    icomp++;
                                 }
-                            }
-                        }
-                        Object att= getAttribute( cdf, var, "VIRTUAL" );
-                        if ( att!=null ) {
-                            logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
-                            if ( String.valueOf(att).equalsIgnoreCase("TRUE") ) {
-                                String funct= (String)getAttribute( cdf, var, "FUNCTION" );
-                                if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
-                                if ( !CdfVirtualVars.isSupported(funct) ) {
-                                    if ( !funct.startsWith("comp_themis") ) {
-                                        logger.log(Level.FINE, "virtual function not supported: {0}", funct);
-                                    }
-                                    continue;
-                                } else {
-                                    vdescr= new StringBuilder( funct );
-                                    vdescr.append( "( " );
-                                    int icomp=0;
-                                    String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                for ( ; icomp<5; icomp++ ) {
+                                    comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
                                     if ( comp!=null ) {
-                                        vdescr.append( comp );
-                                        icomp++;
+                                        vdescr.append( ", ").append( comp );
+                                    } else {
+                                        break;
                                     }
-                                    for ( ; icomp<5; icomp++ ) {
-                                        comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
-                                        if ( comp!=null ) {
-                                            vdescr.append( ", ").append( comp );
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                    vdescr.append(" )" );
                                 }
+                                vdescr.append(" )" );
                             }
                         }
                     }
-                } catch (Exception e) {
-                    logger.log( Level.SEVERE, e.getMessage(), e );
+                    Object att= getAttribute( cdf, var, "VIRTUAL" );
+                    if ( att!=null ) {
+                        logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
+                        if ( String.valueOf(att).equalsIgnoreCase("TRUE") ) {
+                            String funct= (String)getAttribute( cdf, var, "FUNCTION" );
+                            if ( funct==null ) funct= (String) getAttribute( cdf, var, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                            if ( !CdfVirtualVars.isSupported(funct) ) {
+                                if ( !funct.startsWith("comp_themis") ) {
+                                    logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                                }
+                                continue;
+                            } else {
+                                vdescr= new StringBuilder( funct );
+                                vdescr.append( "( " );
+                                int icomp=0;
+                                String comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                if ( comp!=null ) {
+                                    vdescr.append( comp );
+                                    icomp++;
+                                }
+                                for ( ; icomp<5; icomp++ ) {
+                                    comp= (String)getAttribute( cdf, var, "COMPONENT_"+icomp );
+                                    if ( comp!=null ) {
+                                        vdescr.append( ", ").append( comp );
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                vdescr.append(" )" );
+                            }
+                        }
+                    }
                 }
+            } catch (Exception e) {
+                logger.log( Level.SEVERE, e.getMessage(), e );
+            }
 
+            try {
+                if (aAttr != null) {  // check for metadata for DEPEND_0
+                    logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{aAttr.getName(), var.getName()});
+                    Entry xEntry = aAttr.getEntry(var);
+                    xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
+                    xMaxRec = xDependVariable.getMaxWrittenRecord();
+                    if ( xMaxRec!=maxRec && !isVirtual && var.getRecVariance() ) {
+                        if ( maxRec==-1 ) maxRec=0; //why?
+                        warn.add("depend0 length is inconsistent with length ("+(recCount)+")" );
+                        //TODO: warnings are incorrect for Themis data.
+                    }
+                }
+            } catch (CDFException e) {
+                //e.printStackTrace();
+                warn.add( "problem with " + ( aAttr!=null ? aAttr.getName() : "<null>" ) + ": " + e.getMessage() );
+            }
+
+            DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
+
+            DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
+
+            DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
+
+            if (deep) {
                 try {
-                    if (aAttr != null) {  // check for metadata for DEPEND_0
-                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{aAttr.getName(), var.getName()});
-                        Entry xEntry = aAttr.getEntry(var);
-                        xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
-                        xMaxRec = xDependVariable.getMaxWrittenRecord();
-                        if ( xMaxRec!=maxRec && !isVirtual && var.getRecVariance() ) {
-                            if ( maxRec==-1 ) maxRec=0; //why?
-                            warn.add("depend0 length is inconsistent with length ("+(recCount)+")" );
-                            //TODO: warnings are incorrect for Themis data.
+                    if (catDesc != null) {
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{catDesc.getName(), var.getName()});
+                        if ( hasEntry( catDesc, var ) ) {
+                            Entry entry = catDesc.getEntry(var);
+                            scatDesc = String.valueOf(entry.getData());
+                        } else {
+                            scatDesc = "";
+                        }
+                    }
+                    if (varNotes!=null ) {
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{varNotes.getName(), var.getName()});
+                        if ( hasEntry( varNotes, var) ) {
+                            Entry entry = varNotes.getEntry(var);
+                            svarNotes = String.valueOf(entry.getData());
+                        } else {
+                            svarNotes = "";
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
-                    warn.add( "problem with " + ( aAttr!=null ? aAttr.getName() : "<null>" ) + ": " + e.getMessage() );
+                    warn.add( e.getMessage() );
                 }
-
-                DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
-
-                DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
-
-                DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
-
-                if (deep) {
-                    try {
-                        if (catDesc != null) {
-                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{catDesc.getName(), var.getName()});
-                            if ( hasEntry( catDesc, var ) ) {
-                                Entry entry = catDesc.getEntry(var);
-                                scatDesc = String.valueOf(entry.getData());
-                            } else {
-                                scatDesc = "";
-                            }
-                        }
-                        if (varNotes!=null ) {
-                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{varNotes.getName(), var.getName()});
-                            if ( hasEntry( varNotes, var) ) {
-                                Entry entry = varNotes.getEntry(var);
-                                svarNotes = String.valueOf(entry.getData());
-                            } else {
-                                svarNotes = "";
-                            }
-                        }
-                    } catch (CDFException e) {
-                        warn.add( e.getMessage() );
-                    }
-                }
-
-                String desc = "" + var.getName();
-                if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName();
-                    if ( xMaxRec>=0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
-                         desc+= "=" + (xMaxRec + 1);
-                    }
-                    if ( dep1desc.dep != null) {
-                        desc += "," + dep1desc.dep.getName() + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
-                        if ( dep2desc.dep != null) {
-                            desc += "," + dep2desc.dep.getName() + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
-                            if (dep3desc.dep != null) {
-                                desc += "," + dep3desc.dep.getName() + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
-                            }
-                        }
-                    } else if ( rank>1 ) {
-                        desc += ","+DataSourceUtil.strjoin( dims, ",");
-                    }
-                    desc += ")";
-                }
-
-                if (deep) {
-                    StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
-
-                    StringBuilder recDesc= new StringBuilder( CDFUtils.getStringDataType(var) );
-                    if ( dims!=null ) {
-                        recDesc.append("[") .append( DataSourceUtil.strjoin( dims, ",") ).append("]");
-                    }
-                    if (maxRec != xMaxRec)
-                        if ( isVirtual ) {
-                            descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
-                        } else {
-                            descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
-                        }
-                    if (scatDesc != null)
-                        descbuf.append("").append(scatDesc).append("<br>");
-                    if (svarNotes !=null ) {
-                        descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
-                    }
-
-                    //if ( vdescr!=null && vdescr.length()>0 ) {
-                    //    descbuf.append("<br>virtual variable implemented by ").append(vdescr).append("<br>");
-                    //}
-
-                    for ( String s: warn ) {
-                        if ( s.startsWith("NOTE") ) {
-                            descbuf.append("<br>").append(s);
-                        } else {
-                            descbuf.append("<br>WARNING: ").append(s);
-                        }
-                    }
-                    
-                    descbuf.append("</html>");
-                    if ( xDependVariable!=null ) {
-                        dependent.put(var.getName(), descbuf.toString());
-                    } else {
-                        result.put(var.getName(), descbuf.toString());
-                    }
-                } else {
-                    if ( xDependVariable!=null ) {
-                        dependent.put(var.getName(), desc);
-                    } else {
-                        result.put(var.getName(), desc);
-                    }
-                }
-
             }
+
+            String desc = "" + var.getName();
+            if (xDependVariable != null) {
+                desc += "(" + xDependVariable.getName();
+                if ( xMaxRec>=0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                     desc+= "=" + (xMaxRec + 1);
+                }
+                if ( dep1desc.dep != null) {
+                    desc += "," + dep1desc.dep.getName() + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    if ( dep2desc.dep != null) {
+                        desc += "," + dep2desc.dep.getName() + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        if (dep3desc.dep != null) {
+                            desc += "," + dep3desc.dep.getName() + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                        }
+                    }
+                } else if ( rank>1 ) {
+                    desc += ","+DataSourceUtil.strjoin( dims, ",");
+                }
+                desc += ")";
+            }
+
+            if (deep) {
+                StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
+
+                StringBuilder recDesc= new StringBuilder( CDFUtils.getStringDataType(var) );
+                if ( dims!=null ) {
+                    recDesc.append("[") .append( DataSourceUtil.strjoin( dims, ",") ).append("]");
+                }
+                if (maxRec != xMaxRec)
+                    if ( isVirtual ) {
+                        descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
+                    } else {
+                        descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                    }
+                if (scatDesc != null)
+                    descbuf.append("").append(scatDesc).append("<br>");
+                if (svarNotes !=null ) {
+                    descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
+                }
+
+                //if ( vdescr!=null && vdescr.length()>0 ) {
+                //    descbuf.append("<br>virtual variable implemented by ").append(vdescr).append("<br>");
+                //}
+
+                for ( String s: warn ) {
+                    if ( s.startsWith("NOTE") ) {
+                        descbuf.append("<br>").append(s);
+                    } else {
+                        descbuf.append("<br>WARNING: ").append(s);
+                    }
+                }
+
+                descbuf.append("</html>");
+                if ( xDependVariable!=null ) {
+                    dependent.put(var.getName(), descbuf.toString());
+                } else {
+                    result.put(var.getName(), descbuf.toString());
+                }
+            } else {
+                if ( xDependVariable!=null ) {
+                    dependent.put(var.getName(), desc);
+                } else {
+                    result.put(var.getName(), desc);
+                }
+            }
+
         } // for
 
         logger.fine("done, get plottable ");
