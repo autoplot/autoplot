@@ -89,13 +89,17 @@ public class LayoutUtil {
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getColumn() == c && cc.isVisible()) {
                 bounds = cc.getBounds();
-                xmin = Math.min(xmin, bounds.x);
-                xmax = Math.max(xmax, bounds.x + bounds.width);
+                if ( bounds.width>0 ) {
+                    xmin = Math.min(xmin, bounds.x);
+                    xmax = Math.max(xmax, bounds.x + bounds.width);
+                }
             }
             if (cc.getRow() == r && cc.isVisible()) {
                 bounds = cc.getBounds();
-                ymin = Math.min(ymin, bounds.y);
-                ymax = Math.max(ymax, bounds.y + bounds.height);
+                if ( bounds.height>0 ) {
+                    ymin = Math.min(ymin, bounds.y);
+                    ymax = Math.max(ymax, bounds.y + bounds.height);
+                }
             }
         }
 
