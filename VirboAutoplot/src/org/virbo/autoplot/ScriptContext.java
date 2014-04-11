@@ -570,7 +570,7 @@ public class ScriptContext extends PyJavaInstance {
             }
         }
         try {
-            encoder.write((BufferedImage) image, out1);
+            encoder.write( image, out1);
         } catch (IOException ioe) {
         } finally {
             try {
@@ -595,14 +595,14 @@ public class ScriptContext extends PyJavaInstance {
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         
-        Image image = c.getImage(width,height);
+        BufferedImage image = c.getImage(width,height);
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
         encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
         encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() );        
 
-        encoder.write((BufferedImage) image, out);
+        encoder.write( image, out);
 
     }
 
@@ -667,7 +667,7 @@ public class ScriptContext extends PyJavaInstance {
         int height= applicationIn.getCanvases(0).getHeight();
         int width= applicationIn.getCanvases(0).getWidth();
 
-        BufferedImage image= (BufferedImage) appmodel.getCanvas().getImage(width, height);
+        BufferedImage image= appmodel.getCanvas().getImage(width, height);
         
         return image;
     }
@@ -682,7 +682,7 @@ public class ScriptContext extends PyJavaInstance {
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
 
-        BufferedImage image= (BufferedImage)  model.getDocumentModel().getCanvases(0).getController().getDasCanvas().getImage(width, height);
+        BufferedImage image= model.getDocumentModel().getCanvases(0).getController().getDasCanvas().getImage(width, height);
         return image;
     }
     /**
