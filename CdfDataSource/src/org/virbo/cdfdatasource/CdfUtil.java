@@ -1128,7 +1128,7 @@ public class CdfUtil {
             }
 
             boolean isVirtual= false;
-            if ( true || virtual!=null ) {
+            if ( virtual!=null ) {
                 try {
                     Entry entry = virtual.getEntry(var);
                     if ( String.valueOf(entry.getData()).equalsIgnoreCase("TRUE") ) {
